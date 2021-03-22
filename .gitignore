@@ -1,0 +1,30 @@
+## for IDEA
+.idea
+.idea/*
+*.iml
+*.DS_Store
+
+## for maven
+pom.xml.versionsBackup
+iast-core/target/
+iast-inject/target/
+iast-agent/target/
+UnitText/target/
+target/
+
+## for eclipse and vscode
+.classpath
+.project
+.settings
+.factorypath
+
+## for vim
+*.swp
+*.swo
+*.swn
+
+# for iast
+release
+
+# for jenv
+.java-version

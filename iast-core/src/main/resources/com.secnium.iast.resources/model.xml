@@ -1,0 +1,902 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<secnium-data-model>
+    <frameworks>
+        <framework type="HttpRequest" enable="false">
+            <signature
+                    value="javax.servlet.Filter.doFilter(javax.servlet.ServletRequest,javax.servlet.ServletResponse,javax.servlet.FilterChain)"
+                    inherit="true"/>
+            <signature
+                    value="javax.servlet.http.HttpServlet.service(javax.servlet.http.HttpServletRequest,javax.servlet.http.HttpServletResponse)"
+                    inherit="true"/>
+            <signature
+                    value="javax.servlet.jsp.JspPage._jspService(javax.servlet.ServletRequest, javax.servlet.ServletResponse)"
+                    inherit="true"/>
+        </framework>
+    </frameworks>
+    <propagators>
+        <!-- 辅助传播节点：用于辅助java基础类型的传播，避免传播路径过多的问题 -->
+        <propagator type="String" enable="true">
+            <signature inherit="false" source="P1" target="O" value="java.lang.String.&lt;init&gt;(java.lang.String)"/>
+            <signature inherit="false" source="P1" target="O"
+                       value="java.lang.String.&lt;init&gt;(java.lang.StringBuffer)"/>
+            <signature inherit="false" source="P1" target="O"
+                       value="java.lang.String.&lt;init&gt;(java.lang.StringBuilder)"/>
+            <signature inherit="false" source="P1" target="O" value="java.lang.String.&lt;init&gt;(byte[])"/>
+            <signature inherit="false" source="P1" target="O" value="java.lang.String.&lt;init&gt;(byte[],int,int)"/>
+            <signature inherit="false" source="P1" target="O"
+                       value="java.lang.String.&lt;init&gt;(byte[],int,int,int)"/>
+            <signature inherit="false" source="P1" target="O"
+                       value="java.lang.String.&lt;init&gt;(byte[],int,int,java.nio.charset.Charset)"/>
+            <signature inherit="false" source="P1" target="O"
+                       value="java.lang.String.&lt;init&gt;(byte[],int,int,java.lang.String)"/>
+            <signature inherit="false" source="P1" target="O" value="java.lang.String.&lt;init&gt;(char[])"/>
+            <signature inherit="false" source="P1" target="O" value="java.lang.String.&lt;init&gt;(char[],int,int)"/>
+            <signature inherit="false" source="P2" target="O"
+                       value="java.lang.String.replace(java.lang.CharSequence,java.lang.CharSequence)"/>
+            <signature inherit="false" source="O" target="R" value="java.lang.String.toLowerCase(java.util.Locale)"/>
+            <signature inherit="false" source="O" target="R" value="java.lang.String.toUpperCase(java.util.Locale)"/>
+            <signature inherit="false" source="O" target="R" value="java.lang.String.getBytes()"/>
+            <signature inherit="false" source="O" target="R" value="java.lang.String.getBytes(java.lang.String)"/>
+            <signature inherit="false" source="P1" target="R" value="java.lang.String.getBytes(java.nio.charset.Charset)"/>
+            <signature inherit="false" source="O" target="P3" value="java.lang.String.getBytes(int,int,byte[],int)"/>
+            <signature inherit="false" source="O" target="P3" value="java.lang.String.getChars(int,int,char[],int)"/>
+            <signature inherit="false" source="O|P1" target="R" value="java.lang.String.concat(java.lang.String)"/>
+            <signature inherit="false" source="O" target="R" value="java.lang.String.substring(int,int)"/>
+            <signature inherit="false" source="O" target="R" value="java.lang.String.substring(int)"/>
+            <signature inherit="false" source="O" target="R" value="java.lang.String.toCharArray()"/>
+            <signature inherit="false" source="P1" target="O" value="java.lang.String.<init>(char[],int,int,boolean)"/>
+            <signature inherit="false" source="O" target="R" value="java.lang.String.split(java.lang.String)"/>
+            <signature inherit="false" source="O" target="R" value="java.lang.String.split(java.lang.String, int)"/>
+        </propagator>
+
+        <propagator type="StringBuilder" enable="true">
+            <!--<signature inherit="true" source="O,P3" target="R"
+                       value="java.lang.AbstractStringBuilder.replace(int,int,java.lang.String)"/>-->
+            <signature inherit="false" source="O" target="R"
+                       value="java.lang.StringBuilder.replace(int,int,java.lang.String)"/>
+            <signature inherit="false" source="O" target="R"
+                       value="java.lang.StringBuilder.toString()"/>
+            <signature inherit="false" source="P1" target="O" value="java.lang.StringBuilder.<init>(java.lang.String)"/>
+            <signature inherit="false" source="P1" target="O"
+                       value="java.lang.StringBuilder.<init>(java.lang.CharSequence)"/>
+            <signature inherit="false" source="P1" target="O" value="java.lang.StringBuilder.append(java.lang.Object)"/>
+            <signature inherit="false" source="P1" target="O" value="java.lang.StringBuilder.append(java.lang.String)"/>
+            <signature inherit="false" source="P1" target="O"
+                       value="java.lang.StringBuilder.append(java.lang.StringBuffer)"/>
+            <signature inherit="false" source="P1" target="O"
+                       value="java.lang.StringBuilder.append(java.lang.CharSequence)"/>
+            <signature inherit="false" source="P1" target="O"
+                       value="java.lang.StringBuilder.append(java.lang.CharSequence,int,int)"/>
+            <signature inherit="false" source="P1" target="O" value="java.lang.StringBuilder.append(char[],int,int)"/>
+        </propagator>
+
+        <propagator type="List" enable="true">
+            <signature inherit="true" source="P1" target="O" value="java.util.List.<init>(java.util.Collection)"/>
+            <signature inherit="true" source="P2" target="O" value="java.util.List.add(int,java.lang.Object)"/>
+            <signature inherit="true" source="P1" target="O" value="java.util.List.add(java.lang.Object)"/>
+            <signature inherit="true" source="P2" target="P2" value="java.util.List.addAll(int,java.util.Collection)"/>
+            <signature inherit="true" source="P1" target="O" value="java.util.List.addAll(java.util.Collection)"/>
+            <signature inherit="true" source="P2" target="O" value="java.util.List.set(int,java.lang.Object)"/>
+            <signature inherit="true" source="O&amp;R" target="R" value="java.util.List.get(int)"/>
+            <signature inherit="true" source="O" target="R" value="java.util.List.clone()"/>
+            <signature inherit="true" source="O" target="R" value="java.util.List.toArray()"/>
+            <signature inherit="true" source="O" target="R" value="java.util.List.toArray(java.lang.Object[])"/>
+        </propagator>
+
+        <propagator type="Map" enable="true">
+            <signature inherit="true" value="java.util.Map.get(java.lang.Object)" source="O&amp;R" target="R"/>
+            <signature inherit="true" value="java.util.Map.getOrDefault(java.lang.Object,java.lang.Object)" source="O&amp;R" target="R"/>
+            <signature inherit="true" value="java.util.Map.put(java.lang.Object,java.lang.Object)" source="P1,2" target="O"/>
+            <signature inherit="true" value="java.util.Map.putAll(java.util.Map)" source="P1" target="O"/>
+            <signature inherit="true" value="java.util.Map.putIfAbsent(java.lang.Object,java.lang.Object)" source="P1,2" target="O"/>
+            <!-- JDK 1.8 map增加forEach方法，参数可为匿名函数 -->
+<!--            <signature inherit="all" value="java.util.Map.forEach(java.util.function.BiConsumer)" source="O" target="P1"/>-->
+        </propagator>
+
+        <propagator type="Enumeration" enable="true">
+            <signature inherit="true" value="java.util.Enumeration.nextElement()" source="O" target="R"/>
+        </propagator>
+
+        <propagator type="io" enable="true">
+            <signature inherit="false" value="java.net.Socket.&lt;init&gt;(java.lang.String,int)" source="P1"
+                       target="O"/>
+            <signature inherit="false" value="java.net.Socket.getOutputStream()" source="O" target="R"/>
+            <signature inherit="false" value="java.io.BufferedReader.&lt;init&gt;(java.io.Reader)" source="P1"
+                       target="O"/>
+            <signature inherit="false" value="java.io.BufferedReader.&lt;init&gt;(java.io.Reader,int)" source="P1"
+                       target="O"/>
+            <signature inherit="false" value="java.io.BufferedReader.&lt;init&gt;(java.io.FileReader)" source="P1"
+                       target="O"/>
+            <signature inherit="false" value="java.io.BufferedReader.&lt;init&gt;(java.io.InputStreamReader)"
+                       source="P1" target="O"/>
+            <signature inherit="false" value="java.io.BufferedReader.readLine()" source="O" target="R"/>
+            <signature inherit="false" value="java.io.InputStreamReader.&lt;init&gt;(java.io.InputStream)" source="P1"
+                       target="O"/>
+            <signature inherit="false" value="java.io.InputStreamReader.&lt;init&gt;(java.io.InputStream,java.nio.charset.Charset)"
+                       source="P1" target="O"/>
+            <signature inherit="false" value="java.io.StringReader.&lt;init&gt;(java.lang.String)" source="P1"
+                       target="O"/>
+            <signature inherit="false" value="java.io.FileInputStream.&lt;init&gt;(java.io.File)" source="P1"
+                       target="O"/>
+            <signature inherit="false" value="java.io.FileInputStream.&lt;init&gt;(java.lang.String)" source="P1" target="O"/>
+            <signature inherit="false" value="java.io.InputStreamReader.&lt;init&gt;(java.io.InputStream)" source="P1"
+                       target="O"/>
+            <signature inherit="false" value="java.io.FileReader.&lt;init&gt;(java.io.File)" source="P1" target="O"/>
+            <signature inherit="false" value="java.io.InputStreamReader.read(char[],int,int)" source="O" target="P1"/>
+            <signature inherit="false" value="java.io.ByteArrayInputStream.&lt;init&gt;(byte[])" source="P1" target="O"/>
+            <signature inherit="false" value="java.io.ByteArrayInputStream.&lt;init&gt;(byte[],int,int)" source="P1" target="O"/>
+            <signature inherit="false" value="java.io.InputStream.read(byte[],int,int)" source="O" target="P1"/>
+            <signature inherit="false" value="java.io.PushbackInputStream.&lt;init&gt;(java.io.InputStream,int)"
+                       source="P1" target="O"/>
+            <signature inherit="false" value="java.io.InputStream.&lt;init&gt;(java.io.InputStream)" source="P1"
+                       target="O"/>
+            <signature inherit="all" value="java.io.ObjectInputStream.&lt;init&gt;(java.io.InputStream)" source="P1" target="O"/>
+            <signature inherit="false" value="java.io.CharArrayReader.&lt;init&gt;(char[])" source="P1" target="O"/>
+            <signature inherit="false" value="java.io.CharArrayReader.&lt;init&gt;(char[],int,int)" source="P1"
+                       target="O"/>
+            <signature inherit="false" value="java.io.CharArrayReader.read(char[],int,int)" source="O" target="P1"/>
+            <signature inherit="false" value="java.io.ByteArrayOutputStream.write(byte[],int,int)" source="P1"
+                       target="O"/>
+            <signature inherit="false" value="java.io.ByteArrayOutputStream.toByteArray()" source="P1" target="O"/>
+            <signature inherit="false" value="java.io.ByteArrayOutputStream.reset()" source="O" target="O"/>
+        </propagator>
+
+        <propagator type="URI" enable="true">
+            <signature inherit="false" value="java.net.URI.&lt;init&gt;(java.lang.String)" source="P1" target="O"/>
+            <signature inherit="false"
+                       value="java.net.URI.&lt;init&gt;(java.lang.String,java.lang.String,java.lang.String)"
+                       source="P1,2,3" target="O"/>
+            <signature inherit="false"
+                       value="java.net.URI.&lt;init&gt;(java.lang.String,java.lang.String,java.lang.String,java.lang.String,java.lang.String)"
+                       source="P2,3,4,5" target="O"/>
+            <signature inherit="false" value="java.net.URI.toURL()" source="O" target="R"/>
+            <signature inherit="false"
+                       value="org.apache.commons.httpclient.URI.parseUriReference(java.lang.String, boolean)"
+                       source="P1" target="O"/>
+        </propagator>
+
+        <propagator type="URL" enable="true">
+            <signature inherit="false" value="java.net.URL.&lt;init&gt;(java.lang.String)" source="P1" target="O"/>
+            <signature inherit="false"
+                       value="java.net.URL.&lt;init&gt;(java.lang.String,java.lang.String,int,java.lang.String)"
+                       source="P1,2,4" target="O"/>
+            <signature inherit="false"
+                       value="java.net.URL.&lt;init&gt;(java.lang.String,java.lang.String,int,java.lang.String,java.net.URLStreamHandler)"
+                       source="P1,2,4" target="O"/>
+            <signature inherit="false"
+                       value="java.net.URL.&lt;init&gt;(java.lang.String,java.lang.String,java.lang.String)"
+                       source="P1,2,3" target="O"/>
+            <signature inherit="false"
+                       value="java.net.URL.&lt;init&gt;(java.net.URL,java.lang.String)"
+                       source="P1,2" target="O"/>
+        </propagator>
+
+        <propagator type="URLDecoder" enable="true">
+            <signature inherit="false" value="java.net.URLDecoder.decode(java.lang.String,java.lang.String)" source="P1"
+                       target="R"/>
+        </propagator>
+
+        <propagator type="RequestFacade" enable="false">
+            <signature inherit="true" value="javax.servlet.ServletRequest.getParameterNames()"
+                       source="O" target="R"/>
+            <signature inherit="true"
+                       value="javax.servlet.ServletRequest.getParameterValues(java.lang.String)"
+                       source="O" target="R"/>
+        </propagator>
+
+        <propagator type="Cookie" enable="true">
+            <signature inherit="false" value="javax.servlet.http.Cookie.getValue()" source="O" target="R"/>
+            <signature inherit="false" value="javax.servlet.http.Cookie.<init>(java.lang.String,java.lang.String)" source="P1,2" target="O"/>
+        </propagator>
+
+        <propagator type="ProcessBuilder" enable="true">
+            <signature inherit="false" value="java.lang.ProcessBuilder.command(java.lang.String[])" source="P1"
+                       target="O"/>
+            <signature inherit="false" value="java.lang.ProcessBuilder.command(java.util.List)" source="P1" target="O"/>
+            <signature inherit="false" value="java.lang.ProcessBuilder.<init>(java.lang.String[])" source="P1"
+                       target="O"/>
+            <signature inherit="false" value="java.lang.ProcessBuilder.<init>(java.util.List)" source="P1"
+                       target="O"/>
+        </propagator>
+
+        <propagator type="base64-dec" enable="true">
+            <signature inherit="false" value="java.util.Base64$Decoder.decode(byte[])" source="P1" target="R"/>
+            <signature inherit="false" value="java.util.Base64$Decoder.decode(java.lang.String)" source="P1" target="R"/>
+            <signature inherit="false" value="java.util.Base64$Decoder.decode(java.nio.ByteBuffer)" source="P1"
+                       target="R"/>
+            <signature inherit="false" value="java.util.Base64$Decoder.decode(byte[],byte[])" source="P1" target="P2"/>
+            <signature inherit="true" value="org.apache.commons.codec.binary.Base64.decodeBase64(java.lang.String)"
+                       source="P1" target="R"/>
+            <signature inherit="true" value="org.apache.commons.codec.binary.Base64.decodeBase64(byte[])" source="P1"
+                       target="R"/>
+            <signature inherit="true" value="org.apache.commons.codec.binary.Base64.decodeInteger(byte[])" source="P1"
+                       target="R"/>
+            <signature inherit="true" value="org.apache.commons.codec.binary.BaseNCodec.decode(java.lang.Object)"
+                       source="P1" target="R"/>
+            <signature inherit="true" value="org.apache.commons.codec.binary.BaseNCodec.decode(byte[])" source="P1"
+                       target="R"/>
+            <signature inherit="true" value="org.apache.commons.codec.binary.BaseNCodec.decode(java.lang.String)"
+                       source="P1" target="R"/>
+            <signature inherit="true"
+                       value="org.apache.commons.codec.binary.Base64.decode(byte[],int,int,org.apache.commons.codec.binary.BaseNCodec$Context)"
+                       source="P1" target="R"/>
+        </propagator>
+
+        <propagator type="base64-enc" enable="true">
+            <signature inherit="false" value="java.util.Base64$Encoder.encode(byte[])" source="P1" target="R"/>
+            <signature inherit="false" value="java.util.Base64$Encoder.encodeToString(byte[])" source="P1" target="R"/>
+            <signature inherit="false" value="java.util.Base64$Encoder.encode(java.nio.ByteBuffer)" source="P1"
+                       target="R"/>
+            <signature inherit="false" value="java.util.Base64$Encoder.encode(byte[],byte[])" source="P1" target="P2"/>
+            <signature inherit="true" value="org.apache.commons.codec.binary.BaseNCodec.encode(byte[])" source="P1"
+                       target="R"/>
+            <signature inherit="true" value="org.apache.commons.codec.binary.BaseNCodec.encode(byte[],int,int)"
+                       source="P1" target="R"/>
+            <signature inherit="true" value="org.apache.commons.codec.binary.BaseNCodec.encode(java.lang.Object)"
+                       source="P1" target="R"/>
+            <signature inherit="true" value="org.apache.commons.codec.binary.BaseNCodec.encodeAsString(byte[])"
+                       source="P1" target="R"/>
+            <signature inherit="true" value="org.apache.commons.codec.binary.BaseNCodec.encodeToString(byte[])"
+                       source="P1" target="R"/>
+            <signature inherit="true" value="org.apache.commons.codec.binary.Base64.encodeBase64(byte[])"
+                       source="P1" target="R"/>
+            <signature inherit="true" value="org.apache.commons.codec.binary.Base64.encodeBase64(byte[],boolean)"
+                       source="P1" target="R"/>
+            <signature inherit="true"
+                       value="org.apache.commons.codec.binary.Base64.encodeBase64(byte[],boolean,boolean)" source="P1"
+                       target="R"/>
+            <signature inherit="true"
+                       value="org.apache.commons.codec.binary.Base64.encodeBase64(byte[],boolean,boolean,int)"
+                       source="P1" target="R"/>
+        </propagator>
+
+        <propagator type="owasp-esapi" enable="true">
+            <signature inherit="true" source="P1" target="R"
+                       value="org.owasp.esapi.reference.DefaultEncoder.encodeForHTML(java.lang.String)"/>
+            <!--<signature inherit="true" source="P1" target="R" value=""/>-->
+        </propagator>
+
+        <propagator type="apache-filter" enable="true">
+            <signature inherit="false" source="P1" target="R"
+                       value="org.apache.commons.lang.StringEscapeUtils.escapeHtml(java.lang.String)"/>
+            <signature inherit="false" source="P2" target="R"
+                       value="org.apache.commons.lang.StringEscapeUtils.escapeHtml(java.io.Writer,java.lang.String)"/>
+        </propagator>
+
+        <propagator type="javax" enable="true">
+            <signature inherit="false" value="javax.xml.transform.stream.StreamSource.&lt;init&gt;(java.io.File)"
+                       source="P1" target="O"/>
+            <signature inherit="false" value="javax.xml.transform.stream.StreamSource.&lt;init&gt;(java.io.Reader)"
+                       source="P1" target="O"/>
+            <signature inherit="false"
+                       value="javax.xml.transform.stream.StreamSource.&lt;init&gt;(java.io.Reader,java.lang.String)"
+                       source="P1" target="O"/>
+            <signature inherit="false" value="javax.xml.transform.stream.StreamSource.&lt;init&gt;(java.io.InputStream)"
+                       source="P1" target="O"/>
+            <signature inherit="false"
+                       value="javax.xml.transform.stream.StreamSource.&lt;init&gt;(java.io.InputStream,java.lang.String)"
+                       source="P1" target="O"/>
+            <signature inherit="false" value="javax.xml.stream.XMLInputFactory.createXMLStreamReader(java.io.Reader)"
+                       source="P1" target="R"/>
+            <signature inherit="false" value="javax.xml.stream.XMLInputFactory.createXMLStreamReader(javax.xml.transform.Source)" source="P1" target="R"/>
+            <signature inherit="false" value="javax.xml.stream.XMLInputFactory.createXMLStreamReader(java.io.InputStream)" source="P1" target="R"/>
+            <signature inherit="false" value="javax.xml.stream.XMLInputFactory.createXMLStreamReader(java.io.InputStream,java.lang.String)" source="P1" target="R"/>
+            <signature inherit="false" value="javax.xml.stream.XMLInputFactory.createXMLStreamReader(java.lang.String,java.io.InputStream)" source="P2" target="R"/>
+            <signature inherit="false" value="javax.xml.stream.XMLInputFactory.createXMLStreamReader(java.lang.String,java.io.Reader)" source="P2" target="R"/>
+            <signature inherit="false" value="javax.xml.bind.Unmarshaller.unmarshal(java.io.Reader)" source="P1"
+                       target="R"/>
+            <signature inherit="false" value="javax.xml.bind.Unmarshaller.unmarshal(java.io.InputStream)" source="P1"
+                       target="R"/>
+            <signature inherit="false" value="javax.xml.bind.Unmarshaller.unmarshal(org.xml.sax.InputSource)"
+                       source="P1" target="R"/>
+            <signature inherit="false" value="javax.xml.bind.Unmarshaller.unmarshal(javax.xml.transform.Source)"
+                       source="P1" target="R"/>
+            <signature inherit="false"
+                       value="javax.xml.bind.Unmarshaller.unmarshal(javax.xml.transform.Source,java.lang.Class)"
+                       source="P1" target="R"/>
+            <signature inherit="false" value="javax.xml.bind.JAXBElement.getValue()" source="O" target="R"/>
+            <signature inherit="false" value="javax.xml.transform.sax.SAXSource.&lt;init&gt;(org.xml.sax.InputSource)"
+                       source="P1" target="O"/>
+            <signature inherit="false"
+                       value="javax.xml.transform.sax.SAXSource.&lt;init&gt;(org.xml.sax.XMLReader,org.xml.sax.InputSource)"
+                       source="P2" target="O"/>
+            <signature inherit="false" value="javax.xml.transform.sax.SAXSource.setInputSource(org.xml.sax.InputSource)"
+                       source="P1" target="O"/>
+        </propagator>
+
+        <propagator type="xml.sax" enable="true">
+            <signature inherit="false" value="org.xml.sax.InputSource.&lt;init&gt;(java.lang.String)" source="P1"
+                       target="O"/>
+            <signature inherit="false" value="org.xml.sax.InputSource.&lt;init&gt;(java.io.InputStream)" source="P1"
+                       target="O"/>
+            <signature inherit="false" value="org.xml.sax.InputSource.&lt;init&gt;(java.io.Reader)" source="P1"
+                       target="O"/>
+            <signature inherit="false" value="org.xml.sax.InputSource.setCharacterStream(java.io.Reader)" source="P1"
+                       target="O"/>
+            <signature inherit="false" value="org.xml.sax.InputSource.getCharacterStream()" source="O" target="R"/>
+            <signature inherit="false" value="org.xml.sax.InputSource.setByteStream(java.io.InputStream)" source="P1"
+                       target="O"/>
+            <signature inherit="false" value="org.xml.sax.InputSource.getByteStream()" source="O" target="R"/>
+            <signature inherit="false" value="org.xml.sax.InputSource.setSystemId(java.lang.String" source="P1"
+                       target="O"/>
+            <signature inherit="false" value="org.xml.sax.InputSource.getSystemId()" source="O" target="R"/>
+        </propagator>
+
+        <propagator type="spring" enable="true">
+            <signature inherit="false" source="P1" target="R"
+                       value="org.springframework.web.util.HtmlUtils.htmlEscape(java.lang.String)"/>
+            <signature inherit="false" source="P1,2,3,4" target="R"
+                       value="org.springframework.cloud.config.server.resource.ResourceController.retrieve(java.lang.String,java.lang.String,java.lang.String,java.lang.String,boolean)"/>
+            <signature inherit="false" source="P1,2,3,4" target="R"
+                       value="org.springframework.cloud.config.server.resource.GenericResourceRepository.findOne(java.lang.String,java.lang.String,java.lang.String,java.lang.String)"/>
+            <signature inherit="false" source="P1,2,3" target="R"
+                       value="org.springframework.cloud.config.server.environment.MultipleJGitEnvironmentRepository.getLocations(java.lang.String,java.lang.String,java.lang.String)"/>
+        </propagator>
+
+        <propagator type="httpclient" enable="true">
+            <signature inherit="true" source="P1" target="O" value="org.apache.hc.core5.http.message.BasicHttpRequest.setUri(java.net.URI)"/>
+            <signature inherit="true" source="P1" target="O" value="org.apache.hc.core.http.message.BasicHttpRequest.setUri(java.net.URI)"/>
+        </propagator>
+
+        <propagator type="httpclient5" enable="true">
+            <signature inherit="false" source="P1" target="O" value="org.apache.hc.client5.http.classic.methods.HttpGet.&lt;init&gt;(java.lang.String)"/>
+            <signature inherit="false" source="P1" target="O" value="org.apache.hc.client5.http.classic.methods.HttpGet.&lt;init&gt;(java.net.URI)"/>
+            <signature inherit="false" source="P1" target="O" value="org.apache.hc.core5.http.HttpHost.&lt;init&gt;(java.lang.String,int)"/>
+            <signature inherit="false" source="P1" target="O" value="org.apache.hc.core5.http.HttpHost.&lt;init&gt;(java.lang.String,java.lang.String)"/>
+        </propagator>
+
+        <propagator type="okhttp"  enable="true">
+            <signature inherit="false" source="O" target="R" value="com.squareup.okhttp.Request$Builder.build()"/>
+            <signature inherit="false" source="P1" target="R" value="com.squareup.okhttp.Request$Builder.url(com.squareup.okhttp.HttpUrl)"/>
+            <signature inherit="false" source="P1" target="R" value="com.squareup.okhttp.HttpUrl.parse(java.lang.String)"/>
+            <signature inherit="false" source="P1" target="R" value="com.squareup.okhttp.OkHttpClient.newCall(com.squareup.okhttp.Request)"/>
+        </propagator>
+
+        <propagator type="okhttp3"  enable="true">
+            <signature inherit="false" source="O" target="R" value="okhttp3.Request$Builder.build()"/>
+            <signature inherit="false" source="P1" target="R" value="okhttp3.Request$Builder.url(okhttp3.HttpUrl)"/>
+            <signature inherit="false" source="P1" target="R" value="okhttp3.HttpUrl.get(java.lang.String)"/>
+            <signature inherit="true" source="P1" target="R" value="okhttp3.Call$Factory.newCall(okhttp3.Request)"/>
+        </propagator>
+
+        <propagator type="spel" enable="true">
+            <signature inherit="true" source="P1" target="R" value="org.springframework.expression.ExpressionParser.parseExpression(java.lang.String,org.springframework.expression.ParserContext)"/>
+            <signature inherit="true" source="P1" target="R" value="org.springframework.expression.ExpressionParser.parseExpression(java.lang.String)"/>
+        </propagator>
+
+        <propagator type="ognl" enable="true">
+            <signature inherit="true" source="P1" target="R" value="ognl.Ognl.parseExpression(java.lang.String)"/>
+            <signature inherit="false" source="P1" target="O" value="ognl.OgnlParser.&lt;init&gt;(java.io.Reader)"/>
+            <signature inherit="false" source="P1" target="O" value="ognl.OgnlParser.&lt;init&gt;(java.io.InputStream)"/>
+            <signature inherit="false" source="P1" target="O" value="ognl.OgnlParser.&lt;init&gt;(ognl.OgnlParserTokenManager)"/>
+            <signature inherit="false" source="O" target="R" value="ognl.OgnlParser.topLevelExpression()"/>
+        </propagator>
+
+<!--        <propagator type="xml-input-source" enable="true">-->
+<!--            <signature inherit="false" source="P1" target="O" value="com.sun.org.apache.xerces.internal.xni.parser.XMLInputSource.&lt;init&gt;(com.sun.org.apache.xerces.internal.xni.XMLResourceIdentifier"/>-->
+<!--            <signature inherit="false" source="P3" target="O" value="com.sun.org.apache.xerces.internal.xni.parser.XMLInputSource.&lt;init&gt;(java.lang.String,java.lang.String,java.lang.String"/>-->
+<!--            <signature inherit="false" source="P4" target="O" value="com.sun.org.apache.xerces.internal.xni.parser.XMLInputSource.&lt;init&gt;(java.lang.String,java.lang.String,java.lang.String,java.io.InputStream,java.lang.String"/>-->
+<!--        </propagator>-->
+
+        <propagator type="lambda-function" enable="true">
+            <signature inherit="true" source="O" target="P1" value="java.util.function.BiConsumer.accept(java.lang.Object,java.lang.Object"/>
+        </propagator>
+
+        <propagator type="servelt-stream" enable="true">
+            <signature inherit="false" source="O" target="P1" value="org.apache.catalina.connector.CoyoteInputStream.read(byte[])"/>
+            <signature inherit="false" source="O" target="P1" value="org.apache.catalina.connector.CoyoteInputStream.read(byte[],int,int)"/>
+            <signature inherit="false" source="O" target="P1" value="org.apache.catalina.connector.CoyoteInputStream.read(java.nio.ByteBuffer)"/>
+        </propagator>
+
+        <propagator type="jdbc" enable="true">
+            <signature inherit="true" source="P1" target="O" value="java.sql.Connection.nativeSQL(java.lang.String)"/>
+        </propagator>
+
+    </propagators>
+    <sinks>
+        <sink type="smtp-injection" enable="true" level="high">
+            <signature inherit="all" track="true" position="P1"
+                       value="javax.mail.Message.setFrom(javax.mail.Address)"/>
+            <signature inherit="all" track="true" position="P1,2" value="javax.mail.Message.setHeader(java.lang.String,java.lang.String)"/>
+            <signature inherit="all" track="true" position="P2"
+                       value="javax.mail.Message.setRecipient(javax.mail.Message.RecipientType,javax.mail.Address)"/>
+            <signature inherit="all" track="true" position="P2"
+                       value="javax.mail.internet.MimeMessage.setRecipients(javax.mail.Message.RecipientType,java.lang.String)"/>
+            <signature inherit="all" track="true" position="P1"
+                       value="javax.mail.Message.setSubject(java.lang.String)"/>
+            <signature inherit="all" track="true" position="P1"
+                       value="javax.mail.internet.MimeMessage.setSubject(java.lang.String,java.lang.String)"/>
+            <signature inherit="all" track="true" position="P1"
+                       value="javax.mail.Part.setText(java.lang.String)"/>
+            <signature inherit="all" track="true" position="P2"
+                       value="javax.mail.internet.MimeBodyPart.setText(javax.mail.internet.MimePart,java.lang.String,java.lang.String,java.lang.String)"/>
+            <signature inherit="all" track="true" position="P1,2" value="javax.mail.internet.InternetHeaders.setHeader(java.lang.String,java.lang.String)"/>
+            <signature inherit="all" track="true" position="P1,2"
+                       value="javax.mail.internet.InternetHeaders.addHeader(java.lang.String,java.lang.String)"/>
+            <signature inherit="all" track="true" position="P1"
+                       value="javax.mail.internet.InternetHeaders.addHeaderLine(java.lang.String)"/>
+        </sink>
+
+        <sink type="ssrf" level="high" enable="true">
+            <signature inherit="all" track="true" position="O" value="java.net.URL.openConnection()"/>
+            <signature inherit="all" track="true" position="O" value="java.net.URL.openConnection(java.net.Proxy)"/>
+            <signature inherit="all" track="true" position="P1" value="org.apache.http.client.methods.HttpRequestBase.setURI(java.net.URI)"/>
+            <signature inherit="all" track="true" position="P1" value="org.apache.commons.httpclient.HttpMethodBase.&lt;init&gt;(java.lang.String)"/>
+            <signature inherit="all" track="true" position="P1" value="org.apache.commons.httpclient.HttpMethodBase.setURI(java.net.URI)"/>
+            <signature inherit="all" track="true" position="P2" value="org.apache.hc.client5.http.impl.classic.CloseableHttpClient.doExecute(org.apache.hc.core5.http.HttpHost,org.apache.hc.core5.http.ClassicHttpRequest,org.apache.hc.core5.http.protocol.HttpContext)"/>
+            <signature inherit="false" track="true" position="O" value="com.squareup.okhttp.Call.execute()"/>
+            <signature inherit="false" track="true" position="O" value="com.squareup.okhttp.Call.enqueue(com.squareup.okhttp.Callback)"/>
+            <signature inherit="all" track="true" position="O" value="okhttp3.Call.execute()"/>
+            <signature inherit="all" track="true" position="O" value="okhttp3.Call.enqueue(okhttp3.Callback)"/>
+        </sink>
+
+        <sink type="unsafe-xml-decode" level="high" enable="true">
+            <signature inherit="all" track="true" position="P1" value="java.beans.XMLDecoder.&lt;init&gt;(org.xml.sax.InputSource)"/>
+            <signature inherit="all" track="true" position="P1" value="java.beans.XMLDecoder.&lt;init&gt;(java.io.InputStream)"/>
+            <signature inherit="all" track="true" position="P1" value="java.beans.XMLDecoder.&lt;init&gt;(java.io.InputStream,java.lang.Object)"/>
+            <signature inherit="all" track="true" position="P1" value="java.beans.XMLDecoder.&lt;init&gt;(java.io.InputStream,java.lang.Object,java.beans.ExceptionListener)"/>
+        </sink>
+
+        <sink type="cmd-injection" level="high" enable="true">
+            <signature inherit="false" track="true" position="P1,2"
+                       value="java.lang.ProcessImpl.start(java.lang.String[],java.util.Map,java.lang.String,java.lang.ProcessBuilder$Redirect[],boolean)"/>
+            <signature inherit="false" track="true" position="O"
+                       value="java.lang.ProcessBuilder.start()"/>
+            <signature inherit="false" track="true" position="P1,2"
+                       value="java.lang.Runtime.exec(java.lang.String[],java.lang.String[])"/>
+            <signature inherit="false" track="true" position="P1"
+                       value="java.lang.Runtime.exec(java.lang.String[])"/>
+            <signature inherit="false" track="true" position="P1"
+                       value="java.lang.Runtime.exec(java.lang.String)"/>
+            <signature inherit="false" track="true" position="P1,2"
+                       value="java.lang.Runtime.exec(java.lang.String[],java.lang.String[],java.io.File)"/>
+            <signature inherit="false" track="true" position="P1,2"
+                       value="java.lang.Runtime.exec(java.lang.String,java.lang.String[],java.io.File)"/>
+            <signature inherit="false" track="true" position="P1,2"
+                       value="java.lang.Runtime.exec(java.lang.String,java.lang.String[])"/>
+        </sink>
+
+        <sink type="sql-injection" level="high" enable="true">
+            <signature inherit="true" track="true" position="P1" value="java.sql.Statement.addBatch(java.lang.String)"/>
+            <signature inherit="true" track="true" position="P1" value="java.sql.Statement.execute(java.lang.String)"/>
+            <signature inherit="true" track="true" position="P1" value="java.sql.Statement.execute(java.lang.String,int)"/>
+            <signature inherit="true" track="true" position="P1" value="java.sql.Statement.execute(java.lang.String,int[])"/>
+            <signature inherit="true" track="true" position="P1" value="java.sql.Statement.execute(java.lang.String,java.lang.String[])"/>
+            <signature inherit="true" track="true" position="P1" value="java.sql.Statement.executeQuery(java.lang.String)"/>
+            <signature inherit="true" track="true" position="P1" value="java.sql.Statement.executeUpdate(java.lang.String)"/>
+            <signature inherit="true" track="true" position="P1" value="java.sql.Statement.executeUpdate(java.lang.String,int)"/>
+            <signature inherit="true" track="true" position="P1" value="java.sql.Statement.executeUpdate(java.lang.String,int[])"/>
+            <signature inherit="true" track="true" position="P1" value="java.sql.Statement.executeUpdate(java.lang.String,java.lang.String[])"/>
+            <signature inherit="true" track="true" position="P1" value="java.sql.Connection.prepareCall(java.lang.String)"/>
+            <signature inherit="true" track="true" position="P1" value="java.sql.Connection.prepareCall(java.lang.String,int,int)"/>
+            <signature inherit="true" track="true" position="P1" value="java.sql.Connection.prepareCall(java.lang.String,int,int,int)"/>
+            <signature inherit="true" track="true" position="P1" value="java.sql.Connection.prepareStatement(java.lang.String)"/>
+            <signature inherit="true" track="true" position="P1" value="java.sql.Connection.prepareStatement(java.lang.String,int)"/>
+            <signature inherit="true" track="true" position="P1" value="java.sql.Connection.prepareStatement(java.lang.String,int,int)"/>
+            <signature inherit="true" track="true" position="P1" value="java.sql.Connection.prepareStatement(java.lang.String,int,int,int)"/>
+            <signature inherit="true" track="true" position="P1" value="java.sql.Connection.prepareStatement(java.lang.String,int[])"/>
+            <signature inherit="true" track="true" position="P1" value="java.sql.Connection.prepareStatement(java.lang.String,java.lang.String[])"/>
+        </sink>
+
+        <sink type="ldap-injection" level="high" enable="true">
+            <signature inherit="all" track="true" position="P2"
+                       value="javax.naming.directory.DirContext.search(java.lang.String,java.lang.String,java.lang.Object[],javax.naming.directory.SearchControls)"/>
+            <signature inherit="all" track="true" position="P2"
+                       value="javax.naming.directory.DirContext.search(java.lang.String,java.lang.String,javax.naming.directory.SearchControls)"/>
+            <signature inherit="all" track="true" position="P2"
+                       value="javax.naming.directory.DirContext.search(java.lang.String,java.lang.String,javax.naming.directory.SearchControls"/>
+            <signature inherit="all" track="true" position="P2"
+                       value="javax.naming.directory.InitialDirContext.search(java.lang.String,java.lang.String,java.lang.Object[],javax.naming.directory.SearchControls)"/>
+            <signature inherit="all" track="true" position="P2"
+                       value="javax.naming.directory.InitialDirContext.search(java.lang.String,java.lang.String,javax.naming.directory.SearchControls)"/>
+            <signature inherit="all" track="true" position="P2"
+                       value="javax.naming.directory.InitialDirContext.search(java.lang.String,java.lang.String,javax.naming.directory.SearchControls"/>
+        </sink>
+
+        <sink type="xpath-injection" enable="true">
+            <signature inherit="all" track="true" position="P1"
+                       value="javax.xml.xpath.XPath.compile(java.lang.String)"/>
+            <signature inherit="all" track="true" position="P1"
+                       value="javax.xml.xpath.XPath.evaluate(java.lang.String,org.xml.sax.InputSource)"/>
+            <signature inherit="all" track="true" position="P1"
+                       value="javax.xml.xpath.XPath.evaluate(java.lang.String,org.xml.sax.InputSource,javax.xml.namespace.QName)"/>
+            <signature inherit="all" track="true" position="P1" value="javax.xml.xpath.XPath.evaluate(java.lang.String,java.lang.Object)"/>
+            <signature inherit="all" track="true" position="P1" value="javax.xml.xpath.XPath.evaluate(java.lang.String,java.lang.Object,javax.xml.namespace.QName)"/>
+            <signature inherit="all" track="true" position="P2" value="javax.xml.xpath.XPath.eval(org.w3c.dom.Node,java.lang.String)"/>
+            <signature inherit="all" track="true" position="P2" value="org.apache.xpath.XPathAPI.eval(org.w3c.dom.Node,java.lang.String)"/>
+            <signature inherit="all" track="true" position="P2" value="org.apache.xpath.XPathAPI.eval(org.w3c.dom.Node,java.lang.String,org.w3c.dom.Node)"/>
+            <signature inherit="all" track="true" position="P2" value="org.apache.xpath.XPathAPI.eval(org.w3c.dom.Node,java.lang.String,org.apache.xml.utils.PrefixResolver)"/>
+            <signature inherit="all" track="true" position="P1" value="net.sf.saxon.s9api.XPathCompiler.compile(java.lang.String)"/>
+            <signature inherit="all" track="true" position="P1" value="com.sun.org.apache.xpath.internal.jaxp.XPathImpl.eval(java.lang.String,java.lang.Object)"/>
+            <signature inherit="all" track="true" position="P1" value="com.sun.org.apache.xpath.internal.jaxp.XPathImpl.evaluate(java.lang.String,java.lang.Object,javax.xml.namespace.QName)"/>
+            <signature inherit="all" track="true" position="P1" value="com.sun.org.apache.xpath.internal.jaxp.XPathImpl.evaluate(java.lang.String,java.lang.Object)"/>
+            <signature inherit="all" track="true" position="P1" value="com.sun.org.apache.xpath.internal.jaxp.XPathImpl.compile(java.lang.String)"/>
+            <signature inherit="all" track="true" position="P1" value="com.sun.org.apache.xpath.internal.jaxp.XPathImpl.evaluate(java.lang.String,org.xml.sax.InputSource,javax.xml.namespace.QName)"/>
+            <signature inherit="all" track="true" position="P1" value="com.sun.org.apache.xpath.internal.jaxp.XPathImpl.evaluate(java.lang.String,org.xml.sax.InputSource)"/>
+            <signature inherit="all" track="true" position="P1" value="org.apache.xpath.jaxp.XPathImpl.eval(java.lang.String,java.lang.Object)"/>
+            <signature inherit="all" track="true" position="P1" value="org.apache.xpath.jaxp.XPathImpl.compile(java.lang.String)"/>
+            <signature inherit="all" track="true" position="P1" value="org.apache.xpath.jaxp.XPathImpl.evaluate(java.lang.String,java.lang.Object,javax.xml.namespace.QName)"/>
+            <signature inherit="all" track="true" position="P1" value="org.apache.xpath.jaxp.XPathImpl.evaluate(java.lang.String,java.lang.Object)"/>
+            <signature inherit="all" track="true" position="P1" value="org.apache.xpath.jaxp.XPathImpl.evaluate(java.lang.String,org.xml.sax.InputSource,javax.xml.namespace.QName)"/>
+            <signature inherit="all" track="true" position="P1" value="org.apache.xpath.jaxp.XPathImpl.evaluate(java.lang.String,org.xml.sax.InputSource)"/>
+        </sink>
+
+        <sink type="path-traversal" enable="true">
+            <signature inherit="all" track="true" position="P1,2" value="java.nio.file.Paths.get(java.lang.String,java.lang.String[])"/>
+            <signature inherit="all" track="true" position="P1" value="java.nio.file.Paths.get(java.net.URI)"/>
+            <signature inherit="all" track="true" position="P1" value="java.io.File.&lt;init&gt;(java.lang.String)"/>
+            <signature inherit="all" track="true" position="P1,2" value="java.io.File.&lt;init&gt;(java.lang.String,java.lang.String)"/>
+            <signature inherit="all" track="true" position="P2" value="java.io.File.&lt;init&gt;(java.io.File,java.lang.String)"/>
+            <signature inherit="all" track="true" position="P1" value="java.io.File.&lt;init&gt;(java.net.URI)"/>
+            <signature inherit="all" track="true" position="P1" value="java.io.RandomAccessFile.&lt;init&gt;(java.lang.String,java.lang.String)"/>
+        </sink>
+
+        <sink type="crypto-weak-randomness" enable="true">
+            <signature inherit="false" track="false" value="java.lang.Math.random()"/>
+            <signature inherit="false" track="false" value="org.apache.commons.lang.RandomStringUtils.random(int,int,int,boolean,boolean,char[])"/>
+            <signature inherit="false" track="false" value="org.apache.commons.lang.RandomStringUtils.random(int,int,int,boolean,boolean)"/>
+            <signature inherit="false" track="false" value="org.apache.commons.lang.RandomStringUtils.randomAlphabetic(int)"/>
+            <signature inherit="false" track="false" value="org.apache.commons.lang.RandomStringUtils.randomAlphanumeric(int)"/>
+            <signature inherit="false" track="false" value="org.apache.commons.lang.RandomStringUtils.randomAscii(int)"/>
+            <signature inherit="false" track="false" value="org.apache.commons.lang.RandomStringUtils.randomNumeric(int)"/>
+            <signature inherit="false" track="false" value="java.util.Random.nextInt(int)"/>
+            <signature inherit="false" track="false" value="java.util.Random.nextBoolean()"/>
+            <!--            <signature inherit="false" track="false" value="java.util.Random.nextBytes(byte[])"/>-->
+            <signature inherit="false" track="false" value="java.util.Random.nextDouble()"/>
+            <signature inherit="false" track="false" value="java.util.Random.nextFloat()"/>
+            <signature inherit="false" track="false" value="java.util.Random.nextGaussian()"/>
+            <signature inherit="false" track="false" value="java.util.Random.nextInt()"/>
+            <signature inherit="false" track="false" value="java.util.Random.nextLong()"/>
+        </sink>
+
+        <sink type="crypto-bad-mac" enable="true">
+            <signature inherit="false" track="false" position="P1"
+                       value="java.security.MessageDigest.getInstance(java.lang.String)"/>
+            <signature inherit="false" track="false" position="P1"
+                       value="java.security.MessageDigest.getInstance(java.lang.String,java.security.Provider)"/>
+            <signature inherit="false" track="false" position="P1"
+                       value="java.security.MessageDigest.getInstance(java.lang.String,java.lang.String)"/>
+        </sink>
+
+        <sink type="crypto-bad-ciphers" enable="true">
+            <signature inherit="false" track="false" position="P1"
+                       value="javax.crypto.Cipher.getInstance(java.lang.String)"/>
+            <signature inherit="false" track="false" position="P1"
+                       value="javax.crypto.Cipher.getInstance(java.lang.String,java.security.Provider)"/>
+            <signature inherit="false" track="false" position="P1"
+                       value="javax.crypto.Cipher.getInstance(java.lang.String,java.lang.String)"/>
+        </sink>
+
+        <sink type="cookie-flags-missing" enable="true">
+            <signature inherit="true" track="false" position="P1" value="javax.servlet.http.Cookie.setSecure(boolean)"/>
+            <signature inherit="false" track="false" position="P1"
+                       value="org.glassfish.grizzly.http.Cookie.setSecure(boolean)"/>
+            <signature inherit="false" track="false" position="P9"
+                       value="javax.ws.rs.core.NewCookie.&lt;init&gt;(java.lang.String,java.lang.String,java.lang.String,java.lang.String,int,java.lang.String,int,java.util.Date,boolean,boolean)"/>
+            <signature inherit="false" track="false" position="P5"
+                       value="javax.ws.rs.core.NewCookie.&lt;init&gt;(javax.ws.rs.core.Cookie,java.lang.String,int,java.util.Date,boolean,boolean)"/>
+        </sink>
+
+        <sink type="trust-boundary-violation" enable="true">
+            <signature inherit="true" track="true" position="P1,2"
+                       value="javax.servlet.http.HttpSession.setAttribute(java.lang.String,java.lang.Object)"/>
+            <signature inherit="true" track="true" position="P1,2"
+                       value="javax.servlet.http.HttpSession.putValue(java.lang.String,java.lang.Object)"/>
+            <signature inherit="false" track="true" position="P1,2"
+                       value="org.apache.struts2.dispatcher.SessionMap.put(java.lang.Object,java.lang.Object)"/>
+            <signature inherit="false" track="true" position="P1,2"
+                       value="coldfusion.runtime.SessionScope.bind(java.lang.String,java.lang.Object)"/>
+            <signature inherit="false" track="true" position="P1,2"
+                       value="play.mvc.Http$Session.put(java.lang.String,java.lang.String)"/>
+        </sink>
+
+        <sink type="reflected-xss" enable="false">
+            <signature inherit="false" track="true" position="P1"
+                       value="org.springframework.http.converter.StringHttpMessageConverter.writeInternal(java.lang.String,org.springframework.http.HttpOutputMessage)"/>
+            <signature inherit="false" track="true" position="P1" value="play.twirl.api.Html$.apply(java.lang.String)"/>
+            <signature inherit="false" track="true" position="P1"
+                       value="org.glassfish.jersey.message.internal.ByteArrayProvider.writeTo(byte[],java.lang.Class,java.lang.reflect.Type,java.lang.annotation.Annotation[],javax.ws.rs.core.MediaType,javax.ws.rs.core.MultivaluedMap,java.io.OutputStream)"/>
+            <signature inherit="false" track="true" position="P1"
+                       value="org.glassfish.jersey.message.internal.DataSourceProvider.writeTo(javax.activation.DataSource,java.lang.Class,java.lang.reflect.Type,java.lang.annotation.Annotation[],javax.ws.rs.core.MediaType,javax.ws.rs.core.MultivaluedMap,java.io.OutputStream)"/>
+            <signature inherit="false" track="true" position="P1"
+                       value="org.glassfish.jersey.message.internal.FileProvider.writeTo(java.io.File,java.lang.Class,java.lang.reflect.Type,java.lang.annotation.Annotation[],javax.ws.rs.core.MediaType,javax.ws.rs.core.MultivaluedMap,java.io.OutputStream)"/>
+            <signature inherit="false" track="true" position="P1"
+                       value="org.glassfish.jersey.message.internal.InputStreamProvider.writeTo(java.io.InputStream,java.lang.Class,java.lang.reflect.Type,java.lang.annotation.Annotation[],javax.ws.rs.core.MediaType,javax.ws.rs.core.MultivaluedMap,java.io.OutputStream)"/>
+            <signature inherit="false" track="true" position="P1"
+                       value="org.glassfish.jersey.message.internal.ReaderProvider.writeTo(java.io.Reader,java.lang.Class,java.lang.reflect.Type,java.lang.annotation.Annotation[],javax.ws.rs.core.MediaType,javax.ws.rs.core.MultivaluedMap,java.io.OutputStream)"/>
+            <signature inherit="false" track="true" position="P1"
+                       value="org.glassfish.jersey.message.internal.StringMessageProvider.writeTo(java.lang.String,java.lang.Class,java.lang.reflect.Type,java.lang.annotation.Annotation[],javax.ws.rs.core.MediaType,javax.ws.rs.core.MultivaluedMap,java.io.OutputStream)"/>
+            <signature inherit="false" track="true" position="P1"
+                       value="org.glassfish.jersey.message.internal.AbstractMessageReaderWriterProvider.writeToAsString(java.lang.String,java.io.OutputStream,javax.ws.rs.core.MediaType)"/>
+            <signature inherit="false" track="true" position="P2"
+                       value="com.github.mustachejava.codes.ValueCode.execute(java.io.Writer,java.lang.String)"/>
+            <signature inherit="all" track="true" position="P1"
+                       value="javax.servlet.jsp.JspWriter.print(java.lang.String)"/>
+            <signature inherit="all" track="true" position="P1"
+                       value="javax.servlet.jsp.JspWriter.println(java.lang.String)"/>
+            <signature inherit="all" track="true" position="P1"
+                       value="javax.servlet.jsp.JspWriter.write(java.lang.String)"/>
+            <signature inherit="all" track="true" position="P1"
+                       value="javax.servlet.jsp.JspWriter.write(java.lang.String,int,int)"/>
+            <signature inherit="all" track="true" position="P1" value="javax.servlet.jsp.JspWriter.write(char[])"/>
+            <signature inherit="all" track="true" position="P1"
+                       value="javax.servlet.jsp.JspWriter.write(char[],int,int)"/>
+            <!--            <signature inherit="all" track="true" position="P1"-->
+            <!--                       value="javax.servlet.ServletOutputStream.write(byte[])"/>-->
+            <!--            <signature inherit="all" track="true" position="P1"-->
+            <!--                       value="javax.servlet.ServletOutputStream.write(byte[],int,int)"/>-->
+            <!--            <signature inherit="all" track="true" position="P1"-->
+            <!--                       value="javax.servlet.ServletOutputStream.print(java.lang.String)"/>-->
+            <!--            <signature inherit="all" track="true" position="P1"-->
+            <!--                       value="javax.servlet.ServletOutputStream.println(java.lang.String)"/>-->
+            <signature inherit="true" track="true" position="P2,3"
+                       value="java.io.PrintWriter.format(java.util.Locale,java.lang.String,java.lang.Object[])"/>
+            <signature inherit="true" track="true" position="P1,2"
+                       value="java.io.PrintWriter.format(java.lang.String,java.lang.Object[])"/>
+            <signature inherit="true" track="true" position="P1" value="java.io.PrintWriter.print(char[])"/>
+            <signature inherit="true" track="true" position="P1" value="java.io.PrintWriter.print(java.lang.Object)"/>
+            <signature inherit="true" track="true" position="P1" value="java.io.PrintWriter.print(java.lang.String)"/>
+            <signature inherit="true" track="true" position="P2,3"
+                       value="java.io.PrintWriter.printf(java.util.Locale,java.lang.String,java.lang.Object[])"/>
+            <signature inherit="true" track="true" position="P1,2"
+                       value="java.io.PrintWriter.printf(java.lang.String,java.lang.Object[])"/>
+            <signature inherit="true" track="true" position="P1" value="java.io.PrintWriter.println(char[])"/>
+            <signature inherit="true" track="true" position="P1" value="java.io.PrintWriter.println(java.lang.Object)"/>
+            <signature inherit="true" track="true" position="P1" value="java.io.PrintWriter.println(java.lang.String)"/>
+            <signature inherit="true" track="true" position="P1" value="java.io.PrintWriter.write(char[])"/>
+            <signature inherit="true" track="true" position="P1" value="java.io.PrintWriter.write(char[],int,int)"/>
+            <signature inherit="true" track="true" position="P1" value="java.io.PrintWriter.write(java.lang.String)"/>
+            <signature inherit="true" track="true" position="P1"
+                       value="java.io.PrintWriter.write(java.lang.String,int,int)"/>
+            <signature inherit="false" track="true" position="P1"
+                       value="org.apache.tapestry5.internal.services.MarkupWriterImpl.writeRaw(java.lang.String)"/>
+            <signature inherit="false" track="true" position="P1"
+                       value="com.sun.faces.renderkit.html_basic.HtmlResponseWriter.write(java.lang.String)"/>
+            <signature inherit="false" track="true" position="P3"
+                       value="org.mule.module.http.internal.domain.response.DefaultHttpResponse.&lt;init&gt;(org.mule.module.http.internal.domain.response.ResponseStatus,org.apache.commons.collections.MultiMap,org.mule.module.http.internal.domain.HttpEntity)"/>
+            <signature inherit="false" track="true" position="P1"
+                       value="org.mule.module.http.internal.domain.response.HttpResponseBuilder.setEntity(org.mule.module.http.internal.domain.HttpEntity)"/>
+            <signature inherit="false" track="true" position="P1"
+                       value="org.mule.module.http.internal.domain.response.HttpResponseBuilder.build(org.mule.module.http.internal.domain.HttpEntity)"/>
+            <signature inherit="false" track="true" position="P1"
+                       value="org.mule.transformer.simple.SetPayloadMessageProcessor.resolveDataType(org.mule.DefaultMuleEvent,java.lang.Object)"/>
+            <signature inherit="false" track="true" position="P1"
+                       value="org.mule.transformer.simple.SetPayloadMessageProcessor.resolveDataType(org.mule.api.MuleEvent,java.lang.Object)"/>
+            <signature inherit="false" track="true" position="P1"
+                       value="org.apache.jasper.runtime.JspWriterImpl.println(java.lang.String)"/>
+        </sink>
+
+        <sink type="xxe" enable="true">
+            <signature inherit="true" track="true" position="P1" value="javax.xml.parsers.DocumentBuilder.parse(java.io.File)"/>
+            <signature inherit="true" track="true" position="P1" value="javax.xml.parsers.DocumentBuilder.parse(java.io.InputStream)"/>
+            <signature inherit="true" track="true" position="P1" value="javax.xml.parsers.DocumentBuilder.parse(java.io.InputStream,java.lang.String)"/>
+            <signature inherit="true" track="true" position="P1" value="javax.xml.parsers.DocumentBuilder.parse(java.lang.String)"/>
+            <signature inherit="true" track="true" position="P1" value="javax.xml.parsers.DocumentBuilder.parse(org.xml.sax.InputSource)"/>
+            <signature inherit="true" track="true" position="P1" value="nu.xom.Builder.build(java.io.File)"/>
+            <signature inherit="true" track="true" position="P1" value="nu.xom.Builder.build(java.io.InputStream)"/>
+            <signature inherit="true" track="true" position="P1" value="nu.xom.Builder.build(java.io.InputStream,java.lang.String)"/>
+            <signature inherit="true" track="true" position="P1" value="nu.xom.Builder.build(java.io.Reader)"/>
+            <signature inherit="true" track="true" position="P1" value="nu.xom.Builder.build(java.io.Reader,java.lang.String)"/>
+            <signature inherit="true" track="true" position="P1" value="nu.xom.Builder.build(java.lang.String)"/>
+            <signature inherit="true" track="true" position="P1" value="javax.xml.bind.Unmarshaller.unmarshal(java.io.InputStream)"/>
+            <signature inherit="true" track="true" position="P1" value="javax.xml.bind.Unmarshaller.unmarshal(java.io.Reader)"/>
+            <signature inherit="true" track="true" position="P1" value="javax.xml.bind.Unmarshaller.unmarshal(javax.xml.transform.Source)"/>
+            <signature inherit="true" track="true" position="P1" value="javax.xml.bind.Unmarshaller.unmarshal(javax.xml.transform.Source,java.lang.Class)"/>
+            <signature inherit="true" track="true" position="P1" value="javax.xml.bind.Unmarshaller.unmarshal(org.xml.sax.InputSource)"/>
+            <signature inherit="true" track="true" position="P1" value="javax.xml.bind.Unmarshaller.unmarshal(javax.xml.stream.XMLStreamReader)"/>
+            <signature inherit="true" track="true" position="P1" value="javax.xml.bind.Unmarshaller.unmarshal(javax.xml.stream.XMLStreamReader,java.lang.Class)"/>
+            <signature inherit="true" track="true" position="P1" value="javax.xml.bind.Unmarshaller.unmarshal(javax.xml.stream.XMLEventReader)"/>
+            <signature inherit="true" track="true" position="P1" value="javax.xml.bind.Unmarshaller.unmarshal(javax.xml.stream.XMLEventReader,java.lang.Class)"/>
+            <signature inherit="true" track="true" position="P1" value="javax.xml.parsers.SAXParser.parse(java.io.InputStream,org.xml.sax.HandlerBase)"/>
+            <signature inherit="true" track="true" position="P1" value="javax.xml.parsers.SAXParser.parse(java.io.InputStream,org.xml.sax.HandlerBase,java.lang.String)"/>
+            <signature inherit="true" track="true" position="P1" value="javax.xml.parsers.SAXParser.parse(java.io.InputStream,org.xml.sax.helpers.DefaultHandler)"/>
+            <signature inherit="true" track="true" position="P1" value="javax.xml.parsers.SAXParser.parse(java.io.InputStream,org.xml.sax.helpers.DefaultHandler,java.lang.String)"/>
+            <signature inherit="true" track="true" position="P1" value="javax.xml.parsers.SAXParser.parse(org.xml.sax.InputSource,org.xml.sax.HandlerBase)"/>
+            <signature inherit="true" track="true" position="P1" value="javax.xml.parsers.SAXParser.parse(org.xml.sax.InputSource,org.xml.sax.helpers.DefaultHandler)"/>
+            <signature inherit="true" track="true" position="P1" value="org.xml.sax.XMLReader.parse(org.xml.sax.InputSource)"/>
+            <signature inherit="true" track="true" position="O" value="javax.xml.stream.XMLStreamReader.getElementText()"/>
+        </sink>
+
+        <!-- hook点继承关系已确认 -->
+        <sink type="expression-language-injection" level="high" enable="true">
+            <signature inherit="all" track="true" position="P1" value="javax.servlet.jsp.el.ExpressionEvaluator.evaluate(java.lang.String,java.lang.Class,javax.servlet.jsp.el.VariableResolver,javax.servlet.jsp.el.FunctionMapper)"/>
+            <signature inherit="all" track="true" position="P1" value="ognl.Ognl.getValue(java.lang.Object,java.util.Map,java.lang.Object)"/>
+            <signature inherit="all" track="true" position="P1" value="ognl.Ognl.getValue(java.lang.Object,java.util.Map,java.lang.Object,java.lang.Class)"/>
+            <signature inherit="all" track="true" position="P1" value="ognl.Ognl.getValue(java.lang.String,java.util.Map,java.lang.Object)"/>
+            <signature inherit="all" track="true" position="P1" value="ognl.Ognl.getValue(java.lang.String,java.util.Map,java.lang.Object,java.lang.Class)"/>
+            <signature inherit="all" track="true" position="P1" value="ognl.Ognl.getValue(java.lang.Object,java.lang.Object)"/>
+            <signature inherit="all" track="true" position="P1" value="ognl.Ognl.getValue(java.lang.Object,java.lang.Object,java.lang.Class)"/>
+            <signature inherit="all" track="true" position="P1" value="ognl.Ognl.getValue(java.lang.String,java.lang.Object)"/>
+            <signature inherit="all" track="true" position="P1" value="ognl.Ognl.getValue(java.lang.String,java.lang.Object,java.lang.Class)"/>
+            <signature inherit="all" track="true" position="P1" value="org.apache.commons.ognl.Ognl.parseExpression(java.lang.String)"/>
+            <!--  org.springframework.expression.Expression 接口 位于Spring-Expression包 -->
+            <signature inherit="true" track="true" position="O" value="org.springframework.expression.Expression.getValue()"/>
+            <signature inherit="true" track="true" position="O" value="org.springframework.expression.Expression.getValue(java.lang.Class)"/>
+            <signature inherit="true" track="true" position="O" value="org.springframework.expression.Expression.getValue(org.springframework.expression.EvaluationContext)"/>
+            <signature inherit="true" track="true" position="O" value="org.springframework.expression.Expression.getValue(org.springframework.expression.EvaluationContext,java.lang.Class)"/>
+            <signature inherit="true" track="true" position="O" value="org.springframework.expression.Expression.getValue(org.springframework.expression.EvaluationContext,java.lang.Object,java.lang.Class)"/>
+            <signature inherit="true" track="true" position="O" value="org.springframework.expression.Expression.getValue(org.springframework.expression.EvaluationContext,java.lang.Object)"/>
+            <signature inherit="true" track="true" position="O" value="org.springframework.expression.Expression.getValue(java.lang.Object)"/>
+            <signature inherit="true" track="true" position="O" value="org.springframework.expression.Expression.getValue(java.lang.Object,java.lang.Class)"/>
+            <signature inherit="true" track="true" position="O" value="org.springframework.expression.Expression.getValueTypeDescriptor(java.lang.Object)"/>
+            <signature inherit="true" track="true" position="O" value="org.springframework.expression.Expression.getValueTypeDescriptor()"/>
+            <signature inherit="true" track="true" position="O" value="org.springframework.expression.Expression.getValueTypeDescriptor(org.springframework.expression.EvaluationContext,java.lang.Object)"/>
+            <signature inherit="true" track="true" position="O" value="org.springframework.expression.Expression.getValueTypeDescriptor(org.springframework.expression.EvaluationContext)"/>
+
+        </sink>
+
+        <sink type="redos" level="high" enable="true">
+            <signature track="true" position="P1" value="java.util.regex.Pattern.matcher(java.lang.CharSequence)"/>
+            <signature track="true" position="P1" value="jregex.Pattern.matcher(java.lang.String)"/>
+        </sink>
+
+        <!-- hook点继承关系已确认 -->
+        <sink type="reflection-injection" level="high" enable="true">
+            <signature track="false" position="P1" value="java.lang.Class.forName(java.lang.String)"/>
+            <signature track="false" position="P1" value="java.lang.Class.forName(java.lang.String,boolean,java.lang.ClassLoader)"/>
+        </sink>
+
+        <sink type="unsafe-json-deserialize" level="high" enable="true">
+            <signature inherit="true" track="true" position="O" value="java.io.ObjectInput.readObject()"/>
+            <signature inherit="all" track="true" position="O" value="java.io.ObjectInputStream.readObject()"/>
+            <signature inherit="false" track="true" position="P1" value="com.thoughtworks.xstream.XStream.fromXML(java.lang.String)"/>
+            <signature inherit="false" track="true" position="P1" value="com.thoughtworks.xstream.XStream.fromXML(java.lang.String,java.lang.Object)"/>
+            <signature inherit="false" track="true" position="P1" value="com.thoughtworks.xstream.XStream.fromXML(java.io.Reader)"/>
+            <signature inherit="false" track="true" position="P1" value="com.thoughtworks.xstream.XStream.fromXML(java.io.Reader,java.lang.Object)"/>
+            <signature inherit="false" track="true" position="P1" value="com.thoughtworks.xstream.XStream.fromXML(java.io.InputStream)"/>
+            <signature inherit="false" track="true" position="P1" value="com.thoughtworks.xstream.XStream.fromXML(java.io.InputStream,java.lang.Object)"/>
+            <signature inherit="false" track="true" position="P1" value="com.thoughtworks.xstream.XStream.fromXML(java.net.URL)"/>
+            <signature inherit="false" track="true" position="P1" value="com.thoughtworks.xstream.XStream.fromXML(java.net.URL,java.lang.Object)"/>
+            <signature inherit="false" track="true" position="P1" value="com.esotericsoftware.kryo.Kryo.readObject(com.esotericsoftware.kryo.io.Input,java.lang.Class)"/>
+            <signature inherit="false" track="true" position="P1" value="com.esotericsoftware.kryo.Kryo.readObjectOrNull(com.esotericsoftware.kryo.io.Input,java.lang.Class)"/>
+            <signature inherit="false" track="true" position="P1" value="com.esotericsoftware.kryo.Kryo.readObject(com.esotericsoftware.kryo.io.Input,java.lang.Class,com.esotericsoftware.kryo.Serializer)"/>
+            <signature inherit="false" track="true" position="P1" value="com.esotericsoftware.kryo.Kryo.readObjectOrNull(com.esotericsoftware.kryo.io.Input,java.lang.Class,com.esotericsoftware.kryo.Serializer)"/>
+            <signature inherit="false" track="true" position="P1" value="com.esotericsoftware.kryo.Kryo.readClassAndObject(com.esotericsoftware.kryo.io.Input)"/>
+        </sink>
+
+        <!-- hook点继承关系已确认 -->
+        <sink type="hql-injection" enable="true" level="high">
+            <signature inherit="true" track="true" position="P2" value="org.hibernate.Session.createFilter(java.lang.Object,java.lang.String)"/>
+            <signature inherit="true" track="true" position="P1" value="org.hibernate.Session.createQuery(java.lang.String)"/>
+            <signature inherit="true" track="true" position="P1" value="org.hibernate.Session.createSQLQuery(java.lang.String,java.lang.String,java.lang.Class)"/>
+            <signature inherit="true" track="true" position="P1" value="org.hibernate.Session.createSQLQuery(java.lang.String,java.lang.String[],java.lang.Class[])"/>
+            <signature inherit="true" track="true" position="P1" value="org.hibernate.Session.createSQLQuery(java.lang.String)"/>
+            <signature inherit="true" track="true" position="P1" value="org.hibernate.Session.delete(java.lang.String)"/>
+            <signature inherit="true" track="true" position="P1" value="org.hibernate.Session.delete(java.lang.String,java.lang.Object,org.hibernate.type.Type)"/>
+            <signature inherit="true" track="true" position="P1" value="org.hibernate.Session.delete(java.lang.String,java.lang.Object[],org.hibernate.type.Type[])"/>
+            <signature inherit="true" track="true" position="P2" value="org.hibernate.Session.filter(java.lang.Object,java.lang.String)"/>
+            <signature inherit="true" track="true" position="P2" value="org.hibernate.Session.filter(java.lang.Object,java.lang.String,java.lang.Object,org.hibernate.type.Type)"/>
+            <signature inherit="true" track="true" position="P2" value="org.hibernate.Session.filter(java.lang.Object,java.lang.String,java.lang.Object[],org.hibernate.type.Type[])"/>
+            <signature inherit="true" track="true" position="P1" value="org.hibernate.Session.find(java.lang.String)"/>
+            <signature inherit="true" track="true" position="P1" value="org.hibernate.Session.find(java.lang.String,java.lang.Object,org.hibernate.type.Type)"/>
+            <signature inherit="true" track="true" position="P1" value="org.hibernate.Session.find(java.lang.String,java.lang.Object[],org.hibernate.type.Type[])"/>
+            <signature inherit="true" track="true" position="P1" value="org.hibernate.Session.iterate(java.lang.String)"/>
+            <signature inherit="true" track="true" position="P1" value="org.hibernate.Session.iterate(java.lang.String,java.lang.Object,org.hibernate.type.Type)"/>
+            <signature inherit="true" track="true" position="P1" value="org.hibernate.Session.iterate(java.lang.String,java.lang.Object[],org.hibernate.type.Type[])"/>
+            <signature inherit="true" track="true" position="P1" value="org.hibernate.SharedSessionContract.createQuery(java.lang.String)"/>
+            <signature inherit="true" track="true" position="P1" value="org.hibernate.SharedSessionContract.createSQLQuery(java.lang.String)"/>
+            <!--            <signature inherit="true" track="true" position="P1" value="org.hibernate.SharedSessionContract.getNamedProcedureCall(java.lang.String)"/>-->
+            <!--            <signature inherit="true" track="true" position="P1" value="org.hibernate.SharedSessionContract.createStoredProcedureCall(java.lang.String)"/>-->
+            <!--            <signature inherit="true" track="true" position="P1" value="org.hibernate.SharedSessionContract.createStoredProcedureCall(java.lang.String,java.lang.Class[])"/>-->
+            <!--            <signature inherit="true" track="true" position="P1" value="org.hibernate.SharedSessionContract.createStoredProcedureCall(java.lang.Object,java.lang.String[])"/>-->
+        </sink>
+
+        <sink type="nosql-injection" level="high" enable="true">
+            <signature inherit="true" position="P1" track="true"
+                       value="com.mongodb.DB.doEval(java.lang.String,java.lang.Object[])"/>
+        </sink>
+
+        <sink type="unsafe-readline" level="high" enable="true">
+            <signature inherit="true" value="java.io.BufferedReader.readLine()" track="true" position="O"/>
+        </sink>
+
+        <sink level="high" type="unvalidated-forward" enable="true">
+<!--            <signature inherit="true" track="true" position="P1" value="javax.servlet.ServletContext.getRequestDispatcher(java.lang.String)"/>-->
+            <signature inherit="true" track="true" position="P1" value="javax.servlet.ServletRequest.getRequestDispatcher(java.lang.String)"/>
+            <signature inherit="false" track="true" position="P1" value="javax.servlet.jsp.PageContext.forward(java.lang.String)"/>
+        </sink>
+
+        <sink level="high" type="unvalidated-redirect" enable="true">
+            <signature inherit="true" track="true" position="P1" value="org.glassfish.grizzly.http.server.Response.sendRedirect(java.lang.String)"/>
+            <signature inherit="true" track="true" position="P1" value="play.mvc.Results.redirect(java.lang.String)"/>
+            <signature inherit="true" track="true" position="P1" value="javax.ws.rs.core.Response.temporaryRedirect(java.net.URI)"/>
+            <signature inherit="true" track="true" position="P1" value="javax.servlet.http.HttpServletResponse.sendRedirect(java.lang.String)"/>
+            <!-- 如果P1是(l/L)ocation，则P2需要检测未受验证的重定向 -->
+            <signature inherit="true" track="true" position="P2" value="javax.servlet.http.HttpServletResponse.setHeader(java.lang.String,java.lang.String)"/>
+            <!-- 如果P1是(l/L)ocation，则P2需要检测未受验证的重定向 -->
+            <signature inherit="true" track="true" position="P2" value="io.netty.handler.codec.http.DefaultHttpHeaders.add0(int,int,java.lang.CharSequence,java.lang.CharSequence)"/>
+            <!-- 如果P1是(l/L)ocation，则P2需要检测未受验证的重定向 -->
+            <signature inherit="true" track="true" position="P2" value="javax.servlet.http.HttpServletResponse.addHeader(java.lang.String,java.lang.String)"/>
+        </sink>
+
+        <sink level="high" type="header-injection" enable="false">
+            <signature position="P1,2" inherit="false" track="true" value="javax.servlet.http.HttpServletResponse.setHeader(java.lang.String,java.lang.String)"/>
+            <signature position="P1,2" inherit="false" track="true" value="javax.servlet.http.HttpServletResponse.addHeader(java.lang.String,java.lang.String)"/>
+            <signature position="P1,2" inherit="false" track="true" value="javax.ws.rs.core.Response$ResponseBuilder.header(java.lang.String,java.lang.Object)"/>
+        </sink>
+
+        <sink level="high" type="dynamic-library-load" enable="true">
+            <signature inherit="false" track="true" position="P2" value="java.lang.Runtime.load0(java.lang.Class,java.lang.String)"/>
+        </sink>
+
+        <sink level="high" type="spring-cloud-config-server" enable="true">
+            <signature inherit="false" track="true" position="P1"
+                       value="org.springframework.core.io.FileUrlResource.createRelative(java.lang.String)"/>
+        </sink>
+
+        <!-- hook点继承关系已确认 -->
+        <sink level="info" type="sql-over-power" enable="true">
+            <!-- mysql -->
+            <signature inherit="false"  track="false" position="P4" value="com.mysql.jdbc.MysqlIO.sqlQueryDirect(com.mysql.jdbc.StatementImpl,java.lang.String,java.lang.String,com.mysql.jdbc.Buffer,int,int,int,boolean,java.lang.String,com.mysql.jdbc.Field[])"/>
+            <signature inherit="false"  track="false" position="P4" value="com.mysql.cj.NativeSession.execSQL(com.mysql.cj.Query,java.lang.String,int,com.mysql.cj.protocol.a.NativePacketPayload,boolean,com.mysql.cj.protocol.ProtocolEntityFactory,com.mysql.cj.protocol.ColumnDefinition,boolean)"/>
+            <signature inherit="false"  track="false" position="P4" value="com.mysql.cj.NativeSession.execSQL(com.mysql.cj.Query,java.lang.String,int,com.mysql.cj.protocol.a.NativePacketPayload,boolean,com.mysql.cj.protocol.ProtocolEntityFactory,java.lang.String,com.mysql.cj.protocol.ColumnDefinition,boolean)"/>
+            <signature inherit="false"  track="false" position="P4" value="com.mysql.cj.fabric.jdbc.FabricMySQLConnectionProxy.execSQL(com.mysql.cj.jdbc.StatementImpl,java.lang.String,int,com.mysql.cj.mysqla.io.Buffer,int,int,boolean,java.lang.String,com.mysql.cj.core.result.Field[])"/>
+            <signature inherit="false"  track="false" position="P4" value="com.mysql.cj.fabric.jdbc.FabricMySQLConnectionProxy.execSQL(com.mysql.cj.jdbc.StatementImpl,java.lang.String,int,com.mysql.cj.mysqla.io.Buffer,int,int,boolean,java.lang.String,com.mysql.cj.core.result.Field[],boolean)"/>
+            <signature inherit="false"  track="false" position="P4" value="com.mysql.cj.jdbc.ConnectionImpl.execSQL(com.mysql.cj.jdbc.StatementImpl,java.lang.String,int,com.mysql.cj.api.mysqla.io.PacketPayload,boolean,java.lang.String,com.mysql.cj.api.mysqla.result.ColumnDefinition)"/>
+            <signature inherit="false"  track="false" position="P4" value="com.mysql.cj.jdbc.ConnectionImpl.execSQL(com.mysql.cj.jdbc.StatementImpl,java.lang.String,int,com.mysql.cj.api.mysqla.io.PacketPayload,boolean,java.lang.String,com.mysql.cj.api.mysqla.result.ColumnDefinition,boolean)"/>
+            <signature inherit="false"  track="false" position="P4" value="com.mysql.cj.jdbc.ConnectionImpl.execSQL(com.mysql.cj.jdbc.StatementImpl,java.lang.String,int,com.mysql.cj.mysqla.io.Buffer,int,int,boolean,java.lang.String,com.mysql.cj.core.result.Field[])"/>
+            <signature inherit="false"  track="false" position="P4" value="com.mysql.cj.jdbc.ConnectionImpl.execSQL(com.mysql.cj.jdbc.StatementImpl,java.lang.String,int,com.mysql.cj.mysqla.io.Buffer,int,int,boolean,java.lang.String,com.mysql.cj.core.result.Field[],boolean)"/>
+            <signature inherit="false"  track="false" position="P4" value="com.mysql.cj.jdbc.ConnectionWrapper.execSQL(com.mysql.cj.jdbc.StatementImpl,java.lang.String,int,com.mysql.cj.api.mysqla.io.PacketPayload,boolean,java.lang.String,com.mysql.cj.api.mysqla.result.ColumnDefinition)"/>
+            <signature inherit="false"  track="false" position="P4" value="com.mysql.cj.jdbc.ConnectionWrapper.execSQL(com.mysql.cj.jdbc.StatementImpl,java.lang.String,int,com.mysql.cj.api.mysqla.io.PacketPayload,boolean,java.lang.String,com.mysql.cj.api.mysqla.result.ColumnDefinition,boolean)"/>
+            <signature inherit="false"  track="false" position="P4" value="com.mysql.cj.jdbc.ConnectionWrapper.execSQL(com.mysql.cj.jdbc.StatementImpl,java.lang.String,int,com.mysql.cj.mysqla.io.Buffer,int,int,boolean,java.lang.String,com.mysql.cj.core.result.Field[])"/>
+            <signature inherit="false"  track="false" position="P4" value="com.mysql.cj.jdbc.ConnectionWrapper.execSQL(com.mysql.cj.jdbc.StatementImpl,java.lang.String,int,com.mysql.cj.mysqla.io.Buffer,int,int,boolean,java.lang.String,com.mysql.cj.core.result.Field[],boolean)"/>
+            <signature inherit="false"  track="false" position="P4" value="com.mysql.cj.jdbc.ha.MultiHostMySQLConnection.execSQL(com.mysql.cj.jdbc.StatementImpl,java.lang.String,int,com.mysql.cj.api.mysqla.io.PacketPayload,boolean,java.lang.String,com.mysql.cj.api.mysqla.result.ColumnDefinition)"/>
+            <signature inherit="false"  track="false" position="P4" value="com.mysql.cj.jdbc.ha.MultiHostMySQLConnection.execSQL(com.mysql.cj.jdbc.StatementImpl,java.lang.String,int,com.mysql.cj.api.mysqla.io.PacketPayload,boolean,java.lang.String,com.mysql.cj.api.mysqla.result.ColumnDefinition,boolean)"/>
+            <signature inherit="false"  track="false" position="P4" value="com.mysql.cj.jdbc.ha.MultiHostMySQLConnection.execSQL(com.mysql.cj.jdbc.StatementImpl,java.lang.String,int,com.mysql.cj.mysqla.io.Buffer,int,int,boolean,java.lang.String,com.mysql.cj.core.result.Field[])"/>
+            <signature inherit="false"  track="false" position="P4" value="com.mysql.cj.jdbc.ha.MultiHostMySQLConnection.execSQL(com.mysql.cj.jdbc.StatementImpl,java.lang.String,int,com.mysql.cj.mysqla.io.Buffer,int,int,boolean,java.lang.String,com.mysql.cj.core.result.Field[],boolean)"/>
+            <signature inherit="false"  track="false" position="P4" value="com.mysql.cj.mysqla.MysqlaSession.execSQL(com.mysql.cj.api.Query,java.lang.String,int,com.mysql.cj.api.mysqla.io.PacketPayload,boolean,com.mysql.cj.api.mysqla.io.ProtocolEntityFactory,java.lang.String,com.mysql.cj.api.mysqla.result.ColumnDefinition,boolean)"/>
+            <signature inherit="false"  track="false" position="P4" value="com.mysql.fabric.jdbc.FabricMySQLConnectionProxy.execSQL(com.mysql.jdbc.StatementImpl,java.lang.String,int,com.mysql.jdbc.Buffer,int,int,boolean,java.lang.String,com.mysql.jdbc.Field[])"/>
+            <signature inherit="false"  track="false" position="P4" value="com.mysql.fabric.jdbc.FabricMySQLConnectionProxy.execSQL(com.mysql.jdbc.StatementImpl,java.lang.String,int,com.mysql.jdbc.Buffer,int,int,boolean,java.lang.String,com.mysql.jdbc.Field[],boolean)"/>
+            <signature inherit="false"  track="false" position="P4" value="java.sql.Connection.execSQL(com.mysql.jdbc.StatementImpl,java.lang.String,int,com.mysql.jdbc.Buffer,int,int,boolean,java.lang.String,com.mysql.jdbc.Field[])"/>
+<!--            <signature inherit="false"  track="false" position="P4" value="com.mysql.jdbc.ConnectionImpl.execSQL(com.mysql.jdbc.StatementImpl,java.lang.String,int,com.mysql.jdbc.Buffer,int,int,boolean,java.lang.String,com.mysql.jdbc.Field[])"/>-->
+            <signature inherit="false"  track="false" position="P4" value="java.sql.Connection.execSQL(com.mysql.jdbc.StatementImpl,java.lang.String,int,com.mysql.jdbc.Buffer,int,int,boolean,java.lang.String,com.mysql.jdbc.Field[],boolean)"/>
+<!--            <signature inherit="false"  track="false" position="P4" value="com.mysql.jdbc.ConnectionImpl.execSQL(com.mysql.jdbc.StatementImpl,java.lang.String,int,com.mysql.jdbc.Buffer,int,int,boolean,java.lang.String,com.mysql.jdbc.Field[],boolean)"/>-->
+            <signature inherit="false"  track="false" position="P4" value="com.mysql.jdbc.LoadBalancedMySQLConnection.execSQL(com.mysql.jdbc.StatementImpl,java.lang.String,int,com.mysql.jdbc.Buffer,int,int,boolean,java.lang.String,com.mysql.jdbc.Field[])"/>
+            <signature inherit="false"  track="false" position="P4" value="com.mysql.jdbc.LoadBalancedMySQLConnection.execSQL(com.mysql.jdbc.StatementImpl,java.lang.String,int,com.mysql.jdbc.Buffer,int,int,boolean,java.lang.String,com.mysql.jdbc.Field[],boolean)"/>
+            <signature inherit="false"  track="false" position="P4" value="com.mysql.jdbc.MultiHostMySQLConnection.execSQL(com.mysql.jdbc.StatementImpl,java.lang.String,int,com.mysql.jdbc.Buffer,int,int,boolean,java.lang.String,com.mysql.jdbc.Field[])"/>
+            <signature inherit="false"  track="false" position="P4" value="com.mysql.jdbc.MultiHostMySQLConnection.execSQL(com.mysql.jdbc.StatementImpl,java.lang.String,int,com.mysql.jdbc.Buffer,int,int,boolean,java.lang.String,com.mysql.jdbc.Field[],boolean)"/>
+
+            <!-- postgresql pg -->
+            <signature inherit="false"  track="false" position="P1,2" value="org.postgresql.jdbc.PgStatement.executeInternal(org.postgresql.core.CachedQuery,org.postgresql.core.ParameterList,int)"/>
+            <signature inherit="false" track="false" position="P1,2" value="org.postgresql.core.v3.QueryExecutorImpl.sendParse(org.postgresql.core.v3.SimpleQuery,org.postgresql.core.v3.SimpleParameterList,boolean)"/>
+
+            <!-- sqlserver mssql -->
+            <signature inherit="false" track="false" position="P1" value="com.microsoft.sqlserver.jdbc.SQLServerConnection.executeCommand(com.microsoft.sqlserver.jdbc.TDSCommand)"/>
+            <signature inherit="false" track="false" position="P1" value="com.microsoft.sqlserver.jdbc.SQLServerStatement.executeCommand(com.microsoft.sqlserver.jdbc.TDSCommand)"/>
+
+            <!-- oracle -->
+        </sink>
+
+    </sinks>
+    <filters>
+        <filter type="reflected-xss-filter" enable="true">
+            <signature inherit="false" value="org.springframework.web.util.HtmlUtils.htmlEscape(java.lang.String)"/>
+            <signature inherit="false"
+                       value="org.springframework.web.util.HtmlUtils.htmlEscape(java.lang.String,java.lang.String)"/>
+            <signature inherit="false"
+                       value="org.springframework.web.util.HtmlUtils.htmlEscapeDecimal(java.lang.String)"/>
+            <signature inherit="false"
+                       value="org.springframework.web.util.HtmlUtils.htmlEscapeDecimal(java.lang.String,java.lang.String)"/>
+
+            <signature inherit="false" value="org.apache.commons.lang.StringEscapeUtils.escapeHtml(java.lang.String)"/>
+            <signature inherit="false"
+                       value="org.apache.commons.lang.StringEscapeUtils.escapeHtml(java.io.Writer,java.lang.String)"/>
+
+            <signature inherit="false"
+                       value="org.owasp.esapi.reference.DefaultEncoder.encodeForHTML(java.lang.String)"/>
+        </filter>
+        <filter type="xxe-filter" enable="true">
+            <signature inherit="true"
+                       value="javax.xml.parsers.DocumentBuilderFactory.setFeature(java.lang.String, boolean)"/>
+            <signature inherit="true" value="javax.xml.parsers.SAXParserFactory.setFeature(java.lang.String, boolean)"/>
+            <signature inherit="true" value="org.xml.sax.XMLReader.setFeature(java.lang.String, boolean)"/>
+            <signature inherit="true"
+                       value="javax.xml.transform.TransformerFactory.setFeature(java.lang.String, boolean)"/>
+            <signature inherit="true"
+                       value="com.sun.org.apache.xerces.internal.xni.parser.XMLParserConfiguration.setFeature(java.lang.String, boolean)"/>
+            <signature inherit="true"
+                       value="com.sun.org.apache.xerces.internal.xni.grammars.XMLGrammarLoader.setFeature(java.lang.String, boolean)"/>
+        </filter>
+        <!-- XStream 增加setupDefaultSecurity方法调用的filters点 -->
+    </filters>
+</secnium-data-model>

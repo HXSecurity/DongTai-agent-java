@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.secnium.iast</groupId>
+    <artifactId>iast</artifactId>
+    <version>0.5.2</version>
+    <packaging>pom</packaging>
+
+    <name>IAST</name>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <iast.version>0.5.2</iast.version>
+        <shade-prefix>com.secnium.iast.thirdparty</shade-prefix>
+
+        <maven.compiler.source>1.6</maven.compiler.source>
+        <maven.compiler.target>1.6</maven.compiler.target>
+        <maven.deploy.plugin.version>3.2.0</maven.deploy.plugin.version>
+        <maven.compiler.version>2.3.2</maven.compiler.version>
+        <commons.cli.versin>1.4</commons.cli.versin>
+        <sun.tools.version>1.6</sun.tools.version>
+        <!--docker环境下配置-->
+        <sun.tools.systempath>${java.home}/../lib/tools.jar</sun.tools.systempath>
+        <!--        <sun.tools.systempath>${java.home}/lib/tools.jar</sun.tools.systempath>-->
+        <nanoxml.version>2.2.3</nanoxml.version>
+
+        <!-- java 1.6 最高可用版本-->
+        <log4j.version>2.3</log4j.version>
+        <slf4j-api.version>1.7.24</slf4j-api.version>
+        <logback-classic.version>1.2.1</logback-classic.version>
+        <commons-lang3.version>3.4</commons-lang3.version>
+        <commons-collections.version>3.2.1</commons-collections.version>
+        <commons-io.version>2.4</commons-io.version>
+        <commons-configuration.version>1.10</commons-configuration.version>
+        <guava.version>18.0</guava.version>
+        <json.version>20160810</json.version>
+        <retrofit.version>1.9.0</retrofit.version>
+        <!--        <asm.version>5.0.4</asm.version>-->
+        <asm.version>7.0</asm.version>
+        <junit.version>4.9</junit.version>
+        <proguard.version>2.2.0</proguard.version>
+        <jdk.version.level>2</jdk.version.level>
+    </properties>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <version>2.4</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <version>2.2-beta-5</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.compiler.version}</version>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                    <encoding>UTF-8</encoding>
+                    <showDeprecation>true</showDeprecation>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <modules>
+        <module>iast-agent</module>
+        <module>iast-inject</module>
+        <module>iast-core</module>
+    </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.secnium.iast</groupId>
+                <artifactId>iast-inject</artifactId>
+                <version>${iast.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.secnium.iast</groupId>
+                <artifactId>iast-core</artifactId>
+                <version>${iast.version}</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+
+    <description>Secnium IAST Community</description>
+
+    <repositories>
+        <repository>
+            <id>spring</id>
+            <url>https://maven.aliyun.com/repository/public</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+</project>

@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+         xmlns="http://maven.apache.org/POM/4.0.0">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.secnium.iast</groupId>
+        <artifactId>iast</artifactId>
+        <version>0.5.2</version>
+    </parent>
+    <artifactId>iast-core</artifactId>
+    <name>iast-core</name>
+    <properties>
+        <jdk.version.level>2</jdk.version.level>
+    </properties>
+
+    <build>
+        <!-- 1：asm 5；2：asm 8-->
+        <finalName>iast-core</finalName>
+
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>lingzhi-log.xml</include>
+                    <include>**/version</include>
+                    <include>**/logo</include>
+                    <include>**/blackext.txt</include>
+                    <include>**/blacklist.txt</include>
+                    <include>**/blacklistfunc.txt</include>
+                    <include>**/model.xml</include>
+                    <include>**/sinks.txt</include>
+                    <include>**/sources.txt</include>
+                    <include>**/whitelist.txt</include>
+                </includes>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+
+                        <configuration>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/</exclude>
+                                        <exclude>*.dtd</exclude>
+                                        <exclude>java.lang.iast.inject.*</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                            <relocations>
+                                <relocation>
+                                    <pattern>org.apache</pattern>
+                                    <shadedPattern>${shade-prefix}.org.apache</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.objectweb</pattern>
+                                    <shadedPattern>${shade-prefix}.org.objectweb</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>com.google</pattern>
+                                    <shadedPattern>${shade-prefix}.com.google</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>net.n3.nanoxml</pattern>
+                                    <shadedPattern>${shade-prefix}.net.n3.nanoxml</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>ch.qos</pattern>
+                                    <shadedPattern>${shade-prefix}.ch.qos</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.slf4j</pattern>
+                                    <shadedPattern>${shade-prefix}.org.slf4j</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.json</pattern>
+                                    <shadedPattern>${shade-prefix}.org.json</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>javax.servlet</pattern>
+                                    <shadedPattern>${shade-prefix}.javax.servlet</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>javax.xml.bind</pattern>
+                                    <shadedPattern>${shade-prefix}.javax.xml.bind</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>javax.xml.stream</pattern>
+                                    <shadedPattern>${shade-prefix}.javax.xml.stream</shadedPattern>
+                                </relocation>
+                            </relocations>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <!-- https://mvnrepository.com/artifact/com.github.wvengen/proguard-maven-plugin -->
+                <groupId>com.github.wvengen</groupId>
+                <artifactId>proguard-maven-plugin</artifactId>
+                <version>${proguard.version}</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>proguard</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <obfuscate>true</obfuscate>
+                    <inLibsFilter>!module-info.class</inLibsFilter>
+                    <injar>${project.build.finalName}.jar</injar>
+                    <outjar>${project.build.finalName}.jar</outjar>
+                    <outputDirectory>${project.build.directory}</outputDirectory>
+                    <proguardInclude>${basedir}/proguard.conf</proguardInclude>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-lib-src-webapps</id>
+                        <phase>package</phase>
+                        <configuration>
+                            <tasks>
+                                <copy todir="./../release/lib">
+                                    <fileset dir="target/">
+                                        <include name="iast-core.jar"/>
+                                    </fileset>
+                                </copy>
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.secnium.iast</groupId>
+            <artifactId>iast-inject</artifactId>
+            <version>${iast.version}</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/be.cyberelf.nanoxml/nanoxml -->
+        <dependency>
+            <groupId>be.cyberelf.nanoxml</groupId>
+            <artifactId>nanoxml</artifactId>
+            <version>${nanoxml.version}</version>
+        </dependency>
+
+        <!--日志所需依赖-->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j-api.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback-classic.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${commons-lang3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <version>${commons-collections.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${commons-io.version}</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/commons-configuration/commons-configuration -->
+        <dependency>
+            <groupId>commons-configuration</groupId>
+            <artifactId>commons-configuration</artifactId>
+            <version>${commons-configuration.version}</version>
+        </dependency>
+
+
+        <!-- asm -->
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm</artifactId>
+            <version>${asm.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm-commons</artifactId>
+            <version>${asm.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm-util</artifactId>
+            <version>${asm.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>${json.version}</version>
+        </dependency>
+
+        <!--  RSA加密所需 -->
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.activation</groupId>
+                    <artifactId>activation</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+    </dependencies>
+
+</project>
