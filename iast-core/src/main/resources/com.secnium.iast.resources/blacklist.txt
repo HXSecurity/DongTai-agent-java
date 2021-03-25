@@ -36527,10 +36527,13 @@ org/apache/struts2/dispatcher/mapper/ParameterAction
 org/apache/struts2/dispatcher/mapper/PrefixBasedActionMapper
 org/apache/struts2/dispatcher/mapper/Restful2ActionMapper
 org/apache/struts2/dispatcher/mapper/RestfulActionMapper
-org/apache/struts2/dispatcher/multipart/JakartaMultiPartRequest
+# fix s2-061 vul detect
+# close this hook point, it's slowly
+#org/apache/struts2/dispatcher/multipart/JakartaMultiPartRequest
 org/apache/struts2/dispatcher/multipart/JakartaMultiPartRequest$1
 org/apache/struts2/dispatcher/multipart/JakartaStreamMultiPartRequest
 org/apache/struts2/dispatcher/multipart/JakartaStreamMultiPartRequest$FileInfo
+# fix s2-061 vul detect
 org/apache/struts2/dispatcher/multipart/MultiPartRequest
 org/apache/struts2/dispatcher/multipart/MultiPartRequestWrapper
 org/apache/struts2/dispatcher/ng/ExecuteOperations

@@ -73,7 +73,7 @@
                                         <include name="iast-inject.jar"/>
                                     </fileset>
                                 </copy>
-                                <copy todir="./../../lingzhi-agent-server/iast-package">
+                                <copy todir="./../../../dongtai-openapi/iast-package">
                                     <fileset dir="target/">
                                         <include name="iast-inject.jar"/>
                                     </fileset>

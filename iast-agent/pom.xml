@@ -156,7 +156,7 @@
                                         <include name="iast-agent.jar"/>
                                     </fileset>
                                 </copy>
-                                <copy todir="./../../lingzhi-agent-server/iast-package">
+                                <copy todir="./../../../dongtai-openapi/iast-package">
                                     <fileset dir="target/">
                                         <include name="iast-agent.jar"/>
                                     </fileset>

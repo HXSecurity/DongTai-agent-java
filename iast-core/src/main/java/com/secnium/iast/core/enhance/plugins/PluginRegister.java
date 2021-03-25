@@ -9,6 +9,7 @@ import com.secnium.iast.core.enhance.plugins.sinks.cookie.DispatchCookie;
 import com.secnium.iast.core.enhance.plugins.sources.servlet.DispatchServlet;
 import com.secnium.iast.core.enhance.plugins.sources.servlet.stream.catalina.DispatchCoyoteInputStream;
 import com.secnium.iast.core.enhance.plugins.sources.spring.DispatchSpringSource;
+import com.secnium.iast.core.enhance.plugins.sources.struts2.DispatchStruts2;
 import org.objectweb.asm.ClassVisitor;
 
 import java.util.ArrayList;
@@ -43,6 +44,7 @@ public class PluginRegister {
         PLUGINS.add(new DispatchJ2ee());
         PLUGINS.add(new DispatchJsp());
         PLUGINS.add(new DispatchServlet());
+        PLUGINS.add(new DispatchStruts2());
         PLUGINS.add(new DispatchCoyoteInputStream());
         PLUGINS.add(new DispatchCookie());
         PLUGINS.add(new DispatchRecyclePlugin());
