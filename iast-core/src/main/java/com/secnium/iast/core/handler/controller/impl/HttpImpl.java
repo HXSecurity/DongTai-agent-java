@@ -43,6 +43,7 @@ public class HttpImpl {
             EngineManager.RESPONSE_CACHE.set(new HttpResponse(event.argumentArray[1]));
             EngineManager.TRACK_MAP.set(new HashMap<Integer, MethodEvent>());
             EngineManager.TAINT_POOL.set(new HashSet<Object>());
+            EngineManager.TAINT_HASH_CODES.set(new HashSet<Integer>());
 
             if (logger.isDebugEnabled()) {
                 logger.debug("HTTP Request:{} {} from: {}", request.getMethod(), request.getRequestURL(), event.signature);

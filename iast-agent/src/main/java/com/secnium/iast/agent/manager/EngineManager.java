@@ -352,9 +352,10 @@ public class EngineManager {
      */
     private static String getJdkVersion() {
         String jdkVersion = System.getProperty("java.version", "1.8");
+        System.out.println("current jdk version is : " + jdkVersion);
         String[] jdkVersions = jdkVersion.split("\\.");
         boolean isHighJdk = true;
-        if ("6".equals(jdkVersions[1]) || "7".equals(jdkVersions[1]) || "8".equals(jdkVersions[1])) {
+        if (jdkVersions.length > 1 && ("6".equals(jdkVersions[1]) || "7".equals(jdkVersions[1]) || "8".equals(jdkVersions[1]))) {
             isHighJdk = false;
         }
         return isHighJdk ? "2" : "1";

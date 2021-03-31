@@ -15,14 +15,13 @@ import java.util.Set;
  * 场景：污点池中数据的查询数多于插入数量
  */
 public class TaintPoolUtils {
-    private static final boolean enableAllHook = EngineManager.isEnableAllHook();
 
     public static boolean poolContains(Object obj, MethodEvent event) {
         if (obj == null) {
             return false;
         }
 
-        boolean isContains = false;
+        boolean isContains;
         boolean isString = obj instanceof String;
         // 检查对象是否存在
         isContains = contains(obj, isString, event);
@@ -33,6 +32,7 @@ public class TaintPoolUtils {
                     isContains = contains(tempObj, true, event);
                     if (isContains) {
                         EngineManager.TAINT_POOL.addToPool(obj);
+                        EngineManager.TAINT_HASH_CODES.get().add(obj.hashCode());
                         event.addSourceHash(obj.hashCode());
                         break;
                     }
@@ -42,30 +42,39 @@ public class TaintPoolUtils {
         return isContains;
     }
 
+    /**
+     * 判断污点是否匹配
+     *
+     * @param obj
+     * @param isString
+     * @param event
+     * @return
+     */
     private static boolean contains(Object obj, boolean isString, MethodEvent event) {
         Set<Object> taints = EngineManager.TAINT_POOL.get();
         Iterator<Object> iterator = taints.iterator();
+        int hashcode = 0;
+
+        if (isString) {
+            hashcode = System.identityHashCode(obj);
+        } else {
+            hashcode = obj.hashCode();
+        }
 
         while (iterator.hasNext()) {
             try {
                 Object value = iterator.next();
-                if (isString) {
-                    if (enableAllHook) {
-                        if (obj == value) {
-                            event.addSourceHash(System.identityHashCode(obj));
-                            return true;
-                        } else if (obj.equals(value)) {
-                            // fixme 全量hook时，增加此逻辑
-                            event.addSourceHash(System.identityHashCode(value));
+                if (obj.equals(value)) {
+                    if (isString) {
+                        // 检查当前污点的hashcode是否在hashcode池中，如果在，则标记传播
+                        if (EngineManager.TAINT_HASH_CODES.get().contains(hashcode)) {
+                            EngineManager.TAINT_HASH_CODES.get().add(hashcode);
+                            event.addSourceHash(hashcode);
                             return true;
                         }
-                    } else if (obj == value) {
-                        event.addSourceHash(System.identityHashCode(obj));
-                        return true;
-                    }
-                } else {
-                    if (obj.equals(value)) {
-                        event.addSourceHash(obj.hashCode());
+                    } else {
+                        EngineManager.TAINT_HASH_CODES.get().add(hashcode);
+                        event.addSourceHash(hashcode);
                         return true;
                     }
                 }

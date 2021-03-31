@@ -1,5 +1,6 @@
 package com.secnium.iast.core.threadlocalpool;
 
+import com.secnium.iast.core.EngineManager;
 import com.secnium.iast.core.handler.models.MethodEvent;
 
 import java.util.HashSet;
@@ -10,6 +11,7 @@ import java.util.Set;
  * @author dongzhiyong@huoxian.cn
  */
 public class IASTTaintPool extends ThreadLocal<HashSet<Object>> {
+
     @Override
     protected HashSet<Object> initialValue() {
         return null;
@@ -25,32 +27,51 @@ public class IASTTaintPool extends ThreadLocal<HashSet<Object>> {
      *
      * @param obj source点的污点
      */
-    public void addSourceToPool(Object obj, MethodEvent event) {
+    public void addTaintToPool(Object obj, MethodEvent event, boolean isSource) {
+        int subHashCode = 0;
         if (obj instanceof String[]) {
             this.get().add(obj);
+            EngineManager.TAINT_HASH_CODES.get().add(obj.hashCode());
             event.addTargetHash(obj.hashCode());
 
             String[] tempObjs = (String[]) obj;
             for (String tempObj : tempObjs) {
                 this.get().add(tempObj);
-                event.addTargetHash(System.identityHashCode(tempObj));
+                subHashCode = System.identityHashCode(tempObj);
+                EngineManager.TAINT_HASH_CODES.get().add(subHashCode);
+                event.addTargetHash(subHashCode);
             }
         } else if (obj instanceof Map) {
             this.get().add(obj);
-            Map<String, String[]> tempMap = (Map<String, String[]>) obj;
-            Set<Map.Entry<String, String[]>> entrys = tempMap.entrySet();
-            for (Map.Entry<String, String[]> entry : entrys) {
-                Object key = entry.getKey();
-                Object value = entry.getValue();
-                addSourceToPool(key, event);
-                addSourceToPool(value, event);
+            if (isSource) {
+                Map<String, String[]> tempMap = (Map<String, String[]>) obj;
+                Set<Map.Entry<String, String[]>> entrys = tempMap.entrySet();
+                for (Map.Entry<String, String[]> entry : entrys) {
+                    Object key = entry.getKey();
+                    Object value = entry.getValue();
+                    addTaintToPool(key, event, isSource);
+                    addTaintToPool(value, event, isSource);
+                }
+            }
+        } else if (obj.getClass().isArray() && obj.getClass().getComponentType().isPrimitive() == false) {
+            Object[] tempObjs = (Object[]) obj;
+            if (tempObjs == null || tempObjs.length == 0) {
+
+            } else {
+                for (Object tempObj : tempObjs) {
+                    addTaintToPool(tempObj, event, isSource);
+                }
             }
         } else {
             this.get().add(obj);
             if (obj instanceof String) {
-                event.addTargetHash(System.identityHashCode(obj));
+                subHashCode = System.identityHashCode(obj);
+                EngineManager.TAINT_HASH_CODES.get().add(subHashCode);
+                event.addTargetHash(subHashCode);
             } else {
-                event.addTargetHash(obj.hashCode());
+                subHashCode = obj.hashCode();
+                EngineManager.TAINT_HASH_CODES.get().add(subHashCode);
+                event.addTargetHash(subHashCode);
             }
 
         }

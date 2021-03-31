@@ -35,7 +35,7 @@ public class SourceImpl {
             if (isNotEmpty(event.returnValue)) {
                 // todo 数据保存时，直接计算hash，放入outHash中
                 EngineManager.TRACK_MAP.addTrackMethod(invokeId, event);
-                EngineManager.TAINT_POOL.addSourceToPool(event.returnValue, event);
+                EngineManager.TAINT_POOL.addTaintToPool(event.returnValue, event, true);
             }
         }
     }

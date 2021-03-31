@@ -24564,7 +24564,7 @@ java/util/Base64
 java/util/BitSet
 java/util/Calendar
 java/util/Calendar$Builder
-java/util/Collections*
+#java/util/Collections*
 java/util/Collections$UnmodifiableCollection$1
 java/util/Collections$1
 java/util/Collections$AsLIFOQueue

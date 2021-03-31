@@ -137,7 +137,7 @@ public class PropagatorImpl {
             }
         }
         if (isNotEmpty(event.outValue)) {
-            EngineManager.TAINT_POOL.addSourceToPool(event.outValue, event);
+            EngineManager.TAINT_POOL.addTaintToPool(event.outValue, event, false);
         }
     }
 

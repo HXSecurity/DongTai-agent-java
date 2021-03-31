@@ -24,8 +24,8 @@ public class EngineManager {
     public static final IASTResponseCache RESPONSE_CACHE = new IASTResponseCache();
     public static final IASTTrackMap TRACK_MAP = new IASTTrackMap();
     public static final IASTTaintPool TAINT_POOL = new IASTTaintPool();
+    public static final IASTTaintHashCodes TAINT_HASH_CODES = new IASTTaintHashCodes();
     public static final IASTScopeTracker SCOPE_TRACKER = new IASTScopeTracker();
-    // fixme 登陆识别 全局有效，此处使用ThreadLocal 不满足要求
     private static final IASTServerPort LOGIN_LOGIC_WEIGHT = new IASTServerPort();
     private static final BooleanTheadLocal LINGZHI_RUNNING = new BooleanTheadLocal(false);
     public static final IASTServerAddr SERVER_ADDR = new IASTServerAddr();
@@ -88,6 +88,7 @@ public class EngineManager {
         EngineManager.RESPONSE_CACHE.remove();
         EngineManager.TRACK_MAP.remove();
         EngineManager.TAINT_POOL.remove();
+        EngineManager.TAINT_HASH_CODES.remove();
         EngineManager.SCOPE_TRACKER.remove();
         EngineManager.SERVER_ADDR.remove();
         EngineManager.SERVER_PORT.remove();
