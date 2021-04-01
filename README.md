@@ -2,6 +2,7 @@
 [![django-project](https://img.shields.io/badge/django%20versions-3.0.3-blue)](https://www.djangoproject.com/)
 [![dongtai-project](https://img.shields.io/badge/dongtai%20versions-beta-green)](https://github.com/huoxianclub/dongtai)
 [![dongtai--agent--java](https://img.shields.io/badge/dongtai--agent--java-v1.0.0-lightgrey)](https://github.com/huoxianclub/dongtai-web)
+[![license GPL-3.0](https://img.shields.io/github/license/HXSecurity/DongTai-agent-java)](https://github.com/HXSecurity/DongTai-agent-java/blob/main/LICENSE)
 
 > 原"灵芝IAST"，后更名为"洞态IAST"，产品改为SaaS版，agent端采集与污点相关的数据并发送至服务器端，服务器端接收数据并重构形成污点方法图，再根据深度优先算法搜索污点调用链
 
