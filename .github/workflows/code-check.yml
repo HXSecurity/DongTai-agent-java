@@ -18,7 +18,8 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 1.6
-        run: mvn -version
 
       - name: Build with Maven
-        run: mvn -B package -Dmaven.test.skip=true
+        run: |
+          mvn -version
+          mvn -B package -Dmaven.test.skip=true
