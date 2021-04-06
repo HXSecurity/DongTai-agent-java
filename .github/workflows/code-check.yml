@@ -13,8 +13,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: show mvn version
+      - name: Show Maven Version
         run: |
+          java -version
           mvn -version
 
       - uses: actions/checkout@v2
@@ -23,7 +24,7 @@ jobs:
         with:
           java-version: 1.6
 
-      - name: Build with Maven
+      - name: Build DongTai-Java-Agent With Maven
         run: |
           mvn -version
           mvn -B package -Dmaven.test.skip=true
