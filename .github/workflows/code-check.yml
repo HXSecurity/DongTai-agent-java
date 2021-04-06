@@ -28,6 +28,7 @@ jobs:
         run: |
           mkdir -p ~/.m2/repository/
           cp deploy/settings.xml ~/.m2/repository/
+          cd /tmp/
           mvn help:effective-settings
 
       - name: Build DongTai-Java-Agent With Maven
