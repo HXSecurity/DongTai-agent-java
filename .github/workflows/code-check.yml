@@ -34,4 +34,5 @@ jobs:
           pwd
           mkdir -p ~/.m2/repository/
           cp deploy/settings.xml ~/.m2/repository/
+          mvn help:effective-settings
           mvn -B package -Dmaven.test.skip=true
