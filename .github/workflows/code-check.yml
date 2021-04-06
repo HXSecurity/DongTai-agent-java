@@ -19,6 +19,11 @@ jobs:
         with:
           java-version: 1.6
 
+      - name: Set up Maven
+        uses: stCarolas/setup-maven@v4
+        with:
+          maven-version: 3.2.5
+
       - name: Show Maven Version
         run: |
           java -version
