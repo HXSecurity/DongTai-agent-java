@@ -31,5 +31,6 @@ jobs:
 
       - name: Build DongTai-Java-Agent With Maven
         run: |
-          mvn -version
+          pwd
+          cp deploy/settings.xml ~/.m2/repository/
           mvn -B package -Dmaven.test.skip=true
