@@ -8,6 +8,9 @@ import org.objectweb.asm.MethodVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * @author dongzhiyong@huoxian.cn
+ */
 public class DubboAdapter extends AbstractClassVisitor {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 

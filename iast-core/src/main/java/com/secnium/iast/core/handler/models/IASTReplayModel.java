@@ -1,5 +1,8 @@
 package com.secnium.iast.core.handler.models;
 
+/**
+ * @author dongzhiyong@huoxian.cn
+ */
 public class IASTReplayModel {
     public IASTReplayModel(String requestMethod, String requestUrl, String queryString, String requestBody, String requestHeader, String traceId) {
         this.requestMethod = requestMethod.toUpperCase();

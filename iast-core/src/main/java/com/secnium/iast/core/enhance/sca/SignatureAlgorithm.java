@@ -15,7 +15,7 @@ import java.security.NoSuchAlgorithmException;
  */
 public class SignatureAlgorithm {
 
-    public static String getSignture(InputStream is, String algorithm) {
+    public static String getSignature(InputStream is, String algorithm) {
         String signature = null;
         try {
             MessageDigest digest = MessageDigest.getInstance(algorithm);
@@ -34,7 +34,7 @@ public class SignatureAlgorithm {
         return signature;
     }
 
-    public static String getSignture(File file, String algorithm) {
+    public static String getSignature(File file, String algorithm) {
         if (!file.exists()) {
             return null;
         }
@@ -42,7 +42,7 @@ public class SignatureAlgorithm {
         FileInputStream in = null;
         try {
             in = new FileInputStream(file);
-            signature = getSignture(in, algorithm);
+            signature = getSignature(in, algorithm);
         } catch (IOException e) {
             System.out.println(e);
         } finally {
@@ -57,7 +57,7 @@ public class SignatureAlgorithm {
         return signature;
     }
 
-    public static String getSignture(String filename, String algorithm) {
-        return SignatureAlgorithm.getSignture(new File(filename), algorithm);
+    public static String getSignature(String filename, String algorithm) {
+        return SignatureAlgorithm.getSignature(new File(filename), algorithm);
     }
 }

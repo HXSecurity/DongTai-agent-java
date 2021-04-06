@@ -10,6 +10,9 @@ import com.secnium.iast.core.util.base64.Base64Utils;
 import com.secnium.iast.core.util.http.HttpRequest;
 import org.json.JSONObject;
 
+/**
+ * @author dongzhiyong@huoxian.cn
+ */
 public abstract class AbstractNormalVulScan implements IVulScan {
     private static final ServerDetect SERVER_DETECT = ServerDetect.getInstance();
 

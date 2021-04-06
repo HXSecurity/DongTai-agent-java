@@ -40,13 +40,13 @@ public class SCAScanTest {
         };
 
         for (String packagePath : packagePaths) {
-            SCAScaner.scan(new File(packagePath));
+            SCAScanner.scan(new File(packagePath));
         }
     }
 
     @Test
     public void scanWithJar() {
         String path = "jar:file:～/workspace/secnium/BugPlatflam/lingzhi/test-case/springsec/target/iast-vulns.jar!/BOOT-INF/lib/spring-core-5.2.8.RELEASE.jar!/";
-        SCAScaner.scanWithJarPackage(path);
+        SCAScanner.scanWithJarPackage(path);
     }
 }

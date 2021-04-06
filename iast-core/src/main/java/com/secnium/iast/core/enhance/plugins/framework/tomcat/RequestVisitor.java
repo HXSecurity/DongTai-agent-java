@@ -9,6 +9,9 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Modifier;
 
+/**
+ * @author dongzhiyong@huoxian.cn
+ */
 public class RequestVisitor extends AbstractClassVisitor {
 
     public RequestVisitor(ClassVisitor classVisitor, IASTContext context) {

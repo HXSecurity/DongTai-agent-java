@@ -1,6 +1,6 @@
 package com.secnium.iast.core.enhance;
 
-import com.secnium.iast.core.enhance.sca.SCAScaner;
+import com.secnium.iast.core.enhance.sca.ScaScanner;
 import com.secnium.iast.core.report.ErrorLogReport;
 import com.secnium.iast.core.util.ThrowableUtils;
 import org.json.JSONObject;
@@ -24,7 +24,11 @@ public class IASTClassAncestorQuery {
     private static final Map<String, List<String>> DEFAULT_INTERFACE_LIST_MAP;
     private static final String BASE_CLASS = "java/lang/Object";
     private final HashSet<String> scannedClassSet = new HashSet<String>();
-    private CodeSource codeSource;
+
+    public void setLoader(ClassLoader loader) {
+        this.loader = loader;
+    }
+
     private ClassLoader loader;
     private static IASTClassAncestorQuery instance;
 
@@ -33,11 +37,6 @@ public class IASTClassAncestorQuery {
             instance = new IASTClassAncestorQuery();
         }
         return instance;
-    }
-
-    public synchronized void setCodeSource(CodeSource codeSource, ClassLoader loader) {
-        this.codeSource = codeSource;
-        this.loader = loader;
     }
 
     private IASTClassAncestorQuery() {
@@ -96,7 +95,7 @@ public class IASTClassAncestorQuery {
             }
         } else {
             Set<String> tempClassFamily = new HashSet<String>();
-            scanJarForAccesstor(className, tempClassFamily);
+            scanJarForAncestor(className, tempClassFamily);
             if (!tempClassFamily.isEmpty()) {
                 for (String tempClass : tempClassFamily) {
                     ancestors.add(tempClass);
@@ -126,10 +125,10 @@ public class IASTClassAncestorQuery {
     /**
      * 从classloader中查找父类，将当前类的父类收集足够完整，避免丢失hook点，该方法未做持续查找，缺少深度
      *
-     * @param className  当前类名
-     * @param accesstors 当前类的祖先 类/接口 集合
+     * @param className 当前类名
+     * @param ancestors 当前类的祖先 类/接口 集合
      */
-    private void scanJarForAccesstor(String className, Set<String> accesstors) {
+    private void scanJarForAncestor(String className, Set<String> ancestors) {
         if (null == this.loader) {
             this.loader = this.getClass().getClassLoader();
         }
@@ -150,10 +149,10 @@ public class IASTClassAncestorQuery {
                     String[] interfaces = cr.getInterfaces();
                     String superclass = cr.getSuperName();
                     if (!(BASE_CLASS.equals(superclass) || null == superclass)) {
-                        accesstors.add(superclass);
+                        ancestors.add(superclass);
                         queue.offer(superclass);
                     }
-                    accesstors.addAll(Arrays.asList(interfaces));
+                    ancestors.addAll(Arrays.asList(interfaces));
                     for (String tempInterface : interfaces) {
                         queue.offer(tempInterface);
                     }
@@ -184,19 +183,18 @@ public class IASTClassAncestorQuery {
             File jarPackageFile = new File(jarPackageFilePath);
             String packagePath = jarPackageFile.getParent();
             if (jarPackageFilePath.startsWith("file:") && jarPackageFilePath.contains(".jar!/") && jarPackageFilePath.endsWith(".jar!/")) {
-                // 从jar包中提取依赖
                 jarPackageFilePath = jarPackageFilePath.replace("file:", "");
                 jarPackageFilePath = jarPackageFilePath.substring(0, jarPackageFilePath.indexOf("!/"));
                 if (!scannedClassSet.contains(jarPackageFilePath)) {
                     scannedClassSet.add(jarPackageFilePath);
-                    SCAScaner.scanWithJarPackage(jarPackageFilePath);
+                    ScaScanner.scanWithJarPackage(jarPackageFilePath);
                 }
             } else if (!jarPackageFilePath.endsWith("iast-core.jar") && !jarPackageFilePath.endsWith("iast-inject.jar") && !scannedClassSet.contains(packagePath)) {
                 scannedClassSet.add(packagePath);
                 File packagePathFile = new File(packagePath);
                 File[] packagePathFiles = packagePathFile.listFiles();
                 for (File tempPackagePathFile : packagePathFiles != null ? packagePathFiles : new File[0]) {
-                    SCAScaner.scan(tempPackagePathFile);
+                    ScaScanner.scan(tempPackagePathFile);
                 }
             }
         }

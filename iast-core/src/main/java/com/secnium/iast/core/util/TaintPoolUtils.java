@@ -13,6 +13,8 @@ import java.util.Set;
  * 2.检测时，将污点池中的复杂对象拆分出来
  * <p>
  * 场景：污点池中数据的查询数多于插入数量
+ *
+ * @author dongzhiyong@huoxian.cn
  */
 public class TaintPoolUtils {
 

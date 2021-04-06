@@ -9,7 +9,10 @@ import java.io.InputStream;
 
 /**
  * 字符串工具类
- * Created by luanjia@taobao.com on 15/5/18.
+ *
+ * @author luanjia@taobao.com
+ * @date 15/5/18
+ * @modify dongzhiyong@huoxian.cn
  */
 public class SandboxStringUtils {
 

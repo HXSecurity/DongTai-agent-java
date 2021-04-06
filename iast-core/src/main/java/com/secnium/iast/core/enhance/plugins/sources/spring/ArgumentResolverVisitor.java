@@ -6,6 +6,9 @@ import com.secnium.iast.core.util.AsmUtils;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 
+/**
+ * @author dongzhiyong@huoxian.cn
+ */
 public class ArgumentResolverVisitor extends AbstractClassVisitor {
     public ArgumentResolverVisitor(ClassVisitor classVisitor, IASTContext context) {
         super(classVisitor, context);

@@ -5,7 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * @author dongzhiyong@huoxian.cn
  */
-public class InternalClass extends ClassBase {
+public class InternalClass extends AbstractMatcher {
     private static final String[] classes;
 
     @Override

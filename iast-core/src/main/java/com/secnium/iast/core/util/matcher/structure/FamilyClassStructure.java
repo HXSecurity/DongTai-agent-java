@@ -7,6 +7,9 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+/**
+ * @author dongzhiyong@huoxian.cn
+ */
 public abstract class FamilyClassStructure implements ClassStructure {
 
     private final LazyGet<Set<ClassStructure>> familyInterfaceClassStructuresLazyGet
@@ -63,7 +66,12 @@ public abstract class FamilyClassStructure implements ClassStructure {
         return familyTypeClassStructuresLazyGet.get();
     }
 
-    // 当前类结构是否一个可被继承的Annotation类结构
+    /**
+     * 当前类结构是否一个可被继承的Annotation类结构
+     *
+     * @param classStructure
+     * @return
+     */
     private static boolean isInheritedAnnotationType(ClassStructure classStructure) {
         if (!classStructure.getAccess().isAnnotation()) {
             return false;

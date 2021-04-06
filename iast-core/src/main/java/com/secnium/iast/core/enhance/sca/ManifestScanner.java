@@ -1,6 +1,5 @@
 package com.secnium.iast.core.enhance.sca;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 import java.util.jar.Attributes;
@@ -10,9 +9,9 @@ import java.util.jar.Manifest;
 /**
  * @author dongzhiyong@huoxian.cn
  */
-public class ManifestScaner {
+public class ManifestScanner {
 
-    private static String getPackgeInfo(Attributes attributes) {
+    private static String getPackageInfo(Attributes attributes) {
         String version;
         String title;
 
@@ -25,25 +24,23 @@ public class ManifestScaner {
     }
 
     /**
-     * todo: 考虑提取pom.xml或pom.properties，进行依赖的深度解析
-     *
-     * @param jarFile
+     * @param jarFile 待检测Manifest的Jar包
      * @return
      * @throws IOException
      */
-    public static String parseJarManifest(JarFile jarFile) throws IOException {
+    public static String parseManifest(JarFile jarFile) throws IOException {
         String filename = null;
         Manifest manifest = jarFile.getManifest();
 
         Map<String, Attributes> entries = manifest.getEntries();
         for (Map.Entry<String, Attributes> entry : entries.entrySet()) {
-            filename = getPackgeInfo(entry.getValue());
+            filename = getPackageInfo(entry.getValue());
             if (filename != null) {
                 break;
             }
         }
         if (null == filename) {
-            filename = getPackgeInfo(manifest.getMainAttributes());
+            filename = getPackageInfo(manifest.getMainAttributes());
         }
 
         if (null == filename) {
@@ -51,9 +48,5 @@ public class ManifestScaner {
             filename = stages[stages.length - 1];
         }
         return filename;
-    }
-
-    public static String parseJarManifest(File file) throws IOException {
-        return parseJarManifest(new JarFile(file));
     }
 }

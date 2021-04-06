@@ -9,6 +9,9 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Modifier;
 
+/**
+ * @author dongzhiyong@huoxian.cn
+ */
 public class CharChunkVisitor extends AbstractClassVisitor {
 
     private IASTContext IASTContext;

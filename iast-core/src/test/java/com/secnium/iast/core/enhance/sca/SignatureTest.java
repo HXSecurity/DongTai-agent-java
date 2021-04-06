@@ -13,12 +13,12 @@ public class SignatureTest {
         File file = new File(filename);
         String signature;
 
-        if (null != (signature = SignatureAlgorithm.getSignture(file, algorithm))) {
+        if (null != (signature = SignatureAlgorithm.getSignature(file, algorithm))) {
             System.out.println(algorithm + ": " + signature);
         }
 
         algorithm = "MD5";
-        if (null != (signature = SignatureAlgorithm.getSignture(file, algorithm))) {
+        if (null != (signature = SignatureAlgorithm.getSignature(file, algorithm))) {
             System.out.println(algorithm + ": " + signature);
         }
     }
@@ -29,12 +29,12 @@ public class SignatureTest {
         String filename = "/Volumes/workspace/JobSpace/secnium/iast/agent_example/iast_test/apache-tomcat-8.5.40/lib/catalina.jar";
         String signature;
 
-        if (null != (signature = SignatureAlgorithm.getSignture(filename, algorithm))) {
+        if (null != (signature = SignatureAlgorithm.getSignature(filename, algorithm))) {
             System.out.println(algorithm + ": " + signature);
         }
 
         algorithm = "MD5";
-        if (null != (signature = SignatureAlgorithm.getSignture(filename, algorithm))) {
+        if (null != (signature = SignatureAlgorithm.getSignature(filename, algorithm))) {
             System.out.println(algorithm + ": " + signature);
         }
 

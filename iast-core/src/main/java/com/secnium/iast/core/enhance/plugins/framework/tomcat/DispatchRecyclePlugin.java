@@ -10,6 +10,9 @@ import org.objectweb.asm.MethodVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * @author dongzhiyong@huoxian.cn
+ */
 public class DispatchRecyclePlugin implements DispatchPlugin {
 
     private final String outputBuffer = " org/apache/catalina/connector/OutputBuffer".substring(1);

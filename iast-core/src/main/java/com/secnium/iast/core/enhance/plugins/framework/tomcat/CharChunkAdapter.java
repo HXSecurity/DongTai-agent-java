@@ -5,6 +5,9 @@ import com.secnium.iast.core.util.AsmUtils;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.commons.AdviceAdapter;
 
+/**
+ * @author dongzhiyong@huoxian.cn
+ */
 public class CharChunkAdapter extends AdviceAdapter {
     private final IASTContext IASTContext;
 

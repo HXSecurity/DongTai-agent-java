@@ -10,6 +10,7 @@ import java.util.HashSet;
 
 /**
  * 处理jsp include方法的文件包含
+ * @author dongzhiyong@huoxian.cn
  */
 public class DispatchJsp implements DispatchPlugin {
 

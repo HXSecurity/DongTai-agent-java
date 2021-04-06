@@ -35,7 +35,14 @@ public class AsmUtils {
         return getCommonSuperClassImplByAsm(type1, type2, loader);
     }
 
-    // implements by ASM
+    /**
+     * implements by ASM
+     *
+     * @param type1
+     * @param type2
+     * @param targetClassLoader
+     * @return
+     */
     private static String getCommonSuperClassImplByAsm(String type1, String type2, ClassLoader targetClassLoader) {
         InputStream inputStreamOfType1 = null, inputStreamOfType2 = null;
         try {

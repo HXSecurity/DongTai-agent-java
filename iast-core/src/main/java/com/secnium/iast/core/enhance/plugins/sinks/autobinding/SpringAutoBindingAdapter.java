@@ -13,6 +13,9 @@ import org.objectweb.asm.commons.AdviceAdapter;
 import org.objectweb.asm.commons.Method;
 
 
+/**
+ * @author dongzhiyong@huoxian.cn
+ */
 public class SpringAutoBindingAdapter extends AbstractClassVisitor {
 
     private static Method onbind;

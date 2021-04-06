@@ -6,6 +6,9 @@ import com.secnium.iast.core.handler.controller.HookType;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 
+/**
+ * @author dongzhiyong@huoxian.cn
+ */
 public class DubboAdviceAdapter extends AbstractAdviceAdapter {
 
     public DubboAdviceAdapter(MethodVisitor mv, int access, String name, String desc, String signCode, IASTContext context) {

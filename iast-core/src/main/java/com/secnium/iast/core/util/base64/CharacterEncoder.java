@@ -3,6 +3,9 @@ package com.secnium.iast.core.util.base64;
 import java.io.*;
 import java.nio.ByteBuffer;
 
+/**
+ * @author dongzhiyong@huoxian.cn
+ */
 public abstract class CharacterEncoder {
     protected PrintStream pStream;
 

@@ -23,31 +23,36 @@ public class ByteUtils {
         double size = 1.0 * byteSize;
 
         String type = "B";
-        if ((int) Math.floor(size / UNIT) <= 0) { //不足1KB
+        //不足1KB
+        if ((int) Math.floor(size / UNIT) <= 0) {
             type = "B";
             return format(size, type);
         }
 
         size = size / UNIT;
-        if ((int) Math.floor(size / UNIT) <= 0) { //不足1MB
+        //不足1MB
+        if ((int) Math.floor(size / UNIT) <= 0) {
             type = "KB";
             return format(size, type);
         }
 
         size = size / UNIT;
-        if ((int) Math.floor(size / UNIT) <= 0) { //不足1GB
+        //不足1GB
+        if ((int) Math.floor(size / UNIT) <= 0) {
             type = "MB";
             return format(size, type);
         }
 
         size = size / UNIT;
-        if ((int) Math.floor(size / UNIT) <= 0) { //不足1TB
+        //不足1TB
+        if ((int) Math.floor(size / UNIT) <= 0) {
             type = "GB";
             return format(size, type);
         }
 
         size = size / UNIT;
-        if ((int) Math.floor(size / UNIT) <= 0) { //不足1PB
+        //不足1PB
+        if ((int) Math.floor(size / UNIT) <= 0) {
             type = "TB";
             return format(size, type);
         }

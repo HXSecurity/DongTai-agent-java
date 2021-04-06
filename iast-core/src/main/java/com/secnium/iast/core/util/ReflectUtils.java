@@ -6,6 +6,9 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @author dongzhiyong@huoxian.cn
+ */
 public class ReflectUtils {
     private static final Class<?>[] basetype = {
             Boolean.class,

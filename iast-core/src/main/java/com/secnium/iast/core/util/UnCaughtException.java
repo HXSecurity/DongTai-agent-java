@@ -3,7 +3,10 @@ package com.secnium.iast.core.util;
 /**
  * 未捕获异常
  * 用来封装不希望抛出的异常
- * Created by luanjia@taobao.com on 16/5/21.
+ *
+ * @author luanjia@taobao.com
+ * @date 16/5/21
+ * @modify dongzhiyong@huoxian.cn
  */
 public class UnCaughtException extends RuntimeException {
 

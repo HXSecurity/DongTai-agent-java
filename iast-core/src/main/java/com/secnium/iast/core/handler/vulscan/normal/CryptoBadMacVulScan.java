@@ -10,6 +10,9 @@ import java.util.regex.Pattern;
 
 import static java.util.regex.Pattern.CASE_INSENSITIVE;
 
+/**
+ * @author dongzhiyong@huoxian.cn
+ */
 public class CryptoBadMacVulScan extends AbstractNormalVulScan {
     private final static Pattern GOOD_MAC_PAT = Pattern.compile("^(SHA2|SHA-224|SHA-256|SHA3|SHA-384|SHA5|SHA512|SHA-512)$", CASE_INSENSITIVE);
 

@@ -12,6 +12,9 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @author dongzhiyong@huoxian.cn
+ */
 public class HttpRequest {
     private WeakReference<Object> requestReference;
     private String method;

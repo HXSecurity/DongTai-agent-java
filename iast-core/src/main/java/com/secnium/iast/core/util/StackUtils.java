@@ -1,5 +1,8 @@
 package com.secnium.iast.core.util;
 
+/**
+ * @author dongzhiyong@huoxian.cn
+ */
 public class StackUtils {
     public static StackTraceElement[] createCallStack(int stackStartPos) {
         StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();

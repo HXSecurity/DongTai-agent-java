@@ -27,9 +27,9 @@ public class ConfigMatcher {
     private final static String[] END_ARRAY;
     private final static HashSet<String> internalWhiteList;
     private final static String[] disableExt;
-    private final static ClassBase internalClass = new InternalClass();
-    private final static ClassBase frameworkClass = new FrameworkClass();
-    private final static ClassBase serverClass = new ServerClass();
+    private final static AbstractMatcher internalClass = new InternalClass();
+    private final static AbstractMatcher frameworkClass = new FrameworkClass();
+    private final static AbstractMatcher serverClass = new ServerClass();
     private final static ClassLoader iastClassLoader = IASTClassFileTransformer.class.getClassLoader();
 
 

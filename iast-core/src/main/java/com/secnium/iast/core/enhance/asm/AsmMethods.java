@@ -8,7 +8,9 @@ import java.lang.iast.inject.Injecter;
 /**
  * 常用的ASM method 集合
  * 省得我到处声明
- * Created by luanjia@taobao.com on 16/5/21.
+ *
+ * @author luanjia@taobao.com
+ * @date 16/5/21
  * Modified by dongzhiyong@huoxian.cn
  */
 public interface AsmMethods {

@@ -4,6 +4,9 @@ import com.secnium.iast.core.enhance.IASTContext;
 import com.secnium.iast.core.enhance.plugins.DispatchPlugin;
 import org.objectweb.asm.ClassVisitor;
 
+/**
+ * @author dongzhiyong@huoxian.cn
+ */
 public class DispatchDubbo implements DispatchPlugin {
 
     @Override

@@ -25,8 +25,7 @@ public class PluginRegister {
     private final static ArrayList<DispatchPlugin> PLUGINS;
 
     public ClassVisitor initial(ClassVisitor classVisitor, IASTContext context) {
-        // fixme 注释硬编码检测实现类
-        // classVisitor = new DispatchHardcodedPlugin().dispatch(classVisitor, context);
+        // todo 暂时注释硬编码检测实现类，后续看情况打开。classVisitor = new DispatchHardcodedPlugin().dispatch(classVisitor, context);
         for (DispatchPlugin plugin : PLUGINS) {
             ClassVisitor pluginVisitor = plugin.dispatch(classVisitor, context);
             if (pluginVisitor != classVisitor) {

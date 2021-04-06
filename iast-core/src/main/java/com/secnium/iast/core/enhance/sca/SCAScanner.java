@@ -14,7 +14,7 @@ import java.util.jar.JarFile;
 /**
  * @author dongzhiyong@huoxian.cn
  */
-public class SCAScaner {
+public class ScaScanner {
     private static final String ALGORITHM = "SHA-1";
     private static final String JAR = ".jar";
 
@@ -23,10 +23,10 @@ public class SCAScaner {
         if (filePath.endsWith(JAR)) {
             if (file.exists()) {
                 try {
-                    String packageName = ManifestScaner.parseJarManifest(file);
-                    String signature = SignatureAlgorithm.getSignture(file, SCAScaner.ALGORITHM);
+                    String packageName = ManifestScanner.parseManifest(new JarFile(file));
+                    String signature = SignatureAlgorithm.getSignature(file, ScaScanner.ALGORITHM);
                     if (null != packageName && null != signature) {
-                        AssestReport.sendReport(filePath, packageName, signature, SCAScaner.ALGORITHM);
+                        AssestReport.sendReport(filePath, packageName, signature, ScaScanner.ALGORITHM);
                     }
                 } catch (IOException e) {
                     System.err.println("SCA scan failed, package path: " + filePath);
@@ -53,10 +53,10 @@ public class SCAScaner {
                 entryName = entry.getName();
                 if (entryName.endsWith(".jar")) {
                     InputStream is = getJarInputStream(path, entryName);
-                    String signature = SignatureAlgorithm.getSignture(is, SCAScaner.ALGORITHM);
+                    String signature = SignatureAlgorithm.getSignature(is, ScaScanner.ALGORITHM);
                     String packageName = entry.getName();
                     if (null != packageName && null != signature) {
-                        AssestReport.sendReport("jar:file:" + path + "!/" + entryName, packageName, signature, SCAScaner.ALGORITHM);
+                        AssestReport.sendReport("jar:file:" + path + "!/" + entryName, packageName, signature, ScaScanner.ALGORITHM);
                     }
                 }
             }
@@ -65,9 +65,5 @@ public class SCAScaner {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    public static void scan(URL url) {
-        scan(new File(url.getPath()));
     }
 }

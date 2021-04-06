@@ -15,7 +15,7 @@ public class ManifestScanTest {
         try {
             File file = new File(filename);
             if (file.exists()) {
-                String manifestes = ManifestScaner.parseJarManifest(new JarFile(file));
+                String manifestes = ManifestScanner.parseManifest(new JarFile(file));
                 System.out.println("manifestes = " + manifestes);
             }
         } catch (IOException e) {

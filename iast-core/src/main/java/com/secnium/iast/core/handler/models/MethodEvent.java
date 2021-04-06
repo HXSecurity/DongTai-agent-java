@@ -64,10 +64,6 @@ public class MethodEvent {
      */
     public final Object[] argumentArray;
 
-    public Object getReturnValue() {
-        return returnValue;
-    }
-
     /**
      * 构造方法返回值
      */
@@ -179,8 +175,8 @@ public class MethodEvent {
         this.javaMethodName = javaMethodName;
         this.javaMethodDesc = javaMethodDesc;
         this.signature = signature;
-        this.object = object;//
-        this.argumentArray = argumentArray;//
+        this.object = object;
+        this.argumentArray = argumentArray;
         this.returnValue = returnValue;
         this.leave = false;
         this.source = false;

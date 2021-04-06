@@ -8,7 +8,10 @@ import com.secnium.iast.core.util.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -210,21 +213,9 @@ public class IASTHookRuleModel {
     public static String getFrameworkByMethodSignature(String signature) {
         if (instance != null) {
             return instance.hooks.get(signature);
-            //String framework = instance.hooks.get(signature);
-            //return framework == null ? getFrameworkByReMethodSignature(signature) : framework;
         } else {
             return null;
         }
-    }
-
-    public static String getFrameworkByReMethodSignature(String signature) {
-        for (Map.Entry<Pattern, String> item : instance.prefixHooks.entrySet()) {
-            Pattern p = item.getKey();
-            if (p.matcher(signature).find()) {
-                return item.getValue();
-            }
-        }
-        return null;
     }
 
     /**

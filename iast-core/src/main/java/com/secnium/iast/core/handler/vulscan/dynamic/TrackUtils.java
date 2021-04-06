@@ -2,11 +2,8 @@ package com.secnium.iast.core.handler.vulscan.dynamic;
 
 import com.secnium.iast.core.handler.models.MethodEvent;
 import com.secnium.iast.core.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 
@@ -59,7 +56,7 @@ public class TrackUtils {
      * 检查污点数据是否为空
      *
      * @param taintValue 污点值
-     * @param isSink 是否为sink方法调用
+     * @param isSink     是否为sink方法调用
      * @return true-污点为空，false-污点不为空
      */
     public static boolean isEmpty(Object taintValue, boolean isSink) {
@@ -88,16 +85,13 @@ public class TrackUtils {
                 }
                 empty = !isNotEmpty;
             } else if (taintValue instanceof Map) {
-                if (((Map<?,?>) taintValue).isEmpty()) {
+                if (((Map<?, ?>) taintValue).isEmpty()) {
                     empty = true;
                 }
             } else if (taintValue instanceof String) {
                 if (((String) taintValue).isEmpty()) {
                     empty = true;
-                }/*else if (isSink && StringUtils.isConstant((String) taintValue)) {
-                    logger.warn("[com.secnium.iast] constant string:{}", taintValue);
-                    empty = true;
-                }*/
+                }
             } else if (taintValue instanceof StringBuilder) {
                 if (((StringBuilder) taintValue).toString().isEmpty()) {
                     empty = true;

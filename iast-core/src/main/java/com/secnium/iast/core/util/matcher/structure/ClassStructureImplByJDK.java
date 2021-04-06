@@ -105,6 +105,8 @@ class AccessImplByJDKBehavior extends ModifierAccess {
 
 /**
  * 用JDK的反射实现的类结构
+ *
+ * @author dongzhiyong@huoxian.cn
  */
 public class ClassStructureImplByJDK extends FamilyClassStructure {
 

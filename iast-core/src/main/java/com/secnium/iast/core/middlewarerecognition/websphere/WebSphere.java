@@ -5,6 +5,9 @@ import com.secnium.iast.core.middlewarerecognition.PackageManager;
 
 import java.lang.management.RuntimeMXBean;
 
+/**
+ * @author dongzhiyong@huoxian.cn
+ */
 public class WebSphere implements IServer {
     static final String PACKAGE_NAME = "bootstrap";
     static final String WS90 = "WAS90.";

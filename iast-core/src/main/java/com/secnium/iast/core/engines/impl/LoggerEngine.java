@@ -13,6 +13,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.instrument.Instrumentation;
 
+/**
+ * @author dongzhiyong@huoxian.cn
+ */
 public class LoggerEngine implements IEngine {
     private PropertyUtils cfg;
     private Instrumentation inst;
@@ -30,7 +33,6 @@ public class LoggerEngine implements IEngine {
             configStream = LoggerEngine.class.getClassLoader().getResourceAsStream("lingzhi-log.xml");
             configurator.doConfigure(configStream);
             logger.info("Log module initialized successfully");
-            //logger.info(SandboxStringUtils.getLogo());
         } catch (JoranException e) {
             e.printStackTrace();
         } finally {

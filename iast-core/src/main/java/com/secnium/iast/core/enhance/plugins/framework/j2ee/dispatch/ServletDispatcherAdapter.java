@@ -9,6 +9,9 @@ import org.objectweb.asm.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * @author dongzhiyong@huoxian.cn
+ */
 public class ServletDispatcherAdapter extends AbstractClassVisitor {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());

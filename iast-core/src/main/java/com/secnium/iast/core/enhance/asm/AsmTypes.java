@@ -7,7 +7,9 @@ import java.lang.iast.inject.Injecter;
 /**
  * 常用的ASM type集合
  * 省得我到处声明
- * Modify by dongzhiyong@huoxian.cn.
+ *
+ * @author luanjia@taobao.com
+ * @modify dongzhiyong@huoxian.cn
  */
 public interface AsmTypes {
 

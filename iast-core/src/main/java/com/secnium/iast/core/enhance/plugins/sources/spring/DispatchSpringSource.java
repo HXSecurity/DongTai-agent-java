@@ -6,6 +6,9 @@ import org.objectweb.asm.ClassVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * @author dongzhiyong@huoxian.cn
+ */
 public class DispatchSpringSource implements DispatchPlugin {
     private final String ARGUMENT_RESOLVER = " org/springframework/web/method/support/HandlerMethodArgumentResolver".substring(1);
     private IASTContext context;

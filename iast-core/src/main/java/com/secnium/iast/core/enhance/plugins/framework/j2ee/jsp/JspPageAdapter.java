@@ -11,6 +11,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
+/**
+ * @author dongzhiyong@huoxian.cn
+ */
 public class JspPageAdapter extends AbstractClassVisitor {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());

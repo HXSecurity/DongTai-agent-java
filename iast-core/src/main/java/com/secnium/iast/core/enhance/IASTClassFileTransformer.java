@@ -100,7 +100,7 @@ public class IASTClassFileTransformer implements ClassFileTransformer {
                 final String superName = cr.getSuperName();
                 final String className = cr.getClassName();
 
-                COMMON_UTILS.setCodeSource(codeSource, loader);
+                COMMON_UTILS.setLoader(loader);
                 COMMON_UTILS.saveAncestors(className, superName, interfaces);
                 HashSet<String> ancestors = COMMON_UTILS.getAncestors(className, superName, interfaces);
 

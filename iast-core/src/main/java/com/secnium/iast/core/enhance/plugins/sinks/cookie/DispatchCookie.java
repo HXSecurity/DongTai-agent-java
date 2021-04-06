@@ -8,10 +8,13 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
 
+/**
+ * @author dongzhiyong@huoxian.cn
+ */
 public class DispatchCookie implements DispatchPlugin {
-    private static String servletCookie;
-    private static String glassfishCookie;
-    private static String wsCookie;
+    private static final String servletCookie;
+    private static final String glassfishCookie;
+    private static final String wsCookie;
     private static String classname;
     private static HashSet<String> ancestors;
 

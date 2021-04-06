@@ -6,6 +6,9 @@ import com.secnium.iast.core.handler.controller.HookType;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 
+/**
+ * @author dongzhiyong@huoxian.cn
+ */
 public class ArgumentResolverAdviceAdapter extends AbstractAdviceAdapter {
     public ArgumentResolverAdviceAdapter(MethodVisitor mv, int access, String name, String desc, IASTContext context, String signCode) {
         super(mv, access, name, desc, context, "SpringArguments", signCode);

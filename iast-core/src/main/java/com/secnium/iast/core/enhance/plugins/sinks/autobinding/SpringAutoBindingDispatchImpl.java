@@ -7,6 +7,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Set;
 
+/**
+ * @author dongzhiyong@huoxian.cn
+ */
 public class SpringAutoBindingDispatchImpl {
     public void onDoBind(Object paramObject1, Object paramObject2) throws Throwable {
         if (paramObject1 != null && paramObject2 != null) {

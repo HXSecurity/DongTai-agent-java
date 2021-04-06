@@ -10,6 +10,9 @@ import java.lang.reflect.Modifier;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * @author dongzhiyong@huoxian.cn
+ */
 public class DispatchJ2ee implements DispatchPlugin {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final String FILTER = " javax/servlet/Filter".substring(1);
@@ -82,8 +85,6 @@ public class DispatchJ2ee implements DispatchPlugin {
     private boolean isServletDispatch(String className, Set ancestors) {
         boolean isServlet = FACES_SERVLET.equals(className);
         isServlet = (isServlet || HTTP_SERVLET.equals(className));
-        // 关闭hook点，避免对jsp进行hook，此类用于hook servlet
-        // isServlet = (isServlet || ancestors.contains(HTTP_SERVLET));
         return (isServlet || ancestors.contains(FILTER) || ancestors.contains(FILTERCHAIN));
     }
 }

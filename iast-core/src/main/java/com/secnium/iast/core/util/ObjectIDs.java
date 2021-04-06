@@ -38,16 +38,17 @@ public class ObjectIDs {
      */
     private final ReadWriteLock rwLock = new ReentrantReadWriteLock();
 
-    // 全局<对象:ID>映射表
-    private final WeakHashMap<Object, Integer> objectIDMapping
-            = new WeakHashMap<Object, Integer>();
+    /**
+     * 全局<对象:ID>映射表
+     */
+    private final WeakHashMap<Object, Integer> objectIDMapping = new WeakHashMap<Object, Integer>();
 
 
-    // --- ObjectID : Object 的映射关系维护 ----------------------------------------+
-    private final ReferenceQueue<Object> rQueue = new ReferenceQueue<Object>(); //|
-    private final HashMap<Integer, IdentityWeakReference> identityObjectMapping //|
-            = new HashMap<Integer, IdentityWeakReference>();                    //|
-    // ---------------------------------------------------------------------------+
+    /**
+     * ObjectID : Object 的映射关系维护
+     */
+    private final ReferenceQueue<Object> rQueue = new ReferenceQueue<Object>();
+    private final HashMap<Integer, IdentityWeakReference> identityObjectMapping = new HashMap<Integer, IdentityWeakReference>();
 
 
     private ObjectIDs() {

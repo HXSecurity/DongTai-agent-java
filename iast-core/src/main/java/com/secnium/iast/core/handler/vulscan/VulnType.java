@@ -1,5 +1,9 @@
 package com.secnium.iast.core.handler.vulscan;
 
+/**
+ * @author dongzhiyong@huoxian.cn
+ */
+
 public enum VulnType {
 
     /**

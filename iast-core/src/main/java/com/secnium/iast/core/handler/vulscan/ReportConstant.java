@@ -1,5 +1,9 @@
 package com.secnium.iast.core.handler.vulscan;
 
+/**
+ * 定义iast云端报告中需要使用的常量数据
+ * @author dongzhiyong@huoxian.cn
+ */
 public class ReportConstant {
 
     public static final String REPORT_KEY = "type";

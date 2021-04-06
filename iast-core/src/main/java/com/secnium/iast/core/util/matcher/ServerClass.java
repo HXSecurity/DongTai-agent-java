@@ -5,7 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * @author dongzhiyong@huoxian.cn
  */
-public class ServerClass extends ClassBase {
+public class ServerClass extends AbstractMatcher {
     private static final String[] CLASSES;
 
     @Override
