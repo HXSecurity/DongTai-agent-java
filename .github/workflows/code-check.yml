@@ -24,15 +24,12 @@ jobs:
         with:
           maven-version: 3.2.5
 
-      - name: Show Maven Version
+      - name: Solve Maven Effective Settings
         run: |
-          java -version
-          mvn -version
-
-      - name: Build DongTai-Java-Agent With Maven
-        run: |
-          pwd
           mkdir -p ~/.m2/repository/
           cp deploy/settings.xml ~/.m2/repository/
           mvn help:effective-settings
+
+      - name: Build DongTai-Java-Agent With Maven
+        run: |
           mvn -B package -Dmaven.test.skip=true
