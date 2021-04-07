@@ -43,16 +43,16 @@ public class UpdateUtils {
             URL url = new URL(urlStr);
             // 通过请求地址判断请求类型(http或者是https)
 
-            if ("https".equals(url.getProtocol().toLowerCase())) {
+            if (Constant.PROTOCOL_HTTPS.equalsIgnoreCase(url.getProtocol())) {
                 HttpsURLConnection https = (HttpsURLConnection) url.openConnection();
                 https.setHostnameVerifier(DO_NOT_VERIFY);
                 connection = https;
             } else {
                 connection = (HttpURLConnection) url.openConnection();
             }
-            connection.setRequestMethod("GET");
+            connection.setRequestMethod(Constant.HTTP_METHOD_GET);
             //fixme:根据配置文件动态获取token和http请求头，用于后续自定义操作
-            connection.setRequestProperty("User-Agent", "SecniumIast Java Agent ");
+            connection.setRequestProperty("User-Agent", "SecniumIast Java Agent");
             connection.setRequestProperty("Authorization", "Token " + IASTProperties.getInstance().getIastServerToken());
             connection.setRequestProperty("Accept", "*/*");
             connection.setUseCaches(false);
@@ -78,7 +78,6 @@ public class UpdateUtils {
     }
 
     public static void trustAllHosts() {
-        // Create a trust manager that does not validate certificate chains
         TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
             @Override
             public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
@@ -95,9 +94,9 @@ public class UpdateUtils {
                 return new X509Certificate[0];
             }
         }};
-        // Install the all-trusting trust manager
+
         try {
-            SSLContext sc = SSLContext.getInstance("TLS");
+            SSLContext sc = SSLContext.getInstance(Constant.SSL_INSTANCE);
             sc.init(null, trustAllCerts, new java.security.SecureRandom());
             HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
         } catch (Exception e) {

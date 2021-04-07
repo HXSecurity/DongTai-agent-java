@@ -113,10 +113,6 @@ public class IASTProperties {
         return cfg.getString("engine.status");
     }
 
-    public String getJdkVersion() {
-        return cfg.getString("jdk.version");
-    }
-
     public String getEngineName() {
         return cfg.getString("engine.name");
     }
