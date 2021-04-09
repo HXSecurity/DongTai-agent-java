@@ -14,7 +14,7 @@
         <filtering>true</filtering>
         <directory>src/main/resources</directory>
         <includes>
-          <include>lingzhi-log.xml</include>
+          <include>dongtai-log.xml</include>
           <include>**/version</include>
           <include>**/logo</include>
           <include>**/blackext.txt</include>

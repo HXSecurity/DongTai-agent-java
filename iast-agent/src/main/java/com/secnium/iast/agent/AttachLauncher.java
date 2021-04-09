@@ -16,21 +16,21 @@ public class AttachLauncher {
     public static void attach(String pid, String args) {
         VirtualMachine vmObj = null;
         try {
-            System.out.println("[com.lingzhi.agent] trying attach lingzhi to process " + pid + ", agent address is " + agentPath);
+            System.out.println("[cn.huoxian.dongtai.iast] trying attach dongtai to process " + pid + ", agent address is " + agentPath);
             vmObj = VirtualMachine.attach(pid);
             vmObj.loadAgent(agentPath, "token=" + args);
-            System.out.println("[com.lingzhi.agent] attach lingzhi to process " + pid + " success.");
+            System.out.println("[cn.huoxian.dongtai.iast] attach dongtai to process " + pid + " success.");
         } catch (AttachNotSupportedException e) {
-            System.err.println("[com.lingzhi.agent] attach failed");
+            System.err.println("[cn.huoxian.dongtai.iast] attach failed");
             e.printStackTrace();
         } catch (IOException e) {
-            System.err.println("[com.lingzhi.agent] attach failed");
+            System.err.println("[cn.huoxian.dongtai.iast] attach failed");
             e.printStackTrace();
         } catch (AgentLoadException e) {
-            System.err.println("[com.lingzhi.agent] attach failed");
+            System.err.println("[cn.huoxian.dongtai.iast] attach failed");
             e.printStackTrace();
         } catch (AgentInitializationException e) {
-            System.err.println("[com.lingzhi.agent] attach failed");
+            System.err.println("[cn.huoxian.dongtai.iast] attach failed");
             e.printStackTrace();
         }
     }

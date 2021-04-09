@@ -37,9 +37,7 @@
         <guava.version>18.0</guava.version>
         <json.version>20160810</json.version>
         <retrofit.version>1.9.0</retrofit.version>
-        <!--        <asm.version>5.0.4</asm.version>-->
-        <asm.version>7.0</asm.version>
-        <!--        <asm.version>8.0</asm.version>-->
+        <asm.version>9.0</asm.version>
         <junit.version>4.9</junit.version>
         <proguard.version>2.2.0</proguard.version>
         <jdk.version.level>2</jdk.version.level>

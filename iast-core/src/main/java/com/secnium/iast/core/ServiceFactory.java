@@ -37,7 +37,7 @@ public class ServiceFactory {
         PropertyUtils propertiesUtils = PropertyUtils.getInstance();
         this.heartbeatMisc = propertiesUtils.getHeartBeatInterval();
         this.reportTims = propertiesUtils.getReportInterval();
-        this.executorService = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("lingzhi-engine-report").build());
+        this.executorService = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("dongtai-engine-report").build());
     }
 
     public void init() {
