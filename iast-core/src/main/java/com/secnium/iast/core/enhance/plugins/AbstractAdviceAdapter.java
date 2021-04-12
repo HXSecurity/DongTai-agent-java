@@ -56,7 +56,9 @@ public abstract class AbstractAdviceAdapter extends AdviceAdapter implements Asm
      */
     @Override
     protected void onMethodExit(final int opcode) {
-        after(opcode);
+        if (!isThrow(opcode)) {
+            after(opcode);
+        }
     }
 
     protected abstract void before();
@@ -76,7 +78,7 @@ public abstract class AbstractAdviceAdapter extends AdviceAdapter implements Asm
         mark(catchLabel);
         visitTryCatchBlock(tryLabel, catchLabel, mark(), ASM_TYPE_THROWABLE.getInternalName());
 
-        //after(ATHROW);
+        after(ATHROW);
         throwException();
 
         super.visitMaxs(maxStack, maxLocals);

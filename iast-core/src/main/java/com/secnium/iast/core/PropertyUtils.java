@@ -82,11 +82,6 @@ public class PropertyUtils {
         return "true".equals(System.getProperty("iast.allhook.enable", cfg.getString("iast.allhook.enable")));
     }
 
-    public String getModelFilePath() {
-        return "com.secnium.iast.resources/model.xml";
-    }
-
-
     public String getSourceFilePath() {
         return "com.secnium.iast.resources/sources.txt";
     }
@@ -133,5 +128,9 @@ public class PropertyUtils {
 
     public String getEngineName() {
         return System.getProperty("engine.name", cfg.getString("engine.name", "agent"));
+    }
+
+    public String getProjectName() {
+        return System.getProperty("project.name", cfg.getString("project.name", "Demo Project"));
     }
 }
