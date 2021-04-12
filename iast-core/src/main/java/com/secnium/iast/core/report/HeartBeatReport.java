@@ -17,6 +17,7 @@ import java.util.Enumeration;
 
 /**
  * 心跳机制实现，默认30s
+ *
  * @author dongzhiyong@huoxian.cn
  */
 public class HeartBeatReport extends AbstractThread {
@@ -69,8 +70,8 @@ public class HeartBeatReport extends AbstractThread {
         detail.put(ReportConstant.HEART_BEAT_WEB_SERVER_VERSION, SERVER == null ? "" : SERVER.getVersion());
         detail.put(ReportConstant.HEART_BEAT_WEB_SERVER_PATH, SERVER_DETECT.getWebServerPath());
         detail.put(ReportConstant.HEART_BEAT_WEB_SERVER_HOSTNAME, getHostName());
-        detail.put(ReportConstant.HEART_BEAT_WEB_SERVER_IP, EngineManager.SERVER_ADDR.get());
-        detail.put(ReportConstant.HEART_BEAT_WEB_SERVER_PORT, EngineManager.SERVER_PORT.get());
+        detail.put(ReportConstant.HEART_BEAT_WEB_SERVER_IP, null != EngineManager.SERVER ? EngineManager.SERVER.getServerAddr() : "");
+        detail.put(ReportConstant.HEART_BEAT_WEB_SERVER_PORT, null != EngineManager.SERVER ? EngineManager.SERVER.getServerPort() : "");
 
         return report.toString();
     }
