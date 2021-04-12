@@ -96,27 +96,6 @@
         </executions>
       </plugin>
       <plugin>
-        <groupId>com.github.wvengen</groupId>
-        <artifactId>proguard-maven-plugin</artifactId>
-        <version>${proguard.version}</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>proguard</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <obfuscate>true</obfuscate>
-          <inLibsFilter>!module-info.class</inLibsFilter>
-          <injar>${project.build.finalName}.jar</injar>
-          <outjar>${project.build.finalName}.jar</outjar>
-          <outputDirectory>${project.build.directory}</outputDirectory>
-          <proguardInclude>${basedir}/proguard.conf</proguardInclude>
-        </configuration>
-      </plugin>
-      <plugin>
         <artifactId>maven-antrun-plugin</artifactId>
         <executions>
           <execution>
