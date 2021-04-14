@@ -69,6 +69,7 @@ public class GraphBuilder {
         report.put(ReportConstant.REPORT_VALUE_KEY, detail);
 
         detail.put(ReportConstant.AGENT_NAME, AgentRegisterReport.getAgentToken());
+        detail.put(ReportConstant.PROJECT_NAME, AgentRegisterReport.getProjectName());
         detail.put(ReportConstant.COMMON_REMOTE_IP, request.getRemoteAddr());
         detail.put(ReportConstant.COMMON_HTTP_PROTOCOL, request.getProtocol());
         detail.put(ReportConstant.COMMON_HTTP_SCHEME, request.getScheme());

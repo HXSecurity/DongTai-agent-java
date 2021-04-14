@@ -58,6 +58,7 @@ public class HeartBeatReport extends AbstractThread {
 
         detail.put(ReportConstant.SERVER_ENV, Base64Utils.encodeBase64String(System.getProperties().toString().getBytes()).replaceAll("\n", ""));
         detail.put(ReportConstant.AGENT_NAME, AgentRegisterReport.getAgentToken());
+        detail.put(ReportConstant.PROJECT_NAME, AgentRegisterReport.getProjectName());
         detail.put(ReportConstant.LANGUAGE, ReportConstant.LANGUAGE_VALUE);
         detail.put(ReportConstant.HEART_BEAT_PID, getPid());
         detail.put(ReportConstant.HOSTNAME, getHostName());
