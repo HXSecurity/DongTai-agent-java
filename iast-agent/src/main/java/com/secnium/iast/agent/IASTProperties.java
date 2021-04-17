@@ -84,7 +84,7 @@ public class IASTProperties {
 
             cfg = new PropertiesConfiguration(propertiesFilePath);
             cfg.setReloadingStrategy(new FileChangedReloadingStrategy());
-            System.out.println("[com.lingzhi.agent] The engine configuration file is initialized successfully. file is " + propertiesFile.toString());
+            System.out.println("[cn.huoxian.dongtai.iast] The engine configuration file is initialized successfully. file is " + propertiesFile.toString());
 
         } catch (IOException e) {
             e.printStackTrace();

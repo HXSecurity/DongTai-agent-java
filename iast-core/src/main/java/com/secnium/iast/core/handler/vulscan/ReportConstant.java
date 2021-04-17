@@ -2,6 +2,7 @@ package com.secnium.iast.core.handler.vulscan;
 
 /**
  * 定义iast云端报告中需要使用的常量数据
+ *
  * @author dongzhiyong@huoxian.cn
  */
 public class ReportConstant {
@@ -22,6 +23,7 @@ public class ReportConstant {
     public static final String LANGUAGE = "language";
     public static final String LANGUAGE_VALUE = "JAVA";
     public static final String AGENT_NAME = "agent_name";
+    public static final String PROJECT_NAME = "project_name";
     public static final String AGENT_VERSION = "agent_version";
     public static final String AGENT_VERSION_VALUE = "v1.0.0";
     public static final String CONTAINER = "container";

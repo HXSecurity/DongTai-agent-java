@@ -21,8 +21,7 @@ public class AsmUtils {
     /**
      * 用于字节码修改的ASM版本，jdk 1.8及以下，使用ASM 5；jdk 1.9及以上，使用ASM 7
      */
-    public static Integer api = Opcodes.ASM5;
-//    public static Integer api = Opcodes.ASM8;
+    public static Integer api = Opcodes.ASM9;
 
     public static Type voidType = Type.getType(void.class);
     public static Type stringArrayType = Type.getType(String[].class);

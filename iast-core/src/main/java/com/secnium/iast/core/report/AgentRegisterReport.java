@@ -11,6 +11,7 @@ import org.json.JSONObject;
  */
 public class AgentRegisterReport {
     private static String AGENT_NAME = null;
+    private static String PROJECT_NAME = null;
 
     public static String getAgentToken() {
         if (AGENT_NAME == null) {
@@ -20,6 +21,14 @@ public class AgentRegisterReport {
             AGENT_NAME = osName + "-" + hostname + "-" + ReportConstant.AGENT_VERSION_VALUE + "-" + cfg.getEngineName();
         }
         return AGENT_NAME;
+    }
+
+    public static String getProjectName() {
+        if (PROJECT_NAME == null) {
+            PropertyUtils cfg = PropertyUtils.getInstance();
+            PROJECT_NAME = cfg.getProjectName();
+        }
+        return PROJECT_NAME;
     }
 
     public static void send() {
@@ -35,6 +44,7 @@ public class AgentRegisterReport {
         JSONObject object = new JSONObject();
         object.put("name", getAgentToken());
         object.put("version", ReportConstant.AGENT_VERSION_VALUE);
+        object.put("project", getProjectName());
         return object.toString();
     }
 

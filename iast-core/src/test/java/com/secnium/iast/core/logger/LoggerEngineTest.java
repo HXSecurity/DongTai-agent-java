@@ -24,8 +24,8 @@ public class LoggerEngineTest {
 
         InputStream configStream = null;
         try {
-            NamespaceConvert.initNamespaceConvert("LingZhi");
-            configStream = LoggerEngine.class.getClassLoader().getResourceAsStream("lingzhi-log.xml");
+            NamespaceConvert.initNamespaceConvert("DongTai");
+            configStream = LoggerEngine.class.getClassLoader().getResourceAsStream("dongtai-log.xml");
             configurator.doConfigure(configStream);
             logger.info("Log module initialized successfully");
             //logger.info(SandboxStringUtils.getLogo());

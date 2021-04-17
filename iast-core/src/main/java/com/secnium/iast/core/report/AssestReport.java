@@ -24,6 +24,7 @@ public class AssestReport {
         report.put(ReportConstant.REPORT_VALUE_KEY, detail);
 
         detail.put(ReportConstant.AGENT_NAME, AgentRegisterReport.getAgentToken());
+        detail.put(ReportConstant.PROJECT_NAME, AgentRegisterReport.getProjectName());
         detail.put(ReportConstant.LANGUAGE, ReportConstant.LANGUAGE_VALUE);
         detail.put(ReportConstant.SCA_PACKAGE_PATH, packagePath);
         detail.put(ReportConstant.SCA_PACKAGE_NAME, packageName);
