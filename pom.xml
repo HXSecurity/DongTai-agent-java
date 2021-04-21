@@ -5,14 +5,14 @@
 
     <groupId>com.secnium.iast</groupId>
     <artifactId>iast</artifactId>
-    <version>0.5.2</version>
+    <version>0.6.0</version>
     <packaging>pom</packaging>
 
-    <name>IAST</name>
+    <name>dongtai-agent-java</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <iast.version>0.5.2</iast.version>
+        <iast.version>0.6.0</iast.version>
         <shade-prefix>com.secnium.iast.thirdparty</shade-prefix>
 
         <maven.compiler.source>1.6</maven.compiler.source>
@@ -37,10 +37,8 @@
         <guava.version>18.0</guava.version>
         <json.version>20160810</json.version>
         <retrofit.version>1.9.0</retrofit.version>
-        <!--        <asm.version>5.0.4</asm.version>-->
-        <asm.version>7.0</asm.version>
-        <!--        <asm.version>8.0</asm.version>-->
-        <junit.version>4.9</junit.version>
+        <asm.version>9.0</asm.version>
+        <junit.version>4.13.1</junit.version>
         <proguard.version>2.2.0</proguard.version>
         <jdk.version.level>2</jdk.version.level>
     </properties>

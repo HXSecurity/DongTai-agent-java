@@ -7,7 +7,7 @@
     <parent>
         <groupId>com.secnium.iast</groupId>
         <artifactId>iast</artifactId>
-        <version>0.5.2</version>
+        <version>0.6.0</version>
     </parent>
     <artifactId>iast-core</artifactId>
     <name>iast-core</name>
@@ -16,7 +16,6 @@
     </properties>
 
     <build>
-        <!-- 1：asm 5；2：asm 8-->
         <finalName>iast-core</finalName>
 
         <resources>
