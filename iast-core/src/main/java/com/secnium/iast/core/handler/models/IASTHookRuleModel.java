@@ -1,10 +1,8 @@
 package com.secnium.iast.core.handler.models;
 
 import com.secnium.iast.core.handler.controller.HookType;
-import com.secnium.iast.core.util.Asserts;
-import com.secnium.iast.core.util.Constants;
-import com.secnium.iast.core.util.HttpClientUtils;
-import com.secnium.iast.core.util.StringUtils;
+import com.secnium.iast.core.report.ErrorLogReport;
+import com.secnium.iast.core.util.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -288,51 +286,50 @@ public class IASTHookRuleModel {
                     String ruleItemValue = detail.getString("value");
                     String ruleItemTrack = detail.getString("track");
                     String ruleItemInherit = detail.getString("inherit");
+                    try {
+                        initHookPoint(ruleItemInherit, ruleItemValue, value);
 
-                    initHookPoint(ruleItemInherit, ruleItemValue, value);
-                    //
-                    switch (type) {
-                        case 1:
-                            // 处理传播节点
-                            // todo create and add propagatoo node
-                            hooksValue.put(value, HookType.PROPAGATOR.getValue());
-                            Object sourcePos = convertLink2Object(ruleItemSource);
-                            Object targetPos = convertLink2Object(ruleItemTarget);
-                            propagator = new IASTPropagatorModel(value, value, ruleItemSource, sourcePos, ruleItemTarget, targetPos);
-                            propagators.put(ruleItemValue, propagator);
-                            break;
-                        case 2:
-                            hooksValue.put(value, HookType.SOURCE.getValue());
-                            sources.add(ruleItemValue);
-                            break;
-                        case 3:
-                            // 处理filter点
-                            hooksValue.put(value, HookType.PROPAGATOR.getValue());
-                            List<String> filterList;
-                            if (filters.containsKey(value)) {
-                                filterList = filters.get(value);
-                            } else {
-                                filterList = new ArrayList<String>();
-                                filters.put(value, filterList);
-                            }
-                            filterList.add(ruleItemValue);
-                            break;
-                        case 4:
-                            // 处理sink点
-                            hooksValue.put(value, HookType.SINK.getValue());
-                            int[] intPositions;
-                            if (ruleItemSource.startsWith("P")) {
-                                intPositions = StringUtils.convertStringToIntArray(ruleItemSource);
-                            } else {
-                                intPositions = null;
-                            }
-                            IASTSinkModel sink = new IASTSinkModel(ruleItemValue, value, intPositions, ruleItemTrack);
-                            sinks.put(ruleItemValue, sink);
-                            break;
-                        case 5:
-                            break;
-                        default:
-                            break;
+                        switch (type) {
+                            case 1:
+                                hooksValue.put(value, HookType.PROPAGATOR.getValue());
+                                Object sourcePos = convertLink2Object(ruleItemSource);
+                                Object targetPos = convertLink2Object(ruleItemTarget);
+                                propagator = new IASTPropagatorModel(value, value, ruleItemSource, sourcePos, ruleItemTarget, targetPos);
+                                propagators.put(ruleItemValue, propagator);
+                                break;
+                            case 2:
+                                hooksValue.put(value, HookType.SOURCE.getValue());
+                                sources.add(ruleItemValue);
+                                break;
+                            case 3:
+                                hooksValue.put(value, HookType.PROPAGATOR.getValue());
+                                List<String> filterList;
+                                if (filters.containsKey(value)) {
+                                    filterList = filters.get(value);
+                                } else {
+                                    filterList = new ArrayList<String>();
+                                    filters.put(value, filterList);
+                                }
+                                filterList.add(ruleItemValue);
+                                break;
+                            case 4:
+                                hooksValue.put(value, HookType.SINK.getValue());
+                                int[] intPositions;
+                                if (ruleItemSource.startsWith("P")) {
+                                    intPositions = StringUtils.convertStringToIntArray(ruleItemSource);
+                                } else {
+                                    intPositions = null;
+                                }
+                                IASTSinkModel sink = new IASTSinkModel(ruleItemValue, value, intPositions, ruleItemTrack);
+                                sinks.put(ruleItemValue, sink);
+                                break;
+                            case 5:
+                                break;
+                            default:
+                                break;
+                        }
+                    } catch (Exception e) {
+                        ErrorLogReport.sendErrorLog(ThrowableUtils.getStackTrace(e));
                     }
                 }
             }
@@ -351,7 +348,7 @@ public class IASTHookRuleModel {
             String classname = signatureNoArg.substring(0, signatureNoArg.lastIndexOf('.'));
             boolean isReMatch = false;
 
-            // 后续考虑增加通配符型规则
+            // todo 后续考虑增加通配符型规则
 //            if (classname.endsWith("*")) {
 //                isReMatch = true;
 //                PREFIX_CLASS_HOOKS.add(classname.substring(0, classname.length() - 1));

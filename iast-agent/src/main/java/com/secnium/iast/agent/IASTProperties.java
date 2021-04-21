@@ -16,6 +16,8 @@ public class IASTProperties {
 
     private static IASTProperties instance;
     public PropertiesConfiguration cfg = null;
+    private String iastServerToken;
+    private String serverUrl;
 
     /**
      * 属性文件路径
@@ -38,6 +40,47 @@ public class IASTProperties {
             instance = new IASTProperties(path);
         }
         return instance;
+    }
+
+    public String getIastServerToken() {
+        if (null == iastServerToken) {
+            if (null != cfg) {
+                iastServerToken = cfg.getString("iast.server.token");
+            }
+            iastServerToken = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx";
+        }
+        return iastServerToken;
+    }
+
+    public String getBaseUrl() {
+        if (null == serverUrl) {
+            serverUrl = System.getProperty("iast.server.url", cfg.getString("iast.server.url"));
+        }
+        return serverUrl;
+    }
+
+    public String getPropertiesFilePath() {
+        return propertiesFilePath;
+    }
+
+    public String getEngineStatus() {
+        return cfg.getString("engine.status");
+    }
+
+    public String getEngineName() {
+        return cfg.getString("engine.name");
+    }
+
+    private String getMode() {
+        return System.getProperty("iast.mode", cfg.getString("iast.mode", "normal"));
+    }
+
+    public boolean isBugHunter() {
+        return "hunter".equals(getMode());
+    }
+
+    public boolean isNormal() {
+        return "normal".equals(getMode());
     }
 
     /**
@@ -84,37 +127,13 @@ public class IASTProperties {
 
             cfg = new PropertiesConfiguration(propertiesFilePath);
             cfg.setReloadingStrategy(new FileChangedReloadingStrategy());
-            System.out.println("[com.lingzhi.agent] The engine configuration file is initialized successfully. file is " + propertiesFile.toString());
+            System.out.println("[cn.huoxian.dongtai.iast] The engine configuration file is initialized successfully. file is " + propertiesFile.toString());
 
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ConfigurationException e) {
             e.printStackTrace();
         }
-    }
-
-    public String getIastServerToken() {
-        if (null != cfg) {
-            return cfg.getString("iast.server.token");
-        }
-        return "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx";
-    }
-
-
-    public String getBaseUrl() {
-        return System.getProperty("iast.server.url", cfg.getString("iast.server.url"));
-    }
-
-    public String getPropertiesFilePath() {
-        return propertiesFilePath;
-    }
-
-    public String getEngineStatus() {
-        return cfg.getString("engine.status");
-    }
-
-    public String getEngineName() {
-        return cfg.getString("engine.name");
     }
 
 }

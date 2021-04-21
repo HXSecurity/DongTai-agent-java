@@ -12,6 +12,21 @@ import java.io.File;
 public class PropertyUtils {
     private static PropertyUtils instance;
     public PropertiesConfiguration cfg = null;
+    private String iastName;
+    private String iastVersion;
+    private String iastResponseName;
+    private String iastResponseValue;
+    private String iastServerToken;
+    private String allHookState;
+    private String dumpClassState;
+    private String iastDumpPath;
+    private Long heartBeatInterval = -1L;
+    private Long reportInterval = -1L;
+    private String serverUrl;
+    private String namespace;
+    private String engineName;
+    private String projectName;
+    private String mode;
 
     private final String propertiesFilePath;
 
@@ -48,23 +63,38 @@ public class PropertyUtils {
     }
 
     public String getIastName() {
-        return cfg.getString("iast.name");
+        if (null == iastName) {
+            iastName = cfg.getString("iast.name");
+        }
+        return iastName;
     }
 
     public String getIastVersion() {
-        return cfg.getString("iast.version");
+        if (null == iastVersion) {
+            iastVersion = cfg.getString("iast.version");
+        }
+        return iastVersion;
     }
 
     public String getIastResponseFlagName() {
-        return cfg.getString("iast.response.name");
+        if (null == iastResponseName) {
+            iastResponseName = cfg.getString("iast.response.name");
+        }
+        return iastResponseName;
     }
 
     public String getIastResponseFlagValue() {
-        return cfg.getString("iast.response.value");
+        if (null == iastResponseValue) {
+            iastResponseValue = cfg.getString("iast.response.value");
+        }
+        return iastResponseValue;
     }
 
     public String getIastServerToken() {
-        return cfg.getString("iast.server.token");
+        if (null == iastServerToken) {
+            iastServerToken = cfg.getString("iast.server.token");
+        }
+        return iastServerToken;
     }
 
     @Override
@@ -78,14 +108,16 @@ public class PropertyUtils {
                 "]";
     }
 
+    private String getAllHookState() {
+        if (null == allHookState) {
+            allHookState = System.getProperty("iast.allhook.enable", cfg.getString("iast.allhook.enable"));
+        }
+        return allHookState;
+    }
+
     public boolean isEnableAllHook() {
-        return "true".equals(System.getProperty("iast.allhook.enable", cfg.getString("iast.allhook.enable")));
+        return "true".equals(getAllHookState());
     }
-
-    public String getModelFilePath() {
-        return "com.secnium.iast.resources/model.xml";
-    }
-
 
     public String getSourceFilePath() {
         return "com.secnium.iast.resources/sources.txt";
@@ -108,30 +140,77 @@ public class PropertyUtils {
     }
 
     public String getDumpClassPath() {
-        return System.getProperty("iast.dump.class.path", cfg.getString("iast.dump.class.path"));
+        if (null == iastDumpPath) {
+            iastDumpPath = System.getProperty("iast.dump.class.path", cfg.getString("iast.dump.class.path"));
+        }
+        return iastDumpPath;
+    }
+
+    private String getDumpClassState() {
+        if (null == dumpClassState) {
+            dumpClassState = System.getProperty("iast.dump.class.enable", cfg.getString("iast.dump.class.enable"));
+        }
+        return dumpClassState;
     }
 
     public boolean isEnableDumpClass() {
-        return "true".equals(System.getProperty("iast.dump.class.enable", cfg.getString("iast.dump.class.enable")));
+        return "true".equals(getDumpClassState());
     }
 
     public long getHeartBeatInterval() {
-        return cfg.getLong("iast.service.heartbeat.interval", 5 * 60 * 1000);
+        if (heartBeatInterval == -1L) {
+            heartBeatInterval = cfg.getLong("iast.service.heartbeat.interval", 5 * 60 * 1000);
+        }
+        return heartBeatInterval;
     }
 
     public long getReportInterval() {
-        return cfg.getLong("iast.service.vulreport.interval", 1000);
+        if (reportInterval == -1L) {
+            reportInterval = cfg.getLong("iast.service.vulreport.interval", 1000);
+        }
+        return reportInterval;
     }
 
     public String getBaseUrl() {
-        return System.getProperty("iast.server.url", cfg.getString("iast.server.url"));
+        if (null == serverUrl) {
+            serverUrl = System.getProperty("iast.server.url", cfg.getString("iast.server.url"));
+        }
+        return serverUrl;
     }
 
     public String getNamespace() {
-        return System.getProperty("app.name", cfg.getString("app.name", "IastVulScan"));
+        if (null == namespace) {
+            namespace = System.getProperty("app.name", cfg.getString("app.name", "IastVulScan"));
+        }
+        return namespace;
     }
 
     public String getEngineName() {
-        return System.getProperty("engine.name", cfg.getString("engine.name", "agent"));
+        if (null == engineName) {
+            engineName = System.getProperty("engine.name", cfg.getString("engine.name", "agent"));
+        }
+        return engineName;
+    }
+
+    public String getProjectName() {
+        if (null == projectName) {
+            projectName = System.getProperty("project.name", cfg.getString("project.name", "Demo Project"));
+        }
+        return projectName;
+    }
+
+    private String getMode() {
+        if (null == mode) {
+            mode = System.getProperty("iast.mode", cfg.getString("iast.mode", "normal"));
+        }
+        return mode;
+    }
+
+    public boolean isHunterMode() {
+        return "hunter".equals(getMode());
+    }
+
+    public boolean isNormalMode() {
+        return "normal".equals(getMode());
     }
 }

@@ -39,10 +39,10 @@ public class UpdateMonitor implements IMonitor {
 
             if (status) {
                 UpdateUtils.setUpdateSuccess();
-                System.out.println("[com.lingzhi.agent] UpdateMonitor.check LingZhi Engine updateEnginePackage success.");
+                System.out.println("[cn.huoxian.dongtai.iast] UpdateMonitor.check DongTai Engine updateEnginePackage success.");
             } else {
                 UpdateUtils.setUpdateFailure();
-                System.out.println("[com.lingzhi.agent] UpdateMonitor.check LingZhi Engine updateEnginePackage failure.");
+                System.out.println("[cn.huoxian.dongtai.iast] UpdateMonitor.check DongTai Engine updateEnginePackage failure.");
             }
         }
     }

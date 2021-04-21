@@ -23,7 +23,6 @@
         <sun.tools.version>1.6</sun.tools.version>
         <!--docker环境下配置-->
         <sun.tools.systempath>${java.home}/../lib/tools.jar</sun.tools.systempath>
-        <!--        <sun.tools.systempath>${java.home}/lib/tools.jar</sun.tools.systempath>-->
         <nanoxml.version>2.2.3</nanoxml.version>
 
         <!-- java 1.6 最高可用版本-->

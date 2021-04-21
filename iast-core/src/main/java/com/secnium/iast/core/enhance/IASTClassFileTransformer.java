@@ -121,7 +121,7 @@ public class IASTClassFileTransformer implements ClassFileTransformer {
                             clock.stop();
                             logger.debug("conversion class {} is successful, and it takes {}ms, total {}.", internalClassName, clock.getTime(), transformClassCount);
                         }
-                        return dumpClassIfNecessary(cr.getClassName(), cw.toByteArray());
+                        return dumpClassIfNecessary(cr.getClassName(), cw.toByteArray(), srcByteCodeArray);
                     }
                 } else {
                     if (logger.isDebugEnabled() && null != clock) {
@@ -172,7 +172,7 @@ public class IASTClassFileTransformer implements ClassFileTransformer {
     /**
      * dump字节码文件到本地，用于DEBUG
      */
-    private byte[] dumpClassIfNecessary(String className, byte[] data) {
+    private byte[] dumpClassIfNecessary(String className, byte[] data, byte[] originalData) {
         if (!isDumpClass) {
             return data;
         }
@@ -185,22 +185,23 @@ public class IASTClassFileTransformer implements ClassFileTransformer {
             path = path + javaClassName.substring(0, javaClassName.lastIndexOf('.')) + "/";
             filename = javaClassName.substring(javaClassName.lastIndexOf('.') + 1);
         }
-        String fullPath = path + filename + ".class";
-        final File dumpClassFile = new File(fullPath);
-        final File classPath = new File(dumpClassFile.getParent());
-
-        if (!classPath.mkdirs() && !classPath.exists()) {
-            logger.warn("create dump classpath={} failed.", classPath);
-            return data;
-        }
-
         try {
-            writeByteArrayToFile(dumpClassFile, data);
+            final File enhancedClass = new File(path + filename + ".class");
+            final File originalClass = new File(path + filename + "-original.class");
+            final File classPath = new File(enhancedClass.getParent());
+
+            if (!classPath.mkdirs() && !classPath.exists()) {
+                logger.warn("create dump classpath={} failed.", classPath);
+                return data;
+            }
+
+            writeByteArrayToFile(enhancedClass, data);
+            writeByteArrayToFile(originalClass, originalData);
             if (logger.isDebugEnabled()) {
-                logger.debug("dump class {} to {} success.", className, dumpClassFile);
+                logger.debug("dump class {} to {} success.", className, enhancedClass);
             }
         } catch (IOException e) {
-            logger.error("dump class {} to {} failed. reason: {}", className, dumpClassFile, e);
+            logger.error("dump class {} failed. reason: {}", className, e);
         }
 
         return data;

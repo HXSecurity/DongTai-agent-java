@@ -27,7 +27,7 @@ public class ReportService {
     }
 
     public static void main(String[] args) {
-        ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("lingzhi-engine-report").build());
+        ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("dongtai-engine-report").build());
 
         long initialDelay = 1;
         long period = 1000;

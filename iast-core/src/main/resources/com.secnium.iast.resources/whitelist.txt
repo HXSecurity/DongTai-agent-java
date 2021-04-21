@@ -24,7 +24,7 @@ net/sf/saxon/s9api/XPathCompiler
 rg/apache/xpath/XPathAPI
 javax/xml/xpath/XPath
 java/nio/file/Paths
-# lingzhi unsafe-xml-decode demo used this.
+# dongtai unsafe-xml-decode demo used this.
 java/io/ByteArrayInputStream
 java/io/ByteArrayOutputStream
 java/io/BufferedReader

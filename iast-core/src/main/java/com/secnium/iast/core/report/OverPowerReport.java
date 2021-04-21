@@ -17,6 +17,7 @@ public class OverPowerReport {
         report.put(ReportConstant.REPORT_VALUE_KEY, detail);
 
         detail.put(ReportConstant.AGENT_NAME, AgentRegisterReport.getAgentToken());
+        detail.put(ReportConstant.PROJECT_NAME, AgentRegisterReport.getProjectName());
         detail.put(ReportConstant.LANGUAGE, ReportConstant.LANGUAGE_VALUE);
         detail.put(ReportConstant.OVER_POWER_SQL, sql);
         detail.put(ReportConstant.OVER_POWER_AUTH_COOKIE, authInfo);

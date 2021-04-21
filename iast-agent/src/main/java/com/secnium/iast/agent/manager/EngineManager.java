@@ -17,7 +17,7 @@ import java.util.jar.JarFile;
  * @author dongzhiyong@huoxian.cn
  */
 public class EngineManager {
-    private static final String IAST_NAMESPACE = "LINGZHI";
+    private static final String IAST_NAMESPACE = "DONGTAI";
     private static final String ENGINE_ENTERPOINT_CLASS = "com.secnium.iast.core.AgentEngine";
     private static final String INJECT_PACKAGE_REMOTE_URI = "/api/v1/engine/download?package_name=iast-inject&jdk.version=";
     private static final String ENGINE_PACKAGE_REMOTE_URI = "/api/v1/engine/download?package_name=iast-core&jdk.version=";
@@ -122,7 +122,7 @@ public class EngineManager {
             final File classPath = new File(new File(fileName).getParent());
 
             if (!classPath.mkdirs() && !classPath.exists()) {
-                System.out.println("[com.lingzhi.agent] Check or create local file cache path, path is " + classPath);
+                System.out.println("[cn.huoxian.dongtai.iast] Check or create local file cache path, path is " + classPath);
             }
             FileOutputStream fileOutputStream = new FileOutputStream(fileName);
             byte[] dataBuffer = new byte[1024];
@@ -130,10 +130,10 @@ public class EngineManager {
             while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
                 fileOutputStream.write(dataBuffer, 0, bytesRead);
             }
-            System.out.println("[com.lingzhi.agent] The remote file " + fileUrl + " was successfully written to the local cache.");
+            System.out.println("[cn.huoxian.dongtai.iast] The remote file " + fileUrl + " was successfully written to the local cache.");
             status = true;
         } catch (Exception ignore) {
-            System.err.println("[com.lingzhi.agent] The remote file " + fileUrl + " download failure, please check the iast-token.");
+            System.err.println("[cn.huoxian.dongtai.iast] The remote file " + fileUrl + " download failure, please check the iast-token.");
         }
         return status;
     }
@@ -158,13 +158,13 @@ public class EngineManager {
 
 
     public boolean downloadEnginePackage() {
-        System.out.println("[com.lingzhi.agent] Check if the engine needs to be updated");
+        System.out.println("[cn.huoxian.dongtai.iast] Check if the engine needs to be updated");
         if (UpdateUtils.checkForUpdate()) {
-            System.out.println("[com.lingzhi.agent] Receive an instruction from the remote server to update the engine, update the engine immediately");
+            System.out.println("[cn.huoxian.dongtai.iast] Receive an instruction from the remote server to update the engine, update the engine immediately");
             return updateEnginePackage();
         } else {
             if (engineNotExist(getInjectPackageCachePath()) || engineNotExist(getEnginePackageCachePath())) {
-                System.out.println("[com.lingzhi.agent] Engine does not exist in local cache, the engine will be downloaded.");
+                System.out.println("[cn.huoxian.dongtai.iast] Engine does not exist in local cache, the engine will be downloaded.");
                 return updateEnginePackage();
             } else {
                 return true;
@@ -187,13 +187,13 @@ public class EngineManager {
                     .invoke(null, launchMode, this.properties.getPropertiesFilePath(), inst);
             return true;
         } catch (IOException e) {
-            System.err.println("[com.lingzhi.agent] LingZhi engine installation failed, please contact staff for help.");
+            System.err.println("[cn.huoxian.dongtai.iast] DongTai engine installation failed, please contact staff for help.");
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
-            System.err.println("[com.lingzhi.agent] LingZhi engine installation failed, please contact staff for help.");
+            System.err.println("[cn.huoxian.dongtai.iast] DongTai engine installation failed, please contact staff for help.");
             e.printStackTrace();
         } catch (Throwable throwable) {
-            System.err.println("[com.lingzhi.agent] LingZhi engine installation failed, please contact staff for help.");
+            System.err.println("[cn.huoxian.dongtai.iast] DongTai engine installation failed, please contact staff for help.");
             throwable.printStackTrace();
         }
         return false;
@@ -211,16 +211,16 @@ public class EngineManager {
             }
             return false;
         } catch (InvocationTargetException e) {
-            System.err.println("[com.lingzhi.agent] LingZhi engine start failed, please contact staff for help.");
+            System.err.println("[cn.huoxian.dongtai.iast] DongTai engine start failed, please contact staff for help.");
             e.printStackTrace();
         } catch (NoSuchMethodException e) {
-            System.err.println("[com.lingzhi.agent] LingZhi engine start failed, please contact staff for help.");
+            System.err.println("[cn.huoxian.dongtai.iast] DongTai engine start failed, please contact staff for help.");
             e.printStackTrace();
         } catch (IllegalAccessException e) {
-            System.err.println("[com.lingzhi.agent] LingZhi engine start failed, please contact staff for help.");
+            System.err.println("[cn.huoxian.dongtai.iast] DongTai engine start failed, please contact staff for help.");
             e.printStackTrace();
         } catch (Throwable throwable) {
-            System.err.println("[com.lingzhi.agent] LingZhi engine start failed, please contact staff for help.");
+            System.err.println("[cn.huoxian.dongtai.iast] DongTai engine start failed, please contact staff for help.");
             throwable.printStackTrace();
         }
         return false;
@@ -240,19 +240,19 @@ public class EngineManager {
             }
             return false;
         } catch (InvocationTargetException e) {
-            System.err.println("[com.lingzhi.agent] LingZhi engine stop failed, please contact staff for help.");
+            System.err.println("[cn.huoxian.dongtai.iast] DongTai engine stop failed, please contact staff for help.");
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
             e.printStackTrace(pw);
             System.err.println(sw.toString());
         } catch (NoSuchMethodException e) {
-            System.err.println("[com.lingzhi.agent] LingZhi engine stop failed, please contact staff for help.");
+            System.err.println("[cn.huoxian.dongtai.iast] DongTai engine stop failed, please contact staff for help.");
             e.printStackTrace();
         } catch (IllegalAccessException e) {
-            System.err.println("[com.lingzhi.agent] LingZhi engine stop failed, please contact staff for help.");
+            System.err.println("[cn.huoxian.dongtai.iast] DongTai engine stop failed, please contact staff for help.");
             e.printStackTrace();
         } catch (Throwable throwable) {
-            System.err.println("[com.lingzhi.agent] LingZhi engine stop failed, please contact staff for help.");
+            System.err.println("[cn.huoxian.dongtai.iast] DongTai engine stop failed, please contact staff for help.");
             throwable.printStackTrace();
         }
         return false;
@@ -337,7 +337,7 @@ public class EngineManager {
     private static boolean engineNotExist(final String jarPath) {
         String isDebug = System.getProperty("debug");
         if ("true".equals(isDebug)) {
-            System.out.println("[com.lingzhi.agent] debug mode is " + isDebug);
+            System.out.println("[cn.huoxian.dongtai.iast] current mode: debug, load engine from " + jarPath);
             File tempFile = new File(jarPath);
             return !tempFile.exists();
         } else {

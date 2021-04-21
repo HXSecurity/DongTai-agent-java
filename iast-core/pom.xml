@@ -22,7 +22,7 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <includes>
-                    <include>lingzhi-log.xml</include>
+                    <include>dongtai-log.xml</include>
                     <include>**/version</include>
                     <include>**/logo</include>
                     <include>**/blackext.txt</include>
@@ -105,29 +105,6 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
-
-            <plugin>
-                <!-- https://mvnrepository.com/artifact/com.github.wvengen/proguard-maven-plugin -->
-                <groupId>com.github.wvengen</groupId>
-                <artifactId>proguard-maven-plugin</artifactId>
-                <version>${proguard.version}</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>proguard</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <obfuscate>true</obfuscate>
-                    <inLibsFilter>!module-info.class</inLibsFilter>
-                    <injar>${project.build.finalName}.jar</injar>
-                    <outjar>${project.build.finalName}.jar</outjar>
-                    <outputDirectory>${project.build.directory}</outputDirectory>
-                    <proguardInclude>${basedir}/proguard.conf</proguardInclude>
-                </configuration>
             </plugin>
 
             <plugin>

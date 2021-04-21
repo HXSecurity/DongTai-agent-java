@@ -1,5 +1,6 @@
 package com.secnium.iast.core;
 
+import com.secnium.iast.core.middlewarerecognition.IastServer;
 import com.secnium.iast.core.middlewarerecognition.ServerDetect;
 import com.secnium.iast.core.threadlocalpool.*;
 import org.slf4j.Logger;
@@ -28,8 +29,7 @@ public class EngineManager {
     public static final IASTScopeTracker SCOPE_TRACKER = new IASTScopeTracker();
     private static final IASTServerPort LOGIN_LOGIC_WEIGHT = new IASTServerPort();
     private static final BooleanTheadLocal LINGZHI_RUNNING = new BooleanTheadLocal(false);
-    public static final IASTServerAddr SERVER_ADDR = new IASTServerAddr();
-    public static final IASTServerPort SERVER_PORT = new IASTServerPort();
+    public static IastServer SERVER;
 
     private static final ConcurrentLinkedQueue<String> REPORTS = new ConcurrentLinkedQueue<String>();
 
@@ -90,8 +90,6 @@ public class EngineManager {
         EngineManager.TAINT_POOL.remove();
         EngineManager.TAINT_HASH_CODES.remove();
         EngineManager.SCOPE_TRACKER.remove();
-        EngineManager.SERVER_ADDR.remove();
-        EngineManager.SERVER_PORT.remove();
     }
 
     public static void maintainRequestCount() {
