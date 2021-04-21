@@ -1,6 +1,7 @@
 package com.secnium.iast.core.util;
 
 import com.secnium.iast.core.EngineManager;
+import com.secnium.iast.core.PropertyUtils;
 import com.secnium.iast.core.handler.models.MethodEvent;
 
 import java.util.Iterator;
@@ -17,6 +18,7 @@ import java.util.Set;
  * @author dongzhiyong@huoxian.cn
  */
 public class TaintPoolUtils {
+    private static PropertyUtils properties = PropertyUtils.getInstance();
 
     public static boolean poolContains(Object obj, MethodEvent event) {
         if (obj == null) {
@@ -54,37 +56,36 @@ public class TaintPoolUtils {
      */
     private static boolean contains(Object obj, boolean isString, MethodEvent event) {
         Set<Object> taints = EngineManager.TAINT_POOL.get();
-        Iterator<Object> iterator = taints.iterator();
         int hashcode = 0;
+        // 检查是否
 
-        if (isString) {
+
+        if (isString && properties.isNormalMode()) {
+            Iterator<Object> iterator = taints.iterator();
             hashcode = System.identityHashCode(obj);
-        } else {
-            hashcode = obj.hashCode();
-        }
-
-        while (iterator.hasNext()) {
-            try {
-                Object value = iterator.next();
-                if (obj.equals(value)) {
-                    if (isString) {
+            while (iterator.hasNext()) {
+                try {
+                    Object value = iterator.next();
+                    if (obj.equals(value)) {
                         // 检查当前污点的hashcode是否在hashcode池中，如果在，则标记传播
                         if (EngineManager.TAINT_HASH_CODES.get().contains(hashcode)) {
                             EngineManager.TAINT_HASH_CODES.get().add(hashcode);
                             event.addSourceHash(hashcode);
                             return true;
                         }
-                    } else {
-                        EngineManager.TAINT_HASH_CODES.get().add(hashcode);
-                        event.addSourceHash(hashcode);
-                        return true;
                     }
+                } catch (Throwable ignore) {
+
                 }
-            } catch (Throwable ignore) {
-
             }
-
+        } else {
+            if (taints.contains(obj)) {
+                event.addSourceHash(obj.hashCode());
+                return true;
+            }
+            return false;
         }
+
         return false;
     }
 

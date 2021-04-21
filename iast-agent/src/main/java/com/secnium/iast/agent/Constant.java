@@ -7,4 +7,7 @@ package com.secnium.iast.agent;
  */
 public class Constant {
     public static final String AGENT_VERSION_VALUE = "v1.0.0";
+    public static final String PROTOCOL_HTTPS = "https";
+    public static final String HTTP_METHOD_GET = "GET";
+    public static final String SSL_INSTANCE = "TLS";
 }
