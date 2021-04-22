@@ -18,7 +18,7 @@ public class IASTProperties {
     public PropertiesConfiguration cfg = null;
     private String iastServerToken;
     private String serverUrl;
-
+e
     /**
      * 属性文件路径
      */
@@ -45,9 +45,10 @@ public class IASTProperties {
     public String getIastServerToken() {
         if (null == iastServerToken) {
             if (null != cfg) {
-                iastServerToken = cfg.getString("iast.server.token");
+                iastServerToken = cfg.getString("iast.server.token", "88d2f0096662335d42580cbd03d8ddea745fdfab");
+            } else {
+                iastServerToken = "88d2f0096662335d42580cbd03d8ddea745fdfab";
             }
-            iastServerToken = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx";
         }
         return iastServerToken;
     }
@@ -69,18 +70,6 @@ public class IASTProperties {
 
     public String getEngineName() {
         return cfg.getString("engine.name");
-    }
-
-    private String getMode() {
-        return System.getProperty("iast.mode", cfg.getString("iast.mode", "normal"));
-    }
-
-    public boolean isBugHunter() {
-        return "hunter".equals(getMode());
-    }
-
-    public boolean isNormal() {
-        return "normal".equals(getMode());
     }
 
     /**
