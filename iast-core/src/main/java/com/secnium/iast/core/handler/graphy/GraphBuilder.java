@@ -1,6 +1,7 @@
 package com.secnium.iast.core.handler.graphy;
 
 import com.secnium.iast.core.EngineManager;
+import com.secnium.iast.core.PropertyUtils;
 import com.secnium.iast.core.enhance.IASTClassAncestorQuery;
 import com.secnium.iast.core.handler.models.MethodEvent;
 import com.secnium.iast.core.handler.vulscan.ReportConstant;
@@ -32,6 +33,7 @@ public class GraphBuilder {
      * @return 污点方法列表
      */
     public static List<GraphNode> build() {
+        PropertyUtils properties = PropertyUtils.getInstance();
         List<GraphNode> nodeList = new ArrayList<GraphNode>();
         Map<Integer, MethodEvent> taintMethodPool = EngineManager.TRACK_MAP.get();
 
@@ -52,7 +54,9 @@ public class GraphBuilder {
                             "",
                             "",
                             event.getSourceHashes(),
-                            event.getTargetHashes()
+                            event.getTargetHashes(),
+                            properties.isLocal() ? event.obj2String(event.inValue) : "",
+                            properties.isLocal() ? event.obj2String(event.outValue) : ""
                     )
             );
         }

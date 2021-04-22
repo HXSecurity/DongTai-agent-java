@@ -36,7 +36,6 @@ public class TaintPoolUtils {
                     isContains = contains(tempObj, true, event);
                     if (isContains) {
                         EngineManager.TAINT_POOL.addToPool(obj);
-                        EngineManager.TAINT_HASH_CODES.get().add(obj.hashCode());
                         event.addSourceHash(obj.hashCode());
                         break;
                     }

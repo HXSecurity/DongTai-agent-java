@@ -27,6 +27,7 @@ public class PropertyUtils {
     private String engineName;
     private String projectName;
     private String mode;
+    private String serverMode;
 
     private final String propertiesFilePath;
 
@@ -212,5 +213,20 @@ public class PropertyUtils {
 
     public boolean isNormalMode() {
         return "normal".equals(getMode());
+    }
+
+    private String getServerMode() {
+        if (null == serverMode) {
+            serverMode = System.getProperty("iast.server.mode", "remote");
+        }
+        return serverMode;
+    }
+
+    public boolean isLocal() {
+        return "local".equals(getServerMode());
+    }
+
+    public boolean isRemote() {
+        return "remote".equals(getServerMode());
     }
 }
