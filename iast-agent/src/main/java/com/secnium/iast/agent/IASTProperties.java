@@ -18,7 +18,7 @@ public class IASTProperties {
     public PropertiesConfiguration cfg = null;
     private String iastServerToken;
     private String serverUrl;
-e
+
     /**
      * 属性文件路径
      */
