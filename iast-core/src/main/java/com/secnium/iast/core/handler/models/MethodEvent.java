@@ -249,7 +249,7 @@ public class MethodEvent {
         this.invokeId = invokeId;
     }
 
-    private String obj2String(Object value) {
+    public String obj2String(Object value) {
         if (null == value) {
             return "NULL";
         }

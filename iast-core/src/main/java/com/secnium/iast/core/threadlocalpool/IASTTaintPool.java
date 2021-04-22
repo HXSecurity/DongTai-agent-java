@@ -1,6 +1,7 @@
 package com.secnium.iast.core.threadlocalpool;
 
 import com.secnium.iast.core.EngineManager;
+import com.secnium.iast.core.PropertyUtils;
 import com.secnium.iast.core.handler.models.MethodEvent;
 
 import java.util.HashSet;
@@ -11,6 +12,7 @@ import java.util.Set;
  * @author dongzhiyong@huoxian.cn
  */
 public class IASTTaintPool extends ThreadLocal<HashSet<Object>> {
+    private static final PropertyUtils PROPERTIES = PropertyUtils.getInstance();
 
     @Override
     protected HashSet<Object> initialValue() {
@@ -31,15 +33,21 @@ public class IASTTaintPool extends ThreadLocal<HashSet<Object>> {
         int subHashCode = 0;
         if (obj instanceof String[]) {
             this.get().add(obj);
-            EngineManager.TAINT_HASH_CODES.get().add(obj.hashCode());
             event.addTargetHash(obj.hashCode());
 
             String[] tempObjs = (String[]) obj;
-            for (String tempObj : tempObjs) {
-                this.get().add(tempObj);
-                subHashCode = System.identityHashCode(tempObj);
-                EngineManager.TAINT_HASH_CODES.get().add(subHashCode);
-                event.addTargetHash(subHashCode);
+            if (PROPERTIES.isNormalMode()) {
+                for (String tempObj : tempObjs) {
+                    this.get().add(tempObj);
+                    subHashCode = System.identityHashCode(tempObj);
+                    EngineManager.TAINT_HASH_CODES.get().add(subHashCode);
+                    event.addTargetHash(subHashCode);
+                }
+            } else {
+                for (String tempObj : tempObjs) {
+                    this.get().add(tempObj);
+                    event.addTargetHash(tempObj.hashCode());
+                }
             }
         } else if (obj instanceof Map) {
             this.get().add(obj);
@@ -53,24 +61,21 @@ public class IASTTaintPool extends ThreadLocal<HashSet<Object>> {
                     addTaintToPool(value, event, isSource);
                 }
             }
-        } else if (obj.getClass().isArray() && obj.getClass().getComponentType().isPrimitive() == false) {
+        } else if (obj.getClass().isArray() && !obj.getClass().getComponentType().isPrimitive()) {
             Object[] tempObjs = (Object[]) obj;
-            if (tempObjs == null || tempObjs.length == 0) {
-
-            } else {
+            if (tempObjs.length != 0) {
                 for (Object tempObj : tempObjs) {
                     addTaintToPool(tempObj, event, isSource);
                 }
             }
         } else {
             this.get().add(obj);
-            if (obj instanceof String) {
+            if (obj instanceof String && PROPERTIES.isNormalMode()) {
                 subHashCode = System.identityHashCode(obj);
                 EngineManager.TAINT_HASH_CODES.get().add(subHashCode);
                 event.addTargetHash(subHashCode);
             } else {
                 subHashCode = obj.hashCode();
-                EngineManager.TAINT_HASH_CODES.get().add(subHashCode);
                 event.addTargetHash(subHashCode);
             }
 

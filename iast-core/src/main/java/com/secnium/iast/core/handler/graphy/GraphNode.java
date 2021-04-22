@@ -33,6 +33,10 @@ public class GraphNode {
      */
     private final int callerLineNumber;
 
+    private final String sourceValues;
+
+    private final String targetValues;
+
     /**
      * 当前方法所在类继承的类名称
      */
@@ -86,7 +90,22 @@ public class GraphNode {
      */
     private final List<Integer> targetHash;
 
-    public GraphNode(boolean isSource, int invokeId, String callerClass, String callerMethod, int callerLineNumber, Set<String> interfaceNames, String className, String methodName, String signature, String args, String retClassName, List<Integer> sourceHash, List<Integer> targetHash) {
+    public GraphNode(boolean isSource,
+                     int invokeId,
+                     String callerClass,
+                     String callerMethod,
+                     int callerLineNumber,
+                     Set<String> interfaceNames,
+                     String className,
+                     String methodName,
+                     String signature,
+                     String args,
+                     String retClassName,
+                     List<Integer> sourceHash,
+                     List<Integer> targetHash,
+                     String sourceValues,
+                     String targetValues
+    ) {
         this.isSource = isSource;
         this.invokeId = invokeId;
         this.callerClass = callerClass;
@@ -100,6 +119,8 @@ public class GraphNode {
         this.retClassName = retClassName;
         this.sourceHash = sourceHash;
         this.targetHash = targetHash;
+        this.sourceValues = sourceValues;
+        this.targetValues = targetValues;
     }
 
     public JSONObject toJson() {
@@ -120,7 +141,9 @@ public class GraphNode {
         value.put("args", args);
         value.put("retClassName", retClassName);
         value.put("sourceHash", sourceHashArray);
+        value.put("sourceValues", sourceValues);
         value.put("targetHash", targetHashArray);
+        value.put("targetValues", targetValues);
 
         if (interfaceNames != null) {
             for (String interfaceName : interfaceNames) {
