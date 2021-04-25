@@ -1,3 +1,12 @@
+# other javaagent
+# pinpoint javaagent
+com/navercorp/pinpoint/*
+#com/navercorp/pinpoint/agent/*
+#com/navercorp/pinpoint/bootstrap/*
+#com/navercorp/pinpoint/common/*
+#com/navercorp/pinpoint/grpc/*
+#com/navercorp/pinpoint/loader/*
+#com/navercorp/pinpoint/profiler/*
 # ehcache - cache need't hook
 net/sf/ehcache/*
 # bytebuddy - need't hook
