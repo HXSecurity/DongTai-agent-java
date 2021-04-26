@@ -24,7 +24,7 @@ public class ScaScanner {
             if (file.exists()) {
                 String packageName = file.getName();
                 String signature = SignatureAlgorithm.getSignature(file, ScaScanner.ALGORITHM);
-                if (null != packageName && null != signature) {
+                if (null != signature) {
                     AssestReport.sendReport(filePath, packageName, signature, ScaScanner.ALGORITHM);
                 }
             }
@@ -51,7 +51,7 @@ public class ScaScanner {
                     InputStream is = getJarInputStream(path, entryName);
                     String signature = SignatureAlgorithm.getSignature(is, ScaScanner.ALGORITHM);
                     String packageName = entry.getName();
-                    if (null != packageName && null != signature) {
+                    if (null != signature) {
                         AssestReport.sendReport("jar:file:" + path + "!/" + entryName, packageName, signature, ScaScanner.ALGORITHM);
                     }
                 }
