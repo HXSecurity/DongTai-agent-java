@@ -5,7 +5,7 @@ package com.secnium.iast.core.handler.models;
  *
  * @author dongzhiyong@huoxian.cn
  */
-public class IASTPropagatorModel {
+public class IastPropagatorModel {
     private final String type;
     private final String signature;
     private final Object sourcePosition;
@@ -13,7 +13,7 @@ public class IASTPropagatorModel {
     private final String target;
     private final Object targetPosition;
 
-    public IASTPropagatorModel(String type, String signature, String source, Object sourcePosition, String target, Object targetPosition) {
+    public IastPropagatorModel(String type, String signature, String source, Object sourcePosition, String target, Object targetPosition) {
         this.type = type;
         this.signature = signature;
         this.source = source;

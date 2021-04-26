@@ -1,6 +1,6 @@
 package com.secnium.iast.core.handler.vulscan.normal;
 
-import com.secnium.iast.core.handler.models.IASTSinkModel;
+import com.secnium.iast.core.handler.models.IastSinkModel;
 import com.secnium.iast.core.handler.models.MethodEvent;
 import com.secnium.iast.core.util.Asserts;
 
@@ -17,7 +17,7 @@ public class CryptoBacCiphersVulScan extends AbstractNormalVulScan {
     private final static Pattern GOOD_CIPHERS = Pattern.compile("^(DESede|AES|RSA).*$", CASE_INSENSITIVE);
 
     @Override
-    public void scan(IASTSinkModel sink, MethodEvent event, AtomicInteger invokeId) {
+    public void scan(IastSinkModel sink, MethodEvent event, AtomicInteger invokeId) {
         Asserts.NOT_NULL("sink.params.position", sink.getPos());
         Asserts.NOT_NULL("sink.params.value", event.argumentArray);
 

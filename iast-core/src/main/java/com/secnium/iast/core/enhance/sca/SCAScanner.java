@@ -22,14 +22,10 @@ public class ScaScanner {
         String filePath = file.getPath();
         if (filePath.endsWith(JAR)) {
             if (file.exists()) {
-                try {
-                    String packageName = ManifestScanner.parseManifest(new JarFile(file));
-                    String signature = SignatureAlgorithm.getSignature(file, ScaScanner.ALGORITHM);
-                    if (null != packageName && null != signature) {
-                        AssestReport.sendReport(filePath, packageName, signature, ScaScanner.ALGORITHM);
-                    }
-                } catch (IOException e) {
-                    System.err.println("SCA scan failed, package path: " + filePath);
+                String packageName = file.getName();
+                String signature = SignatureAlgorithm.getSignature(file, ScaScanner.ALGORITHM);
+                if (null != packageName && null != signature) {
+                    AssestReport.sendReport(filePath, packageName, signature, ScaScanner.ALGORITHM);
                 }
             }
         }

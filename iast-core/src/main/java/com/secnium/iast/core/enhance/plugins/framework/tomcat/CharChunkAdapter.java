@@ -1,6 +1,6 @@
 package com.secnium.iast.core.enhance.plugins.framework.tomcat;
 
-import com.secnium.iast.core.enhance.IASTContext;
+import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.util.AsmUtils;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.commons.AdviceAdapter;
@@ -9,11 +9,11 @@ import org.objectweb.asm.commons.AdviceAdapter;
  * @author dongzhiyong@huoxian.cn
  */
 public class CharChunkAdapter extends AdviceAdapter {
-    private final IASTContext IASTContext;
+    private final IastContext IastContext;
 
-    CharChunkAdapter(MethodVisitor mv, int access, String name, String desc, IASTContext IASTContext) {
+    CharChunkAdapter(MethodVisitor mv, int access, String name, String desc, IastContext IastContext) {
         super(AsmUtils.api, mv, access, name, desc);
-        this.IASTContext = IASTContext;
+        this.IastContext = IastContext;
     }
 
     @Override

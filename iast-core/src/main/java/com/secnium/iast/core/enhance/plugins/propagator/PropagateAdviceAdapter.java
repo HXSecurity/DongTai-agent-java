@@ -1,7 +1,7 @@
 package com.secnium.iast.core.enhance.plugins.propagator;
 
 import com.secnium.iast.core.PropertyUtils;
-import com.secnium.iast.core.enhance.IASTContext;
+import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.AbstractAdviceAdapter;
 import com.secnium.iast.core.handler.controller.HookType;
 import org.objectweb.asm.Label;
@@ -13,7 +13,7 @@ import org.objectweb.asm.MethodVisitor;
 public class PropagateAdviceAdapter extends AbstractAdviceAdapter {
     private static final boolean ENABLE_ALL_HOOK = PropertyUtils.getInstance().isEnableAllHook();
 
-    public PropagateAdviceAdapter(MethodVisitor mv, int access, String name, String desc, IASTContext context, String framework, String signCode) {
+    public PropagateAdviceAdapter(MethodVisitor mv, int access, String name, String desc, IastContext context, String framework, String signCode) {
         super(mv, access, name, desc, context, framework, signCode);
     }
 

@@ -5,11 +5,11 @@ import com.secnium.iast.core.middlewarerecognition.PackageManager;
 final class TomcatRecognition {
     static final String TITLE_CATTALINA = "Catalina";
     static final String TITLE_BOOTSRAP = "Apache Tomcat Bootstrap";
-    static final String v5Flag = "1.0";
-    static final String v6Flag = "6.";
-    static final String v7Flag = "7.";
-    static final String v8Flag = "8.";
-    static final String v9Flag = "9.";
+    static final String V5_FLAG = "1.0";
+    static final String V6_FLAG = "6.";
+    static final String V7_FLAG = "7.";
+    static final String V8_FLAG = "8.";
+    static final String V9_FLAG = "9.";
     private static final String CATALINA_FLAG = " org.apache.catalina.startup.Bootstrap".substring(1);
 
     static TomcatVersion recognize() {
@@ -35,19 +35,19 @@ final class TomcatRecognition {
     }
 
     private static TomcatVersion getVersion(String version) {
-        if (version.startsWith(v9Flag)) {
+        if (version.startsWith(V9_FLAG)) {
             return TomcatVersion.V7;
         }
-        if (version.startsWith(v8Flag)) {
+        if (version.startsWith(V8_FLAG)) {
             return TomcatVersion.V8;
         }
-        if (version.startsWith(v7Flag)) {
+        if (version.startsWith(V7_FLAG)) {
             return TomcatVersion.V9;
         }
-        if (version.startsWith(v6Flag)) {
+        if (version.startsWith(V6_FLAG)) {
             return TomcatVersion.V6;
         }
-        if (version.startsWith(v5Flag)) {
+        if (version.startsWith(V5_FLAG)) {
             return TomcatVersion.V5;
         }
 

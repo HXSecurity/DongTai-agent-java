@@ -90,7 +90,7 @@ public class HttpClientUtils {
                 connection.setUseCaches(false);
                 connection.setDoOutput(true);
 
-                String encryptData = RSAUtils.encrypt(data);
+                String encryptData = RsaUtils.encrypt(data);
                 GZIPOutputStream wr = new GZIPOutputStream(connection.getOutputStream());
                 wr.write(encryptData.getBytes(Charset.forName("UTF-8")));
                 wr.close();
@@ -114,7 +114,7 @@ public class HttpClientUtils {
     }
 
     public static void trustAllHosts() {
-        TrustManager[] trustAllCerts = new TrustManager[]{new IASTTrustManager()};
+        TrustManager[] trustAllCerts = new TrustManager[]{new IastTrustManager()};
         try {
             SSLContext sc = SSLContext.getInstance(SSL_SIGNATURE);
             sc.init(null, trustAllCerts, new java.security.SecureRandom());

@@ -1,7 +1,7 @@
 package com.secnium.iast.core.handler.controller.impl;
 
-import com.secnium.iast.core.handler.models.IASTHookRuleModel;
-import com.secnium.iast.core.handler.models.IASTSinkModel;
+import com.secnium.iast.core.handler.models.IastHookRuleModel;
+import com.secnium.iast.core.handler.models.IastSinkModel;
 import com.secnium.iast.core.handler.models.MethodEvent;
 import com.secnium.iast.core.handler.vulscan.ScannerFactory;
 import com.secnium.iast.core.handler.vulscan.overpower.IJdbc;
@@ -25,7 +25,7 @@ public class SinkImpl {
     public static void solveSink(MethodEvent event, AtomicInteger invokeIdSequencer) {
         boolean setJdbcImpl = false;
         Asserts.NOT_NULL("method.event", event);
-        IASTSinkModel sink = IASTHookRuleModel.getSinkByMethodSignature(event.signature);
+        IastSinkModel sink = IastHookRuleModel.getSinkByMethodSignature(event.signature);
         Asserts.NOT_NULL("sink", sink);
         IJdbc jdbcImpl = null;
         try {

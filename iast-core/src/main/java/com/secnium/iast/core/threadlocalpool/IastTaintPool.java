@@ -11,7 +11,7 @@ import java.util.Set;
 /**
  * @author dongzhiyong@huoxian.cn
  */
-public class IASTTaintPool extends ThreadLocal<HashSet<Object>> {
+public class IastTaintPool extends ThreadLocal<HashSet<Object>> {
     private static final PropertyUtils PROPERTIES = PropertyUtils.getInstance();
 
     @Override

@@ -1,6 +1,6 @@
 package com.secnium.iast.core.enhance.plugins;
 
-import com.secnium.iast.core.enhance.IASTContext;
+import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.framework.j2ee.dispatch.DispatchJ2ee;
 import com.secnium.iast.core.enhance.plugins.framework.j2ee.jsp.DispatchJsp;
 import com.secnium.iast.core.enhance.plugins.framework.tomcat.DispatchRecyclePlugin;
@@ -24,7 +24,7 @@ public class PluginRegister {
      */
     private final static ArrayList<DispatchPlugin> PLUGINS;
 
-    public ClassVisitor initial(ClassVisitor classVisitor, IASTContext context) {
+    public ClassVisitor initial(ClassVisitor classVisitor, IastContext context) {
         // todo 暂时注释硬编码检测实现类，后续看情况打开。classVisitor = new DispatchHardcodedPlugin().dispatch(classVisitor, context);
         for (DispatchPlugin plugin : PLUGINS) {
             ClassVisitor pluginVisitor = plugin.dispatch(classVisitor, context);

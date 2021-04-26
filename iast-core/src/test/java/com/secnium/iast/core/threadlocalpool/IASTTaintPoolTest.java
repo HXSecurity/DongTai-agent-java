@@ -9,7 +9,7 @@ import java.util.HashSet;
 public class IASTTaintPoolTest {
     @Test
     public void addSourceToPool() {
-        IASTTaintPool iastTaintPool = new IASTTaintPool();
+        IastTaintPool iastTaintPool = new IastTaintPool();
         HashSet<Object> newTest = new HashSet<Object>();
         iastTaintPool.set(new HashSet<Object>());
         HashMap<String, String[]> node = new HashMap<String, String[]>();

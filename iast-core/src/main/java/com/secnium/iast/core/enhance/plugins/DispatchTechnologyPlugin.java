@@ -1,6 +1,6 @@
 package com.secnium.iast.core.enhance.plugins;
 
-import com.secnium.iast.core.enhance.IASTContext;
+import com.secnium.iast.core.enhance.IastContext;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.slf4j.Logger;
@@ -66,7 +66,7 @@ final public class DispatchTechnologyPlugin implements DispatchPlugin {
     }
 
     @Override
-    public ClassVisitor dispatch(ClassVisitor classVisitor, IASTContext context) {
+    public ClassVisitor dispatch(ClassVisitor classVisitor, IastContext context) {
         classname = context.getClassName();
         String matchClassName = isMatch();
         if (matchClassName != null) {
@@ -89,7 +89,7 @@ final public class DispatchTechnologyPlugin implements DispatchPlugin {
         private final Logger logger = LoggerFactory.getLogger(getClass());
         private final Map<String, String> technologyMapDetail;
 
-        ClassVisit(ClassVisitor classVisitor, IASTContext context, Map<String, String> technologyMapDetail) {
+        ClassVisit(ClassVisitor classVisitor, IastContext context, Map<String, String> technologyMapDetail) {
             super(classVisitor, context);
             this.technologyMapDetail = technologyMapDetail;
         }

@@ -1,4 +1,4 @@
-package com.secnium.iast.core.handler.vulscan.overpower.JDBCImpl;
+package com.secnium.iast.core.handler.vulscan.overpower.JdbcImpl;
 
 import com.secnium.iast.core.handler.models.MethodEvent;
 import com.secnium.iast.core.handler.vulscan.overpower.IJdbc;

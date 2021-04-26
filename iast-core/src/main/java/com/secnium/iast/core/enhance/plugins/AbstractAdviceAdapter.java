@@ -1,6 +1,6 @@
 package com.secnium.iast.core.enhance.plugins;
 
-import com.secnium.iast.core.enhance.IASTContext;
+import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.asm.AsmMethods;
 import com.secnium.iast.core.enhance.asm.AsmTypes;
 import com.secnium.iast.core.util.AsmUtils;
@@ -20,7 +20,7 @@ public abstract class AbstractAdviceAdapter extends AdviceAdapter implements Asm
     protected int access;
     protected Label tryLabel;
     protected Label catchLabel;
-    protected IASTContext context;
+    protected IastContext context;
     protected String type;
     protected String signature;
     protected Type returnType;
@@ -30,7 +30,7 @@ public abstract class AbstractAdviceAdapter extends AdviceAdapter implements Asm
                                  int access,
                                  String name,
                                  String desc,
-                                 IASTContext context,
+                                 IastContext context,
                                  String type,
                                  String signCode) {
         super(AsmUtils.api, mv, access, name, desc);

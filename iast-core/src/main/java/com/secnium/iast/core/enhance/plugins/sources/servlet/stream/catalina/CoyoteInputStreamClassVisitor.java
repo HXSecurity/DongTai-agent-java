@@ -1,6 +1,6 @@
 package com.secnium.iast.core.enhance.plugins.sources.servlet.stream.catalina;
 
-import com.secnium.iast.core.enhance.IASTContext;
+import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.AbstractClassVisitor;
 import com.secnium.iast.core.util.AsmUtils;
 import org.objectweb.asm.ClassVisitor;
@@ -10,7 +10,7 @@ import org.objectweb.asm.MethodVisitor;
  * @author dongzhiyong@huoxian.cn
  */
 public class CoyoteInputStreamClassVisitor extends AbstractClassVisitor {
-    public CoyoteInputStreamClassVisitor(ClassVisitor classVisitor, IASTContext context) {
+    public CoyoteInputStreamClassVisitor(ClassVisitor classVisitor, IastContext context) {
         super(classVisitor, context);
     }
 

@@ -22,12 +22,12 @@ public class EngineManager {
 
     public static final BooleanTheadLocal ENTER_HTTP_ENTRYPOINT = new BooleanTheadLocal(false);
     public static final RequestContext REQUEST_CONTEXT = new RequestContext();
-    public static final IASTResponseCache RESPONSE_CACHE = new IASTResponseCache();
-    public static final IASTTrackMap TRACK_MAP = new IASTTrackMap();
-    public static final IASTTaintPool TAINT_POOL = new IASTTaintPool();
-    public static final IASTTaintHashCodes TAINT_HASH_CODES = new IASTTaintHashCodes();
-    public static final IASTScopeTracker SCOPE_TRACKER = new IASTScopeTracker();
-    private static final IASTServerPort LOGIN_LOGIC_WEIGHT = new IASTServerPort();
+    public static final IastResponseCache RESPONSE_CACHE = new IastResponseCache();
+    public static final IastTrackMap TRACK_MAP = new IastTrackMap();
+    public static final IastTaintPool TAINT_POOL = new IastTaintPool();
+    public static final IastTaintHashCodes TAINT_HASH_CODES = new IastTaintHashCodes();
+    public static final IastScopeTracker SCOPE_TRACKER = new IastScopeTracker();
+    private static final IastServerPort LOGIN_LOGIC_WEIGHT = new IastServerPort();
     private static final BooleanTheadLocal LINGZHI_RUNNING = new BooleanTheadLocal(false);
     public static IastServer SERVER;
 

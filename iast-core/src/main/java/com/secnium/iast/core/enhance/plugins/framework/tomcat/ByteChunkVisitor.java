@@ -1,6 +1,6 @@
 package com.secnium.iast.core.enhance.plugins.framework.tomcat;
 
-import com.secnium.iast.core.enhance.IASTContext;
+import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.AbstractClassVisitor;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
@@ -15,7 +15,7 @@ import java.lang.reflect.Modifier;
 public class ByteChunkVisitor extends AbstractClassVisitor {
 
 
-    public ByteChunkVisitor(ClassVisitor classVisitor, IASTContext context) {
+    public ByteChunkVisitor(ClassVisitor classVisitor, IastContext context) {
         super(classVisitor, context);
     }
 

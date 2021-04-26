@@ -1,8 +1,8 @@
 package com.secnium.iast.core.handler.controller.impl;
 
 import com.secnium.iast.core.EngineManager;
-import com.secnium.iast.core.handler.models.IASTHookRuleModel;
-import com.secnium.iast.core.handler.models.IASTPropagatorModel;
+import com.secnium.iast.core.handler.models.IastHookRuleModel;
+import com.secnium.iast.core.handler.models.IastPropagatorModel;
 import com.secnium.iast.core.handler.models.MethodEvent;
 import com.secnium.iast.core.handler.vulscan.dynamic.TrackUtils;
 import com.secnium.iast.core.util.StackUtils;
@@ -30,7 +30,7 @@ public class PropagatorImpl {
 
     public static void solvePropagator(MethodEvent event, AtomicInteger invokeIdSequencer) {
         if (!EngineManager.TAINT_POOL.get().isEmpty()) {
-            IASTPropagatorModel propagator = IASTHookRuleModel.getPropagatorByMethodSignature(event.signature);
+            IastPropagatorModel propagator = IastHookRuleModel.getPropagatorByMethodSignature(event.signature);
             if (propagator != null) {
                 auxiliaryPropagator(propagator, invokeIdSequencer, event);
             } else {
@@ -47,7 +47,7 @@ public class PropagatorImpl {
         EngineManager.TRACK_MAP.get().put(invokeId, event);
     }
 
-    private static void auxiliaryPropagator(IASTPropagatorModel propagator, AtomicInteger invokeIdSequencer, MethodEvent event) {
+    private static void auxiliaryPropagator(IastPropagatorModel propagator, AtomicInteger invokeIdSequencer, MethodEvent event) {
         String sourceString = propagator.getSource();
         boolean conditionSource = containts(sourceString);
         if (!conditionSource) {
@@ -115,7 +115,7 @@ public class PropagatorImpl {
         }
     }
 
-    private static void setTarget(IASTPropagatorModel propagator, MethodEvent event) {
+    private static void setTarget(IastPropagatorModel propagator, MethodEvent event) {
         String target = propagator.getTarget();
         if (PARAMS_OBJECT.equals(target)) {
             event.outValue = event.object;

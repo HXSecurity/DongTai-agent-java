@@ -1,6 +1,6 @@
 package com.secnium.iast.core.enhance.plugins.sources.spring;
 
-import com.secnium.iast.core.enhance.IASTContext;
+import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.AbstractAdviceAdapter;
 import com.secnium.iast.core.handler.controller.HookType;
 import org.objectweb.asm.Label;
@@ -10,7 +10,7 @@ import org.objectweb.asm.MethodVisitor;
  * @author dongzhiyong@huoxian.cn
  */
 public class ArgumentResolverAdviceAdapter extends AbstractAdviceAdapter {
-    public ArgumentResolverAdviceAdapter(MethodVisitor mv, int access, String name, String desc, IASTContext context, String signCode) {
+    public ArgumentResolverAdviceAdapter(MethodVisitor mv, int access, String name, String desc, IastContext context, String signCode) {
         super(mv, access, name, desc, context, "SpringArguments", signCode);
     }
 

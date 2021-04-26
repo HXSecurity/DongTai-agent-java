@@ -10,7 +10,7 @@ import java.util.Arrays;
 /**
  * @author dongzhiyong@huoxian.cn
  */
-public class RSAUtils {
+public class RsaUtils {
 
     private static final String PUBLIC_KEY = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC5hIGsrKhzobovomu0qdgHWbrrVZr8pOwuFUoDYWqaw+GlPn/nR+abMO3nvlRqI7XmQwMCl2vAKwT5tu9QyVxqadgxfIssFCkruZFubrnqSYXmsrgu4h/26VBLBzRo0PvQNa3TUDetwHqy5My4YTfye55978AQqStjX0c3Q1S2ewIDAQAB";
     /**

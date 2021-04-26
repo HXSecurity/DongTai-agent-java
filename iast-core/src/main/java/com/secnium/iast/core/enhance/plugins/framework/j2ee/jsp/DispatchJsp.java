@@ -1,6 +1,6 @@
 package com.secnium.iast.core.enhance.plugins.framework.j2ee.jsp;
 
-import com.secnium.iast.core.enhance.IASTContext;
+import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.DispatchPlugin;
 import org.objectweb.asm.ClassVisitor;
 import org.slf4j.Logger;
@@ -20,7 +20,7 @@ public class DispatchJsp implements DispatchPlugin {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
-    public ClassVisitor dispatch(ClassVisitor classVisitor, IASTContext context) {
+    public ClassVisitor dispatch(ClassVisitor classVisitor, IastContext context) {
         ancestors = context.getAncestors();
 
         String matchClassname = isMatch();

@@ -1,6 +1,6 @@
 package com.secnium.iast.core.enhance.plugins.framework.tomcat;
 
-import com.secnium.iast.core.enhance.IASTContext;
+import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.AbstractClassVisitor;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
@@ -14,7 +14,7 @@ import java.lang.reflect.Modifier;
  */
 public class RequestVisitor extends AbstractClassVisitor {
 
-    public RequestVisitor(ClassVisitor classVisitor, IASTContext context) {
+    public RequestVisitor(ClassVisitor classVisitor, IastContext context) {
         super(classVisitor, context);
     }
 

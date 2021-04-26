@@ -1,6 +1,6 @@
 package com.secnium.iast.core.enhance.plugins.sinks.autobinding;
 
-import com.secnium.iast.core.enhance.IASTContext;
+import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.AbstractClassVisitor;
 import com.secnium.iast.core.report.ErrorLogReport;
 import com.secnium.iast.core.util.AsmUtils;
@@ -21,7 +21,7 @@ public class SpringAutoBindingAdapter extends AbstractClassVisitor {
     private static Method onbind;
     private static Type classtype;
 
-    public SpringAutoBindingAdapter(ClassVisitor classVisitor, IASTContext context) {
+    public SpringAutoBindingAdapter(ClassVisitor classVisitor, IastContext context) {
         super(classVisitor, context);
     }
 

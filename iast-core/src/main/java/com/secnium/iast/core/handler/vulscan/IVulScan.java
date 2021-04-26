@@ -1,7 +1,7 @@
 package com.secnium.iast.core.handler.vulscan;
 
 import com.secnium.iast.core.handler.models.MethodEvent;
-import com.secnium.iast.core.handler.models.IASTSinkModel;
+import com.secnium.iast.core.handler.models.IastSinkModel;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -18,7 +18,7 @@ public interface IVulScan {
      * @param event             当前命中的方法
      * @param invokeIdSequencer 方法调用ID生成器，确保全局唯一且自增
      */
-    void scan(IASTSinkModel sink, MethodEvent event, AtomicInteger invokeIdSequencer);
+    void scan(IastSinkModel sink, MethodEvent event, AtomicInteger invokeIdSequencer);
 
     /**
      * 执行sql语句扫描

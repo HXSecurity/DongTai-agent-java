@@ -9,8 +9,8 @@ import java.util.Map;
 /**
  * @author dongzhiyong@huoxian.cn
  */
-public class IASTContext {
-    private static volatile IASTContext instance;
+public class IastContext {
+    private static volatile IastContext instance;
     private String className;
     private String matchClassname;
     private HashSet<String> ancestors;
@@ -30,22 +30,22 @@ public class IASTContext {
     /**
      * 单例
      *
-     * @return IASTContext单例
+     * @return IastContext单例
      */
-    public static IASTContext getInstance() {
+    public static IastContext getInstance() {
         assert instance != null;
         return instance;
     }
 
-    public static IASTContext build(String className, String matchClassname, HashSet<String> ancestors, String[] interfaces,
+    public static IastContext build(String className, String matchClassname, HashSet<String> ancestors, String[] interfaces,
                                     String baseClassName, int flags, byte[] srcCodeBytes, CodeSource codeSource,
                                     ClassLoader loader, int listenId, String namespace, int classLoaderObjectID) {
-        instance = new IASTContext(className, matchClassname, ancestors, interfaces, baseClassName, flags, srcCodeBytes,
+        instance = new IastContext(className, matchClassname, ancestors, interfaces, baseClassName, flags, srcCodeBytes,
                 codeSource, loader, listenId, namespace, classLoaderObjectID);
         return instance;
     }
 
-    private IASTContext(String className, String matchClassname, HashSet<String> ancestors, String[] interfaces,
+    private IastContext(String className, String matchClassname, HashSet<String> ancestors, String[] interfaces,
                         String baseClassName, int flags, byte[] srcCodeBytes, CodeSource codeSource, ClassLoader loader,
                         int listenId, String namespace, int classLoaderObjectID) {
         this.setClassName(className);

@@ -1,6 +1,6 @@
 package com.secnium.iast.core.enhance.plugins.sources.struts2;
 
-import com.secnium.iast.core.enhance.IASTContext;
+import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.AbstractClassVisitor;
 import com.secnium.iast.core.enhance.plugins.sources.servlet.ServletAdviceAdapter;
 import com.secnium.iast.core.enhance.plugins.sources.servlet.ServletClassVisitor;
@@ -26,7 +26,7 @@ public class MultiPartRequestVisitor extends AbstractClassVisitor {
             "getParameterValues"
     ));
 
-    public MultiPartRequestVisitor(ClassVisitor classVisitor, IASTContext context) {
+    public MultiPartRequestVisitor(ClassVisitor classVisitor, IastContext context) {
         super(classVisitor, context);
     }
 

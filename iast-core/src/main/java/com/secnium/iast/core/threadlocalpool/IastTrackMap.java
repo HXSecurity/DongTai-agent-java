@@ -7,7 +7,7 @@ import java.util.Map;
 /**
  * @author dongzhiyong@huoxian.cn
  */
-public class IASTTrackMap extends ThreadLocal<Map<Integer, MethodEvent>> {
+public class IastTrackMap extends ThreadLocal<Map<Integer, MethodEvent>> {
     @Override
     protected Map<Integer, MethodEvent> initialValue() {
         return null;

@@ -2,12 +2,12 @@ package com.secnium.iast.core.enhance.plugins;
 
 import com.secnium.iast.core.EngineManager;
 import com.secnium.iast.core.PropertyUtils;
-import com.secnium.iast.core.enhance.IASTContext;
+import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.propagator.PropagateAdviceAdapter;
 import com.secnium.iast.core.enhance.plugins.sinks.SinkAdviceAdapter;
 import com.secnium.iast.core.handler.controller.HookType;
-import com.secnium.iast.core.handler.models.IASTHookRuleModel;
-import com.secnium.iast.core.handler.models.IASTSinkModel;
+import com.secnium.iast.core.handler.models.IastHookRuleModel;
+import com.secnium.iast.core.handler.models.IastSinkModel;
 import com.secnium.iast.core.handler.vulscan.VulnType;
 import com.secnium.iast.core.util.AsmUtils;
 import com.secnium.iast.core.util.SandboxStringUtils;
@@ -41,7 +41,7 @@ public class DispatchClassPlugin implements DispatchPlugin {
     }
 
     @Override
-    public ClassVisitor dispatch(ClassVisitor classVisitor, IASTContext context) {
+    public ClassVisitor dispatch(ClassVisitor classVisitor, IastContext context) {
         ClassVisit modifiedClassVisitor = null;
         ancestors = context.getAncestors();
         classname = context.getClassName();
@@ -66,7 +66,7 @@ public class DispatchClassPlugin implements DispatchPlugin {
     @Override
     public String isMatch() {
         String javaClassname = SandboxStringUtils.toJavaClassName(classname);
-        if (IASTHookRuleModel.classIsNeededHookByName(javaClassname)) {
+        if (IastHookRuleModel.classIsNeededHookByName(javaClassname)) {
             return javaClassname;
         }
 
@@ -74,7 +74,7 @@ public class DispatchClassPlugin implements DispatchPlugin {
         for (Iterator<String> it = ancestors.iterator(); it.hasNext(); ) {
             String superClass = it.next();
             javaClassname = SandboxStringUtils.toJavaClassName(superClass);
-            if (IASTHookRuleModel.classIsNeededHookBySuperClassName(javaClassname)) {
+            if (IastHookRuleModel.classIsNeededHookBySuperClassName(javaClassname)) {
                 supportsSuper = true;
                 break;
             }
@@ -86,7 +86,7 @@ public class DispatchClassPlugin implements DispatchPlugin {
         private final boolean isAppClass;
         private int classVersion;
 
-        ClassVisit(ClassVisitor classVisitor, IASTContext context) {
+        ClassVisit(ClassVisitor classVisitor, IastContext context) {
             super(classVisitor, context);
             String classname = context.getClassName();
             this.isAppClass = ConfigMatcher.isAppClass(classname);
@@ -103,7 +103,7 @@ public class DispatchClassPlugin implements DispatchPlugin {
 
             if (!Modifier.isInterface(access) && !Modifier.isAbstract(access) && !"<clinit>".equals(name)) {
                 String iastMethodSignature = AsmUtils.buildSignature(context.getMatchClassname(), name, desc);
-                String framework = IASTHookRuleModel.getFrameworkByMethodSignature(iastMethodSignature);
+                String framework = IastHookRuleModel.getFrameworkByMethodSignature(iastMethodSignature);
 
                 mv = context.isEnableAllHook() ? greedyAop(mv, access, name, desc, framework == null ? "none" : framework, iastMethodSignature) : (framework == null ? mv : lazyAop(mv, access, name, desc, framework, iastMethodSignature));
 
@@ -157,12 +157,12 @@ public class DispatchClassPlugin implements DispatchPlugin {
          * @return 修改后的方法访问器
          */
         private MethodVisitor lazyAop(MethodVisitor mv, int access, String name, String desc, String framework, String signature) {
-            int hookValue = IASTHookRuleModel.getRuleTypeValueByFramework(framework);
+            int hookValue = IastHookRuleModel.getRuleTypeValueByFramework(framework);
             if (HookType.PROPAGATOR.equals(hookValue)) {
                 mv = new PropagateAdviceAdapter(mv, access, name, desc, context, framework, signature);
             } else if (HookType.SINK.equals(hookValue)) {
                 // fixme 针对越权类，overpower为true，否则为false
-                IASTSinkModel sinkModel = IASTHookRuleModel.getSinkByMethodSignature(signature);
+                IastSinkModel sinkModel = IastHookRuleModel.getSinkByMethodSignature(signature);
                 assert sinkModel != null;
                 boolean isOverPower = VulnType.SQL_OVER_POWER.equals(sinkModel.getType());
                 mv = new SinkAdviceAdapter(mv, access, name, desc, context, framework, signature, isOverPower);

@@ -3,9 +3,9 @@ package com.secnium.iast.core.threadlocalpool;
 /**
  * @author dongzhiyong@huoxian.cn
  */
-public class IASTServerAddr extends ThreadLocal<String> {
+public class IastServerPort extends ThreadLocal<Integer> {
     @Override
-    protected String initialValue() {
+    protected Integer initialValue() {
         return null;
     }
 }

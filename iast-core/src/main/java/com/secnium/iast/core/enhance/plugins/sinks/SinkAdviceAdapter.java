@@ -1,7 +1,7 @@
 package com.secnium.iast.core.enhance.plugins.sinks;
 
 import com.secnium.iast.core.PropertyUtils;
-import com.secnium.iast.core.enhance.IASTContext;
+import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.AbstractAdviceAdapter;
 import com.secnium.iast.core.handler.controller.HookType;
 import org.objectweb.asm.Label;
@@ -14,7 +14,7 @@ public class SinkAdviceAdapter extends AbstractAdviceAdapter {
     private static final boolean ENABLE_ALL_HOOK = PropertyUtils.getInstance().isEnableAllHook();
     private boolean overpower;
 
-    public SinkAdviceAdapter(MethodVisitor mv, int access, String name, String desc, IASTContext context, String framework, String signCode, boolean overpower) {
+    public SinkAdviceAdapter(MethodVisitor mv, int access, String name, String desc, IastContext context, String framework, String signCode, boolean overpower) {
         super(mv, access, name, desc, context, framework, signCode);
         this.overpower = overpower;
     }

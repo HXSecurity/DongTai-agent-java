@@ -1,6 +1,6 @@
 package com.secnium.iast.core.enhance.plugins.framework.j2ee.dispatch;
 
-import com.secnium.iast.core.enhance.IASTContext;
+import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.DispatchPlugin;
 import org.objectweb.asm.ClassVisitor;
 import org.slf4j.Logger;
@@ -29,7 +29,7 @@ public class DispatchJ2ee implements DispatchPlugin {
 
 
     @Override
-    public ClassVisitor dispatch(ClassVisitor classVisitor, IASTContext context) {
+    public ClassVisitor dispatch(ClassVisitor classVisitor, IastContext context) {
         String className = context.getClassName();
         HashSet<String> ancestors = context.getAncestors();
 

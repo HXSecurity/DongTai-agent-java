@@ -6,7 +6,7 @@ import java.security.cert.X509Certificate;
 /**
  * @author dongzhiyong@huoxian.cn
  */
-public class IASTTrustManager implements X509TrustManager {
+public class IastTrustManager implements X509TrustManager {
     @Override
     public java.security.cert.X509Certificate[] getAcceptedIssuers() {
         return new java.security.cert.X509Certificate[]{};

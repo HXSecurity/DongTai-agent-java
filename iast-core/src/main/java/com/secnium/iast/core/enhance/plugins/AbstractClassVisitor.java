@@ -1,6 +1,6 @@
 package com.secnium.iast.core.enhance.plugins;
 
-import com.secnium.iast.core.enhance.IASTContext;
+import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.util.AsmUtils;
 import org.objectweb.asm.ClassVisitor;
 
@@ -9,10 +9,10 @@ import org.objectweb.asm.ClassVisitor;
  */
 public abstract class AbstractClassVisitor extends ClassVisitor {
 
-    protected IASTContext context;
+    protected IastContext context;
     protected boolean transformed;
 
-    public AbstractClassVisitor(ClassVisitor classVisitor, IASTContext context) {
+    public AbstractClassVisitor(ClassVisitor classVisitor, IastContext context) {
         super(AsmUtils.api, classVisitor);
         this.context = context;
         this.transformed = false;

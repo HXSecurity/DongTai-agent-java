@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author dongzhiyong@huoxian.cn
  */
-public class IASTClassAncestorQuery {
+public class IastClassAncestorQuery {
 
     private final Map<String, Set<String>> classAncestorMap;
     private static final Map<String, List<String>> DEFAULT_INTERFACE_LIST_MAP;
@@ -30,16 +30,16 @@ public class IASTClassAncestorQuery {
     }
 
     private ClassLoader loader;
-    private static IASTClassAncestorQuery instance;
+    private static IastClassAncestorQuery instance;
 
-    public static IASTClassAncestorQuery getInstance() {
+    public static IastClassAncestorQuery getInstance() {
         if (instance == null) {
-            instance = new IASTClassAncestorQuery();
+            instance = new IastClassAncestorQuery();
         }
         return instance;
     }
 
-    private IASTClassAncestorQuery() {
+    private IastClassAncestorQuery() {
         this.classAncestorMap = new ConcurrentHashMap<String, Set<String>>();
     }
 
@@ -189,7 +189,7 @@ public class IASTClassAncestorQuery {
                     scannedClassSet.add(jarPackageFilePath);
                     ScaScanner.scanWithJarPackage(jarPackageFilePath);
                 }
-            } else if (!jarPackageFilePath.endsWith("iast-core.jar") && !jarPackageFilePath.endsWith("iast-inject.jar") && !scannedClassSet.contains(packagePath)) {
+            } else if (!jarPackageFilePath.endsWith("agent.jar") && !jarPackageFilePath.endsWith("iast-core.jar") && !jarPackageFilePath.endsWith("iast-inject.jar") && !scannedClassSet.contains(packagePath)) {
                 scannedClassSet.add(packagePath);
                 File packagePathFile = new File(packagePath);
                 File[] packagePathFiles = packagePathFile.listFiles();

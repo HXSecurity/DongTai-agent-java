@@ -1,7 +1,7 @@
 package com.secnium.iast.core.handler.vulscan.normal;
 
 import com.secnium.iast.core.handler.models.MethodEvent;
-import com.secnium.iast.core.handler.models.IASTSinkModel;
+import com.secnium.iast.core.handler.models.IastSinkModel;
 import com.secnium.iast.core.util.Asserts;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -17,7 +17,7 @@ public class CryptoBadMacVulScan extends AbstractNormalVulScan {
     private final static Pattern GOOD_MAC_PAT = Pattern.compile("^(SHA2|SHA-224|SHA-256|SHA3|SHA-384|SHA5|SHA512|SHA-512)$", CASE_INSENSITIVE);
 
     @Override
-    public void scan(IASTSinkModel sink, MethodEvent event, AtomicInteger invokeId) {
+    public void scan(IastSinkModel sink, MethodEvent event, AtomicInteger invokeId) {
         int[] taintPos = sink.getPos();
         Object[] arguments = event.argumentArray;
         Asserts.NOT_NULL("sink.mac.params", taintPos);

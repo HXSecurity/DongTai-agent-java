@@ -1,7 +1,7 @@
 package com.secnium.iast.core.replay;
 
 import com.secnium.iast.core.AbstractThread;
-import com.secnium.iast.core.handler.models.IASTReplayModel;
+import com.secnium.iast.core.handler.models.IastReplayModel;
 import com.secnium.iast.core.handler.vulscan.overpower.AuthInfoCache;
 import com.secnium.iast.core.util.HttpClientHostnameVerifier;
 import com.secnium.iast.core.util.HttpClientUtils;
@@ -33,7 +33,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class HttpRequestReplay extends AbstractThread {
     private static final String PROTOCOL_HTTPS = "https";
     public final static HostnameVerifier DO_NOT_VERIFY = new HttpClientHostnameVerifier();
-    private final static ConcurrentLinkedQueue<IASTReplayModel> WAITING_REPLAY_REQUESTS = new ConcurrentLinkedQueue<IASTReplayModel>();
+    private final static ConcurrentLinkedQueue<IastReplayModel> WAITING_REPLAY_REQUESTS = new ConcurrentLinkedQueue<IastReplayModel>();
 
     public HttpRequestReplay() {
         this(null, true, 0);
@@ -43,7 +43,7 @@ public class HttpRequestReplay extends AbstractThread {
         super(name, enable, waitTime);
     }
 
-    public static void sendReplayRequest(IASTReplayModel replayModel) {
+    public static void sendReplayRequest(IastReplayModel replayModel) {
         WAITING_REPLAY_REQUESTS.offer(replayModel);
     }
 
@@ -51,7 +51,7 @@ public class HttpRequestReplay extends AbstractThread {
     /**
      * 发起重放请求
      */
-    private static void doReplay(IASTReplayModel replayModel) {
+    private static void doReplay(IastReplayModel replayModel) {
         // 准备http请求需要的数据（url、post数据、headers头）
         HashMap<String, String> headers = splitHeaderStringToHashmap(replayModel.getRequestHeader(), replayModel.getTraceId());
         // 发送http请求
@@ -141,7 +141,7 @@ public class HttpRequestReplay extends AbstractThread {
     @Override
     protected void send() {
         while (!WAITING_REPLAY_REQUESTS.isEmpty()) {
-            IASTReplayModel model = WAITING_REPLAY_REQUESTS.poll();
+            IastReplayModel model = WAITING_REPLAY_REQUESTS.poll();
             doReplay(model);
         }
     }

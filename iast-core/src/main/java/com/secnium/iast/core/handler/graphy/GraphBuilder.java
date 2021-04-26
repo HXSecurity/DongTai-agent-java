@@ -2,7 +2,7 @@ package com.secnium.iast.core.handler.graphy;
 
 import com.secnium.iast.core.EngineManager;
 import com.secnium.iast.core.PropertyUtils;
-import com.secnium.iast.core.enhance.IASTClassAncestorQuery;
+import com.secnium.iast.core.enhance.IastClassAncestorQuery;
 import com.secnium.iast.core.handler.models.MethodEvent;
 import com.secnium.iast.core.handler.vulscan.ReportConstant;
 import com.secnium.iast.core.report.AgentRegisterReport;
@@ -47,7 +47,7 @@ public class GraphBuilder {
                             event.getCallerClass(),
                             event.getCallerMethod(),
                             event.getCallerLine(),
-                            event.object != null ? IASTClassAncestorQuery.getFamilyFromClass(event.object.getClass().getName().replace("\\.", "/")) : null,
+                            event.object != null ? IastClassAncestorQuery.getFamilyFromClass(event.object.getClass().getName().replace("\\.", "/")) : null,
                             event.getJavaClassName(),
                             event.getJavaMethodName(),
                             event.getJavaMethodDesc(),

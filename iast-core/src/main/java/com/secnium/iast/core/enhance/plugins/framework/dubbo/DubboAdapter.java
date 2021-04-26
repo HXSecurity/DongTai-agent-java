@@ -1,6 +1,6 @@
 package com.secnium.iast.core.enhance.plugins.framework.dubbo;
 
-import com.secnium.iast.core.enhance.IASTContext;
+import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.AbstractClassVisitor;
 import com.secnium.iast.core.util.AsmUtils;
 import org.objectweb.asm.ClassVisitor;
@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 public class DubboAdapter extends AbstractClassVisitor {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    public DubboAdapter(ClassVisitor classVisitor, IASTContext context) {
+    public DubboAdapter(ClassVisitor classVisitor, IastContext context) {
         super(classVisitor, context);
     }
 

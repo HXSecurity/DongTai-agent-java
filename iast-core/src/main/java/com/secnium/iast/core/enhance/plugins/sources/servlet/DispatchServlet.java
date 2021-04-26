@@ -1,6 +1,6 @@
 package com.secnium.iast.core.enhance.plugins.sources.servlet;
 
-import com.secnium.iast.core.enhance.IASTContext;
+import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.DispatchPlugin;
 import org.objectweb.asm.ClassVisitor;
 import org.slf4j.Logger;
@@ -11,11 +11,11 @@ import org.slf4j.LoggerFactory;
  */
 public class DispatchServlet implements DispatchPlugin {
     private final String BASE_CLASS = " javax/servlet/ServletRequest".substring(1);
-    private IASTContext context;
+    private IastContext context;
     private final Logger logger = LoggerFactory.getLogger(DispatchServlet.class);
 
     @Override
-    public ClassVisitor dispatch(ClassVisitor classVisitor, IASTContext context) {
+    public ClassVisitor dispatch(ClassVisitor classVisitor, IastContext context) {
         this.context = context;
         String classname = isMatch();
         if (null != classname) {

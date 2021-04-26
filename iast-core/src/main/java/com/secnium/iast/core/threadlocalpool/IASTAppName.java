@@ -3,7 +3,7 @@ package com.secnium.iast.core.threadlocalpool;
 /**
  * @author dongzhiyong@huoxian.cn
  */
-public class IASTAppName extends ThreadLocal<String> {
+public class IastAppName extends ThreadLocal<String> {
     public static final String DEFAULT_APP_NAME = "";
 
     @Override

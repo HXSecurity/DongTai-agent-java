@@ -1,6 +1,6 @@
 package com.secnium.iast.core.enhance.plugins.framework.j2ee.dispatch;
 
-import com.secnium.iast.core.enhance.IASTContext;
+import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.AbstractClassVisitor;
 import com.secnium.iast.core.util.AsmUtils;
 import org.objectweb.asm.ClassVisitor;
@@ -25,7 +25,7 @@ public class ServletDispatcherAdapter extends AbstractClassVisitor {
 
     private final boolean isFaces;
 
-    ServletDispatcherAdapter(ClassVisitor classVisitor, IASTContext context) {
+    ServletDispatcherAdapter(ClassVisitor classVisitor, IastContext context) {
         super(classVisitor, context);
         this.isFaces = FACES_SERVLET.equals(context.getClassName());
     }

@@ -1,6 +1,6 @@
 package com.secnium.iast.core.enhance.plugins;
 
-import com.secnium.iast.core.enhance.IASTContext;
+import com.secnium.iast.core.enhance.IastContext;
 import org.objectweb.asm.ClassVisitor;
 
 /**
@@ -14,7 +14,7 @@ public interface DispatchPlugin {
      * @param context      当前类的上下文对象
      * @return ClassVisitor 命中的类访问起
      */
-    ClassVisitor dispatch(ClassVisitor classVisitor, IASTContext context);
+    ClassVisitor dispatch(ClassVisitor classVisitor, IastContext context);
 
     /**
      * 判断是否命中当前插件，如果命中则返回命中插件的类名，否则返回null

@@ -14,12 +14,12 @@ import java.util.List;
  *
  * @author dongzhiyong@huoxian.cn
  */
-public class IASTClassHookPointMatcher {
+public class IastClassHookPointMatcher {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final Instrumentation inst;
 
-    public IASTClassHookPointMatcher(Instrumentation inst) {
+    public IastClassHookPointMatcher(Instrumentation inst) {
         this.inst = inst;
     }
 
@@ -64,7 +64,7 @@ public class IASTClassHookPointMatcher {
      */
     public static List<Class<?>> findForRetransform(Instrumentation inst, boolean isRemoveUnsupported) {
         final List<Class<?>> classes = new ArrayList<Class<?>>();
-        IASTClassHookPointMatcher classHookManager = new IASTClassHookPointMatcher(inst);
+        IastClassHookPointMatcher classHookManager = new IastClassHookPointMatcher(inst);
         final Iterator<Class<?>> itForLoaded = classHookManager.iteratorForLoadedClasses();
         while (itForLoaded.hasNext()) {
             final Class<?> clazz = itForLoaded.next();

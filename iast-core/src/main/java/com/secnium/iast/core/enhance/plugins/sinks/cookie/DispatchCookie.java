@@ -1,6 +1,6 @@
 package com.secnium.iast.core.enhance.plugins.sinks.cookie;
 
-import com.secnium.iast.core.enhance.IASTContext;
+import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.DispatchPlugin;
 import org.objectweb.asm.ClassVisitor;
 import org.slf4j.Logger;
@@ -12,15 +12,15 @@ import java.util.HashSet;
  * @author dongzhiyong@huoxian.cn
  */
 public class DispatchCookie implements DispatchPlugin {
-    private static final String servletCookie;
-    private static final String glassfishCookie;
-    private static final String wsCookie;
+    private static final String SERVLET_COOKIE = " javax/servlet/http/Cookie".substring(1);
+    private static final String GLASSFISH_COOKIE = " org/glassfish/grizzly/http/Cookie".substring(1);
+    private static final String WS_COOKIE = " javax/ws/rs/core/NewCookie".substring(1);
     private static String classname;
     private static HashSet<String> ancestors;
 
 
     @Override
-    public ClassVisitor dispatch(ClassVisitor classVisitor, IASTContext context) {
+    public ClassVisitor dispatch(ClassVisitor classVisitor, IastContext context) {
         ancestors = context.getAncestors();
         classname = context.getClassName();
         String matchClassname = isMatch();
@@ -36,32 +36,27 @@ public class DispatchCookie implements DispatchPlugin {
 
     @Override
     public String isMatch() {
-        if (ancestors.contains(servletCookie)) {
-            return servletCookie;
-        } else if (classname.equals(glassfishCookie) || ancestors.contains(glassfishCookie)) {
-            return glassfishCookie;
-        } else if (classname.equals(wsCookie) || ancestors.contains(wsCookie)) {
-            return wsCookie;
+        if (ancestors.contains(SERVLET_COOKIE)) {
+            return SERVLET_COOKIE;
+        } else if (classname.equals(GLASSFISH_COOKIE) || ancestors.contains(GLASSFISH_COOKIE)) {
+            return GLASSFISH_COOKIE;
+        } else if (classname.equals(WS_COOKIE) || ancestors.contains(WS_COOKIE)) {
+            return WS_COOKIE;
         } else {
             return null;
         }
     }
 
     static boolean isHookMethod(String name) {
-        if ((classname.equals(servletCookie) || ancestors.contains(servletCookie)) && ("setSecure".equals(name) || "getValue".equals(name))) {
+        if ((classname.equals(SERVLET_COOKIE) || ancestors.contains(SERVLET_COOKIE)) && ("setSecure".equals(name) || "getValue".equals(name))) {
             return true;
-        } else if ((classname.equals(glassfishCookie) || ancestors.contains(glassfishCookie)) && "setSecure".equals(name)) {
+        } else if ((classname.equals(GLASSFISH_COOKIE) || ancestors.contains(GLASSFISH_COOKIE)) && "setSecure".equals(name)) {
             return true;
         } else {
-            return (classname.equals(wsCookie) || ancestors.contains(wsCookie)) && "<init>".equals(name);
+            return (classname.equals(WS_COOKIE) || ancestors.contains(WS_COOKIE)) && "<init>".equals(name);
         }
     }
 
-    static {
-        servletCookie = " javax/servlet/http/Cookie".substring(1);
-        glassfishCookie = " org/glassfish/grizzly/http/Cookie".substring(1);
-        wsCookie = " javax/ws/rs/core/NewCookie".substring(1);
-    }
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 }

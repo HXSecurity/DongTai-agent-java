@@ -1,6 +1,6 @@
 package com.secnium.iast.core.enhance.plugins.sources.servlet.stream.catalina;
 
-import com.secnium.iast.core.enhance.IASTContext;
+import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.DispatchPlugin;
 import org.objectweb.asm.ClassVisitor;
 
@@ -9,7 +9,7 @@ import org.objectweb.asm.ClassVisitor;
  */
 public class DispatchCoyoteInputStream implements DispatchPlugin {
     private final String BASE_CLASS = " org/apache/catalina/connector/CoyoteInputStream".substring(1);
-    private IASTContext context;
+    private IastContext context;
 
     /**
      * 分发类访问器
@@ -19,7 +19,7 @@ public class DispatchCoyoteInputStream implements DispatchPlugin {
      * @return ClassVisitor 命中的类访问起
      */
     @Override
-    public ClassVisitor dispatch(ClassVisitor classVisitor, IASTContext context) {
+    public ClassVisitor dispatch(ClassVisitor classVisitor, IastContext context) {
         this.context = context;
         String classname = isMatch();
         if (null != classname) {

@@ -1,6 +1,6 @@
 package com.secnium.iast.core.enhance.plugins.framework.dubbo;
 
-import com.secnium.iast.core.enhance.IASTContext;
+import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.AbstractAdviceAdapter;
 import com.secnium.iast.core.handler.controller.HookType;
 import org.objectweb.asm.Label;
@@ -11,7 +11,7 @@ import org.objectweb.asm.MethodVisitor;
  */
 public class DubboAdviceAdapter extends AbstractAdviceAdapter {
 
-    public DubboAdviceAdapter(MethodVisitor mv, int access, String name, String desc, String signCode, IASTContext context) {
+    public DubboAdviceAdapter(MethodVisitor mv, int access, String name, String desc, String signCode, IastContext context) {
         super(mv, access, name, desc, context, "dubbo", signCode);
     }
 

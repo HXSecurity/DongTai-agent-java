@@ -1,7 +1,7 @@
 package com.secnium.iast.core.handler.vulscan;
 
 import com.secnium.iast.core.EngineManager;
-import com.secnium.iast.core.handler.models.IASTSinkModel;
+import com.secnium.iast.core.handler.models.IastSinkModel;
 import com.secnium.iast.core.handler.models.MethodEvent;
 import com.secnium.iast.core.handler.vulscan.dynamic.DynamicPropagatorScanner;
 import com.secnium.iast.core.handler.vulscan.normal.CookieFlagsMissingVulScan;
@@ -10,10 +10,10 @@ import com.secnium.iast.core.handler.vulscan.normal.CryptoBadMacVulScan;
 import com.secnium.iast.core.handler.vulscan.normal.CryptoWeakRandomnessVulScan;
 import com.secnium.iast.core.handler.vulscan.overpower.AuthInfoManager;
 import com.secnium.iast.core.handler.vulscan.overpower.IJdbc;
-import com.secnium.iast.core.handler.vulscan.overpower.JDBCImpl.MySqlImpl;
-import com.secnium.iast.core.handler.vulscan.overpower.JDBCImpl.OracleImpl;
-import com.secnium.iast.core.handler.vulscan.overpower.JDBCImpl.PostgresImpl;
-import com.secnium.iast.core.handler.vulscan.overpower.JDBCImpl.SqlServerImpl;
+import com.secnium.iast.core.handler.vulscan.overpower.JdbcImpl.MySqlImpl;
+import com.secnium.iast.core.handler.vulscan.overpower.JdbcImpl.OracleImpl;
+import com.secnium.iast.core.handler.vulscan.overpower.JdbcImpl.PostgresImpl;
+import com.secnium.iast.core.handler.vulscan.overpower.JdbcImpl.SqlServerImpl;
 import com.secnium.iast.core.handler.vulscan.overpower.LoginLogicRecognize;
 import com.secnium.iast.core.handler.vulscan.overpower.OverPowerScanner;
 
@@ -63,7 +63,7 @@ public class ScannerFactory {
      * @param jdbcImpl
      * @param event
      */
-    public static void scan(AtomicInteger invokeIdSequencer, IASTSinkModel sink, IJdbc jdbcImpl, MethodEvent event) {
+    public static void scan(AtomicInteger invokeIdSequencer, IastSinkModel sink, IJdbc jdbcImpl, MethodEvent event) {
         ScannerFactory factory = ScannerFactory.getInstance();
         IVulScan scanner = factory.getStaticVulScanner(sink.getType());
         if (scanner != null) {
@@ -87,7 +87,7 @@ public class ScannerFactory {
      * @param jdbcImpl
      * @return
      */
-    public static boolean preScan(IASTSinkModel sink, MethodEvent event, IJdbc jdbcImpl) {
+    public static boolean preScan(IastSinkModel sink, MethodEvent event, IJdbc jdbcImpl) {
         boolean setJdbcImpl = false;
         if (DynamicPropagatorScanner.isRedirectVuln(sink.getType(), event.signature)) {
             AuthInfoManager.handleSetCookieAction(event.argumentArray[0], event.argumentArray[1]);

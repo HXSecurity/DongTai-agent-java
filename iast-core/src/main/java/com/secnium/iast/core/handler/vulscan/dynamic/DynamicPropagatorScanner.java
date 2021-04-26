@@ -2,7 +2,7 @@ package com.secnium.iast.core.handler.vulscan.dynamic;
 
 import com.secnium.iast.core.EngineManager;
 import com.secnium.iast.core.handler.controller.impl.SinkImpl;
-import com.secnium.iast.core.handler.models.IASTSinkModel;
+import com.secnium.iast.core.handler.models.IastSinkModel;
 import com.secnium.iast.core.handler.models.MethodEvent;
 import com.secnium.iast.core.handler.vulscan.IVulScan;
 import com.secnium.iast.core.util.StackUtils;
@@ -31,7 +31,7 @@ public class DynamicPropagatorScanner implements IVulScan {
     private final Logger logger = LoggerFactory.getLogger(SinkImpl.class);
 
     @Override
-    public void scan(IASTSinkModel sink, MethodEvent event, AtomicInteger invokeIdSequencer) {
+    public void scan(IastSinkModel sink, MethodEvent event, AtomicInteger invokeIdSequencer) {
         if (sinkSourceHitTaintPool(event, sink)) {
             checkVulnAndGenerateReport(event, sink, invokeIdSequencer);
         }
@@ -55,7 +55,7 @@ public class DynamicPropagatorScanner implements IVulScan {
      * @param sink  命中的sink点
      * @return 当前方法是否命中污点池
      */
-    private boolean sinkSourceHitTaintPool(MethodEvent event, IASTSinkModel sink) {
+    private boolean sinkSourceHitTaintPool(MethodEvent event, IastSinkModel sink) {
         // 如果当前sink为 javax.servlet.http.HttpServletResponse.addHeader(java.lang.String,java.lang.String)，第一个参数是否为location时，漏洞类型为unvalidated-redirect时
         boolean hitTaintPool = false;
         if (isRedirectVuln(sink.getType(), event.signature)) {
@@ -112,7 +112,7 @@ public class DynamicPropagatorScanner implements IVulScan {
      * @param sink              当前命中的sink模型实例
      * @param invokeIdSequencer 检测引擎全局的序列号生成器，用于生成有序、唯一的的方法调用ID
      */
-    private void checkVulnAndGenerateReport(MethodEvent event, IASTSinkModel sink, AtomicInteger invokeIdSequencer) {
+    private void checkVulnAndGenerateReport(MethodEvent event, IastSinkModel sink, AtomicInteger invokeIdSequencer) {
         event.setCallStacks(StackUtils.createCallStack(11));
         int invokeId = invokeIdSequencer.getAndIncrement();
         event.setInvokeId(invokeId);

@@ -18,25 +18,21 @@ import java.util.regex.Pattern;
  *
  * @author dongzhiyong@huoxian.cn
  */
-public class IASTHookRuleModel {
-    private final HashMap<String, IASTSinkModel> sinks;
-    private final HashMap<String, IASTPropagatorModel> propagators;
-    private final HashSet<String> sources;
-    private final HashMap<String, List<String>> filters;
+public class IastHookRuleModel {
+    private final HashMap<String, IastSinkModel> sinks;
+    private final HashMap<String, IastPropagatorModel> propagators;
     private final HashMap<String, String> interfaces;
-    private final HashMap<String, String> classs;
     private final HashMap<String, String> hooks = new HashMap<String, String>();
 
-    private final HashMap<Pattern, String> prefixHooks;
     private final HashSet<String> prefixHookClassName;
     private final HashSet<String> hookClassnames;
     private final HashSet<String> hookSuperClassnames;
-    private HashMap<String, Integer> hooksValue;
-    private static IASTHookRuleModel instance;
+    private final HashMap<String, Integer> hooksValue;
+    private static IastHookRuleModel instance;
 
-    private IASTHookRuleModel(HashSet<String> sources,
-                              HashMap<String, IASTSinkModel> sinks,
-                              HashMap<String, IASTPropagatorModel> propagators,
+    private IastHookRuleModel(HashSet<String> sources,
+                              HashMap<String, IastSinkModel> sinks,
+                              HashMap<String, IastPropagatorModel> propagators,
                               HashMap<String, List<String>> filters,
                               HashMap<String, String> interfaces,
                               HashMap<String, String> classs,
@@ -45,15 +41,11 @@ public class IASTHookRuleModel {
                               HashSet<String> hookSuperClassnames,
                               HashSet<String> prefixHookClassName,
                               HashMap<String, Integer> hooksValue) {
-        this.sources = sources;
         this.sinks = sinks;
         this.propagators = propagators;
-        this.filters = filters;
         this.interfaces = interfaces;
-        this.classs = classs;
         this.hooks.putAll(interfaces);
         this.hooks.putAll(classs);
-        this.prefixHooks = prefixHooks;
         this.prefixHookClassName = prefixHookClassName;
         this.hookClassnames = hookClassnames;
         this.hookSuperClassnames = hookSuperClassnames;
@@ -68,32 +60,23 @@ public class IASTHookRuleModel {
     }
 
     /**
-     * 当前方法用于单元测试
-     */
-    public static void buildModelRemote() {
-        ModelBuilder.buildRemote();
-    }
-
-    /**
      * 创建IASTHook规则单例对象
-     *
-     * @param sources
-     * @param sinks
-     * @param propagators
-     * @param filters
-     * @param interfaces
-     * @param classs
-     * @param hookClassnames
-     * @param prefixHookClassName
-     * @param hooksValue
+     *  @param sources             污点来源规则
+     * @param sinks               漏洞触发位置规则
+     * @param propagators         污点传播规则
+     * @param filters             过滤方法规则
+     * @param interfaces          规则中的接口列表
+     * @param classs              规则中的类列表
+     * @param hookClassnames      规则中的类名
+     * @param prefixHookClassName 规则的包名列表
+     * @param hooksValue          hook类型及其值
      */
     private static void createInstance(HashSet<String> sources,
-                                       HashMap<String, IASTSinkModel> sinks,
-                                       HashMap<String, IASTPropagatorModel> propagators,
+                                       HashMap<String, IastSinkModel> sinks,
+                                       HashMap<String, IastPropagatorModel> propagators,
                                        HashMap<String, List<String>> filters,
                                        HashMap<String, String> interfaces,
                                        HashMap<String, String> classs,
-                                       HashMap<Pattern, String> prefixHooks,
                                        HashSet<String> hookClassnames,
                                        HashSet<String> hookSuperClassnames,
                                        HashSet<String> prefixHookClassName,
@@ -107,7 +90,7 @@ public class IASTHookRuleModel {
             Asserts.NOT_NULL("rule.class", classs);
             Asserts.NOT_NULL("rule.classname", hookClassnames);
             Asserts.NOT_NULL("rule.hook.values", hooksValue);
-            instance = new IASTHookRuleModel(sources, sinks, propagators, filters, interfaces, classs, prefixHooks, hookClassnames, hookSuperClassnames, prefixHookClassName, hooksValue);
+            instance = new IastHookRuleModel(sources, sinks, propagators, filters, interfaces, classs, ModelBuilder.PREFIX_HOOKS, hookClassnames, hookSuperClassnames, prefixHookClassName, hooksValue);
         }
     }
 
@@ -117,7 +100,7 @@ public class IASTHookRuleModel {
      * @param signature 方法签名
      * @return 方法对应的传播节点对象
      */
-    public static IASTPropagatorModel getPropagatorByMethodSignature(String signature) {
+    public static IastPropagatorModel getPropagatorByMethodSignature(String signature) {
         if (instance != null) {
             return instance.propagators.get(signature);
         } else {
@@ -131,23 +114,9 @@ public class IASTHookRuleModel {
      * @param signature 方法签名
      * @return sink对象
      */
-    public static IASTSinkModel getSinkByMethodSignature(String signature) {
+    public static IastSinkModel getSinkByMethodSignature(String signature) {
         if (instance != null) {
             return instance.sinks.get(signature);
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * 获取vulType类型漏洞对应的过滤器列表，用于在检测污点链中是否存在过滤函数
-     *
-     * @param vulType 漏洞类型
-     * @return 过滤器列表
-     */
-    public static List<String> getFilterByVulType(String vulType) {
-        if (instance != null) {
-            return instance.filters.get(vulType);
         } else {
             return null;
         }
@@ -242,18 +211,16 @@ public class IASTHookRuleModel {
         private final static HashSet<String> CLASSNAME_HOOKS = new HashSet<String>();
         private final static HashSet<String> SUPER_CLASSNAME_HOOKS = new HashSet<String>();
         private final static HashSet<String> PREFIX_CLASS_HOOKS = new HashSet<String>();
-        private final static HashMap<Pattern, String> prefixHooks = new HashMap<Pattern, String>();
+        private final static HashMap<Pattern, String> PREFIX_HOOKS = new HashMap<Pattern, String>();
 
         /**
          * 从云端获取hook规则并进行xxx
          */
-        public static boolean buildRemote() {
+        public static void buildRemote() {
             JSONArray rules = loadRemoteRule();
             if (rules != null) {
                 buildRuleModel(rules);
-                return true;
             }
-            return false;
         }
 
         private static JSONArray loadRemoteRule() {
@@ -266,11 +233,11 @@ public class IASTHookRuleModel {
         }
 
         private static void buildRuleModel(JSONArray rules) {
-            HashMap<String, IASTSinkModel> sinks = new HashMap<String, IASTSinkModel>();
-            HashMap<String, IASTPropagatorModel> propagators = new HashMap<String, IASTPropagatorModel>();
-            HashSet<String> sources = new HashSet<String>();
-            HashMap<String, List<String>> filters = new HashMap<String, List<String>>();
-            HashMap<String, Integer> hooksValue = new HashMap<String, Integer>();
+            HashMap<String, IastSinkModel> sinks = new HashMap<String, IastSinkModel>(500);
+            HashMap<String, IastPropagatorModel> propagators = new HashMap<String, IastPropagatorModel>(500);
+            HashSet<String> sources = new HashSet<String>(500);
+            HashMap<String, List<String>> filters = new HashMap<String, List<String>>(500);
+            HashMap<String, Integer> hooksValue = new HashMap<String, Integer>(10);
 
             for (int i = 0, rulesLength = rules.length(); i < rulesLength; i++) {
                 JSONObject rule = rules.getJSONObject(i);
@@ -278,7 +245,7 @@ public class IASTHookRuleModel {
                 int type = rule.getInt("type");
                 JSONArray details = rule.getJSONArray("details");
 
-                IASTPropagatorModel propagator;
+                IastPropagatorModel propagator;
                 for (int j = 0, detailsLength = details.length(); j < detailsLength; j++) {
                     JSONObject detail = details.getJSONObject(j);
                     String ruleItemSource = detail.getString("source");
@@ -294,7 +261,7 @@ public class IASTHookRuleModel {
                                 hooksValue.put(value, HookType.PROPAGATOR.getValue());
                                 Object sourcePos = convertLink2Object(ruleItemSource);
                                 Object targetPos = convertLink2Object(ruleItemTarget);
-                                propagator = new IASTPropagatorModel(value, value, ruleItemSource, sourcePos, ruleItemTarget, targetPos);
+                                propagator = new IastPropagatorModel(value, value, ruleItemSource, sourcePos, ruleItemTarget, targetPos);
                                 propagators.put(ruleItemValue, propagator);
                                 break;
                             case 2:
@@ -320,20 +287,22 @@ public class IASTHookRuleModel {
                                 } else {
                                     intPositions = null;
                                 }
-                                IASTSinkModel sink = new IASTSinkModel(ruleItemValue, value, intPositions, ruleItemTrack);
+                                IastSinkModel sink = new IastSinkModel(ruleItemValue, value, intPositions, ruleItemTrack);
                                 sinks.put(ruleItemValue, sink);
-                                break;
-                            case 5:
                                 break;
                             default:
                                 break;
                         }
                     } catch (Exception e) {
-                        ErrorLogReport.sendErrorLog(ThrowableUtils.getStackTrace(e));
+                        JSONObject jsonObject = new JSONObject();
+                        jsonObject.put("type", "rule");
+                        jsonObject.put("rule", details.toString());
+                        jsonObject.put("msg", ThrowableUtils.getStackTrace(e));
+                        ErrorLogReport.sendErrorLog(jsonObject.toString());
                     }
                 }
             }
-            IASTHookRuleModel.createInstance(sources, sinks, propagators, filters, SUPER_CLASS_HOOKS, CLASS_HOOKS, prefixHooks, CLASSNAME_HOOKS, SUPER_CLASSNAME_HOOKS, PREFIX_CLASS_HOOKS, hooksValue);
+            IastHookRuleModel.createInstance(sources, sinks, propagators, filters, SUPER_CLASS_HOOKS, CLASS_HOOKS, CLASSNAME_HOOKS, SUPER_CLASSNAME_HOOKS, PREFIX_CLASS_HOOKS, hooksValue);
         }
 
         /**
@@ -349,11 +318,6 @@ public class IASTHookRuleModel {
             boolean isReMatch = false;
 
             // todo 后续考虑增加通配符型规则
-//            if (classname.endsWith("*")) {
-//                isReMatch = true;
-//                PREFIX_CLASS_HOOKS.add(classname.substring(0, classname.length() - 1));
-//            }
-
             if ("true".equals(inherit)) {
                 SUPER_CLASSNAME_HOOKS.add(classname);
                 SUPER_CLASS_HOOKS.put(signature, type);
@@ -365,7 +329,7 @@ public class IASTHookRuleModel {
                 CLASS_HOOKS.put(signature, type);
             } else {
                 if (isReMatch) {
-                    prefixHooks.put(Pattern.compile(signature), type);
+                    PREFIX_HOOKS.put(Pattern.compile(signature), type);
                 } else {
                     CLASSNAME_HOOKS.add(classname);
                     CLASS_HOOKS.put(signature, type);

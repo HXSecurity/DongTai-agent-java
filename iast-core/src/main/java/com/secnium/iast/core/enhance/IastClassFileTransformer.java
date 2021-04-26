@@ -32,9 +32,9 @@ import static org.objectweb.asm.ClassWriter.COMPUTE_MAXS;
 /**
  * @author dongzhiyong@huoxian.cn
  */
-public class IASTClassFileTransformer implements ClassFileTransformer {
+public class IastClassFileTransformer implements ClassFileTransformer {
 
-    private final IASTClassAncestorQuery COMMON_UTILS = IASTClassAncestorQuery.getInstance();
+    private final IastClassAncestorQuery COMMON_UTILS = IastClassAncestorQuery.getInstance();
 
     private final Logger logger;
     private final boolean isDumpClass;
@@ -45,7 +45,7 @@ public class IASTClassFileTransformer implements ClassFileTransformer {
     private final PluginRegister PLUGINS = new PluginRegister();
     private int transformClassCount = 0;
 
-    IASTClassFileTransformer(Instrumentation inst) {
+    IastClassFileTransformer(Instrumentation inst) {
         this.logger = LoggerFactory.getLogger(getClass());
         this.inst = inst;
         this.listenerId = ObjectIDs.instance.identity(EngineManager.getInstance());
@@ -105,7 +105,7 @@ public class IASTClassFileTransformer implements ClassFileTransformer {
                 HashSet<String> ancestors = COMMON_UTILS.getAncestors(className, superName, interfaces);
 
                 final ClassWriter cw = createClassWriter(loader, cr);
-                ClassVisitor cv = PLUGINS.initial(cw, IASTContext.build(className, className, ancestors, interfaces,
+                ClassVisitor cv = PLUGINS.initial(cw, IastContext.build(className, className, ancestors, interfaces,
                         superName, flags, sourceCodeBak, codeSource, loader, listenerId, namespace,
                         targetClassLoaderObjectID
                 ));
@@ -213,7 +213,7 @@ public class IASTClassFileTransformer implements ClassFileTransformer {
      * @param inst instrument接口
      */
     public static void init(Instrumentation inst) {
-        IASTClassFileTransformer iastClassFileTransformer = new IASTClassFileTransformer(inst);
+        IastClassFileTransformer iastClassFileTransformer = new IastClassFileTransformer(inst);
         inst.addTransformer(iastClassFileTransformer, true);
         iastClassFileTransformer.retransform();
     }
@@ -224,7 +224,7 @@ public class IASTClassFileTransformer implements ClassFileTransformer {
      * @param inst instrument接口
      */
     public static void release(Instrumentation inst) {
-        IASTClassFileTransformer iastClassFileTransformer = new IASTClassFileTransformer(inst);
+        IastClassFileTransformer iastClassFileTransformer = new IastClassFileTransformer(inst);
         inst.removeTransformer(iastClassFileTransformer);
         iastClassFileTransformer.retransform();
     }
@@ -233,7 +233,7 @@ public class IASTClassFileTransformer implements ClassFileTransformer {
      * 执行字节码转换
      */
     private void retransform() {
-        List<Class<?>> waitingReTransformClasses = IASTClassHookPointMatcher.findForRetransform(inst, true);
+        List<Class<?>> waitingReTransformClasses = IastClassHookPointMatcher.findForRetransform(inst, true);
         final int total = waitingReTransformClasses.size();
         int index = 0;
         for (final Class<?> waitingReTransformClass : waitingReTransformClasses) {

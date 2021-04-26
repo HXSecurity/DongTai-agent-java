@@ -1,6 +1,6 @@
 package com.secnium.iast.core.enhance.plugins.sources.spring;
 
-import com.secnium.iast.core.enhance.IASTContext;
+import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.AbstractClassVisitor;
 import com.secnium.iast.core.util.AsmUtils;
 import org.objectweb.asm.ClassVisitor;
@@ -10,7 +10,7 @@ import org.objectweb.asm.MethodVisitor;
  * @author dongzhiyong@huoxian.cn
  */
 public class ArgumentResolverVisitor extends AbstractClassVisitor {
-    public ArgumentResolverVisitor(ClassVisitor classVisitor, IASTContext context) {
+    public ArgumentResolverVisitor(ClassVisitor classVisitor, IastContext context) {
         super(classVisitor, context);
     }
 

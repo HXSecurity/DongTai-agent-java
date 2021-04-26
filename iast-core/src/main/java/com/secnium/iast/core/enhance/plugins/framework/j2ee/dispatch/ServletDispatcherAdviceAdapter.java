@@ -1,6 +1,6 @@
 package com.secnium.iast.core.enhance.plugins.framework.j2ee.dispatch;
 
-import com.secnium.iast.core.enhance.IASTContext;
+import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.AbstractAdviceAdapter;
 import com.secnium.iast.core.handler.controller.HookType;
 import org.objectweb.asm.Label;
@@ -12,7 +12,7 @@ import org.objectweb.asm.MethodVisitor;
  */
 public class ServletDispatcherAdviceAdapter extends AbstractAdviceAdapter {
 
-    public ServletDispatcherAdviceAdapter(MethodVisitor mv, int access, String name, String desc, String signature, IASTContext context) {
+    public ServletDispatcherAdviceAdapter(MethodVisitor mv, int access, String name, String desc, String signature, IastContext context) {
         super(mv, access, name, desc, context, "j2ee", signature);
     }
 

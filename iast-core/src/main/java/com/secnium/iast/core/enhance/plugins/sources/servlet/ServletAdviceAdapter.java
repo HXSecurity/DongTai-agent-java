@@ -1,6 +1,6 @@
 package com.secnium.iast.core.enhance.plugins.sources.servlet;
 
-import com.secnium.iast.core.enhance.IASTContext;
+import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.AbstractAdviceAdapter;
 import com.secnium.iast.core.handler.controller.HookType;
 import org.objectweb.asm.Label;
@@ -11,7 +11,7 @@ import org.objectweb.asm.MethodVisitor;
  */
 public class ServletAdviceAdapter extends AbstractAdviceAdapter {
 
-    public ServletAdviceAdapter(MethodVisitor methodVisitor, int access, String name, String desc, IASTContext context, String signature) {
+    public ServletAdviceAdapter(MethodVisitor methodVisitor, int access, String name, String desc, IastContext context, String signature) {
         super(methodVisitor, access, name, desc, context, "ServletRequest", signature);
     }
 

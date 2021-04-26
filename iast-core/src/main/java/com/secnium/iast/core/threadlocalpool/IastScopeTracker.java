@@ -5,7 +5,7 @@ import com.secnium.iast.core.handler.controller.TrackerHelper;
 /**
  * @author dongzhiyong@huoxian.cn
  */
-public class IASTScopeTracker extends ThreadLocal<TrackerHelper> {
+public class IastScopeTracker extends ThreadLocal<TrackerHelper> {
     @Override
     protected TrackerHelper initialValue() {
         return new TrackerHelper();

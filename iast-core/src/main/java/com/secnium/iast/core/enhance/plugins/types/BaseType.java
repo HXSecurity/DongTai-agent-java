@@ -1,6 +1,6 @@
 package com.secnium.iast.core.enhance.plugins.types;
 
-import com.secnium.iast.core.enhance.IASTContext;
+import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.AbstractClassVisitor;
 import com.secnium.iast.core.enhance.plugins.propagator.PropagateAdviceAdapter;
 import com.secnium.iast.core.util.AsmUtils;
@@ -22,7 +22,7 @@ public class BaseType extends AbstractClassVisitor {
 
     private final List<String> hookMethods;
 
-    public BaseType(ClassVisitor classVisitor, IASTContext context, List<String> methods) {
+    public BaseType(ClassVisitor classVisitor, IastContext context, List<String> methods) {
         super(classVisitor, context);
         this.hookMethods = methods;
     }

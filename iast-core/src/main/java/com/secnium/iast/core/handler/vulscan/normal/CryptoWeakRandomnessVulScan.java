@@ -1,7 +1,7 @@
 package com.secnium.iast.core.handler.vulscan.normal;
 
 import com.secnium.iast.core.handler.models.MethodEvent;
-import com.secnium.iast.core.handler.models.IASTSinkModel;
+import com.secnium.iast.core.handler.models.IastSinkModel;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -18,7 +18,7 @@ public class CryptoWeakRandomnessVulScan extends AbstractNormalVulScan {
      * @param invokeId 方法调用ID
      */
     @Override
-    public void scan(IASTSinkModel sink, MethodEvent event, AtomicInteger invokeId) {
+    public void scan(IastSinkModel sink, MethodEvent event, AtomicInteger invokeId) {
         // todo: 取调用栈信息
         sendReport(getLatestStack(), sink.getType());
     }

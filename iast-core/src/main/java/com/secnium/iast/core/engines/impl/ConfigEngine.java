@@ -2,7 +2,7 @@ package com.secnium.iast.core.engines.impl;
 
 import com.secnium.iast.core.PropertyUtils;
 import com.secnium.iast.core.engines.IEngine;
-import com.secnium.iast.core.handler.models.IASTHookRuleModel;
+import com.secnium.iast.core.handler.models.IastHookRuleModel;
 import com.secnium.iast.core.report.ErrorLogReport;
 import com.secnium.iast.core.util.Asserts;
 import com.secnium.iast.core.util.ThrowableUtils;
@@ -32,7 +32,7 @@ public class ConfigEngine implements IEngine {
     @Override
     public void start() {
         logger.info("Initialize the core configuration of the engine");
-        IASTHookRuleModel.buildModel();
+        IastHookRuleModel.buildModel();
         logger.info("The engine's core configuration is initialized successfully.");
     }
 

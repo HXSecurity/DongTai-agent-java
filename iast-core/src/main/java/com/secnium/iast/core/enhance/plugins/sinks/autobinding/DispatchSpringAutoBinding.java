@@ -1,6 +1,6 @@
 package com.secnium.iast.core.enhance.plugins.sinks.autobinding;
 
-import com.secnium.iast.core.enhance.IASTContext;
+import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.DispatchPlugin;
 import org.objectweb.asm.ClassVisitor;
 
@@ -12,7 +12,7 @@ public class DispatchSpringAutoBinding implements DispatchPlugin {
     String classname;
 
     @Override
-    public ClassVisitor dispatch(ClassVisitor classVisitor, IASTContext context) {
+    public ClassVisitor dispatch(ClassVisitor classVisitor, IastContext context) {
         classname = context.getClassName();
         if (autobindClassname.equals(classname)) {
             classVisitor = new SpringAutoBindingAdapter(classVisitor, context);

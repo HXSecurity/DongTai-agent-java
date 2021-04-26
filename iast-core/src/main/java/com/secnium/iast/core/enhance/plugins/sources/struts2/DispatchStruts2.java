@@ -1,8 +1,7 @@
 package com.secnium.iast.core.enhance.plugins.sources.struts2;
 
-import com.secnium.iast.core.enhance.IASTContext;
+import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.DispatchPlugin;
-import com.secnium.iast.core.enhance.plugins.sources.spring.ArgumentResolverVisitor;
 import org.objectweb.asm.ClassVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +13,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DispatchStruts2 implements DispatchPlugin {
     private final String MULTIPART_REQUEST = " org/apache/struts2/dispatcher/multipart/MultiPartRequest".substring(1);
-    private IASTContext context;
+    private IastContext context;
     private final Logger logger = LoggerFactory.getLogger(DispatchStruts2.class);
 
     /**
@@ -25,7 +24,7 @@ public class DispatchStruts2 implements DispatchPlugin {
      * @return ClassVisitor 命中的类访问起
      */
     @Override
-    public ClassVisitor dispatch(ClassVisitor classVisitor, IASTContext context) {
+    public ClassVisitor dispatch(ClassVisitor classVisitor, IastContext context) {
         this.context = context;
         String className = isMatch();
         if (null != className) {

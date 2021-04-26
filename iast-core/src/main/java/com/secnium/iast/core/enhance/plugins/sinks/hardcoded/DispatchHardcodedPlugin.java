@@ -1,6 +1,6 @@
 package com.secnium.iast.core.enhance.plugins.sinks.hardcoded;
 
-import com.secnium.iast.core.enhance.IASTContext;
+import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.DispatchPlugin;
 import com.secnium.iast.core.util.AsmUtils;
 import com.secnium.iast.core.util.commonUtils;
@@ -21,7 +21,7 @@ public class DispatchHardcodedPlugin implements DispatchPlugin {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
-    public ClassVisitor dispatch(ClassVisitor classVisitor, IASTContext context) {
+    public ClassVisitor dispatch(ClassVisitor classVisitor, IastContext context) {
         classVisitor = new ExtractClassContent(classVisitor);
         return classVisitor;
     }

@@ -8,7 +8,7 @@ import com.secnium.iast.core.handler.vulscan.VulnType;
  *
  * @author dongzhiyong@huoxian.cn
  */
-public class IASTSinkModel {
+public class IastSinkModel {
     /**
      * sink点的漏洞类型
      */
@@ -39,7 +39,7 @@ public class IASTSinkModel {
      */
     private boolean track;
 
-    IASTSinkModel(String signature, String type, int[] position, String track) {
+    IastSinkModel(String signature, String type, int[] position, String track) {
         this.signature = signature;
         this.type = type;
         this.vulnType = VulnType.getTypeByName(type);

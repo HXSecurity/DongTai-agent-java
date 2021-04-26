@@ -1,6 +1,6 @@
 package com.secnium.iast.core.enhance.plugins.sources.servlet;
 
-import com.secnium.iast.core.enhance.IASTContext;
+import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.AbstractClassVisitor;
 import com.secnium.iast.core.enhance.plugins.sinks.SinkAdviceAdapter;
 import com.secnium.iast.core.util.AsmUtils;
@@ -43,7 +43,7 @@ public class ServletClassVisitor extends AbstractClassVisitor {
 
     private static final String SERVLET_REQUEST = " javax.servlet.ServletRequest.getRequestDispatcher(java.lang.String)".substring(1);
 
-    public ServletClassVisitor(ClassVisitor classVisitor, IASTContext context) {
+    public ServletClassVisitor(ClassVisitor classVisitor, IastContext context) {
         super(classVisitor, context);
     }
 
