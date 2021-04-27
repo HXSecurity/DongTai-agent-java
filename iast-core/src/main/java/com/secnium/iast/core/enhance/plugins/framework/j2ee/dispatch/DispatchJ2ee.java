@@ -14,7 +14,7 @@ import java.util.Set;
  * @author dongzhiyong@huoxian.cn
  */
 public class DispatchJ2ee implements DispatchPlugin {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = com.secnium.iast.core.AgentEngine.DEFAULT_LOGGERCONTEXT.getLogger(getClass());
     private final String FILTER = " javax/servlet/Filter".substring(1);
     private final String FILTERCHAIN = " javax/servlet/FilterChain".substring(1);
     private final String HTTP_SERVLET = " javax/servlet/http/HttpServlet".substring(1);

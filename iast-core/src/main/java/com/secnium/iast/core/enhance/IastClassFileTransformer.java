@@ -46,7 +46,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
     private int transformClassCount = 0;
 
     IastClassFileTransformer(Instrumentation inst) {
-        this.logger = LoggerFactory.getLogger(getClass());
+        this.logger = com.secnium.iast.core.AgentEngine.DEFAULT_LOGGERCONTEXT.getLogger(getClass());
         this.inst = inst;
         this.listenerId = ObjectIDs.instance.identity(EngineManager.getInstance());
         this.namespace = EngineManager.getNamespace();

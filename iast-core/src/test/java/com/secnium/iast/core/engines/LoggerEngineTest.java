@@ -16,7 +16,7 @@ public class LoggerEngineTest {
 
         engine.start();
 
-        Logger logger = LoggerFactory.getLogger(getClass());
+        Logger logger = com.secnium.iast.core.AgentEngine.DEFAULT_LOGGERCONTEXT.getLogger(getClass());
         logger.info("LoggerEngineTest.start");
     }
 }

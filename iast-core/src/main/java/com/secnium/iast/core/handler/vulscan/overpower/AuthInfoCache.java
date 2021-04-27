@@ -86,6 +86,6 @@ public class AuthInfoCache extends ConcurrentHashMap<Integer, Object> {
         }
     }
 
-    private static final Logger logger = LoggerFactory.getLogger(AuthInfoCache.class);
+    private static final Logger logger = com.secnium.iast.core.AgentEngine.DEFAULT_LOGGERCONTEXT.getLogger(AuthInfoCache.class);
 
 }

@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
  * @author dongzhiyong@huoxian.cn
  */
 public class DispatchHardcodedPlugin implements DispatchPlugin {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = com.secnium.iast.core.AgentEngine.DEFAULT_LOGGERCONTEXT.getLogger(getClass());
 
     @Override
     public ClassVisitor dispatch(ClassVisitor classVisitor, IastContext context) {

@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 public class DispatchSpringSource implements DispatchPlugin {
     private final String ARGUMENT_RESOLVER = " org/springframework/web/method/support/HandlerMethodArgumentResolver".substring(1);
     private IastContext context;
-    private final Logger logger = LoggerFactory.getLogger(DispatchSpringSource.class);
+    private final Logger logger = com.secnium.iast.core.AgentEngine.DEFAULT_LOGGERCONTEXT.getLogger(DispatchSpringSource.class);
 
     /**
      * 分发类访问器

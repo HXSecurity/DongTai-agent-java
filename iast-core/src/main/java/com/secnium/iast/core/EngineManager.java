@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class EngineManager {
 
-    private static final Logger logger = LoggerFactory.getLogger(EngineManager.class);
+    private static final Logger logger = com.secnium.iast.core.AgentEngine.DEFAULT_LOGGERCONTEXT.getLogger(EngineManager.class);
     private static EngineManager instance;
     private final PropertyUtils cfg;
 
@@ -73,7 +73,7 @@ public class EngineManager {
 
         ServerDetect serverDetect = ServerDetect.getInstance();
         if (serverDetect.getWebserver() != null) {
-            Logger logger = LoggerFactory.getLogger(getClass());
+            Logger logger = com.secnium.iast.core.AgentEngine.DEFAULT_LOGGERCONTEXT.getLogger(getClass());
             logger.info("WebServer [ name={}, path={} ]", serverDetect.getWebserver().getName(), serverDetect.getWebServerPath());
         }
     }

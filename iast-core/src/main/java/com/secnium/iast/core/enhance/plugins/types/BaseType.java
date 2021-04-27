@@ -18,7 +18,7 @@ import java.util.List;
  * @author dongzhiyong@huoxian.cn
  */
 public class BaseType extends AbstractClassVisitor {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = com.secnium.iast.core.AgentEngine.DEFAULT_LOGGERCONTEXT.getLogger(getClass());
 
     private final List<String> hookMethods;
 

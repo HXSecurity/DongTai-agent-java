@@ -19,7 +19,7 @@ import java.lang.instrument.Instrumentation;
  * @author dongzhiyong@huoxian.cn
  */
 public class ConfigEngine implements IEngine {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = com.secnium.iast.core.AgentEngine.DEFAULT_LOGGERCONTEXT.getLogger(getClass());
     private PropertyUtils cfg;
     private Instrumentation inst;
 

@@ -8,7 +8,6 @@ import com.secnium.iast.core.engines.impl.*;
 import com.secnium.iast.core.report.AgentRegisterReport;
 import com.secnium.iast.core.util.NamespaceConvert;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -55,7 +54,7 @@ public class AgentEngine {
         long start = System.currentTimeMillis();
         System.out.println("[com.dongtai.engine] The engine is about to be installed, the installation mode is " + mode);
         configureLogback();
-        Logger logger = LoggerFactory.getLogger(AgentEngine.class);
+        Logger logger = com.secnium.iast.core.AgentEngine.DEFAULT_LOGGERCONTEXT.getLogger(AgentEngine.class);
         logger.info("Log module initialized successfully");
         AgentEngine agentEngine = AgentEngine.getInstance();
         assert agentEngine != null;
@@ -131,7 +130,7 @@ public class AgentEngine {
         InputStream configStream = null;
         try {
             NamespaceConvert.initNamespaceConvert("DongTai");
-            configStream = AgentEngine.class.getClassLoader().getResourceAsStream("dongtai-log.xml");
+            configStream = AgentEngine.class.getClassLoader().getResourceAsStream("logback.xml");
             configurator.doConfigure(configStream);
         } catch (JoranException e) {
             e.printStackTrace();
@@ -143,7 +142,6 @@ public class AgentEngine {
                     e.printStackTrace();
                 }
             }
-            System.out.println("logback配置成功");
         }
     }
 }

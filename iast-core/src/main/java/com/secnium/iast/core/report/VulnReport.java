@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
  */
 public class VulnReport extends AbstractThread {
     private long waitTime;
-    private final Logger logger = LoggerFactory.getLogger(VulnReport.class);
+    private final Logger logger = com.secnium.iast.core.AgentEngine.DEFAULT_LOGGERCONTEXT.getLogger(VulnReport.class);
 
     public VulnReport(long waitTime) {
         super(getThreadName(), true, waitTime);

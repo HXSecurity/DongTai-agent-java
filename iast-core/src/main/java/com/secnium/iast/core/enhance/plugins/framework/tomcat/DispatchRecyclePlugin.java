@@ -69,7 +69,7 @@ public class DispatchRecyclePlugin implements DispatchPlugin {
 
 
     public static class OutputStreamAdapter extends AbstractClassVisitor {
-        private final Logger logger = LoggerFactory.getLogger(getClass());
+        private final Logger logger = com.secnium.iast.core.AgentEngine.DEFAULT_LOGGERCONTEXT.getLogger(getClass());
 
         public OutputStreamAdapter(ClassVisitor classVisitor, IastContext context) {
             super(classVisitor, context);

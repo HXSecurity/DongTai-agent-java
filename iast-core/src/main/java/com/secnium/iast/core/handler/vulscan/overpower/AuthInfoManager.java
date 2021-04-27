@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
  * @author dongzhiyong@huoxian.cn
  */
 public class AuthInfoManager {
-    private static final Logger LOGGER = LoggerFactory.getLogger(LoginLogicRecognize.class);
+    private static final Logger LOGGER = com.secnium.iast.core.AgentEngine.DEFAULT_LOGGERCONTEXT.getLogger(LoginLogicRecognize.class);
     private static final String SET_COOKIE = "Set-Cookie";
 
     /**

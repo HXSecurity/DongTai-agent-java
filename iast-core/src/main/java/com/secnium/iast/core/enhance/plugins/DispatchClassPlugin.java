@@ -37,7 +37,7 @@ public class DispatchClassPlugin implements DispatchPlugin {
 
     public DispatchClassPlugin() {
         this.enableAllHook = PROPERTIES_UTILS.isEnableAllHook();
-        this.logger = LoggerFactory.getLogger(getClass());
+        this.logger = com.secnium.iast.core.AgentEngine.DEFAULT_LOGGERCONTEXT.getLogger(getClass());
     }
 
     @Override

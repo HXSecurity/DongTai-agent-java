@@ -53,5 +53,5 @@ public class HttpImpl {
         }
     }
 
-    private static final Logger logger = LoggerFactory.getLogger(HttpImpl.class);
+    private static final Logger logger = com.secnium.iast.core.AgentEngine.DEFAULT_LOGGERCONTEXT.getLogger(HttpImpl.class);
 }

@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 public class DispatchStruts2 implements DispatchPlugin {
     private final String MULTIPART_REQUEST = " org/apache/struts2/dispatcher/multipart/MultiPartRequest".substring(1);
     private IastContext context;
-    private final Logger logger = LoggerFactory.getLogger(DispatchStruts2.class);
+    private final Logger logger = com.secnium.iast.core.AgentEngine.DEFAULT_LOGGERCONTEXT.getLogger(DispatchStruts2.class);
 
     /**
      * 分发类访问器

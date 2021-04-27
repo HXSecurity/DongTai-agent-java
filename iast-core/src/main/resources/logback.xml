@@ -5,14 +5,14 @@
     <!-- 指定某一关键字对应的转换类 -->
     <!-- <conversionRule conversionWord="NAMESPACE" converterClass="com.cj.log.IpConvert"/>-->
 
-    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <appender name="STDOUT" class="${shade-prefix}.ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <!-- <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %NAMESPACE %-5level %msg%n</pattern>-->
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [com.dongtai.engine] %-5level %msg%n</pattern>
         </encoder>
     </appender>
 
-    <appender name="INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <appender name="INFO" class="${shade-prefix}.ch.qos.logback.core.rolling.RollingFileAppender">
         <file>logs/dongtai.log</file>
         <rollingPolicy class="${shade-prefix}.ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <FileNamePattern>logs/dongtai.log.%d{yyyy-MM-dd}</FileNamePattern>
@@ -23,7 +23,7 @@
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [com.dongtai.engine] %-5level %msg%n</pattern>
             <charset>UTF-8</charset>
         </encoder>
-        <filter class="ch.qos.logback.classic.filter.LevelFilter"><!-- 只打印错误日志 -->
+        <filter class="${shade-prefix}.ch.qos.logback.classic.filter.LevelFilter"><!-- 只打印错误日志 -->
             <level>INFO</level>
             <onMatch>ACCEPT</onMatch>
             <onMismatch>DENY</onMismatch>
@@ -31,7 +31,7 @@
     </appender>
 
     <appender name="ERROR"
-              class="ch.qos.logback.core.rolling.RollingFileAppender">
+              class="${shade-prefix}.ch.qos.logback.core.rolling.RollingFileAppender">
         <file>logs/dongtai.err</file>
         <rollingPolicy class="${shade-prefix}.ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <FileNamePattern>logs/dongtai.err.%d{yyyy-MM-dd}</FileNamePattern>
@@ -41,7 +41,7 @@
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [com.dongtai.engine] %-5level %msg%n</pattern>
             <charset>UTF-8</charset>
         </encoder>
-        <filter class="ch.qos.logback.classic.filter.LevelFilter"><!-- 只打印错误日志 -->
+        <filter class="${shade-prefix}.ch.qos.logback.classic.filter.LevelFilter"><!-- 只打印错误日志 -->
             <level>ERROR</level>
             <onMatch>ACCEPT</onMatch>
             <onMismatch>DENY</onMismatch>
@@ -60,3 +60,4 @@
     </logger>
 
 </configuration>
+

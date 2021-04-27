@@ -14,7 +14,7 @@ import java.util.HashSet;
  * @author dongzhiyong@huoxian.cn
  */
 public class ConfigUtils {
-    private final static Logger logger = LoggerFactory.getLogger(ConfigUtils.class);
+    private final static Logger logger = com.secnium.iast.core.AgentEngine.DEFAULT_LOGGERCONTEXT.getLogger(ConfigUtils.class);
 
     /**
      * 通过文件名从资源加载器中加载资源

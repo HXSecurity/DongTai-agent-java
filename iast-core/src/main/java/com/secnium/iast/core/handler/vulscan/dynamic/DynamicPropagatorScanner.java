@@ -28,7 +28,7 @@ public class DynamicPropagatorScanner implements IVulScan {
             " io.netty.handler.codec.http.DefaultHttpHeaders.add0(int,int,java.lang.CharSequence,java.lang.CharSequence)".substring(1)
     ));
 
-    private final Logger logger = LoggerFactory.getLogger(SinkImpl.class);
+    private final Logger logger = com.secnium.iast.core.AgentEngine.DEFAULT_LOGGERCONTEXT.getLogger(SinkImpl.class);
 
     @Override
     public void scan(IastSinkModel sink, MethodEvent event, AtomicInteger invokeIdSequencer) {

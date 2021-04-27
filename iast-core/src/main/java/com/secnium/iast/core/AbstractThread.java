@@ -12,7 +12,7 @@ import java.io.IOException;
  * @author dongzhiyong@huoxian.cn
  */
 public abstract class AbstractThread extends Thread {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = com.secnium.iast.core.AgentEngine.DEFAULT_LOGGERCONTEXT.getLogger(getClass());
     private boolean enable;
 
     public boolean isEnable() {

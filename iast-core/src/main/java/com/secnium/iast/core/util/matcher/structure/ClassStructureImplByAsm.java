@@ -231,7 +231,7 @@ class ArrayClassStructure extends EmptyClassStructure {
  */
 public class ClassStructureImplByAsm extends FamilyClassStructure {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = com.secnium.iast.core.AgentEngine.DEFAULT_LOGGERCONTEXT.getLogger(getClass());
     private final ClassReader classReader;
     private final ClassLoader loader;
     private final Access access;
