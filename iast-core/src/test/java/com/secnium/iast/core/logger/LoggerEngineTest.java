@@ -36,8 +36,8 @@ public class LoggerEngineTest {
                 }
             }
         }
-        Logger logger = loggerContext.getLogger(LoggerEngine.class);
-        //Logger logger = com.secnium.iast.core.AgentEngine.DEFAULT_LOGGERCONTEXT.getLogger(LoggerEngine.class);
+        //Logger logger = loggerContext.getLogger(LoggerEngine.class);
+        Logger logger = com.secnium.iast.core.AgentEngine.DEFAULT_LOGGERCONTEXT.getLogger(LoggerEngine.class);
         logger.info("Log module initialized successfully");
         logger.debug("hello");
     }
