@@ -14,7 +14,7 @@
 
     <appender name="INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>logs/dongtai.log</file>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        <rollingPolicy class="${shade-prefix}.ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <FileNamePattern>logs/dongtai.log.%d{yyyy-MM-dd}</FileNamePattern>
             <MaxHistory>30</MaxHistory>
         </rollingPolicy>
@@ -33,7 +33,7 @@
     <appender name="ERROR"
               class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>logs/dongtai.err</file>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        <rollingPolicy class="${shade-prefix}.ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <FileNamePattern>logs/dongtai.err.%d{yyyy-MM-dd}</FileNamePattern>
             <MaxHistory>30</MaxHistory>
         </rollingPolicy>
@@ -52,7 +52,7 @@
         <appender-ref ref="STDOUT"/>
     </root>
 
-<!--    <logger name="com.secnium.iast" level="info" additivity="false">-->
+    <!--    <logger name="com.secnium.iast" level="info" additivity="false">-->
     <logger name="com.secnium.iast" level="${log.level:-INFO}" additivity="false">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="INFO"/>

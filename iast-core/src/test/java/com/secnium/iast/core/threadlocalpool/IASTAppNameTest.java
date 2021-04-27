@@ -3,7 +3,7 @@ package com.secnium.iast.core.threadlocalpool;
 import org.junit.Test;
 
 public class IASTAppNameTest {
-    public static IASTAppName appName = new IASTAppName();
+    public static IastAppName appName = new IastAppName();
 
     @Test
     public void testCreate() throws InterruptedException {
