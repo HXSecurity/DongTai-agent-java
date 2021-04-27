@@ -6,7 +6,9 @@ import org.junit.Test;
 public class IASTHookRuleModelTest {
     @Test
     public void buildMoelFromServer() {
-        PropertyUtils.getInstance("～/workspace/secnium/BugPlatflam/dongtai/dongtai-agent-code/iast-agent/src/main/resources/iast.properties");
-        IASTHookRuleModel.buildModelRemote();
+        PropertyUtils.getInstance(
+                "～/workspace/secnium/BugPlatflam/dongtai/dongtai-agent-code/iast-agent/src/main/resources/iast.properties");
+        // IastHookRuleModel.buildModelRemote();
+        IastHookRuleModel.buildModel();
     }
 }
