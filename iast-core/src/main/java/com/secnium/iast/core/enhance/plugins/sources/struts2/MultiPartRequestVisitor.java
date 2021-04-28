@@ -18,7 +18,7 @@ import java.util.Set;
  * @author dongzhiyong@huoxian.cn
  */
 public class MultiPartRequestVisitor extends AbstractClassVisitor {
-    private final Logger logger = com.secnium.iast.core.AgentEngine.DEFAULT_LOGGERCONTEXT.getLogger(ServletClassVisitor.class);
+    private final Logger logger = LoggerFactory.getLogger(ServletClassVisitor.class);
     private static final Set<String> HOOK_METHODS = new HashSet<String>(Arrays.asList(
             "getFileNames",
             "getParameter",

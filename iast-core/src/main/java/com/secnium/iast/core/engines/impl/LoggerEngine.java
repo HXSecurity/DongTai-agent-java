@@ -20,8 +20,11 @@ public class LoggerEngine implements IEngine {
     private PropertyUtils cfg;
     private Instrumentation inst;
 
-    @Override
-    public void init(PropertyUtils cfg, Instrumentation inst) {
+    public LoggerEngine() {
+        this.configLogger();
+    }
+
+    private void configLogger() {
         final LoggerContext loggerContext = new LoggerContext();
         final JoranConfigurator configurator = new JoranConfigurator();
         configurator.setContext(loggerContext);
@@ -44,6 +47,10 @@ public class LoggerEngine implements IEngine {
                 }
             }
         }
+    }
+
+    @Override
+    public void init(PropertyUtils cfg, Instrumentation inst) {
     }
 
     @Override

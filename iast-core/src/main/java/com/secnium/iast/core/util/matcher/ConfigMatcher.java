@@ -16,7 +16,7 @@ import java.util.Set;
  */
 public class ConfigMatcher {
 
-    private final static Logger logger = com.secnium.iast.core.AgentEngine.DEFAULT_LOGGERCONTEXT.getLogger(ConfigMatcher.class);
+    private final static Logger logger = LoggerFactory.getLogger(ConfigMatcher.class);
 
     public final static HashSet<String> SOURCES;
     private final static HashSet<String> BLACKS;

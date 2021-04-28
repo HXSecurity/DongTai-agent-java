@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 public class DispatchServlet implements DispatchPlugin {
     private final String BASE_CLASS = " javax/servlet/ServletRequest".substring(1);
     private IastContext context;
-    private final Logger logger = com.secnium.iast.core.AgentEngine.DEFAULT_LOGGERCONTEXT.getLogger(DispatchServlet.class);
+    private final Logger logger = LoggerFactory.getLogger(DispatchServlet.class);
 
     @Override
     public ClassVisitor dispatch(ClassVisitor classVisitor, IastContext context) {

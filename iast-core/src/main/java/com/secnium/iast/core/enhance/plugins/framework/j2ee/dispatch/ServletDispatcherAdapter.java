@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ServletDispatcherAdapter extends AbstractClassVisitor {
 
-    private final Logger logger = com.secnium.iast.core.AgentEngine.DEFAULT_LOGGERCONTEXT.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private final static String HTTP_SERVLET_REQUEST = " javax.servlet.http.HttpServletRequest".substring(1);
     private final static String HTTP_SERVLET_RESPONSE = " javax.servlet.http.HttpServletResponse".substring(1);
     private final static String SERVLET_REQUEST = " javax.servlet.ServletRequest".substring(1);

@@ -17,7 +17,7 @@ public class DispatchJsp implements DispatchPlugin {
     private static final String JSP_PAGE = " javax/servlet/jsp/JspPage".substring(1);
     private static final String JSP_BASE = " org/apache/jasper/runtime/HttpJspBase".substring(1);
     private HashSet<String> ancestors;
-    private final Logger logger = com.secnium.iast.core.AgentEngine.DEFAULT_LOGGERCONTEXT.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
     public ClassVisitor dispatch(ClassVisitor classVisitor, IastContext context) {

@@ -41,5 +41,5 @@ public class CharChunkVisitor extends AbstractClassVisitor {
         return mv;
     }
 
-    private final Logger logger = com.secnium.iast.core.AgentEngine.DEFAULT_LOGGERCONTEXT.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 }

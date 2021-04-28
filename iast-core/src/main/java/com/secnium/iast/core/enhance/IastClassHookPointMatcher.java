@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class IastClassHookPointMatcher {
 
-    private final Logger logger = com.secnium.iast.core.AgentEngine.DEFAULT_LOGGERCONTEXT.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private final Instrumentation inst;
 
     public IastClassHookPointMatcher(Instrumentation inst) {
