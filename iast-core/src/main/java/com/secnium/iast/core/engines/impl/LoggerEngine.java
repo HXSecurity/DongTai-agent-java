@@ -22,15 +22,15 @@ public class LoggerEngine implements IEngine {
 
     @Override
     public void init(PropertyUtils cfg, Instrumentation inst) {
-        final LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+        final LoggerContext loggerContext = new LoggerContext();
         final JoranConfigurator configurator = new JoranConfigurator();
         configurator.setContext(loggerContext);
         loggerContext.reset();
-        final Logger logger = com.secnium.iast.core.AgentEngine.DEFAULT_LOGGERCONTEXT.getLogger(LoggerEngine.class);
+        final Logger logger = LoggerFactory.getLogger(LoggerEngine.class);
         InputStream configStream = null;
         try {
             NamespaceConvert.initNamespaceConvert("DongTai");
-            configStream = LoggerEngine.class.getClassLoader().getResourceAsStream("logback.xml");
+            configStream = LoggerEngine.class.getClassLoader().getResourceAsStream("logback-dongtai.xml");
             configurator.doConfigure(configStream);
             logger.info("Log module initialized successfully");
         } catch (JoranException e) {

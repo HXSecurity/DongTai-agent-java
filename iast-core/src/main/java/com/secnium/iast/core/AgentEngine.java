@@ -130,7 +130,7 @@ public class AgentEngine {
         InputStream configStream = null;
         try {
             NamespaceConvert.initNamespaceConvert("DongTai");
-            configStream = AgentEngine.class.getClassLoader().getResourceAsStream("logback.xml");
+            configStream = AgentEngine.class.getClassLoader().getResourceAsStream("logback-dongtai.xml");
             configurator.doConfigure(configStream);
         } catch (JoranException e) {
             e.printStackTrace();

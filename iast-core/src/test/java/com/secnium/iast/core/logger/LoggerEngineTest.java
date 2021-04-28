@@ -1,40 +1,17 @@
 package com.secnium.iast.core.logger;
 
-import ch.qos.logback.classic.Logger;
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.classic.joran.JoranConfigurator;
-import ch.qos.logback.core.joran.spi.JoranException;
-import com.secnium.iast.core.AgentEngine;
 import com.secnium.iast.core.engines.impl.LoggerEngine;
-import com.secnium.iast.core.util.NamespaceConvert;
 import org.junit.Test;
-
-import java.io.IOException;
-import java.io.InputStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LoggerEngineTest {
     @Test
     public void testSelfLogger() {
-        LoggerContext loggerContext = new LoggerContext();
-        JoranConfigurator configurator = new JoranConfigurator();
-        configurator.setContext(loggerContext);
-        InputStream configStream = null;
-        try {
-            NamespaceConvert.initNamespaceConvert("DongTai");
-            configStream = AgentEngine.class.getClassLoader().getResourceAsStream("logback.xml");
-            configurator.doConfigure(configStream);
-        } catch (JoranException e) {
-            e.printStackTrace();
-        } finally {
-            if (configStream != null) {
-                try {
-                    configStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        Logger logger = com.secnium.iast.core.AgentEngine.DEFAULT_LOGGERCONTEXT.getLogger(LoggerEngine.class);
+        LoggerEngine loggerEngine = new LoggerEngine();
+        loggerEngine.init(null, null);
+
+        Logger logger = LoggerFactory.getLogger(LoggerEngineTest.class);
         logger.info("Log module initialized successfully");
         logger.debug("hello");
     }
