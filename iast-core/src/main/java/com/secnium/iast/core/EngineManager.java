@@ -73,7 +73,6 @@ public class EngineManager {
 
         ServerDetect serverDetect = ServerDetect.getInstance();
         if (serverDetect.getWebserver() != null) {
-            Logger logger = LoggerFactory.getLogger(getClass());
             logger.info("WebServer [ name={}, path={} ]", serverDetect.getWebserver().getName(), serverDetect.getWebServerPath());
         }
     }

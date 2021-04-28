@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
-public class IASTTaintPoolTest {
+public class IastTaintPoolTest {
     @Test
     public void addSourceToPool() {
         IastTaintPool iastTaintPool = new IastTaintPool();

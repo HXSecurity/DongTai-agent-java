@@ -20,9 +20,12 @@ public class LoggerEngine implements IEngine {
     private PropertyUtils cfg;
     private Instrumentation inst;
 
-    @Override
-    public void init(PropertyUtils cfg, Instrumentation inst) {
-        final LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+    public LoggerEngine() {
+        this.configLogger();
+    }
+
+    private void configLogger() {
+        final LoggerContext loggerContext = new LoggerContext();
         final JoranConfigurator configurator = new JoranConfigurator();
         configurator.setContext(loggerContext);
         loggerContext.reset();
@@ -30,7 +33,7 @@ public class LoggerEngine implements IEngine {
         InputStream configStream = null;
         try {
             NamespaceConvert.initNamespaceConvert("DongTai");
-            configStream = LoggerEngine.class.getClassLoader().getResourceAsStream("dongtai-log.xml");
+            configStream = LoggerEngine.class.getClassLoader().getResourceAsStream("logback-dongtai.xml");
             configurator.doConfigure(configStream);
             logger.info("Log module initialized successfully");
         } catch (JoranException e) {
@@ -44,6 +47,10 @@ public class LoggerEngine implements IEngine {
                 }
             }
         }
+    }
+
+    @Override
+    public void init(PropertyUtils cfg, Instrumentation inst) {
     }
 
     @Override

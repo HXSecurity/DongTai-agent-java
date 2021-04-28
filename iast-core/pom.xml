@@ -22,13 +22,12 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <includes>
-                    <include>dongtai-log.xml</include>
+                    <include>logback-dongtai.xml</include>
                     <include>**/version</include>
                     <include>**/logo</include>
                     <include>**/blackext.txt</include>
                     <include>**/blacklist.txt</include>
                     <include>**/blacklistfunc.txt</include>
-                    <include>**/model.xml</include>
                     <include>**/sinks.txt</include>
                     <include>**/sources.txt</include>
                     <include>**/whitelist.txt</include>

@@ -12,9 +12,9 @@ import java.io.InputStream;
 /**
  * @author dongzhiyong@huoxian.cn
  */
-public class IASTProperties {
+public class IastProperties {
 
-    private static IASTProperties instance;
+    private static IastProperties instance;
     public PropertiesConfiguration cfg = null;
     private String iastServerToken;
     private String serverUrl;
@@ -24,20 +24,20 @@ public class IASTProperties {
      */
     private String propertiesFilePath;
 
-    private IASTProperties(String path) {
+    private IastProperties(String path) {
         init(path);
     }
 
-    public static IASTProperties getInstance() {
+    public static IastProperties getInstance() {
         if (null == instance) {
-            instance = new IASTProperties(null);
+            instance = new IastProperties(null);
         }
         return instance;
     }
 
-    public static IASTProperties getInstance(String path) {
+    public static IastProperties getInstance(String path) {
         if (null == instance) {
-            instance = new IASTProperties(path);
+            instance = new IastProperties(path);
         }
         return instance;
     }
@@ -83,7 +83,7 @@ public class IASTProperties {
             if (path != null) {
                 propertiesFilePath = path;
             } else {
-                agentFile = new File(IASTProperties.class.getProtectionDomain().getCodeSource().getLocation().getFile());
+                agentFile = new File(IastProperties.class.getProtectionDomain().getCodeSource().getLocation().getFile());
                 basePath = agentFile.getParentFile().getPath();
                 propertiesFilePath = basePath + File.separator + "config" + File.separator + "iast.properties";
             }
@@ -99,7 +99,7 @@ public class IASTProperties {
                 propertiesFile.createNewFile();
             }
 
-            InputStream is = IASTProperties.class.getClassLoader().getResourceAsStream("iast.properties");
+            InputStream is = IastProperties.class.getClassLoader().getResourceAsStream("iast.properties");
             FileOutputStream fos = new FileOutputStream(propertiesFile);
             byte[] data = new byte[1024];
             while (true) {

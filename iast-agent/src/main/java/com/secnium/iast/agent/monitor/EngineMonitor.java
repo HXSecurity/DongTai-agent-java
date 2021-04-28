@@ -1,19 +1,19 @@
 package com.secnium.iast.agent.monitor;
 
-import com.secnium.iast.agent.IASTProperties;
+import com.secnium.iast.agent.IastProperties;
 import com.secnium.iast.agent.manager.EngineManager;
 
 /**
  * @author dongzhiyong@huoxian.cn
  */
 public class EngineMonitor implements IMonitor {
-    private final IASTProperties properties;
+    private final IastProperties properties;
     private String currentStatus;
     private final EngineManager engineManager;
 
     public EngineMonitor(EngineManager engineManager) {
         this.engineManager = engineManager;
-        this.properties = IASTProperties.getInstance();
+        this.properties = IastProperties.getInstance();
         this.currentStatus = this.properties.getEngineStatus();
     }
 

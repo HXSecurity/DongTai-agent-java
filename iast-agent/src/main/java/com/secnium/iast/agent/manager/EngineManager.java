@@ -18,15 +18,15 @@ import java.util.jar.JarFile;
  */
 public class EngineManager {
     private static final String IAST_NAMESPACE = "DONGTAI";
-    private static final String ENGINE_ENTERPOINT_CLASS = "com.secnium.iast.core.AgentEngine";
+    private static final String ENGINE_ENTRYPOINT_CLASS = "com.secnium.iast.core.AgentEngine";
     private static final String INJECT_PACKAGE_REMOTE_URI = "/api/v1/engine/download?package_name=iast-inject&jdk.version=";
     private static final String ENGINE_PACKAGE_REMOTE_URI = "/api/v1/engine/download?package_name=iast-core&jdk.version=";
-    private static final Map<String, IASTClassLoader> IAST_CLASS_LOADER_CACHE = new ConcurrentHashMap<String, IASTClassLoader>();
+    private static final Map<String, IastClassLoader> IAST_CLASS_LOADER_CACHE = new ConcurrentHashMap<String, IastClassLoader>();
     private static EngineManager INSTANCE;
 
     private final Instrumentation inst;
     private int runningStatus;
-    private final IASTProperties properties;
+    private final IastProperties properties;
     private final String launchMode;
     private Class<?> classOfEngine;
     private final String ppid;
@@ -77,7 +77,7 @@ public class EngineManager {
         this.inst = inst;
         this.runningStatus = 0;
         this.launchMode = launchMode;
-        this.properties = IASTProperties.getInstance();
+        this.properties = IastProperties.getInstance();
         this.ppid = ppid;
     }
 
@@ -182,7 +182,7 @@ public class EngineManager {
             if (iastClassLoader == null) {
                 iastClassLoader = loadOrDefineClassLoader(EngineManager.getEnginePackageCachePath());
             }
-            classOfEngine = iastClassLoader.loadClass(ENGINE_ENTERPOINT_CLASS);
+            classOfEngine = iastClassLoader.loadClass(ENGINE_ENTRYPOINT_CLASS);
             classOfEngine.getMethod("install", String.class, String.class, Instrumentation.class)
                     .invoke(null, launchMode, this.properties.getPropertiesFilePath(), inst);
             return true;
@@ -273,7 +273,7 @@ public class EngineManager {
      * @question: 通过 inst.appendToBootstrapClassLoaderSearch() 方法加入的jar包无法直接卸载；
      */
     public synchronized boolean uninstall() {
-        final IASTClassLoader classLoader = IAST_CLASS_LOADER_CACHE.get(IAST_NAMESPACE);
+        final IastClassLoader classLoader = IAST_CLASS_LOADER_CACHE.get(IAST_NAMESPACE);
         if (null == classLoader) {
             return true;
         }
@@ -311,7 +311,7 @@ public class EngineManager {
      */
     private static synchronized ClassLoader loadOrDefineClassLoader(final String coreJar) throws Throwable {
 
-        final IASTClassLoader classLoader;
+        final IastClassLoader classLoader;
 
         // 如果已经被启动则返回之前启动的ClassLoader
         if (IAST_CLASS_LOADER_CACHE.containsKey(EngineManager.IAST_NAMESPACE)
@@ -321,7 +321,7 @@ public class EngineManager {
 
         // 如果未启动则重新加载
         else {
-            classLoader = new IASTClassLoader(EngineManager.IAST_NAMESPACE, coreJar);
+            classLoader = new IastClassLoader(EngineManager.IAST_NAMESPACE, coreJar);
             IAST_CLASS_LOADER_CACHE.put(EngineManager.IAST_NAMESPACE, classLoader);
         }
 
@@ -353,9 +353,9 @@ public class EngineManager {
     private static String getJdkVersion() {
         String jdkVersion = System.getProperty("java.version", "1.8");
         System.out.println("current jdk version is : " + jdkVersion);
-        String[] jdkVersions = jdkVersion.split("\\.");
+        String[] jdkVersionItem = jdkVersion.split("\\.");
         boolean isHighJdk = true;
-        if (jdkVersions.length > 1 && ("6".equals(jdkVersions[1]) || "7".equals(jdkVersions[1]) || "8".equals(jdkVersions[1]))) {
+        if (jdkVersionItem.length > 1 && ("6".equals(jdkVersionItem[1]) || "7".equals(jdkVersionItem[1]) || "8".equals(jdkVersionItem[1]))) {
             isHighJdk = false;
         }
         return isHighJdk ? "2" : "1";

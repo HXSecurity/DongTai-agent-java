@@ -14,10 +14,10 @@ import java.security.cert.X509Certificate;
  * @author dongzhiyong@huoxian.cn
  */
 public class UpdateUtils {
-    private final static String UPDATE_URL = IASTProperties.getInstance().getBaseUrl() + "/api/v1/engine/update";
+    private final static IastProperties properties = IastProperties.getInstance();
+    private final static String UPDATE_URL = properties.getBaseUrl() + "/api/v1/engine/update";
     private final static String AGENT_TOKEN = URLEncoder.encode(AgentRegister.getAgentToken());
 
-    //负责发送http请求获取数据
     public static boolean checkForUpdate() {
         String respRaw = sendRequest(UPDATE_URL + "?agent_name=" + AGENT_TOKEN);
         System.out.println(respRaw);
@@ -41,7 +41,6 @@ public class UpdateUtils {
         try {
             trustAllHosts();
             URL url = new URL(urlStr);
-            // 通过请求地址判断请求类型(http或者是https)
 
             if (Constant.PROTOCOL_HTTPS.equalsIgnoreCase(url.getProtocol())) {
                 HttpsURLConnection https = (HttpsURLConnection) url.openConnection();
@@ -51,9 +50,8 @@ public class UpdateUtils {
                 connection = (HttpURLConnection) url.openConnection();
             }
             connection.setRequestMethod(Constant.HTTP_METHOD_GET);
-            //fixme:根据配置文件动态获取token和http请求头，用于后续自定义操作
             connection.setRequestProperty("User-Agent", "SecniumIast Java Agent");
-            connection.setRequestProperty("Authorization", "Token " + IASTProperties.getInstance().getIastServerToken());
+            connection.setRequestProperty("Authorization", "Token " + properties.getIastServerToken());
             connection.setRequestProperty("Accept", "*/*");
             connection.setUseCaches(false);
             connection.setDoOutput(true);

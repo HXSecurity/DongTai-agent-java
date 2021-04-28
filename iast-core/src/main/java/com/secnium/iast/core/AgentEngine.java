@@ -42,10 +42,10 @@ public class AgentEngine {
         engines.add(new TransformEngine());
     }
 
+
     public static void install(String mode, String propertiesFilePath, Instrumentation inst) {
         long start = System.currentTimeMillis();
         System.out.println("[com.dongtai.engine] The engine is about to be installed, the installation mode is " + mode);
-
         AgentEngine agentEngine = AgentEngine.getInstance();
         assert agentEngine != null;
         agentEngine.setInst(inst);
@@ -110,4 +110,5 @@ public class AgentEngine {
             engine.destroy();
         }
     }
+
 }

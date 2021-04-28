@@ -16,16 +16,16 @@ import java.util.jar.JarFile;
  *
  * @author dongzhiyong@huoxian.cn
  */
-public class IASTClassLoader extends URLClassLoader {
+public class IastClassLoader extends URLClassLoader {
 
     private final String toString;
     private final String path;
 
-    public IASTClassLoader(final String namespace,
+    public IastClassLoader(final String namespace,
                            final String jarFilePath) throws MalformedURLException {
         super(new URL[]{new URL("file:" + jarFilePath)});
         this.path = jarFilePath;
-        this.toString = String.format("IASTClassLoader[namespace=%s;path=%s;]", namespace, path);
+        this.toString = String.format("IastClassLoader[namespace=%s;path=%s;]", namespace, path);
     }
 
     @Override

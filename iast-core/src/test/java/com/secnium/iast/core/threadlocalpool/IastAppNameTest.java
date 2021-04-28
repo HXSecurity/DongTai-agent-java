@@ -2,7 +2,7 @@ package com.secnium.iast.core.threadlocalpool;
 
 import org.junit.Test;
 
-public class IASTAppNameTest {
+public class IastAppNameTest {
     public static IastAppName appName = new IastAppName();
 
     @Test

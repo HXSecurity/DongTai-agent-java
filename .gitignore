@@ -28,3 +28,6 @@ release
 
 # for jenv
 .java-version
+
+
+logs
