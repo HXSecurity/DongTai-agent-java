@@ -70,7 +70,7 @@ public class AgentLauncher {
      */
     private static void install(final Instrumentation inst) {
         long startTime = System.nanoTime();
-        IASTProperties.getInstance();
+        IastProperties.getInstance();
         EngineManager engineManager = EngineManager.getInstance(inst, LAUNCH_MODE, ManagementFactory.getRuntimeMXBean().getName().split("@")[0]);
 
         boolean status = engineManager.downloadEnginePackage();

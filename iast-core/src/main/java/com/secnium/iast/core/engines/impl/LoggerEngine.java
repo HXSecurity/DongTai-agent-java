@@ -30,7 +30,7 @@ public class LoggerEngine implements IEngine {
         InputStream configStream = null;
         try {
             NamespaceConvert.initNamespaceConvert("DongTai");
-            configStream = LoggerEngine.class.getClassLoader().getResourceAsStream("prod.xml");
+            configStream = LoggerEngine.class.getClassLoader().getResourceAsStream("logback.xml");
             configurator.doConfigure(configStream);
             logger.info("Log module initialized successfully");
         } catch (JoranException e) {

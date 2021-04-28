@@ -22,7 +22,7 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <includes>
-                    <include>dongtai-log.xml</include>
+                    <include>logback.xml</include>
                     <include>**/version</include>
                     <include>**/logo</include>
                     <include>**/blackext.txt</include>

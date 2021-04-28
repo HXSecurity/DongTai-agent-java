@@ -2,7 +2,7 @@ package com.secnium.iast.agent;
 
 import org.junit.Test;
 
-public class IASTPropertiesTest {
+public class IastPropertiesTest {
 
     @Test
     public void getBlackExtFilePath() {
@@ -19,7 +19,7 @@ public class IASTPropertiesTest {
 
     @Test
     public void init() {
-        IASTProperties properties = IASTProperties.getInstance("/tmp/test.properties");
+        IastProperties properties = IastProperties.getInstance("/tmp/test.properties");
     }
 
     @Test
@@ -104,7 +104,7 @@ public class IASTPropertiesTest {
 
     @Test
     public void getToken() {
-        IASTProperties properties = IASTProperties.getInstance("/tmp/test.properties");
+        IastProperties properties = IastProperties.getInstance("/tmp/test.properties");
         System.out.println(properties.getIastServerToken());
     }
 
@@ -114,7 +114,7 @@ public class IASTPropertiesTest {
 
     @Test
     public void getEngineStatus() {
-        IASTProperties properties = IASTProperties.getInstance("/tmp/test.properties");
+        IastProperties properties = IastProperties.getInstance("/tmp/test.properties");
         int MAX_LOOPS = 20;
         int times = 0;
         while (true) {

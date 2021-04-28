@@ -16,14 +16,12 @@ public class LoggerEngineTest {
     @Test
     public void testSelfLogger() {
         LoggerContext loggerContext = new LoggerContext();
-        //final LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
         JoranConfigurator configurator = new JoranConfigurator();
         configurator.setContext(loggerContext);
-        //loggerContext.reset();
         InputStream configStream = null;
         try {
             NamespaceConvert.initNamespaceConvert("DongTai");
-            configStream = AgentEngine.class.getClassLoader().getResourceAsStream("test.xml");
+            configStream = AgentEngine.class.getClassLoader().getResourceAsStream("logback.xml");
             configurator.doConfigure(configStream);
         } catch (JoranException e) {
             e.printStackTrace();
@@ -36,7 +34,6 @@ public class LoggerEngineTest {
                 }
             }
         }
-        //Logger logger = loggerContext.getLogger(LoggerEngine.class);
         Logger logger = com.secnium.iast.core.AgentEngine.DEFAULT_LOGGERCONTEXT.getLogger(LoggerEngine.class);
         logger.info("Log module initialized successfully");
         logger.debug("hello");

@@ -18,7 +18,7 @@ public class AgentRegister {
         if (AGENT_NAME == null) {
             String osName = System.getProperty("os.name");
             String hostname = getInternalHostName();
-            AGENT_NAME = osName + "-" + hostname + "-" + Constant.AGENT_VERSION_VALUE + "-" + IASTProperties.getInstance().getEngineName();
+            AGENT_NAME = osName + "-" + hostname + "-" + Constant.AGENT_VERSION_VALUE + "-" + IastProperties.getInstance().getEngineName();
         }
         return AGENT_NAME;
     }

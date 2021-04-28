@@ -21,12 +21,12 @@ public class EngineManager {
     private static final String ENGINE_ENTERPOINT_CLASS = "com.secnium.iast.core.AgentEngine";
     private static final String INJECT_PACKAGE_REMOTE_URI = "/api/v1/engine/download?package_name=iast-inject&jdk.version=";
     private static final String ENGINE_PACKAGE_REMOTE_URI = "/api/v1/engine/download?package_name=iast-core&jdk.version=";
-    private static final Map<String, IASTClassLoader> IAST_CLASS_LOADER_CACHE = new ConcurrentHashMap<String, IASTClassLoader>();
+    private static final Map<String, IastClassLoader> IAST_CLASS_LOADER_CACHE = new ConcurrentHashMap<String, IastClassLoader>();
     private static EngineManager INSTANCE;
 
     private final Instrumentation inst;
     private int runningStatus;
-    private final IASTProperties properties;
+    private final IastProperties properties;
     private final String launchMode;
     private Class<?> classOfEngine;
     private final String ppid;
@@ -77,7 +77,7 @@ public class EngineManager {
         this.inst = inst;
         this.runningStatus = 0;
         this.launchMode = launchMode;
-        this.properties = IASTProperties.getInstance();
+        this.properties = IastProperties.getInstance();
         this.ppid = ppid;
     }
 
@@ -273,7 +273,7 @@ public class EngineManager {
      * @question: 通过 inst.appendToBootstrapClassLoaderSearch() 方法加入的jar包无法直接卸载；
      */
     public synchronized boolean uninstall() {
-        final IASTClassLoader classLoader = IAST_CLASS_LOADER_CACHE.get(IAST_NAMESPACE);
+        final IastClassLoader classLoader = IAST_CLASS_LOADER_CACHE.get(IAST_NAMESPACE);
         if (null == classLoader) {
             return true;
         }
@@ -311,7 +311,7 @@ public class EngineManager {
      */
     private static synchronized ClassLoader loadOrDefineClassLoader(final String coreJar) throws Throwable {
 
-        final IASTClassLoader classLoader;
+        final IastClassLoader classLoader;
 
         // 如果已经被启动则返回之前启动的ClassLoader
         if (IAST_CLASS_LOADER_CACHE.containsKey(EngineManager.IAST_NAMESPACE)
@@ -321,7 +321,7 @@ public class EngineManager {
 
         // 如果未启动则重新加载
         else {
-            classLoader = new IASTClassLoader(EngineManager.IAST_NAMESPACE, coreJar);
+            classLoader = new IastClassLoader(EngineManager.IAST_NAMESPACE, coreJar);
             IAST_CLASS_LOADER_CACHE.put(EngineManager.IAST_NAMESPACE, classLoader);
         }
 
