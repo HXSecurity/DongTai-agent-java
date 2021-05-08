@@ -43,10 +43,6 @@
         </filter>
     </appender>
 
-    <root level="debug">
-        <appender-ref ref="STDOUT"/>
-    </root>
-
     <logger name="com.secnium.iast" level="${log.level:-INFO}" additivity="false">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="INFO"/>
