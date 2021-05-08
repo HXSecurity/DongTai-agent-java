@@ -7,7 +7,7 @@ import com.secnium.iast.core.PropertyUtils;
 import com.secnium.iast.core.engines.IEngine;
 import com.secnium.iast.core.util.NamespaceConvert;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.secnium.iast.core.util.LogUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,7 +29,7 @@ public class LoggerEngine implements IEngine {
         final JoranConfigurator configurator = new JoranConfigurator();
         configurator.setContext(loggerContext);
         loggerContext.reset();
-        final Logger logger = LoggerFactory.getLogger(LoggerEngine.class);
+        final Logger logger = LogUtils.getLogger(LoggerEngine.class);
         InputStream configStream = null;
         try {
             NamespaceConvert.initNamespaceConvert("DongTai");

@@ -18,7 +18,7 @@ public class LoggerEngineTest {
     public void start() {
         String propertiesFilePath = "～/Documents/workspace/BugPlatflam/IAST/IastDocker/SecniumIAST/release/config/iast.properties";
         LoggerEngine engine = new LoggerEngine();
-        Logger logger = LoggerFactory.getLogger(getClass());
+        Logger logger = LogUtils.getLogger(getClass());
         logger.info("LoggerEngineTest.start");
     }
 
@@ -30,7 +30,7 @@ public class LoggerEngineTest {
         configurator.setContext(loggerContext);
         loggerContext.reset();
         InputStream configStream = null;
-        final Logger logger = LoggerFactory.getLogger(LoggerEngineTest.class);
+        final Logger logger = LogUtils.getLogger(LoggerEngineTest.class);
         try {
             NamespaceConvert.initNamespaceConvert("DongTai");
             configStream = LoggerEngine.class.getClassLoader().getResourceAsStream("logback-dongtai.xml");
@@ -76,7 +76,7 @@ public class LoggerEngineTest {
         }
         //LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
 
-        Logger logger = LoggerFactory.getLogger(LoggerEngine.class);
+        Logger logger = LogUtils.getLogger(LoggerEngine.class);
         //Logger logger = loggerContext.getLogger(LoggerEngine.class);
         logger.debug("hello");
         logger.info("Log module initialized successfully");
@@ -89,5 +89,6 @@ public class LoggerEngineTest {
         logger.debug("hello");
         logger.info("Log module initialized successfully");
         logger.warn("warnnnnn");
+        logger.error("ftytftf");
     }
 }

@@ -12,7 +12,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.objectweb.asm.*;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.secnium.iast.core.util.LogUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -231,7 +231,7 @@ class ArrayClassStructure extends EmptyClassStructure {
  */
 public class ClassStructureImplByAsm extends FamilyClassStructure {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LogUtils.getLogger(getClass());
     private final ClassReader classReader;
     private final ClassLoader loader;
     private final Access access;

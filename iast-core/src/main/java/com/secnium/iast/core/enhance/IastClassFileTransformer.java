@@ -14,7 +14,7 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.secnium.iast.core.util.LogUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,7 +46,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
     private int transformClassCount = 0;
 
     IastClassFileTransformer(Instrumentation inst) {
-        this.logger = LoggerFactory.getLogger(getClass());
+        this.logger = LogUtils.getLogger(getClass());
         this.inst = inst;
         this.listenerId = ObjectIDs.instance.identity(EngineManager.getInstance());
         this.namespace = EngineManager.getNamespace();

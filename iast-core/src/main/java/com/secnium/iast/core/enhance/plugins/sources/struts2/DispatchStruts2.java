@@ -4,7 +4,7 @@ import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.DispatchPlugin;
 import org.objectweb.asm.ClassVisitor;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.secnium.iast.core.util.LogUtils;
 
 /**
  * 判断是否为Struts2相关的source点入口
@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 public class DispatchStruts2 implements DispatchPlugin {
     private final String MULTIPART_REQUEST = " org/apache/struts2/dispatcher/multipart/MultiPartRequest".substring(1);
     private IastContext context;
-    private final Logger logger = LoggerFactory.getLogger(DispatchStruts2.class);
+    private final Logger logger = LogUtils.getLogger(DispatchStruts2.class);
 
     /**
      * 分发类访问器

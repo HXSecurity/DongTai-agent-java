@@ -3,7 +3,7 @@ package com.secnium.iast.core.logger;
 import com.secnium.iast.core.engines.impl.LoggerEngine;
 import org.junit.Test;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.secnium.iast.core.util.LogUtils;
 
 public class LoggerEngineTest {
     @Test
@@ -11,7 +11,7 @@ public class LoggerEngineTest {
         LoggerEngine loggerEngine = new LoggerEngine();
         loggerEngine.init(null, null);
 
-        Logger logger = LoggerFactory.getLogger(LoggerEngineTest.class);
+        Logger logger = LogUtils.getLogger(LoggerEngineTest.class);
         logger.info("Log module initialized successfully");
         logger.debug("hello");
     }

@@ -4,7 +4,7 @@ import com.secnium.iast.core.middlewarerecognition.IastServer;
 import com.secnium.iast.core.middlewarerecognition.ServerDetect;
 import com.secnium.iast.core.threadlocalpool.*;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.secnium.iast.core.util.LogUtils;
 
 import java.lang.instrument.Instrumentation;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class EngineManager {
 
-    private static final Logger logger = LoggerFactory.getLogger(EngineManager.class);
+    private static final Logger logger = LogUtils.getLogger(EngineManager.class);
     private static EngineManager instance;
     private final PropertyUtils cfg;
 
