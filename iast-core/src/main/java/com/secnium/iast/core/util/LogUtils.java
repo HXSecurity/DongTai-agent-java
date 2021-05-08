@@ -12,13 +12,17 @@ import java.io.InputStream;
 
 /**
  * @author WuHaoyuan
- * @since 2021-05-08 下午5:01
  */
 public class LogUtils implements ILoggerFactory {
 
     private LoggerContext loggerContext;
 
-    public LogUtils() {
+    private static LogUtils logUtils;
+
+    /**
+     * 读取默认的logback配置文件
+     */
+    private LogUtils() {
         this.loggerContext = new LoggerContext();
         JoranConfigurator configurator = new JoranConfigurator();
         configurator.setContext(loggerContext);
@@ -43,5 +47,12 @@ public class LogUtils implements ILoggerFactory {
     @Override
     public Logger getLogger(String s) {
         return this.loggerContext.getLogger(s);
+    }
+
+    public static Logger getLogger(Class<?> clazz) {
+        if (logUtils == null) {
+            logUtils = new LogUtils();
+        }
+        return logUtils.getLogger(clazz.getName());
     }
 }

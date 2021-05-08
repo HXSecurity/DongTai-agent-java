@@ -4,7 +4,7 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import com.secnium.iast.core.engines.impl.LoggerEngine;
-import com.secnium.iast.core.util.MyLoggerFactory;
+import com.secnium.iast.core.util.LogUtils;
 import com.secnium.iast.core.util.NamespaceConvert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -85,7 +85,7 @@ public class LoggerEngineTest {
 
     @Test
     public void testCustomLogger3(){
-        Logger logger = MyLoggerFactory.getLogger(LoggerEngine.class);
+        Logger logger = LogUtils.getLogger(LoggerEngine.class);
         logger.debug("hello");
         logger.info("Log module initialized successfully");
         logger.warn("warnnnnn");
