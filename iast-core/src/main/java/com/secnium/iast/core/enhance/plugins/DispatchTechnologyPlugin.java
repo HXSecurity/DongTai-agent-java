@@ -4,7 +4,7 @@ import com.secnium.iast.core.enhance.IastContext;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.secnium.iast.core.util.LogUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +18,7 @@ final public class DispatchTechnologyPlugin implements DispatchPlugin {
 
     private final Map<String, Map<String, String>> technologyMap;
     private String classname;
-    private final Logger logger = LoggerFactory.getLogger(DispatchTechnologyPlugin.class);
+    private final Logger logger = LogUtils.getLogger(DispatchTechnologyPlugin.class);
 
     DispatchTechnologyPlugin() {
         this.technologyMap = new HashMap<String, Map<String, String>>();
@@ -86,7 +86,7 @@ final public class DispatchTechnologyPlugin implements DispatchPlugin {
     }
 
     public static class ClassVisit extends AbstractClassVisitor {
-        private final Logger logger = LoggerFactory.getLogger(getClass());
+        private final Logger logger = LogUtils.getLogger(getClass());
         private final Map<String, String> technologyMapDetail;
 
         ClassVisit(ClassVisitor classVisitor, IastContext context, Map<String, String> technologyMapDetail) {

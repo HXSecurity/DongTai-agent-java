@@ -6,7 +6,7 @@ import com.secnium.iast.core.PropertyUtils;
 import com.secnium.iast.core.util.Constants;
 import com.secnium.iast.core.util.HttpClientUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.secnium.iast.core.util.LogUtils;
 
 /**
  * 发送报告的功能实现
@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
  */
 public class VulnReport extends AbstractThread {
     private long waitTime;
-    private final Logger logger = LoggerFactory.getLogger(VulnReport.class);
+    private final Logger logger = LogUtils.getLogger(VulnReport.class);
 
     public VulnReport(long waitTime) {
         super(getThreadName(), true, waitTime);

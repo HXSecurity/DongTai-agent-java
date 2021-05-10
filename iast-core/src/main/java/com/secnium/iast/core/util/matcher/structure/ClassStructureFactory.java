@@ -2,7 +2,7 @@ package com.secnium.iast.core.util.matcher.structure;
 
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.secnium.iast.core.util.LogUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,7 +17,7 @@ import java.io.InputStream;
  */
 public class ClassStructureFactory {
 
-    private static final Logger logger = LoggerFactory.getLogger(ClassStructureFactory.class);
+    private static final Logger logger = LogUtils.getLogger(ClassStructureFactory.class);
 
     /**
      * 通过Class类来构造类结构

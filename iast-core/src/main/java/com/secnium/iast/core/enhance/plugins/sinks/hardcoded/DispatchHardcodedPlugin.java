@@ -7,7 +7,7 @@ import com.secnium.iast.core.util.commonUtils;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.FieldVisitor;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.secnium.iast.core.util.LogUtils;
 
 import java.lang.reflect.Modifier;
 import java.util.regex.Pattern;
@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
  * @author dongzhiyong@huoxian.cn
  */
 public class DispatchHardcodedPlugin implements DispatchPlugin {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LogUtils.getLogger(getClass());
 
     @Override
     public ClassVisitor dispatch(ClassVisitor classVisitor, IastContext context) {

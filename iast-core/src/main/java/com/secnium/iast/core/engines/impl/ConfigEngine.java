@@ -8,7 +8,7 @@ import com.secnium.iast.core.util.Asserts;
 import com.secnium.iast.core.util.ThrowableUtils;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.secnium.iast.core.util.LogUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,7 +19,7 @@ import java.lang.instrument.Instrumentation;
  * @author dongzhiyong@huoxian.cn
  */
 public class ConfigEngine implements IEngine {
-    private final Logger logger = LoggerFactory.getLogger(ConfigEngine.class);
+    private final Logger logger = LogUtils.getLogger(ConfigEngine.class);
     private PropertyUtils cfg;
     private Instrumentation inst;
 

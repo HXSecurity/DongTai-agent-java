@@ -25,7 +25,7 @@ public class OverPowerScanner implements IVulScan {
     @Override
     public void scan(String sql, Object[] params) {
         // 检查sql语句是否与污点池有关
-        System.out.println("===>>> 越权检测入口 - sql：" + sql);
+        // System.out.println("===>>> 越权检测入口 - sql：" + sql);
         // 检查参数是否与污点池有关
     }
 }

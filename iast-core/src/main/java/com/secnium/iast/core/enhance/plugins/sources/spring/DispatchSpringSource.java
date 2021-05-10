@@ -4,7 +4,7 @@ import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.DispatchPlugin;
 import org.objectweb.asm.ClassVisitor;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.secnium.iast.core.util.LogUtils;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 public class DispatchSpringSource implements DispatchPlugin {
     private final String ARGUMENT_RESOLVER = " org/springframework/web/method/support/HandlerMethodArgumentResolver".substring(1);
     private IastContext context;
-    private final Logger logger = LoggerFactory.getLogger(DispatchSpringSource.class);
+    private final Logger logger = LogUtils.getLogger(DispatchSpringSource.class);
 
     /**
      * 分发类访问器

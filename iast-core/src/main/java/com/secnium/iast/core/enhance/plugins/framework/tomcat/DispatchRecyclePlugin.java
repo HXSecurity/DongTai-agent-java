@@ -8,7 +8,7 @@ import com.secnium.iast.core.util.AsmUtils;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.secnium.iast.core.util.LogUtils;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -69,7 +69,7 @@ public class DispatchRecyclePlugin implements DispatchPlugin {
 
 
     public static class OutputStreamAdapter extends AbstractClassVisitor {
-        private final Logger logger = LoggerFactory.getLogger(getClass());
+        private final Logger logger = LogUtils.getLogger(getClass());
 
         public OutputStreamAdapter(ClassVisitor classVisitor, IastContext context) {
             super(classVisitor, context);

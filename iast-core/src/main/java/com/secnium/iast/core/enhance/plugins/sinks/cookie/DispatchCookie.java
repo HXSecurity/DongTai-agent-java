@@ -4,7 +4,7 @@ import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.DispatchPlugin;
 import org.objectweb.asm.ClassVisitor;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.secnium.iast.core.util.LogUtils;
 
 import java.util.HashSet;
 
@@ -58,5 +58,5 @@ public class DispatchCookie implements DispatchPlugin {
     }
 
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LogUtils.getLogger(getClass());
 }

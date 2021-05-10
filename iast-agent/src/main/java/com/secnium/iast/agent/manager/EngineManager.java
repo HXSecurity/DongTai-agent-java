@@ -54,7 +54,7 @@ public class EngineManager {
      *
      * @param inst       instrumentation接口实例化对象
      * @param launchMode IAST引擎的启动模式，attach、premain两种
-     * @param ppid       IAST引擎运行的进程ID，用于后续尽心热更新
+     * @param ppid       IAST引擎运行的进程ID，用于后续进行热更新
      * @return IAST引擎管理器的实例化对象
      */
     public static EngineManager getInstance(Instrumentation inst, String launchMode, String ppid) {
