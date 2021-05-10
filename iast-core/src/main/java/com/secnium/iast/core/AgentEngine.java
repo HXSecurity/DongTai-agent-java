@@ -3,6 +3,8 @@ package com.secnium.iast.core;
 import com.secnium.iast.core.engines.IEngine;
 import com.secnium.iast.core.engines.impl.*;
 import com.secnium.iast.core.report.AgentRegisterReport;
+import com.secnium.iast.core.util.LogUtils;
+import org.slf4j.Logger;
 
 import java.lang.instrument.Instrumentation;
 import java.util.ArrayList;
@@ -13,6 +15,7 @@ import java.util.ListIterator;
  */
 public class AgentEngine {
 
+    private static Logger logger = LogUtils.getLogger(AgentEngine.class);
     private static AgentEngine instance;
 
     public Instrumentation getInst() {
@@ -34,7 +37,6 @@ public class AgentEngine {
     }
 
     public AgentEngine() {
-        engines.add(new LoggerEngine());
         engines.add(new ConfigEngine());
         engines.add(new SandboxEngine());
         engines.add(new ServiceEngine());
@@ -45,36 +47,36 @@ public class AgentEngine {
 
     public static void install(String mode, String propertiesFilePath, Instrumentation inst) {
         long start = System.currentTimeMillis();
-        System.out.println("[com.dongtai.engine] The engine is about to be installed, the installation mode is " + mode);
+        logger.info("The engine is about to be installed, the installation mode is {}", mode);
+
         AgentEngine agentEngine = AgentEngine.getInstance();
         assert agentEngine != null;
         agentEngine.setInst(inst);
         agentEngine.init(mode, propertiesFilePath, inst);
         agentEngine.run();
 
-        long total = System.currentTimeMillis() - start;
-        System.out.println("[com.dongtai.engine] The engine is successfully installed to the JVM, and it takes " + total + "ms");
+        logger.info("The engine is successfully installed to the JVM, and it takes {}ms", System.currentTimeMillis() - start);
         AgentRegisterReport.send();
     }
 
     public static void start() {
-        System.out.println("[com.dongtai.engine] Turn on the engine");
+        logger.info("Turn on the engine");
         EngineManager.turnOnEngine();
-        System.out.println("[com.dongtai.engine] Engine opened successfully");
+        logger.info("Engine opened successfully");
     }
 
     public static void stop() {
-        System.out.println("[com.dongtai.engine] Turn off the engine");
+        logger.info("Turn off the engine");
         EngineManager.turnOffEngine();
-        System.out.println("[com.dongtai.engine] Engine shut down successfully");
+        logger.info("Engine shut down successfully");
     }
 
     public static void destroy(String mode, String propertiesFilePath, Instrumentation inst) {
-        System.out.println("[com.dongtai.engine] Uninstall engine");
+        logger.info("Uninstall engine");
         AgentEngine agentEngine = AgentEngine.getInstance();
         assert agentEngine != null;
         agentEngine.destroy();
-        System.out.println("[com.dongtai.engine] Engine uninstallation succeeded");
+        logger.info("Engine uninstallation succeeded");
     }
 
 

@@ -1,5 +1,8 @@
 package com.secnium.iast.core.enhance.sca;
 
+import com.secnium.iast.core.util.LogUtils;
+import org.slf4j.Logger;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -14,6 +17,7 @@ import java.security.NoSuchAlgorithmException;
  * @author dongzhiyong@huoxian.cn
  */
 public class SignatureAlgorithm {
+    private static final Logger logger = LogUtils.getLogger(SignatureAlgorithm.class);
 
     public static String getSignature(InputStream is, String algorithm) {
         String signature = null;
@@ -27,9 +31,9 @@ public class SignatureAlgorithm {
             }
             signature = new BigInteger(1, digest.digest()).toString(16);
         } catch (IOException e) {
-            System.out.println(e);
+            logger.error("calc jar signature error[IOException], msg: %s", e);
         } catch (NoSuchAlgorithmException e) {
-            System.out.println(e);
+            logger.error("calc jar signature error[NoSuchAlgorithmException], msg: %s", e);
         }
         return signature;
     }
@@ -44,14 +48,14 @@ public class SignatureAlgorithm {
             in = new FileInputStream(file);
             signature = getSignature(in, algorithm);
         } catch (IOException e) {
-            System.out.println(e);
+            logger.error("calc jar signature error[IOException], msg: %s", e);
         } finally {
             try {
                 if (in != null) {
                     in.close();
                 }
             } catch (IOException e) {
-                System.out.println(e);
+                logger.error("calc jar signature error[IOException], msg: %s", e);
             }
         }
         return signature;
