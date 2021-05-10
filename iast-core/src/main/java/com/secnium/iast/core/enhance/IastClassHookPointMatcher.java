@@ -2,7 +2,7 @@ package com.secnium.iast.core.enhance;
 
 import com.secnium.iast.core.util.matcher.ConfigMatcher;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.secnium.iast.core.util.LogUtils;
 
 import java.lang.instrument.Instrumentation;
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class IastClassHookPointMatcher {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LogUtils.getLogger(getClass());
     private final Instrumentation inst;
 
     public IastClassHookPointMatcher(Instrumentation inst) {

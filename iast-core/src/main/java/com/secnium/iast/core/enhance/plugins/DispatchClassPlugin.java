@@ -17,7 +17,7 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.commons.JSRInlinerAdapter;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.secnium.iast.core.util.LogUtils;
 
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
@@ -37,7 +37,7 @@ public class DispatchClassPlugin implements DispatchPlugin {
 
     public DispatchClassPlugin() {
         this.enableAllHook = PROPERTIES_UTILS.isEnableAllHook();
-        this.logger = LoggerFactory.getLogger(getClass());
+        this.logger = LogUtils.getLogger(getClass());
     }
 
     @Override

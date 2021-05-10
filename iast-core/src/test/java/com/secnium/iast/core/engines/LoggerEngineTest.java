@@ -4,6 +4,7 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import com.secnium.iast.core.engines.impl.LoggerEngine;
+import com.secnium.iast.core.util.LogUtils;
 import com.secnium.iast.core.util.NamespaceConvert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -17,7 +18,7 @@ public class LoggerEngineTest {
     public void start() {
         String propertiesFilePath = "～/Documents/workspace/BugPlatflam/IAST/IastDocker/SecniumIAST/release/config/iast.properties";
         LoggerEngine engine = new LoggerEngine();
-        Logger logger = LoggerFactory.getLogger(getClass());
+        Logger logger = LogUtils.getLogger(getClass());
         logger.info("LoggerEngineTest.start");
     }
 
@@ -29,7 +30,7 @@ public class LoggerEngineTest {
         configurator.setContext(loggerContext);
         loggerContext.reset();
         InputStream configStream = null;
-        final Logger logger = LoggerFactory.getLogger(LoggerEngineTest.class);
+        final Logger logger = LogUtils.getLogger(LoggerEngineTest.class);
         try {
             NamespaceConvert.initNamespaceConvert("DongTai");
             configStream = LoggerEngine.class.getClassLoader().getResourceAsStream("logback-dongtai.xml");
@@ -45,8 +46,9 @@ public class LoggerEngineTest {
                 }
             }
         }
+        logger.debug("hello");
         logger.info("Log module initialized successfully");
-        logger.debug("this is a debug message");
+        logger.warn("warnnnnn");
     }
 
     @Test
@@ -72,9 +74,21 @@ public class LoggerEngineTest {
                 }
             }
         }
+        //LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
+
+        Logger logger = LogUtils.getLogger(LoggerEngine.class);
         //Logger logger = loggerContext.getLogger(LoggerEngine.class);
-        Logger logger = loggerContext.getLogger(LoggerEngine.class);
-        logger.info("Log module initialized successfully");
         logger.debug("hello");
+        logger.info("Log module initialized successfully");
+        logger.warn("warnnnnn");
+    }
+
+    @Test
+    public void testCustomLogger3(){
+        Logger logger = LogUtils.getLogger(LoggerEngine.class);
+        logger.debug("hello");
+        logger.info("Log module initialized successfully");
+        logger.warn("warnnnnn");
+        logger.error("ftytftf");
     }
 }

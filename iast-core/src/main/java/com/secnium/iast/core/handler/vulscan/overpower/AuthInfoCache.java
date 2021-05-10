@@ -3,7 +3,7 @@ package com.secnium.iast.core.handler.vulscan.overpower;
 import com.secnium.iast.core.EngineManager;
 import com.secnium.iast.core.util.Asserts;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.secnium.iast.core.util.LogUtils;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -86,6 +86,6 @@ public class AuthInfoCache extends ConcurrentHashMap<Integer, Object> {
         }
     }
 
-    private static final Logger logger = LoggerFactory.getLogger(AuthInfoCache.class);
+    private static final Logger logger = LogUtils.getLogger(AuthInfoCache.class);
 
 }

@@ -7,7 +7,7 @@ import com.secnium.iast.core.util.AsmUtils;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.secnium.iast.core.util.LogUtils;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -17,7 +17,7 @@ import java.util.Set;
  * @author dongzhiyong@huoxian.cn
  */
 public class ServletClassVisitor extends AbstractClassVisitor {
-    private final Logger logger = LoggerFactory.getLogger(ServletClassVisitor.class);
+    private final Logger logger = LogUtils.getLogger(ServletClassVisitor.class);
     private static final Set<String> HOOK_METHODS = new HashSet<String>(Arrays.asList(
             "getParameterMap",
             "getParameterNames",

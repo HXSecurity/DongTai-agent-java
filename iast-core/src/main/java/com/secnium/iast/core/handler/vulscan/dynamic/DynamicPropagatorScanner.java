@@ -8,7 +8,7 @@ import com.secnium.iast.core.handler.vulscan.IVulScan;
 import com.secnium.iast.core.util.StackUtils;
 import com.secnium.iast.core.util.TaintPoolUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.secnium.iast.core.util.LogUtils;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -28,7 +28,7 @@ public class DynamicPropagatorScanner implements IVulScan {
             " io.netty.handler.codec.http.DefaultHttpHeaders.add0(int,int,java.lang.CharSequence,java.lang.CharSequence)".substring(1)
     ));
 
-    private final Logger logger = LoggerFactory.getLogger(SinkImpl.class);
+    private final Logger logger = LogUtils.getLogger(SinkImpl.class);
 
     @Override
     public void scan(IastSinkModel sink, MethodEvent event, AtomicInteger invokeIdSequencer) {

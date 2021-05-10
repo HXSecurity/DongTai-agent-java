@@ -4,7 +4,7 @@ import com.secnium.iast.core.report.ErrorLogReport;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.LineIterator;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.secnium.iast.core.util.LogUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,7 +14,7 @@ import java.util.HashSet;
  * @author dongzhiyong@huoxian.cn
  */
 public class ConfigUtils {
-    private final static Logger logger = LoggerFactory.getLogger(ConfigUtils.class);
+    private final static Logger logger = LogUtils.getLogger(ConfigUtils.class);
 
     /**
      * 通过文件名从资源加载器中加载资源

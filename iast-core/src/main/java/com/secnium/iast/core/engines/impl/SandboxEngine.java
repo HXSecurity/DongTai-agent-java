@@ -4,7 +4,7 @@ import com.secnium.iast.core.EngineManager;
 import com.secnium.iast.core.PropertyUtils;
 import com.secnium.iast.core.engines.IEngine;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.secnium.iast.core.util.LogUtils;
 
 import java.lang.instrument.Instrumentation;
 
@@ -12,7 +12,7 @@ import java.lang.instrument.Instrumentation;
  * @author dongzhiyong@huoxian.cn
  */
 public class SandboxEngine implements IEngine {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LogUtils.getLogger(getClass());
     private Instrumentation inst;
     private PropertyUtils cfg;
 

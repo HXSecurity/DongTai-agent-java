@@ -8,7 +8,7 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.secnium.iast.core.util.LogUtils;
 
 
 /**
@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
  */
 public class JspPageAdapter extends AbstractClassVisitor {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LogUtils.getLogger(getClass());
 
     JspPageAdapter(ClassVisitor classVisitor, IastContext context) {
         super(classVisitor, context);

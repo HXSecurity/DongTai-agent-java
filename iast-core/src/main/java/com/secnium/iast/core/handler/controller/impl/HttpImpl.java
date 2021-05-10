@@ -8,7 +8,7 @@ import com.secnium.iast.core.util.http.HttpRequest;
 import com.secnium.iast.core.util.http.HttpResponse;
 import com.secnium.iast.core.util.matcher.ConfigMatcher;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.secnium.iast.core.util.LogUtils;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -53,5 +53,5 @@ public class HttpImpl {
         }
     }
 
-    private static final Logger logger = LoggerFactory.getLogger(HttpImpl.class);
+    private static final Logger logger = LogUtils.getLogger(HttpImpl.class);
 }
