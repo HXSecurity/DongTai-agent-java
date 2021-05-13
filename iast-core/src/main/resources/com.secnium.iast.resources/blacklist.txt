@@ -11,6 +11,10 @@ com/navercorp/pinpoint/*
 net/sf/ehcache/*
 # bytebuddy - need't hook
 net/bytebuddy/*
+# skywalking
+org/apache/skywalking/*
+# jacoco
+org/jacoco/*
 # self package - need't hook
 com/secnium/*
 # apple package

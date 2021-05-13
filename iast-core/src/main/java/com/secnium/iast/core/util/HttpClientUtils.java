@@ -11,6 +11,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -32,13 +33,15 @@ public class HttpClientUtils {
     private static final String REQUEST_ENCODING_TYPE = "gzip";
     private static final String SSL_SIGNATURE = "TLS";
     public final static HostnameVerifier DO_NOT_VERIFY = new HttpClientHostnameVerifier();
+    private final static PropertyUtils PROPERTIES = PropertyUtils.getInstance();
+    private final static Proxy PROXY = loadProxy();
 
     public static String sendGet(String uri, String arg, String value) {
         try {
             if (arg != null && value != null) {
-                return sendRequest(HttpMethods.GET, PropertyUtils.getInstance().getBaseUrl(), uri + "?" + arg + "=" + value, null, null, null);
+                return sendRequest(HttpMethods.GET, PROPERTIES.getBaseUrl(), uri + "?" + arg + "=" + value, null, null, PROXY);
             } else {
-                return sendRequest(HttpMethods.GET, PropertyUtils.getInstance().getBaseUrl(), uri, null, null, null);
+                return sendRequest(HttpMethods.GET, PROPERTIES.getBaseUrl(), uri, null, null, PROXY);
             }
         } catch (Exception e) {
             return null;
@@ -47,7 +50,7 @@ public class HttpClientUtils {
 
     public static boolean sendPost(String uri, String value) throws Exception {
         Asserts.NOT_NULL("report", value);
-        sendRequest(HttpMethods.POST, PropertyUtils.getInstance().getBaseUrl(), uri, value, null, null);
+        sendRequest(HttpMethods.POST, PROPERTIES.getBaseUrl(), uri, value, null, PROXY);
         return true;
     }
 
@@ -60,11 +63,11 @@ public class HttpClientUtils {
             URL url = new URL(baseUrl + urlStr);
             // 通过请求地址判断请求类型(http或者是https)
             if (PROTOCOL_HTTPS.equals(url.getProtocol().toLowerCase())) {
-                HttpsURLConnection https = (HttpsURLConnection) url.openConnection();
+                HttpsURLConnection https = proxy == null ? (HttpsURLConnection) url.openConnection() : (HttpsURLConnection) url.openConnection(proxy);
                 https.setHostnameVerifier(DO_NOT_VERIFY);
                 connection = https;
             } else {
-                connection = (HttpURLConnection) url.openConnection();
+                connection = proxy == null ? (HttpURLConnection) url.openConnection() : (HttpURLConnection) url.openConnection(proxy);
             }
 
             // 设置基础的验证token（从配置文件下载）
@@ -111,6 +114,25 @@ public class HttpClientUtils {
                 connection.disconnect();
             }
         }
+    }
+
+    /**
+     * 根据配置文件创建http/https代理
+     */
+    public static Proxy loadProxy() {
+        try {
+            if (PROPERTIES.isProxyEnable()) {
+                Proxy proxy;
+                proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(
+                        PROPERTIES.getProxyHost(),
+                        PROPERTIES.getProxyPort()
+                ));
+                return proxy;
+            }
+        } catch (Throwable ignored) {
+
+        }
+        return null;
     }
 
     public static void trustAllHosts() {

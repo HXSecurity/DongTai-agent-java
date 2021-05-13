@@ -18,6 +18,9 @@ public class IastProperties {
     public PropertiesConfiguration cfg = null;
     private String iastServerToken;
     private String serverUrl;
+    private String proxyEnableStatus;
+    private String proxyHost;
+    private int proxyPort;
 
     /**
      * 属性文件路径
@@ -70,6 +73,31 @@ public class IastProperties {
 
     public String getEngineName() {
         return cfg.getString("engine.name");
+    }
+
+    private String getProxyEnableStatus() {
+        if (null == proxyEnableStatus) {
+            proxyEnableStatus = System.getProperty("iast.proxy.enable", cfg.getString("iast.proxy.enable", "false"));
+        }
+        return proxyEnableStatus;
+    }
+
+    public boolean isProxyEnable() {
+        return "true".equalsIgnoreCase(getProxyEnableStatus());
+    }
+
+    public String getProxyHost() {
+        if (null == proxyHost) {
+            proxyHost = System.getProperty("iast.proxy.host", cfg.getString("iast.proxy.host", "false"));
+        }
+        return proxyHost;
+    }
+
+    public int getProxyPort() {
+        if (-1 == proxyPort) {
+            proxyPort = Integer.parseInt(System.getProperty("iast.proxy.port", cfg.getString("iast.proxy.port", "80")));
+        }
+        return proxyPort;
     }
 
     /**

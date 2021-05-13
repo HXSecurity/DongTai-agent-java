@@ -5,10 +5,10 @@ import com.secnium.iast.core.handler.controller.impl.SinkImpl;
 import com.secnium.iast.core.handler.models.IastSinkModel;
 import com.secnium.iast.core.handler.models.MethodEvent;
 import com.secnium.iast.core.handler.vulscan.IVulScan;
+import com.secnium.iast.core.util.LogUtils;
 import com.secnium.iast.core.util.StackUtils;
 import com.secnium.iast.core.util.TaintPoolUtils;
 import org.slf4j.Logger;
-import com.secnium.iast.core.util.LogUtils;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -69,16 +69,24 @@ public class DynamicPropagatorScanner implements IVulScan {
             int[] taintPositionIndexArray = sink.getPos();
 
             if (taintPositionIndexArray != null) {
+                Object sourceValue = null;
                 for (int index : taintPositionIndexArray) {
                     if (event.argumentArray.length > index) {
                         hitTaintPool = TaintPoolUtils.poolContains(event.argumentArray[index], event);
                         if (hitTaintPool) {
+                            sourceValue = event.argumentArray[index];
                             break;
                         }
                     }
                 }
+                if (hitTaintPool) {
+                    event.inValue = sourceValue;
+                }
             } else {
                 hitTaintPool = TaintPoolUtils.poolContains(event.object, event);
+                if(hitTaintPool){
+                    event.inValue = event.object;
+                }
             }
         }
         return hitTaintPool;
