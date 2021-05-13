@@ -25,7 +25,10 @@ public class IastProperties {
     private String propertiesFilePath;
 
     private IastProperties(String path) {
-        init(path);
+        try {
+            init(path);
+        } catch (ClassNotFoundException e) {
+        }
     }
 
     public static IastProperties getInstance() {
@@ -75,7 +78,7 @@ public class IastProperties {
     /**
      * 根据配置文件初始化单例配置类
      */
-    public void init(String path) {
+    public void init(String path) throws ClassNotFoundException {
         String basePath = null;
         File agentFile;
         File propertiesFile;
@@ -117,7 +120,6 @@ public class IastProperties {
             cfg = new PropertiesConfiguration(propertiesFilePath);
             cfg.setReloadingStrategy(new FileChangedReloadingStrategy());
             System.out.println("[cn.huoxian.dongtai.iast] The engine configuration file is initialized successfully. file is " + propertiesFile.toString());
-
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ConfigurationException e) {
