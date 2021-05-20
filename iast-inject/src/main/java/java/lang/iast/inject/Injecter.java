@@ -23,7 +23,7 @@ public class Injecter {
 
     private static final Class<Ret> SPY_RET_CLASS = Ret.class;
 
-    private static final Map<String, MethodHook> namespaceMethodHookMap
+    private static final Map<String, MethodHook> NAMESPACE_METHOD_HOOK_MAP
             = new ConcurrentHashMap<String, MethodHook>();
 
     /**
@@ -33,7 +33,7 @@ public class Injecter {
      * @return TRUE:已完成初始化;FALSE:未完成初始化;
      */
     public static boolean isInit(final String namespace) {
-        return namespaceMethodHookMap.containsKey(namespace);
+        return NAMESPACE_METHOD_HOOK_MAP.containsKey(namespace);
     }
 
     /**
@@ -62,7 +62,7 @@ public class Injecter {
                             final Method IS_FIRST_LEVEL_HTTP,
                             final Method HAS_TAINT
     ) {
-        namespaceMethodHookMap.put(
+        NAMESPACE_METHOD_HOOK_MAP.put(
                 namespace,
                 new MethodHook(
                         ON_BEFORE_METHOD,
@@ -91,10 +91,10 @@ public class Injecter {
      * @param namespace 命名空间
      */
     public static void clean(final String namespace) {
-        namespaceMethodHookMap.remove(namespace);
+        NAMESPACE_METHOD_HOOK_MAP.remove(namespace);
 
         // 如果是最后的一个命名空间，则需要重新清理Node中所持有的Thread
-        if (namespaceMethodHookMap.isEmpty()) {
+        if (NAMESPACE_METHOD_HOOK_MAP.isEmpty()) {
             selfCallBarrier.cleanAndInit();
         }
 
@@ -142,7 +142,7 @@ public class Injecter {
         if (!selfCallBarrier.isEnter(thread)) {
             final SelfCallBarrier.Node node = selfCallBarrier.enter(thread);
             try {
-                final MethodHook hook = namespaceMethodHookMap.get(namespace);
+                final MethodHook hook = NAMESPACE_METHOD_HOOK_MAP.get(namespace);
                 if (null != hook) {
                     hook.ON_BEFORE_METHOD.invoke(null,
                             listenerId, framework, javaClassName, javaMethodName, javaMethodDesc, target, argumentArray, retValue, signCode, isStatic, hookType);
@@ -163,7 +163,7 @@ public class Injecter {
         if (!selfCallBarrier.isEnter(thread)) {
             final SelfCallBarrier.Node node = selfCallBarrier.enter(thread);
             try {
-                final MethodHook hook = namespaceMethodHookMap.get(namespace);
+                final MethodHook hook = NAMESPACE_METHOD_HOOK_MAP.get(namespace);
                 if (null != hook) {
                     hook.ON_RETURN_METHOD.invoke(null, listenerId, SPY_RET_CLASS, retValue);
                 }
@@ -184,7 +184,7 @@ public class Injecter {
         }
         final SelfCallBarrier.Node node = selfCallBarrier.enter(thread);
         try {
-            final MethodHook hook = namespaceMethodHookMap.get(namespace);
+            final MethodHook hook = NAMESPACE_METHOD_HOOK_MAP.get(namespace);
             if (null == hook) {
                 return Ret.RET_NONE;
             }
@@ -203,7 +203,7 @@ public class Injecter {
         if (!selfCallBarrier.isEnter(thread)) {
             final SelfCallBarrier.Node node = selfCallBarrier.enter(thread);
             try {
-                final MethodHook hook = namespaceMethodHookMap.get(namespace);
+                final MethodHook hook = NAMESPACE_METHOD_HOOK_MAP.get(namespace);
                 if (null != hook) {
                     hook.ENTER_PROPAGATOR.invoke(null);
                 }
@@ -223,7 +223,7 @@ public class Injecter {
         if (!selfCallBarrier.isEnter(thread)) {
             final SelfCallBarrier.Node node = selfCallBarrier.enter(thread);
             try {
-                final MethodHook hook = namespaceMethodHookMap.get(namespace);
+                final MethodHook hook = NAMESPACE_METHOD_HOOK_MAP.get(namespace);
                 if (null != hook) {
                     hook.LEAVE_PROPAGATOR.invoke(null);
                 }
@@ -243,7 +243,7 @@ public class Injecter {
         if (!selfCallBarrier.isEnter(thread)) {
             final SelfCallBarrier.Node node = selfCallBarrier.enter(thread);
             try {
-                final MethodHook hook = namespaceMethodHookMap.get(namespace);
+                final MethodHook hook = NAMESPACE_METHOD_HOOK_MAP.get(namespace);
                 if (null != hook) {
                     return (Boolean) hook.IS_TOP_LEVEL_PROPAGATOR.invoke(null);
                 }
@@ -264,7 +264,7 @@ public class Injecter {
         if (!selfCallBarrier.isEnter(thread)) {
             final SelfCallBarrier.Node node = selfCallBarrier.enter(thread);
             try {
-                final MethodHook hook = namespaceMethodHookMap.get(namespace);
+                final MethodHook hook = NAMESPACE_METHOD_HOOK_MAP.get(namespace);
                 if (null != hook) {
                     return (Boolean) hook.IS_TOP_LEVEL_SINK.invoke(null);
                 }
@@ -280,12 +280,11 @@ public class Injecter {
     }
 
     public static boolean hasTaint(final String namespace) {
-        // 进入传播节点
         final Thread thread = Thread.currentThread();
         if (!selfCallBarrier.isEnter(thread)) {
             final SelfCallBarrier.Node node = selfCallBarrier.enter(thread);
             try {
-                final MethodHook hook = namespaceMethodHookMap.get(namespace);
+                final MethodHook hook = NAMESPACE_METHOD_HOOK_MAP.get(namespace);
                 if (null != hook) {
                     return (Boolean) hook.HAS_TAINT.invoke(null);
                 }
@@ -301,12 +300,11 @@ public class Injecter {
     }
 
     public static void enterSink(final String namespace) {
-        // 进入传播节点
         final Thread thread = Thread.currentThread();
         if (!selfCallBarrier.isEnter(thread)) {
             final SelfCallBarrier.Node node = selfCallBarrier.enter(thread);
             try {
-                final MethodHook hook = namespaceMethodHookMap.get(namespace);
+                final MethodHook hook = NAMESPACE_METHOD_HOOK_MAP.get(namespace);
                 if (null != hook) {
                     hook.ENTER_SINK.invoke(null);
                 }
@@ -321,12 +319,11 @@ public class Injecter {
     }
 
     public static void leaveSink(final String namespace) {
-        // 进入传播节点
         final Thread thread = Thread.currentThread();
         if (!selfCallBarrier.isEnter(thread)) {
             final SelfCallBarrier.Node node = selfCallBarrier.enter(thread);
             try {
-                final MethodHook hook = namespaceMethodHookMap.get(namespace);
+                final MethodHook hook = NAMESPACE_METHOD_HOOK_MAP.get(namespace);
                 if (null != hook) {
                     hook.LEAVE_SINK.invoke(null);
                 }
@@ -341,12 +338,11 @@ public class Injecter {
     }
 
     public static boolean isFirstLevelSource(final String namespace) {
-        // 进入传播节点
         final Thread thread = Thread.currentThread();
         if (!selfCallBarrier.isEnter(thread)) {
             final SelfCallBarrier.Node node = selfCallBarrier.enter(thread);
             try {
-                final MethodHook hook = namespaceMethodHookMap.get(namespace);
+                final MethodHook hook = NAMESPACE_METHOD_HOOK_MAP.get(namespace);
                 if (null != hook) {
                     return (Boolean) hook.IS_TOP_LEVEL_SOURCE.invoke(null);
                 }
@@ -362,12 +358,11 @@ public class Injecter {
     }
 
     public static void enterSource(final String namespace) {
-        // 进入传播节点
         final Thread thread = Thread.currentThread();
         if (!selfCallBarrier.isEnter(thread)) {
             final SelfCallBarrier.Node node = selfCallBarrier.enter(thread);
             try {
-                final MethodHook hook = namespaceMethodHookMap.get(namespace);
+                final MethodHook hook = NAMESPACE_METHOD_HOOK_MAP.get(namespace);
                 if (null != hook) {
                     hook.ENTER_SOURCE.invoke(null);
                 }
@@ -382,12 +377,11 @@ public class Injecter {
     }
 
     public static void leaveSource(final String namespace) {
-        // 进入传播节点
         final Thread thread = Thread.currentThread();
         if (!selfCallBarrier.isEnter(thread)) {
             final SelfCallBarrier.Node node = selfCallBarrier.enter(thread);
             try {
-                final MethodHook hook = namespaceMethodHookMap.get(namespace);
+                final MethodHook hook = NAMESPACE_METHOD_HOOK_MAP.get(namespace);
                 if (null != hook) {
                     hook.LEAVE_SOURCE.invoke(null);
                 }
@@ -402,12 +396,11 @@ public class Injecter {
     }
 
     public static void enterHttp(final String namespace) {
-        // 进入传播节点
         final Thread thread = Thread.currentThread();
         if (!selfCallBarrier.isEnter(thread)) {
             final SelfCallBarrier.Node node = selfCallBarrier.enter(thread);
             try {
-                final MethodHook hook = namespaceMethodHookMap.get(namespace);
+                final MethodHook hook = NAMESPACE_METHOD_HOOK_MAP.get(namespace);
                 if (null != hook) {
                     hook.ENTER_HTTP.invoke(null);
                 }
@@ -422,12 +415,11 @@ public class Injecter {
     }
 
     public static void leaveHttp(final String namespace) {
-        // 进入传播节点
         final Thread thread = Thread.currentThread();
         if (!selfCallBarrier.isEnter(thread)) {
             final SelfCallBarrier.Node node = selfCallBarrier.enter(thread);
             try {
-                final MethodHook hook = namespaceMethodHookMap.get(namespace);
+                final MethodHook hook = NAMESPACE_METHOD_HOOK_MAP.get(namespace);
                 if (null != hook) {
                     hook.LEAVE_HTTP.invoke(null);
                 }
@@ -446,7 +438,7 @@ public class Injecter {
         if (!selfCallBarrier.isEnter(thread)) {
             final SelfCallBarrier.Node node = selfCallBarrier.enter(thread);
             try {
-                final MethodHook hook = namespaceMethodHookMap.get(namespace);
+                final MethodHook hook = NAMESPACE_METHOD_HOOK_MAP.get(namespace);
                 if (null != hook) {
                     return (Boolean) hook.IS_TOP_LEVEL_HTTP.invoke(null);
                 }

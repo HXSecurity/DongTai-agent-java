@@ -11,12 +11,40 @@ com/navercorp/pinpoint/*
 net/sf/ehcache/*
 # bytebuddy - need't hook
 net/bytebuddy/*
+# skywalking
+org/apache/skywalking/*
+# jacoco
+org/jacoco/*
 # self package - need't hook
 com/secnium/*
 # apple package
 apple/*
 # octo
 com/octo/captcha/*
+# apache shaded
+org/apache/curator/shaded/*
+# redis client
+org/redisson/*
+# quartz
+org/quartz/*
+# sharding-jdbc
+io/shardingjdbc/*
+# micrometer
+io/micrometer/*
+#
+groovy/*
+# https://github.com/AutoGeneral/cors-filter
+com/thetransactioncompany/*
+# protobuf
+com/google/protobuf/*
+#Spring Cloud Sleuth
+com/github/benmanes/caffeine/*
+# spring
+org/springframework/cloud/sleuth/*
+#
+io/netty/handler/codec/*
+# fastjson
+com/alibaba/fastjson/*
 # old rule
 EDU/oswego/cs/dl/util/concurrent/BoundedChannel
 EDU/oswego/cs/dl/util/concurrent/BoundedLinkedQueue
@@ -56694,13 +56722,14 @@ org/quartz/spi/SchedulerPlugin
 org/quartz/spi/SchedulerSignaler
 org/quartz/spi/ThreadPool
 org/quartz/spi/TriggerFiredBundle
-org/quartz/utils/ConnectionProvider
-org/quartz/utils/DBConnectionManager
-org/quartz/utils/JNDIConnectionProvider
-org/quartz/utils/Key
-org/quartz/utils/Pair
-org/quartz/utils/PropertiesParser
-org/quartz/utils/StringKeyDirtyFlagMap
+org/quartz/utils/*
+#org/quartz/utils/ConnectionProvider
+#org/quartz/utils/DBConnectionManager
+#org/quartz/utils/JNDIConnectionProvider
+#org/quartz/utils/Key
+#org/quartz/utils/Pair
+#org/quartz/utils/PropertiesParser
+#org/quartz/utils/StringKeyDirtyFlagMap
 org/rhq/core/communications/command/annotation/Asynchronous
 org/rhq/core/communications/command/annotation/LimitedConcurrency
 org/rhq/core/communications/command/annotation/Timeout

@@ -10,6 +10,7 @@ import com.secnium.iast.core.handler.models.IastHookRuleModel;
 import com.secnium.iast.core.handler.models.IastSinkModel;
 import com.secnium.iast.core.handler.vulscan.VulnType;
 import com.secnium.iast.core.util.AsmUtils;
+import com.secnium.iast.core.util.LogUtils;
 import com.secnium.iast.core.util.SandboxStringUtils;
 import com.secnium.iast.core.util.matcher.ConfigMatcher;
 import com.secnium.iast.core.util.matcher.Method;
@@ -17,7 +18,6 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.commons.JSRInlinerAdapter;
 import org.slf4j.Logger;
-import com.secnium.iast.core.util.LogUtils;
 
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
@@ -160,14 +160,18 @@ public class DispatchClassPlugin implements DispatchPlugin {
             int hookValue = IastHookRuleModel.getRuleTypeValueByFramework(framework);
             if (HookType.PROPAGATOR.equals(hookValue)) {
                 mv = new PropagateAdviceAdapter(mv, access, name, desc, context, framework, signature);
+                transformed = true;
             } else if (HookType.SINK.equals(hookValue)) {
                 // fixme 针对越权类，overpower为true，否则为false
                 IastSinkModel sinkModel = IastHookRuleModel.getSinkByMethodSignature(signature);
-                assert sinkModel != null;
-                boolean isOverPower = VulnType.SQL_OVER_POWER.equals(sinkModel.getType());
-                mv = new SinkAdviceAdapter(mv, access, name, desc, context, framework, signature, isOverPower);
+                if (sinkModel != null) {
+                    boolean isOverPower = VulnType.SQL_OVER_POWER.equals(sinkModel.getType());
+                    mv = new SinkAdviceAdapter(mv, access, name, desc, context, framework, signature, isOverPower);
+                    transformed = true;
+                } else {
+                    logger.error("framework[{}], method[{}] doesn't find sink model", framework, name);
+                }
             }
-            transformed = true;
             return mv;
         }
     }

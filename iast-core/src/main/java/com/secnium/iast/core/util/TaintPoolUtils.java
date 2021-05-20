@@ -78,9 +78,13 @@ public class TaintPoolUtils {
                 }
             }
         } else {
-            if (taints.contains(obj)) {
-                event.addSourceHash(obj.hashCode());
-                return true;
+            try {
+                if (taints.contains(obj)) {
+                    event.addSourceHash(obj.hashCode());
+                    return true;
+                }
+            } catch (Throwable ignore) {
+
             }
             return false;
         }

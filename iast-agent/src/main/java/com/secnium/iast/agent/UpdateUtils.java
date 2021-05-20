@@ -4,9 +4,7 @@ import org.json.JSONObject;
 
 import javax.net.ssl.*;
 import java.io.BufferedInputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
+import java.net.*;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
@@ -41,13 +39,14 @@ public class UpdateUtils {
         try {
             trustAllHosts();
             URL url = new URL(urlStr);
+            Proxy proxy = UpdateUtils.loadProxy();
 
             if (Constant.PROTOCOL_HTTPS.equalsIgnoreCase(url.getProtocol())) {
-                HttpsURLConnection https = (HttpsURLConnection) url.openConnection();
+                HttpsURLConnection https = proxy == null ? (HttpsURLConnection) url.openConnection() : (HttpsURLConnection) url.openConnection(proxy);
                 https.setHostnameVerifier(DO_NOT_VERIFY);
                 connection = https;
             } else {
-                connection = (HttpURLConnection) url.openConnection();
+                connection = proxy == null ? (HttpURLConnection) url.openConnection() : (HttpURLConnection) url.openConnection(proxy);
             }
             connection.setRequestMethod(Constant.HTTP_METHOD_GET);
             connection.setRequestProperty("User-Agent", "SecniumIast Java Agent");
@@ -100,6 +99,25 @@ public class UpdateUtils {
         } catch (Exception e) {
         }
     }
+
+    /**
+     * 根据配置文件创建http/https代理
+     */
+    public static Proxy loadProxy() {
+        try {
+            if (properties.isProxyEnable()) {
+                Proxy proxy;
+                proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(
+                        properties.getProxyHost(),
+                        properties.getProxyPort()
+                ));
+                return proxy;
+            }
+        } catch (Throwable ignored) {
+        }
+        return null;
+    }
+
 
     public final static HostnameVerifier DO_NOT_VERIFY = new HostnameVerifier() {
         @Override

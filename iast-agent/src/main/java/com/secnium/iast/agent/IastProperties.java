@@ -18,6 +18,9 @@ public class IastProperties {
     public PropertiesConfiguration cfg = null;
     private String iastServerToken;
     private String serverUrl;
+    private String proxyEnableStatus;
+    private String proxyHost;
+    private int proxyPort = -1;
 
     /**
      * 属性文件路径
@@ -25,7 +28,10 @@ public class IastProperties {
     private String propertiesFilePath;
 
     private IastProperties(String path) {
-        init(path);
+        try {
+            init(path);
+        } catch (ClassNotFoundException e) {
+        }
     }
 
     public static IastProperties getInstance() {
@@ -72,10 +78,35 @@ public class IastProperties {
         return cfg.getString("engine.name");
     }
 
+    private String getProxyEnableStatus() {
+        if (null == proxyEnableStatus) {
+            proxyEnableStatus = System.getProperty("iast.proxy.enable", cfg.getString("iast.proxy.enable", "false"));
+        }
+        return proxyEnableStatus;
+    }
+
+    public boolean isProxyEnable() {
+        return "true".equalsIgnoreCase(getProxyEnableStatus());
+    }
+
+    public String getProxyHost() {
+        if (null == proxyHost) {
+            proxyHost = System.getProperty("iast.proxy.host", cfg.getString("iast.proxy.host", "false"));
+        }
+        return proxyHost;
+    }
+
+    public int getProxyPort() {
+        if (-1 == proxyPort) {
+            proxyPort = Integer.parseInt(System.getProperty("iast.proxy.port", cfg.getString("iast.proxy.port", "80")));
+        }
+        return proxyPort;
+    }
+
     /**
      * 根据配置文件初始化单例配置类
      */
-    public void init(String path) {
+    public void init(String path) throws ClassNotFoundException {
         String basePath = null;
         File agentFile;
         File propertiesFile;
@@ -117,7 +148,6 @@ public class IastProperties {
             cfg = new PropertiesConfiguration(propertiesFilePath);
             cfg.setReloadingStrategy(new FileChangedReloadingStrategy());
             System.out.println("[cn.huoxian.dongtai.iast] The engine configuration file is initialized successfully. file is " + propertiesFile.toString());
-
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ConfigurationException e) {
