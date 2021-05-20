@@ -46,7 +46,6 @@ public class UpdateUtils {
                 https.setHostnameVerifier(DO_NOT_VERIFY);
                 connection = https;
             } else {
-
                 connection = proxy == null ? (HttpURLConnection) url.openConnection() : (HttpURLConnection) url.openConnection(proxy);
             }
             connection.setRequestMethod(Constant.HTTP_METHOD_GET);
@@ -115,7 +114,6 @@ public class UpdateUtils {
                 return proxy;
             }
         } catch (Throwable ignored) {
-
         }
         return null;
     }

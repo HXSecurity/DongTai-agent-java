@@ -20,7 +20,7 @@ public class IastProperties {
     private String serverUrl;
     private String proxyEnableStatus;
     private String proxyHost;
-    private int proxyPort;
+    private int proxyPort = -1;
 
     /**
      * 属性文件路径
