@@ -4,10 +4,10 @@ import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.AbstractClassVisitor;
 import com.secnium.iast.core.enhance.plugins.sinks.SinkAdviceAdapter;
 import com.secnium.iast.core.util.AsmUtils;
+import com.secnium.iast.core.util.LogUtils;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.slf4j.Logger;
-import com.secnium.iast.core.util.LogUtils;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -30,9 +30,9 @@ public class ServletClassVisitor extends AbstractClassVisitor {
             "getHeaders",
             "getHeaderNames",
             "getParts",
-            "getPart",
-            "getAttribute",
-            "getAttributeNames"
+            "getPart"
+//            "getAttribute",
+//            "getAttributeNames",
             // "getRealPath"
     ));
 
