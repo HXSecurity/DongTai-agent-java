@@ -2,11 +2,10 @@ package com.secnium.iast.core.report;
 
 import com.secnium.iast.core.AbstractThread;
 import com.secnium.iast.core.EngineManager;
-import com.secnium.iast.core.PropertyUtils;
 import com.secnium.iast.core.util.Constants;
 import com.secnium.iast.core.util.HttpClientUtils;
-import org.slf4j.Logger;
 import com.secnium.iast.core.util.LogUtils;
+import org.slf4j.Logger;
 
 /**
  * 发送报告的功能实现
@@ -14,12 +13,10 @@ import com.secnium.iast.core.util.LogUtils;
  * @author dongzhiyong@huoxian.cn
  */
 public class VulnReport extends AbstractThread {
-    private long waitTime;
     private final Logger logger = LogUtils.getLogger(VulnReport.class);
 
     public VulnReport(long waitTime) {
         super(getThreadName(), true, waitTime);
-        this.waitTime = waitTime;
     }
 
     private static String getThreadName() {
@@ -34,22 +31,13 @@ public class VulnReport extends AbstractThread {
                 if (report != null && !report.isEmpty()) {
                     boolean success = HttpClientUtils.sendPost(Constants.API_REPORT_UPLOAD, report);
                     if (!success) {
-                        EngineManager.sendNewReport(report);
+                        logger.error("report send failure.");
                     }
                 }
             } catch (Exception e) {
                 logger.info(report);
                 throw e;
-            } finally {
-                if (waitTime != PropertyUtils.getInstance().getReportInterval()) {
-                    waitTime = PropertyUtils.getInstance().getReportInterval();
-                    setMilliseconds();
-                }
             }
         }
-    }
-
-    public static void main(String[] args) {
-
     }
 }
