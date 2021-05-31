@@ -257,7 +257,9 @@ public class HttpRequest {
     public String getQueryString() {
         if (this.queryString == null) {
             try {
-                this.setQueryString((String) classOfHttpRequest.getMethod("getQueryString").invoke(requestReference.get()));
+                Method method = classOfHttpRequest.getMethod("getQueryString");
+                method.setAccessible(true);
+                this.setQueryString((String) method.invoke(requestReference.get()));
             } catch (IllegalAccessException e) {
                 this.queryString = "";
                 ErrorLogReport.sendErrorLog(ThrowableUtils.getStackTrace(e));
