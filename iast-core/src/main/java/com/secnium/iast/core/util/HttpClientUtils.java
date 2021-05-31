@@ -50,6 +50,11 @@ public class HttpClientUtils {
 
     public static boolean sendPost(String uri, String value) throws Exception {
         Asserts.NOT_NULL("report", value);
+        if(PROPERTIES.isDebug()){
+            String respString = sendRequest(HttpMethods.POST, PROPERTIES.getBaseUrl(), uri, value, null, PROXY);
+            System.out.println("cn.huoxian.iast url is " + uri);
+            System.out.println("cn.huoxian.iast resp is " + respString);
+        }
         sendRequest(HttpMethods.POST, PROPERTIES.getBaseUrl(), uri, value, null, PROXY);
         return true;
     }
@@ -62,7 +67,7 @@ public class HttpClientUtils {
             trustAllHosts();
             URL url = new URL(baseUrl + urlStr);
             // 通过请求地址判断请求类型(http或者是https)
-            if (PROTOCOL_HTTPS.equals(url.getProtocol().toLowerCase())) {
+            if (PROTOCOL_HTTPS.equalsIgnoreCase(url.getProtocol())) {
                 HttpsURLConnection https = proxy == null ? (HttpsURLConnection) url.openConnection() : (HttpsURLConnection) url.openConnection(proxy);
                 https.setHostnameVerifier(DO_NOT_VERIFY);
                 connection = https;
@@ -70,7 +75,6 @@ public class HttpClientUtils {
                 connection = proxy == null ? (HttpURLConnection) url.openConnection() : (HttpURLConnection) url.openConnection(proxy);
             }
 
-            // 设置基础的验证token（从配置文件下载）
             connection.setRequestMethod(method.name());
             if (HttpMethods.POST.equals(method)) {
                 connection.setRequestProperty(REQUEST_HEADER_CONTENT_TYPE, MEDIA_TYPE_APPLICATION_JSON);

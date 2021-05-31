@@ -196,7 +196,12 @@ public class IastHookRuleModel {
      */
     public static int getRuleTypeValueByFramework(String framework) {
         if (instance != null) {
-            return instance.hooksValue.get(framework);
+            try {
+                return instance.hooksValue.get(framework);
+            } catch (java.lang.NullPointerException e) {
+                //规则待更新
+                return -1;
+            }
         } else {
             return -1;
         }

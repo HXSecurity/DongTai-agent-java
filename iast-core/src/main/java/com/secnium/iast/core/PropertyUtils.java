@@ -31,6 +31,7 @@ public class PropertyUtils {
     private String proxyEnableStatus;
     private String proxyHost;
     private int proxyPort = -1;
+    private String debugFlag;
 
     private final String propertiesFilePath;
 
@@ -256,5 +257,16 @@ public class PropertyUtils {
             proxyPort = Integer.parseInt(System.getProperty("iast.proxy.port", cfg.getString("iast.proxy.port", "80")));
         }
         return proxyPort;
+    }
+
+    private String getDebugFlag(){
+        if(debugFlag==null){
+            debugFlag = System.getProperty("debug","false");
+        }
+        return debugFlag;
+    }
+
+    public boolean isDebug(){
+        return "true".equalsIgnoreCase(debugFlag);
     }
 }

@@ -40,7 +40,7 @@ public abstract class AbstractThread extends Thread {
             Thread.sleep(1000);
             send();
         } catch (IOException e) {
-            logger.error("authorization failed. please check you' iast-token. ");
+            logger.error("report error reason: ", e);
         } catch (Exception e) {
             logger.error("report error, reason: ", e);
         }
