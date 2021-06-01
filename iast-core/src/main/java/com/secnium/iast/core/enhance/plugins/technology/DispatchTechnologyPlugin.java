@@ -1,6 +1,8 @@
-package com.secnium.iast.core.enhance.plugins;
+package com.secnium.iast.core.enhance.plugins.technology;
 
 import com.secnium.iast.core.enhance.IastContext;
+import com.secnium.iast.core.enhance.plugins.AbstractClassVisitor;
+import com.secnium.iast.core.enhance.plugins.DispatchPlugin;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.slf4j.Logger;

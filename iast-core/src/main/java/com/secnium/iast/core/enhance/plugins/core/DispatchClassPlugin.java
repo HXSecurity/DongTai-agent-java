@@ -1,10 +1,12 @@
-package com.secnium.iast.core.enhance.plugins;
+package com.secnium.iast.core.enhance.plugins.core;
 
 import com.secnium.iast.core.EngineManager;
 import com.secnium.iast.core.PropertyUtils;
 import com.secnium.iast.core.enhance.IastContext;
-import com.secnium.iast.core.enhance.plugins.propagator.PropagateAdviceAdapter;
-import com.secnium.iast.core.enhance.plugins.sinks.SinkAdviceAdapter;
+import com.secnium.iast.core.enhance.plugins.*;
+import com.secnium.iast.core.enhance.plugins.core.adapter.PropagateAdviceAdapter;
+import com.secnium.iast.core.enhance.plugins.core.adapter.SinkAdviceAdapter;
+import com.secnium.iast.core.enhance.plugins.core.adapter.SourceAdviceAdapter;
 import com.secnium.iast.core.handler.controller.HookType;
 import com.secnium.iast.core.handler.models.IastHookRuleModel;
 import com.secnium.iast.core.handler.models.IastSinkModel;
@@ -22,7 +24,6 @@ import org.slf4j.Logger;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Iterator;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -71,8 +72,7 @@ public class DispatchClassPlugin implements DispatchPlugin {
         }
 
         boolean supportsSuper = false;
-        for (Iterator<String> it = ancestors.iterator(); it.hasNext(); ) {
-            String superClass = it.next();
+        for (String superClass : ancestors) {
             javaClassname = SandboxStringUtils.toJavaClassName(superClass);
             if (IastHookRuleModel.classIsNeededHookBySuperClassName(javaClassname)) {
                 supportsSuper = true;
@@ -171,6 +171,9 @@ public class DispatchClassPlugin implements DispatchPlugin {
                 } else {
                     logger.error("framework[{}], method[{}] doesn't find sink model", framework, name);
                 }
+            } else if (HookType.SOURCE.equals(hookValue)) {
+                mv = new SourceAdviceAdapter(mv, access, name, desc, context, framework, signature);
+                transformed = true;
             }
             return mv;
         }

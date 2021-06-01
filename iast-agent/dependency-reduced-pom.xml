@@ -92,11 +92,6 @@
                     <include />
                   </fileset>
                 </copy>
-                <copy>
-                  <fileset>
-                    <include />
-                  </fileset>
-                </copy>
               </tasks>
             </configuration>
           </execution>

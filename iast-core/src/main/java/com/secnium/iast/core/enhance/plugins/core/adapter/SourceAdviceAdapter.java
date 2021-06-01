@@ -1,4 +1,4 @@
-package com.secnium.iast.core.enhance.plugins.sources.servlet;
+package com.secnium.iast.core.enhance.plugins.core.adapter;
 
 import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.AbstractAdviceAdapter;
@@ -9,32 +9,25 @@ import org.objectweb.asm.MethodVisitor;
 /**
  * @author dongzhiyong@huoxian.cn
  */
-public class ServletStreamAdviceAdapter extends AbstractAdviceAdapter {
+public class SourceAdviceAdapter extends AbstractAdviceAdapter {
 
-    public ServletStreamAdviceAdapter(MethodVisitor methodVisitor, int access, String name, String desc, IastContext context, String signature) {
-        super(methodVisitor, access, name, desc, context, "ServletRequest", signature);
+    public SourceAdviceAdapter(MethodVisitor mv, int access, String name, String desc, IastContext context, String type, String signCode) {
+        super(mv, access, name, desc, context, type, signCode);
     }
 
     @Override
     protected void before() {
         mark(tryLabel);
-        push(context.getNamespace());
-        invokeStatic(ASM_TYPE_SPY, ASM_METHOD_Spy$enterSource);
+        enterSource();
     }
 
-    /**
-     * servlet的流数据方法返回时，需要复制返回值并返回新的返回值
-     *
-     * @param opcode
-     */
     @Override
-    protected void after(final int opcode) {
+    protected void after(int opcode) {
         if (!isThrow(opcode)) {
             Label elseLabel = new Label();
             Label endLabel = new Label();
 
-            push(context.getNamespace());
-            invokeStatic(ASM_TYPE_SPY, ASM_METHOD_Spy$isFirstLevelSource);
+            isFirstLevelSource();
             mv.visitJumpInsn(EQ, elseLabel);
 
             captureMethodState(opcode, HookType.SOURCE.getValue(), true);
@@ -45,9 +38,18 @@ public class ServletStreamAdviceAdapter extends AbstractAdviceAdapter {
         leaveSource();
     }
 
+    private void enterSource() {
+        push(context.getNamespace());
+        invokeStatic(ASM_TYPE_SPY, ASM_METHOD_Spy$enterSource);
+    }
+
     private void leaveSource() {
         push(context.getNamespace());
         invokeStatic(ASM_TYPE_SPY, ASM_METHOD_Spy$leaveSource);
     }
 
+    private void isFirstLevelSource() {
+        push(context.getNamespace());
+        invokeStatic(ASM_TYPE_SPY, ASM_METHOD_Spy$isFirstLevelSource);
+    }
 }

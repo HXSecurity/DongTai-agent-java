@@ -1,4 +1,4 @@
-package com.secnium.iast.core.enhance.plugins.propagator;
+package com.secnium.iast.core.enhance.plugins.core.adapter;
 
 import com.secnium.iast.core.PropertyUtils;
 import com.secnium.iast.core.enhance.IastContext;

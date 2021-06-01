@@ -1,4 +1,4 @@
-package com.secnium.iast.core.enhance.plugins.sinks.cookie;
+package com.secnium.iast.core.enhance.plugins.cookie;
 
 import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.DispatchPlugin;
