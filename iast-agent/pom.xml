@@ -134,11 +134,6 @@
                                         <include name="iast-agent.jar"/>
                                     </fileset>
                                 </copy>
-                                <copy todir="./../../../dongtai-openapi/iast-package">
-                                    <fileset dir="target/">
-                                        <include name="iast-agent.jar"/>
-                                    </fileset>
-                                </copy>
                             </tasks>
                         </configuration>
                         <goals>

@@ -1,4 +1,4 @@
-package com.secnium.iast.core.enhance.plugins.sinks.autobinding;
+package com.secnium.iast.core.enhance.plugins.autobinding;
 
 import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.AbstractClassVisitor;

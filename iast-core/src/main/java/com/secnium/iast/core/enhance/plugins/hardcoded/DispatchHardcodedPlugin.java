@@ -1,4 +1,4 @@
-package com.secnium.iast.core.enhance.plugins.sinks.hardcoded;
+package com.secnium.iast.core.enhance.plugins.hardcoded;
 
 import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.DispatchPlugin;

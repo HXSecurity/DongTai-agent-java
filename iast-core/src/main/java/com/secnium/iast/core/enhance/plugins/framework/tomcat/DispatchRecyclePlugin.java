@@ -3,7 +3,7 @@ package com.secnium.iast.core.enhance.plugins.framework.tomcat;
 import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.AbstractClassVisitor;
 import com.secnium.iast.core.enhance.plugins.DispatchPlugin;
-import com.secnium.iast.core.enhance.plugins.propagator.PropagateAdviceAdapter;
+import com.secnium.iast.core.enhance.plugins.core.adapter.PropagateAdviceAdapter;
 import com.secnium.iast.core.util.AsmUtils;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;

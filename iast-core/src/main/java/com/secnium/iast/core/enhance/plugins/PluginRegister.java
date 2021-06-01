@@ -1,15 +1,9 @@
 package com.secnium.iast.core.enhance.plugins;
 
 import com.secnium.iast.core.enhance.IastContext;
+import com.secnium.iast.core.enhance.plugins.core.DispatchClassPlugin;
 import com.secnium.iast.core.enhance.plugins.framework.j2ee.dispatch.DispatchJ2ee;
-import com.secnium.iast.core.enhance.plugins.framework.j2ee.jsp.DispatchJsp;
-import com.secnium.iast.core.enhance.plugins.framework.tomcat.DispatchRecyclePlugin;
-import com.secnium.iast.core.enhance.plugins.sinks.autobinding.DispatchSpringAutoBinding;
-import com.secnium.iast.core.enhance.plugins.sinks.cookie.DispatchCookie;
-import com.secnium.iast.core.enhance.plugins.sources.servlet.DispatchServlet;
-import com.secnium.iast.core.enhance.plugins.sources.servlet.stream.catalina.DispatchCoyoteInputStream;
-import com.secnium.iast.core.enhance.plugins.sources.spring.DispatchSpringSource;
-import com.secnium.iast.core.enhance.plugins.sources.struts2.DispatchStruts2;
+import com.secnium.iast.core.enhance.plugins.cookie.DispatchCookie;
 import org.objectweb.asm.ClassVisitor;
 
 import java.util.ArrayList;
@@ -38,17 +32,12 @@ public class PluginRegister {
 
     static {
         PLUGINS = new ArrayList<DispatchPlugin>();
-        PLUGINS.add(new DispatchTechnologyPlugin());
-        PLUGINS.add(new DispatchSpringSource());
+        //PLUGINS.add(new DispatchTechnologyPlugin());
         PLUGINS.add(new DispatchJ2ee());
-        PLUGINS.add(new DispatchJsp());
-        PLUGINS.add(new DispatchServlet());
-        PLUGINS.add(new DispatchStruts2());
-        PLUGINS.add(new DispatchCoyoteInputStream());
+        //PLUGINS.add(new DispatchJsp());
         PLUGINS.add(new DispatchCookie());
-        PLUGINS.add(new DispatchRecyclePlugin());
-
-        PLUGINS.add(new DispatchSpringAutoBinding());
+        //PLUGINS.add(new DispatchRecyclePlugin());
+        //PLUGINS.add(new DispatchSpringAutoBinding());
 
         PLUGINS.add(new DispatchClassPlugin());
     }
