@@ -27,6 +27,7 @@
 3. 运行应用，测试代码（以SpringBoot应用为例）：`java -javaagent:/path/to/iast-home/release/iast-agent.jar -Ddebug=true -jar app.jar`
 4. 针对bug，创建ISSUES、PR并关联ISSUES到PR上；针对feature，提交PR
 
+请阅读完整的[贡献指南](CONTRIBUTING.md)，该包含参与贡献的方式、流程、格式、如何部署、哪里可以获取帮助等。
 
 #### 支持的Java版本及中间件
 - Java 1.6+
