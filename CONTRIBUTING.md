@@ -24,7 +24,7 @@
 
 ### Issue提交后会被如何处理？
 我们项目的 maintainer 会监控所有的 issue，并做相应的处理：
-1. 他们会再次确认新创建的 issue 是不是添加了上述五种 label 里正确的 label，如果不是的话他们会进行更新。
+1. 他们会再次确认新创建的 issue 是不是添加了上述四种 label 里正确的 label，如果不是的话他们会进行更新。
 2. 他们同时也会决定是不是 accept issue，参见下一条。
 3. 如果适用的话，他们可能会将以下四种新的 tag 加到 issue 上：
     1) [`duplicate`](https://github.com/HXSecurity/DongTai-agent-java/labels/duplicate): 重复的 issue
