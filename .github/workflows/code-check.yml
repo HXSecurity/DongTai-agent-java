@@ -24,10 +24,10 @@ jobs:
         with:
           maven-version: 3.2.5
 
-#      - name: maven-settings-xml-action
-#        uses: whelk-io/maven-settings-xml-action@v14
-#        with:
-#          mirrors: '[{ "id": "aliyunmaven", "mirrorOf": "*", "url": "http://maven.aliyun.com/nexus/content/groups/public" }]'
+      - name: maven-settings-xml-action
+        uses: whelk-io/maven-settings-xml-action@v14
+        with:
+          mirrors: '[{ "id": "aliyunmaven", "mirrorOf": "*", "url": "https://maven.aliyun.com/repository/public" }]'
 
       - name: Build DongTai-Java-Agent With Maven
         run: |
