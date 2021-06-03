@@ -1,8 +1,8 @@
-package com.secnium.iast.core.enhance.plugins.cookie;
+package com.secnium.iast.core.enhance.plugins.sinks.cookie;
 
 import com.secnium.iast.core.enhance.IastContext;
+import com.secnium.iast.core.enhance.plugins.types.BaseType;
 import org.objectweb.asm.ClassVisitor;
-import com.secnium.iast.core.enhance.plugins.cookie.BaseType;
 
 /**
  * @author dongzhiyong@huoxian.cn

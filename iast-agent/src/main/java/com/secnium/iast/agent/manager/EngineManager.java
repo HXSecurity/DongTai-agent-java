@@ -6,8 +6,6 @@ import java.io.*;
 import java.lang.instrument.Instrumentation;
 import java.lang.reflect.InvocationTargetException;
 import java.net.HttpURLConnection;
-import java.net.InetSocketAddress;
-import java.net.Proxy;
 import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -112,8 +110,7 @@ public class EngineManager {
         boolean status = false;
         try {
             URL url = new URL(fileUrl);
-            Proxy proxy = UpdateUtils.loadProxy();
-            HttpURLConnection connection = proxy == null ? (HttpURLConnection) url.openConnection() : (HttpURLConnection) url.openConnection(proxy);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
             connection.setRequestMethod("GET");
             connection.setRequestProperty("User-Agent", "SecniumIast Agent");

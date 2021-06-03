@@ -34,6 +34,7 @@ public abstract class AbstractAdviceAdapter extends AdviceAdapter implements Asm
                                  String type,
                                  String signCode) {
         super(AsmUtils.api, mv, access, name, desc);
+        System.out.println("AbstractAdviceAdapter-333333333333333333333333");
         this.access = access;
         this.name = name;
         this.desc = desc;
@@ -45,11 +46,13 @@ public abstract class AbstractAdviceAdapter extends AdviceAdapter implements Asm
         this.type = type;
         this.signature = signCode;
         this.hasException = false;
+        System.out.println("method name="+name);
     }
 
 
     @Override
     protected void onMethodEnter() {
+        System.out.println("onMethodEnter-2222222222222222222222222222");
         before();
     }
 
@@ -60,6 +63,7 @@ public abstract class AbstractAdviceAdapter extends AdviceAdapter implements Asm
      */
     @Override
     protected void onMethodExit(final int opcode) {
+        System.out.println("onMethodExit-1111111111111111111111111111");
         if (!isThrow(opcode)) {
             after(opcode);
         }
@@ -116,12 +120,15 @@ public abstract class AbstractAdviceAdapter extends AdviceAdapter implements Asm
         push(type);
         push(context.getListenId());
         push(context.getMatchClassname());
+        System.out.println("getMatchClassname="+context.getMatchClassname());
         push(name);
         push(desc);
+        System.out.println("desc="+desc);
         loadThisOrPushNullIfIsStatic();
         push(signature);
         push(Modifier.isStatic(access));
         push(hookValue);
+        System.out.println("ASM_METHOD_Spy$spyMethodOnBefore="+ASM_METHOD_Spy$spyMethodOnBefore);
         invokeStatic(ASM_TYPE_SPY, ASM_METHOD_Spy$spyMethodOnBefore);
     }
 

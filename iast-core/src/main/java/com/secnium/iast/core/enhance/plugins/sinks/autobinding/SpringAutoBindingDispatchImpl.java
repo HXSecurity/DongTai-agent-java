@@ -1,4 +1,4 @@
-package com.secnium.iast.core.enhance.plugins.autobinding;
+package com.secnium.iast.core.enhance.plugins.sinks.autobinding;
 
 import com.secnium.iast.core.util.ObjectShare;
 import com.secnium.iast.core.util.ReflectUtils;

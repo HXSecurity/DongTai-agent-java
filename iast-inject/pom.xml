@@ -73,6 +73,11 @@
                                         <include name="iast-inject.jar"/>
                                     </fileset>
                                 </copy>
+                                <copy todir="./../../../dongtai-openapi/iast-package">
+                                    <fileset dir="target/">
+                                        <include name="iast-inject.jar"/>
+                                    </fileset>
+                                </copy>
                             </tasks>
                         </configuration>
                         <goals>

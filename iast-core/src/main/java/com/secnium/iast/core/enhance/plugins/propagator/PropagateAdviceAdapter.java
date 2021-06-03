@@ -1,4 +1,4 @@
-package com.secnium.iast.core.enhance.plugins.core.adapter;
+package com.secnium.iast.core.enhance.plugins.propagator;
 
 import com.secnium.iast.core.PropertyUtils;
 import com.secnium.iast.core.enhance.IastContext;
@@ -33,6 +33,7 @@ public class PropagateAdviceAdapter extends AbstractAdviceAdapter {
                 Label endLabel = new Label();
                 push(context.getNamespace());
                 invokeStatic(ASM_TYPE_SPY, ASM_METHOD_Spy$isFirstLevelPropagator);
+                System.out.println("elseLabel="+elseLabel.toString());
                 mv.visitJumpInsn(EQ, elseLabel);
                 captureMethodState(opcode, HookType.PROPAGATOR.getValue(), true);
                 mark(elseLabel);

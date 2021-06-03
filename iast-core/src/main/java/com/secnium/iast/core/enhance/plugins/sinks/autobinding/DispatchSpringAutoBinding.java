@@ -1,4 +1,4 @@
-package com.secnium.iast.core.enhance.plugins.autobinding;
+package com.secnium.iast.core.enhance.plugins.sinks.autobinding;
 
 import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.DispatchPlugin;

@@ -11,7 +11,6 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -33,15 +32,13 @@ public class HttpClientUtils {
     private static final String REQUEST_ENCODING_TYPE = "gzip";
     private static final String SSL_SIGNATURE = "TLS";
     public final static HostnameVerifier DO_NOT_VERIFY = new HttpClientHostnameVerifier();
-    private final static PropertyUtils PROPERTIES = PropertyUtils.getInstance();
-    private final static Proxy PROXY = loadProxy();
 
     public static String sendGet(String uri, String arg, String value) {
         try {
             if (arg != null && value != null) {
-                return sendRequest(HttpMethods.GET, PROPERTIES.getBaseUrl(), uri + "?" + arg + "=" + value, null, null, PROXY);
+                return sendRequest(HttpMethods.GET, PropertyUtils.getInstance().getBaseUrl(), uri + "?" + arg + "=" + value, null, null, null);
             } else {
-                return sendRequest(HttpMethods.GET, PROPERTIES.getBaseUrl(), uri, null, null, PROXY);
+                return sendRequest(HttpMethods.GET, PropertyUtils.getInstance().getBaseUrl(), uri, null, null, null);
             }
         } catch (Exception e) {
             return null;
@@ -50,12 +47,7 @@ public class HttpClientUtils {
 
     public static boolean sendPost(String uri, String value) throws Exception {
         Asserts.NOT_NULL("report", value);
-        if(PROPERTIES.isDebug()){
-            String respString = sendRequest(HttpMethods.POST, PROPERTIES.getBaseUrl(), uri, value, null, PROXY);
-            System.out.println("cn.huoxian.iast url is " + uri);
-            System.out.println("cn.huoxian.iast resp is " + respString);
-        }
-        sendRequest(HttpMethods.POST, PROPERTIES.getBaseUrl(), uri, value, null, PROXY);
+        sendRequest(HttpMethods.POST, PropertyUtils.getInstance().getBaseUrl(), uri, value, null, null);
         return true;
     }
 
@@ -67,14 +59,15 @@ public class HttpClientUtils {
             trustAllHosts();
             URL url = new URL(baseUrl + urlStr);
             // 通过请求地址判断请求类型(http或者是https)
-            if (PROTOCOL_HTTPS.equalsIgnoreCase(url.getProtocol())) {
-                HttpsURLConnection https = proxy == null ? (HttpsURLConnection) url.openConnection() : (HttpsURLConnection) url.openConnection(proxy);
+            if (PROTOCOL_HTTPS.equals(url.getProtocol().toLowerCase())) {
+                HttpsURLConnection https = (HttpsURLConnection) url.openConnection();
                 https.setHostnameVerifier(DO_NOT_VERIFY);
                 connection = https;
             } else {
-                connection = proxy == null ? (HttpURLConnection) url.openConnection() : (HttpURLConnection) url.openConnection(proxy);
+                connection = (HttpURLConnection) url.openConnection();
             }
 
+            // 设置基础的验证token（从配置文件下载）
             connection.setRequestMethod(method.name());
             if (HttpMethods.POST.equals(method)) {
                 connection.setRequestProperty(REQUEST_HEADER_CONTENT_TYPE, MEDIA_TYPE_APPLICATION_JSON);
@@ -118,25 +111,6 @@ public class HttpClientUtils {
                 connection.disconnect();
             }
         }
-    }
-
-    /**
-     * 根据配置文件创建http/https代理
-     */
-    public static Proxy loadProxy() {
-        try {
-            if (PROPERTIES.isProxyEnable()) {
-                Proxy proxy;
-                proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(
-                        PROPERTIES.getProxyHost(),
-                        PROPERTIES.getProxyPort()
-                ));
-                return proxy;
-            }
-        } catch (Throwable ignored) {
-
-        }
-        return null;
     }
 
     public static void trustAllHosts() {

@@ -1,18 +1,15 @@
-package com.secnium.iast.core.enhance.plugins.core;
+package com.secnium.iast.core.enhance.plugins;
 
 import com.secnium.iast.core.EngineManager;
 import com.secnium.iast.core.PropertyUtils;
 import com.secnium.iast.core.enhance.IastContext;
-import com.secnium.iast.core.enhance.plugins.*;
-import com.secnium.iast.core.enhance.plugins.core.adapter.PropagateAdviceAdapter;
-import com.secnium.iast.core.enhance.plugins.core.adapter.SinkAdviceAdapter;
-import com.secnium.iast.core.enhance.plugins.core.adapter.SourceAdviceAdapter;
+import com.secnium.iast.core.enhance.plugins.propagator.PropagateAdviceAdapter;
+import com.secnium.iast.core.enhance.plugins.sinks.SinkAdviceAdapter;
 import com.secnium.iast.core.handler.controller.HookType;
 import com.secnium.iast.core.handler.models.IastHookRuleModel;
 import com.secnium.iast.core.handler.models.IastSinkModel;
 import com.secnium.iast.core.handler.vulscan.VulnType;
 import com.secnium.iast.core.util.AsmUtils;
-import com.secnium.iast.core.util.LogUtils;
 import com.secnium.iast.core.util.SandboxStringUtils;
 import com.secnium.iast.core.util.matcher.ConfigMatcher;
 import com.secnium.iast.core.util.matcher.Method;
@@ -20,10 +17,12 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.commons.JSRInlinerAdapter;
 import org.slf4j.Logger;
+import com.secnium.iast.core.util.LogUtils;
 
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -47,6 +46,7 @@ public class DispatchClassPlugin implements DispatchPlugin {
         ancestors = context.getAncestors();
         classname = context.getClassName();
         String matchClassname = isMatch();
+        System.out.println("matchClassname="+matchClassname);
 
 
         if (null != matchClassname) {
@@ -72,7 +72,8 @@ public class DispatchClassPlugin implements DispatchPlugin {
         }
 
         boolean supportsSuper = false;
-        for (String superClass : ancestors) {
+        for (Iterator<String> it = ancestors.iterator(); it.hasNext(); ) {
+            String superClass = it.next();
             javaClassname = SandboxStringUtils.toJavaClassName(superClass);
             if (IastHookRuleModel.classIsNeededHookBySuperClassName(javaClassname)) {
                 supportsSuper = true;
@@ -102,12 +103,14 @@ public class DispatchClassPlugin implements DispatchPlugin {
             MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
 
             if (!Modifier.isInterface(access) && !Modifier.isAbstract(access) && !"<clinit>".equals(name)) {
+                System.out.println("MethodVisitor-name="+name);
                 String iastMethodSignature = AsmUtils.buildSignature(context.getMatchClassname(), name, desc);
                 String framework = IastHookRuleModel.getFrameworkByMethodSignature(iastMethodSignature);
-
+                System.out.println("MethodVisitor-framework="+framework);
                 mv = context.isEnableAllHook() ? greedyAop(mv, access, name, desc, framework == null ? "none" : framework, iastMethodSignature) : (framework == null ? mv : lazyAop(mv, access, name, desc, framework, iastMethodSignature));
 
                 if (transformed && this.classVersion < 50) {
+                    System.out.println("transformed && this.classVersion < 50");
                     mv = new JSRInlinerAdapter(mv, access, name, desc, signature, exceptions);
                 }
 
@@ -160,21 +163,14 @@ public class DispatchClassPlugin implements DispatchPlugin {
             int hookValue = IastHookRuleModel.getRuleTypeValueByFramework(framework);
             if (HookType.PROPAGATOR.equals(hookValue)) {
                 mv = new PropagateAdviceAdapter(mv, access, name, desc, context, framework, signature);
-                transformed = true;
             } else if (HookType.SINK.equals(hookValue)) {
                 // fixme 针对越权类，overpower为true，否则为false
                 IastSinkModel sinkModel = IastHookRuleModel.getSinkByMethodSignature(signature);
-                if (sinkModel != null) {
-                    boolean isOverPower = VulnType.SQL_OVER_POWER.equals(sinkModel.getType());
-                    mv = new SinkAdviceAdapter(mv, access, name, desc, context, framework, signature, isOverPower);
-                    transformed = true;
-                } else {
-                    logger.error("framework[{}], method[{}] doesn't find sink model", framework, name);
-                }
-            } else if (HookType.SOURCE.equals(hookValue)) {
-                mv = new SourceAdviceAdapter(mv, access, name, desc, context, framework, signature);
-                transformed = true;
+                assert sinkModel != null;
+                boolean isOverPower = VulnType.SQL_OVER_POWER.equals(sinkModel.getType());
+                mv = new SinkAdviceAdapter(mv, access, name, desc, context, framework, signature, isOverPower);
             }
+            transformed = true;
             return mv;
         }
     }

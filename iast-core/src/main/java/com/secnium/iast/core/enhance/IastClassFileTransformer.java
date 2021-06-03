@@ -102,6 +102,8 @@ public class IastClassFileTransformer implements ClassFileTransformer {
 
                 COMMON_UTILS.setLoader(loader);
                 COMMON_UTILS.saveAncestors(className, superName, interfaces);
+                System.out.println("superName="+superName);
+                System.out.println("interfaces="+interfaces.toString());
                 HashSet<String> ancestors = COMMON_UTILS.getAncestors(className, superName, interfaces);
 
                 final ClassWriter cw = createClassWriter(loader, cr);

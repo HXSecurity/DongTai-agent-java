@@ -25,7 +25,7 @@ public class IastClassAncestorQuery {
     private static final String BASE_CLASS = "java/lang/Object";
     private final HashSet<String> scannedClassSet = new HashSet<String>();
 
-    public synchronized void setLoader(ClassLoader loader) {
+    public void setLoader(ClassLoader loader) {
         this.loader = loader;
     }
 

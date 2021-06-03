@@ -28,10 +28,6 @@ public class PropertyUtils {
     private String projectName;
     private String mode;
     private String serverMode;
-    private String proxyEnableStatus;
-    private String proxyHost;
-    private int proxyPort = -1;
-    private String debugFlag;
 
     private final String propertiesFilePath;
 
@@ -232,41 +228,5 @@ public class PropertyUtils {
 
     public boolean isRemote() {
         return "remote".equals(getServerMode());
-    }
-
-    private String getProxyEnableStatus() {
-        if (null == proxyEnableStatus) {
-            proxyEnableStatus = System.getProperty("iast.proxy.enable", cfg.getString("iast.proxy.enable", "false"));
-        }
-        return proxyEnableStatus;
-    }
-
-    public boolean isProxyEnable() {
-        return "true".equalsIgnoreCase(getProxyEnableStatus());
-    }
-
-    public String getProxyHost() {
-        if (null == proxyHost) {
-            proxyHost = System.getProperty("iast.proxy.host", cfg.getString("iast.proxy.host", "false"));
-        }
-        return proxyHost;
-    }
-
-    public int getProxyPort() {
-        if (-1 == proxyPort) {
-            proxyPort = Integer.parseInt(System.getProperty("iast.proxy.port", cfg.getString("iast.proxy.port", "80")));
-        }
-        return proxyPort;
-    }
-
-    private String getDebugFlag(){
-        if(debugFlag==null){
-            debugFlag = System.getProperty("debug","false");
-        }
-        return debugFlag;
-    }
-
-    public boolean isDebug(){
-        return "true".equalsIgnoreCase(debugFlag);
     }
 }

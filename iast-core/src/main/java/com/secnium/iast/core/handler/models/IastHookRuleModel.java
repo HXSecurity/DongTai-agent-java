@@ -61,8 +61,7 @@ public class IastHookRuleModel {
 
     /**
      * 创建IASTHook规则单例对象
-     *
-     * @param sources             污点来源规则
+     *  @param sources             污点来源规则
      * @param sinks               漏洞触发位置规则
      * @param propagators         污点传播规则
      * @param filters             过滤方法规则
@@ -196,12 +195,7 @@ public class IastHookRuleModel {
      */
     public static int getRuleTypeValueByFramework(String framework) {
         if (instance != null) {
-            try {
-                return instance.hooksValue.get(framework);
-            } catch (java.lang.NullPointerException e) {
-                //规则待更新
-                return -1;
-            }
+            return instance.hooksValue.get(framework);
         } else {
             return -1;
         }
@@ -245,34 +239,28 @@ public class IastHookRuleModel {
             HashMap<String, List<String>> filters = new HashMap<String, List<String>>(500);
             HashMap<String, Integer> hooksValue = new HashMap<String, Integer>(10);
 
-            JSONObject rule, detail, errorLogReport;
-            JSONArray details;
-            Object sourcePos, targetPos;
-            String value, ruleItemSource, ruleItemTarget, ruleItemValue, ruleItemTrack, ruleItemInherit;
-            IastPropagatorModel propagator;
-            IastSinkModel sink;
             for (int i = 0, rulesLength = rules.length(); i < rulesLength; i++) {
-                rule = rules.getJSONObject(i);
-                value = rule.getString("value");
+                JSONObject rule = rules.getJSONObject(i);
+                String value = rule.getString("value");
                 int type = rule.getInt("type");
-                details = rule.getJSONArray("details");
+                JSONArray details = rule.getJSONArray("details");
 
-
+                IastPropagatorModel propagator;
                 for (int j = 0, detailsLength = details.length(); j < detailsLength; j++) {
-                    detail = details.getJSONObject(j);
-                    ruleItemSource = detail.getString("source");
-                    ruleItemTarget = detail.getString("target");
-                    ruleItemValue = detail.getString("value");
-                    ruleItemTrack = detail.getString("track");
-                    ruleItemInherit = detail.getString("inherit");
+                    JSONObject detail = details.getJSONObject(j);
+                    String ruleItemSource = detail.getString("source");
+                    String ruleItemTarget = detail.getString("target");
+                    String ruleItemValue = detail.getString("value");
+                    String ruleItemTrack = detail.getString("track");
+                    String ruleItemInherit = detail.getString("inherit");
                     try {
                         initHookPoint(ruleItemInherit, ruleItemValue, value);
 
                         switch (type) {
                             case 1:
                                 hooksValue.put(value, HookType.PROPAGATOR.getValue());
-                                sourcePos = convertLink2Object(ruleItemSource);
-                                targetPos = convertLink2Object(ruleItemTarget);
+                                Object sourcePos = convertLink2Object(ruleItemSource);
+                                Object targetPos = convertLink2Object(ruleItemTarget);
                                 propagator = new IastPropagatorModel(value, value, ruleItemSource, sourcePos, ruleItemTarget, targetPos);
                                 propagators.put(ruleItemValue, propagator);
                                 break;
@@ -282,12 +270,6 @@ public class IastHookRuleModel {
                                 break;
                             case 3:
                                 hooksValue.put(value, HookType.PROPAGATOR.getValue());
-
-                                sourcePos = convertLink2Object(ruleItemSource);
-                                targetPos = convertLink2Object(ruleItemTarget);
-                                propagator = new IastPropagatorModel(value, value, ruleItemSource, sourcePos, ruleItemTarget, targetPos);
-                                propagators.put(ruleItemValue, propagator);
-
                                 List<String> filterList;
                                 if (filters.containsKey(value)) {
                                     filterList = filters.get(value);
@@ -305,18 +287,18 @@ public class IastHookRuleModel {
                                 } else {
                                     intPositions = null;
                                 }
-                                sink = new IastSinkModel(ruleItemValue, value, intPositions, ruleItemTrack);
+                                IastSinkModel sink = new IastSinkModel(ruleItemValue, value, intPositions, ruleItemTrack);
                                 sinks.put(ruleItemValue, sink);
                                 break;
                             default:
                                 break;
                         }
                     } catch (Exception e) {
-                        errorLogReport = new JSONObject();
-                        errorLogReport.put("type", "rule");
-                        errorLogReport.put("rule", details.toString());
-                        errorLogReport.put("msg", ThrowableUtils.getStackTrace(e));
-                        ErrorLogReport.sendErrorLog(errorLogReport.toString());
+                        JSONObject jsonObject = new JSONObject();
+                        jsonObject.put("type", "rule");
+                        jsonObject.put("rule", details.toString());
+                        jsonObject.put("msg", ThrowableUtils.getStackTrace(e));
+                        ErrorLogReport.sendErrorLog(jsonObject.toString());
                     }
                 }
             }
