@@ -27,8 +27,9 @@ jobs:
       - name: maven-settings-xml-action
         uses: whelk-io/maven-settings-xml-action@v14
         with:
-          mirrors: '[{ "id": "aliyunmaven", "mirrorOf": "*", "url": "http://maven.aliyun.com/nexus/content/groups/public" }]'
+          mirrors: '[{ "id": "aliyunmaven", "mirrorOf": "*", "url": "https://maven.aliyun.com/repository/public" }]'
 
       - name: Build DongTai-Java-Agent With Maven
         run: |
+          mvn -version
           mvn -B package -Dmaven.test.skip=true
