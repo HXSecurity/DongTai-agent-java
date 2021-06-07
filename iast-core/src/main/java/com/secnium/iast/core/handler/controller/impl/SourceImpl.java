@@ -30,6 +30,7 @@ public class SourceImpl {
 
             int invokeId = invokeIdSequencer.getAndIncrement();
             event.setInvokeId(invokeId);
+            event.inValue = event.argumentArray;
             event.outValue = event.returnValue;
 
             if (isNotEmpty(event.returnValue)) {
