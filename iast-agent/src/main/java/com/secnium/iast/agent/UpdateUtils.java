@@ -30,7 +30,6 @@ public class UpdateUtils {
     public static String checkForStatus() {
         try {
             String respRaw = sendRequest(START_URL + "?agent_name=" + AGENT_TOKEN);
-            System.out.println(respRaw);
             if (respRaw != null && !respRaw.isEmpty()) {
                 JSONObject resp = new JSONObject(respRaw);
                 return resp.get("data").toString();

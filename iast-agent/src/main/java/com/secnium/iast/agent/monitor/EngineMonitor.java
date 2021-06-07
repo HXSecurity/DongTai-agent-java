@@ -36,17 +36,5 @@ public class EngineMonitor implements IMonitor {
             engineManager.stop();
         }
         this.currentStatus = status;
-//        if (!currentStatus.equals(this.properties.getEngineStatus())) {
-//            if ("start".equals(this.properties.getEngineStatus())) {
-//                engineManager.start();
-//            } else if ("stop".equals(this.properties.getEngineStatus())) {
-//                engineManager.stop();
-//            } else if ("uninstall".equals(this.properties.getEngineStatus())) {
-//                engineManager.uninstall();
-//            } else if ("install".equals(this.properties.getEngineStatus())) {
-//                engineManager.install();
-//            }
-//            this.currentStatus = this.properties.getEngineStatus();
-//        }
     }
 }
