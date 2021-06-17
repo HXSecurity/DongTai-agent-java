@@ -3,7 +3,7 @@ package com.secnium.iast.core.util.http;
 import com.secnium.iast.core.report.ErrorLogReport;
 import com.secnium.iast.core.util.Asserts;
 import com.secnium.iast.core.util.ThrowableUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;

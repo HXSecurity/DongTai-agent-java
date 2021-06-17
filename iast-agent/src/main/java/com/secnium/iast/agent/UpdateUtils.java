@@ -12,14 +12,13 @@ import java.security.cert.X509Certificate;
  * @author dongzhiyong@huoxian.cn
  */
 public class UpdateUtils {
-    private final static IastProperties properties = IastProperties.getInstance();
-    private final static String UPDATE_URL = properties.getBaseUrl() + "/api/v1/engine/update";
-    private final static String START_URL = properties.getBaseUrl() + "/api/v1/engine/startstop";
+    private final static IastProperties PROPERTIES = IastProperties.getInstance();
+    private final static String UPDATE_URL = PROPERTIES.getBaseUrl() + "/api/v1/engine/update";
+    private final static String START_URL = PROPERTIES.getBaseUrl() + "/api/v1/engine/startstop";
     private final static String AGENT_TOKEN = URLEncoder.encode(AgentRegister.getAgentToken());
 
     public static boolean checkForUpdate() {
         String respRaw = sendRequest(UPDATE_URL + "?agent_name=" + AGENT_TOKEN);
-        System.out.println(respRaw);
         if (respRaw != null && !respRaw.isEmpty()) {
             JSONObject resp = new JSONObject(respRaw);
             return "1".equals(resp.get("data").toString());
@@ -64,7 +63,7 @@ public class UpdateUtils {
             }
             connection.setRequestMethod(Constant.HTTP_METHOD_GET);
             connection.setRequestProperty("User-Agent", "SecniumIast Java Agent");
-            connection.setRequestProperty("Authorization", "Token " + properties.getIastServerToken());
+            connection.setRequestProperty("Authorization", "Token " + PROPERTIES.getIastServerToken());
             connection.setRequestProperty("Accept", "*/*");
             connection.setUseCaches(false);
             connection.setDoOutput(true);
@@ -119,11 +118,11 @@ public class UpdateUtils {
      */
     public static Proxy loadProxy() {
         try {
-            if (properties.isProxyEnable()) {
+            if (PROPERTIES.isProxyEnable()) {
                 Proxy proxy;
                 proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(
-                        properties.getProxyHost(),
-                        properties.getProxyPort()
+                        PROPERTIES.getProxyHost(),
+                        PROPERTIES.getProxyPort()
                 ));
                 return proxy;
             }

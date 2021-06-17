@@ -3,7 +3,7 @@ package com.secnium.iast.core.handler.vulscan.overpower;
 import com.secnium.iast.core.EngineManager;
 import com.secnium.iast.core.handler.vulscan.ReportConstant;
 import com.secnium.iast.core.util.Asserts;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import com.secnium.iast.core.util.LogUtils;
