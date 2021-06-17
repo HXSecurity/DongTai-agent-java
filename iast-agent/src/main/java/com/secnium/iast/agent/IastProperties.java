@@ -1,13 +1,7 @@
 package com.secnium.iast.agent;
 
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.util.Properties;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -15,7 +9,7 @@ import java.io.InputStream;
 public class IastProperties {
 
     private static IastProperties instance;
-    public PropertiesConfiguration cfg = null;
+    public Properties cfg = new Properties();
     private String iastServerToken;
     private String serverUrl;
     private String proxyEnableStatus;
@@ -51,7 +45,7 @@ public class IastProperties {
     public String getIastServerToken() {
         if (null == iastServerToken) {
             if (null != cfg) {
-                iastServerToken = cfg.getString("iast.server.token", "88d2f0096662335d42580cbd03d8ddea745fdfab");
+                iastServerToken = cfg.getProperty("iast.server.token", "88d2f0096662335d42580cbd03d8ddea745fdfab");
             } else {
                 iastServerToken = "88d2f0096662335d42580cbd03d8ddea745fdfab";
             }
@@ -61,7 +55,7 @@ public class IastProperties {
 
     public String getBaseUrl() {
         if (null == serverUrl) {
-            serverUrl = System.getProperty("iast.server.url", cfg.getString("iast.server.url"));
+            serverUrl = System.getProperty("iast.server.url", cfg.getProperty("iast.server.url"));
         }
         return serverUrl;
     }
@@ -71,16 +65,16 @@ public class IastProperties {
     }
 
     public String getEngineStatus() {
-        return cfg.getString("engine.status");
+        return cfg.getProperty("engine.status");
     }
 
     public String getEngineName() {
-        return cfg.getString("engine.name");
+        return cfg.getProperty("engine.name");
     }
 
     private String getProxyEnableStatus() {
         if (null == proxyEnableStatus) {
-            proxyEnableStatus = System.getProperty("iast.proxy.enable", cfg.getString("iast.proxy.enable", "false"));
+            proxyEnableStatus = System.getProperty("iast.proxy.enable", cfg.getProperty("iast.proxy.enable", "false"));
         }
         return proxyEnableStatus;
     }
@@ -91,14 +85,14 @@ public class IastProperties {
 
     public String getProxyHost() {
         if (null == proxyHost) {
-            proxyHost = System.getProperty("iast.proxy.host", cfg.getString("iast.proxy.host", "false"));
+            proxyHost = System.getProperty("iast.proxy.host", cfg.getProperty("iast.proxy.host", "false"));
         }
         return proxyHost;
     }
 
     public int getProxyPort() {
         if (-1 == proxyPort) {
-            proxyPort = Integer.parseInt(System.getProperty("iast.proxy.port", cfg.getString("iast.proxy.port", "80")));
+            proxyPort = Integer.parseInt(System.getProperty("iast.proxy.port", cfg.getProperty("iast.proxy.port", "80")));
         }
         return proxyPort;
     }
@@ -142,15 +136,16 @@ public class IastProperties {
                 }
                 fos.write(data);
             }
+
             is.close();
             fos.close();
 
-            cfg = new PropertiesConfiguration(propertiesFilePath);
-            cfg.setReloadingStrategy(new FileChangedReloadingStrategy());
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(data);
+            cfg.load(inputStream);
+
+
             System.out.println("[cn.huoxian.dongtai.iast] The engine configuration file is initialized successfully. file is " + propertiesFile.toString());
         } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ConfigurationException e) {
             e.printStackTrace();
         }
     }

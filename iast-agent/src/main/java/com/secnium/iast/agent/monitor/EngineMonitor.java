@@ -25,7 +25,6 @@ public class EngineMonitor implements IMonitor {
             return;
         }
         if (status.equals(this.currentStatus)){
-            System.out.println("相同状态返回="+status);
             return;
         }
         if ("start".equals(status)) {
