@@ -16,21 +16,12 @@ public class UpdateMonitor implements IMonitor {
     }
 
     /**
-     * 访问远程API接口检测是否需要更新引擎
-     *
-     * @return 布尔值，表示是否需要更新
-     */
-    private boolean isUpdate() {
-        return UpdateUtils.checkForUpdate();
-    }
-
-    /**
      * 检测引擎生命周期管理
      * - 安装、启动、暂停、卸载
      */
     @Override
     public void check() {
-        if (isUpdate()) {
+        if (UpdateUtils.needUpdate()) {
             boolean status = this.engineManager.stop();
             status = status && this.engineManager.uninstall();
             status = status && this.engineManager.updateEnginePackage();

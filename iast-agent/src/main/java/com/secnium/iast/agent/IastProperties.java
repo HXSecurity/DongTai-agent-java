@@ -15,6 +15,7 @@ public class IastProperties {
     private String proxyEnableStatus;
     private String proxyHost;
     private int proxyPort = -1;
+    private int delayTime = -1;
 
     /**
      * 属性文件路径
@@ -95,6 +96,13 @@ public class IastProperties {
             proxyPort = Integer.parseInt(System.getProperty("iast.proxy.port", cfg.getProperty("iast.proxy.port", "80")));
         }
         return proxyPort;
+    }
+
+    public int getDelayTime() {
+        if (-1 == delayTime) {
+            delayTime = Integer.parseInt(System.getProperty("iast.engine.delay.time", "0"));
+        }
+        return delayTime;
     }
 
     /**
