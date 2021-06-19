@@ -6,7 +6,6 @@ import java.io.*;
 import java.lang.instrument.Instrumentation;
 import java.lang.reflect.InvocationTargetException;
 import java.net.HttpURLConnection;
-import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.URL;
 import java.util.Map;
@@ -162,7 +161,7 @@ public class EngineManager {
 
     public boolean downloadEnginePackage() {
         System.out.println("[cn.huoxian.dongtai.iast] Check if the engine needs to be updated");
-        if (UpdateUtils.checkForUpdate()) {
+        if (UpdateUtils.needUpdate()) {
             System.out.println("[cn.huoxian.dongtai.iast] Receive an instruction from the remote server to update the engine, update the engine immediately");
             return updateEnginePackage();
         } else {

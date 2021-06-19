@@ -69,24 +69,16 @@ public class AgentLauncher {
      * @param inst inst
      */
     private static void install(final Instrumentation inst) {
-        long startTime = System.nanoTime();
         IastProperties.getInstance();
+        loadEngine(inst);
+    }
+
+    private static void loadEngine(final Instrumentation inst) {
         EngineManager engineManager = EngineManager.getInstance(inst, LAUNCH_MODE, ManagementFactory.getRuntimeMXBean().getName().split("@")[0]);
-
-        boolean status = engineManager.downloadEnginePackage();
-        status = status && engineManager.install();
-        status = status && engineManager.start();
-
-        if (status) {
-            Thread agentMonitorDaemonThead = new Thread(new MonitorDaemonThread(engineManager));
-            agentMonitorDaemonThead.setDaemon(true);
-            agentMonitorDaemonThead.setName("dongtai-agent-monitor");
-            agentMonitorDaemonThead.start();
-
-            System.out.println("[cn.huoxian.dongtai.iast] Successfully opened the engine, and it takes  " + (System.nanoTime() - startTime) / 1000 / 1000 / 1000 + "s");
-        } else {
-            System.out.println("[cn.huoxian.dongtai.iast] Engine start failed, start the application directly without starting the engine, and it takes  " + (System.nanoTime() - startTime) / 1000 / 1000 / 1000 + "s");
-        }
+        Thread agentMonitorDaemonThead = new Thread(new MonitorDaemonThread(engineManager));
+        agentMonitorDaemonThead.setDaemon(true);
+        agentMonitorDaemonThead.setName("dongtai-agent-monitor");
+        agentMonitorDaemonThead.start();
     }
 
 
