@@ -30,9 +30,11 @@ public class EngineMonitor implements IMonitor {
         if ("start".equals(status)) {
             System.out.println("执行了agent启动 start");
             engineManager.start();
+            // 更新状态
         } else if ("stop".equals(status)) {
             System.out.println("执行了agent暂停 stop");
             engineManager.stop();
+            // 更新状态
         }
         this.currentStatus = status;
     }
