@@ -48,15 +48,16 @@ public class AgentEngine {
     public static void install(String mode, String propertiesFilePath, Instrumentation inst) {
         long start = System.currentTimeMillis();
         logger.info("The engine is about to be installed, the installation mode is {}", mode);
+        PropertyUtils propertiesUtils = PropertyUtils.getInstance(propertiesFilePath);
+        AgentRegisterReport.send();
 
         AgentEngine agentEngine = AgentEngine.getInstance();
         assert agentEngine != null;
         agentEngine.setInst(inst);
-        agentEngine.init(mode, propertiesFilePath, inst);
+        agentEngine.init(mode, propertiesUtils, inst);
         agentEngine.run();
 
         logger.info("The engine is successfully installed to the JVM, and it takes {}ms", System.currentTimeMillis() - start);
-        AgentRegisterReport.send();
     }
 
     public static void start() {
@@ -83,10 +84,7 @@ public class AgentEngine {
     /**
      * // 初始化引擎
      */
-    public void init(String mode, String propertiesFilePath, Instrumentation inst) {
-        PropertyUtils propertiesUtils = PropertyUtils.getInstance(propertiesFilePath);
-
-
+    public void init(String mode, PropertyUtils propertiesUtils, Instrumentation inst) {
         for (IEngine engine : engines) {
             engine.init(propertiesUtils, inst);
         }

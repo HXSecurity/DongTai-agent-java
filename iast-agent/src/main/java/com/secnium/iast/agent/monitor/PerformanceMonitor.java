@@ -77,18 +77,18 @@ public class PerformanceMonitor implements IMonitor {
      */
     @Override
     public void check() {
-        double unUserdRate = memUsedRate();
+        double unUsedRate = memUsedRate();
         int preStatus = this.engineManager.getRunningStatus();
-        if (isStart(unUserdRate, preStatus)) {
+        if (isStart(unUsedRate, preStatus)) {
             this.engineManager.start();
             this.engineManager.setRunningStatus(2);
-        } else if (isStop(unUserdRate, preStatus)) {
+        } else if (isStop(unUsedRate, preStatus)) {
             this.engineManager.stop();
             this.engineManager.setRunningStatus(3);
-        } else if (isUninstall(unUserdRate, preStatus)) {
+        } else if (isUninstall(unUsedRate, preStatus)) {
             this.engineManager.uninstall();
             this.engineManager.setRunningStatus(4);
-        } else if (isInstall(unUserdRate, preStatus)) {
+        } else if (isInstall(unUsedRate, preStatus)) {
             this.engineManager.install();
             this.engineManager.setRunningStatus(1);
         }

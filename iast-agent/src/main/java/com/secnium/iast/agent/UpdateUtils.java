@@ -17,7 +17,7 @@ public class UpdateUtils {
     private final static String START_URL = PROPERTIES.getBaseUrl() + "/api/v1/engine/startstop";
     private final static String AGENT_TOKEN = URLEncoder.encode(AgentRegister.getAgentToken());
 
-    public static boolean checkForUpdate() {
+    public static boolean needUpdate() {
         String respRaw = sendRequest(UPDATE_URL + "?agent_name=" + AGENT_TOKEN);
         if (respRaw != null && !respRaw.isEmpty()) {
             JSONObject resp = new JSONObject(respRaw);
