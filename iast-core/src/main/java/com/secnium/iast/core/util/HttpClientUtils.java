@@ -97,9 +97,8 @@ public class HttpClientUtils {
                 connection.setUseCaches(false);
                 connection.setDoOutput(true);
 
-                String encryptData = RsaUtils.encrypt(data);
                 GZIPOutputStream wr = new GZIPOutputStream(connection.getOutputStream());
-                wr.write(encryptData.getBytes(Charset.forName("UTF-8")));
+                wr.write(data.getBytes(Charset.forName("UTF-8")));
                 wr.close();
             }
             InputStream is = connection.getInputStream();
