@@ -216,4 +216,8 @@ public class EventListenerHandlers {
         return false;
     }
 
+    public static Object cloneRequest(Object req) {
+        return HttpImpl.cloneRequest(req);
+    }
+
 }

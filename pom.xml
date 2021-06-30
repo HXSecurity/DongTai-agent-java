@@ -74,6 +74,7 @@
     <modules>
         <module>iast-agent</module>
         <module>iast-inject</module>
+        <module>iast-servlet</module>
         <module>iast-core</module>
     </modules>
 

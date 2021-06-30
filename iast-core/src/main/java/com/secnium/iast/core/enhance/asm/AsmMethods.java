@@ -167,4 +167,14 @@ public interface AsmMethods {
             String.class
     );
 
+    /**
+     * asm method of {@link Injecter#cloneRequest(String, Object)}
+     */
+    Method ASM_METHOD_Spy$cloneRequest = InnerHelper.getAsmMethod(
+            Injecter.class,
+            "cloneRequest",
+            String.class,
+            Object.class
+    );
+
 }

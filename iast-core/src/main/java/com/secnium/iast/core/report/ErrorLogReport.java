@@ -26,7 +26,7 @@ public class ErrorLogReport {
         detail.put(ReportConstant.AGENT_NAME, AgentRegisterReport.getAgentToken());
         detail.put(ReportConstant.PROJECT_NAME, AgentRegisterReport.getProjectName());
         detail.put(ReportConstant.LANGUAGE, ReportConstant.LANGUAGE_VALUE);
-        detail.put(ReportConstant.COMMON_APP_NAME, EngineManager.REQUEST_CONTEXT.get() == null ? "" : EngineManager.REQUEST_CONTEXT.get().getContextPath());
+        detail.put(ReportConstant.COMMON_APP_NAME, EngineManager.REQUEST_CONTEXT.get() == null ? "" : EngineManager.REQUEST_CONTEXT.get().get("contextPath"));
         detail.put(ReportConstant.HEART_BEAT_WEB_SERVER_PATH, HeartBeatReport.getWebServerPath());
         detail.put(ReportConstant.ERROR_LOG_DETAIL, errorLog);
 

@@ -3,15 +3,16 @@ package com.secnium.iast.core.util.matcher;
 import com.secnium.iast.core.PropertyUtils;
 import com.secnium.iast.core.enhance.IastClassFileTransformer;
 import com.secnium.iast.core.util.ConfigUtils;
+import com.secnium.iast.core.util.LogUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
-import com.secnium.iast.core.util.LogUtils;
 
 import java.util.HashSet;
 import java.util.Set;
 
 /**
  * 各种匹配方法（通过配置文件匹配）
+ *
  * @author dongzhiyong@huoxian.cn
  */
 public class ConfigMatcher {
@@ -88,7 +89,7 @@ public class ConfigMatcher {
 
         // com.secnium.iast的类不hook
         // todo: 计算startsWith、contains与正则匹配的时间损耗
-        if (hook && (className.startsWith("com/secnium/iast/") || className.startsWith("java/lang/iast/"))) {
+        if (hook && (className.startsWith("com/secnium/iast/") || className.startsWith("java/lang/iast/") || className.startsWith("cn/huoxian/iast/"))) {
             hook = false;
             logger.trace("ignore transform {} in loader={}. Reason: classname is startswith com/secnium/iast/", className, loader);
         }

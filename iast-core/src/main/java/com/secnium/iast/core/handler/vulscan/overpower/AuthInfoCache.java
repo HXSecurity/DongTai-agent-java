@@ -2,8 +2,8 @@ package com.secnium.iast.core.handler.vulscan.overpower;
 
 import com.secnium.iast.core.EngineManager;
 import com.secnium.iast.core.util.Asserts;
-import org.slf4j.Logger;
 import com.secnium.iast.core.util.LogUtils;
+import org.slf4j.Logger;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -54,7 +54,7 @@ public class AuthInfoCache extends ConcurrentHashMap<Integer, Object> {
             }
         }
         addAuthInfoToCache(updatedAuth);
-        logger.debug("\n===>>> url: {}\n===>>> original cookie: {}\n===>>> updated cookie：{}", EngineManager.REQUEST_CONTEXT.get().getRequestURL(), originalAuth, updatedAuth);
+        logger.debug("\n===>>> url: {}\n===>>> original cookie: {}\n===>>> updated cookie：{}", EngineManager.REQUEST_CONTEXT.get().get("requestURL").toString(), originalAuth, updatedAuth);
     }
 
     public static synchronized int getSize() {

@@ -65,7 +65,8 @@ public class SpyUtils {
                 unCaughtGetClassDeclaredJavaMethod(EventListenerHandlers.class, "enterHttp"),
                 unCaughtGetClassDeclaredJavaMethod(EventListenerHandlers.class, "leaveHttp"),
                 unCaughtGetClassDeclaredJavaMethod(EventListenerHandlers.class, "isFirstLevelHttp"),
-                unCaughtGetClassDeclaredJavaMethod(EventListenerHandlers.class, "hasTaintValue")
+                unCaughtGetClassDeclaredJavaMethod(EventListenerHandlers.class, "hasTaintValue"),
+                unCaughtGetClassDeclaredJavaMethod(EventListenerHandlers.class, "cloneRequest", Object.class)
         );
 
     }
