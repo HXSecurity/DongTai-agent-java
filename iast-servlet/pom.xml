@@ -9,12 +9,32 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>iast-inject</artifactId>
+    <artifactId>iast-servlet</artifactId>
 
-    <name>iast-inject</name>
-    
+    <properties>
+        <maven.compiler.source>6</maven.compiler.source>
+        <maven.compiler.target>6</maven.compiler.target>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.4</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/jakarta.servlet/jakarta.servlet-api -->
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>5.0.0</version>
+            <scope>provided</scope>
+        </dependency>
+
+    </dependencies>
+
     <build>
-        <finalName>iast-inject</finalName>
+        <finalName>dongtai-servlet</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -22,26 +42,10 @@
                 <version>2.4</version>
                 <executions>
                     <execution>
+                        <phase>package</phase>
                         <goals>
                             <goal>shade</goal>
                         </goals>
-                        <phase>package</phase>
-                        <configuration>
-                            <filters>
-                                <filter>
-                                    <artifact>*:*</artifact>
-                                    <excludes>
-                                        <exclude>META-INF/</exclude>
-                                        <exclude>LICENSE</exclude>
-                                        <exclude>/*.png</exclude>
-                                        <exclude>/*.html</exclude>
-                                        <exclude>/*.jpeg</exclude>
-                                    </excludes>
-                                </filter>
-                            </filters>
-                            <relocations>
-                            </relocations>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -56,7 +60,7 @@
                             <tasks>
                                 <copy todir="./../release/lib">
                                     <fileset dir="target/">
-                                        <include name="iast-inject.jar"/>
+                                        <include name="dongtai-servlet.jar"/>
                                     </fileset>
                                 </copy>
                             </tasks>

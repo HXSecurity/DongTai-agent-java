@@ -1,17 +1,17 @@
 package com.secnium.iast.core.threadlocalpool;
 
-import com.secnium.iast.core.util.http.HttpRequest;
+import java.util.Map;
 
 /**
  * @author dongzhiyong@huoxian.cn
  */
-public class RequestContext extends ThreadLocal<HttpRequest> {
+public class RequestContext extends ThreadLocal<Map<String, Object>> {
     @Override
-    protected HttpRequest initialValue() {
+    protected Map<String, Object> initialValue() {
         return null;
     }
 
     public String getCookieValue() {
-        return this.get().getCookieValue();
+        return (String) this.get().get("cookies");
     }
 }

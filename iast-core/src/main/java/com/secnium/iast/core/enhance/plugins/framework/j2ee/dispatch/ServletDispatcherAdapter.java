@@ -59,7 +59,7 @@ public class ServletDispatcherAdapter extends AbstractClassVisitor {
 
     /**
      * 检查是否为http入口方法（service/doFilter)
-     *
+     * javax.servlet.http.HttpServlet
      * @param name       方法名称
      * @param typeOfArgs 方法参数
      * @return true-是http入口方法，falst-非http入口方法

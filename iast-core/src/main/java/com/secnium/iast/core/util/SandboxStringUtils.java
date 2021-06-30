@@ -1,11 +1,6 @@
 package com.secnium.iast.core.util;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.objectweb.asm.Type;
-
-import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * 字符串工具类
@@ -43,28 +38,6 @@ public class SandboxStringUtils {
         return internalClassName.replace('/', '.');
     }
 
-    public static String[] toJavaClassNameArray(String[] internalClassNameArray) {
-        if (null == internalClassNameArray) {
-            return new String[]{};
-        }
-        final String[] javaClassNameArray = new String[internalClassNameArray.length];
-        for (int index = 0; index < internalClassNameArray.length; index++) {
-            javaClassNameArray[index] = toJavaClassName(internalClassNameArray[index]);
-        }
-        return javaClassNameArray;
-    }
-
-    public static String[] toJavaClassNameArray(Type[] asmTypeArray) {
-        if (null == asmTypeArray) {
-            return new String[]{};
-        }
-        final String[] javaClassNameArray = new String[asmTypeArray.length];
-        for (int index = 0; index < asmTypeArray.length; index++) {
-            javaClassNameArray[index] = asmTypeArray[index].getClassName();
-        }
-        return javaClassNameArray;
-    }
-
     /**
      * 获取异常的原因描述
      *
@@ -76,23 +49,6 @@ public class SandboxStringUtils {
             return getCauseMessage(t.getCause());
         }
         return t.getMessage();
-    }
-
-    /**
-     * 获取LOGO
-     *
-     * @return LOGO
-     */
-    public static String getLogo() {
-        try {
-            final InputStream logoIs = SandboxStringUtils.class.getResourceAsStream("/com.secnium.iast.resources/logo");
-            final String logo = IOUtils.toString(logoIs);
-            IOUtils.closeQuietly(logoIs);
-            return logo;
-        } catch (IOException ioe) {
-            // ignore...
-            return StringUtils.EMPTY;
-        }
     }
 
 }

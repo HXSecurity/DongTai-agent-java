@@ -15,6 +15,7 @@
         <directory>src/main/resources</directory>
         <includes>
           <include>logback-dongtai.xml</include>
+          <include>dongtai-servlet.jar</include>
           <include>**/version</include>
           <include>**/logo</include>
           <include>**/blackext.txt</include>
@@ -44,7 +45,6 @@
                   <excludes>
                     <exclude>META-INF/</exclude>
                     <exclude>*.dtd</exclude>
-                    <exclude>java.lang.iast.inject.*</exclude>
                   </excludes>
                 </filter>
               </filters>
@@ -76,10 +76,6 @@
                 <relocation>
                   <pattern>org.json</pattern>
                   <shadedPattern>${shade-prefix}.org.json</shadedPattern>
-                </relocation>
-                <relocation>
-                  <pattern>javax.servlet</pattern>
-                  <shadedPattern>${shade-prefix}.javax.servlet</shadedPattern>
                 </relocation>
                 <relocation>
                   <pattern>javax.xml.bind</pattern>
@@ -129,6 +125,18 @@
           <groupId>org.hamcrest</groupId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>com.secnium.iast</groupId>
+      <artifactId>iast-inject</artifactId>
+      <version>0.6.1</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <version>2.4</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
   <properties>

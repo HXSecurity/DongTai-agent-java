@@ -7,9 +7,7 @@ import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
@@ -50,7 +48,7 @@ public class HttpClientUtils {
 
     public static boolean sendPost(String uri, String value) throws Exception {
         Asserts.NOT_NULL("report", value);
-        if(PROPERTIES.isDebug()){
+        if (PROPERTIES.isDebug()) {
             String respString = sendRequest(HttpMethods.POST, PROPERTIES.getBaseUrl(), uri, value, null, PROXY);
             System.out.println("cn.huoxian.iast url is " + uri);
             System.out.println("cn.huoxian.iast resp is " + respString);
@@ -97,9 +95,7 @@ public class HttpClientUtils {
                 connection.setUseCaches(false);
                 connection.setDoOutput(true);
 
-//                String encryptData = RsaUtils.encrypt(data);
                 GZIPOutputStream wr = new GZIPOutputStream(connection.getOutputStream());
-//                wr.write(encryptData.getBytes(Charset.forName("UTF-8")));
                 wr.write(data.getBytes(Charset.forName("UTF-8")));
                 wr.close();
             }
@@ -122,9 +118,44 @@ public class HttpClientUtils {
     }
 
     /**
+     * 从云端下载jar包
+     *
+     * @param fileURI  云端对应URI
+     * @param fileName 本地文件名及地址
+     */
+    public static void downloadRemoteJar(String fileURI, String fileName) {
+        try {
+            URL url = new URL(PROPERTIES.getBaseUrl().concat(fileURI));
+            HttpURLConnection connection = PROXY == null ? (HttpURLConnection) url.openConnection() : (HttpURLConnection) url.openConnection(PROXY);
+
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("User-Agent", "SecniumIast Agent");
+            connection.setRequestProperty("Authorization", "Token " + PROPERTIES.getIastServerToken());
+            connection.setUseCaches(false);
+            connection.setDoOutput(true);
+
+            BufferedInputStream in = new BufferedInputStream(connection.getInputStream());
+            final File classPath = new File(new File(fileName).getParent());
+
+            if (!classPath.mkdirs() && !classPath.exists()) {
+                System.out.println("[cn.huoxian.dongtai.iast] Check or create local file cache path, path is " + classPath);
+            }
+            FileOutputStream fileOutputStream = new FileOutputStream(fileName);
+            byte[] dataBuffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
+                fileOutputStream.write(dataBuffer, 0, bytesRead);
+            }
+            System.out.println("[cn.huoxian.dongtai.iast] The remote file " + fileURI + " was successfully written to the local cache.");
+        } catch (Exception ignore) {
+            System.err.println("[cn.huoxian.dongtai.iast] The remote file " + fileURI + " download failure, please check the iast-token.");
+        }
+    }
+
+    /**
      * 根据配置文件创建http/https代理
      */
-    public static Proxy loadProxy() {
+    private static Proxy loadProxy() {
         try {
             if (PROPERTIES.isProxyEnable()) {
                 Proxy proxy;
