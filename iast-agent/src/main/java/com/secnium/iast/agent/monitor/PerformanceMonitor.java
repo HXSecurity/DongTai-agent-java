@@ -4,6 +4,7 @@ import com.secnium.iast.agent.manager.EngineManager;
 
 /**
  * 负责监控jvm性能状态，如果达到停止阈值，则停止检测引擎；如果达到卸载阈值，则卸载引擎；
+ * fixme 增加CPU使用情况的监控
  *
  * @author dongzhiyong@huoxian.cn
  */

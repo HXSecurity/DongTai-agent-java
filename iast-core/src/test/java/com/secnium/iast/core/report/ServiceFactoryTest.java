@@ -3,12 +3,10 @@ package com.secnium.iast.core.report;
 import com.secnium.iast.core.PropertyUtils;
 import com.secnium.iast.core.ServiceFactory;
 import org.junit.Test;
-import java.util.concurrent.TimeUnit;
-import com.secnium.iast.core.report.HeartBeatReport;
-import com.secnium.iast.core.report.VulnReport;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class ServiceFactoryTest {
     @Test
@@ -82,12 +80,6 @@ public class ServiceFactoryTest {
     @Test
     public void scheduleTask() {
         ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-        executorService.scheduleWithFixedDelay(new HeartBeatReport(1000), 30, 2, TimeUnit.SECONDS);
-        executorService.scheduleWithFixedDelay(new VulnReport(1000), 30, 2, TimeUnit.SECONDS);
-        // 这里的 AssestReport ErrorLogReport不是继承自Runnable 不能这样使用
-        // executorService.scheduleWithFixedDelay(new AssestReport(), 30, 2,
-        // TimeUnit.SECONDS);
-        // executorService.scheduleWithFixedDelay(new ErrorLogReport(), 30, 2,
-        // TimeUnit.SECONDS);
+        executorService.scheduleWithFixedDelay(new ReportSender(), 30, 2, TimeUnit.SECONDS);
     }
 }

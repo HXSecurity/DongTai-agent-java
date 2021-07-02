@@ -6,7 +6,7 @@ import com.secnium.iast.core.enhance.IastClassAncestorQuery;
 import com.secnium.iast.core.handler.models.MethodEvent;
 import com.secnium.iast.core.handler.vulscan.ReportConstant;
 import com.secnium.iast.core.report.AgentRegisterReport;
-import com.secnium.iast.core.util.base64.Base64Utils;
+import com.secnium.iast.core.util.base64.Base64Encoder;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -83,7 +83,7 @@ public class GraphBuilder {
         detail.put(ReportConstant.COMMON_HTTP_URI, requestMeta.get("requestURI"));
         detail.put(ReportConstant.COMMON_HTTP_CLIENT_IP, requestMeta.get("remoteAddr"));
         detail.put(ReportConstant.COMMON_HTTP_QUERY_STRING, requestMeta.get("queryString"));
-        detail.put(ReportConstant.COMMON_HTTP_REQ_HEADER, Base64Utils.encodeBase64String(requestMeta.get("headers").toString().getBytes()).replaceAll("\n", ""));
+        detail.put(ReportConstant.COMMON_HTTP_REQ_HEADER, Base64Encoder.encodeBase64String(requestMeta.get("headers").toString().getBytes()).replaceAll("\n", ""));
         detail.put(ReportConstant.COMMON_HTTP_BODY, requestMeta.get("body"));
         detail.put(ReportConstant.COMMON_HTTP_CONTEXT_PATH, requestMeta.get("contextPath"));
 

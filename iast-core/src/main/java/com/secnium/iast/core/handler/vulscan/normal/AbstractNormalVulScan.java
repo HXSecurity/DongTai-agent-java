@@ -6,7 +6,7 @@ import com.secnium.iast.core.handler.vulscan.ReportConstant;
 import com.secnium.iast.core.middlewarerecognition.ServerDetect;
 import com.secnium.iast.core.report.AgentRegisterReport;
 import com.secnium.iast.core.util.StackUtils;
-import com.secnium.iast.core.util.base64.Base64Utils;
+import com.secnium.iast.core.util.base64.Base64Encoder;
 import org.json.JSONObject;
 
 import java.util.Map;
@@ -42,7 +42,7 @@ public abstract class AbstractNormalVulScan implements IVulScan {
         detail.put(ReportConstant.COMMON_HTTP_URI, requestMeta.get("requestURI"));
         detail.put(ReportConstant.COMMON_HTTP_METHOD, requestMeta.get("method"));
         detail.put(ReportConstant.COMMON_HTTP_QUERY_STRING, requestMeta.get("queryString"));
-        detail.put(ReportConstant.COMMON_HTTP_REQ_HEADER, Base64Utils.encodeBase64String(requestMeta.get("headers").toString().getBytes()).replaceAll("\n", ""));
+        detail.put(ReportConstant.COMMON_HTTP_REQ_HEADER, Base64Encoder.encodeBase64String(requestMeta.get("headers").toString().getBytes()).replaceAll("\n", ""));
         detail.put(ReportConstant.COMMON_HTTP_BODY, requestMeta.get("body"));
         detail.put(ReportConstant.COMMON_HTTP_CLIENT_IP, requestMeta.get("remoteAddr"));
         detail.put(ReportConstant.VULN_CALLER, stack);

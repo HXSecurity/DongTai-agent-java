@@ -1,17 +1,17 @@
 package com.secnium.iast.core.report;
 
-import com.secnium.iast.core.AbstractThread;
 import com.secnium.iast.core.EngineManager;
 import com.secnium.iast.core.handler.vulscan.ReportConstant;
 import com.secnium.iast.core.middlewarerecognition.IServer;
 import com.secnium.iast.core.middlewarerecognition.ServerDetect;
 import com.secnium.iast.core.util.ByteUtils;
-import com.secnium.iast.core.util.base64.Base64Utils;
+import com.secnium.iast.core.util.base64.Base64Encoder;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryUsage;
+import java.lang.management.OperatingSystemMXBean;
 import java.net.*;
 import java.util.Enumeration;
 
@@ -20,48 +20,30 @@ import java.util.Enumeration;
  *
  * @author dongzhiyong@huoxian.cn
  */
-public class HeartBeatReport extends AbstractThread {
-    final ServerDetect SERVER_DETECT = ServerDetect.getInstance();
-    final IServer SERVER = SERVER_DETECT.getWebserver();
-    final MemoryUsage memoryUsage = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage();
-    final String pid = ManagementFactory.getRuntimeMXBean().getName().split("@")[0];
-    final String hostName = getInternalHostName();
-    final static String CURRENT_PATH = getCurrentPath();
-    private static HeartBeatReport instance;
+public class HeartBeatReport {
+    final static ServerDetect SERVER_DETECT = ServerDetect.getInstance();
+    final static IServer SERVER = SERVER_DETECT.getWebserver();
+    final static String PID = ManagementFactory.getRuntimeMXBean().getName().split("@")[0];
+    final static String HOST_NAME = getInternalHostName();
 
-    public HeartBeatReport(long waitTime) {
-        super(null, true, waitTime);
-    }
 
-    public static HeartBeatReport getInstance() {
-        return instance;
-    }
-
-    public static HeartBeatReport getInstance(long waitTime) {
-        if (null == instance) {
-            instance = new HeartBeatReport(waitTime);
-        }
-        return instance;
-    }
-
-    @Override
-    protected void send() {
+    public static void createReport() {
         String msg = generateHeartBeatMsg();
         EngineManager.sendNewReport(msg);
     }
 
-    private String generateHeartBeatMsg() {
+    private static String generateHeartBeatMsg() {
         JSONObject report = new JSONObject();
         JSONObject detail = new JSONObject();
         report.put(ReportConstant.REPORT_KEY, ReportConstant.REPORT_HEART_BEAT);
         report.put(ReportConstant.REPORT_VALUE_KEY, detail);
 
-        detail.put(ReportConstant.SERVER_ENV, Base64Utils.encodeBase64String(System.getProperties().toString().getBytes()).replaceAll("\n", ""));
+        detail.put(ReportConstant.SERVER_ENV, Base64Encoder.encodeBase64String(System.getProperties().toString().getBytes()).replaceAll("\n", ""));
         detail.put(ReportConstant.AGENT_NAME, AgentRegisterReport.getAgentToken());
         detail.put(ReportConstant.PROJECT_NAME, AgentRegisterReport.getProjectName());
         detail.put(ReportConstant.LANGUAGE, ReportConstant.LANGUAGE_VALUE);
-        detail.put(ReportConstant.HEART_BEAT_PID, getPid());
-        detail.put(ReportConstant.HOSTNAME, getHostName());
+        detail.put(ReportConstant.HEART_BEAT_PID, PID);
+        detail.put(ReportConstant.HOSTNAME, HOST_NAME);
         detail.put(ReportConstant.HEART_BEAT_NETWORK, readIpInfo());
         detail.put(ReportConstant.HEART_BEAT_MEMORY, readMemInfo());
         detail.put(ReportConstant.HEART_BEAT_CPU, readCpuInfo());
@@ -70,7 +52,7 @@ public class HeartBeatReport extends AbstractThread {
         detail.put(ReportConstant.HEART_BEAT_WEB_SERVER_NAME, SERVER == null ? "" : SERVER.getName());
         detail.put(ReportConstant.HEART_BEAT_WEB_SERVER_VERSION, SERVER == null ? "" : SERVER.getVersion());
         detail.put(ReportConstant.HEART_BEAT_WEB_SERVER_PATH, SERVER_DETECT.getWebServerPath());
-        detail.put(ReportConstant.HEART_BEAT_WEB_SERVER_HOSTNAME, getHostName());
+        detail.put(ReportConstant.HEART_BEAT_WEB_SERVER_HOSTNAME, HOST_NAME);
         detail.put(ReportConstant.HEART_BEAT_WEB_SERVER_IP, null != EngineManager.SERVER ? EngineManager.SERVER.getServerAddr() : "");
         detail.put(ReportConstant.HEART_BEAT_WEB_SERVER_PORT, null != EngineManager.SERVER ? EngineManager.SERVER.getServerPort() : "");
 
@@ -78,11 +60,7 @@ public class HeartBeatReport extends AbstractThread {
     }
 
     public static String getWebServerPath() {
-        if (null == instance) {
-            return CURRENT_PATH;
-        } else {
-            return instance.SERVER_DETECT.getWebServerPath();
-        }
+        return SERVER_DETECT.getWebServerPath();
     }
 
     /**
@@ -128,32 +106,28 @@ public class HeartBeatReport extends AbstractThread {
         }
     }
 
-    public String getHostName() {
-        return hostName;
-    }
-
-    public static String readIpInfo() {
+    private static String readIpInfo() {
         try {
             StringBuilder sb = new StringBuilder();
             boolean first = true;
-            Enumeration interefaces = NetworkInterface.getNetworkInterfaces();
-            while (interefaces.hasMoreElements()) {
-                NetworkInterface iface = (NetworkInterface) interefaces.nextElement();
-                if (iface.isLoopback() || !iface.isUp()) {
+            Enumeration<?> interfaces = NetworkInterface.getNetworkInterfaces();
+            while (interfaces.hasMoreElements()) {
+                NetworkInterface networkInterface = (NetworkInterface) interfaces.nextElement();
+                if (networkInterface.isLoopback() || !networkInterface.isUp()) {
                     continue;
                 }
-                Enumeration addresses = iface.getInetAddresses();
+                Enumeration<?> addresses = networkInterface.getInetAddresses();
                 while (addresses.hasMoreElements()) {
                     InetAddress inetAddress = (InetAddress) addresses.nextElement();
                     if (inetAddress instanceof Inet6Address) {
                         continue;
                     }
                     if (first) {
-                        sb.append("{\"name\"").append(":").append("\"").append(iface.getDisplayName()).append("\"");
+                        sb.append("{\"name\"").append(":").append("\"").append(networkInterface.getDisplayName()).append("\"");
                         sb.append(",\"ip\"").append(":").append("\"").append(inetAddress.getHostAddress()).append("\"}");
                         first = false;
                     } else {
-                        sb.append(",{\"name\"").append(":").append("\"").append(iface.getDisplayName()).append("\"");
+                        sb.append(",{\"name\"").append(":").append("\"").append(networkInterface.getDisplayName()).append("\"");
                         sb.append(",\"ip\"").append(":").append("\"").append(inetAddress.getHostAddress()).append("\"}");
                     }
                 }
@@ -165,19 +139,17 @@ public class HeartBeatReport extends AbstractThread {
     }
 
     public static String readCpuInfo() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("{");
-        sb.append("\"total\":").append("\"0.13 GB\"");
-        sb.append(",\"use\":").append("\"0.03 GB\"");
-        sb.append(",\"rate\":").append("\"3.21 %\"");
-        sb.append("}");
-        return sb.toString();
+        OperatingSystemMXBean operatingSystemMXBean = ManagementFactory.getOperatingSystemMXBean();
+        JSONObject cpuInfo = new JSONObject();
+        cpuInfo.put("rate", (int) (operatingSystemMXBean.getSystemLoadAverage() * 100));
+        return cpuInfo.toString();
     }
 
     /**
      * 获取JVM相关的内存
      */
-    public String readMemInfo() {
+    public static String readMemInfo() {
+        MemoryUsage memoryUsage = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage();
         JSONObject memoryReport = new JSONObject();
         memoryReport.put("total", ByteUtils.formatByteSize(memoryUsage.getMax()));
         memoryReport.put("use", ByteUtils.formatByteSize(memoryUsage.getUsed()));
@@ -186,26 +158,6 @@ public class HeartBeatReport extends AbstractThread {
     }
 
     public static String getDiskInfo() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("{")
-                .append("\"total\"").append(":").append("\"").append("\"")
-                .append(",\"use\"").append(":").append("\"").append("\"")
-                .append(",\"rate\"").append(":").append("\"").append("\"");
-        sb.append("}");
-        return sb.toString();
-    }
-
-    public String getPid() {
-        return pid;
-    }
-
-    public static String getIpAddr() {
-        try {
-            InetAddress ip4 = Inet4Address.getLocalHost();
-            return ip4.getHostAddress();
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
-        return "127.0.0.1";
+        return "{}";
     }
 }

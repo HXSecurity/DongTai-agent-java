@@ -34,7 +34,7 @@ public class HttpClientUtils {
     private final static PropertyUtils PROPERTIES = PropertyUtils.getInstance();
     private final static Proxy PROXY = loadProxy();
 
-    public static String sendGet(String uri, String arg, String value) {
+    public static StringBuilder sendGet(String uri, String arg, String value) {
         try {
             if (arg != null && value != null) {
                 return sendRequest(HttpMethods.GET, PROPERTIES.getBaseUrl(), uri + "?" + arg + "=" + value, null, null, PROXY);
@@ -46,19 +46,18 @@ public class HttpClientUtils {
         }
     }
 
-    public static boolean sendPost(String uri, String value) throws Exception {
-        Asserts.NOT_NULL("report", value);
+    public static StringBuilder sendPost(String uri, String value) throws Exception {
+        StringBuilder response;
+        response = sendRequest(HttpMethods.POST, PROPERTIES.getBaseUrl(), uri, value, null, PROXY);
         if (PROPERTIES.isDebug()) {
-            String respString = sendRequest(HttpMethods.POST, PROPERTIES.getBaseUrl(), uri, value, null, PROXY);
             System.out.println("cn.huoxian.iast url is " + uri);
-            System.out.println("cn.huoxian.iast resp is " + respString);
+            System.out.println("cn.huoxian.iast resp is " + response.toString());
         }
-        sendRequest(HttpMethods.POST, PROPERTIES.getBaseUrl(), uri, value, null, PROXY);
-        return true;
+        return response;
     }
 
 
-    private static String sendRequest(HttpMethods method, String baseUrl, String urlStr, String data, HashMap<String, String> headers, Proxy proxy) throws Exception {
+    private static StringBuilder sendRequest(HttpMethods method, String baseUrl, String urlStr, String data, HashMap<String, String> headers, Proxy proxy) throws Exception {
         HttpURLConnection connection = null;
         StringBuilder response = new StringBuilder();
         try {
@@ -107,7 +106,7 @@ public class HttpClientUtils {
                 response.append('\r');
             }
             rd.close();
-            return response.toString();
+            return response;
         } catch (Exception e) {
             throw e;
         } finally {

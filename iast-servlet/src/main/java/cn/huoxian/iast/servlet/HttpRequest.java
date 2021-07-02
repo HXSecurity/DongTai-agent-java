@@ -31,6 +31,7 @@ public class HttpRequest {
         requestMeta.put("secure", request.isSecure());
         requestMeta.put("body", getPostBody(request));
         requestMeta.put("headers", getHeaders(request));
+        requestMeta.put("replay-request", null != request.getHeader("dongtai-replay-id"));
 
         return requestMeta;
     }

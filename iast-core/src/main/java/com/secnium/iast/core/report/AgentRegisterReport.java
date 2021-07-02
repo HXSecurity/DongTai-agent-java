@@ -47,9 +47,4 @@ public class AgentRegisterReport {
         object.put("project", getProjectName());
         return object.toString();
     }
-
-    public static void main(String[] args) {
-        PropertyUtils.getInstance("～/.iast/config/iast.properties");
-        AgentRegisterReport.send();
-    }
 }
