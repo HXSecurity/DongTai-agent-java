@@ -45,6 +45,7 @@ public abstract class AbstractNormalVulScan implements IVulScan {
         detail.put(ReportConstant.COMMON_HTTP_REQ_HEADER, Base64Encoder.encodeBase64String(requestMeta.get("headers").toString().getBytes()).replaceAll("\n", ""));
         detail.put(ReportConstant.COMMON_HTTP_BODY, requestMeta.get("body"));
         detail.put(ReportConstant.COMMON_HTTP_CLIENT_IP, requestMeta.get("remoteAddr"));
+        detail.put(ReportConstant.COMMON_HTTP_REPLAY_REQUEST, requestMeta.get("replay-request"));
         detail.put(ReportConstant.VULN_CALLER, stack);
 
         EngineManager.sendNewReport(report.toString());

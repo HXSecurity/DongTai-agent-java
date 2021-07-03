@@ -1,6 +1,8 @@
 package com.secnium.iast.core.util;
 
 /**
+ * 获取堆栈hook点的应用堆栈情况
+ *
  * @author dongzhiyong@huoxian.cn
  */
 public class StackUtils {

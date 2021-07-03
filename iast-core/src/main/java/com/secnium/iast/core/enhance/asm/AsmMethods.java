@@ -1,6 +1,5 @@
 package com.secnium.iast.core.enhance.asm;
 
-import com.secnium.iast.core.util.SandboxReflectUtils;
 import org.objectweb.asm.commons.Method;
 
 import java.lang.iast.inject.Injecter;
@@ -175,6 +174,12 @@ public interface AsmMethods {
             "cloneRequest",
             String.class,
             Object.class
+    );
+
+    Method ASM_METHOD_Spy$isReplayRequest = InnerHelper.getAsmMethod(
+            Injecter.class,
+            "isReplayRequest",
+            String.class
     );
 
 }

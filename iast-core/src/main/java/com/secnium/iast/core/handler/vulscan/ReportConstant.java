@@ -65,6 +65,7 @@ public class ReportConstant {
     public static final String COMMON_HTTP_CONTEXT_PATH = "context_path";
     public static final String COMMON_HTTP_RES_HEADER = "http_res_header";
     public static final String COMMON_HTTP_RES_BODY = "http_res_body";
+    public static final String COMMON_HTTP_REPLAY_REQUEST = "http_replay_request";
     public static final String SERVER_ENV = "server_env";
     public static final String VULN_CALLER = "app_caller";
     public static final String TAINT_VALUE = "taint_value";

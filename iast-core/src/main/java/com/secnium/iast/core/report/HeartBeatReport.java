@@ -141,7 +141,7 @@ public class HeartBeatReport {
     public static String readCpuInfo() {
         OperatingSystemMXBean operatingSystemMXBean = ManagementFactory.getOperatingSystemMXBean();
         JSONObject cpuInfo = new JSONObject();
-        cpuInfo.put("rate", (int) (operatingSystemMXBean.getSystemLoadAverage() * 100));
+        cpuInfo.put("rate", (int) (operatingSystemMXBean.getSystemLoadAverage() * 10));
         return cpuInfo.toString();
     }
 

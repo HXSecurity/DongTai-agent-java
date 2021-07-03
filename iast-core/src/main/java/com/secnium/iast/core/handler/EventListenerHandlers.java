@@ -216,8 +216,23 @@ public class EventListenerHandlers {
         return false;
     }
 
+    /**
+     * 克隆request，用于获取请求头、请求体相关信息
+     *
+     * @param req HttpServletRequest类型的request对象
+     * @return RequestWrapper 包装之后的request对象，可重复调用inputStream/Reader
+     */
     public static Object cloneRequest(Object req) {
         return HttpImpl.cloneRequest(req);
+    }
+
+    public static boolean isReplayRequest() {
+        try {
+            return (Boolean) EngineManager.REQUEST_CONTEXT.get().get("replay-request");
+        } catch (Exception e) {
+            ErrorLogReport.sendErrorLog(ThrowableUtils.getStackTrace(e));
+        }
+        return false;
     }
 
 }

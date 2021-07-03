@@ -21,7 +21,7 @@ public class RequestWrapper extends HttpServletRequestWrapper {
 
     private RequestWrapper(HttpServletRequest request) {
         super(request);
-        this.usingBody = ("POST".equalsIgnoreCase(request.getMethod()) && request.getContentType().contains("application/json"));
+        this.usingBody = ("POST".equals(request.getMethod()) && request.getContentType().contains("application/json"));
 
         StringBuilder stringBuilder = new StringBuilder();
         BufferedReader bufferedReader = null;
