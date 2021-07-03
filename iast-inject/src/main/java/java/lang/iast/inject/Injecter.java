@@ -61,7 +61,8 @@ public class Injecter {
                             final Method LEAVE_HTTP,
                             final Method IS_FIRST_LEVEL_HTTP,
                             final Method HAS_TAINT,
-                            final Method CLONE_REQUEST
+                            final Method CLONE_REQUEST,
+                            final Method IS_REPLAY_REQUEST
     ) {
         NAMESPACE_METHOD_HOOK_MAP.put(
                 namespace,
@@ -82,7 +83,8 @@ public class Injecter {
                         LEAVE_HTTP,
                         IS_FIRST_LEVEL_HTTP,
                         HAS_TAINT,
-                        CLONE_REQUEST
+                        CLONE_REQUEST,
+                        IS_REPLAY_REQUEST
                 )
         );
     }
@@ -473,6 +475,24 @@ public class Injecter {
         return req;
     }
 
+    public static boolean isReplayRequest(final String namespace) throws Throwable {
+        final Thread thread = Thread.currentThread();
+        if (!selfCallBarrier.isEnter(thread)) {
+            final SelfCallBarrier.Node node = selfCallBarrier.enter(thread);
+            try {
+                final MethodHook hook = NAMESPACE_METHOD_HOOK_MAP.get(namespace);
+                if (null != hook) {
+                    return (Boolean) hook.IS_REPLAY_REQUEST.invoke(null);
+                }
+            } catch (Throwable cause) {
+                handleException(cause);
+            } finally {
+                selfCallBarrier.exit(thread, node);
+            }
+        }
+        return false;
+    }
+
     /**
      * 返回结果
      */
@@ -653,6 +673,7 @@ public class Injecter {
         private final Method IS_TOP_LEVEL_HTTP;
         private final Method HAS_TAINT;
         private final Method CLONE_REQUEST;
+        private final Method IS_REPLAY_REQUEST;
 
         public MethodHook(final Method on_before_method,
                           final Method on_return_method,
@@ -670,7 +691,8 @@ public class Injecter {
                           final Method LEAVE_HTTP,
                           final Method IS_TOP_LEVEL_HTTP,
                           final Method HAS_TAINT,
-                          final Method CLONE_REQUEST) {
+                          final Method CLONE_REQUEST,
+                          final Method IS_REPLAY_REQUEST) {
             assert null != on_before_method;
             assert null != on_return_method;
             assert null != on_throws_method;
@@ -691,6 +713,7 @@ public class Injecter {
             this.IS_TOP_LEVEL_HTTP = IS_TOP_LEVEL_HTTP;
             this.HAS_TAINT = HAS_TAINT;
             this.CLONE_REQUEST = CLONE_REQUEST;
+            this.IS_REPLAY_REQUEST = IS_REPLAY_REQUEST;
         }
     }
 

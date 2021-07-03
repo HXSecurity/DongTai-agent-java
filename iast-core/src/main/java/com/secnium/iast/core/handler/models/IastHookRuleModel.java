@@ -230,9 +230,9 @@ public class IastHookRuleModel {
         }
 
         private static JSONArray loadRemoteRule() {
-            String respRaw = HttpClientUtils.sendGet(Constants.API_HOOK_PROFILE, null, null);
+            StringBuilder respRaw = HttpClientUtils.sendGet(Constants.API_HOOK_PROFILE, null, null);
             if (respRaw != null) {
-                JSONObject resp = new JSONObject(respRaw);
+                JSONObject resp = new JSONObject(respRaw.toString());
                 return resp.getJSONArray("data");
             }
             return null;

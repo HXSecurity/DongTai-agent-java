@@ -1,8 +1,8 @@
 package com.secnium.iast.core;
 
 
-import org.slf4j.Logger;
 import com.secnium.iast.core.util.LogUtils;
+import org.slf4j.Logger;
 
 import java.io.IOException;
 
@@ -13,22 +13,7 @@ import java.io.IOException;
  */
 public abstract class AbstractThread extends Thread {
     private final Logger logger = LogUtils.getLogger(getClass());
-    private boolean enable;
-
-    public boolean isEnable() {
-        return enable;
-    }
-
-    public void setEnable(boolean enable) {
-        this.enable = enable;
-    }
-
-    public void setMilliseconds() {
-    }
-
-    protected AbstractThread(String name, boolean enable, long waitTime) {
-        this.enable = enable;
-    }
+    private final PropertyUtils properties = PropertyUtils.getInstance();
 
     @Override
     public void run() {
@@ -37,7 +22,7 @@ public abstract class AbstractThread extends Thread {
             EngineManager.turnOffLingzhi();
         }
         try {
-            Thread.sleep(1000);
+            Thread.sleep(properties.getReportInterval());
             send();
         } catch (IOException e) {
             logger.error("report error reason: ", e);
