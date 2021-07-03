@@ -6,6 +6,7 @@ import com.secnium.iast.core.enhance.plugins.AbstractClassVisitor;
 import com.secnium.iast.core.enhance.plugins.PluginRegister;
 import com.secnium.iast.core.report.ErrorLogReport;
 import com.secnium.iast.core.util.AsmUtils;
+import com.secnium.iast.core.util.LogUtils;
 import com.secnium.iast.core.util.ObjectIDs;
 import com.secnium.iast.core.util.ThrowableUtils;
 import com.secnium.iast.core.util.matcher.ConfigMatcher;
@@ -14,7 +15,6 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 import org.slf4j.Logger;
-import com.secnium.iast.core.util.LogUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -131,7 +131,6 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                 }
             }
         } catch (Throwable cause) {
-            logger.error("transform class {} failed.{}", internalClassName, cause);
             ErrorLogReport.sendErrorLog(ThrowableUtils.getStackTrace(cause));
         } finally {
             if (isRunning) {

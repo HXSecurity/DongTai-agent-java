@@ -100,7 +100,7 @@ public class IastProperties {
 
     public int getDelayTime() {
         if (-1 == delayTime) {
-            delayTime = Integer.parseInt(System.getProperty("iast.engine.delay.time", "0"));
+            delayTime = Integer.parseInt(System.getProperty("iast.engine.delay.time", "10"));
         }
         return delayTime;
     }

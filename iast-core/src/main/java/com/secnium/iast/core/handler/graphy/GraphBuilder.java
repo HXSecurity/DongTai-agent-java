@@ -6,8 +6,7 @@ import com.secnium.iast.core.enhance.IastClassAncestorQuery;
 import com.secnium.iast.core.handler.models.MethodEvent;
 import com.secnium.iast.core.handler.vulscan.ReportConstant;
 import com.secnium.iast.core.report.AgentRegisterReport;
-import com.secnium.iast.core.util.base64.Base64Utils;
-import com.secnium.iast.core.util.http.HttpRequest;
+import com.secnium.iast.core.util.base64.Base64Encoder;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -64,7 +63,7 @@ public class GraphBuilder {
     }
 
     public static String convertToReport(List<GraphNode> nodeList) {
-        HttpRequest request = EngineManager.REQUEST_CONTEXT.get();
+        Map<String, Object> requestMeta = EngineManager.REQUEST_CONTEXT.get();
         JSONObject report = new JSONObject();
         JSONObject detail = new JSONObject();
         JSONArray methodPool = new JSONArray();
@@ -72,19 +71,22 @@ public class GraphBuilder {
         report.put(ReportConstant.REPORT_KEY, ReportConstant.REPORT_VULN_SAAS_POOL);
         report.put(ReportConstant.REPORT_VALUE_KEY, detail);
 
+        detail.put(ReportConstant.LANGUAGE, ReportConstant.LANGUAGE_VALUE);
         detail.put(ReportConstant.AGENT_NAME, AgentRegisterReport.getAgentToken());
         detail.put(ReportConstant.PROJECT_NAME, AgentRegisterReport.getProjectName());
-        detail.put(ReportConstant.COMMON_REMOTE_IP, request.getRemoteAddr());
-        detail.put(ReportConstant.COMMON_HTTP_PROTOCOL, request.getProtocol());
-        detail.put(ReportConstant.COMMON_HTTP_SCHEME, request.getScheme());
-        detail.put(ReportConstant.COMMON_HTTP_METHOD, request.getMethod());
-        detail.put(ReportConstant.COMMON_HTTP_SECURE, request.isSecure());
-        detail.put(ReportConstant.COMMON_HTTP_URL, request.getRequestURL());
-        detail.put(ReportConstant.COMMON_HTTP_URI, request.getRequestURI());
-        detail.put(ReportConstant.COMMON_HTTP_CLIENT_IP, request.getRemoteAddr());
-        detail.put(ReportConstant.COMMON_HTTP_QUERY_STRING, request.getQueryString());
-        detail.put(ReportConstant.COMMON_HTTP_REQ_HEADER, Base64Utils.encodeBase64String(request.getHeadersValue().getBytes()).replaceAll("\n", ""));
-        detail.put(ReportConstant.COMMON_HTTP_CONTEXT_PATH, request.getContextPath());
+        detail.put(ReportConstant.COMMON_REMOTE_IP, requestMeta.get("remoteAddr"));
+        detail.put(ReportConstant.COMMON_HTTP_PROTOCOL, requestMeta.get("protocol"));
+        detail.put(ReportConstant.COMMON_HTTP_SCHEME, requestMeta.get("scheme"));
+        detail.put(ReportConstant.COMMON_HTTP_METHOD, requestMeta.get("method"));
+        detail.put(ReportConstant.COMMON_HTTP_SECURE, requestMeta.get("secure"));
+        detail.put(ReportConstant.COMMON_HTTP_URL, requestMeta.get("requestURL").toString());
+        detail.put(ReportConstant.COMMON_HTTP_URI, requestMeta.get("requestURI"));
+        detail.put(ReportConstant.COMMON_HTTP_CLIENT_IP, requestMeta.get("remoteAddr"));
+        detail.put(ReportConstant.COMMON_HTTP_QUERY_STRING, requestMeta.get("queryString"));
+        detail.put(ReportConstant.COMMON_HTTP_REQ_HEADER, Base64Encoder.encodeBase64String(requestMeta.get("headers").toString().getBytes()).replaceAll("\n", ""));
+        detail.put(ReportConstant.COMMON_HTTP_BODY, requestMeta.get("body"));
+        detail.put(ReportConstant.COMMON_HTTP_CONTEXT_PATH, requestMeta.get("contextPath"));
+        detail.put(ReportConstant.COMMON_HTTP_REPLAY_REQUEST, requestMeta.get("replay-request"));
 
         detail.put(ReportConstant.SAAS_METHOD_POOL, methodPool);
 
@@ -94,13 +96,4 @@ public class GraphBuilder {
 
         return report.toString();
     }
-
-    // a,b,c,d,e,f,g
-    // 栈
-    // a
-    // ab
-    // abc
-    // abd
-    // abd
-
 }

@@ -25,6 +25,7 @@ public class ServletDispatcherAdviceAdapter extends AbstractAdviceAdapter {
         isFirstLevelHttp();
         mv.visitJumpInsn(EQ, elseLabel);
 
+        cloneHttpServletRequest();
         captureMethodState(-1, HookType.HTTP.getValue(), false);
         mark(elseLabel);
     }
@@ -64,7 +65,7 @@ public class ServletDispatcherAdviceAdapter extends AbstractAdviceAdapter {
         loadArg(0);
         // astore_1: 将栈顶应用型数值存储至第一个本地变量
         // 调用克隆方法// 替换为克隆方法，并进行类型转换
-        //invokeStatic(ASM_TYPE_SPY, ASM_METHOD_Spy$cloneRequest);
+        invokeStatic(ASM_TYPE_SPY, ASM_METHOD_Spy$cloneRequest);
         // 将
         storeArg(0);
         //pop();

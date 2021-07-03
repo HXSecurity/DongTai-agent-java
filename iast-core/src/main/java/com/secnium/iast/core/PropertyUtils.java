@@ -164,16 +164,16 @@ public class PropertyUtils {
         return "true".equals(getDumpClassState());
     }
 
-    public long getHeartBeatInterval() {
+    public long getReplayInterval() {
         if (heartBeatInterval == -1L) {
-            heartBeatInterval = Long.valueOf(cfg.getProperty("iast.service.heartbeat.interval", "300000"));
+            heartBeatInterval = Long.valueOf(System.getProperty("iast.service.replay.interval", cfg.getProperty("iast.service.replay.interval", "300000")));
         }
         return heartBeatInterval;
     }
 
     public long getReportInterval() {
         if (reportInterval == -1L) {
-            reportInterval = Long.valueOf(cfg.getProperty("iast.service.vulreport.interval", "1000"));
+            reportInterval = Long.valueOf(System.getProperty("iast.service.report.interval", cfg.getProperty("iast.service.report.interval", "60000")));
         }
         return reportInterval;
     }

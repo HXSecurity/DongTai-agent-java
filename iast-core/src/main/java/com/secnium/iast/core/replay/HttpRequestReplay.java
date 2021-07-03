@@ -2,21 +2,27 @@ package com.secnium.iast.core.replay;
 
 import com.secnium.iast.core.AbstractThread;
 import com.secnium.iast.core.handler.models.IastReplayModel;
-import com.secnium.iast.core.handler.vulscan.overpower.AuthInfoCache;
+import com.secnium.iast.core.report.ErrorLogReport;
 import com.secnium.iast.core.util.HttpClientHostnameVerifier;
 import com.secnium.iast.core.util.HttpClientUtils;
 import com.secnium.iast.core.util.HttpMethods;
+import com.secnium.iast.core.util.ThrowableUtils;
+import com.secnium.iast.core.util.base64.Base64Decoder;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ArrayBlockingQueue;
 
 /**
  * 根据字符串格式的header头及cookie信息生成重放请求
@@ -33,18 +39,40 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class HttpRequestReplay extends AbstractThread {
     private static final String PROTOCOL_HTTPS = "https";
     public final static HostnameVerifier DO_NOT_VERIFY = new HttpClientHostnameVerifier();
-    private final static ConcurrentLinkedQueue<IastReplayModel> WAITING_REPLAY_REQUESTS = new ConcurrentLinkedQueue<IastReplayModel>();
-
-    public HttpRequestReplay() {
-        this(null, true, 0);
-    }
-
-    protected HttpRequestReplay(String name, boolean enable, long waitTime) {
-        super(name, enable, waitTime);
-    }
+    private final static ArrayBlockingQueue<IastReplayModel> WAITING_REPLAY_REQUESTS = new ArrayBlockingQueue<IastReplayModel>(256);
 
     public static void sendReplayRequest(IastReplayModel replayModel) {
         WAITING_REPLAY_REQUESTS.offer(replayModel);
+    }
+
+    /**
+     * @param replayRequestRaw
+     */
+    public static void sendReplayRequest(StringBuilder replayRequestRaw) {
+        try {
+            JSONObject resp = new JSONObject(replayRequestRaw.toString());
+            Integer statusCode = (Integer) resp.get("status");
+            if (statusCode == 201) {
+                JSONArray replayRequests = (JSONArray) resp.get("data");
+                for (int index = 0, total = replayRequests.length(); index < total; index++) {
+                    JSONObject replayRequest = (JSONObject) replayRequests.get(index);
+                    IastReplayModel replayModel = new IastReplayModel(
+                            replayRequest.get("method"),
+                            replayRequest.get("uri"),
+                            replayRequest.get("params"),
+                            replayRequest.get("body"),
+                            replayRequest.get("header"),
+                            replayRequest.get("id"),
+                            replayRequest.get("relation_id"),
+                            replayRequest.get("replay_type"));
+                    if (replayModel.isValid()) {
+                        sendReplayRequest(replayModel);
+                    }
+                }
+            }
+        } catch (Throwable cause) {
+            ErrorLogReport.sendErrorLog(ThrowableUtils.getStackTrace(cause));
+        }
     }
 
 
@@ -52,35 +80,35 @@ public class HttpRequestReplay extends AbstractThread {
      * 发起重放请求
      */
     private static void doReplay(IastReplayModel replayModel) {
-        // 准备http请求需要的数据（url、post数据、headers头）
-        HashMap<String, String> headers = splitHeaderStringToHashmap(replayModel.getRequestHeader(), replayModel.getTraceId());
-        // 发送http请求
         try {
-            String cookieValue = headers.get("Cookie");
-            headers.put("Cookie", "");
-            sendRequest(replayModel.getRequestMethod(), replayModel.getFullUrl(), replayModel.getRequestBody(), headers);
-            headers.put("Cookie", cookieValue);
-            sendRequest(replayModel.getRequestMethod(), replayModel.getFullUrl(), replayModel.getRequestBody(), headers);
+            HashMap<String, String> headers = splitHeaderStringToHashmap(replayModel.getRequestHeader());
+            headers.put("dongtai-replay-id", String.valueOf(replayModel.getReplayId()));
+            headers.put("dongtai-relation-id", String.valueOf(replayModel.getRelationId()));
+            headers.put("dongtai-replay-type", String.valueOf(replayModel.getReplayType()));
+
+            String url = replayModel.getFullUrl();
+            if (url != null) {
+                sendRequest(replayModel.getRequestMethod(), url, replayModel.getRequestBody(), headers);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private static HashMap<String, String> splitHeaderStringToHashmap(String originalHeaders, String traceId) {
-        HashMap<String, String> headers = new HashMap<String, String>();
-        String[] headerItems = originalHeaders.trim().split("\n");
-        for (String item : headerItems) {
-            int splitCharIndex = item.indexOf(":");
-            String key = item.substring(0, splitCharIndex);
-            String value = item.substring(splitCharIndex + 1);
-            // 替换cookie
-            if ("cookie".equals(key.toLowerCase())) {
-                value = AuthInfoCache.getAnotherCookie(value);
+    private static HashMap<String, String> splitHeaderStringToHashmap(String originalHeaders) {
+        HashMap<String, String> headers = new HashMap<String, String>(32);
+        byte[] headerRaw = Base64Decoder.decodeBase64FromString(originalHeaders);
+        if (headerRaw != null) {
+            String decodeHeaders = new String(headerRaw);
+            String[] headerItems = decodeHeaders.trim().split("\n");
+            for (String item : headerItems) {
+                int splitCharIndex = item.indexOf(":");
+                String key = item.substring(0, splitCharIndex);
+                String value = item.substring(splitCharIndex + 1);
+                headers.put(key, value);
             }
-            headers.put(key, value);
         }
 
-        headers.put("x-trace-id", traceId);
         return headers;
     }
 
@@ -114,21 +142,24 @@ public class HttpRequestReplay extends AbstractThread {
             }
 
             //Send request
-            connection.getResponseCode();
             if (HttpMethods.POST.equals(method)) {
                 connection.setUseCaches(false);
                 connection.setDoOutput(true);
 
-                InputStream is = connection.getInputStream();
-                BufferedReader rd = new BufferedReader(new InputStreamReader(is));
-                StringBuilder response = new StringBuilder();
-                String line;
-                while ((line = rd.readLine()) != null) {
-                    response.append(line);
-                    response.append('\r');
-                }
-                rd.close();
+                OutputStream outputStream = connection.getOutputStream();
+                outputStream.write(data.getBytes(Charset.forName("UTF-8")));
+                outputStream.close();
             }
+
+            InputStream is = connection.getInputStream();
+            BufferedReader rd = new BufferedReader(new InputStreamReader(is));
+            StringBuilder response = new StringBuilder();
+            String line;
+            while ((line = rd.readLine()) != null) {
+                response.append(line);
+                response.append('\r');
+            }
+            rd.close();
         } catch (Exception e) {
             throw e;
         } finally {

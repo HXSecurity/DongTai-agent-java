@@ -3,10 +3,12 @@ package com.secnium.iast.core.handler.vulscan.overpower;
 import com.secnium.iast.core.EngineManager;
 import com.secnium.iast.core.handler.vulscan.ReportConstant;
 import com.secnium.iast.core.util.Asserts;
+import com.secnium.iast.core.util.LogUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 import org.slf4j.Logger;
-import com.secnium.iast.core.util.LogUtils;
+
+import java.util.Map;
 
 /**
  * Auth凭证信息生命周期管理
@@ -71,18 +73,19 @@ public class AuthInfoManager {
      * @return auth凭证信息报告
      */
     private static String generateAuthAddReport(String jdbcClassName, String cookie, String sqlStatement) {
+        Map<String, Object> requestMeta = EngineManager.REQUEST_CONTEXT.get();
         JSONObject report = new JSONObject();
         JSONObject detail = new JSONObject();
         report.put(ReportConstant.REPORT_KEY, ReportConstant.REPORT_AUTH_ADD);
         report.put(ReportConstant.REPORT_VALUE_KEY, detail);
 
-        detail.put(ReportConstant.COMMON_APP_NAME, EngineManager.REQUEST_CONTEXT.get().getContextPath());
-        detail.put(ReportConstant.COMMON_SERVER_NAME, EngineManager.REQUEST_CONTEXT.get().getServerName());
-        detail.put(ReportConstant.COMMON_SERVER_PORT, EngineManager.REQUEST_CONTEXT.get().getServerPort());
-        detail.put(ReportConstant.COMMON_REMOTE_IP, EngineManager.REQUEST_CONTEXT.get().getRemoteIp());
-        detail.put(ReportConstant.COMMON_HTTP_URL, EngineManager.REQUEST_CONTEXT.get().getRequestURL());
-        detail.put(ReportConstant.COMMON_HTTP_QUERY_STRING, EngineManager.REQUEST_CONTEXT.get().getQueryString());
-        detail.put(ReportConstant.COMMON_HTTP_BODY, EngineManager.REQUEST_CONTEXT.get().getCachedBody());
+        detail.put(ReportConstant.COMMON_APP_NAME, requestMeta.get("contextPath"));
+        detail.put(ReportConstant.COMMON_SERVER_NAME, requestMeta.get("serverName"));
+        detail.put(ReportConstant.COMMON_SERVER_PORT, requestMeta.get("serverPort"));
+        detail.put(ReportConstant.COMMON_REMOTE_IP, requestMeta.get("remoteAddr"));
+        detail.put(ReportConstant.COMMON_HTTP_URL, requestMeta.get("requestURI"));
+        detail.put(ReportConstant.COMMON_HTTP_QUERY_STRING, requestMeta.get("queryString"));
+        detail.put(ReportConstant.COMMON_HTTP_BODY, requestMeta.get("body"));
         detail.put(ReportConstant.AUTH_ADD_JDBC_CLASS, jdbcClassName);
         detail.put(ReportConstant.AUTH_ADD_VALUE, cookie);
         detail.put(ReportConstant.AUTH_ADD_SQL_STATEMENT, sqlStatement);
@@ -98,18 +101,19 @@ public class AuthInfoManager {
      * @return 凭证更新的报告
      */
     private static String generateAuthUpdateReport(String originalCookie, String updatedCookie) {
+        Map<String, Object> requestMeta = EngineManager.REQUEST_CONTEXT.get();
         JSONObject report = new JSONObject();
         JSONObject detail = new JSONObject();
         report.put(ReportConstant.REPORT_KEY, ReportConstant.REPORT_AUTH_UPDATE);
         report.put(ReportConstant.REPORT_VALUE_KEY, detail);
 
-        detail.put(ReportConstant.COMMON_APP_NAME, EngineManager.REQUEST_CONTEXT.get().getContextPath());
-        detail.put(ReportConstant.COMMON_SERVER_NAME, EngineManager.REQUEST_CONTEXT.get().getServerName());
-        detail.put(ReportConstant.COMMON_SERVER_PORT, EngineManager.REQUEST_CONTEXT.get().getServerPort());
-        detail.put(ReportConstant.COMMON_REMOTE_IP, EngineManager.REQUEST_CONTEXT.get().getRemoteIp());
-        detail.put(ReportConstant.COMMON_HTTP_URL, EngineManager.REQUEST_CONTEXT.get().getRequestURL());
-        detail.put(ReportConstant.COMMON_HTTP_QUERY_STRING, EngineManager.REQUEST_CONTEXT.get().getQueryString());
-        detail.put(ReportConstant.COMMON_HTTP_BODY, EngineManager.REQUEST_CONTEXT.get().getCachedBody());
+        detail.put(ReportConstant.COMMON_APP_NAME, requestMeta.get("contextPath"));
+        detail.put(ReportConstant.COMMON_SERVER_NAME, requestMeta.get("serverName"));
+        detail.put(ReportConstant.COMMON_SERVER_PORT, requestMeta.get("serverPort"));
+        detail.put(ReportConstant.COMMON_REMOTE_IP, requestMeta.get("remoteAddr"));
+        detail.put(ReportConstant.COMMON_HTTP_URL, requestMeta.get("requestURI"));
+        detail.put(ReportConstant.COMMON_HTTP_QUERY_STRING, requestMeta.get("queryString"));
+        detail.put(ReportConstant.COMMON_HTTP_BODY, requestMeta.get("body"));
         detail.put(ReportConstant.AUTH_UPDATE_ORIGINA, originalCookie);
         detail.put(ReportConstant.AUTH_UPDATE_UPDATED, updatedCookie);
 
