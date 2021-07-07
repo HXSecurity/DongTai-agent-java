@@ -29643,6 +29643,7 @@ org/antlr/v4/runtime/misc/FlexibleHashMap
 org/antlr/v4/runtime/misc/MultiMap
 org/antlr/v4/runtime/Recognizer$1
 org/apache/AnnotationProcessor
+org/apache/ibatis/logging/log4j/Log4jImpl
 org/apache/InstanceManager
 org/apache/PeriodicEventListener
 org/apache/aries/application/DeploymentMetadata
@@ -58100,6 +58101,7 @@ org/springframework/boot/autoconfigure/condition/SearchStrategy
 org/springframework/boot/autoconfigure/condition/SpringBootCondition
 org/springframework/boot/autoconfigure/context/ConfigurationPropertiesAutoConfiguration
 org/springframework/boot/autoconfigure/context/ConfigurationPropertiesAutoConfiguration$$EnhancerBySpringCGLIB$$20892cdd
+org/springframework/boot/autoconfigure/freemarker/FreeMarkerReactiveWebConfiguration
 org/springframework/boot/autoconfigure/freemarker/FreeMarkerTemplateAvailabilityProvider
 org/springframework/boot/autoconfigure/groovy/template/GroovyTemplateAvailabilityProvider
 org/springframework/boot/autoconfigure/gson/GsonAutoConfiguration
@@ -58454,6 +58456,7 @@ org/springframework/boot/test/context/SpringBootConfigurationFinder$Cache
 # 测试javaseccode靶场，发现命中该filter
 org/springframework/boot/web/support/ErrorPageFilter
 org/springframework/cache/CacheManager
+org/springframework/cache/caffeine/CaffeineCacheManager
 org/springframework/cache/ehcache/EhCacheFactoryBean
 org/springframework/cache/ehcache/EhCacheManagerFactoryBean
 org/springframework/cache/ehcache/package-info
@@ -59179,6 +59182,7 @@ org/springframework/dao/support/PersistenceExceptionTranslationInterceptor
 org/springframework/dao/support/PersistenceExceptionTranslator
 org/springframework/dao/support/package-info
 org/springframework/data/jpa/repository/query/AbstractJpaQuery$TupleConverter$TupleBackedMap
+org/springframework/data/web/XmlBeamHttpMessageConverter
 org/springframework/ejb/access/AbstractRemoteSlsbInvokerInterceptor
 org/springframework/ejb/access/AbstractSlsbInvokerInterceptor
 org/springframework/ejb/access/EjbAccessException
@@ -60407,8 +60411,7 @@ org/springframework/transaction/interceptor/NoRollbackRuleAttribute
 org/springframework/transaction/interceptor/RollbackRuleAttribute
 org/springframework/transaction/interceptor/RuleBasedTransactionAttribute
 org/springframework/transaction/interceptor/TransactionAspectSupport
-org/springframework/transaction/interceptor/TransactionAspectSupport$1
-org/springframework/transaction/interceptor/TransactionAspectSupport$TransactionInfo
+org/springframework/transaction/interceptor/TransactionAspectSupport$*
 org/springframework/transaction/interceptor/TransactionAspectUtils
 org/springframework/transaction/interceptor/TransactionAttribute
 org/springframework/transaction/interceptor/TransactionAttributeEditor
@@ -60438,6 +60441,7 @@ org/springframework/transaction/jta/WebSphereUowTransactionManager
 org/springframework/transaction/jta/WebSphereUowTransactionManager$UOWActionAdapter
 org/springframework/transaction/jta/package-info
 org/springframework/transaction/package-info
+org/springframework/transaction/reactive/TransactionalOperator
 org/springframework/transaction/support/AbstractPlatformTransactionManager
 org/springframework/transaction/support/AbstractPlatformTransactionManager$SuspendedResourcesHolder
 org/springframework/transaction/support/AbstractTransactionStatus
@@ -74297,6 +74301,7 @@ workshop/util/encoding/EncodingManager$EncodingProxy
 workshop/util/encoding/EncodingReader
 workshop/util/encoding/impl/PropertiesEncoding
 workshop/util/encoding/impl/TextEncoding
+com/alibaba/druid/filter/logging/Log4jFilter
 com/alibaba/fastjson/parser/deserializer/FastjsonASMDeserializer_1_RepeaterConfig
 # disable alibaba sandbox's class dongtai-001
 com/alibaba/jvm/sandbox/*
