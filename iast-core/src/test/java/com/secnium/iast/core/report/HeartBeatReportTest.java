@@ -22,17 +22,6 @@ public class HeartBeatReportTest {
         System.out.println(System.getProperties().toString());
     }
 
-    @Test
-    public void testGetCurrentPath() {
-        String currentPath = HeartBeatReport.getCurrentPath();
-        System.out.println("path：" + currentPath);
-    }
-
-    @Test
-    public void getWebServerPath() {
-        String serverPath = HeartBeatReport.getWebServerPath();
-        System.out.println("hostname = " + serverPath);
-    }
 
     @Test
     public void testSend() throws Exception {

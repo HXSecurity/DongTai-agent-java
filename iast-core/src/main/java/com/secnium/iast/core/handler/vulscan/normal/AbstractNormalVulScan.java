@@ -25,9 +25,7 @@ public abstract class AbstractNormalVulScan implements IVulScan {
         report.put(ReportConstant.REPORT_KEY, ReportConstant.REPORT_VULN_NORNAL);
         report.put(ReportConstant.REPORT_VALUE_KEY, detail);
 
-        detail.put(ReportConstant.AGENT_NAME, AgentRegisterReport.getAgentToken());
-        detail.put(ReportConstant.AGENT_VERSION, ReportConstant.AGENT_VERSION_VALUE);
-        detail.put(ReportConstant.LANGUAGE, ReportConstant.LANGUAGE_VALUE);
+        detail.put(ReportConstant.AGENT_ID, AgentRegisterReport.getAgentFlag());
         detail.put(ReportConstant.VULN_TYPE, vulType);
         detail.put(ReportConstant.COMMON_APP_NAME, requestMeta.get("contextPath"));
         detail.put(ReportConstant.COMMON_HTTP_PROTOCOL, requestMeta.get("protocol"));

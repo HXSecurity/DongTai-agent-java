@@ -22,25 +22,24 @@ public class ReportConstant {
 
     public static final String LANGUAGE = "language";
     public static final String LANGUAGE_VALUE = "JAVA";
-    public static final String AGENT_NAME = "agent_name";
+    public static final String AGENT_ID = "agent_id";
     public static final String PROJECT_NAME = "project_name";
-    public static final String AGENT_VERSION = "agent_version";
+    public static final String AGENT_VERSION = "version";
     public static final String AGENT_VERSION_VALUE = "v1.0.0";
     public static final String CONTAINER = "container";
     public static final String CONTAINER_PATH = "container_path";
 
-    public static final String HEART_BEAT_PID = "pid";
-    public static final String HEART_BEAT_NETWORK = "network";
+    public static final String PID = "pid";
+    public static final String NETWORK = "network";
     public static final String HEART_BEAT_MEMORY = "memory";
     public static final String HEART_BEAT_CPU = "cpu";
     public static final String HEART_BEAT_DISK = "disk";
     public static final String HEART_BEAT_REQ_COUNT = "req_count";
-    public static final String HEART_BEAT_WEB_SERVER_NAME = "web_server_name";
-    public static final String HEART_BEAT_WEB_SERVER_VERSION = "web_server_version";
-    public static final String HEART_BEAT_WEB_SERVER_PATH = "web_server_path";
-    public static final String HEART_BEAT_WEB_SERVER_HOSTNAME = "web_server_hostname";
-    public static final String HEART_BEAT_WEB_SERVER_IP = "web_server_ip";
-    public static final String HEART_BEAT_WEB_SERVER_PORT = "web_server_port";
+    public static final String CONTAINER_NAME = "container_name";
+    public static final String CONTAINER_VERSION = "container_version";
+    public static final String WEB_SERVER_PATH = "web_server_path";
+    public static final String WEB_SERVER_ADDR = "web_server_addr";
+    public static final String WEB_SERVER_PORT = "web_server_port";
     public static final String HOSTNAME = "hostname";
 
     public static final String SCA_PACKAGE_PATH = "package_path";

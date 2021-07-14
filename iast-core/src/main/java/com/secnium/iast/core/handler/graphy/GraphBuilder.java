@@ -72,8 +72,7 @@ public class GraphBuilder {
         report.put(ReportConstant.REPORT_VALUE_KEY, detail);
 
         detail.put(ReportConstant.LANGUAGE, ReportConstant.LANGUAGE_VALUE);
-        detail.put(ReportConstant.AGENT_NAME, AgentRegisterReport.getAgentToken());
-        detail.put(ReportConstant.PROJECT_NAME, AgentRegisterReport.getProjectName());
+        detail.put(ReportConstant.AGENT_ID, AgentRegisterReport.getAgentFlag());
         detail.put(ReportConstant.COMMON_REMOTE_IP, requestMeta.get("remoteAddr"));
         detail.put(ReportConstant.COMMON_HTTP_PROTOCOL, requestMeta.get("protocol"));
         detail.put(ReportConstant.COMMON_HTTP_SCHEME, requestMeta.get("scheme"));
@@ -85,6 +84,9 @@ public class GraphBuilder {
         detail.put(ReportConstant.COMMON_HTTP_QUERY_STRING, requestMeta.get("queryString"));
         detail.put(ReportConstant.COMMON_HTTP_REQ_HEADER, Base64Encoder.encodeBase64String(requestMeta.get("headers").toString().getBytes()).replaceAll("\n", ""));
         detail.put(ReportConstant.COMMON_HTTP_BODY, requestMeta.get("body"));
+        // fixme 增加响应头/响应体
+        detail.put(ReportConstant.COMMON_HTTP_RES_HEADER, "");
+        detail.put(ReportConstant.COMMON_HTTP_RES_BODY, "");
         detail.put(ReportConstant.COMMON_HTTP_CONTEXT_PATH, requestMeta.get("contextPath"));
         detail.put(ReportConstant.COMMON_HTTP_REPLAY_REQUEST, requestMeta.get("replay-request"));
 
