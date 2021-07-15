@@ -182,4 +182,11 @@ public interface AsmMethods {
             String.class
     );
 
+    Method ASM_METHOD_Spy$cloneResponse = InnerHelper.getAsmMethod(
+            Injecter.class,
+            "cloneResponse",
+            String.class,
+            Object.class
+    );
+
 }

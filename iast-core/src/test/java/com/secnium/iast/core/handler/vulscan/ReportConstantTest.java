@@ -11,18 +11,18 @@ public class ReportConstantTest {
         report.put(ReportConstant.REPORT_KEY, ReportConstant.REPORT_HEART_BEAT);
         report.put(ReportConstant.REPORT_VALUE_KEY, detail);
 
-        detail.put(ReportConstant.HEART_BEAT_PID, 20102);
-        detail.put(ReportConstant.HEART_BEAT_NETWORK, 20102);
+        detail.put(ReportConstant.PID, 20102);
+        detail.put(ReportConstant.NETWORK, 20102);
         detail.put(ReportConstant.HEART_BEAT_MEMORY, 20102);
         detail.put(ReportConstant.HEART_BEAT_CPU, 20102);
         detail.put(ReportConstant.HEART_BEAT_DISK, 20102);
         detail.put(ReportConstant.HEART_BEAT_REQ_COUNT, 20102);
-        detail.put(ReportConstant.HEART_BEAT_WEB_SERVER_NAME, 20102);
-        detail.put(ReportConstant.HEART_BEAT_WEB_SERVER_VERSION, 20102);
-        detail.put(ReportConstant.HEART_BEAT_WEB_SERVER_PATH, 20102);
+        detail.put(ReportConstant.CONTAINER_NAME, 20102);
+        detail.put(ReportConstant.CONTAINER_VERSION, 20102);
+        detail.put(ReportConstant.WEB_SERVER_PATH, 20102);
         detail.put(ReportConstant.HEART_BEAT_WEB_SERVER_HOSTNAME, 20102);
-        detail.put(ReportConstant.HEART_BEAT_WEB_SERVER_IP, 20102);
-        detail.put(ReportConstant.HEART_BEAT_WEB_SERVER_PORT, 20102);
+        detail.put(ReportConstant.WEB_SERVER_ADDR, 20102);
+        detail.put(ReportConstant.WEB_SERVER_PORT, 20102);
 
         System.out.println("心跳数据报告：");
         System.out.println(report.toString());
