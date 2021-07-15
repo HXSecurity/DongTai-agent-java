@@ -3,6 +3,7 @@ package com.secnium.iast.core.handler.graphy;
 import com.secnium.iast.core.EngineManager;
 import com.secnium.iast.core.PropertyUtils;
 import com.secnium.iast.core.enhance.IastClassAncestorQuery;
+import com.secnium.iast.core.handler.controller.impl.HttpImpl;
 import com.secnium.iast.core.handler.models.MethodEvent;
 import com.secnium.iast.core.handler.vulscan.ReportConstant;
 import com.secnium.iast.core.report.AgentRegisterReport;
@@ -10,6 +11,7 @@ import com.secnium.iast.core.util.base64.Base64Encoder;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -63,6 +65,16 @@ public class GraphBuilder {
     }
 
     public static String convertToReport(List<GraphNode> nodeList) {
+        Map<String, Object> responseMeta = null;
+        try {
+            responseMeta = HttpImpl.getResponseMeta(EngineManager.RESPONSE_CACHE.get(), true);
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
         Map<String, Object> requestMeta = EngineManager.REQUEST_CONTEXT.get();
         JSONObject report = new JSONObject();
         JSONObject detail = new JSONObject();
@@ -84,9 +96,8 @@ public class GraphBuilder {
         detail.put(ReportConstant.COMMON_HTTP_QUERY_STRING, requestMeta.get("queryString"));
         detail.put(ReportConstant.COMMON_HTTP_REQ_HEADER, Base64Encoder.encodeBase64String(requestMeta.get("headers").toString().getBytes()).replaceAll("\n", ""));
         detail.put(ReportConstant.COMMON_HTTP_BODY, requestMeta.get("body"));
-        // fixme 增加响应头/响应体
-        detail.put(ReportConstant.COMMON_HTTP_RES_HEADER, "");
-        detail.put(ReportConstant.COMMON_HTTP_RES_BODY, "");
+        detail.put(ReportConstant.COMMON_HTTP_RES_HEADER, responseMeta == null ? "" : responseMeta.get("headers"));
+        detail.put(ReportConstant.COMMON_HTTP_RES_BODY, responseMeta == null ? "" : responseMeta.get("body"));
         detail.put(ReportConstant.COMMON_HTTP_CONTEXT_PATH, requestMeta.get("contextPath"));
         detail.put(ReportConstant.COMMON_HTTP_REPLAY_REQUEST, requestMeta.get("replay-request"));
 

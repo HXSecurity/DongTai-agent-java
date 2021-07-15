@@ -192,9 +192,7 @@ public class EventListenerHandlers {
         try {
             EngineManager.SCOPE_TRACKER.leaveHttp();
             if (EngineManager.SCOPE_TRACKER.isExitedHttp() && EngineManager.ENTER_HTTP_ENTRYPOINT.isEnterHttp()) {
-                HttpImpl.getResponseMeta(EngineManager.RESPONSE_CACHE.get(), true);
                 EngineManager.maintainRequestCount();
-                // todo: 数据发送至服务器端
                 GraphBuilder.buildAndReport();
                 EngineManager.cleanThreadState();
             }
