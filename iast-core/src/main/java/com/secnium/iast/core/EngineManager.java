@@ -1,5 +1,6 @@
 package com.secnium.iast.core;
 
+import com.secnium.iast.core.handler.models.MethodEvent;
 import com.secnium.iast.core.middlewarerecognition.IastServer;
 import com.secnium.iast.core.middlewarerecognition.ServerDetect;
 import com.secnium.iast.core.threadlocalpool.*;
@@ -7,6 +8,9 @@ import com.secnium.iast.core.util.LogUtils;
 import org.slf4j.Logger;
 
 import java.lang.instrument.Instrumentation;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 
 /**
@@ -188,4 +192,18 @@ public class EngineManager {
         return instance.cfg.isEnableDumpClass();
     }
 
+    public static void enterHttpEntry(Map<String, Object> requestMeta) {
+        if (null == SERVER) {
+            SERVER = new IastServer(
+                    (String) requestMeta.get("serverName"),
+                    (Integer) requestMeta.get("serverPort"),
+                    true
+            );
+        }
+        ENTER_HTTP_ENTRYPOINT.enterHttpEntryPoint();
+        REQUEST_CONTEXT.set(requestMeta);
+        TRACK_MAP.set(new HashMap<Integer, MethodEvent>(1024));
+        TAINT_POOL.set(new HashSet<Object>());
+        TAINT_HASH_CODES.set(new HashSet<Integer>());
+    }
 }

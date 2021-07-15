@@ -1,7 +1,6 @@
 package com.secnium.iast.core.util.matcher;
 
 import com.secnium.iast.core.PropertyUtils;
-import com.secnium.iast.core.enhance.IastClassFileTransformer;
 import com.secnium.iast.core.util.ConfigUtils;
 import com.secnium.iast.core.util.LogUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -31,10 +30,15 @@ public class ConfigMatcher {
     private final static AbstractMatcher internalClass = new InternalClass();
     private final static AbstractMatcher frameworkClass = new FrameworkClass();
     private final static AbstractMatcher serverClass = new ServerClass();
-    private final static ClassLoader iastClassLoader = IastClassFileTransformer.class.getClassLoader();
 
 
-    public static boolean disableExtention(String uri) {
+    /**
+     * 检查后缀黑名单
+     *
+     * @param uri
+     * @return
+     */
+    public static boolean disableExtension(String uri) {
         if (uri == null || uri.isEmpty()) {
             return false;
         }
