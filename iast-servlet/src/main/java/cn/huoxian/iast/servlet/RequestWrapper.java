@@ -1,5 +1,6 @@
 package cn.huoxian.iast.servlet;
 
+import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
@@ -56,6 +57,21 @@ public class RequestWrapper extends HttpServletRequestWrapper {
             final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(body.getBytes());
 
             return new ServletInputStream() {
+                @Override
+                public boolean isFinished() {
+                    return false;
+                }
+
+                @Override
+                public boolean isReady() {
+                    return false;
+                }
+
+                @Override
+                public void setReadListener(ReadListener readListener) {
+
+                }
+
                 @Override
                 public int read() {
                     return byteArrayInputStream.read();
