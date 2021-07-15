@@ -96,7 +96,7 @@ public class GraphBuilder {
         detail.put(ReportConstant.COMMON_HTTP_QUERY_STRING, requestMeta.get("queryString"));
         detail.put(ReportConstant.COMMON_HTTP_REQ_HEADER, Base64Encoder.encodeBase64String(requestMeta.get("headers").toString().getBytes()).replaceAll("\n", ""));
         detail.put(ReportConstant.COMMON_HTTP_BODY, requestMeta.get("body"));
-        detail.put(ReportConstant.COMMON_HTTP_RES_HEADER, responseMeta == null ? "" : responseMeta.get("headers"));
+        detail.put(ReportConstant.COMMON_HTTP_RES_HEADER, responseMeta == null ? "" : Base64Encoder.encodeBase64String(responseMeta.get("headers").toString().getBytes()).replaceAll("\n", ""));
         detail.put(ReportConstant.COMMON_HTTP_RES_BODY, responseMeta == null ? "" : responseMeta.get("body"));
         detail.put(ReportConstant.COMMON_HTTP_CONTEXT_PATH, requestMeta.get("contextPath"));
         detail.put(ReportConstant.COMMON_HTTP_REPLAY_REQUEST, requestMeta.get("replay-request"));
