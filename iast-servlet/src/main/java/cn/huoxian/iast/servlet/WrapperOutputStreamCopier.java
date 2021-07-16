@@ -1,6 +1,7 @@
 package cn.huoxian.iast.servlet;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -27,5 +28,15 @@ public class WrapperOutputStreamCopier extends ServletOutputStream {
 
     byte[] getCopy() {
         return copier.toByteArray();
+    }
+
+    @Override
+    public boolean isReady() {
+        return false;
+    }
+
+    @Override
+    public void setWriteListener(WriteListener writeListener) {
+
     }
 }
