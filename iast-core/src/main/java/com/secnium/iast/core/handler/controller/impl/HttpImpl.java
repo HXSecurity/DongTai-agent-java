@@ -134,7 +134,7 @@ public class HttpImpl {
             } else {
                 proxyClass = iastClassLoader.loadClass("cn.huoxian.iast.servlet.HttpResponseJakarta");
             }
-            iastRequestMethod = proxyClass.getDeclaredMethod("getResponse", Object.class);
+            iastResponseMethod = proxyClass.getDeclaredMethod("getResponse", Object.class);
         }
         return (Map<String, Object>) iastResponseMethod.invoke(null, response);
     }

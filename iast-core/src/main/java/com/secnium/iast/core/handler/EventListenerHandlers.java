@@ -198,6 +198,7 @@ public class EventListenerHandlers {
             }
         } catch (Exception e) {
             ErrorLogReport.sendErrorLog(ThrowableUtils.getStackTrace(e));
+            EngineManager.cleanThreadState();
         }
     }
 
