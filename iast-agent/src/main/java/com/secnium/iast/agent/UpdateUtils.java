@@ -62,7 +62,7 @@ public class UpdateUtils {
                 connection = proxy == null ? (HttpURLConnection) url.openConnection() : (HttpURLConnection) url.openConnection(proxy);
             }
             connection.setRequestMethod(Constant.HTTP_METHOD_GET);
-            connection.setRequestProperty("User-Agent", "SecniumIast Java Agent");
+            connection.setRequestProperty("User-Agent", "DongTai-IAST-Agent");
             connection.setRequestProperty("Authorization", "Token " + PROPERTIES.getIastServerToken());
             connection.setRequestProperty("Accept", "*/*");
             connection.setUseCaches(false);

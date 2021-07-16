@@ -188,12 +188,12 @@ public class EventListenerHandlers {
     /**
      * 离开HTTP入口时，维护当前线程的状态
      */
-    public static void leaveHttp() {
+    public static void leaveHttp(Object response) {
         try {
             EngineManager.SCOPE_TRACKER.leaveHttp();
             if (EngineManager.SCOPE_TRACKER.isExitedHttp() && EngineManager.ENTER_HTTP_ENTRYPOINT.isEnterHttp()) {
                 EngineManager.maintainRequestCount();
-                GraphBuilder.buildAndReport();
+                GraphBuilder.buildAndReport(response);
                 EngineManager.cleanThreadState();
             }
         } catch (Exception e) {

@@ -80,7 +80,7 @@ public class HttpClientUtils {
                 connection.setRequestProperty(REQUEST_HEADER_USER_AGENT, "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.94 Safari/537.36 IAST-AGENT");
             }
             //fixme:根据配置文件动态获取token和http请求头，用于后续自定义操作
-            connection.setRequestProperty(REQUEST_HEADER_USER_AGENT, "SecniumIast Agent");
+            connection.setRequestProperty(REQUEST_HEADER_USER_AGENT, "DongTai-IAST-Agent");
             connection.setRequestProperty(REQUEST_HEADER_TOKEN_KEY, "Token " + PropertyUtils.getInstance().getIastServerToken());
             // 插入自定义的
             if (null != headers) {
@@ -128,7 +128,7 @@ public class HttpClientUtils {
             HttpURLConnection connection = PROXY == null ? (HttpURLConnection) url.openConnection() : (HttpURLConnection) url.openConnection(PROXY);
 
             connection.setRequestMethod("GET");
-            connection.setRequestProperty("User-Agent", "SecniumIast Agent");
+            connection.setRequestProperty("User-Agent", "DongTai-IAST-Agent");
             connection.setRequestProperty("Authorization", "Token " + PROPERTIES.getIastServerToken());
             connection.setUseCaches(false);
             connection.setDoOutput(true);

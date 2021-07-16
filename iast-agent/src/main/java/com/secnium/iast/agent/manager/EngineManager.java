@@ -115,7 +115,7 @@ public class EngineManager {
             HttpURLConnection connection = proxy == null ? (HttpURLConnection) url.openConnection() : (HttpURLConnection) url.openConnection(proxy);
 
             connection.setRequestMethod("GET");
-            connection.setRequestProperty("User-Agent", "SecniumIast Agent");
+            connection.setRequestProperty("User-Agent", "DongTai-IAST-Agent");
             connection.setRequestProperty("Authorization", "Token " + properties.getIastServerToken());
             connection.setUseCaches(false);
             connection.setDoOutput(true);

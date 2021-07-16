@@ -420,14 +420,14 @@ public class Injecter {
         }
     }
 
-    public static void leaveHttp(final String namespace) {
+    public static void leaveHttp(final String namespace, final Object response) {
         final Thread thread = Thread.currentThread();
         if (!selfCallBarrier.isEnter(thread)) {
             final SelfCallBarrier.Node node = selfCallBarrier.enter(thread);
             try {
                 final MethodHook hook = NAMESPACE_METHOD_HOOK_MAP.get(namespace);
                 if (null != hook) {
-                    hook.LEAVE_HTTP.invoke(null);
+                    hook.LEAVE_HTTP.invoke(null, response);
                 }
             } catch (IllegalAccessException e) {
                 e.printStackTrace();

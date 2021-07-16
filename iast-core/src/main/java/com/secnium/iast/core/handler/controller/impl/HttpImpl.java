@@ -99,9 +99,7 @@ public class HttpImpl {
     public static Object cloneResponse(Object response) {
         try {
             loadCloneResponseMethod();
-            Object clonedResponse = cloneResponseMethod.invoke(null, response);
-            EngineManager.RESPONSE_CACHE.set(clonedResponse);
-            return clonedResponse;
+            return cloneResponseMethod.invoke(null, response);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (InvocationTargetException e) {

@@ -149,12 +149,13 @@ public interface AsmMethods {
     );
 
     /**
-     * asm method of {@link Injecter#leaveHttp(String)}
+     * asm method of {@link Injecter#leaveHttp(String, Object)}
      */
     Method ASM_METHOD_Spy$leaveHttp = InnerHelper.getAsmMethod(
             Injecter.class,
             "leaveHttp",
-            String.class
+            String.class,
+            Object.class
     );
 
     /**

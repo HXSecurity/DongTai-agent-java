@@ -21,9 +21,9 @@ import java.util.Map;
  */
 public class GraphBuilder {
 
-    public static void buildAndReport() {
+    public static void buildAndReport(Object response) {
         List<GraphNode> nodeList = build();
-        String report = convertToReport(nodeList);
+        String report = convertToReport(nodeList, response);
         EngineManager.sendNewReport(report);
     }
 
@@ -64,10 +64,10 @@ public class GraphBuilder {
         return nodeList;
     }
 
-    public static String convertToReport(List<GraphNode> nodeList) {
+    public static String convertToReport(List<GraphNode> nodeList, Object response) {
         Map<String, Object> responseMeta = null;
         try {
-            responseMeta = HttpImpl.getResponseMeta(EngineManager.RESPONSE_CACHE.get(), true);
+            responseMeta = HttpImpl.getResponseMeta(response, true);
         } catch (InvocationTargetException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
