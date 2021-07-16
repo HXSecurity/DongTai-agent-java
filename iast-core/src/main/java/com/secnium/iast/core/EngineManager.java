@@ -26,7 +26,6 @@ public class EngineManager {
 
     public static final BooleanTheadLocal ENTER_HTTP_ENTRYPOINT = new BooleanTheadLocal(false);
     public static final RequestContext REQUEST_CONTEXT = new RequestContext();
-    public static final IastResponseCache RESPONSE_CACHE = new IastResponseCache();
     public static final IastTrackMap TRACK_MAP = new IastTrackMap();
     public static final IastTaintPool TAINT_POOL = new IastTaintPool();
     public static final IastTaintHashCodes TAINT_HASH_CODES = new IastTaintHashCodes();
@@ -88,7 +87,6 @@ public class EngineManager {
         EngineManager.LOGIN_LOGIC_WEIGHT.remove();
         EngineManager.ENTER_HTTP_ENTRYPOINT.remove();
         EngineManager.REQUEST_CONTEXT.remove();
-        EngineManager.RESPONSE_CACHE.remove();
         EngineManager.TRACK_MAP.remove();
         EngineManager.TAINT_POOL.remove();
         EngineManager.TAINT_HASH_CODES.remove();

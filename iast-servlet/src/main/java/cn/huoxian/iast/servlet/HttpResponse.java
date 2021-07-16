@@ -1,16 +1,13 @@
 package cn.huoxian.iast.servlet;
 
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 public class HttpResponse {
-    public static Map<String, Object> getResponse(Object res) throws IOException {
+    public static Map<String, Object> getResponse(Object res) {
         HttpServletResponse response = (HttpServletResponse) res;
         Map<String, Object> responseMeta = new HashMap<String, Object>(2);
         responseMeta.put("headers", getHeaders(response));
@@ -50,11 +47,16 @@ public class HttpResponse {
      * @param response
      * @return
      */
-    private static String getBody(HttpServletResponse response) throws IOException {
+    private static String getBody(HttpServletResponse response) {
         String responseStr = "";
         if (response instanceof ResponseWrapper) {
-            byte[] responseData = ((ResponseWrapper) response).getResponseData();
-            responseStr = new String(responseData);
+            try {
+                byte[] responseData = ((ResponseWrapper) response).getResponseData();
+                responseStr = new String(responseData);
+            } catch (Exception e) {
+
+            }
+
         }
         return responseStr;
     }

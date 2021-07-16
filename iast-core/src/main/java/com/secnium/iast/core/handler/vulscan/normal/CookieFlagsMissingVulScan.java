@@ -20,13 +20,16 @@ public class CookieFlagsMissingVulScan extends AbstractNormalVulScan {
 
         if (arguments.length >= taintPos.length) {
             for (Integer pos : taintPos) {
-                if (null != arguments[pos]) {
-                    Boolean flag = (Boolean) arguments[pos];
-                    if (!flag) {
-                        sendReport(getLatestStack(), sink.getType());
-                        break;
-                    }
+                if (null == arguments[pos]) {
+                    continue;
                 }
+
+                Boolean flag = (Boolean) arguments[pos];
+                if (!flag) {
+                    sendReport(getLatestStack(), sink.getType());
+                    break;
+                }
+
             }
         }
     }

@@ -17,6 +17,11 @@ import java.util.Map;
 public abstract class AbstractNormalVulScan implements IVulScan {
     private static final ServerDetect SERVER_DETECT = ServerDetect.getInstance();
 
+    /**
+     *
+     * @param stack
+     * @param vulType
+     */
     public void sendReport(StackTraceElement stack, String vulType) {
         Map<String, Object> requestMeta = EngineManager.REQUEST_CONTEXT.get();
         JSONObject report = new JSONObject();

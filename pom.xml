@@ -39,6 +39,8 @@
         <junit.version>4.13.1</junit.version>
         <proguard.version>2.2.0</proguard.version>
         <jdk.version.level>2</jdk.version.level>
+        <javax.servlet-api>3.1.0</javax.servlet-api>
+        <jakarta.servlet-api>5.0.0</jakarta.servlet-api>
     </properties>
 
     <build>
