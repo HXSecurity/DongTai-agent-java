@@ -8,10 +8,17 @@ import com.secnium.iast.core.util.LogUtils;
 import org.slf4j.Logger;
 
 import java.lang.instrument.Instrumentation;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
+
+import static com.secnium.iast.core.report.AgentRegisterReport.send;
 
 /**
  * 存储全局信息
@@ -193,15 +200,38 @@ public class EngineManager {
     public static void enterHttpEntry(Map<String, Object> requestMeta) {
         if (null == SERVER) {
             SERVER = new IastServer(
-                    (String) requestMeta.get("serverName"),
+                    getIP(),
                     (Integer) requestMeta.get("serverPort"),
                     true
             );
+            send();
         }
         ENTER_HTTP_ENTRYPOINT.enterHttpEntryPoint();
         REQUEST_CONTEXT.set(requestMeta);
         TRACK_MAP.set(new HashMap<Integer, MethodEvent>(1024));
         TAINT_POOL.set(new HashSet<Object>());
         TAINT_HASH_CODES.set(new HashSet<Integer>());
+    }
+
+    public static String getIP() {
+        try {
+            Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
+            NetworkInterface networkInterface;
+            Enumeration<InetAddress> inetAddresses;
+            InetAddress inetAddress;
+            while (networkInterfaces.hasMoreElements()) {
+                networkInterface = networkInterfaces.nextElement();
+                inetAddresses = networkInterface.getInetAddresses();
+                while (inetAddresses.hasMoreElements()) {
+                    inetAddress = inetAddresses.nextElement();
+                    if (inetAddress instanceof Inet4Address) {
+                        return inetAddress.getHostAddress();
+                    }
+                }
+            }
+        } catch (SocketException e) {
+            return "";
+        }
+        return "";
     }
 }
