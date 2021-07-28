@@ -3,6 +3,7 @@ package com.secnium.iast.core;
 import com.secnium.iast.core.handler.models.MethodEvent;
 import com.secnium.iast.core.middlewarerecognition.IastServer;
 import com.secnium.iast.core.middlewarerecognition.ServerDetect;
+import com.secnium.iast.core.report.AgentRegisterReport;
 import com.secnium.iast.core.threadlocalpool.*;
 import com.secnium.iast.core.util.LogUtils;
 import org.slf4j.Logger;
@@ -197,6 +198,7 @@ public class EngineManager {
                     (Integer) requestMeta.get("serverPort"),
                     true
             );
+            AgentRegisterReport.send();
         }
         ENTER_HTTP_ENTRYPOINT.enterHttpEntryPoint();
         REQUEST_CONTEXT.set(requestMeta);
