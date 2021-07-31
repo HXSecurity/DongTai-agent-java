@@ -4,10 +4,10 @@ import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.AbstractClassVisitor;
 import com.secnium.iast.core.enhance.plugins.core.adapter.PropagateAdviceAdapter;
 import com.secnium.iast.core.util.AsmUtils;
+import com.secnium.iast.core.util.LogUtils;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.slf4j.Logger;
-import com.secnium.iast.core.util.LogUtils;
 
 import java.util.List;
 
@@ -37,7 +37,7 @@ public class BaseType extends AbstractClassVisitor {
             mv = new PropagateAdviceAdapter(mv, access, name, desc, context, framework, iastMethodSignature);
             transformed = true;
             if (logger.isDebugEnabled()) {
-                logger.debug("rewrite method {} for listener[id={},class={}]", iastMethodSignature, context.getListenId(), context.getClassName());
+                logger.debug("rewrite method {} for listener[match={},class={}]", iastMethodSignature, context.getMatchClassname(), context.getClassName());
             }
         }
         return mv;

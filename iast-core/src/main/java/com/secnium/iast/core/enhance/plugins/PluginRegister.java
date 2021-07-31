@@ -1,9 +1,9 @@
 package com.secnium.iast.core.enhance.plugins;
 
 import com.secnium.iast.core.enhance.IastContext;
+import com.secnium.iast.core.enhance.plugins.cookie.DispatchCookie;
 import com.secnium.iast.core.enhance.plugins.core.DispatchClassPlugin;
 import com.secnium.iast.core.enhance.plugins.framework.j2ee.dispatch.DispatchJ2ee;
-import com.secnium.iast.core.enhance.plugins.cookie.DispatchCookie;
 import org.objectweb.asm.ClassVisitor;
 
 import java.util.ArrayList;
@@ -36,9 +36,7 @@ public class PluginRegister {
         PLUGINS.add(new DispatchJ2ee());
         //PLUGINS.add(new DispatchJsp());
         PLUGINS.add(new DispatchCookie());
-        //PLUGINS.add(new DispatchRecyclePlugin());
         //PLUGINS.add(new DispatchSpringAutoBinding());
-
         PLUGINS.add(new DispatchClassPlugin());
     }
 }

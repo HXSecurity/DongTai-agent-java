@@ -102,7 +102,7 @@ public class ScannerFactory {
             }
             if (setJdbcImpl) {
                 jdbcImpl.setEvent(event);
-                LoginLogicRecognize.handleLoginLogicRecognize(event.javaClassName, jdbcImpl.readSql());
+                LoginLogicRecognize.handleLoginLogicRecognize(event.getMatchClassName(), jdbcImpl.readSql());
             }
         }
         return setJdbcImpl;

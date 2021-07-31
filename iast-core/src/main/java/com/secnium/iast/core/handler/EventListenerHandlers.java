@@ -25,9 +25,9 @@ public class EventListenerHandlers {
      */
     private static final AtomicInteger INVOKE_ID_SEQUENCER = new AtomicInteger(1000);
 
-    public static void onBefore(final int listenerId,
-                                final String framework,
+    public static void onBefore(final String framework,
                                 final String javaClassName,
+                                final String matchClassName,
                                 final String javaMethodName,
                                 final String javaMethodDesc,
                                 final Object object,
@@ -49,7 +49,7 @@ public class EventListenerHandlers {
                 boolean isEnterHttpEntryPoint = EngineManager.ENTER_HTTP_ENTRYPOINT.isEnterHttp();
                 boolean isHttpEntryMethod = HookType.HTTP.equals(hookType);
                 if (isEnterHttpEntryPoint || isHttpEntryMethod) {
-                    MethodEvent event = new MethodEvent(0, -1, javaClassName, javaMethodName, javaMethodDesc, signature, object, argumentArray, retValue, framework, isStatic, null);
+                    MethodEvent event = new MethodEvent(0, -1, javaClassName, matchClassName, javaMethodName, javaMethodDesc, signature, object, argumentArray, retValue, framework, isStatic, null);
                     if (isHttpEntryMethod) {
                         HttpImpl.solveHttp(event);
                     } else {

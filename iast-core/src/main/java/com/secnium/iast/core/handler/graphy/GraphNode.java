@@ -40,8 +40,6 @@ public class GraphNode {
     /**
      * 当前方法所在类继承的类名称
      */
-    private String superClassName;
-
     public void setInterfaceNames(Set<String> interfaceNames) {
         if (interfaceNames == null) {
             this.interfaceNames = null;
@@ -61,10 +59,15 @@ public class GraphNode {
      * 当前方法所在类实现的接口列表
      */
     private String[] interfaceNames;
+
+    /**
+     * 方法所在类的原始名称
+     */
+    private final String matchClassName;
     /**
      * 当前方法所在类的名称
      */
-    private final String className;
+    private final String originClassName;
     /**
      * 当前方法的名称
      */
@@ -96,7 +99,8 @@ public class GraphNode {
                      String callerMethod,
                      int callerLineNumber,
                      Set<String> interfaceNames,
-                     String className,
+                     String matchClassName,
+                     String originClassName,
                      String methodName,
                      String signature,
                      String args,
@@ -112,7 +116,8 @@ public class GraphNode {
         this.callerMethod = callerMethod;
         this.callerLineNumber = callerLineNumber;
         this.setInterfaceNames(interfaceNames);
-        this.className = className;
+        this.matchClassName = matchClassName;
+        this.originClassName = originClassName;
         this.methodName = methodName;
         this.signature = signature;
         this.args = args;
@@ -135,7 +140,8 @@ public class GraphNode {
         value.put("callerMethod", callerMethod);
         value.put("callerLineNumber", callerLineNumber);
         value.put("interfaces", interfaceArray);
-        value.put("className", className);
+        value.put("originClassName", originClassName);
+        value.put("className", matchClassName);
         value.put("methodName", methodName);
         value.put("signature", signature);
         value.put("args", args);

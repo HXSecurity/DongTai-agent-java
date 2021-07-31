@@ -3,11 +3,11 @@ package com.secnium.iast.core.enhance.plugins.framework.j2ee.dispatch;
 import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.AbstractClassVisitor;
 import com.secnium.iast.core.util.AsmUtils;
+import com.secnium.iast.core.util.LogUtils;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 import org.slf4j.Logger;
-import com.secnium.iast.core.util.LogUtils;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -50,7 +50,7 @@ public class ServletDispatcherAdapter extends AbstractClassVisitor {
         }
         if (transformed) {
             if (logger.isDebugEnabled()) {
-                logger.debug("rewrite method {}.{} for listener[id={}]", context.getClassName(), name, context.getListenId());
+                logger.debug("rewrite method {}.{} for listener[match={}]", context.getClassName(), name, context.getMatchClassname());
             }
         }
 
@@ -60,6 +60,7 @@ public class ServletDispatcherAdapter extends AbstractClassVisitor {
     /**
      * 检查是否为http入口方法（service/doFilter)
      * javax.servlet.http.HttpServlet
+     *
      * @param name       方法名称
      * @param typeOfArgs 方法参数
      * @return true-是http入口方法，falst-非http入口方法
