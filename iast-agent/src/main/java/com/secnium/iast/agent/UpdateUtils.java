@@ -13,18 +13,8 @@ import java.security.cert.X509Certificate;
  */
 public class UpdateUtils {
     private final static IastProperties PROPERTIES = IastProperties.getInstance();
-    private final static String UPDATE_URL = PROPERTIES.getBaseUrl() + "/api/v1/engine/update";
     private final static String START_URL = PROPERTIES.getBaseUrl() + "/api/v1/engine/startstop";
     private final static String AGENT_TOKEN = URLEncoder.encode(AgentRegister.getAgentToken());
-
-    public static boolean needUpdate() {
-        String respRaw = sendRequest(UPDATE_URL + "?agent_name=" + AGENT_TOKEN);
-        if (respRaw != null && !respRaw.isEmpty()) {
-            JSONObject resp = new JSONObject(respRaw);
-            return "1".equals(resp.get("data").toString());
-        }
-        return false;
-    }
 
     public static String checkForStatus() {
         try {
@@ -37,14 +27,6 @@ public class UpdateUtils {
             return "other";
         }
         return "other";
-    }
-
-    public static void setUpdateSuccess() {
-        sendRequest(UPDATE_URL + "/0?agent_name=" + AGENT_TOKEN);
-    }
-
-    public static void setUpdateFailure() {
-        sendRequest(UPDATE_URL + "/1?agent_name=" + AGENT_TOKEN);
     }
 
     private static String sendRequest(String urlStr) {

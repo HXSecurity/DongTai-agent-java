@@ -150,27 +150,18 @@ public class EngineManager {
     public boolean updateEnginePackage() {
         String jdkVersion = getJdkVersion();
         String baseUrl = properties.getBaseUrl();
-        if (downloadJarPackageToCacheFromUrl(baseUrl + INJECT_PACKAGE_REMOTE_URI + jdkVersion, getInjectPackageCachePath()) &&
-                downloadJarPackageToCacheFromUrl(baseUrl + ENGINE_PACKAGE_REMOTE_URI + jdkVersion, getEnginePackageCachePath())) {
-            UpdateUtils.setUpdateSuccess();
-            return true;
-        }
-        return false;
+        return downloadJarPackageToCacheFromUrl(baseUrl + INJECT_PACKAGE_REMOTE_URI + jdkVersion, getInjectPackageCachePath()) &&
+                downloadJarPackageToCacheFromUrl(baseUrl + ENGINE_PACKAGE_REMOTE_URI + jdkVersion, getEnginePackageCachePath());
     }
 
 
     public boolean downloadEnginePackage() {
         System.out.println("[cn.huoxian.dongtai.iast] Check if the engine needs to be updated");
-        if (UpdateUtils.needUpdate()) {
-            System.out.println("[cn.huoxian.dongtai.iast] Receive an instruction from the remote server to update the engine, update the engine immediately");
+        if (engineNotExist(getInjectPackageCachePath()) || engineNotExist(getEnginePackageCachePath())) {
+            System.out.println("[cn.huoxian.dongtai.iast] Engine does not exist in local cache, the engine will be downloaded.");
             return updateEnginePackage();
         } else {
-            if (engineNotExist(getInjectPackageCachePath()) || engineNotExist(getEnginePackageCachePath())) {
-                System.out.println("[cn.huoxian.dongtai.iast] Engine does not exist in local cache, the engine will be downloaded.");
-                return updateEnginePackage();
-            } else {
-                return true;
-            }
+            return true;
         }
     }
 

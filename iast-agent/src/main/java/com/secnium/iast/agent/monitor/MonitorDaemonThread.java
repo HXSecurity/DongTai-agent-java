@@ -16,7 +16,6 @@ public class MonitorDaemonThread implements Runnable {
     public MonitorDaemonThread(EngineManager engineManager) {
         this.monitorTasks = new ArrayList<IMonitor>();
         this.monitorTasks.add(new PerformanceMonitor(engineManager));
-        this.monitorTasks.add(new UpdateMonitor(engineManager));
         this.monitorTasks.add(new EngineMonitor(engineManager));
         this.engineManager = engineManager;
     }

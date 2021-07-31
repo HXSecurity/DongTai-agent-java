@@ -22,7 +22,6 @@ public class IastContext {
     private ClassLoader classLoader;
     private int listenId;
     private String namespace;
-    private int classLoaderObjectID;
     private Map<Integer, MethodEvent> trackMap;
     private int version;
     private boolean enableAllHook;
@@ -39,15 +38,15 @@ public class IastContext {
 
     public static IastContext build(String className, String matchClassname, HashSet<String> ancestors, String[] interfaces,
                                     String baseClassName, int flags, byte[] srcCodeBytes, CodeSource codeSource,
-                                    ClassLoader loader, int listenId, String namespace, int classLoaderObjectID) {
+                                    ClassLoader loader, int listenId, String namespace) {
         instance = new IastContext(className, matchClassname, ancestors, interfaces, baseClassName, flags, srcCodeBytes,
-                codeSource, loader, listenId, namespace, classLoaderObjectID);
+                codeSource, loader, listenId, namespace);
         return instance;
     }
 
     private IastContext(String className, String matchClassname, HashSet<String> ancestors, String[] interfaces,
                         String baseClassName, int flags, byte[] srcCodeBytes, CodeSource codeSource, ClassLoader loader,
-                        int listenId, String namespace, int classLoaderObjectID) {
+                        int listenId, String namespace) {
         this.setClassName(className);
         this.setMatchClassname(matchClassname);
         this.setAncestor(ancestors);
@@ -59,13 +58,12 @@ public class IastContext {
         this.setLoader(loader);
         this.setListenId(listenId);
         this.setNamespace(namespace);
-        this.setClassLoaderObjectID(classLoaderObjectID);
         this.setEnableAllHook(false);
     }
 
 
     public void setClassName(String className) {
-        this.className = className;
+        this.className = className.replace('/', '.');
     }
 
     public void setAncestor(HashSet<String> ancestors) {
@@ -122,14 +120,6 @@ public class IastContext {
 
     public String getNamespace() {
         return namespace;
-    }
-
-    public void setClassLoaderObjectID(int classLoaderObjectID) {
-        this.classLoaderObjectID = classLoaderObjectID;
-    }
-
-    public int getClassLoaderObjectID() {
-        return classLoaderObjectID;
     }
 
     public String getMatchClassname() {

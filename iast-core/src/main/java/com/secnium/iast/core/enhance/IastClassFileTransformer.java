@@ -93,9 +93,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                 System.arraycopy(srcByteCodeArray, 0, sourceCodeBak, 0, srcByteCodeArray.length);
                 final ClassReader cr = new ClassReader(sourceCodeBak);
                 final int flags = cr.getAccess();
-
-                final int targetClassLoaderObjectID = ObjectIDs.instance.identity(loader);
-
+                
                 final String[] interfaces = cr.getInterfaces();
                 final String superName = cr.getSuperName();
                 final String className = cr.getClassName();
@@ -106,8 +104,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
 
                 final ClassWriter cw = createClassWriter(loader, cr);
                 ClassVisitor cv = PLUGINS.initial(cw, IastContext.build(className, className, ancestors, interfaces,
-                        superName, flags, sourceCodeBak, codeSource, loader, listenerId, namespace,
-                        targetClassLoaderObjectID
+                        superName, flags, sourceCodeBak, codeSource, loader, listenerId, namespace
                 ));
 
                 // fixme: 根据改行日志判断出时间损耗主要出现在accept中，但是，plugin的匹配也很耗时，需优化

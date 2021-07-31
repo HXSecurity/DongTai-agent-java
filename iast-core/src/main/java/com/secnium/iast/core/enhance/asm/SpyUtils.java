@@ -31,7 +31,7 @@ public class SpyUtils {
         Injecter.init(
                 namespace,
                 unCaughtGetClassDeclaredJavaMethod(EventListenerHandlers.class, "onBefore",
-                        int.class,
+                        String.class,
                         String.class,
                         String.class,
                         String.class,

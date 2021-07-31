@@ -2,7 +2,9 @@ package com.secnium.iast.core.handler.models;
 
 import org.json.JSONObject;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * 方法事件
@@ -14,7 +16,7 @@ public class MethodEvent {
     /**
      * 调用过程ID
      */
-    public final int processId;
+    private final int processId;
 
     public int getInvokeId() {
         return invokeId;
@@ -25,34 +27,40 @@ public class MethodEvent {
      */
     private int invokeId;
 
-    public final boolean isStatic;
+    private final boolean isStatic;
 
-    public String getJavaClassName() {
-        return javaClassName;
+    public String getOriginClassName() {
+        return originClassName;
+    }
+
+    private final String originClassName;
+
+    public String getMatchClassName() {
+        return matchClassName;
     }
 
     /**
      * 获取触发调用事件的类名称
      */
-    public final String javaClassName;
+    private final String matchClassName;
 
-    public String getJavaMethodName() {
-        return javaMethodName;
+    public String getMethodName() {
+        return methodName;
     }
 
     /**
      * 获取触发调用事件的方法名称
      */
-    private final String javaMethodName;
+    private final String methodName;
 
-    public String getJavaMethodDesc() {
-        return javaMethodDesc;
+    public String getMethodDesc() {
+        return methodDesc;
     }
 
     /**
      * 获取触发调用事件的方法签名
      */
-    public final String javaMethodDesc;
+    private final String methodDesc;
 
     /**
      * 获取触发调用事件的对象
@@ -150,18 +158,19 @@ public class MethodEvent {
      *
      * @param processId      调用者ID
      * @param invokeId       方法调用ID
-     * @param javaClassName  方法所在类的名称
-     * @param javaMethodName 方法名称
-     * @param javaMethodDesc 方法描述符
+     * @param matchClassName 方法所在类的名称
+     * @param methodName     方法名称
+     * @param methodDesc     方法描述符
      * @param object         方法对应的实例化对象
      * @param argumentArray  方法参数
      * @param isStatic       方法是否为静态方法，true-静态方法；false-实例方法
      */
     public MethodEvent(final int processId,
                        final int invokeId,
-                       final String javaClassName,
-                       final String javaMethodName,
-                       final String javaMethodDesc,
+                       final String originClassName,
+                       final String matchClassName,
+                       final String methodName,
+                       final String methodDesc,
                        final String signature,
                        final Object object,
                        final Object[] argumentArray,
@@ -171,9 +180,10 @@ public class MethodEvent {
                        final StackTraceElement[] callStack) {
         this.processId = processId;
         this.invokeId = invokeId;
-        this.javaClassName = javaClassName;
-        this.javaMethodName = javaMethodName;
-        this.javaMethodDesc = javaMethodDesc;
+        this.matchClassName = matchClassName;
+        this.originClassName = originClassName;
+        this.methodName = methodName;
+        this.methodDesc = methodDesc;
         this.signature = signature;
         this.object = object;
         this.argumentArray = argumentArray;
@@ -185,28 +195,6 @@ public class MethodEvent {
         this.isStatic = isStatic;
         this.callStacks = callStack;
         this.framework = framework;
-    }
-
-    /**
-     * 通过此方法实现不同类型的深复制，避免方法运行过程中数据被gc
-     *
-     * @return
-     */
-    public Object cloneRefObject(Object obj) {
-        if (obj instanceof Map) {
-            HashMap<Object, Object> newHashMap = new HashMap<Object, Object>();
-            Map<?, ?> mapOfTargets = (Map<?, ?>) obj;
-            for (Object key : mapOfTargets.keySet()) {
-                if (key != null) {
-                    Object objOfValue = mapOfTargets.get(key);
-                    newHashMap.put(key, objOfValue);
-                }
-            }
-
-            return newHashMap;
-        } else {
-            return obj;
-        }
     }
 
     /**
@@ -232,18 +220,6 @@ public class MethodEvent {
         return this.object;
     }
 
-    public void addSubEvent(MethodEvent event) {
-        this.subEvent.add(event);
-    }
-
-    public List<MethodEvent> getSubEvent() {
-        return this.subEvent;
-    }
-
-
-    public List<MethodEvent> getSubEvents() {
-        return subEvent;
-    }
 
     public void setInvokeId(int invokeId) {
         this.invokeId = invokeId;
@@ -277,8 +253,8 @@ public class MethodEvent {
 
     public JSONObject toReport() {
         JSONObject methodReport = new JSONObject();
-        methodReport.put("classname", object == null ? javaClassName : object.getClass().getName());
-        methodReport.put("methodname", javaMethodName);
+        methodReport.put("classname", object == null ? matchClassName : object.getClass().getName());
+        methodReport.put("methodname", methodName);
 
         if (!source) {
             if (inValue == null) {
@@ -306,9 +282,9 @@ public class MethodEvent {
                 "processId=" + processId +
                 ", invokeId=" + invokeId +
                 ", isStatic=" + isStatic +
-                ", javaClassName='" + javaClassName + '\'' +
-                ", javaMethodName='" + javaMethodName + '\'' +
-                ", javaMethodDesc='" + javaMethodDesc + '\'' +
+                ", javaClassName='" + matchClassName + '\'' +
+                ", javaMethodName='" + methodName + '\'' +
+                ", javaMethodDesc='" + methodDesc + '\'' +
                 ", object=" + object +
                 ", argumentArray=" + Arrays.toString(argumentArray) +
                 ", returnValue=" + returnValue +
@@ -325,10 +301,6 @@ public class MethodEvent {
                 '}';
     }
 
-    public boolean hasSubEvent() {
-        return !this.subEvent.isEmpty();
-    }
-
     public String getCallerClass() {
         return callStack.getClassName();
     }
@@ -341,15 +313,8 @@ public class MethodEvent {
         return callStack.getLineNumber();
     }
 
-    public StackTraceElement getCallStack() {
-        return callStack;
-    }
-
     public void setCallStack(StackTraceElement callStack) {
         this.callStack = callStack;
     }
 
-    public int getChildCount() {
-        return this.subEvent == null ? 0 : this.subEvent.size();
-    }
 }

@@ -26,12 +26,12 @@ public interface AsmMethods {
     }
 
     /**
-     * asm method of {@link Injecter#spyMethodOnBefore(Object, Object[], String, String, int, String, String, String, Object, String, boolean, int)}
+     * asm method of {@link Injecter#spyMethodOnBefore(Object, Object[], String, String, String, String, String, String, Object, String, boolean, int)}
      */
     Method ASM_METHOD_Spy$spyMethodOnBefore = InnerHelper.getAsmMethod(
             Injecter.class,
             "spyMethodOnBefore",
-            Object.class, Object[].class, String.class, String.class, int.class, String.class, String.class, String.class, Object.class, String.class, boolean.class, int.class
+            Object.class, Object[].class, String.class, String.class, String.class, String.class, String.class, String.class, Object.class, String.class, boolean.class, int.class
     );
 
     /**

@@ -72,7 +72,7 @@ public class SourceImpl {
 
     private static boolean allowCall(MethodEvent event) {
         boolean allowed = true;
-        if (METHOD_OF_GETATTRIBUTE.equals(event.getJavaMethodName())) {
+        if (METHOD_OF_GETATTRIBUTE.equals(event.getMethodName())) {
             return allowAttribute((String) event.argumentArray[0]);
         }
         return allowed;

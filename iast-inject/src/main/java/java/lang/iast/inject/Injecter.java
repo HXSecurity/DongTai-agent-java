@@ -136,8 +136,8 @@ public class Injecter {
                                          final Object[] argumentArray,
                                          final String namespace,
                                          final String framework,
-                                         final int listenerId,
                                          final String javaClassName,
+                                         final String matchClassName,
                                          final String javaMethodName,
                                          final String javaMethodDesc,
                                          final Object target,
@@ -150,8 +150,7 @@ public class Injecter {
             try {
                 final MethodHook hook = NAMESPACE_METHOD_HOOK_MAP.get(namespace);
                 if (null != hook) {
-                    hook.ON_BEFORE_METHOD.invoke(null,
-                            listenerId, framework, javaClassName, javaMethodName, javaMethodDesc, target, argumentArray, retValue, signCode, isStatic, hookType);
+                    hook.ON_BEFORE_METHOD.invoke(null, framework, javaClassName, matchClassName, javaMethodName, javaMethodDesc, target, argumentArray, retValue, signCode, isStatic, hookType);
                 }
             } catch (Throwable cause) {
                 handleException(cause);
