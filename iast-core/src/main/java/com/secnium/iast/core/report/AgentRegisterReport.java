@@ -141,7 +141,9 @@ public class AgentRegisterReport {
         try {
             String msg = generateAgentRegisterMsg();
             StringBuilder responseRaw = HttpClientUtils.sendPost(Constants.API_AGENT_REGISTER, msg);
-            setAgentId(responseRaw);
+            if (!isRegistered()) {
+                setAgentId(responseRaw);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -36567,7 +36567,7 @@ org/apache/struts2/dispatcher/mapper/Restful2ActionMapper
 org/apache/struts2/dispatcher/mapper/RestfulActionMapper
 # fix s2-061 vul detect
 # close this hook point, it's slowly
-#org/apache/struts2/dispatcher/multipart/JakartaMultiPartRequest
+org/apache/struts2/dispatcher/multipart/JakartaMultiPartRequest
 org/apache/struts2/dispatcher/multipart/JakartaMultiPartRequest$1
 org/apache/struts2/dispatcher/multipart/JakartaStreamMultiPartRequest
 org/apache/struts2/dispatcher/multipart/JakartaStreamMultiPartRequest$FileInfo

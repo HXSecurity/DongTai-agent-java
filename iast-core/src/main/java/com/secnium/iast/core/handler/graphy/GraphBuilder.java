@@ -7,9 +7,13 @@ import com.secnium.iast.core.handler.controller.impl.HttpImpl;
 import com.secnium.iast.core.handler.models.MethodEvent;
 import com.secnium.iast.core.handler.vulscan.ReportConstant;
 import com.secnium.iast.core.report.AgentRegisterReport;
+import com.secnium.iast.core.util.Constants;
+import com.secnium.iast.core.util.HttpClientUtils;
+import com.secnium.iast.core.util.LogUtils;
 import com.secnium.iast.core.util.base64.Base64Encoder;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -23,8 +27,30 @@ public class GraphBuilder {
 
     public static void buildAndReport(Object response) {
         List<GraphNode> nodeList = build();
-        String report = convertToReport(nodeList, response);
-        EngineManager.sendNewReport(report);
+        Map<String, Object> responseMeta = getResponseMeta(response);
+        if (nodeList.size() > 1) {
+            String report = convertToReport(nodeList, responseMeta);
+            try {
+                HttpClientUtils.sendPost(Constants.API_REPORT_UPLOAD, report);
+            } catch (Exception reportSendException) {
+                logger.info(report);
+                logger.error(reportSendException.toString());
+            }
+        }
+    }
+
+    private static Map<String, Object> getResponseMeta(Object response) {
+        Map<String, Object> responseMeta = null;
+        try {
+            responseMeta = HttpImpl.getResponseMeta(response, true);
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+        return responseMeta;
     }
 
     /**
@@ -65,17 +91,7 @@ public class GraphBuilder {
         return nodeList;
     }
 
-    public static String convertToReport(List<GraphNode> nodeList, Object response) {
-        Map<String, Object> responseMeta = null;
-        try {
-            responseMeta = HttpImpl.getResponseMeta(response, true);
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        }
+    public static String convertToReport(List<GraphNode> nodeList, Map<String, Object> responseMeta) {
         Map<String, Object> requestMeta = EngineManager.REQUEST_CONTEXT.get();
         JSONObject report = new JSONObject();
         JSONObject detail = new JSONObject();
@@ -110,4 +126,6 @@ public class GraphBuilder {
 
         return report.toString();
     }
+
+    private static final Logger logger = LogUtils.getLogger(GraphBuilder.class);
 }
