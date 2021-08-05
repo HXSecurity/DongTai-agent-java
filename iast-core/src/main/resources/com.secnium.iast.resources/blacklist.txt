@@ -4447,7 +4447,6 @@ com/ctc/wstx/sr/ReaderCreator
 com/ctc/wstx/sr/StreamReaderImpl
 com/ctc/wstx/sr/StreamScanner
 com/ctc/wstx/sr/TypedStreamReader
-com/ctc/wstx/sr/ValidatingStreamReader
 com/ctc/wstx/stax/WstxInputFactory
 com/ctc/wstx/stax/WstxOutputFactory
 com/ctc/wstx/sw/AsciiXmlWriter

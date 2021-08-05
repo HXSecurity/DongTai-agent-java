@@ -7,8 +7,6 @@ import com.secnium.iast.core.handler.controller.impl.HttpImpl;
 import com.secnium.iast.core.handler.models.MethodEvent;
 import com.secnium.iast.core.handler.vulscan.ReportConstant;
 import com.secnium.iast.core.report.AgentRegisterReport;
-import com.secnium.iast.core.util.Constants;
-import com.secnium.iast.core.util.HttpClientUtils;
 import com.secnium.iast.core.util.LogUtils;
 import com.secnium.iast.core.util.base64.Base64Encoder;
 import org.json.JSONArray;
@@ -27,16 +25,8 @@ public class GraphBuilder {
 
     public static void buildAndReport(Object response) {
         List<GraphNode> nodeList = build();
-        Map<String, Object> responseMeta = getResponseMeta(response);
-        if (nodeList.size() > 1) {
-            String report = convertToReport(nodeList, responseMeta);
-            try {
-                HttpClientUtils.sendPost(Constants.API_REPORT_UPLOAD, report);
-            } catch (Exception reportSendException) {
-                logger.info(report);
-                logger.error(reportSendException.toString());
-            }
-        }
+        String report = convertToReport(nodeList, response);
+        EngineManager.sendMethodReport(report);
     }
 
     private static Map<String, Object> getResponseMeta(Object response) {
@@ -91,8 +81,9 @@ public class GraphBuilder {
         return nodeList;
     }
 
-    public static String convertToReport(List<GraphNode> nodeList, Map<String, Object> responseMeta) {
+    public static String convertToReport(List<GraphNode> nodeList, Object response) {
         Map<String, Object> requestMeta = EngineManager.REQUEST_CONTEXT.get();
+        Map<String, Object> responseMeta = getResponseMeta(response);
         JSONObject report = new JSONObject();
         JSONObject detail = new JSONObject();
         JSONArray methodPool = new JSONArray();
