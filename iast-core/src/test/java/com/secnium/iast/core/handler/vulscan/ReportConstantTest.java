@@ -20,7 +20,6 @@ public class ReportConstantTest {
         detail.put(ReportConstant.CONTAINER_NAME, 20102);
         detail.put(ReportConstant.CONTAINER_VERSION, 20102);
         detail.put(ReportConstant.WEB_SERVER_PATH, 20102);
-        detail.put(ReportConstant.HEART_BEAT_WEB_SERVER_HOSTNAME, 20102);
         detail.put(ReportConstant.WEB_SERVER_ADDR, 20102);
         detail.put(ReportConstant.WEB_SERVER_PORT, 20102);
 
