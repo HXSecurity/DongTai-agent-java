@@ -2,6 +2,7 @@ package com.secnium.iast.core;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.secnium.iast.core.replay.HttpRequestReplay;
+import com.secnium.iast.core.report.MethodReportSender;
 import com.secnium.iast.core.report.ReportSender;
 
 import java.util.concurrent.Executors;
@@ -19,6 +20,7 @@ public class ServiceFactory {
 
     ReportSender report = null;
     HttpRequestReplay requestReplay = null;
+    MethodReportSender methodReportSender = null;
 
     public static ServiceFactory getInstance() {
         if (null == INSTANCE) {
@@ -39,11 +41,13 @@ public class ServiceFactory {
     }
 
     public void init() {
+        methodReportSender = new MethodReportSender();
         report = new ReportSender();
         requestReplay = new HttpRequestReplay();
     }
 
     public void start() {
+        executorService.scheduleWithFixedDelay(methodReportSender, 0, reportInterval, TimeUnit.MILLISECONDS);
         executorService.scheduleWithFixedDelay(report, 0, reportInterval, TimeUnit.MILLISECONDS);
         executorService.scheduleWithFixedDelay(requestReplay, 0, replayInterval, TimeUnit.MILLISECONDS);
     }
