@@ -63,9 +63,9 @@ public class HttpResponse {
                     }
                 }
                 try {
-                    responseStr = new String(responseData, charSet);
+                    responseStr = new String(responseData,0,1000, charSet);
                 } catch (UnsupportedEncodingException e) {
-                    responseStr = new String(responseData);
+                    responseStr = new String(responseData,0,1000);
                 }
 
             } catch (Exception e) {
