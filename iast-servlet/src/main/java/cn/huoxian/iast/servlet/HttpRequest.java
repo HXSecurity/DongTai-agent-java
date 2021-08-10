@@ -27,7 +27,7 @@ public class HttpRequest {
         requestMeta.put("queryString", request.getQueryString());
         requestMeta.put("protocol", request.getProtocol());
         requestMeta.put("scheme", request.getScheme());
-        requestMeta.put("remoteAddr", request.getRemoteAddr());
+        requestMeta.put("remoteAddr", getRemoteAddr(request));
         requestMeta.put("secure", request.isSecure());
         requestMeta.put("body", getPostBody(request));
         requestMeta.put("headers", getHeaders(request));
@@ -88,4 +88,9 @@ public class HttpRequest {
         }
         return postBody.toString();
     }
+
+    private static String getRemoteAddr(HttpServletRequest request) {
+       return request.getRemoteAddr().equals("0:0:0:0:0:0:0:1") ? "127.0.0.1" : request.getRemoteAddr();
+    }
+
 }
