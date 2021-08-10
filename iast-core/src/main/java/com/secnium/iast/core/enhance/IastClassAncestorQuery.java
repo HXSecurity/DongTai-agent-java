@@ -187,7 +187,7 @@ public class IastClassAncestorQuery {
                     scannedClassSet.add(jarPackageFilePath);
                     ScaScanner.scanWithJarPackage(jarPackageFilePath);
                 }
-            } else if (jarPackageFilePath.endsWith(".jar") && !jarPackageFilePath.contains("dongtai") && !jarPackageFilePath.endsWith("agent.jar") && !scannedClassSet.contains(jarPackageFilePath)) {
+            } else if (jarPackageFilePath.endsWith(".jar") && !jarPackageFilePath.contains("dongtai-servlet") && !jarPackageFilePath.endsWith("agent.jar") && !scannedClassSet.contains(jarPackageFilePath)) {
                 scannedClassSet.add(jarPackageFilePath);
                 File packagePathFile = new File(jarPackageFilePath);
                 ScaScanner.scan(packagePathFile);
