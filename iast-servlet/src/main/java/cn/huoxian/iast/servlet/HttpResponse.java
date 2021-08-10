@@ -52,11 +52,9 @@ public class HttpResponse {
         if (response instanceof ResponseWrapper) {
             try {
                 byte[] responseData = ((ResponseWrapper) response).getResponseData();
-                responseStr = new String(responseData);
+                responseStr = new String(responseData, 0, Math.min(responseData.length, 1000));
             } catch (Exception e) {
-
             }
-
         }
         return responseStr;
     }
