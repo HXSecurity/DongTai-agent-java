@@ -84,7 +84,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
         try {
             final CodeSource codeSource = (protectionDomain != null) ? protectionDomain.getCodeSource() : null;
             // fixme: 临时关闭SCA，判断速度慢的方法
-            if (codeSource != null && internalClassName != null && !internalClassName.startsWith("com/secnium/iast/")) {
+            if (codeSource != null && internalClassName != null && !internalClassName.startsWith("com/secnium/iast/") && !internalClassName.startsWith("com/sun/") && !internalClassName.startsWith("sun/")) {
                 COMMON_UTILS.scanCodeSource(codeSource);
             }
 
