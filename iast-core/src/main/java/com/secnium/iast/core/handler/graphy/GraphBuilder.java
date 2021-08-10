@@ -7,9 +7,11 @@ import com.secnium.iast.core.handler.controller.impl.HttpImpl;
 import com.secnium.iast.core.handler.models.MethodEvent;
 import com.secnium.iast.core.handler.vulscan.ReportConstant;
 import com.secnium.iast.core.report.AgentRegisterReport;
+import com.secnium.iast.core.util.LogUtils;
 import com.secnium.iast.core.util.base64.Base64Encoder;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -24,7 +26,21 @@ public class GraphBuilder {
     public static void buildAndReport(Object response) {
         List<GraphNode> nodeList = build();
         String report = convertToReport(nodeList, response);
-        EngineManager.sendNewReport(report);
+        EngineManager.sendMethodReport(report);
+    }
+
+    private static Map<String, Object> getResponseMeta(Object response) {
+        Map<String, Object> responseMeta = null;
+        try {
+            responseMeta = HttpImpl.getResponseMeta(response, true);
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+        return responseMeta;
     }
 
     /**
@@ -66,17 +82,8 @@ public class GraphBuilder {
     }
 
     public static String convertToReport(List<GraphNode> nodeList, Object response) {
-        Map<String, Object> responseMeta = null;
-        try {
-            responseMeta = HttpImpl.getResponseMeta(response, true);
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        }
         Map<String, Object> requestMeta = EngineManager.REQUEST_CONTEXT.get();
+        Map<String, Object> responseMeta = getResponseMeta(response);
         JSONObject report = new JSONObject();
         JSONObject detail = new JSONObject();
         JSONArray methodPool = new JSONArray();
@@ -110,4 +117,6 @@ public class GraphBuilder {
 
         return report.toString();
     }
+
+    private static final Logger logger = LogUtils.getLogger(GraphBuilder.class);
 }
