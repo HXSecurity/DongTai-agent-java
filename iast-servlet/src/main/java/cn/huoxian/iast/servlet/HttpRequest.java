@@ -90,7 +90,8 @@ public class HttpRequest {
     }
 
     private static String getRemoteAddr(HttpServletRequest request) {
-       return request.getRemoteAddr().equals("0:0:0:0:0:0:0:1") ? "127.0.0.1" : request.getRemoteAddr();
+        String remoteAddr = request.getRemoteAddr();
+        return remoteAddr.equals("0:0:0:0:0:0:0:1") ? "127.0.0.1" : remoteAddr;
     }
 
 }
