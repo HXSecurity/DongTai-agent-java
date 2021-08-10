@@ -1,7 +1,7 @@
 package cn.huoxian.iast.servlet;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -49,10 +49,25 @@ public class HttpResponse {
      */
     private static String getBody(HttpServletResponse response) {
         String responseStr = "";
+        String charSet = "utf-8";
         if (response instanceof ResponseWrapper) {
             try {
                 byte[] responseData = ((ResponseWrapper) response).getResponseData();
-                responseStr = new String(responseData);
+                String contentType = response.getContentType();
+                if (contentType != null && contentType.contains("charset")) {
+                    String[] contentTypes = contentType.split(";");
+                    for (String contentTypeItem : contentTypes) {
+                        if (contentTypeItem.contains("charset")) {
+                            charSet = contentTypeItem.trim().replace("charset=", "");
+                        }
+                    }
+                }
+                try {
+                    responseStr = new String(responseData, charSet);
+                } catch (UnsupportedEncodingException e) {
+                    responseStr = new String(responseData);
+                }
+
             } catch (Exception e) {
 
             }

@@ -35,7 +35,8 @@ public class EngineManager {
     private static final BooleanTheadLocal LINGZHI_RUNNING = new BooleanTheadLocal(false);
     public static IastServer SERVER;
 
-    private static final ArrayBlockingQueue<String> REPORTS = new ArrayBlockingQueue<String>(256);
+    private static final ArrayBlockingQueue<String> REPORTS = new ArrayBlockingQueue<String>(2048);
+    private static final ArrayBlockingQueue<String> METHOD_REPORT = new ArrayBlockingQueue<String>(2048);
 
     private static boolean logined = false;
     private static int reqCounts = 0;
@@ -149,6 +150,18 @@ public class EngineManager {
 
     public static boolean hasNewReport() {
         return !REPORTS.isEmpty();
+    }
+
+    public static void sendMethodReport(String report) {
+        METHOD_REPORT.offer(report);
+    }
+
+    public static String getMethodReport() {
+        return METHOD_REPORT.poll();
+    }
+
+    public static boolean hasMethodReport() {
+        return !METHOD_REPORT.isEmpty();
     }
 
     public static boolean getIsLoginLogic() {
