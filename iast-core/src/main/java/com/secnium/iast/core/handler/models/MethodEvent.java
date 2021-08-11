@@ -1,5 +1,7 @@
 package com.secnium.iast.core.handler.models;
 
+import com.secnium.iast.core.report.ErrorLogReport;
+import com.secnium.iast.core.util.ThrowableUtils;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -226,27 +228,31 @@ public class MethodEvent {
     }
 
     public String obj2String(Object value) {
-        if (null == value) {
-            return "NULL";
-        }
         StringBuilder sb = new StringBuilder();
-        // 判断是否是基本类型的数组，基本类型的数组无法类型转换为Object[]，导致java.lang.ClassCastException异常
-        if (value.getClass().isArray() && !value.getClass().getComponentType().isPrimitive()) {
-            Object[] taints = (Object[]) value;
-            for (Object taint : taints) {
-                if (taint != null) {
-                    if (taint.getClass().isArray() && !taint.getClass().getComponentType().isPrimitive()) {
-                        Object[] subTaints = (Object[]) taint;
-                        for (Object subTaint : subTaints) {
-                            sb.append(subTaint.toString()).append(" ");
+        if (null == value) {
+            return "";
+        }
+        try {
+            // 判断是否是基本类型的数组，基本类型的数组无法类型转换为Object[]，导致java.lang.ClassCastException异常
+            if (value.getClass().isArray() && !value.getClass().getComponentType().isPrimitive()) {
+                Object[] taints = (Object[]) value;
+                for (Object taint : taints) {
+                    if (taint != null) {
+                        if (taint.getClass().isArray() && !taint.getClass().getComponentType().isPrimitive()) {
+                            Object[] subTaints = (Object[]) taint;
+                            for (Object subTaint : subTaints) {
+                                sb.append(subTaint.toString()).append(" ");
+                            }
+                        } else {
+                            sb.append(taint.toString()).append(" ");
                         }
-                    } else {
-                        sb.append(taint.toString()).append(" ");
                     }
                 }
+            } else {
+                sb.append(value.toString());
             }
-        } else {
-            sb.append(value.toString());
+        } catch (Exception convertObjectToStringError) {
+            ErrorLogReport.sendErrorLog(ThrowableUtils.getStackTrace(convertObjectToStringError));
         }
         return sb.toString();
     }
