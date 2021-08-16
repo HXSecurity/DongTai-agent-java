@@ -61,7 +61,7 @@ jobs:
           ./bin/startup.sh
           # wait 90s for tomcat running
           sleep 90
-          curl localhost:8080
+          curl localhost:8080/vulns/001-dir-1.jsp
       
       - name: Benchmark-Vulns-Test
         run: |
