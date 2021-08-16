@@ -34,3 +34,8 @@ jobs:
         run: |
           mvn -version
           mvn -B package -Dmaven.test.skip=true
+      
+      - name: OpenRASP-Vulns-Test
+        run: |
+          pwd
+          ls -l
