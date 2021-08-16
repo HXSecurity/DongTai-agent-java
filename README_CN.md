@@ -31,7 +31,7 @@ DongTai-agent-java 由`agent.jar`、`iast-core.jar `、`iast-inject.jar`、`dong
 
 ### 快速使用
 
-请参考：[快速开始](https://hxsecurity.github.io/DongTaiDoc/#/doc/tutorial/quickstart)
+请参考：[快速开始](https://hxsecurity.github.io/DongTai-Doc/#/doc/tutorial/quickstart)
 
 ### 快速开发
 
