@@ -71,7 +71,7 @@ jobs:
           ./spider.sh
 
           echo "show catalina logs"
-          sleep 120
+          sleep 600
       
       - name: Benchmark-Vulns-Test
         run: |
