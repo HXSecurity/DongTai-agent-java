@@ -58,6 +58,7 @@ jobs:
           cd apache-tomcat-8.5.40
           echo "init mysql..."
           #./init.sh
+          echo "java home is $JAVA_HOME"
           ./bin/startup.sh
           # wait 90s for tomcat running
           sleep 90
