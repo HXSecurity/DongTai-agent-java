@@ -61,8 +61,8 @@ jobs:
           echo "java home is $JAVA_HOME"
           ./bin/startup.sh
           # wait 90s for tomcat running
-          sleep 90
-          curl localhost:8080/vulns/001-dir-1.jsp
+          sleep 120
+          ./bin/spider.sh
       
       - name: Benchmark-Vulns-Test
         run: |
