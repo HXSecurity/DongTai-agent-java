@@ -18,6 +18,12 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 1.6
+            
+      - uses: dbelyaev/action-checkstyle@master
+        with:
+          github_token: ${{ secrets.github_token }}
+          reporter: github-pr-review
+          level: warning
 
       - name: Set up Maven
         uses: stCarolas/setup-maven@v4
