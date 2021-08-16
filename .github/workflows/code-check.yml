@@ -62,7 +62,7 @@ jobs:
           ./bin/startup.sh
           # wait 90s for tomcat running
           sleep 120
-          ./bin/spider.sh
+          ./spider.sh
       
       - name: Benchmark-Vulns-Test
         run: |
