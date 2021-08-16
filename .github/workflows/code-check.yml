@@ -65,13 +65,13 @@ jobs:
           echo "start catalina..."
           ./bin/startup.sh 2>/dev/null
           # wait 90s for tomcat running
-          sleep 120
+          sleep 30
 
           echo "start vulns spider..."
           ./spider.sh
 
           echo "show catalina logs"
-          cat logs/catalina.out
+          sleep 120
       
       - name: Benchmark-Vulns-Test
         run: |
