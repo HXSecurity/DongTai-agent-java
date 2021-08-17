@@ -62,15 +62,14 @@ jobs:
           #echo "init mysql..."
           #./init.sh
           
-          echo "start catalina..."
+          echo "start catalina and waitting 30s..."
           ./bin/startup.sh 2>/dev/null
-          # wait 90s for tomcat running
           sleep 30
 
           echo "start vulns spider..."
           ./spider.sh
 
-          echo "show catalina logs"
+          echo "waitting for send vuls data"
           sleep 600
       
       - name: Benchmark-Vulns-Test
