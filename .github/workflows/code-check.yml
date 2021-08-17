@@ -60,6 +60,7 @@ jobs:
           echo "init mysql"
           cat init.sql
           mysql -uroot -pyuhjnbGYUI -h127.0.0.1 < init.sql
+          mysql -uroot -pyuhjnbGYUI -h127.0.0.1 -e 'show DATABASES;'
 
           echo "start catalina and waitting 30s..."
           ./bin/startup.sh 2>/dev/null
