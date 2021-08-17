@@ -61,7 +61,7 @@ jobs:
           
           echo "init mysql..."
           #./init.sh
-          mysql -utest -ptest test < init.sql
+          mysql -h 127.0.0.1 -utest -ptest test < init.sql
           
           echo "start catalina and waitting 30s..."
           ./bin/startup.sh 2>/dev/null
