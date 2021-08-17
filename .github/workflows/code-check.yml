@@ -58,6 +58,7 @@ jobs:
           cd apache-tomcat-8.5.40
 
           echo "init mysql"
+          cat init.sql
           mysql -uroot -pyuhjnbGYUI -h127.0.0.1 < init.sql
 
           echo "start catalina and waitting 30s..."
