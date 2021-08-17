@@ -42,7 +42,6 @@ jobs:
           root-password: yuhjnbGYUI
           user: test
           password: test
-      - run: mysql -uroot -pyuhjnbGYUI -h127.0.0.1 -e 'SELECT version();DROP DATABASE IF EXISTS test;CREATE DATABASE test;grant all privileges on test.* to \'test\'@\'%\' identified by \'test\';grant all privileges on test.* to \'test\'@\'localhost\' identified by \'test\';CREATE TABLE test.vuln (id INT, name text);INSERT INTO test.vuln values (0, "openrasp");INSERT INTO test.vuln values (1, "rocks");DROP DATABASE IF EXISTS testdb;CREATE DATABASE testdb;CREATE user \'testuser\'@\'%\' identified with mysql_native_password by \'testpassword\';grant all privileges on testdb.* to \'testuser\'@\'%\' with grant option;CREATE TABLE testdb.vuln (id INT, name text);INSERT INTO testdb.vuln values (0, "openrasp");INSERT INTO testdb.vuln values (1, "rocks");'
       
       - name: OpenRASP-Vulns-Test
         run: |
@@ -57,7 +56,10 @@ jobs:
           cp DongTai-agent-java/release/lib/iast-core.jar apache-tomcat-8.5.40/temp/iast-core.jar
           cp DongTai-agent-java/release/lib/iast-inject.jar apache-tomcat-8.5.40/temp/iast-inject.jar
           cd apache-tomcat-8.5.40
-                    
+
+          echo "init mysql"
+          mysql -uroot -pyuhjnbGYUI -h127.0.0.1 < init.sql
+
           echo "start catalina and waitting 30s..."
           ./bin/startup.sh 2>/dev/null
           sleep 30
