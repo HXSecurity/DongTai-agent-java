@@ -35,15 +35,15 @@ jobs:
           mvn -version
           mvn -B package -Dmaven.test.skip=true
       
-      - uses: mirromutth/mysql-action@v1.1
+      - uses: shogo82148/actions-setup-mysql@v1
         with:
-          character set server: 'utf8' # Optional, default value is 'utf8mb4'. The '--character-set-server' option for mysqld
-          collation server: 'utf8_general_ci' # Optional, default value is 'utf8mb4_general_ci'. The '--collation-server' option for mysqld
-          mysql version: '8.0' # Optional, default value is "latest". The version of the MySQL
-          mysql database: 'test' # Optional, default value is "test". The specified database which will be create
-          mysql root password: test # Required if "mysql user" is empty, default is empty. The root superuser password
-          mysql user: 'test' # Required if "mysql root password" is empty, default is empty. The superuser for the specified database. Can use secrets, too
-          mysql password: test # Required if "mysql user" exists. The password for the "mysql user"
+          mysql-version: '8.0'
+          auto-start: true
+          root-password: yuhjnbGYUI
+          user: test
+          password: test
+      - run: mysql -uroot -h127.0.0.1 -e 'SELECT version()'
+
       
       - name: OpenRASP-Vulns-Test
         run: |
