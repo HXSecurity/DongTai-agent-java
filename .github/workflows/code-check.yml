@@ -42,7 +42,7 @@ jobs:
           root-password: yuhjnbGYUI
           user: test
           password: test
-      - run: mysql -uroot -h127.0.0.1 -e 'SELECT version()'
+      - run: mysql -uroot -pyuhjnbGYUI -h127.0.0.1 -e 'SELECT version()'
 
       
       - name: OpenRASP-Vulns-Test
