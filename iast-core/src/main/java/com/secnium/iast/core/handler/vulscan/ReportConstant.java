@@ -17,6 +17,8 @@ public class ReportConstant {
     public static final int REPORT_AUTH_ADD = 0x31;
     public static final int REPORT_AUTH_UPDATE = 0x32;
     public static final int REPORT_ERROR_LOG = 0x51;
+    public static final int REPORT_API = 0x61;
+
 
     public static final String REPORT_VALUE_KEY = "detail";
 
@@ -86,4 +88,14 @@ public class ReportConstant {
     public static final String OVER_POWER_AUTH_COOKIE = "cookie";
     public static final String OVER_POWER_TRACE_ID = "x-trace-id";
 
+    public static final String API_DATA = "api_data";
+    public static final String API_DATA_URI = "uri";
+    public static final String API_DATA_METHOD = "method";
+    public static final String API_DATA_CLASS = "class";
+    public static final String API_DATA_PARAMETER_NAME = "name";
+    public static final String API_DATA_PARAMETER_TYPE = "type";
+    public static final String API_DATA_PARAMETER_ANNOTATION = "annotation";
+    public static final String API_DATA_RETURN = "return_type";
+    public static final String API_DATA_FILE = "file";
+    public static final String API_DATA_CONTROLLER = "controller";
 }

@@ -59,6 +59,9 @@ public class EventListenerHandlers {
                             SourceImpl.solveSource(event, INVOKE_ID_SEQUENCER);
                         } else if (HookType.SINK.equals(hookType)) {
                             SinkImpl.solveSink(event, INVOKE_ID_SEQUENCER);
+                        } else if (HookType.SPRINGAPPLICATION.equals(hookType)) {
+                            // todo
+                            System.out.println("a");
                         }
                     }
                 }
