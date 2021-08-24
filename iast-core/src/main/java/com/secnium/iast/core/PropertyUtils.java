@@ -22,6 +22,7 @@ public class PropertyUtils {
     private String iastDumpPath;
     private Long heartBeatInterval = -1L;
     private Long reportInterval = -1L;
+    private Long replayInterval = -1L;
     private String serverUrl;
     private String namespace;
     private String engineName;
@@ -165,10 +166,10 @@ public class PropertyUtils {
     }
 
     public long getReplayInterval() {
-        if (heartBeatInterval == -1L) {
-            heartBeatInterval = Long.valueOf(System.getProperty("iast.service.replay.interval", cfg.getProperty("iast.service.replay.interval", "300000")));
+        if (replayInterval == -1L) {
+            replayInterval = Long.valueOf(System.getProperty("iast.service.replay.interval", cfg.getProperty("iast.service.replay.interval", "5000")));
         }
-        return heartBeatInterval;
+        return replayInterval;
     }
 
     public long getReportInterval() {
@@ -176,6 +177,13 @@ public class PropertyUtils {
             reportInterval = Long.valueOf(System.getProperty("iast.service.report.interval", cfg.getProperty("iast.service.report.interval", "60000")));
         }
         return reportInterval;
+    }
+
+    public long getHeartBeatInterval() {
+        if (heartBeatInterval == -1L) {
+            heartBeatInterval = Long.valueOf(System.getProperty("iast.service.heartbeat.interval", cfg.getProperty("iast.service.heartbeat.interval", "5")));
+        }
+        return heartBeatInterval;
     }
 
     public String getBaseUrl() {

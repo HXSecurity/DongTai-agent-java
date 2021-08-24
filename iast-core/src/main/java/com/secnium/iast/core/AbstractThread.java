@@ -22,7 +22,6 @@ public abstract class AbstractThread extends Thread {
             EngineManager.turnOffLingzhi();
         }
         try {
-            Thread.sleep(properties.getReportInterval());
             send();
         } catch (IOException e) {
             logger.error("report error reason: ", e);
