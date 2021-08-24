@@ -1,5 +1,6 @@
 package com.secnium.iast.core;
 
+import com.secnium.iast.core.handler.models.IastReplayModel;
 import com.secnium.iast.core.handler.models.MethodEvent;
 import com.secnium.iast.core.middlewarerecognition.IastServer;
 import com.secnium.iast.core.middlewarerecognition.ServerDetect;
@@ -37,6 +38,7 @@ public class EngineManager {
 
     private static final ArrayBlockingQueue<String> REPORTS = new ArrayBlockingQueue<String>(2048);
     private static final ArrayBlockingQueue<String> METHOD_REPORT = new ArrayBlockingQueue<String>(2048);
+    private final static ArrayBlockingQueue<IastReplayModel> REPLAY_QUEUE = new ArrayBlockingQueue<IastReplayModel>(256);
 
     private static boolean logined = false;
     private static int reqCounts = 0;
@@ -152,6 +154,26 @@ public class EngineManager {
         return !REPORTS.isEmpty();
     }
 
+    public static int getReportQueueSize() {
+        return REPORTS.size();
+    }
+
+    public static boolean hasReplayData() {
+        return !REPLAY_QUEUE.isEmpty();
+    }
+
+    public static IastReplayModel getReplayModel() {
+        return REPLAY_QUEUE.poll();
+    }
+
+    public static void sendReplayModel(IastReplayModel replayModel) {
+        REPLAY_QUEUE.offer(replayModel);
+    }
+
+    public static int getReplayQueueSize() {
+        return REPLAY_QUEUE.size();
+    }
+
     public static void sendMethodReport(String report) {
         METHOD_REPORT.offer(report);
     }
@@ -162,6 +184,10 @@ public class EngineManager {
 
     public static boolean hasMethodReport() {
         return !METHOD_REPORT.isEmpty();
+    }
+
+    public static int getMethodReportQueueSize() {
+        return METHOD_REPORT.size();
     }
 
     public static boolean getIsLoginLogic() {

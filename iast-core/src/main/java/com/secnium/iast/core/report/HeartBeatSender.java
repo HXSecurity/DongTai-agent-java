@@ -2,9 +2,15 @@ package com.secnium.iast.core.report;
 
 import com.secnium.iast.core.EngineManager;
 import com.secnium.iast.core.handler.vulscan.ReportConstant;
+import com.secnium.iast.core.replay.HttpRequestReplay;
 import com.secnium.iast.core.util.ByteUtils;
+import com.secnium.iast.core.util.Constants;
+import com.secnium.iast.core.util.HttpClientUtils;
+import com.secnium.iast.core.util.LogUtils;
 import org.json.JSONObject;
+import org.slf4j.Logger;
 
+import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryUsage;
 import java.lang.management.OperatingSystemMXBean;
@@ -14,12 +20,8 @@ import java.lang.management.OperatingSystemMXBean;
  *
  * @author dongzhiyong@huoxian.cn
  */
-public class HeartBeatReport {
-
-    public static void createReport() {
-        String msg = generateHeartBeatMsg();
-        EngineManager.sendNewReport(msg);
-    }
+public class HeartBeatSender extends Thread {
+    private final Logger logger = LogUtils.getLogger(getClass());
 
     private static String generateHeartBeatMsg() {
         JSONObject report = new JSONObject();
@@ -32,6 +34,9 @@ public class HeartBeatReport {
         detail.put(ReportConstant.HEART_BEAT_CPU, readCpuInfo());
         detail.put(ReportConstant.HEART_BEAT_DISK, getDiskInfo());
         detail.put(ReportConstant.HEART_BEAT_REQ_COUNT, EngineManager.getRequestCount());
+        detail.put(ReportConstant.REPORT_QUEUE, EngineManager.getReportQueueSize());
+        detail.put(ReportConstant.METHOD_QUEUE, EngineManager.getMethodReportQueueSize());
+        detail.put(ReportConstant.REPLAY_QUEUE, EngineManager.getReplayQueueSize());
 
         return report.toString();
     }
@@ -67,5 +72,26 @@ public class HeartBeatReport {
      */
     public static String getDiskInfo() {
         return "{}";
+    }
+
+    @Override
+    public void run() {
+        boolean isRunning = EngineManager.isLingzhiRunning();
+        if (isRunning) {
+            EngineManager.turnOffLingzhi();
+        }
+        try {
+            String report = generateHeartBeatMsg();
+            StringBuilder response = HttpClientUtils.sendPost(Constants.API_REPORT_UPLOAD, report);
+            HttpRequestReplay.sendReplayRequest(response);
+        } catch (IOException e) {
+            logger.error("report error reason: ", e);
+        } catch (Exception e) {
+            logger.error("report error, reason: ", e);
+        }
+
+        if (isRunning) {
+            EngineManager.turnOnLingzhi();
+        }
     }
 }

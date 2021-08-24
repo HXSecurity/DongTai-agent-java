@@ -100,4 +100,8 @@ public class ReportConstant {
     public static final String API_DATA_FILE = "file";
     public static final String API_DATA_CONTROLLER = "controller";
     public static final String API_DATA_DESCRIPTION = "description";
+  
+    public static final String REPORT_QUEUE = "report_queue";
+    public static final String METHOD_QUEUE = "method_queue";
+    public static final String REPLAY_QUEUE = "replay_queue";
 }
