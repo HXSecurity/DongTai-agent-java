@@ -115,11 +115,6 @@
                                         <include name="iast-core.jar"/>
                                     </fileset>
                                 </copy>
-                                <copy todir="/var/folders/xy/xyx56h3s29z6376gvk32621h0000gn/T">
-                                    <fileset dir="target/">
-                                        <include name="iast-core.jar"/>
-                                    </fileset>
-                                </copy>
                             </tasks>
                         </configuration>
                         <goals>
