@@ -182,7 +182,7 @@ public class IastClassAncestorQuery {
             String jarPackageFilePath = url.getFile();
             File jarPackageFile = new File(jarPackageFilePath);
             String packagePath = jarPackageFile.getParent();
-            if (jarPackageFilePath.startsWith("file:") && jarPackageFilePath.endsWith(".jar!/")) {
+            if (jarPackageFilePath.startsWith("file:") && jarPackageFilePath.endsWith(".jar!/") && (jarPackageFilePath.contains("WEB-INF") || jarPackageFilePath.contains("BOOT-INF"))) {
                 jarPackageFilePath = jarPackageFilePath.replace("file:", "");
                 jarPackageFilePath = jarPackageFilePath.substring(0, jarPackageFilePath.indexOf("!/"));
                 if (!scannedClassSet.contains(jarPackageFilePath)) {

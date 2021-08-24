@@ -13,7 +13,6 @@ public class DispatchSpringApplication implements DispatchPlugin {
     @Override
     public ClassVisitor dispatch(ClassVisitor classVisitor, IastContext context) {
         classname = context.getClassName();
-        System.out.println(classname);
         if (autoBindClassname.equals(classname)) {
             classVisitor = new SpringApplicationAdapter(classVisitor, context);
         }
