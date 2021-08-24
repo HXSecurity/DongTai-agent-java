@@ -1,6 +1,7 @@
 package com.secnium.iast.core.replay;
 
 import com.secnium.iast.core.AbstractThread;
+import com.secnium.iast.core.EngineManager;
 import com.secnium.iast.core.handler.models.IastReplayModel;
 import com.secnium.iast.core.report.ErrorLogReport;
 import com.secnium.iast.core.util.HttpClientHostnameVerifier;
@@ -22,7 +23,6 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ArrayBlockingQueue;
 
 /**
  * 根据字符串格式的header头及cookie信息生成重放请求
@@ -39,11 +39,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 public class HttpRequestReplay extends AbstractThread {
     private static final String PROTOCOL_HTTPS = "https";
     public final static HostnameVerifier DO_NOT_VERIFY = new HttpClientHostnameVerifier();
-    private final static ArrayBlockingQueue<IastReplayModel> WAITING_REPLAY_REQUESTS = new ArrayBlockingQueue<IastReplayModel>(256);
 
-    public static void sendReplayRequest(IastReplayModel replayModel) {
-        WAITING_REPLAY_REQUESTS.offer(replayModel);
-    }
 
     /**
      * @param replayRequestRaw
@@ -66,7 +62,7 @@ public class HttpRequestReplay extends AbstractThread {
                             replayRequest.get("relation_id"),
                             replayRequest.get("replay_type"));
                     if (replayModel.isValid()) {
-                        sendReplayRequest(replayModel);
+                        EngineManager.sendReplayModel(replayModel);
                     }
                 }
             }
@@ -171,8 +167,8 @@ public class HttpRequestReplay extends AbstractThread {
 
     @Override
     protected void send() {
-        while (!WAITING_REPLAY_REQUESTS.isEmpty()) {
-            IastReplayModel model = WAITING_REPLAY_REQUESTS.poll();
+        while (EngineManager.hasReplayData()) {
+            IastReplayModel model = EngineManager.getReplayModel();
             doReplay(model);
         }
     }

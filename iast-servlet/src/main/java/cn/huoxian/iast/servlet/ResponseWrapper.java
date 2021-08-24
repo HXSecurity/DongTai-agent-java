@@ -24,6 +24,7 @@ public class ResponseWrapper extends HttpServletResponseWrapper {
 
     public ResponseWrapper(HttpServletResponse response) {
         super(response);
+        response.addHeader("DongTai", "v1.0.3");
     }
 
     @Override

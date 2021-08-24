@@ -86,4 +86,7 @@ public class ReportConstant {
     public static final String OVER_POWER_AUTH_COOKIE = "cookie";
     public static final String OVER_POWER_TRACE_ID = "x-trace-id";
 
+    public static final String REPORT_QUEUE = "report_queue";
+    public static final String METHOD_QUEUE = "method_queue";
+    public static final String REPLAY_QUEUE = "replay_queue";
 }
