@@ -29,7 +29,11 @@ public class PropagatorImpl {
     private static final int STACK_DEPTH = 11;
 
     public static void solvePropagator(MethodEvent event, AtomicInteger invokeIdSequencer) {
-        if (!EngineManager.TAINT_POOL.get().isEmpty()) {
+        //
+        if(event.framework.equals("SPRINGAPPLICATION_FOR_API")){
+            System.out.println("");
+        }
+        else if (!EngineManager.TAINT_POOL.get().isEmpty()) {
             IastPropagatorModel propagator = IastHookRuleModel.getPropagatorByMethodSignature(event.signature);
             if (propagator != null) {
                 auxiliaryPropagator(propagator, invokeIdSequencer, event);

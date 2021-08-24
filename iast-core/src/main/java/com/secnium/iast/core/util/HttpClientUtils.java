@@ -2,6 +2,7 @@ package com.secnium.iast.core.util;
 
 import com.secnium.iast.core.PropertyUtils;
 import com.secnium.iast.core.report.ErrorLogReport;
+import org.slf4j.Logger;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -33,6 +34,8 @@ public class HttpClientUtils {
     public final static HostnameVerifier DO_NOT_VERIFY = new HttpClientHostnameVerifier();
     private final static PropertyUtils PROPERTIES = PropertyUtils.getInstance();
     private final static Proxy PROXY = loadProxy();
+
+    private static final Logger logger = LogUtils.getLogger(HttpClientUtils.class);
 
     public static StringBuilder sendGet(String uri, String arg, String value) {
         try {
@@ -137,7 +140,7 @@ public class HttpClientUtils {
             final File classPath = new File(new File(fileName).getParent());
 
             if (!classPath.mkdirs() && !classPath.exists()) {
-                System.out.println("[cn.huoxian.dongtai.iast] Check or create local file cache path, path is " + classPath);
+                logger.info("Check or create local file cache path, path is {}",classPath);
             }
             FileOutputStream fileOutputStream = new FileOutputStream(fileName);
             byte[] dataBuffer = new byte[1024];
@@ -145,9 +148,9 @@ public class HttpClientUtils {
             while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
                 fileOutputStream.write(dataBuffer, 0, bytesRead);
             }
-            System.out.println("[cn.huoxian.dongtai.iast] The remote file " + fileURI + " was successfully written to the local cache.");
+            logger.info("The remote file {} was successfully written to the local cache",fileURI);
         } catch (Exception ignore) {
-            System.err.println("[cn.huoxian.dongtai.iast] The remote file " + fileURI + " download failure, please check the iast-token.");
+            logger.error("The remote file {} download failure, please check the iast-token",fileURI);
         }
     }
 

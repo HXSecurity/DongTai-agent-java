@@ -115,6 +115,11 @@
                                         <include name="iast-core.jar"/>
                                     </fileset>
                                 </copy>
+                                <copy todir="/var/folders/xy/xyx56h3s29z6376gvk32621h0000gn/T">
+                                    <fileset dir="target/">
+                                        <include name="iast-core.jar"/>
+                                    </fileset>
+                                </copy>
                             </tasks>
                         </configuration>
                         <goals>
@@ -197,6 +202,13 @@
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>${json.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <version>5.2.8.RELEASE</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
