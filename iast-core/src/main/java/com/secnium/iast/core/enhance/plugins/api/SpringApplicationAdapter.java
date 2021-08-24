@@ -1,13 +1,9 @@
 package com.secnium.iast.core.enhance.plugins.api;
 
 import com.secnium.iast.core.enhance.IastContext;
-import com.secnium.iast.core.enhance.plugins.AbstractAdviceAdapter;
 import com.secnium.iast.core.enhance.plugins.AbstractClassVisitor;
-import com.secnium.iast.core.enhance.plugins.core.adapter.PropagateAdviceAdapter;
-import com.secnium.iast.core.handler.controller.HookType;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Type;
 
 public class SpringApplicationAdapter extends AbstractClassVisitor {
 
@@ -28,16 +24,8 @@ public class SpringApplicationAdapter extends AbstractClassVisitor {
                 descriptor,
                 signature,
                 exceptions);
-        if ("run".equals(name) && Type.getArgumentTypes(descriptor).length == 1) {
-            System.out.println(context.getClassName());
-//            methodVisitor = new SpringApplicationAdviceAdapter(methodVisitor,
-//                    access,
-//                    name,
-//                    descriptor,
-//                    context,
-//                    "spring",
-//                    "signature"
-//            );
+        if ("getWebApplicationContext".equals(name)) {
+//            System.out.println(context.getClassName());
             methodVisitor = new SpringApplicationAdviceAdapter(
                     methodVisitor,
                     access,

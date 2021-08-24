@@ -75,6 +75,10 @@ public class IastClassFileTransformer implements ClassFileTransformer {
             EngineManager.turnOffLingzhi();
         }
 
+        if (internalClassName.equals("org/springframework/web/servlet/DispatcherServlet")){
+            System.out.println("a");
+        }
+
         StopWatch clock = null;
         if (logger.isDebugEnabled()) {
             clock = new StopWatch();

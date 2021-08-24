@@ -6,13 +6,13 @@ import org.objectweb.asm.ClassVisitor;
 
 public class DispatchSpringApplication implements DispatchPlugin {
 
-    static String autoBindClassname = " org.springframework.boot.SpringApplication".substring(1);
+    static String autoBindClassname = " org.springframework.web.servlet.FrameworkServlet".substring(1);
+
     private String classname;
 
     @Override
     public ClassVisitor dispatch(ClassVisitor classVisitor, IastContext context) {
         classname = context.getClassName();
-
         System.out.println(classname);
         if (autoBindClassname.equals(classname)) {
             classVisitor = new SpringApplicationAdapter(classVisitor, context);

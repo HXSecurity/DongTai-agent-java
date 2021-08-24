@@ -1,6 +1,7 @@
 package com.secnium.iast.core.handler;
 
 import com.secnium.iast.core.EngineManager;
+import com.secnium.iast.core.enhance.plugins.api.SpringApplicationImpl;
 import com.secnium.iast.core.handler.controller.HookType;
 import com.secnium.iast.core.handler.controller.impl.HttpImpl;
 import com.secnium.iast.core.handler.controller.impl.PropagatorImpl;
@@ -61,7 +62,7 @@ public class EventListenerHandlers {
                             SinkImpl.solveSink(event, INVOKE_ID_SEQUENCER);
                         } else if (HookType.SPRINGAPPLICATION.equals(hookType)) {
                             // todo
-                            System.out.println("a");
+                            SpringApplicationImpl.getWebApplicationContext(event,INVOKE_ID_SEQUENCER);
                         }
                     }
                 }

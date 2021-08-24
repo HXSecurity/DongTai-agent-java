@@ -92,10 +92,12 @@ public class ReportConstant {
     public static final String API_DATA_URI = "uri";
     public static final String API_DATA_METHOD = "method";
     public static final String API_DATA_CLASS = "class";
+    public static final String API_DATA_PARAMETERS = "parameters";
     public static final String API_DATA_PARAMETER_NAME = "name";
     public static final String API_DATA_PARAMETER_TYPE = "type";
     public static final String API_DATA_PARAMETER_ANNOTATION = "annotation";
     public static final String API_DATA_RETURN = "return_type";
     public static final String API_DATA_FILE = "file";
     public static final String API_DATA_CONTROLLER = "controller";
+    public static final String API_DATA_DESCRIPTION = "description";
 }

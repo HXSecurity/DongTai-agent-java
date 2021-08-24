@@ -33,6 +33,7 @@ public class PluginRegister {
 
     static {
         PLUGINS = new ArrayList<DispatchPlugin>();
+        PLUGINS.add(new DispatchSpringApplication());
         //PLUGINS.add(new DispatchTechnologyPlugin());
         PLUGINS.add(new DispatchJ2ee());
         //PLUGINS.add(new DispatchJsp());
@@ -40,6 +41,5 @@ public class PluginRegister {
         //PLUGINS.add(new DispatchSpringAutoBinding());
         PLUGINS.add(new DispatchClassPlugin());
         //PLUGINS.add()
-        PLUGINS.add(new DispatchSpringApplication());
     }
 }

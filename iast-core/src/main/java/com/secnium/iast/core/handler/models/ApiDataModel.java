@@ -1,5 +1,6 @@
 package com.secnium.iast.core.handler.models;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -10,18 +11,18 @@ import java.util.Map;
 public class ApiDataModel {
 
     private String url;
-    private String method;
+    private String[] method;
     private String clazz;
-    private Map<String,String>[] parameters;
+    List<Map<String, String>> parameters;
     private String returnType;
     private String file;
     private String controller;
+    private String description;
 
     public ApiDataModel() {
     }
 
-
-    public ApiDataModel(String url, String method, String clazz, Map<String, String>[] parameters, String returnType, String file, String controller) {
+    public ApiDataModel(String url, String[] method, String clazz, List<Map<String, String>> parameters, String returnType, String file, String controller, String description) {
         this.url = url;
         this.method = method;
         this.clazz = clazz;
@@ -29,6 +30,18 @@ public class ApiDataModel {
         this.returnType = returnType;
         this.file = file;
         this.controller = controller;
+        this.description = description;
+    }
+
+    public String getDescription() {
+        if (description == null) {
+            description = "";
+        }
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getClazz() {
@@ -47,19 +60,19 @@ public class ApiDataModel {
         this.url = url;
     }
 
-    public String getMethod() {
+    public String[] getMethod() {
         return method;
     }
 
-    public void setMethod(String method) {
+    public void setMethod(String[] method) {
         this.method = method;
     }
 
-    public Map<String, String>[] getParameters() {
+    public List<Map<String, String>> getParameters() {
         return parameters;
     }
 
-    public void setParameters(Map<String, String>[] parameters) {
+    public void setParameters(List<Map<String, String>> parameters) {
         this.parameters = parameters;
     }
 
@@ -72,6 +85,9 @@ public class ApiDataModel {
     }
 
     public String getFile() {
+        if (file == null) {
+            file = "";
+        }
         return file;
     }
 
