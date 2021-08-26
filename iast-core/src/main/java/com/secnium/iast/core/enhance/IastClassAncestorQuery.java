@@ -182,20 +182,21 @@ public class IastClassAncestorQuery {
             String jarPackageFilePath = url.getFile();
             File jarPackageFile = new File(jarPackageFilePath);
             String packagePath = jarPackageFile.getParent();
-            if (jarPackageFilePath.startsWith("file:") && jarPackageFilePath.endsWith(".jar!/") && (jarPackageFilePath.contains("WEB-INF") || jarPackageFilePath.contains("BOOT-INF"))) {
+            if (jarPackageFilePath.startsWith("file:") && jarPackageFilePath.endsWith(".jar!/") && jarPackageFilePath.contains("BOOT-INF") && !scannedClassSet.contains(packagePath)) {
+                scannedClassSet.add(packagePath);
                 jarPackageFilePath = jarPackageFilePath.replace("file:", "");
                 jarPackageFilePath = jarPackageFilePath.substring(0, jarPackageFilePath.indexOf("!/"));
-                if (!scannedClassSet.contains(jarPackageFilePath)) {
-                    scannedClassSet.add(jarPackageFilePath);
-                    ScaScanner.scanWithJarPackage(jarPackageFilePath);
-                }
-            } else if (jarPackageFilePath.endsWith(".jar") && !jarPackageFilePath.contains("dongtai-servlet") && !jarPackageFilePath.endsWith("agent.jar") && !scannedClassSet.contains(packagePath)) {
+                ScaScanner.scanWithJarPackage(jarPackageFilePath);
+            } else if (jarPackageFilePath.endsWith(".jar") && jarPackageFilePath.contains("WEB-INF") && !scannedClassSet.contains(packagePath)) {
                 scannedClassSet.add(packagePath);
                 File packagePathFile = new File(packagePath);
                 File[] packagePathFiles = packagePathFile.listFiles();
                 for (File tempPackagePathFile : packagePathFiles != null ? packagePathFiles : new File[0]) {
                     ScaScanner.scan(tempPackagePathFile);
                 }
+            }else if (jarPackageFilePath.endsWith(".jar") && jarPackageFilePath.contains("repository") && !scannedClassSet.contains(jarPackageFilePath)){
+                scannedClassSet.add(jarPackageFilePath);
+                ScaScanner.scan(jarPackageFile);
             }
         }
     }
