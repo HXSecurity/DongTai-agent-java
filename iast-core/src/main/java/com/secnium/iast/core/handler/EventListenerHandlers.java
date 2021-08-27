@@ -44,12 +44,20 @@ public class EventListenerHandlers {
                 EngineManager.turnOnLingzhi();
             }
         }
+
+        if (hookType == 4) {
+            if (!EngineManager.isLingzhiRunning()) {
+                EngineManager.turnOnLingzhi();
+            }
+        }
+
         if (EngineManager.isLingzhiRunning()) {
             try {
                 EngineManager.turnOffLingzhi();
                 boolean isEnterHttpEntryPoint = EngineManager.ENTER_HTTP_ENTRYPOINT.isEnterHttp();
                 boolean isHttpEntryMethod = HookType.HTTP.equals(hookType);
-                if (isEnterHttpEntryPoint || isHttpEntryMethod) {
+                boolean isSpringMethod = HookType.SPRINGAPPLICATION.equals(hookType);
+                if (isEnterHttpEntryPoint || isHttpEntryMethod || isSpringMethod) {
                     MethodEvent event = new MethodEvent(0, -1, javaClassName, matchClassName, javaMethodName, javaMethodDesc, signature, object, argumentArray, retValue, framework, isStatic, null);
                     if (isHttpEntryMethod) {
                         HttpImpl.solveHttp(event);
