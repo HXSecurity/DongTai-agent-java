@@ -49,10 +49,8 @@ public class EventListenerHandlers {
             if (EngineManager.isLingzhiRunning()) {
                 EngineManager.turnOffLingzhi();
             }
-            if (HookType.SPRINGAPPLICATION.equals(hookType)) {
-                MethodEvent event = new MethodEvent(0, -1, javaClassName, matchClassName, javaMethodName, javaMethodDesc, signature, object, argumentArray, retValue, framework, isStatic, null);
-                SpringApplicationImpl.getWebApplicationContext(event,INVOKE_ID_SEQUENCER);
-            }
+            MethodEvent event = new MethodEvent(0, -1, javaClassName, matchClassName, javaMethodName, javaMethodDesc, signature, object, argumentArray, retValue, framework, isStatic, null);
+            SpringApplicationImpl.getWebApplicationContext(event, INVOKE_ID_SEQUENCER);
             EngineManager.turnOnLingzhi();
         }
 
@@ -61,8 +59,7 @@ public class EventListenerHandlers {
                 EngineManager.turnOffLingzhi();
                 boolean isEnterHttpEntryPoint = EngineManager.ENTER_HTTP_ENTRYPOINT.isEnterHttp();
                 boolean isHttpEntryMethod = HookType.HTTP.equals(hookType);
-                boolean isSpringMethod = HookType.SPRINGAPPLICATION.equals(hookType);
-                if (isEnterHttpEntryPoint || isHttpEntryMethod || isSpringMethod) {
+                if (isEnterHttpEntryPoint || isHttpEntryMethod) {
                     MethodEvent event = new MethodEvent(0, -1, javaClassName, matchClassName, javaMethodName, javaMethodDesc, signature, object, argumentArray, retValue, framework, isStatic, null);
                     if (isHttpEntryMethod) {
                         HttpImpl.solveHttp(event);
