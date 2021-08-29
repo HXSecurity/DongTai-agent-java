@@ -46,9 +46,14 @@ public class EventListenerHandlers {
         }
 
         if (hookType == 4) {
-            if (!EngineManager.isLingzhiRunning()) {
-                EngineManager.turnOnLingzhi();
+            if (EngineManager.isLingzhiRunning()) {
+                EngineManager.turnOffLingzhi();
             }
+            if (HookType.SPRINGAPPLICATION.equals(hookType)) {
+                MethodEvent event = new MethodEvent(0, -1, javaClassName, matchClassName, javaMethodName, javaMethodDesc, signature, object, argumentArray, retValue, framework, isStatic, null);
+                SpringApplicationImpl.getWebApplicationContext(event,INVOKE_ID_SEQUENCER);
+            }
+            EngineManager.turnOnLingzhi();
         }
 
         if (EngineManager.isLingzhiRunning()) {
@@ -68,8 +73,6 @@ public class EventListenerHandlers {
                             SourceImpl.solveSource(event, INVOKE_ID_SEQUENCER);
                         } else if (HookType.SINK.equals(hookType)) {
                             SinkImpl.solveSink(event, INVOKE_ID_SEQUENCER);
-                        } else if (HookType.SPRINGAPPLICATION.equals(hookType)) {
-                            SpringApplicationImpl.getWebApplicationContext(event,INVOKE_ID_SEQUENCER);
                         }
                     }
                 }
