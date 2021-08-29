@@ -69,7 +69,6 @@ public class EventListenerHandlers {
                         } else if (HookType.SINK.equals(hookType)) {
                             SinkImpl.solveSink(event, INVOKE_ID_SEQUENCER);
                         } else if (HookType.SPRINGAPPLICATION.equals(hookType)) {
-                            // todo
                             SpringApplicationImpl.getWebApplicationContext(event,INVOKE_ID_SEQUENCER);
                         }
                     }
