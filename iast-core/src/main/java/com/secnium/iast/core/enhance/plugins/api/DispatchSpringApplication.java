@@ -6,14 +6,13 @@ import org.objectweb.asm.ClassVisitor;
 
 public class DispatchSpringApplication implements DispatchPlugin {
 
-    static String autoBindClassname = " org.springframework.web.servlet.FrameworkServlet".substring(1);
-
     private String classname;
 
     @Override
     public ClassVisitor dispatch(ClassVisitor classVisitor, IastContext context) {
         classname = context.getClassName();
-        if (autoBindClassname.equals(classname)) {
+        String springbootClassname = isMatch();
+        if (springbootClassname != null) {
             classVisitor = new SpringApplicationAdapter(classVisitor, context);
         }
         return classVisitor;
@@ -21,7 +20,10 @@ public class DispatchSpringApplication implements DispatchPlugin {
 
     @Override
     public String isMatch() {
-        return null;
+        String springbootClassname = " org.springframework.web.servlet.FrameworkServlet".substring(1);
+        if (springbootClassname.equals(classname)) {
+            return springbootClassname;
+        } else return null;
     }
 
 }
