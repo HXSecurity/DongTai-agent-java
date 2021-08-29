@@ -48,7 +48,7 @@ public class HttpRequestReplay extends AbstractThread {
             Integer statusCode = (Integer) resp.get("status");
             if (statusCode == 201) {
                 String data = resp.get("data").toString();
-                if ("[]".equals(data)) {
+                if (!"[]".equals(data)) {
                     JSONArray replayRequests = (JSONArray) resp.get("data");
                     for (int index = 0, total = replayRequests.length(); index < total; index++) {
                         JSONObject replayRequest = (JSONObject) replayRequests.get(index);
