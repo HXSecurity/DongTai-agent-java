@@ -25,7 +25,6 @@ public class SpringApplicationAdapter extends AbstractClassVisitor {
                 signature,
                 exceptions);
         if ("getWebApplicationContext".equals(name)) {
-//            System.out.println(context.getClassName());
             methodVisitor = new SpringApplicationAdviceAdapter(
                     methodVisitor,
                     access,

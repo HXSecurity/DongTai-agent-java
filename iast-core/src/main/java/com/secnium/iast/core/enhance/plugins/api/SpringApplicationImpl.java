@@ -24,7 +24,7 @@ public class SpringApplicationImpl {
     public static boolean isSend;
 
     public static void getWebApplicationContext(MethodEvent event, AtomicInteger invokeIdSequencer) {
-//        if (!isSend) {
+        if (!isSend) {
         Object applicationContext = event.returnValue;
         createClassLoader(applicationContext);
         loadApplicationContext();
@@ -39,7 +39,7 @@ public class SpringApplicationImpl {
         }
         sendReport(apiList);
         isSend = true;
-//        }
+        }
     }
 
     private static void createClassLoader(Object applicationContext) {
