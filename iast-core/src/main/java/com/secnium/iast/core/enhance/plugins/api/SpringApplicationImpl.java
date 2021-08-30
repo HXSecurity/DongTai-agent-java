@@ -34,7 +34,9 @@ public class SpringApplicationImpl {
             invoke = (List<ApiDataModel>) getAPI.invoke(null, applicationContext);
             apiList = invoke.toString();
             apiList = apiList.replace("=", ":").replace("{", "{\"").replace("}", "\"}").replace(" ", "").replace(":", "\":\"").replace("'", "").replace(",", "\",\"").replace("\"[", "[\"").replace("]\"", "\"]").replace("null", "").replace("}\"", "}").replace("\"{", "{").replace("/{\"", "/{").replace("\"},\"met", "}\",\"met").replace("clazz", "class");
-        } catch (IllegalAccessException | InvocationTargetException e) {
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e){
             e.printStackTrace();
         }
         sendReport(apiList);
