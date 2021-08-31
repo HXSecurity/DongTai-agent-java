@@ -36,9 +36,9 @@ public class EngineManager {
     private static final BooleanTheadLocal LINGZHI_RUNNING = new BooleanTheadLocal(false);
     public static IastServer SERVER;
 
-    private static final ArrayBlockingQueue<String> REPORTS = new ArrayBlockingQueue<String>(2048);
-    private static final ArrayBlockingQueue<String> METHOD_REPORT = new ArrayBlockingQueue<String>(2048);
-    private final static ArrayBlockingQueue<IastReplayModel> REPLAY_QUEUE = new ArrayBlockingQueue<IastReplayModel>(256);
+    private static final ArrayBlockingQueue<String> REPORTS = new ArrayBlockingQueue<String>(4096);
+    private static final ArrayBlockingQueue<String> METHOD_REPORT = new ArrayBlockingQueue<String>(4096);
+    private static final ArrayBlockingQueue<IastReplayModel> REPLAY_QUEUE = new ArrayBlockingQueue<IastReplayModel>(4096);
 
     private static boolean logined = false;
     private static int reqCounts = 0;
