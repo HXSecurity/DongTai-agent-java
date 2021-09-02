@@ -20,6 +20,8 @@ public class ServiceFactory {
     private final long heartBeatInterval;
     private final ScheduledExecutorService heartBeatService;
     private final ScheduledExecutorService reportService;
+    private final ScheduledExecutorService methodService;
+    private final ScheduledExecutorService replayService;
 
     ReportSender report = null;
     HttpRequestReplay requestReplay = null;
@@ -44,6 +46,8 @@ public class ServiceFactory {
         this.heartBeatInterval = propertiesUtils.getHeartBeatInterval();
         this.heartBeatService = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("dongtai-heartbeat").build());
         this.reportService = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("dongtai-report").build());
+        this.methodService = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("dongtai-method").build());
+        this.replayService = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("dongtai-replay").build());
     }
 
     public void init() {
@@ -55,9 +59,9 @@ public class ServiceFactory {
 
     public void start() {
         heartBeatService.scheduleWithFixedDelay(heartBeatSender, 0, heartBeatInterval, TimeUnit.SECONDS);
-        reportService.scheduleWithFixedDelay(methodReportSender, 0, reportInterval, TimeUnit.MILLISECONDS);
+        methodService.scheduleWithFixedDelay(methodReportSender, 0, reportInterval, TimeUnit.MILLISECONDS);
         reportService.scheduleWithFixedDelay(report, 0, reportInterval, TimeUnit.MILLISECONDS);
-        reportService.scheduleWithFixedDelay(requestReplay, 0, replayInterval, TimeUnit.MILLISECONDS);
+        replayService.scheduleWithFixedDelay(requestReplay, 0, replayInterval, TimeUnit.MILLISECONDS);
     }
 
     public void stop() {

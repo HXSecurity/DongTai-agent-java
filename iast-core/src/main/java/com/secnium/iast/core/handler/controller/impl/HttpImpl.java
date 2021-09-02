@@ -27,7 +27,7 @@ public class HttpImpl {
     public static Method cloneRequestMethod;
     public static Method cloneResponseMethod;
     private static IastClassLoader iastClassLoader;
-    private static File IAST_REQUEST_JAR_PACKAGE;
+    public static File IAST_REQUEST_JAR_PACKAGE;
 
     private static void createClassLoader(Object req) {
         try {

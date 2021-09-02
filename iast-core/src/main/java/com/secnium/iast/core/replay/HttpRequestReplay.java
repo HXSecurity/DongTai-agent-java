@@ -3,11 +3,9 @@ package com.secnium.iast.core.replay;
 import com.secnium.iast.core.AbstractThread;
 import com.secnium.iast.core.EngineManager;
 import com.secnium.iast.core.handler.models.IastReplayModel;
-import com.secnium.iast.core.report.ErrorLogReport;
 import com.secnium.iast.core.util.HttpClientHostnameVerifier;
 import com.secnium.iast.core.util.HttpClientUtils;
 import com.secnium.iast.core.util.HttpMethods;
-import com.secnium.iast.core.util.ThrowableUtils;
 import com.secnium.iast.core.util.base64.Base64Decoder;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -49,25 +47,27 @@ public class HttpRequestReplay extends AbstractThread {
             JSONObject resp = new JSONObject(replayRequestRaw.toString());
             Integer statusCode = (Integer) resp.get("status");
             if (statusCode == 201) {
-                JSONArray replayRequests = (JSONArray) resp.get("data");
-                for (int index = 0, total = replayRequests.length(); index < total; index++) {
-                    JSONObject replayRequest = (JSONObject) replayRequests.get(index);
-                    IastReplayModel replayModel = new IastReplayModel(
-                            replayRequest.get("method"),
-                            replayRequest.get("uri"),
-                            replayRequest.get("params"),
-                            replayRequest.get("body"),
-                            replayRequest.get("header"),
-                            replayRequest.get("id"),
-                            replayRequest.get("relation_id"),
-                            replayRequest.get("replay_type"));
-                    if (replayModel.isValid()) {
-                        EngineManager.sendReplayModel(replayModel);
+                String data = resp.get("data").toString();
+                if (!"[]".equals(data)) {
+                    JSONArray replayRequests = (JSONArray) resp.get("data");
+                    for (int index = 0, total = replayRequests.length(); index < total; index++) {
+                        JSONObject replayRequest = (JSONObject) replayRequests.get(index);
+                        IastReplayModel replayModel = new IastReplayModel(
+                                replayRequest.get("method"),
+                                replayRequest.get("uri"),
+                                replayRequest.get("params"),
+                                replayRequest.get("body"),
+                                replayRequest.get("header"),
+                                replayRequest.get("id"),
+                                replayRequest.get("relation_id"),
+                                replayRequest.get("replay_type"));
+                        if (replayModel.isValid()) {
+                            EngineManager.sendReplayModel(replayModel);
+                        }
                     }
                 }
             }
-        } catch (Throwable cause) {
-            ErrorLogReport.sendErrorLog(ThrowableUtils.getStackTrace(cause));
+        } catch (Throwable ignore) {
         }
     }
 

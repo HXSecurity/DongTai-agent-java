@@ -1,6 +1,7 @@
 package com.secnium.iast.core.handler;
 
 import com.secnium.iast.core.EngineManager;
+import com.secnium.iast.core.enhance.plugins.api.SpringApplicationImpl;
 import com.secnium.iast.core.handler.controller.HookType;
 import com.secnium.iast.core.handler.controller.impl.HttpImpl;
 import com.secnium.iast.core.handler.controller.impl.PropagatorImpl;
@@ -43,6 +44,16 @@ public class EventListenerHandlers {
                 EngineManager.turnOnLingzhi();
             }
         }
+
+        if (hookType == 4) {
+            if (EngineManager.isLingzhiRunning()) {
+                EngineManager.turnOffLingzhi();
+            }
+            MethodEvent event = new MethodEvent(0, -1, javaClassName, matchClassName, javaMethodName, javaMethodDesc, signature, object, argumentArray, retValue, framework, isStatic, null);
+            SpringApplicationImpl.getWebApplicationContext(event, INVOKE_ID_SEQUENCER);
+            EngineManager.turnOnLingzhi();
+        }
+
         if (EngineManager.isLingzhiRunning()) {
             try {
                 EngineManager.turnOffLingzhi();

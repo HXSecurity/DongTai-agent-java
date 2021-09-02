@@ -57,7 +57,10 @@ public class HttpRequest {
         StringBuilder postBody = new StringBuilder();
         try {
             if ("POST".equals(request.getMethod())) {
-                boolean usingBody = request.getContentType().contains("application/json");
+                boolean usingBody = false;
+                if (request.getContentType() != null){
+                usingBody = request.getContentType().contains("application/json");
+                }
                 if (usingBody) {
                     InputStream inputStream = request.getInputStream();
                     InputStreamReader isReader = new InputStreamReader(inputStream);
