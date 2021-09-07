@@ -2,14 +2,12 @@ package com.secnium.iast.core.enhance.plugins.api;
 
 import com.secnium.iast.core.handler.IastClassLoader;
 import com.secnium.iast.core.handler.controller.impl.HttpImpl;
-import com.secnium.iast.core.handler.models.ApiDataModel;
 import com.secnium.iast.core.handler.models.MethodEvent;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.secnium.iast.core.report.ApiReport.sendReport;
@@ -28,12 +26,11 @@ public class SpringApplicationImpl {
         Object applicationContext = event.returnValue;
         createClassLoader(applicationContext);
         loadApplicationContext();
-        List<ApiDataModel> invoke = null;
+        String invoke = null;
         String apiList = null;
         try {
-            invoke = (List<ApiDataModel>) getAPI.invoke(null, applicationContext);
-            apiList = invoke.toString();
-            apiList = apiList.replace("=", ":").replace("{", "{\"").replace("}", "\"}").replace(" ", "").replace(":", "\":\"").replace("'", "").replace(",", "\",\"").replace("\"[", "[\"").replace("]\"", "\"]").replace("null", "").replace("}\"", "}").replace("\"{", "{").replace("/{\"", "/{").replace("\"},\"met", "}\",\"met").replace("clazz", "class");
+            invoke = (String) getAPI.invoke(null, applicationContext);
+            sendReport(invoke);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (InvocationTargetException e){

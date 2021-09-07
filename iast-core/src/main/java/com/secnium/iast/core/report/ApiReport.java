@@ -4,10 +4,6 @@ import com.secnium.iast.core.EngineManager;
 import com.secnium.iast.core.handler.vulscan.ReportConstant;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import com.secnium.iast.core.handler.models.ApiDataModel;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * 发送应用接口
@@ -30,7 +26,8 @@ public class ApiReport {
         detail.put(ReportConstant.AGENT_ID, AgentRegisterReport.getAgentFlag());
         detail.put(ReportConstant.API_DATA, api);
         String result = report.toString();
-        result = result.replace("\"api_data\":[]", "\"api_data\":" + apiList).replace("url","uri").replace("returnType","return_type").replace("\"method\":[]","\"method\":[\"GET\",\"POST\"]");
+        apiList = apiList.substring(1,apiList.length()-1);
+        result = result.replace("\"api_data\":[]", apiList);
         return result;
     }
 

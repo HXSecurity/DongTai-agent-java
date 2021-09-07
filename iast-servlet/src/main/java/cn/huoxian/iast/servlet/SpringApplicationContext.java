@@ -1,5 +1,7 @@
 package cn.huoxian.iast.servlet;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.method.HandlerMethod;
@@ -14,14 +16,14 @@ import java.util.*;
 
 public class SpringApplicationContext {
 
-    public static List<Object> getAPI(Object applicationContext) {
-        return getAPIList((ApplicationContext) applicationContext);
+    public static String getAPI(Object applicationContext) {
+        return createReport(getAPIList((ApplicationContext) applicationContext));
     }
 
-    public static List<Object> getAPIList(ApplicationContext applicationContext) {
+    public static List<ApiDataModel> getAPIList(ApplicationContext applicationContext) {
         RequestMappingHandlerMapping mapping = applicationContext.getBean(RequestMappingHandlerMapping.class);
         Map<RequestMappingInfo, HandlerMethod> methodMap = mapping.getHandlerMethods();
-        List<Object> apiList = new ArrayList<>();
+        List<ApiDataModel> apiList = new ArrayList<>();
         for (RequestMappingInfo info : methodMap.keySet()) {
             ApiDataModel apiDataModel = new ApiDataModel();
             HandlerMethod handlerMethod = methodMap.get(info);
@@ -119,6 +121,43 @@ public class SpringApplicationContext {
             }
         }
         return apiList;
+    }
+
+    private static String createReport(List<ApiDataModel> apiList) {
+        JSONObject apiDataReport = new JSONObject();
+        JSONArray apiData = new JSONArray();
+        for (ApiDataModel apiDataModel:apiList
+        ) {
+            JSONObject api = new JSONObject();
+            apiData.put(api);
+            api.put("uri",apiDataModel.getUrl());
+            JSONArray methodsjson = new JSONArray();
+            api.put("method",methodsjson);
+            String[] methods = apiDataModel.getMethod();
+            for (String method:methods
+            ) {
+                methodsjson.put(method);
+            }
+            api.put("method",apiDataModel.getMethod());
+            api.put("class",apiDataModel.getClazz());
+            List<Map<String, String>> parameters = apiDataModel.getParameters();
+            JSONArray parametersJson = new JSONArray();
+            api.put("parameters",parametersJson);
+            for (Map<String,String> parameter:parameters
+            ) {
+                JSONObject parameterjson = new JSONObject();
+                parametersJson.put(parameterjson);
+                parameterjson.put("name",parameter.get("name"));
+                parameterjson.put("type",parameter.get("type"));
+                parameterjson.put("annotation",parameter.get("annotation"));
+            }
+            api.put("return_type",apiDataModel.getReturnType());
+            api.put("file",apiDataModel.getFile());
+            api.put("controller",apiDataModel.getController());
+            api.put("description",apiDataModel.getDescription());
+        }
+        apiDataReport.put("api_data",apiData);
+        return apiDataReport.toString();
     }
 
 }

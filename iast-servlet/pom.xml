@@ -36,6 +36,12 @@
             <version>5.2.8.RELEASE</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>${json.version}</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
