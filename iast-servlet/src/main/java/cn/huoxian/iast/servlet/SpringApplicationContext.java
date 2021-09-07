@@ -1,7 +1,5 @@
 package cn.huoxian.iast.servlet;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.method.HandlerMethod;
@@ -124,29 +122,24 @@ public class SpringApplicationContext {
     }
 
     private static String createReport(List<ApiDataModel> apiList) {
-        JSONObject apiDataReport = new JSONObject();
-        JSONArray apiData = new JSONArray();
+        Map<String, Object> apiDataReport = new HashMap<>();
+        List<Object> apiData = new ArrayList<>();
         for (ApiDataModel apiDataModel:apiList
         ) {
-            JSONObject api = new JSONObject();
-            apiData.put(api);
+            Map<String, Object> api = new HashMap<>();
+            apiData.add(api);
             api.put("uri",apiDataModel.getUrl());
-            JSONArray methodsjson = new JSONArray();
-            api.put("method",methodsjson);
             String[] methods = apiDataModel.getMethod();
-            for (String method:methods
-            ) {
-                methodsjson.put(method);
-            }
-            api.put("method",apiDataModel.getMethod());
+            List<Object> methodsjson = new ArrayList<>(Arrays.asList(methods));
+            api.put("method",methodsjson);
             api.put("class",apiDataModel.getClazz());
             List<Map<String, String>> parameters = apiDataModel.getParameters();
-            JSONArray parametersJson = new JSONArray();
+            List<Object> parametersJson = new ArrayList<>();
             api.put("parameters",parametersJson);
             for (Map<String,String> parameter:parameters
             ) {
-                JSONObject parameterjson = new JSONObject();
-                parametersJson.put(parameterjson);
+                Map<String, Object> parameterjson = new HashMap<>();
+                parametersJson.add(parameterjson);
                 parameterjson.put("name",parameter.get("name"));
                 parameterjson.put("type",parameter.get("type"));
                 parameterjson.put("annotation",parameter.get("annotation"));

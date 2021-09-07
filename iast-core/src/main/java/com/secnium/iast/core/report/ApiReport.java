@@ -20,15 +20,13 @@ public class ApiReport {
     private static String createReport(String apiList) {
         JSONObject report = new JSONObject();
         JSONObject detail = new JSONObject();
-        JSONArray api = new JSONArray();
         report.put(ReportConstant.REPORT_KEY, ReportConstant.REPORT_API);
         report.put(ReportConstant.REPORT_VALUE_KEY, detail);
         detail.put(ReportConstant.AGENT_ID, AgentRegisterReport.getAgentFlag());
-        detail.put(ReportConstant.API_DATA, api);
-        String result = report.toString();
-        apiList = apiList.substring(1,apiList.length()-1);
-        result = result.replace("\"api_data\":[]", apiList);
-        return result;
+        apiList = apiList.replace("=",":").replace(":,",":\"\",").replace("uri:","uri:\"").replace(", class","\", class").replace("type:[","type:").replace(";}","}");
+        JSONObject apiListJson = new JSONObject(apiList);
+        detail.put(ReportConstant.API_DATA, apiListJson.get(ReportConstant.API_DATA));
+        return report.toString();
     }
 
 }
