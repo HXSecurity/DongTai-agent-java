@@ -27,7 +27,6 @@ public class SpringApplicationImpl {
         createClassLoader(applicationContext);
         loadApplicationContext();
         String invoke = null;
-        String apiList = null;
         try {
             invoke = (String) getAPI.invoke(null, applicationContext);
             sendReport(invoke);
@@ -36,7 +35,6 @@ public class SpringApplicationImpl {
         } catch (InvocationTargetException e){
             e.printStackTrace();
         }
-        sendReport(apiList);
         isSend = true;
         }
     }
