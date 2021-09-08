@@ -14,7 +14,7 @@ import java.util.*;
 
 public class SpringApplicationContext {
 
-    public static String getAPI(Object applicationContext) {
+    public static Map<String, Object> getAPI(Object applicationContext) {
         return createReport(getAPIList((ApplicationContext) applicationContext));
     }
 
@@ -121,7 +121,7 @@ public class SpringApplicationContext {
         return apiList;
     }
 
-    private static String createReport(List<ApiDataModel> apiList) {
+    private static Map<String, Object> createReport(List<ApiDataModel> apiList) {
         Map<String, Object> apiDataReport = new HashMap<>();
         List<Object> apiData = new ArrayList<>();
         for (ApiDataModel apiDataModel:apiList
@@ -150,7 +150,7 @@ public class SpringApplicationContext {
             api.put("description",apiDataModel.getDescription());
         }
         apiDataReport.put("api_data",apiData);
-        return apiDataReport.toString();
+        return apiDataReport;
     }
 
 }
