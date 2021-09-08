@@ -8,6 +8,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.secnium.iast.core.report.ApiReport.sendReport;
@@ -26,9 +27,9 @@ public class SpringApplicationImpl {
         Object applicationContext = event.returnValue;
         createClassLoader(applicationContext);
         loadApplicationContext();
-        String invoke = null;
+        Map<String, Object> invoke = null;
         try {
-            invoke = (String) getAPI.invoke(null, applicationContext);
+            invoke = (Map<String, Object>) getAPI.invoke(null, applicationContext);
             sendReport(invoke);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
