@@ -23,7 +23,6 @@ public class SourceImpl {
     private static final String METHOD_OF_GETATTRIBUTE = "getAttribute";
 
     public static void solveSource(MethodEvent event, AtomicInteger invokeIdSequencer) {
-        // 将返回值加入到污点池中
         if (isAllowTaintType(event.returnValue) && allowCall(event) && isNotEmpty(event.returnValue)) {
             event.source = true;
             event.setCallStacks(StackUtils.createCallStack(9));
@@ -34,7 +33,6 @@ public class SourceImpl {
             event.outValue = event.returnValue;
 
             if (isNotEmpty(event.returnValue)) {
-                // todo 数据保存时，直接计算hash，放入outHash中
                 EngineManager.TRACK_MAP.addTrackMethod(invokeId, event);
                 EngineManager.TAINT_POOL.addTaintToPool(event.returnValue, event, true);
             }
