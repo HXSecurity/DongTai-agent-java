@@ -68,7 +68,6 @@ public class TaintPoolUtils {
                     if (obj.equals(value)) {
                         // 检查当前污点的hashcode是否在hashcode池中，如果在，则标记传播
                         if (EngineManager.TAINT_HASH_CODES.get().contains(hashcode)) {
-                            EngineManager.TAINT_HASH_CODES.get().add(hashcode);
                             event.addSourceHash(hashcode);
                             return true;
                         }
