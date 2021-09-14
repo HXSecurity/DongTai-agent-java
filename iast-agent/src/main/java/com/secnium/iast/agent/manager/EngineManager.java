@@ -124,7 +124,7 @@ public class EngineManager {
             final File classPath = new File(new File(fileName).getParent());
 
             if (!classPath.mkdirs() && !classPath.exists()) {
-                System.out.println("[cn.huoxian.dongtai.iast] Check or create local file cache path, path is " + classPath);
+                LogUtils.info("Check or create local file cache path, path is " + classPath);
             }
             FileOutputStream fileOutputStream = new FileOutputStream(fileName);
             byte[] dataBuffer = new byte[1024];
@@ -132,10 +132,10 @@ public class EngineManager {
             while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
                 fileOutputStream.write(dataBuffer, 0, bytesRead);
             }
-            System.out.println("[cn.huoxian.dongtai.iast] The remote file " + fileUrl + " was successfully written to the local cache.");
+            LogUtils.info("The remote file " + fileUrl + " was successfully written to the local cache.");
             status = true;
         } catch (Exception ignore) {
-            System.err.println("[cn.huoxian.dongtai.iast] The remote file " + fileUrl + " download failure, please check the iast-token.");
+            LogUtils.error("The remote file " + fileUrl + " download failure, please check the iast-token.");
         }
         return status;
     }
@@ -156,18 +156,14 @@ public class EngineManager {
 
 
     public boolean downloadEnginePackage() {
-        System.out.println("[cn.huoxian.dongtai.iast] Check if the engine needs to be updated");
         if (engineNotExist(getInjectPackageCachePath()) || engineNotExist(getEnginePackageCachePath())) {
-            System.out.println("[cn.huoxian.dongtai.iast] Engine does not exist in local cache, the engine will be downloaded.");
+            LogUtils.info("Engine does not exist in local cache, the engine will be downloaded.");
             return updateEnginePackage();
         } else {
             return true;
         }
     }
 
-    /**
-     * 向BootstrapClassLoader中注册间谍包、加载检测引擎所在jar包
-     */
     public boolean install() {
         try {
             inst.appendToBootstrapClassLoaderSearch(new JarFile(new File(EngineManager.getInjectPackageCachePath())));
@@ -180,13 +176,11 @@ public class EngineManager {
                     .invoke(null, launchMode, this.properties.getPropertiesFilePath(), inst);
             return true;
         } catch (IOException e) {
-            System.err.println("[cn.huoxian.dongtai.iast] DongTai engine installation failed, please contact staff for help.");
-            e.printStackTrace();
+            LogUtils.error("DongTai engine start failed, please contact staff for help.");
         } catch (ClassNotFoundException e) {
-            System.err.println("[cn.huoxian.dongtai.iast] DongTai engine installation failed, please contact staff for help.");
-            e.printStackTrace();
+            LogUtils.error(" DongTai engine start failed, please contact staff for help.");
         } catch (Throwable throwable) {
-            System.err.println("[cn.huoxian.dongtai.iast] DongTai engine installation failed, please contact staff for help.");
+            LogUtils.error("DongTai engine start failed, please contact staff for help.");
             throwable.printStackTrace();
         }
         return false;
@@ -200,20 +194,18 @@ public class EngineManager {
         try {
             if (classOfEngine != null) {
                 classOfEngine.getMethod("start").invoke(null);
+                LogUtils.info("DongTai engine start successfully.");
                 return true;
             }
             return false;
         } catch (InvocationTargetException e) {
-            System.err.println("[cn.huoxian.dongtai.iast] DongTai engine start failed, please contact staff for help.");
-            e.printStackTrace();
+            LogUtils.error("DongTai engine start failed, please contact staff for help.");
         } catch (NoSuchMethodException e) {
-            System.err.println("[cn.huoxian.dongtai.iast] DongTai engine start failed, please contact staff for help.");
-            e.printStackTrace();
+            LogUtils.error("DongTai engine start failed, please contact staff for help.");
         } catch (IllegalAccessException e) {
-            System.err.println("[cn.huoxian.dongtai.iast] DongTai engine start failed, please contact staff for help.");
-            e.printStackTrace();
+            LogUtils.error("DongTai engine start failed, please contact staff for help.");
         } catch (Throwable throwable) {
-            System.err.println("[cn.huoxian.dongtai.iast] DongTai engine start failed, please contact staff for help.");
+            LogUtils.error("DongTai engine start failed, please contact staff for help.");
             throwable.printStackTrace();
         }
         return false;
@@ -229,23 +221,23 @@ public class EngineManager {
         try {
             if (classOfEngine != null) {
                 classOfEngine.getMethod("stop").invoke(null);
+                LogUtils.info("DongTai engine stop successfully.");
                 return true;
             }
             return false;
         } catch (InvocationTargetException e) {
-            System.err.println("[cn.huoxian.dongtai.iast] DongTai engine stop failed, please contact staff for help.");
+            LogUtils.error("DongTai engine stop failed, please contact staff for help.");
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
             e.printStackTrace(pw);
-            System.err.println(sw.toString());
+            LogUtils.error(sw.toString());
         } catch (NoSuchMethodException e) {
-            System.err.println("[cn.huoxian.dongtai.iast] DongTai engine stop failed, please contact staff for help.");
-            e.printStackTrace();
+            LogUtils.error("DongTai engine stop failed, please contact staff for help.");
         } catch (IllegalAccessException e) {
-            System.err.println("[cn.huoxian.dongtai.iast] DongTai engine stop failed, please contact staff for help.");
+            LogUtils.error("DongTai engine stop failed, please contact staff for help.");
             e.printStackTrace();
         } catch (Throwable throwable) {
-            System.err.println("[cn.huoxian.dongtai.iast] DongTai engine stop failed, please contact staff for help.");
+            LogUtils.error("DongTai engine stop failed, please contact staff for help.");
             throwable.printStackTrace();
         }
         return false;
@@ -328,9 +320,10 @@ public class EngineManager {
      * @return true-引擎不存在；false-引擎存在
      */
     private static boolean engineNotExist(final String jarPath) {
+        LogUtils.info("Check if the engine[" + jarPath + "] needs to be updated");
         String isDebug = System.getProperty("debug");
         if ("true".equals(isDebug)) {
-            System.out.println("[cn.huoxian.dongtai.iast] current mode: debug, load engine from " + jarPath);
+            LogUtils.info("current mode: debug, load engine from " + jarPath);
             File tempFile = new File(jarPath);
             return !tempFile.exists();
         } else {
@@ -343,9 +336,9 @@ public class EngineManager {
      *
      * @return 1 - jdk 1.6~1.8；2 - jdk 1.9及以上
      */
-    private static String getJdkVersion() {
+    public static String getJdkVersion() {
         String jdkVersion = System.getProperty("java.version", "1.8");
-        System.out.println("current jdk version is : " + jdkVersion);
+        LogUtils.info("current jdk version is : " + jdkVersion);
         String[] jdkVersionItem = jdkVersion.split("\\.");
         boolean isHighJdk = true;
         if (jdkVersionItem.length > 1 && ("6".equals(jdkVersionItem[1]) || "7".equals(jdkVersionItem[1]) || "8".equals(jdkVersionItem[1]))) {

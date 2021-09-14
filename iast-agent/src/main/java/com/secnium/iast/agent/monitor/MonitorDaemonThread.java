@@ -1,6 +1,7 @@
 package com.secnium.iast.agent.monitor;
 
 import com.secnium.iast.agent.IastProperties;
+import com.secnium.iast.agent.LogUtils;
 import com.secnium.iast.agent.manager.EngineManager;
 
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ public class MonitorDaemonThread implements Runnable {
         int timeInterval = properties.getDelayTime();
         if (timeInterval > 0) {
             try {
-                System.out.println("开启延时加载模式，检测引擎将在" + timeInterval + "s后启动");
+                LogUtils.info("DongTai engine starts after " + timeInterval + " seconds");
                 Thread.sleep(timeInterval * 1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -45,7 +46,7 @@ public class MonitorDaemonThread implements Runnable {
         boolean status = engineManager.downloadEnginePackage();
         status = status && engineManager.install();
         status = status && engineManager.start();
-        System.out.println("引擎启动成功，漏洞检测功能开启");
+        LogUtils.info("DongTai Engine started successfully");
         return status;
     }
 

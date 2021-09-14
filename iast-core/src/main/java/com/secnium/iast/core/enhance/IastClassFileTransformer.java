@@ -106,10 +106,8 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                         superName, flags, sourceCodeBak, codeSource, loader, listenerId, namespace
                 ));
 
-                // fixme: 根据改行日志判断出时间损耗主要出现在accept中，但是，plugin的匹配也很耗时，需优化
                 if (cv instanceof AbstractClassVisitor) {
                     cr.accept(cv, ClassReader.EXPAND_FRAMES);
-                    // todo 增加类验证
                     AbstractClassVisitor dumpClassVisitor = (AbstractClassVisitor) cv;
                     if (dumpClassVisitor.hasTransformed()) {
                         transformClassCount++;

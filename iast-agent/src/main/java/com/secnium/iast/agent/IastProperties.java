@@ -151,8 +151,7 @@ public class IastProperties {
             ByteArrayInputStream inputStream = new ByteArrayInputStream(data);
             cfg.load(inputStream);
 
-
-            System.out.println("[cn.huoxian.dongtai.iast] The engine configuration file is initialized successfully. file is " + propertiesFile.toString());
+            LogUtils.info("The engine configuration file is initialized successfully. file is " + propertiesFile.toString());
         } catch (IOException e) {
             e.printStackTrace();
         }

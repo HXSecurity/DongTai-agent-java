@@ -1,6 +1,7 @@
 package com.secnium.iast.agent.monitor;
 
 import com.secnium.iast.agent.IastProperties;
+import com.secnium.iast.agent.LogUtils;
 import com.secnium.iast.agent.UpdateUtils;
 import com.secnium.iast.agent.manager.EngineManager;
 
@@ -28,13 +29,11 @@ public class EngineMonitor implements IMonitor {
             return;
         }
         if ("start".equals(status)) {
-            System.out.println("执行了agent启动 start");
+            LogUtils.info("engine start");
             engineManager.start();
-            // 更新状态
         } else if ("stop".equals(status)) {
-            System.out.println("执行了agent暂停 stop");
+            LogUtils.info("engine stop");
             engineManager.stop();
-            // 更新状态
         }
         this.currentStatus = status;
     }
