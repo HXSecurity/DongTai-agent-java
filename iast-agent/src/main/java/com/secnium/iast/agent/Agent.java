@@ -1,5 +1,6 @@
 package com.secnium.iast.agent;
 
+import com.secnium.iast.agent.manager.EngineManager;
 import org.apache.commons.cli.*;
 
 import java.io.File;
@@ -37,11 +38,14 @@ public class Agent {
                 String mode = result.getOptionValue("m");
                 String attachArgs = null;
                 attachArgs = mode;
-                if (appendToolsPath()) {
+
+                String jdkVersion = EngineManager.getJdkVersion();
+                if ("1".equals(jdkVersion) && appendToolsPath()) {
                     AttachLauncher.attach(pid, attachArgs);
-                    System.out.println("engine " + attachArgs + " success for pid: " + pid);
+                    LogUtils.info("engine " + attachArgs + " successfully. pid: " + pid);
                 } else {
-                    System.out.println("engine " + attachArgs + " failed for pid: " + pid);
+                    AttachLauncher.attach(pid, attachArgs);
+                    LogUtils.info("engine " + attachArgs + " successfully. pid: " + pid);
                 }
             } else {
                 formatter.printHelp("java -jar agent.jar", attachOptions, true);
@@ -75,7 +79,6 @@ public class Agent {
         try {
             File file = new File(new File(System.getProperty("java.home")).getParent(), "lib/tools.jar");
             if (!file.exists()) {
-                System.out.println("Not running with JDK!");
                 throw new RuntimeException("Not running with JDK!");
             }
             URLClassLoader urlClassLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();

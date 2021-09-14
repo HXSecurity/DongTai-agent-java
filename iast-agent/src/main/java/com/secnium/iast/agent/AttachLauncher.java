@@ -11,27 +11,23 @@ import java.io.IOException;
  * @author 代码参考自开源项目jvm-sandbox
  */
 public class AttachLauncher {
-    private static String agentPath = Agent.class.getProtectionDomain().getCodeSource().getLocation().getFile();
+    private static final String AGENT_PATH = Agent.class.getProtectionDomain().getCodeSource().getLocation().getFile();
 
     public static void attach(String pid, String args) {
         VirtualMachine vmObj = null;
         try {
-            System.out.println("[cn.huoxian.dongtai.iast] trying attach dongtai to process " + pid + ", agent address is " + agentPath);
+            LogUtils.info("trying attach to process " + pid + ", agent address is " + AGENT_PATH);
             vmObj = VirtualMachine.attach(pid);
-            vmObj.loadAgent(agentPath, "token=" + args);
-            System.out.println("[cn.huoxian.dongtai.iast] attach dongtai to process " + pid + " success.");
+            vmObj.loadAgent(AGENT_PATH, "token=" + args);
+            LogUtils.info("attach to process " + pid + " success.");
         } catch (AttachNotSupportedException e) {
-            System.err.println("[cn.huoxian.dongtai.iast] attach failed");
-            e.printStackTrace();
+            LogUtils.error("attach failed, reason: Attach not support");
         } catch (IOException e) {
-            System.err.println("[cn.huoxian.dongtai.iast] attach failed");
-            e.printStackTrace();
+            LogUtils.info("attach to process " + pid + ", Please wait and check the WEB service log to observe whether the engine has started successfully");
         } catch (AgentLoadException e) {
-            System.err.println("[cn.huoxian.dongtai.iast] attach failed");
-            e.printStackTrace();
+            LogUtils.error("attach failed, reason: agent load error");
         } catch (AgentInitializationException e) {
-            System.err.println("[cn.huoxian.dongtai.iast] attach failed");
-            e.printStackTrace();
+            LogUtils.error("attach failed, reason: agent init error");
         }
     }
 

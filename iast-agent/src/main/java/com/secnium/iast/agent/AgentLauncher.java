@@ -10,20 +10,14 @@ import java.lang.management.ManagementFactory;
  * @author dongzhiyong@huoxian.cn
  */
 public class AgentLauncher {
-
-    // 启动模式: agent方式加载
     private static final String LAUNCH_MODE_AGENT = "agent";
-
-    // 启动模式: attach方式加载
     private static final String LAUNCH_MODE_ATTACH = "attach";
-
-    // 启动默认
     private static String LAUNCH_MODE;
 
     /**
-     * 启动加载
+     * install agent with premain
      *
-     * @param args 启动参数 传入token、配置文件路径
+     * @param args boot args [namespace,token,ip,port,prop]
      * @param inst inst
      */
     public static void premain(String args, Instrumentation inst) {
@@ -37,15 +31,15 @@ public class AgentLauncher {
     }
 
     /**
-     * 动态加载
+     * install agent with attach
      *
-     * @param featureString 启动参数
+     * @param featureString boot args
      *                      [namespace,token,ip,port,prop]
      * @param inst          inst
      */
     public static void agentmain(String featureString, Instrumentation inst) {
         if ("uninstall".equals(featureString)) {
-            System.out.println("[cn.huoxian.dongtai.iast] Engine is about to be uninstalled");
+            LogUtils.info("Engine is about to be uninstalled");
             uninstall();
         } else {
             LAUNCH_MODE = LAUNCH_MODE_ATTACH;
@@ -55,7 +49,7 @@ public class AgentLauncher {
 
 
     /**
-     * 卸载agent
+     * uninstall agent
      */
     @SuppressWarnings("unused")
     public static synchronized void uninstall() {
@@ -64,7 +58,7 @@ public class AgentLauncher {
     }
 
     /**
-     * 安装agent
+     * install agent
      *
      * @param inst inst
      */
@@ -75,10 +69,10 @@ public class AgentLauncher {
 
     private static void loadEngine(final Instrumentation inst) {
         EngineManager engineManager = EngineManager.getInstance(inst, LAUNCH_MODE, ManagementFactory.getRuntimeMXBean().getName().split("@")[0]);
-        Thread agentMonitorDaemonThead = new Thread(new MonitorDaemonThread(engineManager));
-        agentMonitorDaemonThead.setDaemon(true);
-        agentMonitorDaemonThead.setName("dongtai-agent-monitor");
-        agentMonitorDaemonThead.start();
+        Thread agentMonitorDaemonThread = new Thread(new MonitorDaemonThread(engineManager));
+        agentMonitorDaemonThread.setDaemon(true);
+        agentMonitorDaemonThread.setName("dongtai-agent-monitor");
+        agentMonitorDaemonThread.start();
     }
 
 
