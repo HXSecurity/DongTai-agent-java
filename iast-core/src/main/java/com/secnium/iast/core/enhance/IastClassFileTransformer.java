@@ -92,7 +92,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                 System.arraycopy(srcByteCodeArray, 0, sourceCodeBak, 0, srcByteCodeArray.length);
                 final ClassReader cr = new ClassReader(sourceCodeBak);
                 final int flags = cr.getAccess();
-                
+
                 final String[] interfaces = cr.getInterfaces();
                 final String superName = cr.getSuperName();
                 final String className = cr.getClassName();
@@ -237,8 +237,8 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                 if (logger.isDebugEnabled()) {
                     logger.debug("reTransform class {} success, index={};total={};", waitingReTransformClass, index - 1, total);
                 }
-            } catch (Throwable causeOfReTransform) {
-                ErrorLogReport.sendErrorLog(ThrowableUtils.getStackTrace(causeOfReTransform));
+            } catch (Throwable ignored) {
+                ErrorLogReport.sendErrorLog(ThrowableUtils.getStackTrace(ignored));
             }
         }
     }
