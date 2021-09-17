@@ -108,12 +108,12 @@ public class SpringApplicationContext {
             if (patterns.size() > 1) {
                 for (String s : patterns
                 ) {
-                    String uri = s.replace("[", "").replace("]", "");
+                    String uri =applicationContext.getApplicationName() + s.replace("[", "").replace("]", "");
                     apiDataModel.setUrl(uri);
                     apiList.add(apiDataModel);
                 }
             } else {
-                String uri = info.getPatternsCondition().toString().replace("[", "").replace("]", "");
+                String uri = applicationContext.getApplicationName() + info.getPatternsCondition().toString().replace("[", "").replace("]", "");
                 apiDataModel.setUrl(uri);
                 apiList.add(apiDataModel);
             }
