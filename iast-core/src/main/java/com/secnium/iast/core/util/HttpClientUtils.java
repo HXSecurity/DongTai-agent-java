@@ -78,7 +78,7 @@ public class HttpClientUtils {
             connection.setRequestMethod(method.name());
             if (HttpMethods.POST.equals(method)) {
                 connection.setRequestProperty(REQUEST_HEADER_CONTENT_TYPE, MEDIA_TYPE_APPLICATION_JSON);
-                connection.setRequestProperty(REQUEST_HEADER_CONTENT_LENGTH, Integer.toString(data.getBytes().length));
+//                connection.setRequestProperty(REQUEST_HEADER_CONTENT_LENGTH, Integer.toString(data.getBytes().length));
                 connection.setRequestProperty(REQUEST_HEADER_CONTENT_ENCODING, REQUEST_ENCODING_TYPE);
                 connection.setRequestProperty(REQUEST_HEADER_USER_AGENT, "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.94 Safari/537.36 IAST-AGENT");
             }
