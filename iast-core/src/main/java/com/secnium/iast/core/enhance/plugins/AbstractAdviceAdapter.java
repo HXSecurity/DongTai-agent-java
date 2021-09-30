@@ -114,7 +114,6 @@ public abstract class AbstractAdviceAdapter extends AdviceAdapter implements Asm
         loadArgArray();
         push(context.getNamespace());
         push(type);
-        // fixme 修改为传原始类名
         push(context.getClassName());
         push(context.getMatchClassname());
         push(name);

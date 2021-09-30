@@ -45,21 +45,10 @@ public class ConfigMatcher {
         return StringUtils.endsWithAny(uri, disableExt);
     }
 
-    public static boolean internalMatch(String classname) {
-        return internalWhiteList.contains(classname);
-    }
-
-    private static boolean inHookBlacklist(String className, boolean internal) {
-        if (internal) {
-            return StringUtils.startsWithAny(className, START_ARRAY)
-                    || StringUtils.endsWithAny(className, END_ARRAY)
-                    || BLACKS_SET.contains(className);
-        } else {
-            String internalClassName = className.replace(".", "/");
-            return StringUtils.startsWithAny(internalClassName, START_ARRAY)
-                    || StringUtils.endsWithAny(internalClassName, END_ARRAY)
-                    || BLACKS_SET.contains(internalClassName);
-        }
+    private static boolean inHookBlacklist(String className) {
+        return BLACKS_SET.contains(className)
+                || StringUtils.startsWithAny(className, START_ARRAY)
+                || StringUtils.endsWithAny(className, END_ARRAY);
     }
 
     public static PropagatorType blackFunc(final String signature) {
@@ -118,7 +107,7 @@ public class ConfigMatcher {
 
 
         // 这里过滤掉Sandbox所需要的类，防止ClassCircularityError的发生
-        if (hook && ConfigMatcher.inHookBlacklist(className, true)) {
+        if (hook && ConfigMatcher.inHookBlacklist(className)) {
             hook = false;
             logger.trace("ignore transform {} in loader={}. reason: class is in blacklist", className, loader);
         }

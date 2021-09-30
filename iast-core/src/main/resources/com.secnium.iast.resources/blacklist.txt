@@ -1,12 +1,6 @@
 # other javaagent
 # pinpoint javaagent
 com/navercorp/pinpoint/*
-#com/navercorp/pinpoint/agent/*
-#com/navercorp/pinpoint/bootstrap/*
-#com/navercorp/pinpoint/common/*
-#com/navercorp/pinpoint/grpc/*
-#com/navercorp/pinpoint/loader/*
-#com/navercorp/pinpoint/profiler/*
 # ehcache - cache need't hook
 net/sf/ehcache/*
 # bytebuddy - need't hook
@@ -31607,7 +31601,6 @@ org/apache/commons/el/parser/TokenMgrError
 org/apache/commons/fileupload/DefaultFileItem
 org/apache/commons/fileupload/DefaultFileItemFactory
 org/apache/commons/fileupload/DiskFileUpload
-org/apache/commons/fileupload/FileItem
 org/apache/commons/fileupload/FileItemFactory
 org/apache/commons/fileupload/FileItemHeaders
 org/apache/commons/fileupload/FileItemHeadersSupport
@@ -60855,33 +60848,9 @@ org/springframework/web/method/HandlerMethod$HandlerMethodParameter
 org/springframework/web/method/HandlerMethod$ReturnValueMethodParameter
 org/springframework/web/method/HandlerMethodSelector
 org/springframework/web/method/HandlerMethodSelector$1
-#org/springframework/web/method/annotation/AbstractCookieValueMethodArgumentResolver
-#org/springframework/web/method/annotation/AbstractCookieValueMethodArgumentResolver$CookieValueNamedValueInfo
-#org/springframework/web/method/annotation/AbstractNamedValueMethodArgumentResolver
-#org/springframework/web/method/annotation/AbstractNamedValueMethodArgumentResolver$NamedValueInfo
-#org/springframework/web/method/annotation/ErrorsMethodArgumentResolver
-#org/springframework/web/method/annotation/ExceptionHandlerMethodResolver
-#org/springframework/web/method/annotation/ExpressionValueMethodArgumentResolver
-#org/springframework/web/method/annotation/ExpressionValueMethodArgumentResolver$ExpressionValueNamedValueInfo
-#org/springframework/web/method/annotation/InitBinderDataBinderFactory
-#org/springframework/web/method/annotation/MapMethodProcessor
-#org/springframework/web/method/annotation/MethodArgumentConversionNotSupportedException
-#org/springframework/web/method/annotation/MethodArgumentTypeMismatchException
-#org/springframework/web/method/annotation/ModelAttributeMethodProcessor
-#org/springframework/web/method/annotation/ModelFactory
-#org/springframework/web/method/annotation/ModelMethodProcessor
-#org/springframework/web/method/annotation/RequestHeaderMapMethodArgumentResolver
-#org/springframework/web/method/annotation/RequestHeaderMethodArgumentResolver
-#org/springframework/web/method/annotation/RequestHeaderMethodArgumentResolver$RequestHeaderNamedValueInfo
-#org/springframework/web/method/annotation/RequestParamMapMethodArgumentResolver
-#org/springframework/web/method/annotation/RequestParamMethodArgumentResolver
-#org/springframework/web/method/annotation/RequestParamMethodArgumentResolver$RequestParamNamedValueInfo
-#org/springframework/web/method/annotation/SessionAttributesHandler
-#org/springframework/web/method/annotation/SessionStatusMethodArgumentResolver
 org/springframework/web/method/support/AsyncHandlerMethodReturnValueHandler
 org/springframework/web/method/support/CompositeUriComponentsContributor
 org/springframework/web/method/support/HandlerMethodArgumentResolver
-#org/springframework/web/method/support/HandlerMethodArgumentResolverComposite
 org/springframework/web/method/support/HandlerMethodReturnValueHandler
 org/springframework/web/method/support/HandlerMethodReturnValueHandlerComposite
 org/springframework/web/method/support/InvocableHandlerMethod
@@ -60895,7 +60864,6 @@ org/springframework/web/multipart/MultipartRequest
 org/springframework/web/multipart/MultipartResolver
 org/springframework/web/multipart/commons/CommonsFileUploadSupport
 org/springframework/web/multipart/commons/CommonsFileUploadSupport$MultipartParsingResult
-org/springframework/web/multipart/commons/CommonsMultipartFile
 org/springframework/web/multipart/commons/CommonsMultipartResolver
 org/springframework/web/multipart/commons/CommonsMultipartResolver$1
 org/springframework/web/multipart/commons/package-info
