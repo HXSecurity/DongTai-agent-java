@@ -26,7 +26,7 @@ public class DubboAdviceAdapter extends AbstractAdviceAdapter {
         invokeStatic(ASM_TYPE_SPY, ASM_METHOD_Spy$isFirstLevelHttp);
         mv.visitJumpInsn(EQ, elseLabel);
 
-        captureMethodState(-1, HookType.HTTP.getValue(), false);
+        captureMethodState(-1, HookType.DUBBO.getValue(), false);
 
         // 标记进入source点
         mark(elseLabel);

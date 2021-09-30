@@ -4,6 +4,7 @@ import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.api.DispatchSpringApplication;
 import com.secnium.iast.core.enhance.plugins.cookie.DispatchCookie;
 import com.secnium.iast.core.enhance.plugins.core.DispatchClassPlugin;
+import com.secnium.iast.core.enhance.plugins.framework.dubbo.DispatchDubbo;
 import com.secnium.iast.core.enhance.plugins.framework.j2ee.dispatch.DispatchJ2ee;
 import org.objectweb.asm.ClassVisitor;
 
@@ -38,6 +39,7 @@ public class PluginRegister {
         PLUGINS.add(new DispatchJ2ee());
         //PLUGINS.add(new DispatchJsp());
         PLUGINS.add(new DispatchCookie());
+        PLUGINS.add(new DispatchDubbo());
         //PLUGINS.add(new DispatchSpringAutoBinding());
         PLUGINS.add(new DispatchClassPlugin());
         //PLUGINS.add()

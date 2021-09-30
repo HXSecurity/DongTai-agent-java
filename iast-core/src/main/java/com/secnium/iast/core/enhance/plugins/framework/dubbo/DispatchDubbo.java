@@ -8,11 +8,12 @@ import org.objectweb.asm.ClassVisitor;
  * @author dongzhiyong@huoxian.cn
  */
 public class DispatchDubbo implements DispatchPlugin {
+    static final String CLASS_OF_DUBBO = " org.apache.dubbo.monitor.support.MonitorFilter".substring(1);
 
     @Override
     public ClassVisitor dispatch(ClassVisitor classVisitor, IastContext context) {
         String classname = context.getClassName();
-        if (" com/alibaba/dubbo/rpc/proxy/javassist/JavassistProxyFactory$1".substring(1).equals(classname)) {
+        if (CLASS_OF_DUBBO.equals(classname)) {
             classVisitor = new DubboAdapter(classVisitor, context);
         }
         return classVisitor;

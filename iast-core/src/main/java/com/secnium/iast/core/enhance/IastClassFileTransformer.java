@@ -219,7 +219,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
     public static void release(Instrumentation inst) {
         IastClassFileTransformer iastClassFileTransformer = new IastClassFileTransformer(inst);
         inst.removeTransformer(iastClassFileTransformer);
-        iastClassFileTransformer.retransform();
+        //iastClassFileTransformer.retransform();
     }
 
     /**

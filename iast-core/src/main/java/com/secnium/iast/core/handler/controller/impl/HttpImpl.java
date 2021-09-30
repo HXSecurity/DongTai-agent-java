@@ -139,6 +139,7 @@ public class HttpImpl {
 
     /**
      * 处理http请求
+     * todo Upgrade the current method, support dubbo
      *
      * @param event 待处理的方法调用事件
      */

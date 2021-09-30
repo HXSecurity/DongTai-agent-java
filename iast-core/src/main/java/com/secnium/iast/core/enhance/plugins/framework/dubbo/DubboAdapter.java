@@ -27,7 +27,7 @@ public class DubboAdapter extends AbstractClassVisitor {
     public MethodVisitor visitMethod(final int access, final String name, final String desc, final String signature, final String[] exceptions) {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
         String signCode = AsmUtils.buildSignature(context.getClassName(), name, desc);
-        if ("doInvoke".equals(name)) {
+        if ("invoke".equals(name)) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Adding Dubbo Source tracking for type {}", context.getClassName());
             }
