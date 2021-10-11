@@ -1,7 +1,9 @@
 package com.secnium.iast.agent;
 
+
 public class LogUtils {
     public static void info(String msg) {
+        // todo 增加时间打印
         System.out.println("[cn.huoxian.dongtai.agent] " + msg);
     }
 

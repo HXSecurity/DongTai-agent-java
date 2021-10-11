@@ -83,10 +83,13 @@ public class IastClassFileTransformer implements ClassFileTransformer {
 
         try {
             final CodeSource codeSource = (protectionDomain != null) ? protectionDomain.getCodeSource() : null;
+
+            // sca scan
             if (codeSource != null && internalClassName != null && !internalClassName.startsWith("com/secnium/iast/") && !internalClassName.startsWith("com/sun/") && !internalClassName.startsWith("sun/")) {
                 COMMON_UTILS.scanCodeSource(codeSource);
             }
 
+            // class hook
             if (ConfigMatcher.isHookPoint(internalClassName, loader)) {
                 byte[] sourceCodeBak = new byte[srcByteCodeArray.length];
                 System.arraycopy(srcByteCodeArray, 0, sourceCodeBak, 0, srcByteCodeArray.length);
@@ -219,7 +222,6 @@ public class IastClassFileTransformer implements ClassFileTransformer {
     public static void release(Instrumentation inst) {
         IastClassFileTransformer iastClassFileTransformer = new IastClassFileTransformer(inst);
         inst.removeTransformer(iastClassFileTransformer);
-        //iastClassFileTransformer.retransform();
     }
 
     /**

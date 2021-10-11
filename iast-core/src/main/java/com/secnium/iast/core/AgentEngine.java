@@ -57,7 +57,7 @@ public class AgentEngine {
         agentEngine.init(mode, propertiesUtils, inst);
         agentEngine.run();
 
-        logger.info("The engine is successfully installed to the JVM, and it takes {}ms", System.currentTimeMillis() - start);
+        logger.info("The engine is successfully installed to the JVM, and it takes {} s", (System.currentTimeMillis() - start) / 1000);
     }
 
     public static void start() {

@@ -23,22 +23,19 @@ public class MonitorDaemonThread implements Runnable {
 
     @Override
     public void run() {
-        if (startEngine()) {
-            while (true) {
-                for (IMonitor monitor : this.monitorTasks) {
-                    monitor.check();
-                }
-                threadSleep();
+        while (true) {
+            for (IMonitor monitor : this.monitorTasks) {
+                monitor.check();
             }
+            threadSleep();
         }
     }
 
-    private boolean startEngine() {
+    public boolean startEngine() {
         int timeInterval = properties.getDelayTime();
         if (timeInterval > 0) {
             try {
-                LogUtils.info("DongTai engine starts after " + timeInterval + " seconds");
-                Thread.sleep(timeInterval * 1000);
+                Thread.sleep(timeInterval * 1000L);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -46,7 +43,12 @@ public class MonitorDaemonThread implements Runnable {
         boolean status = engineManager.downloadEnginePackage();
         status = status && engineManager.install();
         status = status && engineManager.start();
-        LogUtils.info("DongTai Engine started successfully");
+        if (status) {
+            LogUtils.info("DongTai IAST started successfully");
+        } else {
+            LogUtils.info("DongTai IAST started failure");
+        }
+
         return status;
     }
 

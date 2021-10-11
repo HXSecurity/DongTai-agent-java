@@ -23,7 +23,7 @@ public class SourceImpl {
     private static final String METHOD_OF_GETATTRIBUTE = "getAttribute";
 
     public static void solveSource(MethodEvent event, AtomicInteger invokeIdSequencer) {
-        if (isAllowTaintType(event.returnValue) && allowCall(event) && isNotEmpty(event.returnValue)) {
+        if (isNotEmpty(event.returnValue) && isAllowTaintType(event.returnValue) && allowCall(event)) {
             event.source = true;
             event.setCallStacks(StackUtils.createCallStack(9));
 
@@ -89,7 +89,7 @@ public class SourceImpl {
 
 
     public static boolean isAllowTaintType(Object obj) {
-        return !(obj instanceof Boolean);
+        return !(obj instanceof Boolean || obj instanceof Integer);
     }
 
     static {
