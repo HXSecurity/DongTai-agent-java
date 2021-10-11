@@ -68,6 +68,10 @@ public class IastClassHookPointMatcher {
             }
 
             try {
+                // fixme ISSUE-274
+                ClassLoader loader = clazz.getClassLoader();
+                loader.getClass().getName();
+                clazz.getName();
                 classes.add(clazz);
             } catch (Throwable cause) {
                 // 在这里可能会遇到非常坑爹的模块卸载错误

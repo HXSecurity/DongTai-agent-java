@@ -69,11 +69,12 @@ public class AgentLauncher {
 
     private static void loadEngine(final Instrumentation inst) {
         EngineManager engineManager = EngineManager.getInstance(inst, LAUNCH_MODE, ManagementFactory.getRuntimeMXBean().getName().split("@")[0]);
-        Thread agentMonitorDaemonThread = new Thread(new MonitorDaemonThread(engineManager));
-        agentMonitorDaemonThread.setDaemon(true);
-        agentMonitorDaemonThread.setName("dongtai-agent-monitor");
-        agentMonitorDaemonThread.start();
+        MonitorDaemonThread daemonThread = new MonitorDaemonThread(engineManager);
+        if (daemonThread.startEngine()) {
+            Thread agentMonitorDaemonThread = new Thread(daemonThread);
+            agentMonitorDaemonThread.setDaemon(true);
+            agentMonitorDaemonThread.setName("dongtai-agent-monitor");
+            agentMonitorDaemonThread.start();
+        }
     }
-
-
 }

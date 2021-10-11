@@ -25,7 +25,7 @@ public class IastProperties {
     private IastProperties(String path) {
         try {
             init(path);
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException ignored) {
         }
     }
 
