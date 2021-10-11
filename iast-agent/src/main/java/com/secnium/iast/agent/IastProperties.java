@@ -1,6 +1,7 @@
 package com.secnium.iast.agent;
 
 import java.io.*;
+import java.net.URLDecoder;
 import java.util.Properties;
 
 /**
@@ -119,6 +120,7 @@ public class IastProperties {
                 agentFile = new File(IastProperties.class.getProtectionDomain().getCodeSource().getLocation().getFile());
                 basePath = agentFile.getParentFile().getPath();
                 propertiesFilePath = basePath + File.separator + "config" + File.separator + "iast.properties";
+                propertiesFilePath = URLDecoder.decode(propertiesFilePath, "utf-8");
             }
 
             propertiesFile = new File(propertiesFilePath);
