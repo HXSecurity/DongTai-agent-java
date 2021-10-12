@@ -14,7 +14,7 @@ import java.security.cert.X509Certificate;
 public class UpdateUtils {
     private final static IastProperties PROPERTIES = IastProperties.getInstance();
     private final static String START_URL = PROPERTIES.getBaseUrl() + "/api/v1/engine/startstop";
-    private final static String AGENT_TOKEN = URLEncoder.encode(AgentRegister.getAgentToken());
+    private final static String AGENT_TOKEN = URLEncoder.encode(AgentRegister.getAgentToken()).replace("+","%20");
 
     public static String checkForStatus() {
         try {
