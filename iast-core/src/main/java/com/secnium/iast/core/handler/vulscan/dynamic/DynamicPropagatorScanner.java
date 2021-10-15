@@ -1,6 +1,7 @@
 package com.secnium.iast.core.handler.vulscan.dynamic;
 
 import com.secnium.iast.core.EngineManager;
+import com.secnium.iast.core.handler.EventListenerHandlers;
 import com.secnium.iast.core.handler.controller.impl.SinkImpl;
 import com.secnium.iast.core.handler.models.IastSinkModel;
 import com.secnium.iast.core.handler.models.MethodEvent;
@@ -12,7 +13,6 @@ import org.slf4j.Logger;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -31,9 +31,9 @@ public class DynamicPropagatorScanner implements IVulScan {
     private final Logger logger = LogUtils.getLogger(SinkImpl.class);
 
     @Override
-    public void scan(IastSinkModel sink, MethodEvent event, AtomicInteger invokeIdSequencer) {
+    public void scan(IastSinkModel sink, MethodEvent event) {
         if (sinkSourceHitTaintPool(event, sink)) {
-            checkVulnAndGenerateReport(event, sink, invokeIdSequencer);
+            checkVulnAndGenerateReport(event);
         }
     }
 
@@ -49,7 +49,7 @@ public class DynamicPropagatorScanner implements IVulScan {
     }
 
     /**
-     * sink方法的污点来源是否命中污点池，用于过滤未命中污点池的sink方法，避免浪费资源
+     * sink方法的污点来源是否命中污点池，用于过滤未命中污点池的sink方法，避免浪费资源，设置污点源去向
      *
      * @param event 当前方法事件
      * @param sink  命中的sink点
@@ -84,7 +84,7 @@ public class DynamicPropagatorScanner implements IVulScan {
                 }
             } else {
                 hitTaintPool = TaintPoolUtils.poolContains(event.object, event);
-                if(hitTaintPool){
+                if (hitTaintPool) {
                     event.inValue = event.object;
                 }
             }
@@ -116,13 +116,11 @@ public class DynamicPropagatorScanner implements IVulScan {
     /**
      * 检查是否存在漏洞，如果存在，生成漏洞报告
      *
-     * @param event             当前调用的方法事件
-     * @param sink              当前命中的sink模型实例
-     * @param invokeIdSequencer 检测引擎全局的序列号生成器，用于生成有序、唯一的的方法调用ID
+     * @param event 当前调用的方法事件
      */
-    private void checkVulnAndGenerateReport(MethodEvent event, IastSinkModel sink, AtomicInteger invokeIdSequencer) {
+    private void checkVulnAndGenerateReport(MethodEvent event) {
         event.setCallStacks(StackUtils.createCallStack(11));
-        int invokeId = invokeIdSequencer.getAndIncrement();
+        int invokeId = EventListenerHandlers.INVOKE_ID_SEQUENCER.getAndIncrement();
         event.setInvokeId(invokeId);
         EngineManager.TRACK_MAP.addTrackMethod(invokeId, event);
     }

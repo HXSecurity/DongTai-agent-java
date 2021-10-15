@@ -4,7 +4,6 @@ import com.secnium.iast.core.handler.models.IastSinkModel;
 import com.secnium.iast.core.handler.models.MethodEvent;
 import com.secnium.iast.core.util.Asserts;
 
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,26 +16,22 @@ public class CryptoBacCiphersVulScan extends AbstractNormalVulScan {
     private final static Pattern GOOD_CIPHERS = Pattern.compile("^(DESede|AES|RSA).*$", CASE_INSENSITIVE);
 
     @Override
-    public void scan(IastSinkModel sink, MethodEvent event, AtomicInteger invokeId) {
-        Asserts.NOT_NULL("sink.params.position", sink.getPos());
-        Asserts.NOT_NULL("sink.params.value", event.argumentArray);
-
+    public void scan(IastSinkModel sink, MethodEvent event) {
         int[] taintPos = sink.getPos();
         Object[] arguments = event.argumentArray;
+        Asserts.NOT_NULL("sink.params.position", taintPos);
+        Asserts.NOT_NULL("sink.params.value", arguments);
 
-        if (arguments.length >= taintPos.length) {
-            Matcher matcher;
-            for (Integer pos : taintPos) {
-                if (null != arguments[pos]) {
-                    String cipher = (String) event.argumentArray[pos];
-                    matcher = GOOD_CIPHERS.matcher(cipher);
-
-                    if (!matcher.find()) {
-                        // todo: 获取调用栈信息
-                        sendReport(getLatestStack(), sink.getType());
-                        break;
-                    }
+        Matcher matcher;
+        for (Integer pos : taintPos) {
+            try {
+                matcher = GOOD_CIPHERS.matcher((CharSequence) arguments[pos]);
+                if (matcher.find()) {
+                    continue;
                 }
+                sendReport(getLatestStack(), sink.getType());
+                break;
+            } catch (Exception ignored) {
             }
         }
     }

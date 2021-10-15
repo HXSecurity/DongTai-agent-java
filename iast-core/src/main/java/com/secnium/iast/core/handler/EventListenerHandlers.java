@@ -24,7 +24,7 @@ public class EventListenerHandlers {
     /**
      * 调用序列生成器
      */
-    private static final AtomicInteger INVOKE_ID_SEQUENCER = new AtomicInteger(1000);
+    public static final AtomicInteger INVOKE_ID_SEQUENCER = new AtomicInteger(1000);
 
     public static void onBefore(final String framework,
                                 final String javaClassName,
@@ -72,7 +72,7 @@ public class EventListenerHandlers {
                     } else if (HookType.SOURCE.equals(hookType)) {
                         SourceImpl.solveSource(event, INVOKE_ID_SEQUENCER);
                     } else if (HookType.SINK.equals(hookType)) {
-                        SinkImpl.solveSink(event, INVOKE_ID_SEQUENCER);
+                        SinkImpl.solveSink(event);
                     }
 
                 }
@@ -231,13 +231,14 @@ public class EventListenerHandlers {
     }
 
     /**
-     * 克隆request，用于获取请求头、请求体相关信息
+     * Wrap the Request object and get the request packet
      *
-     * @param req HttpServletRequest类型的request对象
-     * @return RequestWrapper 包装之后的request对象，可重复调用inputStream/Reader
+     * @param req       The instantiated object of HttpServletRequest(Servlet-API、Jakarta-API)
+     * @param isJakarta Whether it is the request object of jakarta-api
+     * @return The request object wrapped by RequestWrapper, which can call inputStream/Reader repeatedly
      */
-    public static Object cloneRequest(Object req) {
-        return HttpImpl.cloneRequest(req);
+    public static Object cloneRequest(Object req, boolean isJakarta) {
+        return HttpImpl.cloneRequest(req, isJakarta);
     }
 
     public static boolean isReplayRequest() {
@@ -249,7 +250,14 @@ public class EventListenerHandlers {
         return false;
     }
 
-    public static Object cloneResponse(Object response) {
-        return HttpImpl.cloneResponse(response);
+    /**
+     * Wrap the Response object and get the response packet
+     *
+     * @param response  The instantiated object of HttpServletResponse(Servlet-API、Jakarta-API)
+     * @param isJakarta Whether it is the request object of jakarta-api
+     * @return
+     */
+    public static Object cloneResponse(Object response, boolean isJakarta) {
+        return HttpImpl.cloneResponse(response, isJakarta);
     }
 }

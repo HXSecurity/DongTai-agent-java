@@ -32,14 +32,6 @@ public class MonitorDaemonThread implements Runnable {
     }
 
     public boolean startEngine() {
-        int timeInterval = properties.getDelayTime();
-        if (timeInterval > 0) {
-            try {
-                Thread.sleep(timeInterval * 1000L);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
         boolean status = engineManager.downloadEnginePackage();
         status = status && engineManager.install();
         status = status && engineManager.start();
