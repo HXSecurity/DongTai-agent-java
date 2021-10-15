@@ -15,19 +15,22 @@ import org.slf4j.Logger;
 public class ServletDispatcherAdapter extends AbstractClassVisitor {
 
     private final Logger logger = LogUtils.getLogger(getClass());
-    private final static String HTTP_SERVLET_REQUEST = " javax.servlet.http.HttpServletRequest".substring(1);
-    private final static String HTTP_SERVLET_RESPONSE = " javax.servlet.http.HttpServletResponse".substring(1);
-    private final static String SERVLET_REQUEST = " javax.servlet.ServletRequest".substring(1);
-    private final static String SERVLET_RESPONSE = " javax.servlet.ServletResponse".substring(1);
-    private final static String FILTER_CHAIN = " javax.servlet.FilterChain".substring(1);
-    private final static String FACES_SERVLET = " javax.faces.webapp.FacesServlet".substring(1);
+    private final String HTTP_SERVLET_REQUEST = " javax.servlet.http.HttpServletRequest".substring(1);
+    private final String HTTP_SERVLET_RESPONSE = " javax.servlet.http.HttpServletResponse".substring(1);
+    private final String SERVLET_REQUEST = " javax.servlet.ServletRequest".substring(1);
+    private final String SERVLET_RESPONSE = " javax.servlet.ServletResponse".substring(1);
+    private final String FILTER_CHAIN = " javax.servlet.FilterChain".substring(1);
+    private final String JAKARTA_SERVLET_REQUEST = " jakarta.servlet.http.HttpServletRequest".substring(1);
+    private final String JAKARTA_SERVLET_RESPONSE = " jakarta.servlet.http.HttpServletResponse".substring(1);
 
 
     private final boolean isFaces;
+    private final boolean isJakarta;
 
     ServletDispatcherAdapter(ClassVisitor classVisitor, IastContext context) {
         super(classVisitor, context);
-        this.isFaces = FACES_SERVLET.equals(context.getClassName());
+        this.isFaces = " javax.faces.webapp.FacesServlet".substring(1).equals(context.getClassName());
+        this.isJakarta = " jakarta.servlet.http.HttpServlet".substring(1).equals(context.getClassName());
     }
 
     @Override
@@ -40,12 +43,15 @@ public class ServletDispatcherAdapter extends AbstractClassVisitor {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
         Type[] typeOfArgs = Type.getArgumentTypes(desc);
         String signCode = AsmUtils.buildSignature(context.getClassName(), name, desc);
-        if (isService(name, typeOfArgs) || (this.isFaces && isFacesArgs(typeOfArgs))) {
+        if (isService(name, typeOfArgs) ||
+                (this.isJakarta && isJakartaArgs(typeOfArgs)) ||
+                (this.isFaces && isFacesArgs(typeOfArgs))
+        ) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Adding HTTP tracking for type {}", context.getClassName());
             }
 
-            mv = new ServletDispatcherAdviceAdapter(mv, access, name, desc, signCode, context);
+            mv = new ServletDispatcherAdviceAdapter(mv, access, name, desc, signCode, context, isJakarta);
             transformed = true;
         }
         if (transformed) {
@@ -78,6 +84,12 @@ public class ServletDispatcherAdapter extends AbstractClassVisitor {
         return typeOfArgs.length == 2 &&
                 HTTP_SERVLET_REQUEST.equals(typeOfArgs[0].getClassName()) &&
                 HTTP_SERVLET_RESPONSE.equals(typeOfArgs[1].getClassName());
+    }
+
+    private boolean isJakartaArgs(Type[] typeOfArgs) {
+        return typeOfArgs.length == 2 &&
+                JAKARTA_SERVLET_REQUEST.equals(typeOfArgs[0].getClassName()) &&
+                JAKARTA_SERVLET_RESPONSE.equals(typeOfArgs[1].getClassName());
     }
 
     private boolean isFacesArgs(Type[] typeOfArgs) {

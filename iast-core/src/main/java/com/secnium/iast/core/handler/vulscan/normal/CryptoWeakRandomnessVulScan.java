@@ -1,9 +1,7 @@
 package com.secnium.iast.core.handler.vulscan.normal;
 
-import com.secnium.iast.core.handler.models.MethodEvent;
 import com.secnium.iast.core.handler.models.IastSinkModel;
-
-import java.util.concurrent.atomic.AtomicInteger;
+import com.secnium.iast.core.handler.models.MethodEvent;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -13,12 +11,11 @@ public class CryptoWeakRandomnessVulScan extends AbstractNormalVulScan {
      * 检查是否存在若随机数算法
      * fixme: 当出现如若随机数算法时，考虑如何列出出现若随机数算法的组件/平台/中间件，避免造成用户的困扰
      *
-     * @param sink     当前命中的sink点
-     * @param event    当前命中的方法
-     * @param invokeId 方法调用ID
+     * @param sink  当前命中的sink点
+     * @param event 当前命中的方法
      */
     @Override
-    public void scan(IastSinkModel sink, MethodEvent event, AtomicInteger invokeId) {
+    public void scan(IastSinkModel sink, MethodEvent event) {
         // todo: 取调用栈信息
         sendReport(getLatestStack(), sink.getType());
     }
@@ -26,7 +23,7 @@ public class CryptoWeakRandomnessVulScan extends AbstractNormalVulScan {
     /**
      * 执行sql语句扫描
      *
-     * @param sql 待扫描的sql语句
+     * @param sql    待扫描的sql语句
      * @param params sql语句对应的查询参数
      */
     @Override

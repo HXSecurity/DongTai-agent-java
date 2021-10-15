@@ -30,10 +30,10 @@ public class HeartBeatSender extends Thread {
         report.put(ReportConstant.REPORT_VALUE_KEY, detail);
 
         detail.put(ReportConstant.AGENT_ID, AgentRegisterReport.getAgentFlag());
-        detail.put(ReportConstant.HEART_BEAT_MEMORY, getMemInfo());
-        detail.put(ReportConstant.HEART_BEAT_CPU, readCpuInfo());
-        detail.put(ReportConstant.HEART_BEAT_DISK, getDiskInfo());
-        detail.put(ReportConstant.HEART_BEAT_REQ_COUNT, EngineManager.getRequestCount());
+        detail.put(ReportConstant.MEMORY, getMemInfo());
+        detail.put(ReportConstant.CPU, readCpuInfo());
+        detail.put(ReportConstant.DISK, getDiskInfo());
+        detail.put(ReportConstant.REQ_COUNT, EngineManager.getRequestCount());
         detail.put(ReportConstant.REPORT_QUEUE, EngineManager.getReportQueueSize());
         detail.put(ReportConstant.METHOD_QUEUE, EngineManager.getMethodReportQueueSize());
         detail.put(ReportConstant.REPLAY_QUEUE, EngineManager.getReplayQueueSize());
@@ -42,9 +42,9 @@ public class HeartBeatSender extends Thread {
     }
 
     /**
-     * 实时获取CPU信息
+     * Query CPU usage
      *
-     * @return
+     * @return CPU usage, eg: 20%
      */
     public static String readCpuInfo() {
         OperatingSystemMXBean operatingSystemMXBean = ManagementFactory.getOperatingSystemMXBean();

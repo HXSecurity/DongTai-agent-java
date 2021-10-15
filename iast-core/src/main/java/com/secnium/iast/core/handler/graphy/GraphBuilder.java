@@ -13,9 +13,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
@@ -96,21 +93,20 @@ public class GraphBuilder {
 
         detail.put(ReportConstant.LANGUAGE, ReportConstant.LANGUAGE_VALUE);
         detail.put(ReportConstant.AGENT_ID, AgentRegisterReport.getAgentFlag());
-        detail.put(ReportConstant.COMMON_REMOTE_IP, requestMeta.get("remoteAddr"));
-        detail.put(ReportConstant.COMMON_HTTP_PROTOCOL, requestMeta.get("protocol"));
-        detail.put(ReportConstant.COMMON_HTTP_SCHEME, requestMeta.get("scheme"));
-        detail.put(ReportConstant.COMMON_HTTP_METHOD, requestMeta.get("method"));
-        detail.put(ReportConstant.COMMON_HTTP_SECURE, requestMeta.get("secure"));
-        detail.put(ReportConstant.COMMON_HTTP_URL, requestMeta.get("requestURL").toString());
-        detail.put(ReportConstant.COMMON_HTTP_URI, requestMeta.get("requestURI"));
-        detail.put(ReportConstant.COMMON_HTTP_CLIENT_IP, requestMeta.get("remoteAddr"));
-        detail.put(ReportConstant.COMMON_HTTP_QUERY_STRING, requestMeta.get("queryString"));
-        detail.put(ReportConstant.COMMON_HTTP_REQ_HEADER, Base64Encoder.encodeBase64String(requestMeta.get("headers").toString().getBytes()).replaceAll("\n", ""));
-        detail.put(ReportConstant.COMMON_HTTP_BODY, requestMeta.get("body"));
-        detail.put(ReportConstant.COMMON_HTTP_RES_HEADER, responseMeta == null ? "" : Base64Encoder.encodeBase64String(responseMeta.get("headers").toString().getBytes()).replaceAll("\n", ""));
-        detail.put(ReportConstant.COMMON_HTTP_RES_BODY, responseMeta == null ? "" : responseMeta.get("body"));
-        detail.put(ReportConstant.COMMON_HTTP_CONTEXT_PATH, requestMeta.get("contextPath"));
-        detail.put(ReportConstant.COMMON_HTTP_REPLAY_REQUEST, requestMeta.get("replay-request"));
+        detail.put(ReportConstant.PROTOCOL, requestMeta.get("protocol"));
+        detail.put(ReportConstant.SCHEME, requestMeta.get("scheme"));
+        detail.put(ReportConstant.METHOD, requestMeta.get("method"));
+        detail.put(ReportConstant.SECURE, requestMeta.get("secure"));
+        detail.put(ReportConstant.URL, requestMeta.get("requestURL").toString());
+        detail.put(ReportConstant.URI, requestMeta.get("requestURI"));
+        detail.put(ReportConstant.CLIENT_IP, requestMeta.get("remoteAddr"));
+        detail.put(ReportConstant.QUERY_STRING, requestMeta.get("queryString"));
+        detail.put(ReportConstant.REQ_HEADER, Base64Encoder.encodeBase64String(requestMeta.get("headers").toString().getBytes()).replaceAll("\n", ""));
+        detail.put(ReportConstant.REQ_BODY, requestMeta.get("body"));
+        detail.put(ReportConstant.RES_HEADER, responseMeta == null ? "" : Base64Encoder.encodeBase64String(responseMeta.get("headers").toString().getBytes()).replaceAll("\n", ""));
+        detail.put(ReportConstant.RES_BODY, responseMeta == null ? "" : responseMeta.get("body"));
+        detail.put(ReportConstant.CONTEXT_PATH, requestMeta.get("contextPath"));
+        detail.put(ReportConstant.REPLAY_REQUEST, requestMeta.get("replay-request"));
 
         detail.put(ReportConstant.SAAS_METHOD_POOL, methodPool);
 

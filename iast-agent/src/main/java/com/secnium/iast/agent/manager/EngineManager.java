@@ -20,8 +20,8 @@ import java.util.jar.JarFile;
 public class EngineManager {
     private static final String IAST_NAMESPACE = "DONGTAI";
     private static final String ENGINE_ENTRYPOINT_CLASS = "com.secnium.iast.core.AgentEngine";
-    private static final String INJECT_PACKAGE_REMOTE_URI = "/api/v1/engine/download?package_name=iast-inject&jdk.version=";
-    private static final String ENGINE_PACKAGE_REMOTE_URI = "/api/v1/engine/download?package_name=iast-core&jdk.version=";
+    private static final String INJECT_PACKAGE_REMOTE_URI = "/api/v1/engine/download?engineName=iast-inject&jdk.version=";
+    private static final String ENGINE_PACKAGE_REMOTE_URI = "/api/v1/engine/download?engineName=iast-core&jdk.version=";
     private static final Map<String, IastClassLoader> IAST_CLASS_LOADER_CACHE = new ConcurrentHashMap<String, IastClassLoader>();
     private static EngineManager INSTANCE;
 

@@ -168,13 +168,14 @@ public interface AsmMethods {
     );
 
     /**
-     * asm method of {@link Injecter#cloneRequest(String, Object)}
+     * asm method of {@link Injecter#cloneRequest(String, Object, boolean)}
      */
     Method ASM_METHOD_Spy$cloneRequest = InnerHelper.getAsmMethod(
             Injecter.class,
             "cloneRequest",
             String.class,
-            Object.class
+            Object.class,
+            boolean.class
     );
 
     Method ASM_METHOD_Spy$isReplayRequest = InnerHelper.getAsmMethod(
@@ -187,7 +188,8 @@ public interface AsmMethods {
             Injecter.class,
             "cloneResponse",
             String.class,
-            Object.class
+            Object.class,
+            boolean.class
     );
 
 }

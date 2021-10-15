@@ -181,9 +181,9 @@ public class AgentRegisterReport {
         object.put(ReportConstant.SERVER_ENV, Base64Encoder.encodeBase64String(System.getProperties().toString().getBytes()).replaceAll("\n", ""));
         object.put(ReportConstant.CONTAINER_NAME, SERVER == null ? "" : SERVER.getName());
         object.put(ReportConstant.CONTAINER_VERSION, SERVER == null ? "" : SERVER.getVersion());
-        object.put(ReportConstant.WEB_SERVER_PATH, SERVER_DETECT.getWebServerPath());
-        object.put(ReportConstant.WEB_SERVER_ADDR, null != EngineManager.SERVER ? EngineManager.SERVER.getServerAddr() : "");
-        object.put(ReportConstant.WEB_SERVER_PORT, null != EngineManager.SERVER ? EngineManager.SERVER.getServerPort() : "");
+        object.put(ReportConstant.SERVER_PATH, SERVER_DETECT.getWebServerPath());
+        object.put(ReportConstant.SERVER_ADDR, null != EngineManager.SERVER ? EngineManager.SERVER.getServerAddr() : "");
+        object.put(ReportConstant.SERVER_PORT, null != EngineManager.SERVER ? EngineManager.SERVER.getServerPort() : "");
 
         return object.toString();
     }
