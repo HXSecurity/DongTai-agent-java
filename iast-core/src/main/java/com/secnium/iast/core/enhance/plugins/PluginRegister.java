@@ -1,7 +1,8 @@
 package com.secnium.iast.core.enhance.plugins;
 
 import com.secnium.iast.core.enhance.IastContext;
-import com.secnium.iast.core.enhance.plugins.api.DispatchSpringApplication;
+import com.secnium.iast.core.enhance.plugins.api.spring.DispatchSpringApplication;
+import com.secnium.iast.core.enhance.plugins.api.struts2.DispatchStruts2;
 import com.secnium.iast.core.enhance.plugins.cookie.DispatchCookie;
 import com.secnium.iast.core.enhance.plugins.core.DispatchClassPlugin;
 import com.secnium.iast.core.enhance.plugins.framework.dubbo.DispatchDubbo;
@@ -35,6 +36,7 @@ public class PluginRegister {
     static {
         PLUGINS = new ArrayList<DispatchPlugin>();
         PLUGINS.add(new DispatchSpringApplication());
+        PLUGINS.add(new DispatchStruts2());
         //PLUGINS.add(new DispatchTechnologyPlugin());
         PLUGINS.add(new DispatchJ2ee());
         //PLUGINS.add(new DispatchJsp());

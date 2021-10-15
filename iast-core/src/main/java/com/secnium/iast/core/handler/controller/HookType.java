@@ -11,12 +11,13 @@ public enum HookType {
     /**
      * HTTP方法hook
      */
-    DUBBO("dubbo", 5),
     HTTP("http", 0),
     SOURCE("source", 1),
     PROPAGATOR("propagator", 2),
     SINK("sink", 3),
-    SPRINGAPPLICATION("springApplication", 4);
+    SPRINGAPPLICATION("springApplication", 4),
+    DUBBO("dubbo", 5),
+    STRUTS2DISPATCHER("struts2Dispatcher", 6);
 
 
     /**

@@ -1,4 +1,4 @@
-package com.secnium.iast.core.enhance.plugins.api;
+package com.secnium.iast.core.enhance.plugins.api.struts2;
 
 import com.secnium.iast.core.handler.IastClassLoader;
 import com.secnium.iast.core.handler.controller.impl.HttpImpl;
@@ -9,34 +9,30 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.secnium.iast.core.report.ApiReport.sendReport;
 
-/**
- * niuerzhuang@huoxian.cn
- */
-public class SpringApplicationImpl {
+public class Struts2Impl {
 
     private static IastClassLoader iastClassLoader;
     public static Method getAPI;
     public static boolean isSend;
 
-    public static void getWebApplicationContext(MethodEvent event, AtomicInteger invokeIdSequencer) {
+    public static void getDispatcher(MethodEvent event) {
         if (!isSend) {
-        Object applicationContext = event.returnValue;
-        createClassLoader(applicationContext);
-        loadApplicationContext();
-        Map<String, Object> invoke = null;
-        try {
-            invoke = (Map<String, Object>) getAPI.invoke(null, applicationContext);
-            sendReport(invoke);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e){
-            e.printStackTrace();
-        }
-        isSend = true;
+            Object disptcher = event.returnValue;
+            createClassLoader(disptcher);
+            loadDispatcher();
+            Map<String, Object> invoke = null;
+            try {
+                invoke = (Map<String, Object>) getAPI.invoke(null, disptcher);
+                sendReport(invoke);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e){
+                e.printStackTrace();
+            }
+            isSend = true;
         }
     }
 
@@ -54,18 +50,19 @@ public class SpringApplicationImpl {
         }
     }
 
-    private static void loadApplicationContext() {
+    private static void loadDispatcher() {
         if (getAPI == null) {
             try {
                 Class<?> proxyClass;
-                proxyClass = iastClassLoader.loadClass("cn.huoxian.iast.servlet.SpringApplicationContext");
+                proxyClass = iastClassLoader.loadClass("cn.huoxian.iast.servlet.api.Struts2Dispatcher");
                 getAPI = proxyClass.getDeclaredMethod("getAPI", Object.class);
             } catch (NoSuchMethodException e) {
                 e.printStackTrace();
             }
         }
 
-        iastClassLoader.loadClass("org.springframework.context.ApplicationContext");
+        iastClassLoader.loadClass("org.apache.struts2.dispatcher.Dispatcher");
     }
+
 
 }

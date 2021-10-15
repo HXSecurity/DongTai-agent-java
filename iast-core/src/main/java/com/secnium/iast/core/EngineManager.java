@@ -231,7 +231,7 @@ public class EngineManager {
     }
 
     public static void enterHttpEntry(Map<String, Object> requestMeta) {
-        if (null == SERVER) {
+        if (null == SERVER || SERVER.getServerPort() == null) {
             SERVER = new IastServer(
                     (String) requestMeta.get("serverName"),
                     (Integer) requestMeta.get("serverPort"),
