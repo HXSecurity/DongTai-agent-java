@@ -1,4 +1,4 @@
-package cn.huoxian.iast.servlet;
+package cn.huoxian.iast.spring;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
