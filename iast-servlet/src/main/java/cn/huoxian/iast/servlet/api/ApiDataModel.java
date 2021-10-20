@@ -1,6 +1,5 @@
-package cn.huoxian.iast.servlet;
+package cn.huoxian.iast.servlet.api;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -46,6 +45,9 @@ public class ApiDataModel {
     }
 
     public String getClazz() {
+        if (clazz == null) {
+            clazz = "";
+        }
         return clazz;
     }
 
@@ -78,6 +80,9 @@ public class ApiDataModel {
     }
 
     public String getReturnType() {
+        if(returnType == null || returnType.equals("")){
+            returnType = "";
+        }
         return returnType;
     }
 
@@ -97,24 +102,13 @@ public class ApiDataModel {
     }
 
     public String getController() {
+        if (controller == null) {
+            controller = "";
+        }
         return controller;
     }
 
     public void setController(String controller) {
         this.controller = controller;
-    }
-
-    @Override
-    public String toString() {
-        return "{" +
-                "url='" + url + '\'' +
-                ", method=" + Arrays.toString(method) +
-                ", clazz='" + clazz + '\'' +
-                ", parameters=" + parameters +
-                ", returnType='" + returnType + '\'' +
-                ", file='" + file + '\'' +
-                ", controller='" + controller + '\'' +
-                ", description='" + description + '\'' +
-                '}';
     }
 }

@@ -1,4 +1,4 @@
-package com.secnium.iast.core.enhance.plugins.api;
+package com.secnium.iast.core.enhance.plugins.api.spring;
 
 import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.AbstractClassVisitor;

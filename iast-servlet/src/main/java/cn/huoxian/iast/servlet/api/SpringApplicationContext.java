@@ -1,7 +1,8 @@
-package cn.huoxian.iast.servlet;
+package cn.huoxian.iast.servlet.api;
 
 import org.springframework.aop.support.AopUtils;
 import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.condition.PatternsRequestCondition;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
@@ -15,10 +16,10 @@ import java.util.*;
 public class SpringApplicationContext {
 
     public static Map<String, Object> getAPI(Object applicationContext) {
-        return createReport(getAPIList((ApplicationContext) applicationContext));
+        return createReport(getAPIList((WebApplicationContext) applicationContext));
     }
 
-    public static List<ApiDataModel> getAPIList(ApplicationContext applicationContext) {
+    public static List<ApiDataModel> getAPIList(WebApplicationContext applicationContext) {
         RequestMappingHandlerMapping mapping = applicationContext.getBean(RequestMappingHandlerMapping.class);
         Map<RequestMappingInfo, HandlerMethod> methodMap = mapping.getHandlerMethods();
         List<ApiDataModel> apiList = new ArrayList<>();

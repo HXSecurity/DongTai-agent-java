@@ -1,4 +1,4 @@
-package com.secnium.iast.core.enhance.plugins.api;
+package com.secnium.iast.core.enhance.plugins.api.spring;
 
 import com.secnium.iast.core.handler.IastClassLoader;
 import com.secnium.iast.core.handler.controller.impl.HttpImpl;
@@ -24,19 +24,19 @@ public class SpringApplicationImpl {
 
     public static void getWebApplicationContext(MethodEvent event, AtomicInteger invokeIdSequencer) {
         if (!isSend) {
-        Object applicationContext = event.returnValue;
-        createClassLoader(applicationContext);
-        loadApplicationContext();
-        Map<String, Object> invoke = null;
-        try {
-            invoke = (Map<String, Object>) getAPI.invoke(null, applicationContext);
-            sendReport(invoke);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e){
-            e.printStackTrace();
-        }
-        isSend = true;
+            Object applicationContext = event.returnValue;
+            createClassLoader(applicationContext);
+            loadApplicationContext();
+            Map<String, Object> invoke = null;
+            try {
+                invoke = (Map<String, Object>) getAPI.invoke(null, applicationContext);
+                sendReport(invoke);
+                isSend = true;
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -58,14 +58,12 @@ public class SpringApplicationImpl {
         if (getAPI == null) {
             try {
                 Class<?> proxyClass;
-                proxyClass = iastClassLoader.loadClass("cn.huoxian.iast.servlet.SpringApplicationContext");
+                proxyClass = iastClassLoader.loadClass("cn.huoxian.iast.servlet.api.SpringApplicationContext");
                 getAPI = proxyClass.getDeclaredMethod("getAPI", Object.class);
             } catch (NoSuchMethodException e) {
                 e.printStackTrace();
             }
         }
-
-        iastClassLoader.loadClass("org.springframework.context.ApplicationContext");
     }
 
 }
