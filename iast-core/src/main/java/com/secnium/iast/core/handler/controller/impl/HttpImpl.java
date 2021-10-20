@@ -157,7 +157,7 @@ public class HttpImpl {
         try {
             IAST_REQUEST_JAR_PACKAGE = File.createTempFile("dongtai-api", ".jar");
             HttpClientUtils.downloadRemoteJar(
-                    "/api/v1/engine/download?engineName=dongtai-servlet&jakarta=1",
+                    "/api/v1/engine/download?engineName=dongtai-api&jakarta=1",
                     IAST_REQUEST_JAR_PACKAGE.getAbsolutePath()
             );
         } catch (IOException e) {
