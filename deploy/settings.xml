@@ -4,20 +4,17 @@
 
     <localRepository>~/.m2/repository</localRepository>
 
-
     <pluginGroups>
     </pluginGroups>
-
 
     <proxies>
     </proxies>
 
     <mirrors>
         <mirror>
-            <id>aliyunmaven</id>
+            <id>AliYun-Mirror-Repository</id>
             <mirrorOf>*</mirrorOf>
-            <name>阿里云公共仓库</name>
-            <!--<url>https://maven.aliyun.com/repository/public</url>-->
+            <name>AliYun Mirror Repository</name>
             <url>http://maven.aliyun.com/nexus/content/groups/public</url>
         </mirror>
     </mirrors>
