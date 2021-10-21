@@ -1,12 +1,9 @@
-package com.secnium.iast.core.enhance.plugins.api;
+package com.secnium.iast.core.enhance.plugins.api.spring;
 
 import com.secnium.iast.core.handler.IastClassLoader;
 import com.secnium.iast.core.handler.controller.impl.HttpImpl;
 import com.secnium.iast.core.handler.models.MethodEvent;
-import com.secnium.iast.core.util.HttpClientUtils;
 
-import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
@@ -25,7 +22,7 @@ public class SpringApplicationImpl {
     public static Method getAPI;
     public static boolean isSend;
 
-    public static void getWebApplicationContext(MethodEvent event, AtomicInteger invokeIdSequencer) {
+    public static void getWebApplicationContext(MethodEvent event) {
         if (!isSend) {
             Object applicationContext = event.returnValue;
             createClassLoader(applicationContext);
@@ -34,33 +31,19 @@ public class SpringApplicationImpl {
             try {
                 invoke = (Map<String, Object>) getAPI.invoke(null, applicationContext);
                 sendReport(invoke);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
+                isSend = true;
+            } catch (Exception ignored) {
             }
-            isSend = true;
         }
     }
 
     private static void createClassLoader(Object applicationContext) {
         try {
             if (iastClassLoader == null) {
-                try {
-                    HttpImpl.IAST_REQUEST_JAR_PACKAGE = File.createTempFile("dongtai-api-", ".jar");
-                    HttpClientUtils.downloadRemoteJar(
-                            "/api/v1/engine/download?engineName=dongtai-api&jakarta=0",
-                            HttpImpl.IAST_REQUEST_JAR_PACKAGE.getAbsolutePath()
-                    );
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    return;
-                }
                 if (HttpImpl.IAST_REQUEST_JAR_PACKAGE.exists()) {
-                    iastClassLoader = new IastClassLoader(
-                            applicationContext.getClass().getClassLoader(),
-                            new URL[]{HttpImpl.IAST_REQUEST_JAR_PACKAGE.toURI().toURL()}
-                    );
+                    Class<?> applicationContextClass = applicationContext.getClass();
+                    URL[] adapterJar = new URL[]{HttpImpl.IAST_REQUEST_JAR_PACKAGE.toURI().toURL()};
+                    iastClassLoader = new IastClassLoader(applicationContextClass.getClassLoader(), adapterJar);
                 }
             }
         } catch (MalformedURLException e) {
@@ -72,14 +55,12 @@ public class SpringApplicationImpl {
         if (getAPI == null) {
             try {
                 Class<?> proxyClass;
-                proxyClass = iastClassLoader.loadClass("cn.huoxian.iast.servlet.SpringApplicationContext");
+                proxyClass = iastClassLoader.loadClass("cn.huoxian.iast.spring.SpringApplicationContext");
                 getAPI = proxyClass.getDeclaredMethod("getAPI", Object.class);
             } catch (NoSuchMethodException e) {
                 e.printStackTrace();
             }
         }
-
-        iastClassLoader.loadClass("org.springframework.context.ApplicationContext");
     }
 
 }

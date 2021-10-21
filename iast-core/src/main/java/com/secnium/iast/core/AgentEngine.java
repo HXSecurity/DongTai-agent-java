@@ -3,6 +3,7 @@ package com.secnium.iast.core;
 import com.secnium.iast.core.engines.IEngine;
 import com.secnium.iast.core.engines.impl.*;
 import com.secnium.iast.core.report.AgentRegisterReport;
+import com.secnium.iast.core.report.StartUpTimeReport;
 import com.secnium.iast.core.util.LogUtils;
 import org.slf4j.Logger;
 
@@ -56,7 +57,8 @@ public class AgentEngine {
         agentEngine.init(mode, propertiesUtils, inst);
         agentEngine.run();
         agentEngine.setStartUpTime(System.currentTimeMillis() - start);
-
+        Integer startupTime = (int) agentEngine.getStartUpTime();
+        StartUpTimeReport.sendReport(AgentRegisterReport.getAgentFlag(), startupTime);
         logger.info("DongTai Engine is successfully installed to the JVM, and it takes {} s", agentEngine.getStartUpTime() / 1000);
     }
 

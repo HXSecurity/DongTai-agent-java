@@ -1,8 +1,7 @@
 package cn.huoxian.iast.spring;
 
-
 import org.springframework.aop.support.AopUtils;
-import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.condition.PatternsRequestCondition;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
@@ -16,10 +15,10 @@ import java.util.*;
 public class SpringApplicationContext {
 
     public static Map<String, Object> getAPI(Object applicationContext) {
-        return createReport(getAPIList((ApplicationContext) applicationContext));
+        return createReport(getAPIList((WebApplicationContext) applicationContext));
     }
 
-    public static List<ApiDataModel> getAPIList(ApplicationContext applicationContext) {
+    public static List<ApiDataModel> getAPIList(WebApplicationContext applicationContext) {
         RequestMappingHandlerMapping mapping = applicationContext.getBean(RequestMappingHandlerMapping.class);
         Map<RequestMappingInfo, HandlerMethod> methodMap = mapping.getHandlerMethods();
         List<ApiDataModel> apiList = new ArrayList<>();
@@ -74,18 +73,25 @@ public class SpringApplicationContext {
                     ) {
                         String anno = annotation.annotationType().toString();
                         anno = anno.substring(anno.lastIndexOf(".") + 1);
-                        if ("PathVariable".equals(anno)) {
-                            anno = "restful访问参数";
-                        } else if ("RequestHeader".equals(anno)) {
-                            anno = "Header参数";
-                        } else if ("CookieValue".equals(anno)) {
-                            anno = "Cookie参数";
-                        } else if ("RequestParam".equals(anno)) {
-                            anno = "GET请求参数";
-                        } else if ("RequestBody".equals(anno)) {
-                            anno = "POST请求的body参数";
-                        } else if ("Validated".equals(anno)) {
-                            anno = "GET请求参数对象";
+                        switch (anno) {
+                            case "PathVariable":
+                                anno = "restful访问参数";
+                                break;
+                            case "RequestHeader":
+                                anno = "Header参数";
+                                break;
+                            case "CookieValue":
+                                anno = "Cookie参数";
+                                break;
+                            case "RequestParam":
+                                anno = "GET请求参数";
+                                break;
+                            case "RequestBody":
+                                anno = "POST请求的body参数";
+                                break;
+                            case "Validated":
+                                anno = "GET请求参数对象";
+                                break;
                         }
                         annos.append(anno);
                     }
@@ -109,7 +115,7 @@ public class SpringApplicationContext {
             if (patterns.size() > 1) {
                 for (String s : patterns
                 ) {
-                    String uri = applicationContext.getApplicationName() + s.replace("[", "").replace("]", "");
+                    String uri =applicationContext.getApplicationName() + s.replace("[", "").replace("]", "");
                     apiDataModel.setUrl(uri);
                     apiList.add(apiDataModel);
                 }
@@ -125,32 +131,32 @@ public class SpringApplicationContext {
     private static Map<String, Object> createReport(List<ApiDataModel> apiList) {
         Map<String, Object> apiDataReport = new HashMap<>();
         List<Object> apiData = new ArrayList<>();
-        for (ApiDataModel apiDataModel : apiList
+        for (ApiDataModel apiDataModel:apiList
         ) {
             Map<String, Object> api = new HashMap<>();
             apiData.add(api);
-            api.put("uri", apiDataModel.getUrl());
+            api.put("uri",apiDataModel.getUrl());
             String[] methods = apiDataModel.getMethod();
             List<Object> methodsjson = new ArrayList<>(Arrays.asList(methods));
-            api.put("method", methodsjson);
-            api.put("class", apiDataModel.getClazz());
+            api.put("method",methodsjson);
+            api.put("class",apiDataModel.getClazz());
             List<Map<String, String>> parameters = apiDataModel.getParameters();
             List<Object> parametersJson = new ArrayList<>();
-            api.put("parameters", parametersJson);
-            for (Map<String, String> parameter : parameters
+            api.put("parameters",parametersJson);
+            for (Map<String,String> parameter:parameters
             ) {
                 Map<String, Object> parameterjson = new HashMap<>();
                 parametersJson.add(parameterjson);
-                parameterjson.put("name", parameter.get("name"));
-                parameterjson.put("type", parameter.get("type"));
-                parameterjson.put("annotation", parameter.get("annotation"));
+                parameterjson.put("name",parameter.get("name"));
+                parameterjson.put("type",parameter.get("type"));
+                parameterjson.put("annotation",parameter.get("annotation"));
             }
-            api.put("return_type", apiDataModel.getReturnType());
-            api.put("file", apiDataModel.getFile());
-            api.put("controller", apiDataModel.getController());
-            api.put("description", apiDataModel.getDescription());
+            api.put("return_type",apiDataModel.getReturnType());
+            api.put("file",apiDataModel.getFile());
+            api.put("controller",apiDataModel.getController());
+            api.put("description",apiDataModel.getDescription());
         }
-        apiDataReport.put("api_data", apiData);
+        apiDataReport.put("api_data",apiData);
         return apiDataReport;
     }
 
