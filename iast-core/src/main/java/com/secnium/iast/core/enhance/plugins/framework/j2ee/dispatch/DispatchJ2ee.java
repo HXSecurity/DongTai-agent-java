@@ -29,7 +29,7 @@ public class DispatchJ2ee implements DispatchPlugin {
 
         if (Modifier.isInterface(context.getFlags())) {
             logger.trace("Ignoring interface " + className);
-        } else if (isServletDispatch(className, ancestors) || isJakartaServlet(className)) {
+        }  else if (isServletDispatch(className, ancestors) || isJakartaServlet(className)) {
             classVisitor = new ServletDispatcherAdapter(classVisitor, context);
         }
         return classVisitor;

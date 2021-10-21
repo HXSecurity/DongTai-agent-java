@@ -58,7 +58,6 @@ public class EventListenerHandlers {
                     boolean isHttpEntryMethod = HookType.HTTP.equals(hookType) || HookType.DUBBO.equals(hookType);
                     if (isEnterHttpEntryPoint || isHttpEntryMethod) {
                         MethodEvent event = new MethodEvent(0, -1, javaClassName, matchClassName, javaMethodName, javaMethodDesc, signature, object, argumentArray, retValue, framework, isStatic, null);
-
                         if (HookType.HTTP.equals(hookType)) {
                             HttpImpl.solveHttp(event);
                         } else if (HookType.DUBBO.equals(hookType)) {
@@ -70,7 +69,6 @@ public class EventListenerHandlers {
                         } else if (HookType.SINK.equals(hookType)) {
                             SinkImpl.solveSink(event);
                         }
-
                     }
                 }
             } catch (Exception e) {
