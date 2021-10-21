@@ -1,4 +1,4 @@
-package cn.huoxian.iast.spring;
+package cn.huoxian.iast.servlet;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
