@@ -13,24 +13,24 @@ import java.net.URL;
 
 public class StartUpTimeReport {
 
-    public static void sendReport(Integer id,Integer startUpTime) {
+    public static void sendReport(Integer id, Integer startUpTime) {
         String token = PropertyUtils.getInstance().getIastServerToken();
-        String httpUrl = PropertyUtils.getInstance().getBaseUrl()+"/api/v1/agent/startuptime";
+        String httpUrl = PropertyUtils.getInstance().getBaseUrl() + "/api/v1/agent/startuptime";
         String report = createReport(id, startUpTime);
-        sendPost(httpUrl,token,report);
+        sendPost(httpUrl, token, report);
     }
 
-    private static String createReport(Integer id,Integer startUpTime) {
+    private static String createReport(Integer id, Integer startUpTime) {
         JSONObject report = new JSONObject();
-        report.put(ReportConstant.AGENT_ID,id);
-        report.put(ReportConstant.STARTUP_TIME,startUpTime);
+        report.put(ReportConstant.AGENT_ID, id);
+        report.put(ReportConstant.STARTUP_TIME, startUpTime);
         return report.toString();
     }
 
-    public static void sendPost(String httpUrl,String token,String report){
+    public static void sendPost(String httpUrl, String token, String report) {
         OutputStreamWriter out = null;
         HttpURLConnection conn = null;
-        try{
+        try {
             URL url = new URL(httpUrl);
             conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
@@ -45,14 +45,14 @@ public class StartUpTimeReport {
             out.write(report);
             out.flush();
             out.close();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
-        }finally {
-            try{
-                if(out != null){
+        } finally {
+            try {
+                if (out != null) {
                     out.close();
                 }
-            }catch (IOException ioe){
+            } catch (IOException ioe) {
                 ioe.printStackTrace();
             }
         }

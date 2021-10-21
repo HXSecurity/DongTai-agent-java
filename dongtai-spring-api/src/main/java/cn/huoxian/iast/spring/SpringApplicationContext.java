@@ -115,7 +115,7 @@ public class SpringApplicationContext {
             if (patterns.size() > 1) {
                 for (String s : patterns
                 ) {
-                    String uri =applicationContext.getApplicationName() + s.replace("[", "").replace("]", "");
+                    String uri = applicationContext.getApplicationName() + s.replace("[", "").replace("]", "");
                     apiDataModel.setUrl(uri);
                     apiList.add(apiDataModel);
                 }
@@ -131,32 +131,32 @@ public class SpringApplicationContext {
     private static Map<String, Object> createReport(List<ApiDataModel> apiList) {
         Map<String, Object> apiDataReport = new HashMap<>();
         List<Object> apiData = new ArrayList<>();
-        for (ApiDataModel apiDataModel:apiList
+        for (ApiDataModel apiDataModel : apiList
         ) {
             Map<String, Object> api = new HashMap<>();
             apiData.add(api);
-            api.put("uri",apiDataModel.getUrl());
+            api.put("uri", apiDataModel.getUrl());
             String[] methods = apiDataModel.getMethod();
             List<Object> methodsjson = new ArrayList<>(Arrays.asList(methods));
-            api.put("method",methodsjson);
-            api.put("class",apiDataModel.getClazz());
+            api.put("method", methodsjson);
+            api.put("class", apiDataModel.getClazz());
             List<Map<String, String>> parameters = apiDataModel.getParameters();
             List<Object> parametersJson = new ArrayList<>();
-            api.put("parameters",parametersJson);
-            for (Map<String,String> parameter:parameters
+            api.put("parameters", parametersJson);
+            for (Map<String, String> parameter : parameters
             ) {
                 Map<String, Object> parameterjson = new HashMap<>();
                 parametersJson.add(parameterjson);
-                parameterjson.put("name",parameter.get("name"));
-                parameterjson.put("type",parameter.get("type"));
-                parameterjson.put("annotation",parameter.get("annotation"));
+                parameterjson.put("name", parameter.get("name"));
+                parameterjson.put("type", parameter.get("type"));
+                parameterjson.put("annotation", parameter.get("annotation"));
             }
-            api.put("return_type",apiDataModel.getReturnType());
-            api.put("file",apiDataModel.getFile());
-            api.put("controller",apiDataModel.getController());
-            api.put("description",apiDataModel.getDescription());
+            api.put("return_type", apiDataModel.getReturnType());
+            api.put("file", apiDataModel.getFile());
+            api.put("controller", apiDataModel.getController());
+            api.put("description", apiDataModel.getDescription());
         }
-        apiDataReport.put("api_data",apiData);
+        apiDataReport.put("api_data", apiData);
         return apiDataReport;
     }
 

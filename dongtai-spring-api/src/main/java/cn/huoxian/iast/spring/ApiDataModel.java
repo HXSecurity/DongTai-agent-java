@@ -80,7 +80,7 @@ public class ApiDataModel {
     }
 
     public String getReturnType() {
-        if(returnType == null || returnType.equals("")){
+        if (returnType == null || returnType.equals("")) {
             returnType = "";
         }
         return returnType;

@@ -27,7 +27,7 @@ public class PerformanceMonitor implements IMonitor {
     private final static String TOKEN = PROPERTIES.getIastServerToken();
     private final static String START_URL = PROPERTIES.getBaseUrl() + "/api/v1/agent/limit";
     private final static String AGENT_TOKEN = URLEncoder.encode(AgentRegister.getAgentToken());
-    public static Integer AGENT_THRESHOLD_VALUE;
+    private static Integer AGENT_THRESHOLD_VALUE;
 
     private final EngineManager engineManager;
 
@@ -43,10 +43,10 @@ public class PerformanceMonitor implements IMonitor {
 
     public Integer getCpuUsedRate() {
         OperatingSystemMXBean operatingSystemMXBean = ManagementFactory.getOperatingSystemMXBean();
-        return (int) (operatingSystemMXBean.getSystemLoadAverage()*10);
+        return (int) (operatingSystemMXBean.getSystemLoadAverage() * 10);
     }
 
-    public static Integer checkThresholdValue(){
+    public static Integer checkThresholdValue() {
         try {
             String respRaw = getThresholdValue();
             if (respRaw != null && !respRaw.isEmpty()) {
@@ -97,11 +97,11 @@ public class PerformanceMonitor implements IMonitor {
         if (isStart(UsedRate, preStatus)) {
             this.engineManager.start();
             this.engineManager.setRunningStatus(0);
-            LogUtils.info("当前CPU使用率为"+UsedRate+"，低于阈值"+AGENT_THRESHOLD_VALUE+"%，检测引擎启动");
+            LogUtils.info("当前CPU使用率为" + UsedRate + "，低于阈值" + AGENT_THRESHOLD_VALUE + "%，检测引擎启动");
         } else if (isStop(UsedRate, preStatus)) {
             this.engineManager.stop();
             this.engineManager.setRunningStatus(1);
-            LogUtils.info("当前CPU使用率为"+UsedRate+"，高于阈值"+AGENT_THRESHOLD_VALUE+"%，检测引擎停止");
+            LogUtils.info("当前CPU使用率为" + UsedRate + "，高于阈值" + AGENT_THRESHOLD_VALUE + "%，检测引擎停止");
         }
     }
 

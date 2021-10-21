@@ -281,12 +281,12 @@ public class PropertyUtils {
         return "true".equalsIgnoreCase(debugFlag);
     }
 
-    public Integer isAutoCreateProject(){
-        if (null == isAutoCreateProject){
-            String result = System.getProperty("project.create", cfg.getProperty("project.create","false"));
-            if (result.equals("false")){
+    public Integer isAutoCreateProject() {
+        if (null == isAutoCreateProject) {
+            String result = System.getProperty("project.create", cfg.getProperty("project.create", "false"));
+            if (result.equals("false")) {
                 isAutoCreateProject = 0;
-            }else if (result.equals("true")){
+            } else if (result.equals("true")) {
                 isAutoCreateProject = 1;
             }
         }
