@@ -29,13 +29,24 @@ public class HttpImpl {
     private static IastClassLoader iastClassLoader;
     public static File IAST_REQUEST_JAR_PACKAGE;
 
-    private static void createClassLoader(Object req) {
+    private static void createClassLoader(Object req, boolean isJakarta) {
         try {
             if (iastClassLoader == null) {
+                try {
+                    IAST_REQUEST_JAR_PACKAGE = File.createTempFile("dongtai-api-", ".jar");
+                    HttpClientUtils.downloadRemoteJar(
+                            "/api/v1/engine/download?engineName=dongtai-api&jakarta=" + (isJakarta ? 1 : 0),
+                            IAST_REQUEST_JAR_PACKAGE.getAbsolutePath()
+                    );
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return;
+                }
                 if (IAST_REQUEST_JAR_PACKAGE.exists()) {
-                    Class<?> reqClass = req.getClass();
-                    URL[] adapterJar = new URL[]{IAST_REQUEST_JAR_PACKAGE.toURI().toURL()};
-                    iastClassLoader = new IastClassLoader(reqClass.getClassLoader(), adapterJar);
+                    iastClassLoader = new IastClassLoader(
+                            req.getClass().getClassLoader(),
+                            new URL[]{IAST_REQUEST_JAR_PACKAGE.toURI().toURL()}
+                    );
                 }
             }
         } catch (MalformedURLException e) {
@@ -80,7 +91,7 @@ public class HttpImpl {
     public static Object cloneRequest(Object req, boolean isJakarta) {
 
         try {
-            createClassLoader(req);
+            createClassLoader(req, isJakarta);
             loadCloneRequestMethod(isJakarta);
             return cloneRequestMethod.invoke(null, req);
         } catch (IllegalAccessException e) {
@@ -112,7 +123,7 @@ public class HttpImpl {
 
     public static Map<String, Object> getRequestMeta(Object request, boolean isJakarta) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         if (null == iastRequestMethod) {
-            createClassLoader(request);
+            createClassLoader(request, isJakarta);
             Class<?> proxyClass = isJakarta ?
                     iastClassLoader.loadClass("cn.huoxian.iast.jakarta.HttpRequest") :
                     iastClassLoader.loadClass("cn.huoxian.iast.servlet.HttpRequest");
@@ -150,18 +161,6 @@ public class HttpImpl {
         EngineManager.enterHttpEntry(requestMeta);
         if (logger.isDebugEnabled()) {
             logger.debug("HTTP Request:{} {} from: {}", requestMeta.get("method"), requestMeta.get("requestURI"), event.signature);
-        }
-    }
-
-    static {
-        try {
-            IAST_REQUEST_JAR_PACKAGE = File.createTempFile("dongtai-api", ".jar");
-            HttpClientUtils.downloadRemoteJar(
-                    "/api/v1/engine/download?engineName=dongtai-api&jakarta=1",
-                    IAST_REQUEST_JAR_PACKAGE.getAbsolutePath()
-            );
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
