@@ -18,21 +18,29 @@ import java.util.Enumeration;
  * @author dongzhiyong@huoxian.cn
  */
 public class AgentRegisterReport {
-    private static String AGENT_NAME = null;
-    private static String PROJECT_NAME = null;
-    private static Integer AGENT_ID = -1;
-    final static String PID = ManagementFactory.getRuntimeMXBean().getName().split("@")[0];
-    final static ServerDetect SERVER_DETECT = ServerDetect.getInstance();
-    final static IServer SERVER = SERVER_DETECT.getWebserver();
+    private static AgentRegisterReport INSTANCE;
+    private String agentName = null;
+    private String projectName = null;
+    private Integer agentId = -1;
+    final String pid = ManagementFactory.getRuntimeMXBean().getName().split("@")[0];
+    final ServerDetect serverDetect = ServerDetect.getInstance();
+    final IServer server = serverDetect.getWebserver();
 
-    private static String getAgentToken() {
-        if (AGENT_NAME == null) {
+    private String getAgentToken() {
+        if (agentName == null) {
             PropertyUtils cfg = PropertyUtils.getInstance();
             String osName = System.getProperty("os.name");
             String hostname = getInternalHostName();
-            AGENT_NAME = osName + "-" + hostname + "-" + ReportConstant.AGENT_VERSION_VALUE + "-" + cfg.getEngineName();
+            agentName = osName + "-" + hostname + "-" + ReportConstant.AGENT_VERSION_VALUE + "-" + cfg.getEngineName();
         }
-        return AGENT_NAME;
+        return agentName;
+    }
+
+    public static AgentRegisterReport getInstance() {
+        if (null == INSTANCE) {
+            INSTANCE = new AgentRegisterReport();
+        }
+        return INSTANCE;
     }
 
     /**
@@ -40,8 +48,8 @@ public class AgentRegisterReport {
      *
      * @return true - 注册成功；false - 注册失败
      */
-    public static boolean isRegistered() {
-        return AGENT_ID != -1;
+    public boolean isRegistered() {
+        return agentId != -1;
     }
 
     /**
@@ -50,7 +58,8 @@ public class AgentRegisterReport {
      * @return agent唯一标识，当前使用agentId
      */
     public static Integer getAgentFlag() {
-        return AGENT_ID;
+        AgentRegisterReport registerReport = AgentRegisterReport.getInstance();
+        return registerReport.agentId;
     }
 
     /**
@@ -58,12 +67,12 @@ public class AgentRegisterReport {
      *
      * @return
      */
-    private static String getProjectName() {
-        if (PROJECT_NAME == null) {
+    private String getProjectName() {
+        if (projectName == null) {
             PropertyUtils cfg = PropertyUtils.getInstance();
-            PROJECT_NAME = cfg.getProjectName();
+            projectName = cfg.getProjectName();
         }
-        return PROJECT_NAME;
+        return projectName;
     }
 
     /**
@@ -71,7 +80,7 @@ public class AgentRegisterReport {
      *
      * @return 主机名
      */
-    private static String getHostNameForLinux() {
+    private String getHostNameForLinux() {
         try {
             return (InetAddress.getLocalHost()).getHostName();
         } catch (UnknownHostException uhe) {
@@ -91,7 +100,7 @@ public class AgentRegisterReport {
      *
      * @return 主机名
      */
-    private static String getInternalHostName() {
+    private String getInternalHostName() {
         if (System.getenv("COMPUTERNAME") != null) {
             return System.getenv("COMPUTERNAME");
         } else {
@@ -104,7 +113,7 @@ public class AgentRegisterReport {
      *
      * @return
      */
-    private static String readIpInfo() {
+    private String readIpInfo() {
         try {
             StringBuilder sb = new StringBuilder();
             boolean first = true;
@@ -137,7 +146,7 @@ public class AgentRegisterReport {
     }
 
 
-    public static void send() {
+    public void register() {
         try {
             String msg = generateAgentRegisterMsg();
             StringBuilder responseRaw = HttpClientUtils.sendPost(Constants.API_AGENT_REGISTER, msg);
@@ -149,17 +158,22 @@ public class AgentRegisterReport {
         }
     }
 
+    public static void send() {
+        AgentRegisterReport registerReport = AgentRegisterReport.getInstance();
+        registerReport.register();
+    }
+
     /**
      * 根据agent注册接口返回结果设置agent的id
      *
      * @param responseRaw
      */
-    private static void setAgentId(StringBuilder responseRaw) {
+    private void setAgentId(StringBuilder responseRaw) {
         JSONObject responseObj = new JSONObject(responseRaw.toString());
         Integer status = (Integer) responseObj.get("status");
         if (status == 201) {
             JSONObject data = (JSONObject) responseObj.get("data");
-            AGENT_ID = (Integer) data.get("id");
+            agentId = (Integer) data.get("id");
         }
     }
 
@@ -169,19 +183,19 @@ public class AgentRegisterReport {
      *
      * @return agent注册报告
      */
-    private static String generateAgentRegisterMsg() {
+    private String generateAgentRegisterMsg() {
         JSONObject object = new JSONObject();
         object.put("name", getAgentToken());
         object.put(ReportConstant.AGENT_VERSION, ReportConstant.AGENT_VERSION_VALUE);
         object.put(ReportConstant.PROJECT_NAME, getProjectName());
-        object.put(ReportConstant.PID, PID);
+        object.put(ReportConstant.PID, pid);
         object.put(ReportConstant.HOSTNAME, getInternalHostName());
         object.put(ReportConstant.LANGUAGE, ReportConstant.LANGUAGE_VALUE);
         object.put(ReportConstant.NETWORK, readIpInfo());
         object.put(ReportConstant.SERVER_ENV, Base64Encoder.encodeBase64String(System.getProperties().toString().getBytes()).replaceAll("\n", ""));
-        object.put(ReportConstant.CONTAINER_NAME, SERVER == null ? "" : SERVER.getName());
-        object.put(ReportConstant.CONTAINER_VERSION, SERVER == null ? "" : SERVER.getVersion());
-        object.put(ReportConstant.SERVER_PATH, SERVER_DETECT.getWebServerPath());
+        object.put(ReportConstant.CONTAINER_NAME, server == null ? "" : server.getName());
+        object.put(ReportConstant.CONTAINER_VERSION, server == null ? "" : server.getVersion());
+        object.put(ReportConstant.SERVER_PATH, serverDetect.getWebServerPath());
         object.put(ReportConstant.SERVER_ADDR, null != EngineManager.SERVER ? EngineManager.SERVER.getServerAddr() : "");
         object.put(ReportConstant.SERVER_PORT, null != EngineManager.SERVER ? EngineManager.SERVER.getServerPort() : "");
 

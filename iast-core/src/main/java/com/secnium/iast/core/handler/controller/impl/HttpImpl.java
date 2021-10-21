@@ -29,13 +29,24 @@ public class HttpImpl {
     private static IastClassLoader iastClassLoader;
     public static File IAST_REQUEST_JAR_PACKAGE;
 
-    private static void createClassLoader(Object req) {
+    private static void createClassLoader(Object req, boolean isJakarta) {
         try {
             if (iastClassLoader == null) {
+                try {
+                    IAST_REQUEST_JAR_PACKAGE = File.createTempFile("dongtai-api-", ".jar");
+                    HttpClientUtils.downloadRemoteJar(
+                            "/api/v1/engine/download?engineName=dongtai-api&jakarta=" + (isJakarta ? 1 : 0),
+                            IAST_REQUEST_JAR_PACKAGE.getAbsolutePath()
+                    );
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return;
+                }
                 if (IAST_REQUEST_JAR_PACKAGE.exists()) {
-                    Class<?> reqClass = req.getClass();
-                    URL[] adapterJar = new URL[]{IAST_REQUEST_JAR_PACKAGE.toURI().toURL()};
-                    iastClassLoader = new IastClassLoader(reqClass.getClassLoader(), adapterJar);
+                    iastClassLoader = new IastClassLoader(
+                            req.getClass().getClassLoader(),
+                            new URL[]{IAST_REQUEST_JAR_PACKAGE.toURI().toURL()}
+                    );
                 }
             }
         } catch (MalformedURLException e) {
@@ -43,12 +54,14 @@ public class HttpImpl {
         }
     }
 
-    private static void loadCloneRequestMethod() {
+    private static void loadCloneRequestMethod(boolean isJakarta) {
         if (cloneRequestMethod == null) {
             try {
                 Class<?> proxyClass;
 
-                proxyClass = iastClassLoader.loadClass("cn.huoxian.iast.servlet.RequestWrapper");
+                proxyClass = isJakarta ?
+                        iastClassLoader.loadClass("cn.huoxian.iast.jakarta.RequestWrapper") :
+                        iastClassLoader.loadClass("cn.huoxian.iast.servlet.RequestWrapper");
                 cloneRequestMethod = proxyClass.getDeclaredMethod("cloneRequest", Object.class);
             } catch (NoSuchMethodException e) {
                 e.printStackTrace();
@@ -56,12 +69,13 @@ public class HttpImpl {
         }
     }
 
-    private static void loadCloneResponseMethod() {
+    private static void loadCloneResponseMethod(boolean isJakarta) {
         if (cloneResponseMethod == null) {
             try {
                 Class<?> proxyClass;
-
-                proxyClass = iastClassLoader.loadClass("cn.huoxian.iast.servlet.ResponseWrapper");
+                proxyClass = isJakarta ?
+                        iastClassLoader.loadClass("cn.huoxian.iast.jakarta.ResponseWrapper") :
+                        iastClassLoader.loadClass("cn.huoxian.iast.servlet.ResponseWrapper");
                 cloneResponseMethod = proxyClass.getDeclaredMethod("cloneResponse", Object.class);
             } catch (NoSuchMethodException e) {
                 e.printStackTrace();
@@ -70,16 +84,15 @@ public class HttpImpl {
     }
 
     /**
-     * fixme 测试分析该点师傅需要处理 javax/
-     *
-     * @param req
+     * @param req       request object
+     * @param isJakarta Is it a jakarta api request object
      * @return
      */
     public static Object cloneRequest(Object req, boolean isJakarta) {
 
         try {
-            createClassLoader(req);
-            loadCloneRequestMethod();
+            createClassLoader(req, isJakarta);
+            loadCloneRequestMethod(isJakarta);
             return cloneRequestMethod.invoke(null, req);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
@@ -91,14 +104,14 @@ public class HttpImpl {
     }
 
     /**
-     * 克隆response对象，获取响应头、响应体
+     * Clone the response object, get the response header and response body
      *
-     * @param response
-     * @return
+     * @param response original response object
+     * @return dongtai response object
      */
     public static Object cloneResponse(Object response, boolean isJakarta) {
         try {
-            loadCloneResponseMethod();
+            loadCloneResponseMethod(isJakarta);
             return cloneResponseMethod.invoke(null, response);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
@@ -108,39 +121,31 @@ public class HttpImpl {
         return response;
     }
 
-    public static Map<String, Object> getRequestMeta(Object request, boolean javax) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public static Map<String, Object> getRequestMeta(Object request, boolean isJakarta) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         if (null == iastRequestMethod) {
-            createClassLoader(request);
-            Class<?> proxyClass;
-
-            if (javax) {
-                proxyClass = iastClassLoader.loadClass("cn.huoxian.iast.servlet.HttpRequest");
-            } else {
-                proxyClass = iastClassLoader.loadClass("cn.huoxian.iast.servlet.HttpRequestJakarta");
-            }
+            createClassLoader(request, isJakarta);
+            Class<?> proxyClass = isJakarta ?
+                    iastClassLoader.loadClass("cn.huoxian.iast.jakarta.HttpRequest") :
+                    iastClassLoader.loadClass("cn.huoxian.iast.servlet.HttpRequest");
             iastRequestMethod = proxyClass.getDeclaredMethod("getRequest", Object.class);
         }
         return (Map<String, Object>) iastRequestMethod.invoke(null, request);
     }
 
-    public static Map<String, Object> getResponseMeta(Object response, boolean javax) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public static Map<String, Object> getResponseMeta(Object response, boolean isJakarta) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         if (null == iastResponseMethod) {
-            Class<?> proxyClass;
-
-            if (javax) {
-                proxyClass = iastClassLoader.loadClass("cn.huoxian.iast.servlet.HttpResponse");
-            } else {
-                proxyClass = iastClassLoader.loadClass("cn.huoxian.iast.servlet.HttpResponseJakarta");
-            }
+            Class<?> proxyClass = isJakarta ?
+                    iastClassLoader.loadClass("cn.huoxian.iast.jakarta.HttpResponse") :
+                    iastClassLoader.loadClass("cn.huoxian.iast.servlet.HttpResponse");
             iastResponseMethod = proxyClass.getDeclaredMethod("getResponse", Object.class);
         }
         return (Map<String, Object>) iastResponseMethod.invoke(null, response);
     }
 
     /**
-     * 处理http请求
+     * solve http request
      *
-     * @param event 待处理的方法调用事件
+     * @param event method call event
      */
     public static void solveHttp(MethodEvent event) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         if (logger.isDebugEnabled()) {
@@ -148,6 +153,7 @@ public class HttpImpl {
         }
 
         Map<String, Object> requestMeta = getRequestMeta(event.argumentArray[0], true);
+        // todo Consider increasing the capture of html request responses
         if (ConfigMatcher.disableExtension((String) requestMeta.get("requestURI"))) {
             return;
         }
@@ -155,18 +161,6 @@ public class HttpImpl {
         EngineManager.enterHttpEntry(requestMeta);
         if (logger.isDebugEnabled()) {
             logger.debug("HTTP Request:{} {} from: {}", requestMeta.get("method"), requestMeta.get("requestURI"), event.signature);
-        }
-    }
-
-    static {
-        try {
-            IAST_REQUEST_JAR_PACKAGE = File.createTempFile("dongtai-servlet", ".jar");
-            HttpClientUtils.downloadRemoteJar(
-                    "/api/v1/engine/download?engineName=dongtai-servlet",
-                    IAST_REQUEST_JAR_PACKAGE.getAbsolutePath()
-            );
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 

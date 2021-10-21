@@ -9,7 +9,9 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>iast-servlet</artifactId>
+    <groupId>cn.huoxian.iast</groupId>
+    <artifactId>dongtai-servlet-api</artifactId>
+    <version>1.0.6</version>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -23,23 +25,16 @@
             <version>${javax.servlet-api}</version>
             <scope>provided</scope>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/jakarta.servlet/jakarta.servlet-api -->
+
         <dependency>
-            <groupId>jakarta.servlet</groupId>
-            <artifactId>jakarta.servlet-api</artifactId>
-            <version>${jakarta.servlet-api}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-webmvc</artifactId>
-            <version>5.2.8.RELEASE</version>
-            <scope>provided</scope>
+            <groupId>cn.huoxian.iast</groupId>
+            <artifactId>dongtai-spring-api</artifactId>
+            <version>0.6.1</version>
         </dependency>
     </dependencies>
 
     <build>
-        <finalName>dongtai-servlet</finalName>
+        <finalName>dongtai-servlet-api</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -65,7 +60,7 @@
                             <tasks>
                                 <copy todir="./../release/lib">
                                     <fileset dir="target/">
-                                        <include name="dongtai-servlet.jar"/>
+                                        <include name="dongtai-servlet-api.jar"/>
                                     </fileset>
                                 </copy>
                             </tasks>

@@ -18,15 +18,15 @@ public class AgentEngine {
     private static Logger logger = LogUtils.getLogger(AgentEngine.class);
     private static AgentEngine instance;
 
-    public Instrumentation getInst() {
-        return inst;
+    public long getStartUpTime() {
+        return startUpTime;
     }
 
-    public void setInst(Instrumentation inst) {
-        this.inst = inst;
+    public void setStartUpTime(long startUpTime) {
+        this.startUpTime = startUpTime;
     }
 
-    private Instrumentation inst;
+    private long startUpTime = 0;
     ArrayList<IEngine> engines = new ArrayList<IEngine>();
 
     private static AgentEngine getInstance() {
@@ -47,17 +47,17 @@ public class AgentEngine {
 
     public static void install(String mode, String propertiesFilePath, Instrumentation inst) {
         long start = System.currentTimeMillis();
-        logger.info("The engine is about to be installed, the installation mode is {}", mode);
+        logger.info("DongTai Engine is about to be installed, the installation mode is {}", mode);
         PropertyUtils propertiesUtils = PropertyUtils.getInstance(propertiesFilePath);
         AgentRegisterReport.send();
 
         AgentEngine agentEngine = AgentEngine.getInstance();
         assert agentEngine != null;
-        agentEngine.setInst(inst);
         agentEngine.init(mode, propertiesUtils, inst);
         agentEngine.run();
+        agentEngine.setStartUpTime(System.currentTimeMillis() - start);
 
-        logger.info("The engine is successfully installed to the JVM, and it takes {} s", (System.currentTimeMillis() - start) / 1000);
+        logger.info("DongTai Engine is successfully installed to the JVM, and it takes {} s", agentEngine.getStartUpTime() / 1000);
     }
 
     public static void start() {

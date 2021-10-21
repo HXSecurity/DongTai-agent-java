@@ -22,6 +22,7 @@ import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
 import java.security.CodeSource;
 import java.security.ProtectionDomain;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
@@ -43,7 +44,8 @@ public class IastClassFileTransformer implements ClassFileTransformer {
     private final int listenerId;
     private final PropertyUtils properties;
     private final PluginRegister PLUGINS = new PluginRegister();
-    private int transformClassCount = 0;
+    private final List<String> transformerClasses = new ArrayList<String>();
+
 
     IastClassFileTransformer(Instrumentation inst) {
         this.logger = LogUtils.getLogger(getClass());
@@ -113,10 +115,10 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                     cr.accept(cv, ClassReader.EXPAND_FRAMES);
                     AbstractClassVisitor dumpClassVisitor = (AbstractClassVisitor) cv;
                     if (dumpClassVisitor.hasTransformed()) {
-                        transformClassCount++;
+                        transformerClasses.add(internalClassName);
                         if (logger.isDebugEnabled() && null != clock) {
                             clock.stop();
-                            logger.debug("conversion class {} is successful, and it takes {}ms, total {}.", internalClassName, clock.getTime(), transformClassCount);
+                            logger.debug("conversion class {} is successful, and it takes {}ms.", internalClassName, clock.getTime());
                         }
                         return dumpClassIfNecessary(cr.getClassName(), cw.toByteArray(), srcByteCodeArray);
                     }
