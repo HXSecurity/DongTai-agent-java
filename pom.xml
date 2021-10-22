@@ -5,14 +5,14 @@
 
     <groupId>com.secnium.iast</groupId>
     <artifactId>iast</artifactId>
-    <version>0.6.1</version>
+    <version>1.0.6</version>
     <packaging>pom</packaging>
 
     <name>dongtai-agent-java</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <iast.version>0.6.1</iast.version>
+        <iast.version>1.0.6</iast.version>
         <shade-prefix>com.secnium.iast.thirdparty</shade-prefix>
 
         <maven.compiler.source>1.6</maven.compiler.source>
@@ -106,19 +106,6 @@
     </dependencyManagement>
 
 
-    <description>DongTai IAST Community</description>
-
-<!--    <repositories>-->
-<!--        <repository>-->
-<!--            <id>spring</id>-->
-<!--            <url>https://maven.aliyun.com/repository/public</url>-->
-<!--            <releases>-->
-<!--                <enabled>true</enabled>-->
-<!--            </releases>-->
-<!--            <snapshots>-->
-<!--                <enabled>true</enabled>-->
-<!--            </snapshots>-->
-<!--        </repository>-->
-<!--    </repositories>-->
+    <description>DongTai IAST</description>
 
 </project>
