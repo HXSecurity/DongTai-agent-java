@@ -28,8 +28,6 @@ public class PerformanceMonitor implements IMonitor {
     private final static String TOKEN = PROPERTIES.getIastServerToken();
     private final static String START_URL = PROPERTIES.getBaseUrl() + "/api/v1/agent/limit";
     private final static String AGENT_TOKEN = URLEncoder.encode(AgentRegister.getAgentToken());
-    private static final String IAST_NAMESPACE = "DONGTAI";
-    private static final String CPU_USAGE_CLASS = "com.secnium.iast.core.report.HeartBeatSender";
     private static Integer AGENT_THRESHOLD_VALUE;
 
     private final EngineManager engineManager;
