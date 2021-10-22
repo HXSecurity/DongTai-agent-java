@@ -33,6 +33,7 @@ public class PropertyUtils {
     private String proxyHost;
     private int proxyPort = -1;
     private String debugFlag;
+    private Integer isAutoCreateProject;
 
     private final String propertiesFilePath;
 
@@ -278,5 +279,17 @@ public class PropertyUtils {
 
     public boolean isDebug() {
         return "true".equalsIgnoreCase(debugFlag);
+    }
+
+    public Integer isAutoCreateProject() {
+        if (null == isAutoCreateProject) {
+            String result = System.getProperty("project.create", cfg.getProperty("project.create", "false"));
+            if (result.equals("false")) {
+                isAutoCreateProject = 0;
+            } else if (result.equals("true")) {
+                isAutoCreateProject = 1;
+            }
+        }
+        return isAutoCreateProject;
     }
 }

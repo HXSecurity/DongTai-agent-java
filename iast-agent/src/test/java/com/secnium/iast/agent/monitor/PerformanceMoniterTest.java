@@ -34,16 +34,16 @@ public class PerformanceMoniterTest {
     public void isUninstall() {
         PerformanceMonitor performanceMoniter = new PerformanceMonitor(EngineManager.getInstance());
         double unUserdRate = performanceMoniter.memUsedRate();
-        boolean status = performanceMoniter.isUninstall(unUserdRate, 3);
-        System.out.println("PerformanceMoniterTest.isUninstall=" + status);
+//        boolean status = performanceMoniter.isUninstall(unUserdRate, 3);
+//        System.out.println("PerformanceMoniterTest.isUninstall=" + status);
     }
 
     @Test
     public void isInstall() {
         PerformanceMonitor performanceMoniter = new PerformanceMonitor(EngineManager.getInstance());
         double unUserdRate = performanceMoniter.memUsedRate();
-        boolean status = performanceMoniter.isInstall(unUserdRate, 4);
-        System.out.println("PerformanceMoniterTest.isInstall=" + status);
+//        boolean status = performanceMoniter.isInstall(unUserdRate, 4);
+//        System.out.println("PerformanceMoniterTest.isInstall=" + status);
     }
 
     @Test

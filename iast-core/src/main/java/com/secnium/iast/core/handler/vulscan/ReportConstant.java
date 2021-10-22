@@ -71,9 +71,12 @@ public class ReportConstant {
 
     public static final String VULN_TYPE = "vuln_type";
 
-    public static final String API_DATA = "apiData";
+    public static final String API_DATA = "api_data";
 
     public static final String REPORT_QUEUE = "reportQueue";
     public static final String METHOD_QUEUE = "methodQueue";
     public static final String REPLAY_QUEUE = "replayQueue";
+
+    public static final String AUTO_CREATE_PROJECT = "autoCreateProject";
+    public static final String STARTUP_TIME = "startupTime";
 }
