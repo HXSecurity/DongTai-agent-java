@@ -6,6 +6,8 @@ import com.secnium.iast.agent.LogUtils;
 import com.secnium.iast.agent.manager.EngineManager;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import oshi.SystemInfo;
+import oshi.hardware.CentralProcessor;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -14,6 +16,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 负责监控jvm性能状态，如果达到停止阈值，则停止检测引擎；如果达到卸载阈值，则卸载引擎；
@@ -42,15 +45,25 @@ public class PerformanceMonitor implements IMonitor {
     }
 
     public Integer getCpuUsedRate() {
-        Integer cpuUsedRate = 0;
+        SystemInfo systemInfo = new SystemInfo();
+        CentralProcessor processor = systemInfo.getHardware().getProcessor();
+        long[] prevTicks = processor.getSystemCpuLoadTicks();
         try {
-            ClassLoader iastClassLoader = EngineManager.getIastClassLoaderCache().get(IAST_NAMESPACE);
-            Class<?> classOfCPU = iastClassLoader.loadClass(CPU_USAGE_CLASS);
-            cpuUsedRate = (Integer) classOfCPU.getMethod("getCpuInfo").invoke(null);
-        } catch (Exception ignored) {
-        } catch (Throwable ignored) {
+            TimeUnit.SECONDS.sleep(1);
+        } catch (InterruptedException ignored) {
         }
-        return cpuUsedRate;
+        long[] ticks = processor.getSystemCpuLoadTicks();
+        long nice = ticks[CentralProcessor.TickType.NICE.getIndex()] - prevTicks[CentralProcessor.TickType.NICE.getIndex()];
+        long irq = ticks[CentralProcessor.TickType.IRQ.getIndex()] - prevTicks[CentralProcessor.TickType.IRQ.getIndex()];
+        long softirq = ticks[CentralProcessor.TickType.SOFTIRQ.getIndex()] - prevTicks[CentralProcessor.TickType.SOFTIRQ.getIndex()];
+        long steal = ticks[CentralProcessor.TickType.STEAL.getIndex()] - prevTicks[CentralProcessor.TickType.STEAL.getIndex()];
+        long cSys = ticks[CentralProcessor.TickType.SYSTEM.getIndex()] - prevTicks[CentralProcessor.TickType.SYSTEM.getIndex()];
+        long user = ticks[CentralProcessor.TickType.USER.getIndex()] - prevTicks[CentralProcessor.TickType.USER.getIndex()];
+        long iowait = ticks[CentralProcessor.TickType.IOWAIT.getIndex()] - prevTicks[CentralProcessor.TickType.IOWAIT.getIndex()];
+        long idle = ticks[CentralProcessor.TickType.IDLE.getIndex()] - prevTicks[CentralProcessor.TickType.IDLE.getIndex()];
+        long totalCpu = user + nice + cSys + idle + iowait + irq + softirq + steal;
+        double rate = (1.0 - (idle * 1.0 / totalCpu)) * 100;
+        return (int) rate;
     }
 
     public static Integer checkThresholdValue() {
