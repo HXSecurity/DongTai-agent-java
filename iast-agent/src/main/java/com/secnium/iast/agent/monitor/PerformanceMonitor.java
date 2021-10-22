@@ -11,8 +11,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.management.ManagementFactory;
-import java.lang.management.OperatingSystemMXBean;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -27,6 +25,8 @@ public class PerformanceMonitor implements IMonitor {
     private final static String TOKEN = PROPERTIES.getIastServerToken();
     private final static String START_URL = PROPERTIES.getBaseUrl() + "/api/v1/agent/limit";
     private final static String AGENT_TOKEN = URLEncoder.encode(AgentRegister.getAgentToken());
+    private static final String IAST_NAMESPACE = "DONGTAI";
+    private static final String CPU_USAGE_CLASS = "com.secnium.iast.core.report.HeartBeatSender";
     private static Integer AGENT_THRESHOLD_VALUE;
 
     private final EngineManager engineManager;
@@ -42,23 +42,30 @@ public class PerformanceMonitor implements IMonitor {
     }
 
     public Integer getCpuUsedRate() {
-        OperatingSystemMXBean operatingSystemMXBean = ManagementFactory.getOperatingSystemMXBean();
-        return (int) (operatingSystemMXBean.getSystemLoadAverage() * 10);
+        Integer cpuUsedRate = 0;
+        try {
+            ClassLoader iastClassLoader = EngineManager.getIastClassLoaderCache().get(IAST_NAMESPACE);
+            Class<?> classOfCPU = iastClassLoader.loadClass(CPU_USAGE_CLASS);
+            cpuUsedRate = (Integer) classOfCPU.getMethod("getCpuInfo").invoke(null);
+        } catch (Exception ignored) {
+        } catch (Throwable ignored) {
+        }
+        return cpuUsedRate;
     }
 
     public static Integer checkThresholdValue() {
+        int thresholdValue = 100;
         try {
             String respRaw = getThresholdValue();
             if (respRaw != null && !respRaw.isEmpty()) {
                 JSONObject resp = new JSONObject(respRaw);
                 JSONArray limitArray = (JSONArray) resp.get("data");
                 JSONObject cpuLimit = (JSONObject) limitArray.get(0);
-                return Integer.valueOf(cpuLimit.get("value").toString());
+                thresholdValue = Integer.parseInt(cpuLimit.get("value").toString());
             }
-        } catch (Exception e) {
-            return 60;
+        } catch (Exception ignored) {
         }
-        return 60;
+        return thresholdValue;
     }
 
     /**
@@ -92,16 +99,16 @@ public class PerformanceMonitor implements IMonitor {
     @Override
     public void check() {
         PerformanceMonitor.AGENT_THRESHOLD_VALUE = PerformanceMonitor.checkThresholdValue();
-        double UsedRate = getCpuUsedRate();
+        int UsedRate = getCpuUsedRate();
         int preStatus = this.engineManager.getRunningStatus();
         if (isStart(UsedRate, preStatus)) {
             this.engineManager.start();
             this.engineManager.setRunningStatus(0);
-            LogUtils.info("当前CPU使用率为" + UsedRate + "，低于阈值" + AGENT_THRESHOLD_VALUE + "%，检测引擎启动");
+            LogUtils.info("The current CPU usage is" + UsedRate + "%, lower than the threshold" + AGENT_THRESHOLD_VALUE + "%，and the detection engine is starting");
         } else if (isStop(UsedRate, preStatus)) {
             this.engineManager.stop();
             this.engineManager.setRunningStatus(1);
-            LogUtils.info("当前CPU使用率为" + UsedRate + "，高于阈值" + AGENT_THRESHOLD_VALUE + "%，检测引擎停止");
+            LogUtils.info("The current CPU usage is" + UsedRate + "%, higher than the threshold" + AGENT_THRESHOLD_VALUE + "%，and the detection engine is stopping");
         }
     }
 
@@ -132,8 +139,7 @@ public class PerformanceMonitor implements IMonitor {
                 }
                 result = sbf.toString();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException ignored) {
         } finally {
             if (null != br) {
                 try {
@@ -155,6 +161,6 @@ public class PerformanceMonitor implements IMonitor {
     }
 
     static {
-        AGENT_THRESHOLD_VALUE = 60;
+        AGENT_THRESHOLD_VALUE = 100;
     }
 }
