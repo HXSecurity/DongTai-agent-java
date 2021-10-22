@@ -347,8 +347,4 @@ public class EngineManager {
         return isHighJdk ? "2" : "1";
     }
 
-    public static Map<String, IastClassLoader> getIastClassLoaderCache(){
-        return IAST_CLASS_LOADER_CACHE;
-    }
-
 }
