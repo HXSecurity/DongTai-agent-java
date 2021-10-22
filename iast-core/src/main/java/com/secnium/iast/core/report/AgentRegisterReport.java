@@ -198,6 +198,7 @@ public class AgentRegisterReport {
         object.put(ReportConstant.SERVER_PATH, serverDetect.getWebServerPath());
         object.put(ReportConstant.SERVER_ADDR, null != EngineManager.SERVER ? EngineManager.SERVER.getServerAddr() : "");
         object.put(ReportConstant.SERVER_PORT, null != EngineManager.SERVER ? EngineManager.SERVER.getServerPort() : "");
+        object.put(ReportConstant.AUTO_CREATE_PROJECT, PropertyUtils.getInstance().isAutoCreateProject());
 
         return object.toString();
     }

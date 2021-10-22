@@ -1,7 +1,7 @@
 package com.secnium.iast.core.enhance.plugins;
 
 import com.secnium.iast.core.enhance.IastContext;
-import com.secnium.iast.core.enhance.plugins.api.DispatchSpringApplication;
+import com.secnium.iast.core.enhance.plugins.api.spring.DispatchSpringApplication;
 import com.secnium.iast.core.enhance.plugins.cookie.DispatchCookie;
 import com.secnium.iast.core.enhance.plugins.core.DispatchClassPlugin;
 import com.secnium.iast.core.enhance.plugins.framework.dubbo.DispatchDubbo;
