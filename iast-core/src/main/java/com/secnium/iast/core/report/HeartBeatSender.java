@@ -24,24 +24,6 @@ import java.util.concurrent.TimeUnit;
  */
 public class HeartBeatSender extends Thread {
     private final Logger logger = LogUtils.getLogger(getClass());
-    private static HeartBeatSender INSTANCE = null;
-
-    /**
-     * Allocates a new {@code Thread} object. This constructor has the same
-     * effect as
-     * {@code (null, null, gname)}, where {@code gname} is a newly generated
-     * name. Automatically generated names are of the form
-     * {@code "Thread-"+}<i>n</i>, where <i>n</i> is an integer.
-     */
-    public HeartBeatSender() {
-    }
-
-    private static HeartBeatSender getInstance() {
-        if (null == INSTANCE) {
-            INSTANCE = new HeartBeatSender();
-        }
-        return INSTANCE;
-    }
 
 
     private String generateHeartBeatMsg() {
@@ -128,10 +110,9 @@ public class HeartBeatSender extends Thread {
         }
 
         try {
-            HeartBeatSender heartBeatSender = HeartBeatSender.getInstance();
             StringBuilder response = HttpClientUtils.sendPost(
                     Constants.API_REPORT_UPLOAD,
-                    heartBeatSender.generateHeartBeatMsg()
+                    generateHeartBeatMsg()
             );
             HttpRequestReplay.sendReplayRequest(response);
         } catch (IOException e) {
