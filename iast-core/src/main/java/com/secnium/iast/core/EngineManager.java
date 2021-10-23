@@ -26,6 +26,7 @@ public class EngineManager {
     private static EngineManager instance;
     private final PropertyUtils cfg;
 
+    private static final BooleanTheadLocal TRANSFORM_STATE = new BooleanTheadLocal(false);
     public static final BooleanTheadLocal ENTER_HTTP_ENTRYPOINT = new BooleanTheadLocal(false);
     public static final RequestContext REQUEST_CONTEXT = new RequestContext();
     public static final IastTrackMap TRACK_MAP = new IastTrackMap();
@@ -44,6 +45,18 @@ public class EngineManager {
     private static int reqCounts = 0;
     private static int enableLingzhi = 0;
 
+    public static void enterTransform() {
+        TRANSFORM_STATE.set(true);
+    }
+
+    public static void leaveTransform() {
+        TRANSFORM_STATE.set(false);
+    }
+
+    public static boolean isTransforming() {
+        return TRANSFORM_STATE.get();
+    }
+
     public static void turnOnLingzhi() {
         LINGZHI_RUNNING.set(true);
     }
@@ -52,6 +65,11 @@ public class EngineManager {
         LINGZHI_RUNNING.set(false);
     }
 
+    /**
+     * Determine whether the current code flow enters the engine processing logic
+     *
+     * @return
+     */
     public static Boolean isLingzhiRunning() {
         return LINGZHI_RUNNING.get() != null && LINGZHI_RUNNING.get();
     }

@@ -119,22 +119,25 @@ public class HeartBeatSender extends Thread {
 
     @Override
     public void run() {
+        if (EngineManager.isTransforming()) {
+            return;
+        }
         boolean isRunning = EngineManager.isLingzhiRunning();
         if (isRunning) {
             EngineManager.turnOffLingzhi();
+        }
 
-            try {
-                HeartBeatSender heartBeatSender = HeartBeatSender.getInstance();
-                StringBuilder response = HttpClientUtils.sendPost(
-                        Constants.API_REPORT_UPLOAD,
-                        heartBeatSender.generateHeartBeatMsg()
-                );
-                HttpRequestReplay.sendReplayRequest(response);
-            } catch (IOException e) {
-                logger.error("report error reason: ", e);
-            } catch (Exception e) {
-                logger.error("report error, reason: ", e);
-            }
+        try {
+            HeartBeatSender heartBeatSender = HeartBeatSender.getInstance();
+            StringBuilder response = HttpClientUtils.sendPost(
+                    Constants.API_REPORT_UPLOAD,
+                    heartBeatSender.generateHeartBeatMsg()
+            );
+            HttpRequestReplay.sendReplayRequest(response);
+        } catch (IOException e) {
+            logger.error("report error reason: ", e);
+        } catch (Exception e) {
+            logger.error("report error, reason: ", e);
         }
 
         if (isRunning) {
