@@ -115,11 +115,11 @@ public class PerformanceMonitor implements IMonitor {
         if (isStart(UsedRate, preStatus)) {
             this.engineManager.start();
             this.engineManager.setRunningStatus(0);
-            LogUtils.info("The current CPU usage is" + UsedRate + "%, lower than the threshold" + AGENT_THRESHOLD_VALUE + "%，and the detection engine is starting");
+            LogUtils.info("The current CPU usage is " + UsedRate + "%, lower than the threshold " + AGENT_THRESHOLD_VALUE + "%，and the detection engine is starting");
         } else if (isStop(UsedRate, preStatus)) {
             this.engineManager.stop();
             this.engineManager.setRunningStatus(1);
-            LogUtils.info("The current CPU usage is" + UsedRate + "%, higher than the threshold" + AGENT_THRESHOLD_VALUE + "%，and the detection engine is stopping");
+            LogUtils.info("The current CPU usage is " + UsedRate + "%, higher than the threshold " + AGENT_THRESHOLD_VALUE + "%，and the detection engine is stopping");
         }
     }
 
