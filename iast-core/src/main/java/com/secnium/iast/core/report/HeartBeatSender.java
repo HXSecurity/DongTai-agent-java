@@ -24,8 +24,27 @@ import java.util.concurrent.TimeUnit;
  */
 public class HeartBeatSender extends Thread {
     private final Logger logger = LogUtils.getLogger(getClass());
+    private static HeartBeatSender INSTANCE = null;
 
-    private static String generateHeartBeatMsg() {
+    /**
+     * Allocates a new {@code Thread} object. This constructor has the same
+     * effect as
+     * {@code (null, null, gname)}, where {@code gname} is a newly generated
+     * name. Automatically generated names are of the form
+     * {@code "Thread-"+}<i>n</i>, where <i>n</i> is an integer.
+     */
+    public HeartBeatSender() {
+    }
+
+    private static HeartBeatSender getInstance() {
+        if (null == INSTANCE) {
+            INSTANCE = new HeartBeatSender();
+        }
+        return INSTANCE;
+    }
+
+
+    private String generateHeartBeatMsg() {
         JSONObject report = new JSONObject();
         JSONObject detail = new JSONObject();
         report.put(ReportConstant.REPORT_KEY, ReportConstant.REPORT_HEART_BEAT);
@@ -43,18 +62,19 @@ public class HeartBeatSender extends Thread {
         return report.toString();
     }
 
+
     /**
      * Query CPU usage
      *
      * @return CPU usage, eg: 20%
      */
-    public static String readCpuInfo() {
+    private String readCpuInfo() {
         JSONObject cpuInfo = new JSONObject();
         cpuInfo.put("rate", getCpuInfo());
         return cpuInfo.toString();
     }
 
-    public static Integer getCpuInfo() {
+    private Integer getCpuInfo() {
         SystemInfo systemInfo = new SystemInfo();
         CentralProcessor processor = systemInfo.getHardware().getProcessor();
         long[] prevTicks = processor.getSystemCpuLoadTicks();
@@ -79,7 +99,7 @@ public class HeartBeatSender extends Thread {
     /**
      * 实时获取内存信息
      */
-    public static String getMemInfo() {
+    private String getMemInfo() {
         MemoryUsage memoryUsage = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage();
         JSONObject memoryReport = new JSONObject();
         memoryReport.put("total", ByteUtils.formatByteSize(memoryUsage.getMax()));
@@ -93,7 +113,7 @@ public class HeartBeatSender extends Thread {
      *
      * @return
      */
-    public static String getDiskInfo() {
+    public String getDiskInfo() {
         return "{}";
     }
 
@@ -102,15 +122,19 @@ public class HeartBeatSender extends Thread {
         boolean isRunning = EngineManager.isLingzhiRunning();
         if (isRunning) {
             EngineManager.turnOffLingzhi();
-        }
-        try {
-            String report = generateHeartBeatMsg();
-            StringBuilder response = HttpClientUtils.sendPost(Constants.API_REPORT_UPLOAD, report);
-            HttpRequestReplay.sendReplayRequest(response);
-        } catch (IOException e) {
-            logger.error("report error reason: ", e);
-        } catch (Exception e) {
-            logger.error("report error, reason: ", e);
+
+            try {
+                HeartBeatSender heartBeatSender = HeartBeatSender.getInstance();
+                StringBuilder response = HttpClientUtils.sendPost(
+                        Constants.API_REPORT_UPLOAD,
+                        heartBeatSender.generateHeartBeatMsg()
+                );
+                HttpRequestReplay.sendReplayRequest(response);
+            } catch (IOException e) {
+                logger.error("report error reason: ", e);
+            } catch (Exception e) {
+                logger.error("report error, reason: ", e);
+            }
         }
 
         if (isRunning) {

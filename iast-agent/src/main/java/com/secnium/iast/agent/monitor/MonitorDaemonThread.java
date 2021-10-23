@@ -35,9 +35,7 @@ public class MonitorDaemonThread implements Runnable {
         boolean status = engineManager.downloadEnginePackage();
         status = status && engineManager.install();
         status = status && engineManager.start();
-        if (status) {
-            LogUtils.info("DongTai IAST started successfully");
-        } else {
+        if (!status) {
             LogUtils.info("DongTai IAST started failure");
         }
 

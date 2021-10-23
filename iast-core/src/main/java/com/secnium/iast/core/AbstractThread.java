@@ -13,20 +13,19 @@ import java.io.IOException;
  */
 public abstract class AbstractThread extends Thread {
     private final Logger logger = LogUtils.getLogger(getClass());
-    private final PropertyUtils properties = PropertyUtils.getInstance();
 
     @Override
     public void run() {
         boolean isRunning = EngineManager.isLingzhiRunning();
         if (isRunning) {
             EngineManager.turnOffLingzhi();
-        }
-        try {
-            send();
-        } catch (IOException e) {
-            logger.error("report error reason: ", e);
-        } catch (Exception e) {
-            logger.error("report error, reason: ", e);
+            try {
+                send();
+            } catch (IOException e) {
+                logger.error("report error reason: ", e);
+            } catch (Exception e) {
+                logger.error("report error, reason: ", e);
+            }
         }
 
         if (isRunning) {
