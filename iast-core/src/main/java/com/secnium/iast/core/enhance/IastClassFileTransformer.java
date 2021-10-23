@@ -72,6 +72,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                             final Class<?> classBeingRedefined,
                             final ProtectionDomain protectionDomain,
                             final byte[] srcByteCodeArray) {
+        EngineManager.enterTransform();
         boolean isRunning = EngineManager.isLingzhiRunning();
         if (isRunning) {
             EngineManager.turnOffLingzhi();
@@ -141,6 +142,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
             if (isRunning) {
                 EngineManager.turnOnLingzhi();
             }
+            EngineManager.leaveTransform();
         }
 
         return srcByteCodeArray;

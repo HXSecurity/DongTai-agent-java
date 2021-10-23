@@ -57,11 +57,7 @@ public class HttpImpl {
     private static void loadCloneRequestMethod(boolean isJakarta) {
         if (cloneRequestMethod == null) {
             try {
-                Class<?> proxyClass;
-
-                proxyClass = isJakarta ?
-                        iastClassLoader.loadClass("cn.huoxian.iast.jakarta.RequestWrapper") :
-                        iastClassLoader.loadClass("cn.huoxian.iast.servlet.RequestWrapper");
+                Class<?> proxyClass = iastClassLoader.loadClass("cn.huoxian.iast.api.RequestWrapper");
                 cloneRequestMethod = proxyClass.getDeclaredMethod("cloneRequest", Object.class);
             } catch (NoSuchMethodException e) {
                 e.printStackTrace();
@@ -72,10 +68,7 @@ public class HttpImpl {
     private static void loadCloneResponseMethod(boolean isJakarta) {
         if (cloneResponseMethod == null) {
             try {
-                Class<?> proxyClass;
-                proxyClass = isJakarta ?
-                        iastClassLoader.loadClass("cn.huoxian.iast.jakarta.ResponseWrapper") :
-                        iastClassLoader.loadClass("cn.huoxian.iast.servlet.ResponseWrapper");
+                Class<?> proxyClass = iastClassLoader.loadClass("cn.huoxian.iast.api.ResponseWrapper");
                 cloneResponseMethod = proxyClass.getDeclaredMethod("cloneResponse", Object.class);
             } catch (NoSuchMethodException e) {
                 e.printStackTrace();
@@ -121,22 +114,17 @@ public class HttpImpl {
         return response;
     }
 
-    public static Map<String, Object> getRequestMeta(Object request, boolean isJakarta) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public static Map<String, Object> getRequestMeta(Object request) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         if (null == iastRequestMethod) {
-            createClassLoader(request, isJakarta);
-            Class<?> proxyClass = isJakarta ?
-                    iastClassLoader.loadClass("cn.huoxian.iast.jakarta.HttpRequest") :
-                    iastClassLoader.loadClass("cn.huoxian.iast.servlet.HttpRequest");
+            Class<?> proxyClass = iastClassLoader.loadClass("cn.huoxian.iast.api.HttpRequest");
             iastRequestMethod = proxyClass.getDeclaredMethod("getRequest", Object.class);
         }
         return (Map<String, Object>) iastRequestMethod.invoke(null, request);
     }
 
-    public static Map<String, Object> getResponseMeta(Object response, boolean isJakarta) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public static Map<String, Object> getResponseMeta(Object response) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         if (null == iastResponseMethod) {
-            Class<?> proxyClass = isJakarta ?
-                    iastClassLoader.loadClass("cn.huoxian.iast.jakarta.HttpResponse") :
-                    iastClassLoader.loadClass("cn.huoxian.iast.servlet.HttpResponse");
+            Class<?> proxyClass = iastClassLoader.loadClass("cn.huoxian.iast.api.HttpResponse");
             iastResponseMethod = proxyClass.getDeclaredMethod("getResponse", Object.class);
         }
         return (Map<String, Object>) iastResponseMethod.invoke(null, response);
@@ -152,7 +140,7 @@ public class HttpImpl {
             logger.debug(EngineManager.SCOPE_TRACKER.get().toString());
         }
 
-        Map<String, Object> requestMeta = getRequestMeta(event.argumentArray[0], true);
+        Map<String, Object> requestMeta = getRequestMeta(event.argumentArray[0]);
         // todo Consider increasing the capture of html request responses
         if (ConfigMatcher.disableExtension((String) requestMeta.get("requestURI"))) {
             return;

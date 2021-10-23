@@ -1,6 +1,7 @@
-package cn.huoxian.iast.servlet;
+package cn.huoxian.iast.api;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.HashMap;
@@ -63,9 +64,9 @@ public class HttpResponse {
                     }
                 }
                 try {
-                    responseStr = new String(responseData,0,1000, charSet);
+                    responseStr = new String(responseData, 0, 1000, charSet);
                 } catch (UnsupportedEncodingException e) {
-                    responseStr = new String(responseData,0,1000);
+                    responseStr = new String(responseData, 0, 1000);
                 }
 
             } catch (Exception e) {

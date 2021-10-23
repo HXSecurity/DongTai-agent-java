@@ -1,15 +1,15 @@
-package cn.huoxian.iast.servlet;
+package cn.huoxian.iast.api;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.WriteListener;
+
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.WriteListener;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * <p>
- *
- * @author zhaoyb1990
+ * @author owefsad
  */
 public class WrapperOutputStreamCopier extends ServletOutputStream {
     private OutputStream out;
