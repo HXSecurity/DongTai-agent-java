@@ -74,44 +74,39 @@ public class ConfigMatcher {
      * @return 是否支持hook
      */
     public static boolean isHookPoint(String className, ClassLoader loader) {
-        boolean hook = true;
-        // 类名为null的不hook
         if (className == null) {
-            hook = false;
+            return false;
         }
 
-        // com.secnium.iast的类不hook
         // todo: 计算startsWith、contains与正则匹配的时间损耗
-        if (hook && (className.startsWith("com/secnium/iast/") || className.startsWith("java/lang/iast/") || className.startsWith("cn/huoxian/iast/"))) {
-            hook = false;
+        if (className.startsWith("com/secnium/iast/")
+                || className.startsWith("java/lang/iast/")
+                || className.startsWith("cn/huoxian/iast/")
+        ) {
             logger.trace("ignore transform {} in loader={}. Reason: classname is startswith com/secnium/iast/", className, loader);
+            return false;
         }
 
-        // CGLIB$$的类不hook
-        if (hook && className.contains("CGLIB$$")) {
-            hook = false;
+        if (className.contains("CGLIB$$")) {
             logger.trace("ignore transform {} in loader={}. Reason: classname is a aop class by CGLIB", className, loader);
+            return false;
         }
 
-        //$$Lambda$ 针对Lambda进行hook会导致Spring框架中出现多个NoClassDefFoundError错误
-        if (hook && className.contains("$$Lambda$")) {
-            hook = false;
+        if (className.contains("$$Lambda$")) {
             logger.trace("ignore transform {} in loader={}. Reason: classname is a aop class by Lambda", className, loader);
+            return false;
         }
 
-        //$$Lambda$
-        if (hook && className.contains("_$$_jvst")) {
-            hook = false;
+        if (className.contains("_$$_jvst")) {
             logger.trace("ignore transform {} in loader={}. Reason: classname is a aop class", className, loader);
+            return false;
         }
 
-
-        // 这里过滤掉Sandbox所需要的类，防止ClassCircularityError的发生
-        if (hook && ConfigMatcher.inHookBlacklist(className)) {
-            hook = false;
+        if (ConfigMatcher.inHookBlacklist(className)) {
             logger.trace("ignore transform {} in loader={}. reason: class is in blacklist", className, loader);
+            return false;
         }
-        return hook;
+        return true;
     }
 
     public static boolean isAppClass(String classname) {

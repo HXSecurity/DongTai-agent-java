@@ -39,7 +39,7 @@ public class EventListenerHandlers {
                                 final int hookType
     ) {
         // 如果已经进入scope，则检查是否遇到suorce点、sink点等
-        if (hookType == 0) {
+        if (HookType.HTTP.equals(hookType)) {
             if (!EngineManager.isLingzhiRunning()) {
                 EngineManager.turnOnLingzhi();
             }
