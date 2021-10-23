@@ -11,6 +11,8 @@ org/apache/skywalking/*
 org/jacoco/*
 # self package - need't hook
 com/secnium/*
+org/jruby/*
+com/sun/jmx/remote/*
 # apple package
 apple/*
 # octo
@@ -25,7 +27,7 @@ org/quartz/*
 io/shardingjdbc/*
 # micrometer
 io/micrometer/*
-groovy/*
+groovy/*sun/rmi/transport/DGCAckHandler$1
 # https://github.com/AutoGeneral/cors-filter
 com/thetransactioncompany/*
 # protobuf
@@ -63707,12 +63709,14 @@ sun/rmi/transport/Channel
 sun/rmi/transport/Connection
 sun/rmi/transport/ConnectionOutputStream
 sun/rmi/transport/DGCAckHandler
+sun/rmi/transport/DGCAckHandler$1
 sun/rmi/transport/DGCClient
 sun/rmi/transport/DGCClient$EndpointEntry
 sun/rmi/transport/DGCClient$EndpointEntry$1
 sun/rmi/transport/DGCClient$EndpointEntry$RefEntry
 sun/rmi/transport/DGCClient$EndpointEntry$RefEntry$PhantomLiveRef
 sun/rmi/transport/DGCImpl
+sun/rmi/transport/DGCImpl$1
 sun/rmi/transport/DGCImpl$2
 sun/rmi/transport/DGCImpl$2$1
 sun/rmi/transport/DGCImpl$LeaseInfo
@@ -63734,10 +63738,12 @@ sun/rmi/transport/proxy/RMIMasterSocketFactory
 sun/rmi/transport/proxy/RMISocketInfo
 sun/rmi/transport/tcp/TCPChannel
 sun/rmi/transport/tcp/TCPConnection
+sun/rmi/transport/tcp/TCPDirectSocketFactory
 sun/rmi/transport/tcp/TCPEndpoint
 sun/rmi/transport/tcp/TCPTransport
 sun/rmi/transport/tcp/TCPTransport$1
 sun/rmi/transport/tcp/TCPTransport$AcceptLoop
+sun/rmi/transport/tcp/TCPTransport$ConnectionHandler
 sun/security/*
 sun/security/action/GetBooleanAction
 sun/security/action/GetIntegerAction

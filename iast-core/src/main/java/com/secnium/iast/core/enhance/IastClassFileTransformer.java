@@ -87,7 +87,14 @@ public class IastClassFileTransformer implements ClassFileTransformer {
             final CodeSource codeSource = (protectionDomain != null) ? protectionDomain.getCodeSource() : null;
 
             // sca scan
-            if (codeSource != null && internalClassName != null && !internalClassName.startsWith("com/secnium/iast/") && !internalClassName.startsWith("com/sun/") && !internalClassName.startsWith("sun/")) {
+            if (codeSource != null
+                    && internalClassName != null
+                    && !internalClassName.startsWith("com/secnium/iast/")
+                    && !internalClassName.startsWith("java/lang/iast/")
+                    && !internalClassName.startsWith("cn/huoxian/iast/")
+                    && !internalClassName.startsWith("com/sun/")
+                    && !internalClassName.startsWith("sun/")
+            ) {
                 COMMON_UTILS.scanCodeSource(codeSource);
             }
 
@@ -101,7 +108,6 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                 final String[] interfaces = cr.getInterfaces();
                 final String superName = cr.getSuperName();
                 final String className = cr.getClassName();
-
                 COMMON_UTILS.setLoader(loader);
                 COMMON_UTILS.saveAncestors(className, superName, interfaces);
                 HashSet<String> ancestors = COMMON_UTILS.getAncestors(className, superName, interfaces);

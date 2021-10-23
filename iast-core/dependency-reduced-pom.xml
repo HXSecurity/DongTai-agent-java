@@ -89,6 +89,10 @@
                   <pattern>oshi</pattern>
                   <shadedPattern>${shade-prefix}.oshi</shadedPattern>
                 </relocation>
+                <relocation>
+                  <pattern>com.sun.jna</pattern>
+                  <shadedPattern>${shade-prefix}.com.sun.jna</shadedPattern>
+                </relocation>
               </relocations>
             </configuration>
           </execution>

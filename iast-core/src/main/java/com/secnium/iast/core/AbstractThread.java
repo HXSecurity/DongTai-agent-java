@@ -19,15 +19,14 @@ public abstract class AbstractThread extends Thread {
         boolean isRunning = EngineManager.isLingzhiRunning();
         if (isRunning) {
             EngineManager.turnOffLingzhi();
-            try {
-                send();
-            } catch (IOException e) {
-                logger.error("report error reason: ", e);
-            } catch (Exception e) {
-                logger.error("report error, reason: ", e);
-            }
         }
-
+        try {
+            send();
+        } catch (IOException e) {
+            logger.error("report error reason: ", e);
+        } catch (Exception e) {
+            logger.error("report error, reason: ", e);
+        }
         if (isRunning) {
             EngineManager.turnOnLingzhi();
         }
