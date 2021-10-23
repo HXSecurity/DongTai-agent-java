@@ -2,6 +2,7 @@ package com.secnium.iast.core.report;
 
 import com.secnium.iast.core.PropertyUtils;
 import com.secnium.iast.core.handler.vulscan.ReportConstant;
+import com.secnium.iast.core.util.LogUtils;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -29,8 +30,10 @@ public class StartUpTimeReport {
 
     public static void sendPost(String httpUrl, String token, String report) {
         OutputStreamWriter out = null;
+        BufferedReader in = null;
+        StringBuilder result = new StringBuilder();
         HttpURLConnection conn = null;
-        try {
+        try{
             URL url = new URL(httpUrl);
             conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
@@ -45,6 +48,13 @@ public class StartUpTimeReport {
             out.write(report);
             out.flush();
             out.close();
+            if (200 == conn.getResponseCode()){
+                in = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+                String line;
+                while ((line = in.readLine()) != null){
+                    result.append(line);
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
