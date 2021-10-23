@@ -32,7 +32,7 @@ public class GraphBuilder {
     private static Map<String, Object> getResponseMeta(Object response) {
         Map<String, Object> responseMeta = null;
         try {
-            responseMeta = HttpImpl.getResponseMeta(response, true);
+            responseMeta = HttpImpl.getResponseMeta(response);
         } catch (InvocationTargetException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {

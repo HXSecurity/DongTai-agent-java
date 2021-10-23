@@ -1,4 +1,4 @@
-package cn.huoxian.iast.jakarta;
+package cn.huoxian.iast.api;
 
 
 import jakarta.servlet.ServletOutputStream;

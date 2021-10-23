@@ -1,7 +1,8 @@
-package cn.huoxian.iast.servlet;
+package cn.huoxian.iast.api;
 
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -58,8 +59,8 @@ public class HttpRequest {
         try {
             if ("POST".equals(request.getMethod())) {
                 boolean usingBody = false;
-                if (request.getContentType() != null){
-                usingBody = request.getContentType().contains("application/json");
+                if (request.getContentType() != null) {
+                    usingBody = request.getContentType().contains("application/json");
                 }
                 if (usingBody) {
                     InputStream inputStream = request.getInputStream();
