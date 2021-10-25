@@ -7,12 +7,11 @@ import com.secnium.iast.core.util.ByteUtils;
 import com.secnium.iast.core.util.Constants;
 import com.secnium.iast.core.util.HttpClientUtils;
 import com.secnium.iast.core.util.LogUtils;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryUsage;
+import org.json.JSONObject;
+import org.slf4j.Logger;
 
 /**
  * 心跳机制实现，默认30s
@@ -20,6 +19,7 @@ import java.lang.management.MemoryUsage;
  * @author dongzhiyong@huoxian.cn
  */
 public class HeartBeatSender extends Thread {
+
     private final Logger logger = LogUtils.getLogger(getClass());
 
     private String generateHeartBeatMsg() {
@@ -51,6 +51,11 @@ public class HeartBeatSender extends Thread {
         return cpuInfo.toString();
     }
 
+    /**
+     * Get CPU information fixme this code will trigger deadlock
+     *
+     * @return CPU usage
+     */
     public Integer getCpuInfo() {
         return 13;
 //        SystemInfo systemInfo = new SystemInfo();
