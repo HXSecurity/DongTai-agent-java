@@ -58,6 +58,7 @@ public class AgentEngine {
         agentEngine.setStartUpTime(System.currentTimeMillis() - start);
         Integer startupTime = (int) agentEngine.getStartUpTime();
         StartUpTimeReport.sendReport(AgentRegisterReport.getAgentFlag(), startupTime);
+        EngineManager.agentStarted();
         logger.info("DongTai Engine is successfully installed to the JVM, and it takes {} s", agentEngine.getStartUpTime() / 1000);
     }
 

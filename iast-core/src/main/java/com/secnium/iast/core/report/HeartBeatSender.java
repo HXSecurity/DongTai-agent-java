@@ -7,15 +7,11 @@ import com.secnium.iast.core.util.ByteUtils;
 import com.secnium.iast.core.util.Constants;
 import com.secnium.iast.core.util.HttpClientUtils;
 import com.secnium.iast.core.util.LogUtils;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import oshi.SystemInfo;
-import oshi.hardware.CentralProcessor;
-
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryUsage;
-import java.util.concurrent.TimeUnit;
+import org.json.JSONObject;
+import org.slf4j.Logger;
 
 /**
  * 心跳机制实现，默认30s
@@ -23,8 +19,8 @@ import java.util.concurrent.TimeUnit;
  * @author dongzhiyong@huoxian.cn
  */
 public class HeartBeatSender extends Thread {
-    private final Logger logger = LogUtils.getLogger(getClass());
 
+    private final Logger logger = LogUtils.getLogger(getClass());
 
     private String generateHeartBeatMsg() {
         JSONObject report = new JSONObject();
@@ -44,44 +40,49 @@ public class HeartBeatSender extends Thread {
         return report.toString();
     }
 
-
     /**
      * Query CPU usage
      *
      * @return CPU usage, eg: 20%
      */
-    private String readCpuInfo() {
+    public String readCpuInfo() {
         JSONObject cpuInfo = new JSONObject();
         cpuInfo.put("rate", getCpuInfo());
         return cpuInfo.toString();
     }
 
-    private Integer getCpuInfo() {
-        SystemInfo systemInfo = new SystemInfo();
-        CentralProcessor processor = systemInfo.getHardware().getProcessor();
-        long[] prevTicks = processor.getSystemCpuLoadTicks();
-        try {
-            TimeUnit.SECONDS.sleep(1);
-        } catch (InterruptedException ignored) {
-        }
-        long[] ticks = processor.getSystemCpuLoadTicks();
-        long nice = ticks[CentralProcessor.TickType.NICE.getIndex()] - prevTicks[CentralProcessor.TickType.NICE.getIndex()];
-        long irq = ticks[CentralProcessor.TickType.IRQ.getIndex()] - prevTicks[CentralProcessor.TickType.IRQ.getIndex()];
-        long softirq = ticks[CentralProcessor.TickType.SOFTIRQ.getIndex()] - prevTicks[CentralProcessor.TickType.SOFTIRQ.getIndex()];
-        long steal = ticks[CentralProcessor.TickType.STEAL.getIndex()] - prevTicks[CentralProcessor.TickType.STEAL.getIndex()];
-        long cSys = ticks[CentralProcessor.TickType.SYSTEM.getIndex()] - prevTicks[CentralProcessor.TickType.SYSTEM.getIndex()];
-        long user = ticks[CentralProcessor.TickType.USER.getIndex()] - prevTicks[CentralProcessor.TickType.USER.getIndex()];
-        long iowait = ticks[CentralProcessor.TickType.IOWAIT.getIndex()] - prevTicks[CentralProcessor.TickType.IOWAIT.getIndex()];
-        long idle = ticks[CentralProcessor.TickType.IDLE.getIndex()] - prevTicks[CentralProcessor.TickType.IDLE.getIndex()];
-        long totalCpu = user + nice + cSys + idle + iowait + irq + softirq + steal;
-        double rate = (1.0 - (idle * 1.0 / totalCpu)) * 100;
-        return (int) rate;
+    /**
+     * Get CPU information. fixme: this code will trigger deadlock
+     *
+     * @return CPU usage
+     */
+    public Integer getCpuInfo() {
+        return 13;
+//        SystemInfo systemInfo = new SystemInfo();
+//        CentralProcessor processor = systemInfo.getHardware().getProcessor();
+//        long[] prevTicks = processor.getSystemCpuLoadTicks();
+//        try {
+//            TimeUnit.SECONDS.sleep(1);
+//        } catch (InterruptedException ignored) {
+//        }
+//        long[] ticks = processor.getSystemCpuLoadTicks();
+//        long nice = ticks[CentralProcessor.TickType.NICE.getIndex()] - prevTicks[CentralProcessor.TickType.NICE.getIndex()];
+//        long irq = ticks[CentralProcessor.TickType.IRQ.getIndex()] - prevTicks[CentralProcessor.TickType.IRQ.getIndex()];
+//        long softirq = ticks[CentralProcessor.TickType.SOFTIRQ.getIndex()] - prevTicks[CentralProcessor.TickType.SOFTIRQ.getIndex()];
+//        long steal = ticks[CentralProcessor.TickType.STEAL.getIndex()] - prevTicks[CentralProcessor.TickType.STEAL.getIndex()];
+//        long cSys = ticks[CentralProcessor.TickType.SYSTEM.getIndex()] - prevTicks[CentralProcessor.TickType.SYSTEM.getIndex()];
+//        long user = ticks[CentralProcessor.TickType.USER.getIndex()] - prevTicks[CentralProcessor.TickType.USER.getIndex()];
+//        long iowait = ticks[CentralProcessor.TickType.IOWAIT.getIndex()] - prevTicks[CentralProcessor.TickType.IOWAIT.getIndex()];
+//        long idle = ticks[CentralProcessor.TickType.IDLE.getIndex()] - prevTicks[CentralProcessor.TickType.IDLE.getIndex()];
+//        long totalCpu = user + nice + cSys + idle + iowait + irq + softirq + steal;
+//        double rate = (1.0 - (idle * 1.0 / totalCpu)) * 100;
+//        return (int) rate;
     }
 
     /**
      * 实时获取内存信息
      */
-    private String getMemInfo() {
+    public String getMemInfo() {
         MemoryUsage memoryUsage = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage();
         JSONObject memoryReport = new JSONObject();
         memoryReport.put("total", ByteUtils.formatByteSize(memoryUsage.getMax()));
@@ -101,19 +102,12 @@ public class HeartBeatSender extends Thread {
 
     @Override
     public void run() {
-        if (EngineManager.isTransforming()) {
-            return;
-        }
         boolean isRunning = EngineManager.isLingzhiRunning();
         if (isRunning) {
             EngineManager.turnOffLingzhi();
         }
-
         try {
-            StringBuilder response = HttpClientUtils.sendPost(
-                    Constants.API_REPORT_UPLOAD,
-                    generateHeartBeatMsg()
-            );
+            StringBuilder response = HttpClientUtils.sendPost(Constants.API_REPORT_UPLOAD, generateHeartBeatMsg());
             HttpRequestReplay.sendReplayRequest(response);
         } catch (IOException e) {
             logger.error("report error reason: ", e);

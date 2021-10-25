@@ -1,20 +1,19 @@
 package com.secnium.iast.core.engines.impl;
 
-import com.secnium.iast.core.EngineManager;
 import com.secnium.iast.core.PropertyUtils;
 import com.secnium.iast.core.engines.IEngine;
 import com.secnium.iast.core.enhance.IastClassFileTransformer;
 import com.secnium.iast.core.report.ErrorLogReport;
 import com.secnium.iast.core.util.LogUtils;
 import com.secnium.iast.core.util.ThrowableUtils;
-import org.slf4j.Logger;
-
 import java.lang.instrument.Instrumentation;
+import org.slf4j.Logger;
 
 /**
  * @author dongzhiyong@huoxian.cn
  */
 public class TransformEngine implements IEngine {
+
     private final Logger logger = LogUtils.getLogger(getClass());
     private Instrumentation inst;
 
