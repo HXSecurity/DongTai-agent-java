@@ -5,15 +5,20 @@ import com.secnium.iast.core.handler.models.MethodEvent;
 import com.secnium.iast.core.middlewarerecognition.IastServer;
 import com.secnium.iast.core.middlewarerecognition.ServerDetect;
 import com.secnium.iast.core.report.AgentRegisterReport;
-import com.secnium.iast.core.threadlocalpool.*;
+import com.secnium.iast.core.threadlocalpool.BooleanTheadLocal;
+import com.secnium.iast.core.threadlocalpool.IastScopeTracker;
+import com.secnium.iast.core.threadlocalpool.IastServerPort;
+import com.secnium.iast.core.threadlocalpool.IastTaintHashCodes;
+import com.secnium.iast.core.threadlocalpool.IastTaintPool;
+import com.secnium.iast.core.threadlocalpool.IastTrackMap;
+import com.secnium.iast.core.threadlocalpool.RequestContext;
 import com.secnium.iast.core.util.LogUtils;
-import org.slf4j.Logger;
-
 import java.lang.instrument.Instrumentation;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
+import org.slf4j.Logger;
 
 /**
  * 存储全局信息
@@ -40,7 +45,8 @@ public class EngineManager {
 
     private static final ArrayBlockingQueue<String> REPORTS = new ArrayBlockingQueue<String>(4096);
     private static final ArrayBlockingQueue<String> METHOD_REPORT = new ArrayBlockingQueue<String>(4096);
-    private static final ArrayBlockingQueue<IastReplayModel> REPLAY_QUEUE = new ArrayBlockingQueue<IastReplayModel>(4096);
+    private static final ArrayBlockingQueue<IastReplayModel> REPLAY_QUEUE = new ArrayBlockingQueue<IastReplayModel>(
+            4096);
 
     private static boolean logined = false;
     private static int reqCounts = 0;
@@ -102,12 +108,13 @@ public class EngineManager {
     }
 
     private EngineManager(final PropertyUtils cfg,
-                          final Instrumentation inst) {
+            final Instrumentation inst) {
         this.cfg = cfg;
 
         ServerDetect serverDetect = ServerDetect.getInstance();
         if (serverDetect.getWebserver() != null) {
-            logger.info("WebServer [ name={}, path={} ]", serverDetect.getWebserver().getName(), serverDetect.getWebServerPath());
+            logger.info("WebServer [ name={}, path={} ]", serverDetect.getWebserver().getName(),
+                    serverDetect.getWebServerPath());
         }
     }
 
