@@ -90,8 +90,11 @@ jobs:
           cd apache-tomcat-8.5.40
 
           echo "init mysql"
-          cat init.sql
-          mysql -uroot -pyuhjnbGYUI -h127.0.0.1 < init.sql
+          mysql -uroot -pyuhjnbGYUI -h127.0.0.1 -e "DROP DATABASE IF EXISTS test;"
+          mysql -uroot -pyuhjnbGYUI -h127.0.0.1 -e "CREATE DATABASE test;"
+          mysql -uroot -pyuhjnbGYUI -h127.0.0.1 -e "CREATE USER 'test'@'%' IDENTIFIED BY 'test';"
+          mysql -uroot -pyuhjnbGYUI -h127.0.0.1 -e "GRANT ALL PRIVILEGES ON *.* TO 'test'@'%' WITH GRANT OPTION;"
+          mysql -uroot -pyuhjnbGYUI -h127.0.0.1 -e "FLUSH PRIVILEGES;"
           mysql -uroot -pyuhjnbGYUI -h127.0.0.1 -e 'show DATABASES;'
 
           echo "start catalina and waitting 30s..."
@@ -115,7 +118,7 @@ jobs:
           # Run
 
   Upload-To-OSS:
-    name: Build Java Agent
+    name: Upload To TEST OSS
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
     needs: [ Build-Agent ]
