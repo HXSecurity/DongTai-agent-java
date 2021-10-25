@@ -26,6 +26,7 @@ public class EngineManager {
     private static EngineManager instance;
     private final PropertyUtils cfg;
 
+    private static final BooleanTheadLocal AGENT_STATUS = new BooleanTheadLocal(false);
     private static final BooleanTheadLocal TRANSFORM_STATE = new BooleanTheadLocal(false);
     public static final BooleanTheadLocal ENTER_HTTP_ENTRYPOINT = new BooleanTheadLocal(false);
     public static final RequestContext REQUEST_CONTEXT = new RequestContext();
@@ -45,6 +46,14 @@ public class EngineManager {
     private static int reqCounts = 0;
     private static int enableLingzhi = 0;
 
+    public static void agentStarted() {
+        AGENT_STATUS.set(true);
+    }
+
+    public static boolean isAgentStarted() {
+        return AGENT_STATUS.get() != null && AGENT_STATUS.get();
+    }
+
     public static void enterTransform() {
         TRANSFORM_STATE.set(true);
     }
@@ -54,7 +63,7 @@ public class EngineManager {
     }
 
     public static boolean isTransforming() {
-        return TRANSFORM_STATE.get();
+        return TRANSFORM_STATE.get() != null && TRANSFORM_STATE.get();
     }
 
     public static void turnOnLingzhi() {
