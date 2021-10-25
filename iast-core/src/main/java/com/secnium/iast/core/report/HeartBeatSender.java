@@ -52,7 +52,7 @@ public class HeartBeatSender extends Thread {
     }
 
     /**
-     * Get CPU information fixme this code will trigger deadlock
+     * Get CPU information. fixme: this code will trigger deadlock
      *
      * @return CPU usage
      */
