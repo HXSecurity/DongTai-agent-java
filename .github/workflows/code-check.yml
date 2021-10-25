@@ -71,6 +71,7 @@ jobs:
         run: |
           mvn -version
           mvn -B package -Dmaven.test.skip=true
+          ls -l release
 
       - uses: shogo82148/actions-setup-mysql@v1
         with:
