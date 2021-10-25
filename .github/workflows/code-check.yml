@@ -38,7 +38,7 @@ jobs:
 
   Build-Agent:
     name: Build Java Agent
-    if: github.event_name == 'pull_request' or github.event_name == 'schedule'
+    if: github.event_name == 'pull_request' || github.event_name == 'schedule'
     runs-on: ubuntu-latest
     needs: [ Cache-Dependencies ]
     steps:
