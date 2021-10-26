@@ -107,8 +107,12 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                 final int flags = cr.getAccess();
 
                 final String[] interfaces = cr.getInterfaces();
-                final String superName = cr.getSuperName();
-                final String className = cr.getClassName();
+                int interfacesLength = interfaces.length;
+                for (int i = 0; i < interfacesLength; i++) {
+                    interfaces[i] = interfaces[i].replace("/",".");
+                }
+                final String superName = cr.getSuperName().replace("/",".");
+                final String className = cr.getClassName().replace("/",".");
                 COMMON_UTILS.setLoader(loader);
                 COMMON_UTILS.saveAncestors(className, superName, interfaces);
                 HashSet<String> ancestors = COMMON_UTILS.getAncestors(className, superName, interfaces);
