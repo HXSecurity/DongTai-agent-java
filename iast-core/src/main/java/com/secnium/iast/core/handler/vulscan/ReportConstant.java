@@ -69,7 +69,7 @@ public class ReportConstant {
 
     public static final String ERROR_LOG_DETAIL = "log";
 
-    public static final String VULN_TYPE = "vuln_type";
+    public static final String VULN_TYPE = "vulnType";
 
     public static final String API_DATA = "api_data";
 
