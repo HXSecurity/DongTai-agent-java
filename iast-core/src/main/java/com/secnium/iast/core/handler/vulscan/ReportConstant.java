@@ -26,8 +26,11 @@ public class ReportConstant {
     public static final String AGENT_ID = "agentId";
     public static final String PROJECT_NAME = "projectName";
     public static final String AGENT_VERSION = "version";
+    public static final String AGENT_REPORT_VERSION = "agentVersion";
     public static final String AGENT_VERSION_VALUE = "v1.0.6";
     public static final String CONTAINER = "container";
+    public static final String APP_NAME = "appName";
+    public static final String APP_PATH = "appPath";
 
     public static final String PID = "pid";
     public static final String NETWORK = "network";
@@ -39,6 +42,7 @@ public class ReportConstant {
     public static final String CONTAINER_VERSION = "containerVersion";
     public static final String SERVER_PATH = "serverPath";
     public static final String SERVER_ADDR = "serverAddr";
+    public static final String SERVER_NAME = "serverName";
     public static final String SERVER_PORT = "serverPort";
     public static final String HOSTNAME = "hostname";
 
@@ -50,21 +54,34 @@ public class ReportConstant {
     public static final String COMMON_SERVER_NAME = "server_name";
     public static final String COMMON_SERVER_PORT = "server_port";
     public static final String PROTOCOL = "protocol";
+    public static final String HTTP_PROTOCOL = "httpProtocol";
     public static final String SCHEME = "scheme";
+    public static final String HTTP_SCHEME = "httpScheme";
     public static final String METHOD = "method";
+    public static final String HTTP_METHOD = "httpMethod";
     public static final String SECURE = "secure";
+    public static final String HTTP_SECURE = "httpSecure";
     public static final String URL = "url";
+    public static final String HTTP_URL = "httpUrl";
     public static final String URI = "uri";
+    public static final String HTTP_URI = "httpUri";
     public static final String QUERY_STRING = "queryString";
+    public static final String HTTP_QUERY_STRING = "httpQueryString";
     public static final String REQ_HEADER = "reqHeader";
+    public static final String HTTP_REQ_HEADER = "httpReqHeader";
     public static final String REQ_BODY = "reqBody";
+    public static final String HTTP_BODY = "httpBody";
     public static final String CLIENT_IP = "clientIp";
+    public static final String HTTP_CLIENT_IP = "httpClientIp";
     public static final String CONTEXT_PATH = "contextPath";
     public static final String RES_HEADER = "resHeader";
+    public static final String HTTP_RES_HEADER = "httpResHeader";
     public static final String RES_BODY = "resBody";
+    public static final String HTTP_RES_BODY = "httpResBody";
     public static final String REPLAY_REQUEST = "replayRequest";
+    public static final String HTTP_REPLAY_REQUEST = "httpReplayRequest";
     public static final String SERVER_ENV = "serverEnv";
-    public static final String VULN_CALLER = "app_caller";
+    public static final String VULN_CALLER = "appCaller";
     public static final String SAAS_METHOD_POOL = "pool";
 
     public static final String ERROR_LOG_DETAIL = "log";
