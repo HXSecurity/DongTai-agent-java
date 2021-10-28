@@ -143,7 +143,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
         } catch (Throwable cause) {
             ErrorLogReport.sendErrorLog(ThrowableUtils.getStackTrace(cause));
         } finally {
-            if (isRunning) {
+            if (!isRunning) {
                 EngineManager.turnOnLingzhi();
             }
             EngineManager.leaveTransform();
