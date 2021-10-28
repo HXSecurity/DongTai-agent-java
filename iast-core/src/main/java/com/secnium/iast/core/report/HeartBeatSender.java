@@ -115,7 +115,7 @@ public class HeartBeatSender extends Thread {
             logger.error("report error, reason: ", e);
         }
 
-        if (isRunning) {
+        if (!isRunning) {
             EngineManager.turnOnLingzhi();
         }
     }
