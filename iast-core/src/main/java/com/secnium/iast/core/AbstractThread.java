@@ -27,7 +27,7 @@ public abstract class AbstractThread extends Thread {
         } catch (Exception e) {
             logger.error("report error, reason: ", e);
         }
-        if (isRunning) {
+        if (!isRunning) {
             EngineManager.turnOnLingzhi();
         }
     }
