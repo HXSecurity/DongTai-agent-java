@@ -64,7 +64,7 @@ public class ReportConstant {
     public static final String RES_BODY = "resBody";
     public static final String REPLAY_REQUEST = "replayRequest";
     public static final String SERVER_ENV = "serverEnv";
-    public static final String VULN_CALLER = "app_caller";
+    public static final String VULN_CALLER = "appCaller";
     public static final String SAAS_METHOD_POOL = "pool";
 
     public static final String ERROR_LOG_DETAIL = "log";
