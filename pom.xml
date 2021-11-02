@@ -102,6 +102,12 @@
                 <version>${iast.version}</version>
                 <scope>test</scope>
             </dependency>
+
+            <dependency>
+                <groupId>com.contrastsecurity</groupId>
+                <artifactId>contrast-agent</artifactId>
+                <version>3.8.5.20504</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

@@ -1,12 +1,13 @@
 package cn.huoxian.iast.api;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import javax.servlet.http.HttpServletResponse;
 
 public class HttpResponse {
+
     public static Map<String, Object> getResponse(Object res) {
         HttpServletResponse response = (HttpServletResponse) res;
         Map<String, Object> responseMeta = new HashMap<String, Object>(2);
@@ -63,9 +64,9 @@ public class HttpResponse {
                     }
                 }
                 try {
-                    responseStr = new String(responseData,0,1000, charSet);
+                    responseStr = new String(responseData, charSet);
                 } catch (UnsupportedEncodingException e) {
-                    responseStr = new String(responseData,0,1000);
+                    responseStr = new String(responseData);
                 }
 
             } catch (Exception e) {

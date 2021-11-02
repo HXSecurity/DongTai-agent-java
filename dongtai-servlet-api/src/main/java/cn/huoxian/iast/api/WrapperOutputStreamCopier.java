@@ -1,10 +1,10 @@
 package cn.huoxian.iast.api;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.WriteListener;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
 
 /**
  * <p>
@@ -12,12 +12,13 @@ import java.io.OutputStream;
  * @author zhaoyb1990
  */
 public class WrapperOutputStreamCopier extends ServletOutputStream {
-    private OutputStream out;
-    private ByteArrayOutputStream copier;
+
+    private final OutputStream out;
+    private final ByteArrayOutputStream copier;
 
     WrapperOutputStreamCopier(OutputStream out) {
         this.out = out;
-        this.copier = new ByteArrayOutputStream(1024);
+        this.copier = new ByteArrayOutputStream();
     }
 
     @Override

@@ -53,8 +53,6 @@ public class ReportConstantTest {
         report.put(ReportConstant.REPORT_KEY, ReportConstant.REPORT_VULN_NORNAL);
         report.put(ReportConstant.REPORT_VALUE_KEY, detail);
 
-        detail.put(ReportConstant.COMMON_SERVER_NAME, 20102);
-        detail.put(ReportConstant.COMMON_SERVER_PORT, 20102);
         detail.put(ReportConstant.PROTOCOL, 20102);
         detail.put(ReportConstant.SCHEME, 20102);
         detail.put(ReportConstant.METHOD, 20102);
@@ -74,8 +72,6 @@ public class ReportConstantTest {
         report.put(ReportConstant.REPORT_KEY, ReportConstant.REPORT_VULN_NORNAL);
         report.put(ReportConstant.REPORT_VALUE_KEY, detail);
 
-        detail.put(ReportConstant.COMMON_SERVER_NAME, 20102);
-        detail.put(ReportConstant.COMMON_SERVER_PORT, 20102);
         detail.put(ReportConstant.PROTOCOL, 20102);
         detail.put(ReportConstant.SCHEME, 20102);
         detail.put(ReportConstant.METHOD, 20102);
@@ -95,8 +91,6 @@ public class ReportConstantTest {
         report.put(ReportConstant.REPORT_KEY, ReportConstant.REPORT_VULN_NORNAL);
         report.put(ReportConstant.REPORT_VALUE_KEY, detail);
 
-        detail.put(ReportConstant.COMMON_SERVER_NAME, 20102);
-        detail.put(ReportConstant.COMMON_SERVER_PORT, 20102);
         detail.put(ReportConstant.PROTOCOL, 20102);
         detail.put(ReportConstant.SCHEME, 20102);
         detail.put(ReportConstant.METHOD, 20102);
@@ -116,8 +110,6 @@ public class ReportConstantTest {
         report.put(ReportConstant.REPORT_KEY, ReportConstant.REPORT_VULN_NORNAL);
         report.put(ReportConstant.REPORT_VALUE_KEY, detail);
 
-        detail.put(ReportConstant.COMMON_SERVER_NAME, 20102);
-        detail.put(ReportConstant.COMMON_SERVER_PORT, 20102);
         detail.put(ReportConstant.PROTOCOL, 20102);
         detail.put(ReportConstant.SCHEME, 20102);
         detail.put(ReportConstant.METHOD, 20102);
@@ -137,8 +129,6 @@ public class ReportConstantTest {
         report.put(ReportConstant.REPORT_KEY, ReportConstant.REPORT_VULN_NORNAL);
         report.put(ReportConstant.REPORT_VALUE_KEY, detail);
 
-        detail.put(ReportConstant.COMMON_SERVER_NAME, 20102);
-        detail.put(ReportConstant.COMMON_SERVER_PORT, 20102);
         detail.put(ReportConstant.PROTOCOL, 20102);
         detail.put(ReportConstant.SCHEME, 20102);
         detail.put(ReportConstant.METHOD, 20102);
@@ -158,8 +148,6 @@ public class ReportConstantTest {
         report.put(ReportConstant.REPORT_KEY, ReportConstant.REPORT_VULN_NORNAL);
         report.put(ReportConstant.REPORT_VALUE_KEY, detail);
 
-        detail.put(ReportConstant.COMMON_SERVER_NAME, 20102);
-        detail.put(ReportConstant.COMMON_SERVER_PORT, 20102);
         detail.put(ReportConstant.PROTOCOL, 20102);
         detail.put(ReportConstant.SCHEME, 20102);
         detail.put(ReportConstant.METHOD, 20102);

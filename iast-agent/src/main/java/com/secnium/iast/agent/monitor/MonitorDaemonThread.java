@@ -1,18 +1,17 @@
 package com.secnium.iast.agent.monitor;
 
-import com.secnium.iast.agent.IastProperties;
 import com.secnium.iast.agent.LogUtils;
 import com.secnium.iast.agent.manager.EngineManager;
-
 import java.util.ArrayList;
 
 /**
  * @author dongzhiyong@huoxian.cn
  */
 public class MonitorDaemonThread implements Runnable {
+
     public ArrayList<IMonitor> monitorTasks;
     private final EngineManager engineManager;
-    private final IastProperties properties = IastProperties.getInstance();
+    public static boolean isExit = false;
 
     public MonitorDaemonThread(EngineManager engineManager) {
         this.monitorTasks = new ArrayList<IMonitor>();
@@ -23,7 +22,7 @@ public class MonitorDaemonThread implements Runnable {
 
     @Override
     public void run() {
-        while (true) {
+        while (!isExit) {
             for (IMonitor monitor : this.monitorTasks) {
                 monitor.check();
             }

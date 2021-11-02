@@ -3,30 +3,19 @@ package com.secnium.iast.core.engines.impl;
 import com.secnium.iast.core.PropertyUtils;
 import com.secnium.iast.core.engines.IEngine;
 import com.secnium.iast.core.handler.models.IastHookRuleModel;
-import com.secnium.iast.core.report.ErrorLogReport;
-import com.secnium.iast.core.util.Asserts;
-import com.secnium.iast.core.util.ThrowableUtils;
-import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
 import com.secnium.iast.core.util.LogUtils;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.instrument.Instrumentation;
+import org.slf4j.Logger;
 
 /**
  * @author dongzhiyong@huoxian.cn
  */
 public class ConfigEngine implements IEngine {
+
     private final Logger logger = LogUtils.getLogger(ConfigEngine.class);
-    private PropertyUtils cfg;
-    private Instrumentation inst;
 
     @Override
     public void init(PropertyUtils cfg, Instrumentation inst) {
-        this.cfg = cfg;
-        this.inst = inst;
     }
 
     @Override
@@ -46,16 +35,4 @@ public class ConfigEngine implements IEngine {
 
     }
 
-    public void copy(String sourceFilepath, String destFilepath) {
-        InputStream initialStream = null;
-        try {
-            initialStream = ConfigEngine.class.getClassLoader().getResourceAsStream(sourceFilepath);
-            Asserts.NOT_NULL("NoConfigFile", initialStream);
-            File targetFile = new File(destFilepath);
-            FileUtils.copyInputStreamToFile(initialStream, targetFile);
-        } catch (IOException e) {
-            ErrorLogReport.sendErrorLog
-                    (ThrowableUtils.getStackTrace(e));
-        }
-    }
 }

@@ -48,7 +48,7 @@ public class JspPageAdapter extends AbstractClassVisitor {
         public void visitMethodInsn(int opc, String owner, String name, String desc, boolean isInterface) {
             if (owner.endsWith("JspRuntimeLibrary") && "include".equals(name)) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("[com.secnium.iast] 进入include方法" + owner + "." + name);
+                    logger.debug("[com.secnium.iast] enter include method" + owner + "." + name);
                 }
 
                 int j = newLocal(Type.getType(Object.class));

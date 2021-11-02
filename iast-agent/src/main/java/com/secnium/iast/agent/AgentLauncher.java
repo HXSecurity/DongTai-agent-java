@@ -2,7 +2,6 @@ package com.secnium.iast.agent;
 
 import com.secnium.iast.agent.manager.EngineManager;
 import com.secnium.iast.agent.monitor.MonitorDaemonThread;
-
 import java.lang.instrument.Instrumentation;
 import java.lang.management.ManagementFactory;
 
@@ -10,6 +9,7 @@ import java.lang.management.ManagementFactory;
  * @author dongzhiyong@huoxian.cn
  */
 public class AgentLauncher {
+
     private static final String LAUNCH_MODE_AGENT = "agent";
     private static final String LAUNCH_MODE_ATTACH = "attach";
     private static String LAUNCH_MODE;
@@ -33,8 +33,7 @@ public class AgentLauncher {
     /**
      * install agent with attach
      *
-     * @param featureString boot args
-     *                      [namespace,token,ip,port,prop]
+     * @param featureString boot args [namespace,token,ip,port,prop]
      * @param inst          inst
      */
     public static void agentmain(String featureString, Instrumentation inst) {
@@ -68,13 +67,17 @@ public class AgentLauncher {
     }
 
     private static void loadEngine(final Instrumentation inst) {
-        EngineManager engineManager = EngineManager.getInstance(inst, LAUNCH_MODE, ManagementFactory.getRuntimeMXBean().getName().split("@")[0]);
+        EngineManager engineManager = EngineManager
+                .getInstance(inst, LAUNCH_MODE, ManagementFactory.getRuntimeMXBean().getName().split("@")[0]);
         MonitorDaemonThread daemonThread = new MonitorDaemonThread(engineManager);
         if (daemonThread.startEngine()) {
             Thread agentMonitorDaemonThread = new Thread(daemonThread);
             agentMonitorDaemonThread.setDaemon(true);
-            agentMonitorDaemonThread.setName("dongtai-agent-monitor");
+            agentMonitorDaemonThread.setPriority(1);
+            agentMonitorDaemonThread.setName("dongtai-monitor");
             agentMonitorDaemonThread.start();
         }
+        System.out.println("register shutdown hook");
+        Runtime.getRuntime().addShutdownHook(new ShutdownThread());
     }
 }

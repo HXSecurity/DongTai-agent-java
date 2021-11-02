@@ -47,8 +47,6 @@ public class ReportConstant {
     public static final String SCA_PACKAGE_SIGNATURE = "packageSignature";
     public static final String SCA_PACKAGE_ALGORITHM = "packageAlgorithm";
 
-    public static final String COMMON_SERVER_NAME = "server_name";
-    public static final String COMMON_SERVER_PORT = "server_port";
     public static final String PROTOCOL = "protocol";
     public static final String SCHEME = "scheme";
     public static final String METHOD = "method";
@@ -64,7 +62,7 @@ public class ReportConstant {
     public static final String RES_BODY = "resBody";
     public static final String REPLAY_REQUEST = "replayRequest";
     public static final String SERVER_ENV = "serverEnv";
-    public static final String VULN_CALLER = "app_caller";
+    public static final String VULN_CALLER = "appCaller";
     public static final String SAAS_METHOD_POOL = "pool";
 
     public static final String ERROR_LOG_DETAIL = "log";

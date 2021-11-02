@@ -52,7 +52,7 @@ public class DispatchHardcodedPlugin implements DispatchPlugin {
             FieldVisitor fieldVisitor = super.visitField(access, name, desc, signature, value);
             if ("[B".equals(desc) && isKeysField(name)) {
                 logger.trace("Source is {}" + this.source);
-            } else if ("Ljava/lang/String;".equals(desc) && isStaticAndFinal(access) && isPassField(name) && !isWrongPreix(name) && value instanceof String) {
+            } else if ("Ljava/lang/String;".equals(desc) && isStaticAndFinal(access) && isPassField(name) && !isWrongPrefix(name) && value instanceof String) {
                 String fieldName = (String) value;
                 if (!commonUtils.isEmpty(fieldName) && !valueMatcher(fieldName)) {
                     logger.trace("Source is " + this.source);
@@ -69,8 +69,8 @@ public class DispatchHardcodedPlugin implements DispatchPlugin {
             return containArrayItem(name, passArray);
         }
 
-        private boolean isWrongPreix(String name) {
-            return containArrayItem(name, notPreixs);
+        private boolean isWrongPrefix(String name) {
+            return containArrayItem(name, notPrefixes);
         }
 
         private boolean isKeysField(String name) {
@@ -96,7 +96,7 @@ public class DispatchHardcodedPlugin implements DispatchPlugin {
 
         private final String[] keyArray = {"key", "aes", "des", "iv", "secret", "blowfish"};
         private final String[] passArray = {"password", "passkey", "passphrase", "secret"};
-        private final String[] notPreixs = {"date", "forgot", "form", "encode", "pattern", "prefix", "prop", "suffix", "url"};
+        private final String[] notPrefixes = {"date", "forgot", "form", "encode", "pattern", "prefix", "prop", "suffix", "url"};
 
     }
 }

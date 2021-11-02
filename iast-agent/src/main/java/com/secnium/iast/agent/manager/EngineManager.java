@@ -1,8 +1,17 @@
 package com.secnium.iast.agent.manager;
 
-import com.secnium.iast.agent.*;
-
-import java.io.*;
+import com.secnium.iast.agent.Agent;
+import com.secnium.iast.agent.AttachLauncher;
+import com.secnium.iast.agent.IastClassLoader;
+import com.secnium.iast.agent.IastProperties;
+import com.secnium.iast.agent.LogUtils;
+import com.secnium.iast.agent.UpdateUtils;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.instrument.Instrumentation;
 import java.lang.reflect.InvocationTargetException;
 import java.net.HttpURLConnection;
@@ -18,10 +27,11 @@ import java.util.jar.JarFile;
  * @author dongzhiyong@huoxian.cn
  */
 public class EngineManager {
+
     private static final String IAST_NAMESPACE = "DONGTAI";
     private static final String ENGINE_ENTRYPOINT_CLASS = "com.secnium.iast.core.AgentEngine";
-    private static final String INJECT_PACKAGE_REMOTE_URI = "/api/v1/engine/download?engineName=iast-inject&jdk.version=";
-    private static final String ENGINE_PACKAGE_REMOTE_URI = "/api/v1/engine/download?engineName=iast-core&jdk.version=";
+    private static final String INJECT_PACKAGE_REMOTE_URI = "/api/v1/engine/download?engineName=iast-inject";
+    private static final String ENGINE_PACKAGE_REMOTE_URI = "/api/v1/engine/download?engineName=iast-core";
     private static final Map<String, IastClassLoader> IAST_CLASS_LOADER_CACHE = new ConcurrentHashMap<String, IastClassLoader>();
     private static EngineManager INSTANCE;
 
@@ -112,7 +122,8 @@ public class EngineManager {
         try {
             URL url = new URL(fileUrl);
             Proxy proxy = UpdateUtils.loadProxy();
-            HttpURLConnection connection = proxy == null ? (HttpURLConnection) url.openConnection() : (HttpURLConnection) url.openConnection(proxy);
+            HttpURLConnection connection = proxy == null ? (HttpURLConnection) url.openConnection()
+                    : (HttpURLConnection) url.openConnection(proxy);
 
             connection.setRequestMethod("GET");
             connection.setRequestProperty("User-Agent", "DongTai-IAST-Agent");
@@ -141,17 +152,14 @@ public class EngineManager {
     }
 
     /**
-     * 更新IAST引擎需要的jar包，用于启动时加载和热更新检测引擎
-     * - iast-core.jar
-     * - iast-inject.jar
+     * 更新IAST引擎需要的jar包，用于启动时加载和热更新检测引擎 - iast-core.jar - iast-inject.jar
      *
      * @return 更新状态，成功为true，失败为false
      */
     public boolean updateEnginePackage() {
-        String jdkVersion = getJdkVersion();
         String baseUrl = properties.getBaseUrl();
-        return downloadJarPackageToCacheFromUrl(baseUrl + INJECT_PACKAGE_REMOTE_URI + jdkVersion, getInjectPackageCachePath()) &&
-                downloadJarPackageToCacheFromUrl(baseUrl + ENGINE_PACKAGE_REMOTE_URI + jdkVersion, getEnginePackageCachePath());
+        return downloadJarPackageToCacheFromUrl(baseUrl + INJECT_PACKAGE_REMOTE_URI, getInjectPackageCachePath()) &&
+                downloadJarPackageToCacheFromUrl(baseUrl + ENGINE_PACKAGE_REMOTE_URI, getEnginePackageCachePath());
     }
 
 
@@ -330,21 +338,4 @@ public class EngineManager {
             return true;
         }
     }
-
-    /**
-     * 判断jdk版本，根据jdk版本下载不同版本的java agent
-     *
-     * @return 1 - jdk 1.6~1.8；2 - jdk 1.9及以上
-     */
-    public static String getJdkVersion() {
-        String jdkVersion = System.getProperty("java.version", "1.8");
-        LogUtils.info("current jdk version is : " + jdkVersion);
-        String[] jdkVersionItem = jdkVersion.split("\\.");
-        boolean isHighJdk = true;
-        if (jdkVersionItem.length > 1 && ("6".equals(jdkVersionItem[1]) || "7".equals(jdkVersionItem[1]) || "8".equals(jdkVersionItem[1]))) {
-            isHighJdk = false;
-        }
-        return isHighJdk ? "2" : "1";
-    }
-
 }

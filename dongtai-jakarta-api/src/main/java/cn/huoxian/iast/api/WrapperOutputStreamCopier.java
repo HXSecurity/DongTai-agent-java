@@ -3,7 +3,6 @@ package cn.huoxian.iast.api;
 
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.WriteListener;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -12,12 +11,13 @@ import java.io.OutputStream;
  * @author owefsad
  */
 public class WrapperOutputStreamCopier extends ServletOutputStream {
-    private OutputStream out;
-    private ByteArrayOutputStream copier;
+
+    private final OutputStream out;
+    private final ByteArrayOutputStream copier;
 
     WrapperOutputStreamCopier(OutputStream out) {
         this.out = out;
-        this.copier = new ByteArrayOutputStream(1024);
+        this.copier = new ByteArrayOutputStream();
     }
 
     @Override

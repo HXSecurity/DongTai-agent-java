@@ -3,17 +3,16 @@ package com.secnium.iast.core.enhance.plugins.framework.j2ee.dispatch;
 import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.DispatchPlugin;
 import com.secnium.iast.core.util.LogUtils;
+import java.lang.reflect.Modifier;
+import java.util.Set;
 import org.objectweb.asm.ClassVisitor;
 import org.slf4j.Logger;
-
-import java.lang.reflect.Modifier;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * @author dongzhiyong@huoxian.cn
  */
 public class DispatchJ2ee implements DispatchPlugin {
+
     private final Logger logger = LogUtils.getLogger(getClass());
     private final String FILTER = " javax.servlet.Filter".substring(1);
     private final String FILTER_CHAIN = " javax.servlet.FilterChain".substring(1);
@@ -25,11 +24,11 @@ public class DispatchJ2ee implements DispatchPlugin {
     @Override
     public ClassVisitor dispatch(ClassVisitor classVisitor, IastContext context) {
         String className = context.getClassName();
-        HashSet<String> ancestors = context.getAncestors();
+        Set<String> ancestors = context.getAncestors();
 
         if (Modifier.isInterface(context.getFlags())) {
             logger.trace("Ignoring interface " + className);
-        }  else if (isServletDispatch(className, ancestors) || isJakartaServlet(className)) {
+        } else if (isServletDispatch(className, ancestors) || isJakartaServlet(className)) {
             classVisitor = new ServletDispatcherAdapter(classVisitor, context);
         }
         return classVisitor;

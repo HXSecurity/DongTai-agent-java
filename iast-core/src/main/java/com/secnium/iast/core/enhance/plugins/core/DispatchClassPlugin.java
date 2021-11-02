@@ -3,7 +3,8 @@ package com.secnium.iast.core.enhance.plugins.core;
 import com.secnium.iast.core.EngineManager;
 import com.secnium.iast.core.PropertyUtils;
 import com.secnium.iast.core.enhance.IastContext;
-import com.secnium.iast.core.enhance.plugins.*;
+import com.secnium.iast.core.enhance.plugins.AbstractClassVisitor;
+import com.secnium.iast.core.enhance.plugins.DispatchPlugin;
 import com.secnium.iast.core.enhance.plugins.core.adapter.PropagateAdviceAdapter;
 import com.secnium.iast.core.enhance.plugins.core.adapter.SinkAdviceAdapter;
 import com.secnium.iast.core.enhance.plugins.core.adapter.SourceAdviceAdapter;
@@ -16,24 +17,24 @@ import com.secnium.iast.core.util.LogUtils;
 import com.secnium.iast.core.util.SandboxStringUtils;
 import com.secnium.iast.core.util.matcher.ConfigMatcher;
 import com.secnium.iast.core.util.matcher.Method;
+import java.lang.reflect.Modifier;
+import java.util.Arrays;
+import java.util.Set;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.commons.JSRInlinerAdapter;
 import org.slf4j.Logger;
 
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.HashSet;
-
 /**
  * @author dongzhiyong@huoxian.cn
  */
 public class DispatchClassPlugin implements DispatchPlugin {
+
     private final static EngineManager JVM_SANDBOX = EngineManager.getInstance();
     private final static PropertyUtils PROPERTIES_UTILS = JVM_SANDBOX.getCfg();
     private final Logger logger;
     private final boolean enableAllHook;
-    private HashSet<String> ancestors;
+    private Set<String> ancestors;
     private String classname;
 
     public DispatchClassPlugin() {
@@ -48,18 +49,17 @@ public class DispatchClassPlugin implements DispatchPlugin {
         classname = context.getClassName();
         String matchClassname = isMatch();
 
-
         if (null != matchClassname) {
             if (logger.isDebugEnabled()) {
-                logger.debug("当前类 {} 命中规则 {} 类族为 {}", classname, matchClassname, Arrays.toString(ancestors.toArray()));
+                logger.debug("class {} hit rule {}, class diagrams: {}", classname, matchClassname,
+                        Arrays.toString(ancestors.toArray()));
             }
             context.setMatchClassname(matchClassname);
             modifiedClassVisitor = new ClassVisit(classVisitor, context);
-        } else if (enableAllHook && context.getClassLoader() != null) {
+        } else if (enableAllHook && !context.isBootstrapClassLoader()) {
             context.setMatchClassname(classname);
             modifiedClassVisitor = new ClassVisit(classVisitor, context);
         }
-
 
         return modifiedClassVisitor == null ? classVisitor : modifiedClassVisitor;
     }
@@ -83,6 +83,7 @@ public class DispatchClassPlugin implements DispatchPlugin {
     }
 
     public class ClassVisit extends AbstractClassVisitor {
+
         private final boolean isAppClass;
         private int classVersion;
 
@@ -98,28 +99,33 @@ public class DispatchClassPlugin implements DispatchPlugin {
         }
 
         @Override
-        public MethodVisitor visitMethod(final int access, final String name, final String desc, final String signature, final String[] exceptions) {
+        public MethodVisitor visitMethod(final int access, final String name, final String desc, final String signature,
+                final String[] exceptions) {
             MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
 
             if (!Modifier.isInterface(access) && !Modifier.isAbstract(access) && !"<clinit>".equals(name)) {
                 String iastMethodSignature = AsmUtils.buildSignature(context.getMatchClassname(), name, desc);
                 String framework = IastHookRuleModel.getFrameworkByMethodSignature(iastMethodSignature);
 
-                mv = context.isEnableAllHook() ? greedyAop(mv, access, name, desc, framework == null ? "none" : framework, iastMethodSignature) : (framework == null ? mv : lazyAop(mv, access, name, desc, framework, iastMethodSignature));
+                mv = context.isEnableAllHook() ? greedyAop(mv, access, name, desc,
+                        framework == null ? "none" : framework, iastMethodSignature)
+                        : (framework == null ? mv : lazyAop(mv, access, name, desc, framework, iastMethodSignature));
 
                 if (transformed && this.classVersion < 50) {
                     mv = new JSRInlinerAdapter(mv, access, name, desc, signature, exceptions);
                 }
 
                 if (transformed && logger.isDebugEnabled()) {
-                    logger.debug("rewrite method {} for listener[framework={},class={}]", iastMethodSignature, framework, context.getClassName());
+                    logger.debug("rewrite method {} for listener[framework={},class={}]", iastMethodSignature,
+                            framework, context.getClassName());
                 }
             }
             return mv;
         }
 
         @Override
-        public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
+        public void visit(int version, int access, String name, String signature, String superName,
+                String[] interfaces) {
             this.classVersion = version;
             super.visit(version, access, name, signature, superName, interfaces);
         }
@@ -135,7 +141,8 @@ public class DispatchClassPlugin implements DispatchPlugin {
          * @param signature 方法签名
          * @return 修改后的方法访问器
          */
-        private MethodVisitor greedyAop(MethodVisitor mv, int access, String name, String desc, String framework, String signature) {
+        private MethodVisitor greedyAop(MethodVisitor mv, int access, String name, String desc, String framework,
+                String signature) {
             if (null != framework) {
                 mv = new PropagateAdviceAdapter(mv, access, name, desc, context, framework, signature);
             } else if (isAppClass && Method.hook(access, name, desc, signature)) {
@@ -156,7 +163,8 @@ public class DispatchClassPlugin implements DispatchPlugin {
          * @param signature 方法签名
          * @return 修改后的方法访问器
          */
-        private MethodVisitor lazyAop(MethodVisitor mv, int access, String name, String desc, String framework, String signature) {
+        private MethodVisitor lazyAop(MethodVisitor mv, int access, String name, String desc, String framework,
+                String signature) {
             int hookValue = IastHookRuleModel.getRuleTypeValueByFramework(framework);
             if (HookType.PROPAGATOR.equals(hookValue)) {
                 mv = new PropagateAdviceAdapter(mv, access, name, desc, context, framework, signature);
