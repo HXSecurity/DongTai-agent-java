@@ -1,14 +1,18 @@
 package com.secnium.iast.agent;
 
-import com.secnium.iast.agent.manager.EngineManager;
-import org.apache.commons.cli.*;
-
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -39,7 +43,7 @@ public class Agent {
                 String attachArgs = null;
                 attachArgs = mode;
 
-                String jdkVersion = EngineManager.getJdkVersion();
+                String jdkVersion = getJdkVersion();
                 if ("1".equals(jdkVersion) && appendToolsPath()) {
                     AttachLauncher.attach(pid, attachArgs);
                     LogUtils.info("engine " + attachArgs + " successfully. pid: " + pid);
@@ -53,6 +57,23 @@ public class Agent {
         } catch (ParseException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * 判断jdk版本，根据jdk版本下载不同版本的java agent
+     *
+     * @return 1 - jdk 1.6~1.8；2 - jdk 1.9及以上
+     */
+    public static String getJdkVersion() {
+        String jdkVersion = System.getProperty("java.version", "1.8");
+        LogUtils.info("current jdk version is : " + jdkVersion);
+        String[] jdkVersionItem = jdkVersion.split("\\.");
+        boolean isHighJdk = true;
+        if (jdkVersionItem.length > 1 && ("6".equals(jdkVersionItem[1]) || "7".equals(jdkVersionItem[1]) || "8"
+                .equals(jdkVersionItem[1]))) {
+            isHighJdk = false;
+        }
+        return isHighJdk ? "2" : "1";
     }
 
     /**

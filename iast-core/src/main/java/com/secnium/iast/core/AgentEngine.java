@@ -16,7 +16,7 @@ import java.util.ListIterator;
  */
 public class AgentEngine {
 
-    private static Logger logger = LogUtils.getLogger(AgentEngine.class);
+    private static final Logger logger = LogUtils.getLogger(AgentEngine.class);
     private static AgentEngine instance;
 
     public long getStartUpTime() {

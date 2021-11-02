@@ -47,8 +47,6 @@ public class ReportConstant {
     public static final String SCA_PACKAGE_SIGNATURE = "packageSignature";
     public static final String SCA_PACKAGE_ALGORITHM = "packageAlgorithm";
 
-    public static final String COMMON_SERVER_NAME = "server_name";
-    public static final String COMMON_SERVER_PORT = "server_port";
     public static final String PROTOCOL = "protocol";
     public static final String SCHEME = "scheme";
     public static final String METHOD = "method";

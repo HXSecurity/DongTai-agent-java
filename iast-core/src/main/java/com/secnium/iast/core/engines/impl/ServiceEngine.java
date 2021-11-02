@@ -3,24 +3,20 @@ package com.secnium.iast.core.engines.impl;
 import com.secnium.iast.core.PropertyUtils;
 import com.secnium.iast.core.ServiceFactory;
 import com.secnium.iast.core.engines.IEngine;
-import org.slf4j.Logger;
 import com.secnium.iast.core.util.LogUtils;
-
 import java.lang.instrument.Instrumentation;
+import org.slf4j.Logger;
 
 /**
  * @author dongzhiyong@huoxian.cn
  */
 public class ServiceEngine implements IEngine {
+
     private final Logger logger = LogUtils.getLogger(getClass());
-    private PropertyUtils cfg;
-    private Instrumentation inst;
     private ServiceFactory serviceFactory;
 
     @Override
     public void init(PropertyUtils cfg, Instrumentation inst) {
-        this.cfg = cfg;
-        this.inst = inst;
         this.serviceFactory = ServiceFactory.getInstance();
         this.serviceFactory.init();
     }

@@ -1,5 +1,9 @@
 package com.secnium.iast.core.enhance;
 
+import static org.apache.commons.io.FileUtils.writeByteArrayToFile;
+import static org.objectweb.asm.ClassWriter.COMPUTE_FRAMES;
+import static org.objectweb.asm.ClassWriter.COMPUTE_MAXS;
+
 import com.secnium.iast.core.EngineManager;
 import com.secnium.iast.core.PropertyUtils;
 import com.secnium.iast.core.enhance.plugins.AbstractClassVisitor;
@@ -10,12 +14,6 @@ import com.secnium.iast.core.util.LogUtils;
 import com.secnium.iast.core.util.ObjectIDs;
 import com.secnium.iast.core.util.ThrowableUtils;
 import com.secnium.iast.core.util.matcher.ConfigMatcher;
-import org.apache.commons.lang3.time.StopWatch;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ClassWriter;
-import org.slf4j.Logger;
-
 import java.io.File;
 import java.io.IOException;
 import java.lang.instrument.ClassFileTransformer;
@@ -25,10 +23,11 @@ import java.security.ProtectionDomain;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-
-import static org.apache.commons.io.FileUtils.writeByteArrayToFile;
-import static org.objectweb.asm.ClassWriter.COMPUTE_FRAMES;
-import static org.objectweb.asm.ClassWriter.COMPUTE_MAXS;
+import org.apache.commons.lang3.time.StopWatch;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.ClassWriter;
+import org.slf4j.Logger;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -41,7 +40,6 @@ public class IastClassFileTransformer implements ClassFileTransformer {
     private final boolean isDumpClass;
     private final Instrumentation inst;
     private final String namespace;
-    private final int listenerId;
     private final PropertyUtils properties;
     private final PluginRegister PLUGINS = new PluginRegister();
     private final List<String> transformerClasses = new ArrayList<String>();
@@ -50,7 +48,6 @@ public class IastClassFileTransformer implements ClassFileTransformer {
     IastClassFileTransformer(Instrumentation inst) {
         this.logger = LogUtils.getLogger(getClass());
         this.inst = inst;
-        this.listenerId = ObjectIDs.instance.identity(EngineManager.getInstance());
         this.namespace = EngineManager.getNamespace();
         this.isDumpClass = EngineManager.isEnableDumpClass();
         this.properties = PropertyUtils.getInstance();
@@ -68,10 +65,10 @@ public class IastClassFileTransformer implements ClassFileTransformer {
      */
     @Override
     public byte[] transform(final ClassLoader loader,
-                            final String internalClassName,
-                            final Class<?> classBeingRedefined,
-                            final ProtectionDomain protectionDomain,
-                            final byte[] srcByteCodeArray) {
+            final String internalClassName,
+            final Class<?> classBeingRedefined,
+            final ProtectionDomain protectionDomain,
+            final byte[] srcByteCodeArray) {
         EngineManager.enterTransform();
         boolean isRunning = EngineManager.isLingzhiRunning();
         if (isRunning) {
@@ -107,20 +104,15 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                 final int flags = cr.getAccess();
 
                 final String[] interfaces = cr.getInterfaces();
-                int interfacesLength = interfaces.length;
-                for (int i = 0; i < interfacesLength; i++) {
-                    interfaces[i] = interfaces[i].replace("/",".");
-                }
-                final String superName = cr.getSuperName().replace("/",".");
-                final String className = cr.getClassName().replace("/",".");
+                final String superName = cr.getSuperName();
+                final String className = cr.getClassName();
                 COMMON_UTILS.setLoader(loader);
                 COMMON_UTILS.saveAncestors(className, superName, interfaces);
                 HashSet<String> ancestors = COMMON_UTILS.getAncestors(className, superName, interfaces);
 
                 final ClassWriter cw = createClassWriter(loader, cr);
-                ClassVisitor cv = PLUGINS.initial(cw, IastContext.build(className, className, ancestors, interfaces,
-                        superName, flags, sourceCodeBak, codeSource, loader, listenerId, namespace
-                ));
+                ClassVisitor cv = PLUGINS.initial(cw, IastContext.build(className, ancestors, interfaces,
+                        flags, loader == null, namespace));
 
                 if (cv instanceof AbstractClassVisitor) {
                     cr.accept(cv, ClassReader.EXPAND_FRAMES);
@@ -129,14 +121,16 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                         transformerClasses.add(internalClassName);
                         if (logger.isDebugEnabled() && null != clock) {
                             clock.stop();
-                            logger.debug("conversion class {} is successful, and it takes {}ms.", internalClassName, clock.getTime());
+                            logger.debug("conversion class {} is successful, and it takes {}ms.", internalClassName,
+                                    clock.getTime());
                         }
                         return dumpClassIfNecessary(cr.getClassName(), cw.toByteArray(), srcByteCodeArray);
                     }
                 } else {
                     if (logger.isDebugEnabled() && null != clock) {
                         clock.stop();
-                        logger.debug("failed to convert the class {}, and it takes {} ms", internalClassName, clock.getTime());
+                        logger.debug("failed to convert the class {}, and it takes {} ms", internalClassName,
+                                clock.getTime());
                     }
                 }
             }
@@ -159,7 +153,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
      * @return ClassWriter
      */
     private ClassWriter createClassWriter(final ClassLoader targetClassLoader,
-                                          final ClassReader cr) {
+            final ClassReader cr) {
         return new ClassWriter(cr, COMPUTE_FRAMES | COMPUTE_MAXS) {
 
             /*
@@ -251,7 +245,8 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                 inst.retransformClasses(waitingReTransformClass);
 
                 if (logger.isDebugEnabled()) {
-                    logger.debug("reTransform class {} success, index={};total={};", waitingReTransformClass, index - 1, total);
+                    logger.debug("reTransform class {} success, index={};total={};", waitingReTransformClass, index - 1,
+                            total);
                 }
             } catch (Throwable ignored) {
                 ErrorLogReport.sendErrorLog(ThrowableUtils.getStackTrace(ignored));
