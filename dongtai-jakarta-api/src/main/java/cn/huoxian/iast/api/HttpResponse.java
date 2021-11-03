@@ -75,13 +75,13 @@ public class HttpResponse {
                     if (responseBodyLength.equals(RESPONSE_BODY_LENGTH_DEFAULT)){
                         responseStr = new String(responseData, charSet);
                     }else {
-                        responseStr = new String(responseData, 0, responseBodyLength, charSet);
+                        responseStr = new String(responseData, RESPONSE_BODY_LENGTH_DEFAULT, responseBodyLength, charSet);
                     }
                 } catch (UnsupportedEncodingException e) {
                     if (responseBodyLength.equals(RESPONSE_BODY_LENGTH_DEFAULT)){
                         responseStr = new String(responseData);
                     }else {
-                        responseStr = new String(responseData, 0, responseBodyLength);
+                        responseStr = new String(responseData, RESPONSE_BODY_LENGTH_DEFAULT, responseBodyLength);
                     }
                 }
 
