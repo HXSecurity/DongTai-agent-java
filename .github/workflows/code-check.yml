@@ -157,8 +157,4 @@ jobs:
           access-key-secret: ${{ secrets.OSS_KEY_SECRET }}
       - run: |
           ossutil cp -rf release/iast-agent.jar oss://dongtai/agent_test/java/iast-agent.jar --meta x-oss-object-acl:public-read
-          ossutil cp -rf release/lib/iast-core.jar oss://dongtai/agent_test/java/iast-core.jar --meta x-oss-object-acl:public-read
-          ossutil cp -rf release/lib/iast-inject.jar oss://dongtai/agent_test/java/iast-inject.jar --meta x-oss-object-acl:public-read
-          ossutil cp -rf release/lib/dongtai-jakarta-api.jar oss://dongtai/agent_test/java/iast-jakarta-api.jar --meta x-oss-object-acl:public-read
-          ossutil cp -rf release/lib/dongtai-servlet-api.jar oss://dongtai/agent_test/java/iast-servlet-api.jar --meta x-oss-object-acl:public-read
-          ossutil cp -rf release/lib/dongtai-spring-api.jar oss://dongtai/agent_test/java/iast-spring-api.jar --meta x-oss-object-acl:public-read
+          ossutil cp -rf release/lib/ oss://dongtai/agent_test/java/ --meta x-oss-object-acl:public-read
