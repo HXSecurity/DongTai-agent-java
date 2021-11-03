@@ -91,7 +91,6 @@ public class GraphBuilder {
         report.put(ReportConstant.REPORT_KEY, ReportConstant.REPORT_VULN_SAAS_POOL);
         report.put(ReportConstant.REPORT_VALUE_KEY, detail);
 
-        detail.put(ReportConstant.LANGUAGE, ReportConstant.LANGUAGE_VALUE);
         detail.put(ReportConstant.AGENT_ID, AgentRegisterReport.getAgentFlag());
         detail.put(ReportConstant.PROTOCOL, requestMeta.get("protocol"));
         detail.put(ReportConstant.SCHEME, requestMeta.get("scheme"));
