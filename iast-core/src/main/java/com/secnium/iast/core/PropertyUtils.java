@@ -292,4 +292,13 @@ public class PropertyUtils {
         }
         return isAutoCreateProject;
     }
+
+
+    public String getProjectVersion() {
+        return System.getProperty("project.version", cfg.getProperty("project.version","V1.0"));
+    }
+
+    public Integer getResponseLength() {
+        return Integer.parseInt(System.getProperty("response.length", cfg.getProperty("response.length", "0")));
+    }
 }

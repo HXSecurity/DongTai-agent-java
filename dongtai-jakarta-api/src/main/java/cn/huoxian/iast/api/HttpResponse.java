@@ -8,6 +8,14 @@ import java.util.Map;
 
 public class HttpResponse {
 
+    private static final Integer RESPONSE_BODY_LENGTH_DEFAULT = 0;
+    private static Integer responseBodyLength;
+
+    public static Integer getResponseLength(Integer responseLength) {
+        responseBodyLength = responseLength;
+        return responseBodyLength;
+    }
+
     public static Map<String, Object> getResponse(Object res) {
         HttpServletResponse response = (HttpServletResponse) res;
         Map<String, Object> responseMeta = new HashMap<String, Object>(2);
@@ -64,14 +72,20 @@ public class HttpResponse {
                     }
                 }
                 try {
-                    responseStr = new String(responseData, charSet);
+                    if (responseBodyLength.equals(RESPONSE_BODY_LENGTH_DEFAULT)){
+                        responseStr = new String(responseData, charSet);
+                    }else {
+                        responseStr = new String(responseData, 0, responseBodyLength, charSet);
+                    }
                 } catch (UnsupportedEncodingException e) {
-                    responseStr = new String(responseData);
+                    if (responseBodyLength.equals(RESPONSE_BODY_LENGTH_DEFAULT)){
+                        responseStr = new String(responseData);
+                    }else {
+                        responseStr = new String(responseData, 0, responseBodyLength);
+                    }
                 }
 
-            } catch (Exception e) {
-
-            }
+            } catch (Exception ignored) {}
 
         }
         return responseStr;

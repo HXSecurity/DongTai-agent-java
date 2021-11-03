@@ -1,6 +1,7 @@
 package com.secnium.iast.core.handler.controller.impl;
 
 import com.secnium.iast.core.EngineManager;
+import com.secnium.iast.core.PropertyUtils;
 import com.secnium.iast.core.handler.IastClassLoader;
 import com.secnium.iast.core.handler.models.MethodEvent;
 import com.secnium.iast.core.util.HttpClientUtils;
@@ -126,6 +127,8 @@ public class HttpImpl {
         if (null == iastResponseMethod) {
             Class<?> proxyClass = iastClassLoader.loadClass("cn.huoxian.iast.api.HttpResponse");
             iastResponseMethod = proxyClass.getDeclaredMethod("getResponse", Object.class);
+            Method getOpenApi = proxyClass.getDeclaredMethod("getResponseLength", Integer.class);
+            getOpenApi.invoke(null, PropertyUtils.getInstance().getResponseLength());
         }
         return (Map<String, Object>) iastResponseMethod.invoke(null, response);
     }
