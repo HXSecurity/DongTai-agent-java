@@ -8,6 +8,8 @@ import com.secnium.iast.core.util.*;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryUsage;
+import java.lang.management.OperatingSystemMXBean;
+
 import org.json.JSONObject;
 import org.slf4j.Logger;
 
@@ -55,8 +57,8 @@ public class HeartBeatSender extends Thread {
      * @return CPU usage
      */
     public Integer getCpuInfo() {
-
-        return 13;
+        OperatingSystemMXBean osmxb = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
+        return (int) (osmxb.getSystemLoadAverage()*10);
     }
 
     /**
