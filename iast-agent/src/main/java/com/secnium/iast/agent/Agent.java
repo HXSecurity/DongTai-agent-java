@@ -12,7 +12,6 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -54,8 +53,10 @@ public class Agent {
             } else {
                 formatter.printHelp("java -jar agent.jar", attachOptions, true);
             }
-        } catch (ParseException e) {
-            e.printStackTrace();
+        } catch (Throwable t) {
+            LogUtils.error("Start DongTai Agent failed, exception stack trace: ");
+            t.printStackTrace();
+            System.exit(-1);
         }
     }
 
