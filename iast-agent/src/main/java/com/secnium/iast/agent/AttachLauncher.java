@@ -18,10 +18,8 @@ public class AttachLauncher {
         try {
             LogUtils.info("trying attach to process " + pid + ", agent address is " + AGENT_PATH);
             vmObj = VirtualMachine.attach(pid);
-            //attach连接上目标vm后，发送指令，让目标vm加载路径为 AGENT_PATH 的agent，可携带参数 token=xxxx
             vmObj.loadAgent(AGENT_PATH, "token=" + args);
             LogUtils.info("attach to process " + pid + " success.");
-            //attach方式主要是发送指令给目标vm执行加载agent的指令，完成后就可以detach了
             vmObj.detach();
         } catch (AttachNotSupportedException e) {
             LogUtils.error("attach failed, reason: Attach not support");
