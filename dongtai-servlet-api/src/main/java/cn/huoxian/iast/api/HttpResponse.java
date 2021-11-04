@@ -8,7 +8,6 @@ import javax.servlet.http.HttpServletResponse;
 
 public class HttpResponse {
 
-    private static final Integer RESPONSE_BODY_LENGTH_DEFAULT = 0;
     private static Integer responseBodyLength;
 
     public static void getResponseLength(Integer responseLength) {
