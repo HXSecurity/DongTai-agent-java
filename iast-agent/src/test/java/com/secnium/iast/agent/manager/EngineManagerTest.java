@@ -2,12 +2,13 @@ package com.secnium.iast.agent.manager;
 
 import com.secnium.iast.agent.Agent;
 import com.secnium.iast.agent.AttachLauncher;
-import org.junit.Test;
-
+import com.secnium.iast.agent.LogUtils;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
+import org.junit.Test;
 
 public class EngineManagerTest {
+
     @Test
     public void download() {
         String token = "a6573d3a-7054-4235-baca-8261b6da0fbd";
@@ -25,6 +26,13 @@ public class EngineManagerTest {
         String pid = runtimeMXBean.getName().split("@")[0];
         EngineManager engineManager = EngineManager.getInstance(null, "", runtimeMXBean.getName().split("@")[0]);
         Agent.appendToolsPath();
-        AttachLauncher.attach(pid, "");
+        try {
+            AttachLauncher.attach(pid, "");
+        } catch (Throwable e) {
+            LogUtils.error("Start DongTai Agent failed, exception stack trace: ");
+            e.printStackTrace();
+            System.exit(-1);
+        }
+
     }
 }

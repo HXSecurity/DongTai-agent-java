@@ -77,7 +77,6 @@ public class AgentLauncher {
             agentMonitorDaemonThread.setName("dongtai-monitor");
             agentMonitorDaemonThread.start();
         }
-        System.out.println("register shutdown hook");
         Runtime.getRuntime().addShutdownHook(new ShutdownThread());
     }
 }
