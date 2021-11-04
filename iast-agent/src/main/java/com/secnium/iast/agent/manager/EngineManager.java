@@ -277,7 +277,8 @@ public class EngineManager {
                 classOfEngine.getMethod("destroy", String.class, String.class, Instrumentation.class)
                         .invoke(null, launchMode, this.properties.getPropertiesFilePath(), inst);
                 Agent.appendToolsPath();
-                AttachLauncher.detach(ppid);
+                //no necessary to do detach here
+                // AttachLauncher.detach(ppid);
             }
         } catch (IllegalAccessException e) {
             e.printStackTrace();

@@ -20,6 +20,7 @@ public class AttachLauncher {
             vmObj = VirtualMachine.attach(pid);
             vmObj.loadAgent(AGENT_PATH, "token=" + args);
             LogUtils.info("attach to process " + pid + " success.");
+            vmObj.detach();
         } catch (AttachNotSupportedException e) {
             LogUtils.error("attach failed, reason: Attach not support");
         } catch (IOException e) {
