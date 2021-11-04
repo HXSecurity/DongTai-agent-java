@@ -299,6 +299,6 @@ public class PropertyUtils {
     }
 
     public Integer getResponseLength() {
-        return Integer.parseInt(System.getProperty("response.length", cfg.getProperty("response.length", "0")));
+        return Integer.parseInt(System.getProperty("response.length", cfg.getProperty("response.length")));
     }
 }

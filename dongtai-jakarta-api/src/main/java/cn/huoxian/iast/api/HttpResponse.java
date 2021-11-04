@@ -11,9 +11,8 @@ public class HttpResponse {
     private static final Integer RESPONSE_BODY_LENGTH_DEFAULT = 0;
     private static Integer responseBodyLength;
 
-    public static Integer getResponseLength(Integer responseLength) {
+    public static void getResponseLength(Integer responseLength) {
         responseBodyLength = responseLength;
-        return responseBodyLength;
     }
 
     public static Map<String, Object> getResponse(Object res) {
@@ -72,16 +71,16 @@ public class HttpResponse {
                     }
                 }
                 try {
-                    if (responseBodyLength.equals(RESPONSE_BODY_LENGTH_DEFAULT)){
+                    if (responseBodyLength == null){
                         responseStr = new String(responseData, charSet);
                     }else {
-                        responseStr = new String(responseData, RESPONSE_BODY_LENGTH_DEFAULT, responseBodyLength, charSet);
+                        responseStr = new String(responseData, 0, responseBodyLength, charSet);
                     }
                 } catch (UnsupportedEncodingException e) {
-                    if (responseBodyLength.equals(RESPONSE_BODY_LENGTH_DEFAULT)){
+                    if (responseBodyLength == null){
                         responseStr = new String(responseData);
                     }else {
-                        responseStr = new String(responseData, RESPONSE_BODY_LENGTH_DEFAULT, responseBodyLength);
+                        responseStr = new String(responseData, 0, responseBodyLength);
                     }
                 }
 
