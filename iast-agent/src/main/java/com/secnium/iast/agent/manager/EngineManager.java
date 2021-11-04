@@ -277,7 +277,10 @@ public class EngineManager {
                 classOfEngine.getMethod("destroy", String.class, String.class, Instrumentation.class)
                         .invoke(null, launchMode, this.properties.getPropertiesFilePath(), inst);
                 Agent.appendToolsPath();
-                AttachLauncher.detach(ppid);
+                // 此时的agent已经被加载进目标jvm里了，这个detach多余的，
+                // 如果想让启动时的jar执行detach，在它执行完loadAgent后，就可以detach了。
+                // 这里执行的detach 有点像新建了一个连接，没有执行任何操作就detach了
+                // AttachLauncher.detach(ppid);
             }
         } catch (IllegalAccessException e) {
             e.printStackTrace();
