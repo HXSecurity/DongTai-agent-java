@@ -76,6 +76,6 @@ public class ReportConstant {
     public static final String REPLAY_QUEUE = "replayQueue";
 
     public static final String AUTO_CREATE_PROJECT = "autoCreateProject";
-    public static final String AUTO_CREATE_PROJECT_VERSION = "createProjectVersion";
+    public static final String AUTO_CREATE_PROJECT_VERSION = "projectVersion";
     public static final String STARTUP_TIME = "startupTime";
 }
