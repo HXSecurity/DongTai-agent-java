@@ -3,14 +3,13 @@ package com.secnium.iast.core.enhance.plugins.hardcoded;
 import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.DispatchPlugin;
 import com.secnium.iast.core.util.AsmUtils;
+import com.secnium.iast.core.util.LogUtils;
 import com.secnium.iast.core.util.commonUtils;
+import java.lang.reflect.Modifier;
+import java.util.regex.Pattern;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.FieldVisitor;
 import org.slf4j.Logger;
-import com.secnium.iast.core.util.LogUtils;
-
-import java.lang.reflect.Modifier;
-import java.util.regex.Pattern;
 
 /**
  * 检测字节码中使用硬编码的转换类
@@ -18,6 +17,7 @@ import java.util.regex.Pattern;
  * @author dongzhiyong@huoxian.cn
  */
 public class DispatchHardcodedPlugin implements DispatchPlugin {
+
     private final Logger logger = LogUtils.getLogger(getClass());
 
     @Override
@@ -33,7 +33,6 @@ public class DispatchHardcodedPlugin implements DispatchPlugin {
 
     private class ExtractClassContent extends ClassVisitor {
 
-        // 额外字段
         private String source;
 
         public ExtractClassContent(ClassVisitor classVisitor) {
@@ -46,13 +45,13 @@ public class DispatchHardcodedPlugin implements DispatchPlugin {
             this.source = source;
         }
 
-        // 查看字段
         @Override
         public FieldVisitor visitField(int access, String name, String desc, String signature, Object value) {
             FieldVisitor fieldVisitor = super.visitField(access, name, desc, signature, value);
             if ("[B".equals(desc) && isKeysField(name)) {
                 logger.trace("Source is {}" + this.source);
-            } else if ("Ljava/lang/String;".equals(desc) && isStaticAndFinal(access) && isPassField(name) && !isWrongPrefix(name) && value instanceof String) {
+            } else if ("Ljava/lang/String;".equals(desc) && isStaticAndFinal(access) && isPassField(name)
+                    && !isWrongPrefix(name) && value instanceof String) {
                 String fieldName = (String) value;
                 if (!commonUtils.isEmpty(fieldName) && !valueMatcher(fieldName)) {
                     logger.trace("Source is " + this.source);
@@ -96,7 +95,8 @@ public class DispatchHardcodedPlugin implements DispatchPlugin {
 
         private final String[] keyArray = {"key", "aes", "des", "iv", "secret", "blowfish"};
         private final String[] passArray = {"password", "passkey", "passphrase", "secret"};
-        private final String[] notPrefixes = {"date", "forgot", "form", "encode", "pattern", "prefix", "prop", "suffix", "url"};
+        private final String[] notPrefixes = {"date", "forgot", "form", "encode", "pattern", "prefix", "prop", "suffix",
+                "url"};
 
     }
 }
