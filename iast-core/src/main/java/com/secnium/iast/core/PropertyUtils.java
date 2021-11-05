@@ -13,7 +13,6 @@ public class PropertyUtils {
     private static PropertyUtils instance;
     public Properties cfg = null;
     private String iastName;
-    private String iastVersion;
     private String iastResponseName;
     private String iastResponseValue;
     private String iastServerToken;
@@ -78,13 +77,6 @@ public class PropertyUtils {
         return iastName;
     }
 
-    public String getIastVersion() {
-        if (null == iastVersion) {
-            iastVersion = cfg.getProperty("iast.version");
-        }
-        return iastVersion;
-    }
-
     public String getIastResponseFlagName() {
         if (null == iastResponseName) {
             iastResponseName = cfg.getProperty("iast.response.name");
@@ -109,7 +101,6 @@ public class PropertyUtils {
     @Override
     public String toString() {
         return "[IastName=" + getIastName() +
-                ", IastVersion=" + getIastVersion() +
                 ", IastResponseName=" + getIastResponseFlagName() +
                 "，IastResponseVersion=" + getIastResponseFlagValue() +
                 "，IastServerUrl=" + getBaseUrl() +
