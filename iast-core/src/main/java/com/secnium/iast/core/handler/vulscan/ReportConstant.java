@@ -26,7 +26,7 @@ public class ReportConstant {
     public static final String AGENT_ID = "agentId";
     public static final String PROJECT_NAME = "projectName";
     public static final String AGENT_VERSION = "version";
-    public static final String AGENT_VERSION_VALUE = "v1.0.6";
+    public static final String AGENT_VERSION_VALUE = "v1.1.0";
     public static final String CONTAINER = "container";
 
     public static final String PID = "pid";
