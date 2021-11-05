@@ -3,12 +3,12 @@
   <parent>
     <artifactId>iast</artifactId>
     <groupId>com.secnium.iast</groupId>
-    <version>1.0.6</version>
+    <version>1.1.0</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>cn.huoxian.iast</groupId>
   <artifactId>dongtai-servlet-api</artifactId>
-  <version>1.0.6</version>
+  <version>1.1.0</version>
   <build>
     <finalName>dongtai-servlet-api</finalName>
     <plugins>
