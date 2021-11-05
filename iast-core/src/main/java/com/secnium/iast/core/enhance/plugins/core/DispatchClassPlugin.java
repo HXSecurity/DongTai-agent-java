@@ -14,7 +14,6 @@ import com.secnium.iast.core.handler.models.IastSinkModel;
 import com.secnium.iast.core.handler.vulscan.VulnType;
 import com.secnium.iast.core.util.AsmUtils;
 import com.secnium.iast.core.util.LogUtils;
-import com.secnium.iast.core.util.SandboxStringUtils;
 import com.secnium.iast.core.util.matcher.ConfigMatcher;
 import com.secnium.iast.core.util.matcher.Method;
 import java.lang.reflect.Modifier;
@@ -35,7 +34,7 @@ public class DispatchClassPlugin implements DispatchPlugin {
     private final Logger logger;
     private final boolean enableAllHook;
     private Set<String> ancestors;
-    private String classname;
+    private String className;
 
     public DispatchClassPlugin() {
         this.enableAllHook = PROPERTIES_UTILS.isEnableAllHook();
@@ -46,18 +45,18 @@ public class DispatchClassPlugin implements DispatchPlugin {
     public ClassVisitor dispatch(ClassVisitor classVisitor, IastContext context) {
         ClassVisit modifiedClassVisitor = null;
         ancestors = context.getAncestors();
-        classname = context.getClassName();
-        String matchClassname = isMatch();
+        className = context.getClassName();
+        String matchClassName = isMatch();
 
-        if (null != matchClassname) {
+        if (null != matchClassName) {
             if (logger.isDebugEnabled()) {
-                logger.debug("class {} hit rule {}, class diagrams: {}", classname, matchClassname,
+                logger.debug("class {} hit rule {}, class diagrams: {}", className, matchClassName,
                         Arrays.toString(ancestors.toArray()));
             }
-            context.setMatchClassname(matchClassname);
+            context.setMatchClassname(matchClassName);
             modifiedClassVisitor = new ClassVisit(classVisitor, context);
         } else if (enableAllHook && !context.isBootstrapClassLoader()) {
-            context.setMatchClassname(classname);
+            context.setMatchClassname(className);
             modifiedClassVisitor = new ClassVisit(classVisitor, context);
         }
 
@@ -66,20 +65,16 @@ public class DispatchClassPlugin implements DispatchPlugin {
 
     @Override
     public String isMatch() {
-        String javaClassname = SandboxStringUtils.toJavaClassName(classname);
-        if (IastHookRuleModel.classIsNeededHookByName(javaClassname)) {
-            return javaClassname;
+        if (IastHookRuleModel.classIsNeededHookByName(className)) {
+            return className;
         }
 
-        boolean supportsSuper = false;
-        for (String superClass : ancestors) {
-            javaClassname = SandboxStringUtils.toJavaClassName(superClass);
-            if (IastHookRuleModel.classIsNeededHookBySuperClassName(javaClassname)) {
-                supportsSuper = true;
-                break;
+        for (String superClassName : ancestors) {
+            if (IastHookRuleModel.classIsNeededHookBySuperClassName(superClassName)) {
+                return superClassName;
             }
         }
-        return supportsSuper ? javaClassname : null;
+        return null;
     }
 
     public class ClassVisit extends AbstractClassVisitor {
@@ -89,8 +84,8 @@ public class DispatchClassPlugin implements DispatchPlugin {
 
         ClassVisit(ClassVisitor classVisitor, IastContext context) {
             super(classVisitor, context);
-            String classname = context.getClassName();
-            this.isAppClass = ConfigMatcher.isAppClass(classname);
+            String className = context.getClassName();
+            this.isAppClass = ConfigMatcher.isAppClass(className);
         }
 
         @Override
@@ -146,7 +141,7 @@ public class DispatchClassPlugin implements DispatchPlugin {
             if (null != framework) {
                 mv = new PropagateAdviceAdapter(mv, access, name, desc, context, framework, signature);
             } else if (isAppClass && Method.hook(access, name, desc, signature)) {
-                mv = new PropagateAdviceAdapter(mv, access, name, desc, context, framework, signature);
+                mv = new PropagateAdviceAdapter(mv, access, name, desc, context, null, signature);
             }
             transformed = true;
             return mv;

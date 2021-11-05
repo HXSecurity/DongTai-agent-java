@@ -2,13 +2,13 @@ package com.secnium.iast.core.enhance.plugins;
 
 import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.api.spring.DispatchSpringApplication;
+import com.secnium.iast.core.enhance.plugins.autobinding.DispatchSpringAutoBinding;
 import com.secnium.iast.core.enhance.plugins.cookie.DispatchCookie;
 import com.secnium.iast.core.enhance.plugins.core.DispatchClassPlugin;
 import com.secnium.iast.core.enhance.plugins.framework.dubbo.DispatchDubbo;
 import com.secnium.iast.core.enhance.plugins.framework.j2ee.dispatch.DispatchJ2ee;
-import org.objectweb.asm.ClassVisitor;
-
 import java.util.ArrayList;
+import org.objectweb.asm.ClassVisitor;
 
 /**
  * @author dongzhiyong@huoxian.cn

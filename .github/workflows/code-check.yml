@@ -98,7 +98,7 @@ jobs:
           mysql -uroot -pyuhjnbGYUI -h127.0.0.1 -e 'show DATABASES;'
 
           echo "start catalina and waitting 30s..."
-          export JAVA_TOOL_OPTIONS="-Dproject.create=true"
+          export JAVA_TOOL_OPTIONS="-Dproject.create=true -Dproject.version=${{ github.event_name }}-${{ github.run_number }}"
           ./bin/startup.sh 2>/dev/null
           sleep 30
 
