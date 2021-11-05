@@ -56,7 +56,7 @@ public class ServletDispatcherAdapter extends AbstractClassVisitor {
         }
         if (transformed) {
             if (logger.isDebugEnabled()) {
-                logger.debug("rewrite method {}.{} for listener[match={}]", context.getClassName(), name, context.getMatchClassname());
+                logger.debug("rewrite method {}.{} for listener[match={}]", context.getClassName(), name, context.getMatchClassName());
             }
         }
 

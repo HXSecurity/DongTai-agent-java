@@ -28,7 +28,7 @@ public class DispatchJsp implements DispatchPlugin {
             if (logger.isDebugEnabled()) {
                 logger.debug("JspPage match class for {} from {}", context.getClassName(), matchClassname);
             }
-            context.setMatchClassname(matchClassname);
+            context.setMatchClassName(matchClassname);
             // JspPageAdapter
             classVisitor = new JspPageAdapter(classVisitor, context);
         }

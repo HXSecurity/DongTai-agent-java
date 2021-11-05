@@ -53,10 +53,10 @@ public class DispatchClassPlugin implements DispatchPlugin {
                 logger.debug("class {} hit rule {}, class diagrams: {}", className, matchClassName,
                         Arrays.toString(ancestors.toArray()));
             }
-            context.setMatchClassname(matchClassName);
+            context.setMatchClassName(matchClassName);
             modifiedClassVisitor = new ClassVisit(classVisitor, context);
         } else if (enableAllHook && !context.isBootstrapClassLoader()) {
-            context.setMatchClassname(className);
+            context.setMatchClassName(className);
             modifiedClassVisitor = new ClassVisit(classVisitor, context);
         }
 
@@ -99,7 +99,7 @@ public class DispatchClassPlugin implements DispatchPlugin {
             MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
 
             if (!Modifier.isInterface(access) && !Modifier.isAbstract(access) && !"<clinit>".equals(name)) {
-                String iastMethodSignature = AsmUtils.buildSignature(context.getMatchClassname(), name, desc);
+                String iastMethodSignature = AsmUtils.buildSignature(context.getMatchClassName(), name, desc);
                 String framework = IastHookRuleModel.getFrameworkByMethodSignature(iastMethodSignature);
 
                 mv = context.isEnableAllHook() ? greedyAop(mv, access, name, desc,

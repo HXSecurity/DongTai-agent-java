@@ -160,7 +160,7 @@ public class IastClassAncestorQuery {
             } catch (Exception e) {
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("type", "scan class for family");
-                jsonObject.put("classname", currentClass);
+                jsonObject.put("className", currentClass);
                 jsonObject.put("msg", ThrowableUtils.getStackTrace(e));
                 ErrorLogReport.sendErrorLog(jsonObject.toString());
             }

@@ -28,7 +28,7 @@ public class DispatchCookie implements DispatchPlugin {
             if (logger.isDebugEnabled()) {
                 logger.debug("Cookie match class for {} from {}", classname, matchClassname);
             }
-            context.setMatchClassname(matchClassname);
+            context.setMatchClassName(matchClassname);
             classVisitor = new CookieAdapter(classVisitor, context);
         }
         return classVisitor;

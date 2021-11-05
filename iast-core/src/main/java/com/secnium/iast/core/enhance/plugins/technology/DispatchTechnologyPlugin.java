@@ -73,7 +73,7 @@ final public class DispatchTechnologyPlugin implements DispatchPlugin {
         String matchClassName = isMatch();
         if (matchClassName != null) {
             logger.debug("current class {} hit rule \"Technology\"", classname);
-            context.setMatchClassname(matchClassName);
+            context.setMatchClassName(matchClassName);
             classVisitor = new ClassVisit(classVisitor, context, this.technologyMap.get(matchClassName));
         }
         return classVisitor;

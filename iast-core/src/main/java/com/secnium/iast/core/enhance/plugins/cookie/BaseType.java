@@ -31,13 +31,13 @@ public class BaseType extends AbstractClassVisitor {
     public MethodVisitor visitMethod(final int access, final String name, final String desc, final String signature, final String[] exceptions) {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
 
-        if (match(name, context.getMatchClassname())) {
-            String iastMethodSignature = AsmUtils.buildSignature(context.getMatchClassname(), name, desc);
+        if (match(name, context.getMatchClassName())) {
+            String iastMethodSignature = AsmUtils.buildSignature(context.getMatchClassName(), name, desc);
             String framework = "refType";
             mv = new PropagateAdviceAdapter(mv, access, name, desc, context, framework, iastMethodSignature);
             transformed = true;
             if (logger.isDebugEnabled()) {
-                logger.debug("rewrite method {} for listener[match={},class={}]", iastMethodSignature, context.getMatchClassname(), context.getClassName());
+                logger.debug("rewrite method {} for listener[match={},class={}]", iastMethodSignature, context.getMatchClassName(), context.getClassName());
             }
         }
         return mv;
