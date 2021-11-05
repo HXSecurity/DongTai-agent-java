@@ -151,12 +151,12 @@ public class SpringApplicationContext {
                 parameterjson.put("type", parameter.get("type"));
                 parameterjson.put("annotation", parameter.get("annotation"));
             }
-            api.put("return_type", apiDataModel.getReturnType());
+            api.put("returnType", apiDataModel.getReturnType());
             api.put("file", apiDataModel.getFile());
             api.put("controller", apiDataModel.getController());
             api.put("description", apiDataModel.getDescription());
         }
-        apiDataReport.put("api_data", apiData);
+        apiDataReport.put("apiData", apiData);
         return apiDataReport;
     }
 
