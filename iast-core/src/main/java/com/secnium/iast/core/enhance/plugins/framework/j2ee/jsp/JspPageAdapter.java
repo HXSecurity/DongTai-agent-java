@@ -31,7 +31,7 @@ public class JspPageAdapter extends AbstractClassVisitor {
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
         if ("_jspService".equals(name)) {
-            String iastMethodSignature = AsmUtils.buildSignature(context.getMatchClassname(), name, desc);
+            String iastMethodSignature = AsmUtils.buildSignature(context.getMatchClassName(), name, desc);
             mv = new JspAdviceAdapter(mv, access, name, desc, iastMethodSignature, context);
             transformed = true;
         }

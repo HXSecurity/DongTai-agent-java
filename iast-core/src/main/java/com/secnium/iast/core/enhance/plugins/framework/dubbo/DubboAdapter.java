@@ -37,7 +37,7 @@ public class DubboAdapter extends AbstractClassVisitor {
         }
         if (transformed) {
             if (logger.isDebugEnabled()) {
-                logger.debug("rewrite method {}.{} for listener[match={}]", context.getClassName(), name, context.getMatchClassname());
+                logger.debug("rewrite method {}.{} for listener[match={}]", context.getClassName(), name, context.getMatchClassName());
             }
         }
         return mv;

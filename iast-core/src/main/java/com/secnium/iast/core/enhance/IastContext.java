@@ -10,7 +10,7 @@ public class IastContext {
 
     private static volatile IastContext instance;
     private String className;
-    private String matchClassname;
+    private String matchClassName;
     private Set<String> ancestors;
     private String[] interfaces;
     private int flags;
@@ -54,8 +54,8 @@ public class IastContext {
 
     public void setAncestor(Set<String> ancestors) {
         Set<String> copyedAncestors = new HashSet<String>();
-        for (String classname : ancestors) {
-            copyedAncestors.add(classname.replace('/', '.'));
+        for (String className : ancestors) {
+            copyedAncestors.add(className.replace('/', '.'));
         }
         this.ancestors = copyedAncestors;
     }
@@ -95,12 +95,12 @@ public class IastContext {
         return namespace;
     }
 
-    public String getMatchClassname() {
-        return matchClassname;
+    public String getMatchClassName() {
+        return matchClassName;
     }
 
-    public void setMatchClassname(String matchClassname) {
-        this.matchClassname = matchClassname;
+    public void setMatchClassName(String matchClassName) {
+        this.matchClassName = matchClassName;
     }
 
     public String[] getInterfaces() {

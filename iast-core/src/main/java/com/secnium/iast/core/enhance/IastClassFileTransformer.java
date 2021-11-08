@@ -248,8 +248,8 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                     logger.debug("reTransform class {} success, index={};total={};", waitingReTransformClass, index - 1,
                             total);
                 }
-            } catch (Throwable ignored) {
-                ErrorLogReport.sendErrorLog(ThrowableUtils.getStackTrace(ignored));
+            } catch (Throwable t) {
+                ErrorLogReport.sendErrorLog(ThrowableUtils.getStackTrace(t));
             }
         }
     }

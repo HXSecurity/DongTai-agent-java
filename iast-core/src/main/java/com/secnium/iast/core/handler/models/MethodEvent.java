@@ -254,7 +254,7 @@ public class MethodEvent {
         } catch (Exception convertObjectToStringError) {
             ErrorLogReport.sendErrorLog(ThrowableUtils.getStackTrace(convertObjectToStringError));
         }
-        return sb.toString();
+        return sb.toString().trim();
     }
 
     public JSONObject toReport() {
