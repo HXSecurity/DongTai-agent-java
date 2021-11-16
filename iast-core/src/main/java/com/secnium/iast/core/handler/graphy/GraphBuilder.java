@@ -6,7 +6,7 @@ import com.secnium.iast.core.enhance.IastClassAncestorQuery;
 import com.secnium.iast.core.handler.controller.impl.HttpImpl;
 import com.secnium.iast.core.handler.models.MethodEvent;
 import com.secnium.iast.core.handler.vulscan.ReportConstant;
-import com.secnium.iast.core.report.AgentRegisterReport;
+import com.secnium.iast.core.util.Constants;
 import com.secnium.iast.core.util.LogUtils;
 import com.secnium.iast.core.util.base64.Base64Encoder;
 import org.json.JSONArray;
@@ -91,7 +91,7 @@ public class GraphBuilder {
         report.put(ReportConstant.REPORT_KEY, ReportConstant.REPORT_VULN_SAAS_POOL);
         report.put(ReportConstant.REPORT_VALUE_KEY, detail);
 
-        detail.put(ReportConstant.AGENT_ID, AgentRegisterReport.getAgentFlag());
+        detail.put(ReportConstant.AGENT_ID, Constants.AGENT_ID);
         detail.put(ReportConstant.PROTOCOL, requestMeta.get("protocol"));
         detail.put(ReportConstant.SCHEME, requestMeta.get("scheme"));
         detail.put(ReportConstant.METHOD, requestMeta.get("method"));

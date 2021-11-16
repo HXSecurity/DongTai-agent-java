@@ -1,4 +1,4 @@
-package com.secnium.iast.agent;
+package com.secnium.iast.agent.util;
 
 import java.util.Properties;
 

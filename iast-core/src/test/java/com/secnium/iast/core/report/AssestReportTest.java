@@ -5,7 +5,7 @@ import org.junit.Test;
 
 public class AssestReportTest {
 
-    @Test
+    /*@Test
     public void send() {
         try {
             PropertyUtils.getInstance("～/.iast/config/iast.properties");
@@ -23,5 +23,5 @@ public class AssestReportTest {
             System.err.println("-->AssestReportTest error  " + e.getStackTrace());
         }
 
-    }
+    }*/
 }

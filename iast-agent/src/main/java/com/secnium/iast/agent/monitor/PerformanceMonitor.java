@@ -1,9 +1,9 @@
 package com.secnium.iast.agent.monitor;
 
-import com.secnium.iast.agent.AgentRegister;
+import com.secnium.iast.agent.util.LogUtils;
 import com.secnium.iast.agent.IastProperties;
-import com.secnium.iast.agent.LogUtils;
 import com.secnium.iast.agent.manager.EngineManager;
+import com.secnium.iast.agent.report.AgentRegisterReport;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import oshi.SystemInfo;
@@ -27,8 +27,9 @@ public class PerformanceMonitor implements IMonitor {
     private final static IastProperties PROPERTIES = IastProperties.getInstance();
     private final static String TOKEN = PROPERTIES.getIastServerToken();
     private final static String START_URL = PROPERTIES.getBaseUrl() + "/api/v1/agent/limit";
-    private final static String AGENT_TOKEN = URLEncoder.encode(AgentRegister.getAgentToken());
+    private final static String AGENT_TOKEN = URLEncoder.encode(AgentRegisterReport.getAgentToken());
     private static Integer AGENT_THRESHOLD_VALUE;
+    private static Integer CPU_USAGE = 0;
 
     private final EngineManager engineManager;
 
@@ -42,7 +43,11 @@ public class PerformanceMonitor implements IMonitor {
         return free / max;
     }
 
-    public Integer getCpuUsedRate() {
+    public static Integer getCpuUsage(){
+        return CPU_USAGE;
+    }
+
+    public Integer cpuUsedRate() {
         SystemInfo systemInfo = new SystemInfo();
         CentralProcessor processor = systemInfo.getHardware().getProcessor();
         long[] prevTicks = processor.getSystemCpuLoadTicks();
@@ -60,8 +65,8 @@ public class PerformanceMonitor implements IMonitor {
         long iowait = ticks[CentralProcessor.TickType.IOWAIT.getIndex()] - prevTicks[CentralProcessor.TickType.IOWAIT.getIndex()];
         long idle = ticks[CentralProcessor.TickType.IDLE.getIndex()] - prevTicks[CentralProcessor.TickType.IDLE.getIndex()];
         long totalCpu = user + nice + cSys + idle + iowait + irq + softirq + steal;
-        double rate = (1.0 - (idle * 1.0 / totalCpu)) * 100;
-        return (int) rate;
+        CPU_USAGE = (int)((1.0 - (idle * 1.0 / totalCpu)) * 100);
+        return CPU_USAGE;
     }
 
     public static Integer checkThresholdValue() {
@@ -110,7 +115,7 @@ public class PerformanceMonitor implements IMonitor {
     @Override
     public void check() {
         PerformanceMonitor.AGENT_THRESHOLD_VALUE = PerformanceMonitor.checkThresholdValue();
-        int UsedRate = getCpuUsedRate();
+        int UsedRate = cpuUsedRate();
         int preStatus = this.engineManager.getRunningStatus();
         if (isStart(UsedRate, preStatus)) {
             this.engineManager.start();

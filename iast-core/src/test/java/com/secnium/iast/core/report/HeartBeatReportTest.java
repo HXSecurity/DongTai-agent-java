@@ -27,7 +27,7 @@ public class HeartBeatReportTest {
     public void testSend() throws Exception {
         try {
             PropertyUtils.getInstance("/tmp/config/iast.properties");
-            AgentRegisterReport.send();
+//            AgentRegisterReport.send();
 
             ReportSender report1 = new ReportSender();
             report1.send();

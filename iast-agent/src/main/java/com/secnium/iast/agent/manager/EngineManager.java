@@ -1,11 +1,10 @@
 package com.secnium.iast.agent.manager;
 
-import com.secnium.iast.agent.Agent;
-import com.secnium.iast.agent.AttachLauncher;
-import com.secnium.iast.agent.IastClassLoader;
-import com.secnium.iast.agent.IastProperties;
-import com.secnium.iast.agent.LogUtils;
-import com.secnium.iast.agent.UpdateUtils;
+import com.secnium.iast.agent.*;
+import com.secnium.iast.agent.report.AgentRegisterReport;
+import com.secnium.iast.agent.util.LogUtils;
+import com.secnium.iast.agent.util.http.HttpClientUtils;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -40,7 +39,6 @@ public class EngineManager {
     private final IastProperties properties;
     private final String launchMode;
     private Class<?> classOfEngine;
-    private final String ppid;
 
     /**
      * 获取IAST引擎的启动状态
@@ -89,7 +87,6 @@ public class EngineManager {
         this.runningStatus = 0;
         this.launchMode = launchMode;
         this.properties = IastProperties.getInstance();
-        this.ppid = ppid;
     }
 
     /**
@@ -97,7 +94,7 @@ public class EngineManager {
      *
      * @return engine包的本地保存路径
      */
-    public static String getEnginePackageCachePath() {
+    private static String getEnginePackageCachePath() {
         return System.getProperty("java.io.tmpdir") + File.separator + "iast-core.jar";
     }
 
@@ -106,7 +103,7 @@ public class EngineManager {
      *
      * @return inject包的本地路径
      */
-    public static String getInjectPackageCachePath() {
+    private static String getInjectPackageCachePath() {
         return System.getProperty("java.io.tmpdir") + File.separator + "iast-inject.jar";
     }
 
@@ -121,7 +118,7 @@ public class EngineManager {
         boolean status = false;
         try {
             URL url = new URL(fileUrl);
-            Proxy proxy = UpdateUtils.loadProxy();
+            Proxy proxy = HttpClientUtils.loadProxy();
             HttpURLConnection connection = proxy == null ? (HttpURLConnection) url.openConnection()
                     : (HttpURLConnection) url.openConnection(proxy);
 
@@ -180,8 +177,8 @@ public class EngineManager {
                 iastClassLoader = loadOrDefineClassLoader(EngineManager.getEnginePackageCachePath());
             }
             classOfEngine = iastClassLoader.loadClass(ENGINE_ENTRYPOINT_CLASS);
-            classOfEngine.getMethod("install", String.class, String.class, Instrumentation.class)
-                    .invoke(null, launchMode, this.properties.getPropertiesFilePath(), inst);
+            classOfEngine.getMethod("install", String.class, String.class, Integer.class, Instrumentation.class)
+                    .invoke(null, launchMode, this.properties.getPropertiesFilePath(), AgentRegisterReport.getAgentFlag(), inst);
             return true;
         } catch (IOException e) {
             LogUtils.error("DongTai engine start failed, please contact staff for help.");

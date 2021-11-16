@@ -4,7 +4,6 @@ import com.secnium.iast.core.handler.models.IastReplayModel;
 import com.secnium.iast.core.handler.models.MethodEvent;
 import com.secnium.iast.core.middlewarerecognition.IastServer;
 import com.secnium.iast.core.middlewarerecognition.ServerDetect;
-import com.secnium.iast.core.report.AgentRegisterReport;
 import com.secnium.iast.core.threadlocalpool.BooleanTheadLocal;
 import com.secnium.iast.core.threadlocalpool.IastScopeTracker;
 import com.secnium.iast.core.threadlocalpool.IastServerPort;
@@ -271,7 +270,8 @@ public class EngineManager {
                     (Integer) requestMeta.get("serverPort"),
                     true
             );
-            AgentRegisterReport.send();
+            // todo: server addr and port
+//            AgentRegisterReport.send();
         }
         ENTER_HTTP_ENTRYPOINT.enterHttpEntryPoint();
         REQUEST_CONTEXT.set(requestMeta);
