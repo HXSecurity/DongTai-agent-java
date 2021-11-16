@@ -7,7 +7,6 @@ import com.secnium.iast.agent.report.AgentRegisterReport;
 import com.secnium.iast.agent.util.LogUtils;
 
 import java.lang.instrument.Instrumentation;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -27,7 +26,6 @@ public class AgentLauncher {
     public static void premain(String args, Instrumentation inst) {
         LAUNCH_MODE = LAUNCH_MODE_AGENT;
         try {
-            TimeUnit.SECONDS.sleep(10);
             Agent.appendToolsPath();
             install(inst);
         } catch (Exception e) {
@@ -47,7 +45,12 @@ public class AgentLauncher {
             uninstall();
         } else {
             LAUNCH_MODE = LAUNCH_MODE_ATTACH;
-            install(inst);
+            try {
+                Agent.appendToolsPath();
+                install(inst);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
