@@ -2,7 +2,6 @@ package com.secnium.iast.core.report;
 
 import com.secnium.iast.core.EngineManager;
 import com.secnium.iast.core.handler.vulscan.ReportConstant;
-import com.secnium.iast.core.util.Constants;
 import org.json.JSONObject;
 
 import java.util.Map;
@@ -24,7 +23,7 @@ public class ApiReport {
         JSONObject detail = new JSONObject();
         report.put(ReportConstant.REPORT_KEY, ReportConstant.REPORT_API);
         report.put(ReportConstant.REPORT_VALUE_KEY, detail);
-        detail.put(ReportConstant.AGENT_ID, Constants.AGENT_ID);
+        detail.put(ReportConstant.AGENT_ID, EngineManager.getAgentId());
         JSONObject apiListJson = new JSONObject(apiList);
         detail.put(ReportConstant.API_DATA, apiListJson.get(ReportConstant.API_DATA));
         return report.toString();

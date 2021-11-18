@@ -24,7 +24,7 @@ public class AgentQueueReport extends AbstractThread {
         JSONObject detail = new JSONObject();
         report.put(ReportConstant.REPORT_KEY, ReportConstant.REPORT_HEART_BEAT);
         report.put(ReportConstant.REPORT_VALUE_KEY, detail);
-        detail.put(ReportConstant.AGENT_ID, Constants.AGENT_ID);
+        detail.put(ReportConstant.AGENT_ID, EngineManager.getAgentId());
         detail.put(ReportConstant.REQ_COUNT, EngineManager.getRequestCount());
         detail.put(ReportConstant.REPORT_QUEUE, EngineManager.getReportQueueSize());
         detail.put(ReportConstant.METHOD_QUEUE, EngineManager.getMethodReportQueueSize());

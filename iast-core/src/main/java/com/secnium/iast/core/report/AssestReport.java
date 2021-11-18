@@ -2,7 +2,6 @@ package com.secnium.iast.core.report;
 
 import com.secnium.iast.core.EngineManager;
 import com.secnium.iast.core.handler.vulscan.ReportConstant;
-import com.secnium.iast.core.util.Constants;
 import org.json.JSONObject;
 
 
@@ -24,7 +23,7 @@ public class AssestReport {
         report.put(ReportConstant.REPORT_KEY, ReportConstant.REPORT_SCA);
         report.put(ReportConstant.REPORT_VALUE_KEY, detail);
 
-        detail.put(ReportConstant.AGENT_ID, Constants.AGENT_ID);
+        detail.put(ReportConstant.AGENT_ID, EngineManager.getAgentId());
         detail.put(ReportConstant.SCA_PACKAGE_PATH, packagePath);
         detail.put(ReportConstant.SCA_PACKAGE_NAME, packageName);
         detail.put(ReportConstant.SCA_PACKAGE_SIGNATURE, signature);

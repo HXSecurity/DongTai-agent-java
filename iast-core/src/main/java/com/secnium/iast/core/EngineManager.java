@@ -29,6 +29,7 @@ public class EngineManager {
     private static final Logger logger = LogUtils.getLogger(EngineManager.class);
     private static EngineManager instance;
     private final PropertyUtils cfg;
+    public static Integer AGENT_ID;
 
     private static final BooleanTheadLocal AGENT_STATUS = new BooleanTheadLocal(false);
     private static final BooleanTheadLocal TRANSFORM_STATE = new BooleanTheadLocal(false);
@@ -261,6 +262,14 @@ public class EngineManager {
 
     public static boolean isEnableDumpClass() {
         return instance.cfg.isEnableDumpClass();
+    }
+
+    public static Integer getAgentId() {
+        return AGENT_ID;
+    }
+
+    public static void setAgentId(Integer agentId) {
+        AGENT_ID = agentId;
     }
 
     public static void enterHttpEntry(Map<String, Object> requestMeta) {
