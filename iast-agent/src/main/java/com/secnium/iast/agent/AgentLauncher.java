@@ -87,7 +87,7 @@ public class AgentLauncher {
 
     private static void loadEngine(final Instrumentation inst) {
         EngineManager engineManager = EngineManager
-                .getInstance(inst, LAUNCH_MODE, Constant.PID);
+                .getInstance(inst, LAUNCH_MODE, EngineManager.getPID());
         MonitorDaemonThread daemonThread = new MonitorDaemonThread(engineManager);
         Thread agentMonitorDaemonThread = new Thread(daemonThread);
         if (EngineMonitor.isCoreRegisterStart){

@@ -24,11 +24,8 @@ public class HeartBeatReport {
         detail.put(Constant.KEY_AGENT_ID, AgentRegisterReport.getAgentFlag());
         detail.put(Constant.KEY_MEMORY, getMemInfo());
         detail.put(Constant.KEY_CPU, readCpuInfo());
+        detail.put(Constant.KEY_DISK,getDiskInfo());
         detail.put(Constant.KEY_RETURN_QUEUE, 0);
-//        detail.put(Constant.KEY_REQ_COUNT, 0);
-//        detail.put(Constant.KEY_REPORT_QUEUE, 0);
-//        detail.put(Constant.KEY_METHOD_QUEUE, 0);
-//        detail.put(Constant.KEY_REPLAY_QUEUE, 0);
 
         return report.toString();
     }

@@ -2,6 +2,7 @@ package com.secnium.iast.agent.report;
 
 import com.secnium.iast.agent.Constant;
 import com.secnium.iast.agent.IastProperties;
+import com.secnium.iast.agent.manager.EngineManager;
 import com.secnium.iast.agent.middlewarerecognition.IServer;
 import com.secnium.iast.agent.middlewarerecognition.ServerDetect;
 import com.secnium.iast.agent.util.http.HttpClientUtils;
@@ -35,7 +36,7 @@ public class AgentRegisterReport {
         object.put(Constant.KEY_AGENT_TOKEN, AgentRegisterReport.getAgentToken());
         object.put(Constant.KEY_AGENT_VERSION, Constant.AGENT_VERSION_VALUE);
         object.put(Constant.KEY_PROJECT_NAME, getProjectName());
-        object.put(Constant.KEY_PID, Constant.PID);
+        object.put(Constant.KEY_PID, EngineManager.getPID());
         object.put(Constant.KEY_HOSTNAME, AgentRegisterReport.getInternalHostName());
         object.put(Constant.KEY_LANGUAGE, Constant.LANGUAGE);
         object.put(Constant.KEY_NETWORK, readIpInfo());

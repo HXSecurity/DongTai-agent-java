@@ -13,8 +13,6 @@ public class Constant {
     public final static String API_REPORT_UPLOAD = "/api/v1/report/upload";
     public final static String API_ENGINE_ACTION = "/api/v1/engine/action";
 
-    public static final String PID = ManagementFactory.getRuntimeMXBean().getName().split("@")[0];
-
     public static final String KEY_NETWORK = "network";
     public static final String KEY_AGENT_VERSION = "version";
     public static final String KEY_PID = "pid";

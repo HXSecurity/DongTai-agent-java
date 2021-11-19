@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.instrument.Instrumentation;
+import java.lang.management.ManagementFactory;
 import java.lang.reflect.InvocationTargetException;
 import java.net.HttpURLConnection;
 import java.net.Proxy;
@@ -33,6 +34,7 @@ public class EngineManager {
     private static final String ENGINE_PACKAGE_REMOTE_URI = "/api/v1/engine/download?engineName=iast-core";
     private static final Map<String, IastClassLoader> IAST_CLASS_LOADER_CACHE = new ConcurrentHashMap<String, IastClassLoader>();
     private static EngineManager INSTANCE;
+    private static String PID;
 
     private final Instrumentation inst;
     private int runningStatus;
@@ -335,5 +337,12 @@ public class EngineManager {
         } else {
             return true;
         }
+    }
+
+    public static String getPID() {
+        if (PID == null){
+            PID = ManagementFactory.getRuntimeMXBean().getName().split("@")[0];
+        }
+        return PID;
     }
 }
