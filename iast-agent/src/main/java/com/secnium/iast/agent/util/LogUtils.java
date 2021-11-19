@@ -1,4 +1,4 @@
-package com.secnium.iast.agent;
+package com.secnium.iast.agent.util;
 
 
 public class LogUtils {

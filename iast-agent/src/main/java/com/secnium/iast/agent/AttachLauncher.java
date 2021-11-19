@@ -1,5 +1,7 @@
 package com.secnium.iast.agent;
 
+import com.secnium.iast.agent.util.JavaVersionUtils;
+import com.secnium.iast.agent.util.LogUtils;
 import com.sun.tools.attach.AttachNotSupportedException;
 import com.sun.tools.attach.VirtualMachine;
 import java.io.IOException;

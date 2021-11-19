@@ -46,6 +46,12 @@
             <artifactId>oshi-core</artifactId>
             <version>${oshi-core.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${commons-io.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

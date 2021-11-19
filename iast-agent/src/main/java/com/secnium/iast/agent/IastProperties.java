@@ -1,5 +1,7 @@
 package com.secnium.iast.agent;
 
+import com.secnium.iast.agent.util.LogUtils;
+
 import java.io.*;
 import java.net.URLDecoder;
 import java.util.Properties;
@@ -8,20 +10,24 @@ import java.util.Properties;
  * @author dongzhiyong@huoxian.cn
  */
 public class IastProperties {
-
     private static IastProperties instance;
     public Properties cfg = new Properties();
     private String iastServerToken;
     private String serverUrl;
+    private String engineName;
+    private String projectName;
     private String proxyEnableStatus;
     private String proxyHost;
     private int proxyPort = -1;
-    private int delayTime = -1;
+    private Integer isAutoCreateProject;
 
-    /**
-     * 属性文件路径
-     */
     private String propertiesFilePath;
+
+    public static IastProperties getInstance() {
+        if (null == instance) {
+            instance = new IastProperties(null);
+        }
+        return instance;    }
 
     private IastProperties(String path) {
         try {
@@ -30,85 +36,6 @@ public class IastProperties {
         }
     }
 
-    public static IastProperties getInstance() {
-        if (null == instance) {
-            instance = new IastProperties(null);
-        }
-        return instance;
-    }
-
-    public static IastProperties getInstance(String path) {
-        if (null == instance) {
-            instance = new IastProperties(path);
-        }
-        return instance;
-    }
-
-    public String getIastServerToken() {
-        if (null == iastServerToken) {
-            if (null != cfg) {
-                iastServerToken = cfg.getProperty("iast.server.token", "88d2f0096662335d42580cbd03d8ddea745fdfab");
-            } else {
-                iastServerToken = "88d2f0096662335d42580cbd03d8ddea745fdfab";
-            }
-        }
-        return iastServerToken;
-    }
-
-    public String getBaseUrl() {
-        if (null == serverUrl) {
-            serverUrl = System.getProperty("iast.server.url", cfg.getProperty("iast.server.url"));
-        }
-        return serverUrl;
-    }
-
-    public String getPropertiesFilePath() {
-        return propertiesFilePath;
-    }
-
-    public String getEngineStatus() {
-        return cfg.getProperty("engine.status");
-    }
-
-    public String getEngineName() {
-        return cfg.getProperty("engine.name");
-    }
-
-    private String getProxyEnableStatus() {
-        if (null == proxyEnableStatus) {
-            proxyEnableStatus = System.getProperty("iast.proxy.enable", cfg.getProperty("iast.proxy.enable", "false"));
-        }
-        return proxyEnableStatus;
-    }
-
-    public boolean isProxyEnable() {
-        return "true".equalsIgnoreCase(getProxyEnableStatus());
-    }
-
-    public String getProxyHost() {
-        if (null == proxyHost) {
-            proxyHost = System.getProperty("iast.proxy.host", cfg.getProperty("iast.proxy.host", "false"));
-        }
-        return proxyHost;
-    }
-
-    public int getProxyPort() {
-        if (-1 == proxyPort) {
-            proxyPort = Integer.parseInt(System.getProperty("iast.proxy.port", cfg.getProperty("iast.proxy.port", "80")));
-        }
-        return proxyPort;
-    }
-
-    public int getDelayTime() {
-        if (-1 == delayTime) {
-            delayTime = Integer.parseInt(System.getProperty("iast.engine.delay.time", "10"));
-        }
-        return delayTime;
-    }
-
-    /**
-     * 根据配置文件初始化单例配置类
-     */
     public void init(String path) throws ClassNotFoundException {
         String basePath = null;
         File agentFile;
@@ -157,6 +84,80 @@ public class IastProperties {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public String getPropertiesFilePath() {
+        return propertiesFilePath;
+    }
+
+    public String getIastServerToken() {
+        if (null == iastServerToken) {
+            iastServerToken = cfg.getProperty("iast.server.token");
+        }
+        return iastServerToken;
+    }
+
+
+    public String getBaseUrl() {
+        if (null == serverUrl) {
+            serverUrl = System.getProperty("iast.server.url", cfg.getProperty("iast.server.url"));
+        }
+        return serverUrl;
+    }
+
+    public String getEngineName() {
+        if (null == engineName) {
+            engineName = System.getProperty("engine.name", cfg.getProperty("engine.name", "agent"));
+        }
+        return engineName;
+    }
+
+    public String getProjectName() {
+        if (null == projectName) {
+            projectName = System.getProperty("project.name", cfg.getProperty("project.name", "Demo Project"));
+        }
+        return projectName;
+    }
+
+    private String getProxyEnableStatus() {
+        if (null == proxyEnableStatus) {
+            proxyEnableStatus = System.getProperty("iast.proxy.enable", cfg.getProperty("iast.proxy.enable", "false"));
+        }
+        return proxyEnableStatus;
+    }
+
+    public boolean isProxyEnable() {
+        return "true".equalsIgnoreCase(getProxyEnableStatus());
+    }
+
+    public String getProxyHost() {
+        if (null == proxyHost) {
+            proxyHost = System.getProperty("iast.proxy.host", cfg.getProperty("iast.proxy.host", "false"));
+        }
+        return proxyHost;
+    }
+
+    public int getProxyPort() {
+        if (-1 == proxyPort) {
+            proxyPort = Integer.parseInt(System.getProperty("iast.proxy.port", cfg.getProperty("iast.proxy.port", "80")));
+        }
+        return proxyPort;
+    }
+
+    public Integer isAutoCreateProject() {
+        if (null == isAutoCreateProject) {
+            String result = System.getProperty("project.create", cfg.getProperty("project.create", "false"));
+            if (result.equals("false")) {
+                isAutoCreateProject = 0;
+            } else if (result.equals("true")) {
+                isAutoCreateProject = 1;
+            }
+        }
+        return isAutoCreateProject;
+    }
+
+    public String getProjectVersion() {
+        return System.getProperty("project.version", cfg.getProperty("project.version","V1.0"));
     }
 
 }

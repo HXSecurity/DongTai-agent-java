@@ -173,7 +173,7 @@ public class PropertyUtils {
 
     public long getHeartBeatInterval() {
         if (heartBeatInterval == -1L) {
-            heartBeatInterval = Long.valueOf(System.getProperty("iast.service.heartbeat.interval", cfg.getProperty("iast.service.heartbeat.interval", "5")));
+            heartBeatInterval = Long.valueOf(System.getProperty("iast.service.heartbeat.interval", cfg.getProperty("iast.service.heartbeat.interval", "30")));
         }
         return heartBeatInterval;
     }

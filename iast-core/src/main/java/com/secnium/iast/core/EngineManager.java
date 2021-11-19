@@ -4,7 +4,6 @@ import com.secnium.iast.core.handler.models.IastReplayModel;
 import com.secnium.iast.core.handler.models.MethodEvent;
 import com.secnium.iast.core.middlewarerecognition.IastServer;
 import com.secnium.iast.core.middlewarerecognition.ServerDetect;
-import com.secnium.iast.core.report.AgentRegisterReport;
 import com.secnium.iast.core.threadlocalpool.BooleanTheadLocal;
 import com.secnium.iast.core.threadlocalpool.IastScopeTracker;
 import com.secnium.iast.core.threadlocalpool.IastServerPort;
@@ -30,6 +29,7 @@ public class EngineManager {
     private static final Logger logger = LogUtils.getLogger(EngineManager.class);
     private static EngineManager instance;
     private final PropertyUtils cfg;
+    public static Integer AGENT_ID;
 
     private static final BooleanTheadLocal AGENT_STATUS = new BooleanTheadLocal(false);
     private static final BooleanTheadLocal TRANSFORM_STATE = new BooleanTheadLocal(false);
@@ -264,6 +264,14 @@ public class EngineManager {
         return instance.cfg.isEnableDumpClass();
     }
 
+    public static Integer getAgentId() {
+        return AGENT_ID;
+    }
+
+    public static void setAgentId(Integer agentId) {
+        AGENT_ID = agentId;
+    }
+
     public static void enterHttpEntry(Map<String, Object> requestMeta) {
         if (null == SERVER) {
             SERVER = new IastServer(
@@ -271,7 +279,8 @@ public class EngineManager {
                     (Integer) requestMeta.get("serverPort"),
                     true
             );
-            AgentRegisterReport.send();
+            // todo: server addr and port
+//            AgentRegisterReport.send();
         }
         ENTER_HTTP_ENTRYPOINT.enterHttpEntryPoint();
         REQUEST_CONTEXT.set(requestMeta);

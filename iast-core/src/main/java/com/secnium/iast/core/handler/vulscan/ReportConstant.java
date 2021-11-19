@@ -21,14 +21,7 @@ public class ReportConstant {
 
     public static final String REPORT_VALUE_KEY = "detail";
 
-    public static final String LANGUAGE = "language";
-    public static final String LANGUAGE_VALUE = "JAVA";
     public static final String AGENT_ID = "agentId";
-    public static final String PROJECT_NAME = "projectName";
-    public static final String AGENT_VERSION = "version";
-    public static final String AGENT_VERSION_VALUE = "v1.1.0";
-    public static final String CONTAINER = "container";
-
     public static final String PID = "pid";
     public static final String NETWORK = "network";
     public static final String MEMORY = "memory";
@@ -74,6 +67,7 @@ public class ReportConstant {
     public static final String REPORT_QUEUE = "reportQueue";
     public static final String METHOD_QUEUE = "methodQueue";
     public static final String REPLAY_QUEUE = "replayQueue";
+    public static final String KEY_RETURN_QUEUE = "returnQueue";
 
     public static final String AUTO_CREATE_PROJECT = "autoCreateProject";
     public static final String PROJECT_VERSION = "projectVersion";

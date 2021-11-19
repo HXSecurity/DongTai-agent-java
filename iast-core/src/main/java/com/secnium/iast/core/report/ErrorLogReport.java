@@ -23,7 +23,7 @@ public class ErrorLogReport {
         report.put(ReportConstant.REPORT_KEY, ReportConstant.REPORT_ERROR_LOG);
         report.put(ReportConstant.REPORT_VALUE_KEY, detail);
 
-        detail.put(ReportConstant.AGENT_ID, AgentRegisterReport.getAgentFlag());
+        detail.put(ReportConstant.AGENT_ID, EngineManager.getAgentId());
         detail.put(ReportConstant.ERROR_LOG_DETAIL, errorLog);
 
         return report.toString();

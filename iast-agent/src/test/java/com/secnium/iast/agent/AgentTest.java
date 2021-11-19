@@ -2,6 +2,8 @@ package com.secnium.iast.agent;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
+
+import com.secnium.iast.agent.util.LogUtils;
 import org.junit.Test;
 
 public class AgentTest {

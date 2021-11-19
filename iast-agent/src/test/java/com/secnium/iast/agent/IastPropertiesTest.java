@@ -19,7 +19,7 @@ public class IastPropertiesTest {
 
     @Test
     public void init() {
-        IastProperties properties = IastProperties.getInstance("/tmp/test.properties");
+//        IastProperties properties = IastProperties.getInstance("/tmp/test.properties");
     }
 
     @Test
@@ -104,8 +104,8 @@ public class IastPropertiesTest {
 
     @Test
     public void getToken() {
-        IastProperties properties = IastProperties.getInstance("/tmp/test.properties");
-        System.out.println(properties.getIastServerToken());
+//        IastProperties properties = IastProperties.getInstance("/tmp/test.properties");
+//        System.out.println(properties.getIastServerToken());
     }
 
     @Test
@@ -114,7 +114,7 @@ public class IastPropertiesTest {
 
     @Test
     public void getEngineStatus() {
-        IastProperties properties = IastProperties.getInstance("/tmp/test.properties");
+/*        IastProperties properties = IastProperties.getInstance("/tmp/test.properties");
         int MAX_LOOPS = 20;
         int times = 0;
         while (true) {
@@ -135,6 +135,6 @@ public class IastPropertiesTest {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-        }
+        }*/
     }
 }

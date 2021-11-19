@@ -1,14 +1,15 @@
 package com.secnium.iast.agent;
 
 import com.secnium.iast.agent.monitor.MonitorDaemonThread;
+import com.secnium.iast.agent.util.LogUtils;
 
 public class ShutdownThread extends Thread {
 
     @Override
     public void run() {
-        System.out.println("enter shutdown thread");
+        LogUtils.info("enter shutdown thread");
         MonitorDaemonThread.isExit = true;
-        System.out.println("exit shutdown thread");
+        LogUtils.info("exit shutdown thread");
     }
 
 }

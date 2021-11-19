@@ -1,9 +1,12 @@
 package com.secnium.iast.agent;
 
 import com.secnium.iast.agent.manager.EngineManager;
+import com.secnium.iast.agent.monitor.EngineMonitor;
 import com.secnium.iast.agent.monitor.MonitorDaemonThread;
+import com.secnium.iast.agent.report.AgentRegisterReport;
+import com.secnium.iast.agent.util.LogUtils;
+
 import java.lang.instrument.Instrumentation;
-import java.lang.management.ManagementFactory;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -42,7 +45,12 @@ public class AgentLauncher {
             uninstall();
         } else {
             LAUNCH_MODE = LAUNCH_MODE_ATTACH;
-            install(inst);
+            try {
+                Agent.appendToolsPath();
+                install(inst);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -62,21 +70,33 @@ public class AgentLauncher {
      * @param inst inst
      */
     private static void install(final Instrumentation inst) {
-        IastProperties.getInstance();
-        loadEngine(inst);
+        IastProperties iastProperties = IastProperties.getInstance();
+        Boolean send = AgentRegisterReport.send();
+        if (send){
+            LogUtils.info("Agent has successfully registered with "+iastProperties.getBaseUrl());
+            Boolean agentStat = AgentRegisterReport.agentStat();
+            if (!agentStat) {
+                EngineMonitor.isCoreRegisterStart = false;
+                LogUtils.info("The agent was not audited. Disable enabling.");
+            }else {
+                EngineMonitor.isCoreRegisterStart = true;
+            }
+            loadEngine(inst);
+        }
     }
 
     private static void loadEngine(final Instrumentation inst) {
         EngineManager engineManager = EngineManager
-                .getInstance(inst, LAUNCH_MODE, ManagementFactory.getRuntimeMXBean().getName().split("@")[0]);
+                .getInstance(inst, LAUNCH_MODE, EngineManager.getPID());
         MonitorDaemonThread daemonThread = new MonitorDaemonThread(engineManager);
-        if (daemonThread.startEngine()) {
-            Thread agentMonitorDaemonThread = new Thread(daemonThread);
-            agentMonitorDaemonThread.setDaemon(true);
-            agentMonitorDaemonThread.setPriority(1);
-            agentMonitorDaemonThread.setName("dongtai-monitor");
-            agentMonitorDaemonThread.start();
+        Thread agentMonitorDaemonThread = new Thread(daemonThread);
+        if (EngineMonitor.isCoreRegisterStart){
+            daemonThread.startEngine();
         }
+        agentMonitorDaemonThread.setDaemon(true);
+        agentMonitorDaemonThread.setPriority(1);
+        agentMonitorDaemonThread.setName("dongtai-monitor");
+        agentMonitorDaemonThread.start();
         Runtime.getRuntime().addShutdownHook(new ShutdownThread());
     }
 }

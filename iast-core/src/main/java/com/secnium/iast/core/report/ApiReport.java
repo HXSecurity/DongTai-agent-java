@@ -23,7 +23,7 @@ public class ApiReport {
         JSONObject detail = new JSONObject();
         report.put(ReportConstant.REPORT_KEY, ReportConstant.REPORT_API);
         report.put(ReportConstant.REPORT_VALUE_KEY, detail);
-        detail.put(ReportConstant.AGENT_ID, AgentRegisterReport.getAgentFlag());
+        detail.put(ReportConstant.AGENT_ID, EngineManager.getAgentId());
         JSONObject apiListJson = new JSONObject(apiList);
         detail.put(ReportConstant.API_DATA, apiListJson.get(ReportConstant.API_DATA));
         return report.toString();
