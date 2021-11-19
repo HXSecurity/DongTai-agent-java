@@ -286,7 +286,7 @@ public class PropertyUtils {
 
 
     public String getProjectVersion() {
-        return System.getProperty("project.version", cfg.getProperty("project.version","V1.0"));
+        return System.getProperty("project.version", cfg.getProperty("project.version", "V1.0"));
     }
 
     public Integer getResponseLength() {

@@ -7,8 +7,6 @@ import com.secnium.iast.core.handler.models.MethodEvent;
 import com.secnium.iast.core.util.HttpClientUtils;
 import com.secnium.iast.core.util.LogUtils;
 import com.secnium.iast.core.util.matcher.ConfigMatcher;
-import org.slf4j.Logger;
-
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -16,6 +14,7 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
+import org.slf4j.Logger;
 
 /**
  * Http方法处理入口
@@ -23,6 +22,7 @@ import java.util.Map;
  * @author dongzhiyong@huoxian.cn
  */
 public class HttpImpl {
+
     public static Method iastRequestMethod;
     public static Method iastResponseMethod;
     public static Method cloneRequestMethod;
@@ -55,7 +55,7 @@ public class HttpImpl {
         }
     }
 
-    private static void loadCloneRequestMethod(boolean isJakarta) {
+    private static void loadCloneRequestMethod() {
         if (cloneRequestMethod == null) {
             try {
                 Class<?> proxyClass = iastClassLoader.loadClass("cn.huoxian.iast.api.RequestWrapper");
@@ -66,7 +66,7 @@ public class HttpImpl {
         }
     }
 
-    private static void loadCloneResponseMethod(boolean isJakarta) {
+    private static void loadCloneResponseMethod() {
         if (cloneResponseMethod == null) {
             try {
                 Class<?> proxyClass = iastClassLoader.loadClass("cn.huoxian.iast.api.ResponseWrapper");
@@ -86,7 +86,7 @@ public class HttpImpl {
 
         try {
             createClassLoader(req, isJakarta);
-            loadCloneRequestMethod(isJakarta);
+            loadCloneRequestMethod();
             return cloneRequestMethod.invoke(null, req);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
@@ -103,9 +103,9 @@ public class HttpImpl {
      * @param response original response object
      * @return dongtai response object
      */
-    public static Object cloneResponse(Object response, boolean isJakarta) {
+    public static Object cloneResponse(Object response) {
         try {
-            loadCloneResponseMethod(isJakarta);
+            loadCloneResponseMethod();
             return cloneResponseMethod.invoke(null, response);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
@@ -115,7 +115,8 @@ public class HttpImpl {
         return response;
     }
 
-    public static Map<String, Object> getRequestMeta(Object request) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public static Map<String, Object> getRequestMeta(Object request)
+            throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         if (null == iastRequestMethod) {
             Class<?> proxyClass = iastClassLoader.loadClass("cn.huoxian.iast.api.HttpRequest");
             iastRequestMethod = proxyClass.getDeclaredMethod("getRequest", Object.class);
@@ -123,7 +124,8 @@ public class HttpImpl {
         return (Map<String, Object>) iastRequestMethod.invoke(null, request);
     }
 
-    public static Map<String, Object> getResponseMeta(Object response) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public static Map<String, Object> getResponseMeta(Object response)
+            throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         if (null == iastResponseMethod) {
             Class<?> proxyClass = iastClassLoader.loadClass("cn.huoxian.iast.api.HttpResponse");
             iastResponseMethod = proxyClass.getDeclaredMethod("getResponse", Object.class);
@@ -138,7 +140,8 @@ public class HttpImpl {
      *
      * @param event method call event
      */
-    public static void solveHttp(MethodEvent event) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public static void solveHttp(MethodEvent event)
+            throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         if (logger.isDebugEnabled()) {
             logger.debug(EngineManager.SCOPE_TRACKER.get().toString());
         }
@@ -151,7 +154,8 @@ public class HttpImpl {
         // todo: add custom header escape
         EngineManager.enterHttpEntry(requestMeta);
         if (logger.isDebugEnabled()) {
-            logger.debug("HTTP Request:{} {} from: {}", requestMeta.get("method"), requestMeta.get("requestURI"), event.signature);
+            logger.debug("HTTP Request:{} {} from: {}", requestMeta.get("method"), requestMeta.get("requestURI"),
+                    event.signature);
         }
     }
 

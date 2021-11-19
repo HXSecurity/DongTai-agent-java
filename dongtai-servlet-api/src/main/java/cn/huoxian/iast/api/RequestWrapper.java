@@ -1,17 +1,29 @@
 package cn.huoxian.iast.api;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
-import java.io.*;
 
 /**
  * @author dongzhiyong@huoxian.cn
  */
 public class RequestWrapper extends HttpServletRequestWrapper {
+
     private final String body;
     private final boolean usingBody;
+    private final Map<String, String> customHeaders;
 
     public static Object cloneRequest(Object req) {
         if (req instanceof HttpServletRequest) {
@@ -22,6 +34,7 @@ public class RequestWrapper extends HttpServletRequestWrapper {
 
     private RequestWrapper(HttpServletRequest request) {
         super(request);
+        this.customHeaders = new HashMap<String, String>();
         this.usingBody = ("POST".equals(request.getMethod()) && request.getContentType().contains("application/json"));
 
         StringBuilder stringBuilder = new StringBuilder();
@@ -90,6 +103,30 @@ public class RequestWrapper extends HttpServletRequestWrapper {
             return super.getReader();
         }
     }
+
+    @Override
+    public String getHeader(String name) {
+        String headerValue = customHeaders.get(name);
+
+        if (headerValue != null) {
+            return headerValue;
+        }
+        return super.getHeader(name);
+    }
+
+    @Override
+    public Enumeration<String> getHeaderNames() {
+        Set<String> set = new HashSet<String>(customHeaders.keySet());
+
+        @SuppressWarnings("unchecked")
+        Enumeration<String> headerNames = super.getHeaderNames();
+        while (headerNames.hasMoreElements()) {
+            String n = headerNames.nextElement();
+            set.add(n);
+        }
+        return Collections.enumeration(set);
+    }
+
 
     public String getBody() {
         return this.body;
