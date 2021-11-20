@@ -1,7 +1,6 @@
 package cn.huoxian.iast.api;
 
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,11 +8,13 @@ import java.io.InputStreamReader;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author dongzhiyong@huoxian.cn
  */
 public class HttpRequest {
+
     public static Map<String, Object> getRequest(Object req) {
         HttpServletRequest request = (HttpServletRequest) req;
         Map<String, Object> requestMeta = new HashMap<String, Object>(16);
@@ -41,8 +42,7 @@ public class HttpRequest {
         StringBuilder headers = new StringBuilder();
         while (headerNames.hasMoreElements()) {
             String name = (String) headerNames.nextElement();
-            String value = request.getHeader(name);
-            headers.append(name).append(":").append(value).append("\n");
+            headers.append(name).append(":").append(request.getHeader(name)).append("\n");
         }
         return headers.toString();
     }
@@ -58,8 +58,8 @@ public class HttpRequest {
         try {
             if ("POST".equals(request.getMethod())) {
                 boolean usingBody = false;
-                if (request.getContentType() != null){
-                usingBody = request.getContentType().contains("application/json");
+                if (request.getContentType() != null) {
+                    usingBody = request.getContentType().contains("application/json");
                 }
                 if (usingBody) {
                     InputStream inputStream = request.getInputStream();

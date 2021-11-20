@@ -17,7 +17,6 @@ public class ConfigMatcher {
 
     private final static Logger logger = LogUtils.getLogger(ConfigMatcher.class);
 
-    public final static Set<String> SOURCES;
     private final static Set<String> BLACKS;
     private final static String[] START_WITH_BLACKS;
     private final static String[] END_WITH_BLACKS;
@@ -111,12 +110,9 @@ public class ConfigMatcher {
 
     static {
         final PropertyUtils cfg = PropertyUtils.getInstance();
-        String sourcesFile = cfg.getSourceFilePath();
         String blackListFuncFile = cfg.getBlackFunctionFilePath();
         String blackList = cfg.getBlackClassFilePath();
         String disableExtList = cfg.getBlackExtFilePath();
-
-        SOURCES = ConfigUtils.loadConfigFromFile(sourcesFile)[0];
 
         HashSet<String>[] items = ConfigUtils.loadConfigFromFile(blackListFuncFile);
         BLACKS = items[0];
