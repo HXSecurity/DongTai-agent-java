@@ -179,8 +179,9 @@ public class EngineManager {
                 iastClassLoader = loadOrDefineClassLoader(EngineManager.getEnginePackageCachePath());
             }
             classOfEngine = iastClassLoader.loadClass(ENGINE_ENTRYPOINT_CLASS);
-            classOfEngine.getMethod("install", String.class, String.class, Integer.class, Instrumentation.class)
-                    .invoke(null, launchMode, this.properties.getPropertiesFilePath(), AgentRegisterReport.getAgentFlag(), inst);
+            String agentPath = this.getClass().getProtectionDomain().getCodeSource().getLocation().getFile();
+            classOfEngine.getMethod("install", String.class, String.class, Integer.class, Instrumentation.class, String.class)
+                    .invoke(null, launchMode, this.properties.getPropertiesFilePath(), AgentRegisterReport.getAgentFlag(), inst, agentPath);
             return true;
         } catch (IOException e) {
             LogUtils.error("DongTai engine start failed, please contact staff for help.");
@@ -340,7 +341,7 @@ public class EngineManager {
     }
 
     public static String getPID() {
-        if (PID == null){
+        if (PID == null) {
             PID = ManagementFactory.getRuntimeMXBean().getName().split("@")[0];
         }
         return PID;

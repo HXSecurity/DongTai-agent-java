@@ -25,6 +25,8 @@ public class AgentRegisterReport {
     final IServer server = serverDetect.getWebserver();
     private static String AGENT_NAME = null;
     private static String HOST_NAME = null;
+    private static String SERVER_ADDR = null;
+    private static Integer SERVER_PORT = null;
 
     /**
      * 创建agent注册报告
@@ -41,13 +43,11 @@ public class AgentRegisterReport {
         object.put(Constant.KEY_LANGUAGE, Constant.LANGUAGE);
         object.put(Constant.KEY_NETWORK, readIpInfo());
         object.put(Constant.KEY_SERVER_ENV, Base64Encoder.encodeBase64String(System.getProperties().toString().getBytes()).replaceAll("\n", ""));
-        object.put(Constant.KEY_CONTAINER_NAME, server == null ? "" : server.getName());
-        object.put(Constant.KEY_CONTAINER_VERSION, server == null ? "" : server.getVersion());
+        object.put(Constant.KEY_CONTAINER_NAME, null == server ? "" : server.getName());
+        object.put(Constant.KEY_CONTAINER_VERSION, null == server ? "" : server.getVersion());
         object.put(Constant.KEY_SERVER_PATH, serverDetect.getWebServerPath());
-//        object.put(Constant.SERVER_ADDR, null != EngineManager.SERVER ? EngineManager.SERVER.getServerAddr() : "");
-        object.put(Constant.KEY_SERVER_ADDR, "");
-//        object.put(Constant.SERVER_PORT, null != EngineManager.SERVER ? EngineManager.SERVER.getServerPort() : "");
-        object.put(Constant.KEY_SERVER_PORT, "");
+        object.put(Constant.KEY_SERVER_ADDR, null != SERVER_ADDR ? SERVER_ADDR : "");
+        object.put(Constant.KEY_SERVER_PORT, null != SERVER_PORT ? SERVER_PORT : "");
         object.put(Constant.KEY_AUTO_CREATE_PROJECT, IastProperties.getInstance().isAutoCreateProject());
         object.put(Constant.KEY_PROJECT_VERSION, IastProperties.getInstance().getProjectVersion());
 
@@ -217,4 +217,9 @@ public class AgentRegisterReport {
         return coreRegisterStart == 1;
     }
 
+    public static void reportServerMessage(String serverAddr, Integer serverPort) {
+        SERVER_ADDR = serverAddr;
+        SERVER_PORT = serverPort;
+        send();
+    }
 }
