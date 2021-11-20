@@ -33,7 +33,6 @@ public class ReportConstant {
     public static final String SERVER_PATH = "serverPath";
     public static final String SERVER_ADDR = "serverAddr";
     public static final String SERVER_PORT = "serverPort";
-    public static final String HOSTNAME = "hostname";
 
     public static final String SCA_PACKAGE_PATH = "packagePath";
     public static final String SCA_PACKAGE_NAME = "packageName";
@@ -54,7 +53,6 @@ public class ReportConstant {
     public static final String RES_HEADER = "resHeader";
     public static final String RES_BODY = "resBody";
     public static final String REPLAY_REQUEST = "replayRequest";
-    public static final String SERVER_ENV = "serverEnv";
     public static final String VULN_CALLER = "appCaller";
     public static final String SAAS_METHOD_POOL = "pool";
 
@@ -69,7 +67,5 @@ public class ReportConstant {
     public static final String REPLAY_QUEUE = "replayQueue";
     public static final String KEY_RETURN_QUEUE = "returnQueue";
 
-    public static final String AUTO_CREATE_PROJECT = "autoCreateProject";
-    public static final String PROJECT_VERSION = "projectVersion";
     public static final String STARTUP_TIME = "startupTime";
 }

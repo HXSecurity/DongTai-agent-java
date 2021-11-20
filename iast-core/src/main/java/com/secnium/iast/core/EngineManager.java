@@ -1,5 +1,6 @@
 package com.secnium.iast.core;
 
+import com.secnium.iast.core.handler.IastClassLoader;
 import com.secnium.iast.core.handler.models.IastReplayModel;
 import com.secnium.iast.core.handler.models.MethodEvent;
 import com.secnium.iast.core.middlewarerecognition.IastServer;
@@ -12,7 +13,10 @@ import com.secnium.iast.core.threadlocalpool.IastTaintPool;
 import com.secnium.iast.core.threadlocalpool.IastTrackMap;
 import com.secnium.iast.core.threadlocalpool.RequestContext;
 import com.secnium.iast.core.util.LogUtils;
+import java.io.File;
 import java.lang.instrument.Instrumentation;
+import java.lang.reflect.Method;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -30,6 +34,7 @@ public class EngineManager {
     private static EngineManager instance;
     private final PropertyUtils cfg;
     public static Integer AGENT_ID;
+    public static String AGENT_PATH;
 
     private static final BooleanTheadLocal AGENT_STATUS = new BooleanTheadLocal(false);
     private static final BooleanTheadLocal TRANSFORM_STATE = new BooleanTheadLocal(false);
@@ -272,6 +277,14 @@ public class EngineManager {
         AGENT_ID = agentId;
     }
 
+    public static String getAgentPath() {
+        return AGENT_PATH;
+    }
+
+    public static void setAgentPath(String agentPath) {
+        AGENT_PATH = agentPath;
+    }
+
     public static void enterHttpEntry(Map<String, Object> requestMeta) {
         if (null == SERVER) {
             SERVER = new IastServer(
@@ -279,8 +292,13 @@ public class EngineManager {
                     (Integer) requestMeta.get("serverPort"),
                     true
             );
-            // todo: server addr and port
-//            AgentRegisterReport.send();
+            try {
+                ClassLoader iastClassLoader = new IastClassLoader(EngineManager.class.getClassLoader(), new URL[]{new File(getAgentPath()).toURI().toURL()});
+                Class<?> proxyClass = iastClassLoader.loadClass("com.secnium.iast.agent.report.AgentRegisterReport");
+                Method reportServerMessage = proxyClass.getDeclaredMethod("reportServerMessage", String.class, Integer.class);
+                reportServerMessage.invoke(null, SERVER.getServerAddr(), SERVER.getServerPort());
+            } catch (Exception ignored) {
+            }
         }
         ENTER_HTTP_ENTRYPOINT.enterHttpEntryPoint();
         REQUEST_CONTEXT.set(requestMeta);
