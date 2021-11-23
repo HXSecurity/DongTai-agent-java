@@ -45,7 +45,7 @@ public class AgentQueueReport extends AbstractThread {
             StringBuilder response = HttpClientUtils.sendPost(Constants.API_REPORT_UPLOAD, generateHeartBeatMsg());
             HttpRequestReplay.sendReplayRequest(response);
         } catch (Exception e) {
-            logger.error("report error, reason: ", e);
+            logger.error("agent queue reported failed. reason: ", e);
         }
     }
 }
