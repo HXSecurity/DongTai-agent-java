@@ -13,8 +13,8 @@ import org.slf4j.Logger;
  * @author dongzhiyong@huoxian.cn
  */
 public class ReportSender extends AbstractThread {
+
     private final Logger logger = LogUtils.getLogger(ReportSender.class);
-//    private final Pattern PATTERN = Pattern.compile("\"type\":1}");
 
     @Override
     protected void send() throws Exception {
