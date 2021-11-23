@@ -3,21 +3,18 @@ package com.secnium.iast.core.util;
 import com.secnium.iast.core.EngineManager;
 import com.secnium.iast.core.PropertyUtils;
 import com.secnium.iast.core.handler.models.MethodEvent;
-
 import java.util.Iterator;
 import java.util.Set;
 
 /**
- * 检测污点池中是否存在目标对象
- * 解决方案，
- * 1.将加入污点池的复杂对象，拆分为简单对象，后续直接检测
- * 2.检测时，将污点池中的复杂对象拆分出来
+ * 检测污点池中是否存在目标对象 解决方案， 1.将加入污点池的复杂对象，拆分为简单对象，后续直接检测 2.检测时，将污点池中的复杂对象拆分出来
  * <p>
  * 场景：污点池中数据的查询数多于插入数量
  *
  * @author dongzhiyong@huoxian.cn
  */
 public class TaintPoolUtils {
+
     private static PropertyUtils properties = PropertyUtils.getInstance();
 
     public static boolean poolContains(Object obj, MethodEvent event) {
@@ -31,13 +28,21 @@ public class TaintPoolUtils {
         isContains = contains(obj, isString, event);
         if (!isContains) {
             if (obj instanceof String[]) {
-                String[] tempObjs = (String[]) obj;
-                for (String tempObj : tempObjs) {
-                    isContains = contains(tempObj, true, event);
+                String[] stringArray = (String[]) obj;
+                for (String stringItem : stringArray) {
+                    isContains = contains(stringItem, true, event);
                     if (isContains) {
                         EngineManager.TAINT_POOL.addToPool(obj);
                         event.addSourceHash(obj.hashCode());
                         break;
+                    }
+                }
+            }
+            if (obj instanceof Object[]) {
+                Object[] objArray = (Object[]) obj;
+                for (Object objItem : objArray) {
+                    if (poolContains(objItem, event)) {
+                        return true;
                     }
                 }
             }
@@ -57,7 +62,6 @@ public class TaintPoolUtils {
         Set<Object> taints = EngineManager.TAINT_POOL.get();
         int hashcode = 0;
         // 检查是否
-
 
         if (isString && properties.isNormalMode()) {
             Iterator<Object> iterator = taints.iterator();
