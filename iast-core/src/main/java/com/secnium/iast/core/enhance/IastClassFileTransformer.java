@@ -11,7 +11,6 @@ import com.secnium.iast.core.enhance.plugins.PluginRegister;
 import com.secnium.iast.core.report.ErrorLogReport;
 import com.secnium.iast.core.util.AsmUtils;
 import com.secnium.iast.core.util.LogUtils;
-import com.secnium.iast.core.util.ObjectIDs;
 import com.secnium.iast.core.util.ThrowableUtils;
 import com.secnium.iast.core.util.matcher.ConfigMatcher;
 import java.io.File;

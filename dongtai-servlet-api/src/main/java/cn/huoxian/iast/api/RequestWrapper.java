@@ -5,8 +5,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.Map;
 import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -27,9 +25,14 @@ public class RequestWrapper extends HttpServletRequestWrapper {
         return req;
     }
 
+    public static boolean allowedContentType(String contentType) {
+        return contentType.contains("application/json")
+                || contentType.contains("application/xml");
+    }
+
     private RequestWrapper(HttpServletRequest request) {
         super(request);
-        this.usingBody = ("POST".equals(request.getMethod()) && request.getContentType().contains("application/json"));
+        this.usingBody = ("POST".equals(request.getMethod()) && allowedContentType(request.getContentType()));
 
         StringBuilder stringBuilder = new StringBuilder();
         BufferedReader bufferedReader = null;

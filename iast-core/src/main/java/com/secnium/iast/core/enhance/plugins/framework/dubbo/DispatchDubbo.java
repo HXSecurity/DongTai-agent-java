@@ -8,12 +8,13 @@ import org.objectweb.asm.ClassVisitor;
  * @author dongzhiyong@huoxian.cn
  */
 public class DispatchDubbo implements DispatchPlugin {
+
     static final String CLASS_OF_DUBBO = " org.apache.dubbo.monitor.support.MonitorFilter".substring(1);
+    static final String CLASS_OF_ALIBABA_DUBBO = " com.alibaba.dubbo.monitor.support.MonitorFilter".substring(1);
 
     @Override
     public ClassVisitor dispatch(ClassVisitor classVisitor, IastContext context) {
-        String classname = context.getClassName();
-        if (CLASS_OF_DUBBO.equals(classname)) {
+        if (CLASS_OF_DUBBO.equals(context.getClassName()) || CLASS_OF_ALIBABA_DUBBO.equals(context.getClassName())) {
             classVisitor = new DubboAdapter(classVisitor, context);
         }
         return classVisitor;

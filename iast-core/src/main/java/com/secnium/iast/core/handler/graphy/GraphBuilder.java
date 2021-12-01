@@ -6,16 +6,16 @@ import com.secnium.iast.core.enhance.IastClassAncestorQuery;
 import com.secnium.iast.core.handler.controller.impl.HttpImpl;
 import com.secnium.iast.core.handler.models.MethodEvent;
 import com.secnium.iast.core.handler.vulscan.ReportConstant;
+import com.secnium.iast.core.handler.vulscan.normal.AbstractNormalVulScan;
 import com.secnium.iast.core.util.LogUtils;
 import com.secnium.iast.core.util.base64.Base64Encoder;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.slf4j.Logger;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -43,8 +43,7 @@ public class GraphBuilder {
     }
 
     /**
-     * 利用污点方法池，构造有序污点调用图
-     * todo 方法内容未开发完成，先跑通流程，再详细补充
+     * 利用污点方法池，构造有序污点调用图 todo 方法内容未开发完成，先跑通流程，再详细补充
      *
      * @return 污点方法列表
      */
@@ -63,7 +62,8 @@ public class GraphBuilder {
                             event.getCallerClass(),
                             event.getCallerMethod(),
                             event.getCallerLine(),
-                            event.object != null ? IastClassAncestorQuery.getFamilyFromClass(event.object.getClass().getName().replace("\\.", "/")) : null,
+                            event.object != null ? IastClassAncestorQuery
+                                    .getFamilyFromClass(event.object.getClass().getName().replace("\\.", "/")) : null,
                             event.getMatchClassName(),
                             event.getOriginClassName(),
                             event.getMethodName(),
@@ -99,9 +99,12 @@ public class GraphBuilder {
         detail.put(ReportConstant.URI, requestMeta.get("requestURI"));
         detail.put(ReportConstant.CLIENT_IP, requestMeta.get("remoteAddr"));
         detail.put(ReportConstant.QUERY_STRING, requestMeta.get("queryString"));
-        detail.put(ReportConstant.REQ_HEADER, Base64Encoder.encodeBase64String(requestMeta.get("headers").toString().getBytes()).replaceAll("\n", ""));
+        detail.put(ReportConstant.REQ_HEADER,
+                AbstractNormalVulScan.getEncodedHeader((Map<String, String>) requestMeta.get("headers")));
         detail.put(ReportConstant.REQ_BODY, requestMeta.get("body"));
-        detail.put(ReportConstant.RES_HEADER, responseMeta == null ? "" : Base64Encoder.encodeBase64String(responseMeta.get("headers").toString().getBytes()).replaceAll("\n", ""));
+        detail.put(ReportConstant.RES_HEADER, responseMeta == null ? ""
+                : Base64Encoder.encodeBase64String(responseMeta.get("headers").toString().getBytes())
+                        .replaceAll("\n", ""));
         detail.put(ReportConstant.RES_BODY, responseMeta == null ? "" : responseMeta.get("body"));
         detail.put(ReportConstant.CONTEXT_PATH, requestMeta.get("contextPath"));
         detail.put(ReportConstant.REPLAY_REQUEST, requestMeta.get("replay-request"));

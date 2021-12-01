@@ -23,32 +23,41 @@ import org.slf4j.Logger;
  */
 public class HttpImpl {
 
-    public static Method iastRequestMethod;
-    public static Method iastResponseMethod;
-    public static Method cloneRequestMethod;
-    public static Method cloneResponseMethod;
+    private static Method iastRequestMethod;
+    private static Method iastResponseMethod;
+    private static Method cloneRequestMethod;
+    private static Method cloneResponseMethod;
     private static IastClassLoader iastClassLoader;
-    public static File IAST_REQUEST_JAR_PACKAGE;
+    public static volatile File IAST_REQUEST_JAR_PACKAGE;
 
     private static void createClassLoader(Object req, boolean isJakarta) {
         try {
-            if (iastClassLoader == null) {
-                try {
+            if (iastClassLoader != null) {
+                return;
+            }
+            try {
+                if (PropertyUtils.getInstance().isDebug()) {
+                    IAST_REQUEST_JAR_PACKAGE = new File(
+                            System.getProperty("java.io.tmpdir") + File.separator + (
+                                    isJakarta ? "dongtai-jakarta-api.jar"
+                                            : "dongtai-servlet-api.jar")
+                    );
+                } else {
                     IAST_REQUEST_JAR_PACKAGE = File.createTempFile("dongtai-api-", ".jar");
                     HttpClientUtils.downloadRemoteJar(
                             "/api/v1/engine/download?engineName=dongtai-api&jakarta=" + (isJakarta ? 1 : 0),
                             IAST_REQUEST_JAR_PACKAGE.getAbsolutePath()
                     );
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    return;
                 }
-                if (IAST_REQUEST_JAR_PACKAGE.exists()) {
-                    iastClassLoader = new IastClassLoader(
-                            req.getClass().getClassLoader(),
-                            new URL[]{IAST_REQUEST_JAR_PACKAGE.toURI().toURL()}
-                    );
-                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                return;
+            }
+            if (IAST_REQUEST_JAR_PACKAGE.exists()) {
+                iastClassLoader = new IastClassLoader(
+                        req.getClass().getClassLoader(),
+                        new URL[]{IAST_REQUEST_JAR_PACKAGE.toURI().toURL()}
+                );
             }
         } catch (MalformedURLException e) {
             e.printStackTrace();

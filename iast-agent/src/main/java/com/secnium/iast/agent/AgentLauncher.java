@@ -5,7 +5,6 @@ import com.secnium.iast.agent.monitor.EngineMonitor;
 import com.secnium.iast.agent.monitor.MonitorDaemonThread;
 import com.secnium.iast.agent.report.AgentRegisterReport;
 import com.secnium.iast.agent.util.LogUtils;
-
 import java.lang.instrument.Instrumentation;
 
 /**
@@ -72,13 +71,13 @@ public class AgentLauncher {
     private static void install(final Instrumentation inst) {
         IastProperties iastProperties = IastProperties.getInstance();
         Boolean send = AgentRegisterReport.send();
-        if (send){
-            LogUtils.info("Agent has successfully registered with "+iastProperties.getBaseUrl());
+        if (send) {
+            LogUtils.info("Agent has successfully registered with " + iastProperties.getBaseUrl());
             Boolean agentStat = AgentRegisterReport.agentStat();
             if (!agentStat) {
                 EngineMonitor.isCoreRegisterStart = false;
                 LogUtils.info("The agent was not audited. Disable enabling.");
-            }else {
+            } else {
                 EngineMonitor.isCoreRegisterStart = true;
             }
             loadEngine(inst);
@@ -90,9 +89,10 @@ public class AgentLauncher {
                 .getInstance(inst, LAUNCH_MODE, EngineManager.getPID());
         MonitorDaemonThread daemonThread = new MonitorDaemonThread(engineManager);
         Thread agentMonitorDaemonThread = new Thread(daemonThread);
-        if (EngineMonitor.isCoreRegisterStart){
+        if (MonitorDaemonThread.delayTime <= 0 && EngineMonitor.isCoreRegisterStart) {
             daemonThread.startEngine();
         }
+
         agentMonitorDaemonThread.setDaemon(true);
         agentMonitorDaemonThread.setPriority(1);
         agentMonitorDaemonThread.setName("dongtai-monitor");

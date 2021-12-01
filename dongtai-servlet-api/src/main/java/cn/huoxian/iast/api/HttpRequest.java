@@ -37,14 +37,15 @@ public class HttpRequest {
         return requestMeta;
     }
 
-    private static String getHeaders(HttpServletRequest request) {
+    private static Map<String, String> getHeaders(HttpServletRequest request) {
         Enumeration<?> headerNames = request.getHeaderNames();
-        StringBuilder headers = new StringBuilder();
+        Map<String, String> headers = new HashMap<>();
         while (headerNames.hasMoreElements()) {
             String name = (String) headerNames.nextElement();
-            headers.append(name).append(":").append(request.getHeader(name)).append("\n");
+            String value = request.getHeader(name);
+            headers.put(name, value);
         }
-        return headers.toString();
+        return headers;
     }
 
     /**

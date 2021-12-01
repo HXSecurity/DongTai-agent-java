@@ -2,7 +2,6 @@ package cn.huoxian.iast.api;
 
 
 import jakarta.servlet.http.HttpServletRequest;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,6 +14,7 @@ import java.util.Map;
  * @author dongzhiyong@huoxian.cn
  */
 public class HttpRequest {
+
     public static Map<String, Object> getRequest(Object req) {
         HttpServletRequest request = (HttpServletRequest) req;
         Map<String, Object> requestMeta = new HashMap<String, Object>(16);
@@ -37,15 +37,15 @@ public class HttpRequest {
         return requestMeta;
     }
 
-    private static String getHeaders(HttpServletRequest request) {
+    private static Map<String, String> getHeaders(HttpServletRequest request) {
         Enumeration<?> headerNames = request.getHeaderNames();
-        StringBuilder headers = new StringBuilder();
+        Map<String, String> headers = new HashMap<>();
         while (headerNames.hasMoreElements()) {
             String name = (String) headerNames.nextElement();
             String value = request.getHeader(name);
-            headers.append(name).append(":").append(value).append("\n");
+            headers.put(name, value);
         }
-        return headers.toString();
+        return headers;
     }
 
     /**

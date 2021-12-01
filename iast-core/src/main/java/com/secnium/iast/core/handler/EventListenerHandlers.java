@@ -173,7 +173,7 @@ public class EventListenerHandlers {
 
     public static boolean isFirstLevelSink() {
         try {
-            return EngineManager.isTopLovelSink();
+            return EngineManager.isTopLevelSink();
         } catch (Exception e) {
             return false;
         }

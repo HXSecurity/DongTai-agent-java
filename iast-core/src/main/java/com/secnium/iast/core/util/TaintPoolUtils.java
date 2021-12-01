@@ -15,8 +15,6 @@ import java.util.Set;
  */
 public class TaintPoolUtils {
 
-    private static PropertyUtils properties = PropertyUtils.getInstance();
-
     public static boolean poolContains(Object obj, MethodEvent event) {
         if (obj == null) {
             return false;
@@ -63,7 +61,7 @@ public class TaintPoolUtils {
         int hashcode = 0;
         // 检查是否
 
-        if (isString && properties.isNormalMode()) {
+        if (isString && PropertyUtils.getInstance().isNormalMode()) {
             Iterator<Object> iterator = taints.iterator();
             hashcode = System.identityHashCode(obj);
             while (iterator.hasNext()) {
