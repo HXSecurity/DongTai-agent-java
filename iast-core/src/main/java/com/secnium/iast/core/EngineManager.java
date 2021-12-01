@@ -1,5 +1,6 @@
 package com.secnium.iast.core;
 
+import com.secnium.iast.core.context.ContextManager;
 import com.secnium.iast.core.handler.IastClassLoader;
 import com.secnium.iast.core.handler.models.IastReplayModel;
 import com.secnium.iast.core.handler.models.MethodEvent;
@@ -61,20 +62,12 @@ public class EngineManager {
         AGENT_STATUS.set(true);
     }
 
-    public static boolean isAgentStarted() {
-        return AGENT_STATUS.get() != null && AGENT_STATUS.get();
-    }
-
     public static void enterTransform() {
         TRANSFORM_STATE.set(true);
     }
 
     public static void leaveTransform() {
         TRANSFORM_STATE.set(false);
-    }
-
-    public static boolean isTransforming() {
-        return TRANSFORM_STATE.get() != null && TRANSFORM_STATE.get();
     }
 
     public static void turnOnLingzhi() {
@@ -253,7 +246,7 @@ public class EngineManager {
         logined = true;
     }
 
-    public static boolean isTopLovelSink() {
+    public static boolean isTopLevelSink() {
         return SCOPE_TRACKER.isFirstLevelSink();
     }
 
@@ -293,12 +286,21 @@ public class EngineManager {
                     true
             );
             try {
-                ClassLoader iastClassLoader = new IastClassLoader(EngineManager.class.getClassLoader(), new URL[]{new File(getAgentPath()).toURI().toURL()});
+                ClassLoader iastClassLoader = new IastClassLoader(EngineManager.class.getClassLoader(),
+                        new URL[]{new File(getAgentPath()).toURI().toURL()});
                 Class<?> proxyClass = iastClassLoader.loadClass("com.secnium.iast.agent.report.AgentRegisterReport");
-                Method reportServerMessage = proxyClass.getDeclaredMethod("reportServerMessage", String.class, Integer.class);
+                Method reportServerMessage = proxyClass
+                        .getDeclaredMethod("reportServerMessage", String.class, Integer.class);
                 reportServerMessage.invoke(null, SERVER.getServerAddr(), SERVER.getServerPort());
             } catch (Exception ignored) {
             }
+        }
+        Map<String, String> headers = (Map<String, String>) requestMeta.get("headers");
+        if(headers.containsKey("dt-traceid")){
+            ContextManager.getOrCreateGlobalTraceId(headers.get("dt-traceid"), EngineManager.getAgentId());
+        }else{
+            String newTraceId = ContextManager.getOrCreateGlobalTraceId(null, EngineManager.getAgentId());
+            headers.put("dt-traceid", newTraceId);
         }
         ENTER_HTTP_ENTRYPOINT.enterHttpEntryPoint();
         REQUEST_CONTEXT.set(requestMeta);

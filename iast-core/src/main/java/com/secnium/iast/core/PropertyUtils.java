@@ -269,7 +269,7 @@ public class PropertyUtils {
     }
 
     public boolean isDebug() {
-        return "true".equalsIgnoreCase(debugFlag);
+        return "true".equalsIgnoreCase(getDebugFlag());
     }
 
     public Integer isAutoCreateProject() {

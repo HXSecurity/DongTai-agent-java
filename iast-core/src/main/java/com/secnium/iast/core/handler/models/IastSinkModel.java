@@ -1,24 +1,17 @@
 package com.secnium.iast.core.handler.models;
 
 
-import com.secnium.iast.core.handler.vulscan.VulnType;
-
 /**
  * 危险方法策略模型
  *
  * @author dongzhiyong@huoxian.cn
  */
 public class IastSinkModel {
+
     /**
      * sink点的漏洞类型
      */
     private String type;
-
-    public VulnType getVulnType() {
-        return vulnType;
-    }
-
-    private VulnType vulnType;
 
     /**
      * sink点污点所在的参数位置
@@ -42,7 +35,6 @@ public class IastSinkModel {
     IastSinkModel(String signature, String type, int[] position, String track) {
         this.signature = signature;
         this.type = type;
-        this.vulnType = VulnType.getTypeByName(type);
         this.position = position;
         this.track = "true".equals(track);
     }

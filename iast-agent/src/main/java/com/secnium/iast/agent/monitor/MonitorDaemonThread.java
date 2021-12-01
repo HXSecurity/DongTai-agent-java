@@ -2,7 +2,6 @@ package com.secnium.iast.agent.monitor;
 
 import com.secnium.iast.agent.manager.EngineManager;
 import com.secnium.iast.agent.util.LogUtils;
-
 import java.util.ArrayList;
 
 /**
@@ -13,6 +12,7 @@ public class MonitorDaemonThread implements Runnable {
     public ArrayList<IMonitor> monitorTasks;
     public static boolean isExit = false;
     private final EngineManager engineManager;
+    public static int delayTime = 0;
 
     public MonitorDaemonThread(EngineManager engineManager) {
         this.monitorTasks = new ArrayList<IMonitor>();
@@ -20,10 +20,28 @@ public class MonitorDaemonThread implements Runnable {
         this.monitorTasks.add(new EngineMonitor(engineManager));
         this.monitorTasks.add(new HeartBeatMonitor());
         this.engineManager = engineManager;
+        try {
+            delayTime = Integer.parseInt(System.getProperty("iast.engine.delay.time", "0"));
+            LogUtils.info("engine delay time is " + delayTime + " s");
+            delayTime = delayTime * 1000;
+        } catch (Exception e) {
+            LogUtils.error("engine delay time must be int,eg: 10、20");
+            delayTime = 0;
+        }
     }
 
     @Override
     public void run() {
+        if (MonitorDaemonThread.delayTime > 0) {
+            try {
+                Thread.sleep(delayTime);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            if (EngineMonitor.isCoreRegisterStart) {
+                startEngine();
+            }
+        }
         while (!isExit) {
             for (IMonitor monitor : this.monitorTasks) {
                 monitor.check();

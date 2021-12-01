@@ -37,9 +37,7 @@ public abstract class AbstractNormalVulScan implements IVulScan {
         detail.put(ReportConstant.URI, requestMeta.get("requestURI"));
         detail.put(ReportConstant.CLIENT_IP, requestMeta.get("remoteAddr"));
         detail.put(ReportConstant.QUERY_STRING, requestMeta.get("queryString"));
-        detail.put(ReportConstant.REQ_HEADER,
-                Base64Encoder.encodeBase64String(requestMeta.get("headers").toString().getBytes())
-                        .replaceAll("\n", ""));
+        detail.put(ReportConstant.REQ_HEADER, getEncodedHeader((Map<String, String>) requestMeta.get("headers")));
         detail.put(ReportConstant.REQ_BODY, requestMeta.get("body"));
         // fixme add response
         detail.put(ReportConstant.RES_HEADER, "");
@@ -57,5 +55,16 @@ public abstract class AbstractNormalVulScan implements IVulScan {
 
     protected StackTraceElement[] getLatestStack() {
         return StackUtils.createCallStack(10);
+    }
+
+    public static String getEncodedHeader(Map<String, String> headers) {
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<String, String> headerItem : headers.entrySet()) {
+            sb.append(headerItem.getKey());
+            sb.append(":");
+            sb.append(headerItem.getValue());
+            sb.append("\n");
+        }
+        return Base64Encoder.encodeBase64String(sb.toString().getBytes()).replaceAll("\n", "");
     }
 }

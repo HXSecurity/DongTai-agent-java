@@ -1,17 +1,18 @@
 package com.secnium.iast.core.enhance.sca;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import org.junit.Test;
-
-import java.io.File;
 
 public class ScaScanTest {
 
     @Test
-    public void scan() {
-        String[] packagePaths = new String[]{};
+    public void scan() throws MalformedURLException {
+        String[] packagePaths = new String[]{
+        };
 
         for (String packagePath : packagePaths) {
-            ScaScanner.scan(new File(packagePath));
+            ScaScanner.scanForSCA(new URL(packagePath), "");
         }
     }
 

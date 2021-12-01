@@ -23,7 +23,7 @@ public class SourceImpl {
     private static final ArrayList<String> WHITE_ATTRIBUTES = new ArrayList<String>();
     private static final String METHOD_OF_GETATTRIBUTE = "getAttribute";
     private static final String VALUES_ENUMERATOR = " org.apache.tomcat.util.http.ValuesEnumerator".substring(1);
-    private static final String SPRING_OBJECT = " org.springframework.web.".substring(1);
+    private static final String SPRING_OBJECT = " org.springframework.".substring(1);
 
     public static void solveSource(MethodEvent event, AtomicInteger invokeIdSequencer) {
         if (isNotEmpty(event.returnValue) && isAllowTaintType(event.returnValue) && allowCall(event)) {
@@ -52,7 +52,7 @@ public class SourceImpl {
             String className = sourceClass.getName();
             if (className.startsWith("cn.huoxian.iast.api.") ||
                     VALUES_ENUMERATOR.equals(className) ||
-                    className.contains(SPRING_OBJECT)
+                    className.startsWith(SPRING_OBJECT)
             ) {
                 return;
             }
