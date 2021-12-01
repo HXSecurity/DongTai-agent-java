@@ -24,6 +24,7 @@ public class AgentLauncher {
      * @param inst inst
      */
     public static void premain(String args, Instrumentation inst) {
+
         System.setProperty("sun.net.http.allowRestrictedHeaders","true");
         LAUNCH_MODE = LAUNCH_MODE_AGENT;
         try {
