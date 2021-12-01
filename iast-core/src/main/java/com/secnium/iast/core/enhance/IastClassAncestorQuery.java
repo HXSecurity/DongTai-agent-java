@@ -1,17 +1,20 @@
 package com.secnium.iast.core.enhance;
 
-import com.secnium.iast.core.enhance.sca.ScaScanner;
 import com.secnium.iast.core.report.ErrorLogReport;
 import com.secnium.iast.core.util.ThrowableUtils;
+import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import org.json.JSONObject;
 import org.objectweb.asm.ClassReader;
-
-import java.io.File;
-import java.io.InputStream;
-import java.net.URL;
-import java.security.CodeSource;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 查询给定类的类族
@@ -23,7 +26,6 @@ public class IastClassAncestorQuery {
     private final Map<String, Set<String>> classAncestorMap;
     private static final Map<String, List<String>> DEFAULT_INTERFACE_LIST_MAP;
     private static final String BASE_CLASS = "java/lang/Object";
-    private final HashSet<String> scannedClassSet = new HashSet<String>();
 
     public synchronized void setLoader(ClassLoader loader) {
         this.loader = loader;
@@ -172,36 +174,6 @@ public class IastClassAncestorQuery {
     }
 
     /**
-     * todo 修改为异步扫描
-     *
-     * @param codeSource
-     */
-    public void scanCodeSource(CodeSource codeSource) {
-        URL url = codeSource.getLocation();
-        if (url != null) {
-            String jarPackageFilePath = url.getFile();
-            File jarPackageFile = new File(jarPackageFilePath);
-            String packagePath = jarPackageFile.getParent();
-            if (jarPackageFilePath.startsWith("file:") && jarPackageFilePath.endsWith(".jar!/") && jarPackageFilePath.contains("BOOT-INF") && !scannedClassSet.contains(packagePath)) {
-                scannedClassSet.add(packagePath);
-                jarPackageFilePath = jarPackageFilePath.replace("file:", "");
-                jarPackageFilePath = jarPackageFilePath.substring(0, jarPackageFilePath.indexOf("!/"));
-                ScaScanner.scanWithJarPackage(jarPackageFilePath);
-            } else if (jarPackageFilePath.endsWith(".jar") && jarPackageFilePath.contains("WEB-INF") && !scannedClassSet.contains(packagePath)) {
-                scannedClassSet.add(packagePath);
-                File packagePathFile = new File(packagePath);
-                File[] packagePathFiles = packagePathFile.listFiles();
-                for (File tempPackagePathFile : packagePathFiles != null ? packagePathFiles : new File[0]) {
-                    ScaScanner.scan(tempPackagePathFile);
-                }
-            }else if (jarPackageFilePath.endsWith(".jar") && jarPackageFilePath.contains("repository") && !scannedClassSet.contains(jarPackageFilePath)){
-                scannedClassSet.add(jarPackageFilePath);
-                ScaScanner.scan(jarPackageFile);
-            }
-        }
-    }
-
-    /**
      * todo 利用类名查找实现的接口列表、继承的父类
      */
     public static Set<String> getFamilyFromClass(String className) {
@@ -210,11 +182,17 @@ public class IastClassAncestorQuery {
 
     static {
         DEFAULT_INTERFACE_LIST_MAP = new HashMap();
-        DEFAULT_INTERFACE_LIST_MAP.put(" org/apache/jasper/runtime/HttpJspBase".substring(1), Collections.singletonList(" javax/servlet/jsp/JspPage".substring(1)));
-        DEFAULT_INTERFACE_LIST_MAP.put(" javax/servlet/http/HttpServletResponse".substring(1), Collections.singletonList(" javax/servlet/ServletResponse".substring(1)));
-        DEFAULT_INTERFACE_LIST_MAP.put(" javax/servlet/http/HttpServletRequest".substring(1), Collections.singletonList(" javax/servlet/ServletRequest".substring(1)));
-        DEFAULT_INTERFACE_LIST_MAP.put(" weblogic/servlet/internal/ServletRequestImpl".substring(1), Collections.singletonList(" javax/servlet/ServletRequest".substring(1)));
-        DEFAULT_INTERFACE_LIST_MAP.put(" weblogic/servlet/jsp/JspBase".substring(1), Collections.singletonList(" javax/servlet/http/HttpServlet".substring(1)));
-        DEFAULT_INTERFACE_LIST_MAP.put(" com/mysql/jdbc/Statement".substring(1), Collections.singletonList(" java/sql/Statement".substring(1)));
+        DEFAULT_INTERFACE_LIST_MAP.put(" org/apache/jasper/runtime/HttpJspBase".substring(1),
+                Collections.singletonList(" javax/servlet/jsp/JspPage".substring(1)));
+        DEFAULT_INTERFACE_LIST_MAP.put(" javax/servlet/http/HttpServletResponse".substring(1),
+                Collections.singletonList(" javax/servlet/ServletResponse".substring(1)));
+        DEFAULT_INTERFACE_LIST_MAP.put(" javax/servlet/http/HttpServletRequest".substring(1),
+                Collections.singletonList(" javax/servlet/ServletRequest".substring(1)));
+        DEFAULT_INTERFACE_LIST_MAP.put(" weblogic/servlet/internal/ServletRequestImpl".substring(1),
+                Collections.singletonList(" javax/servlet/ServletRequest".substring(1)));
+        DEFAULT_INTERFACE_LIST_MAP.put(" weblogic/servlet/jsp/JspBase".substring(1),
+                Collections.singletonList(" javax/servlet/http/HttpServlet".substring(1)));
+        DEFAULT_INTERFACE_LIST_MAP.put(" com/mysql/jdbc/Statement".substring(1),
+                Collections.singletonList(" java/sql/Statement".substring(1)));
     }
 }

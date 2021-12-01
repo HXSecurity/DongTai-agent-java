@@ -8,6 +8,7 @@ import com.secnium.iast.core.EngineManager;
 import com.secnium.iast.core.PropertyUtils;
 import com.secnium.iast.core.enhance.plugins.AbstractClassVisitor;
 import com.secnium.iast.core.enhance.plugins.PluginRegister;
+import com.secnium.iast.core.enhance.sca.ScaScanner;
 import com.secnium.iast.core.report.ErrorLogReport;
 import com.secnium.iast.core.util.AsmUtils;
 import com.secnium.iast.core.util.LogUtils;
@@ -82,17 +83,8 @@ public class IastClassFileTransformer implements ClassFileTransformer {
 
         try {
             final CodeSource codeSource = (protectionDomain != null) ? protectionDomain.getCodeSource() : null;
-
-            // sca scan
-            if (codeSource != null
-                    && internalClassName != null
-                    && !internalClassName.startsWith("com/secnium/iast/")
-                    && !internalClassName.startsWith("java/lang/iast/")
-                    && !internalClassName.startsWith("cn/huoxian/iast/")
-                    && !internalClassName.startsWith("com/sun/")
-                    && !internalClassName.startsWith("sun/")
-            ) {
-                COMMON_UTILS.scanCodeSource(codeSource);
+            if (codeSource != null) {
+                ScaScanner.scanForSCA(codeSource.getLocation(), internalClassName);
             }
 
             // class hook
