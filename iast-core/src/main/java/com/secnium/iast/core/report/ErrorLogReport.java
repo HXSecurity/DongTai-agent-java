@@ -2,6 +2,7 @@ package com.secnium.iast.core.report;
 
 import com.secnium.iast.core.EngineManager;
 import com.secnium.iast.core.handler.vulscan.ReportConstant;
+import com.secnium.iast.core.util.Constants;
 import org.json.JSONObject;
 
 /**
@@ -13,7 +14,7 @@ public class ErrorLogReport {
 
     public static void sendErrorLog(String errorLog) {
         String report = createReport(errorLog);
-        EngineManager.sendNewReport(report);
+        ReportThread.send(Constants.API_REPORT_UPLOAD, report);
     }
 
     private static String createReport(String errorLog) {

@@ -49,8 +49,6 @@ public class EngineManager {
     private static final BooleanTheadLocal LINGZHI_RUNNING = new BooleanTheadLocal(false);
     public static IastServer SERVER;
 
-    private static final ArrayBlockingQueue<String> REPORTS = new ArrayBlockingQueue<String>(4096);
-    private static final ArrayBlockingQueue<String> METHOD_REPORT = new ArrayBlockingQueue<String>(4096);
     private static final ArrayBlockingQueue<IastReplayModel> REPLAY_QUEUE = new ArrayBlockingQueue<IastReplayModel>(
             4096);
 
@@ -173,23 +171,6 @@ public class EngineManager {
         return cfg;
     }
 
-    public static void sendNewReport(String report) {
-        logger.debug(report);
-        REPORTS.offer(report);
-    }
-
-    public static String getNewReport() {
-        return REPORTS.poll();
-    }
-
-    public static boolean hasNewReport() {
-        return !REPORTS.isEmpty();
-    }
-
-    public static int getReportQueueSize() {
-        return REPORTS.size();
-    }
-
     public static boolean hasReplayData() {
         return !REPLAY_QUEUE.isEmpty();
     }
@@ -200,26 +181,6 @@ public class EngineManager {
 
     public static void sendReplayModel(IastReplayModel replayModel) {
         REPLAY_QUEUE.offer(replayModel);
-    }
-
-    public static int getReplayQueueSize() {
-        return REPLAY_QUEUE.size();
-    }
-
-    public static void sendMethodReport(String report) {
-        METHOD_REPORT.offer(report);
-    }
-
-    public static String getMethodReport() {
-        return METHOD_REPORT.poll();
-    }
-
-    public static boolean hasMethodReport() {
-        return !METHOD_REPORT.isEmpty();
-    }
-
-    public static int getMethodReportQueueSize() {
-        return METHOD_REPORT.size();
     }
 
     public static boolean getIsLoginLogic() {

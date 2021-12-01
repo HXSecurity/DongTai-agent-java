@@ -7,6 +7,8 @@ import com.secnium.iast.core.handler.controller.impl.HttpImpl;
 import com.secnium.iast.core.handler.models.MethodEvent;
 import com.secnium.iast.core.handler.vulscan.ReportConstant;
 import com.secnium.iast.core.handler.vulscan.normal.AbstractNormalVulScan;
+import com.secnium.iast.core.report.ReportThread;
+import com.secnium.iast.core.util.Constants;
 import com.secnium.iast.core.util.LogUtils;
 import com.secnium.iast.core.util.base64.Base64Encoder;
 import java.lang.reflect.InvocationTargetException;
@@ -25,7 +27,7 @@ public class GraphBuilder {
     public static void buildAndReport(Object response) {
         List<GraphNode> nodeList = build();
         String report = convertToReport(nodeList, response);
-        EngineManager.sendMethodReport(report);
+        ReportThread.send(Constants.API_REPORT_UPLOAD, report);
     }
 
     private static Map<String, Object> getResponseMeta(Object response) {
