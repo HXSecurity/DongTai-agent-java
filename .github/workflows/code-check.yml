@@ -85,8 +85,7 @@ jobs:
 
           echo "copy dongtai agent java to tomcat..."
           cp DongTai-agent-java/release/iast-agent.jar apache-tomcat-8.5.40/iast/agent.jar
-          cp DongTai-agent-java/release/lib/iast-core.jar apache-tomcat-8.5.40/temp/iast-core.jar
-          cp DongTai-agent-java/release/lib/iast-inject.jar apache-tomcat-8.5.40/temp/iast-inject.jar
+          cp DongTai-agent-java/release/lib/*.jar apache-tomcat-8.5.40/temp/
           cd apache-tomcat-8.5.40
 
           echo "init mysql"
@@ -110,13 +109,16 @@ jobs:
 
       - name: Benchmark-Vulns-Test
         run: |
-          pwd
-          ls -l
-          java -version
-          mvn -version
           # download Benchmark
+          git clone https://github.com/exexute/BenchmarkJava.git
+          cd BenchmarkJava
+          mvn clean package cargo:start -Pdeploywdongtai
           # Copy Agent To Benchmark
-          # Run
+          cp DongTai-agent-java/release/iast-agent.jar tools/DongTai/
+          cp DongTai-agent-java/release/lib/*.jar target/cargo/installs/apache-tomcat-8.5.70/apache-tomcat-8.5.70/temp
+          # Run Benchmark
+          nohup bash tools/DongTai/runBenchmark_wDongTai.sh &
+          sleep 600
 
   Upload-To-OSS:
     name: Upload To TEST OSS
