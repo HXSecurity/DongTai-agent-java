@@ -105,9 +105,10 @@ jobs:
           ./spider.sh
 
           echo "waitting for send vuls data"
-          sleep 600
+          sleep 120
 
           echo "shutdown tomcat"
+          ps aux
           ps aux|grep tomcat|awk '{print $2}' | xargs -I {} kill -9 {}
 
       - name: Benchmark-Vulns-Test
