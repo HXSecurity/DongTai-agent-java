@@ -8,6 +8,15 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+    paths-ignore:
+      - '.github/**'
+      - 'changes/**'
+      - 'deploy/**'
+      - '**.md'
+      - '**.yml'
+      - '**.xml'
+      - 'LICENSE'
+      - '.gitignore'
   schedule:
     - cron: '0 10 * * *'
 
@@ -140,7 +149,7 @@ jobs:
           bash runCrawler.sh
 
           echo "waiting for report upload..."          
-          sleep 1800
+          sleep 3000
 
 
   Upload-To-OSS:
