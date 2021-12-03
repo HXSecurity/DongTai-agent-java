@@ -28,7 +28,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
-      - name: Get python version
+      - name: Get release version
         id: get_release_version
         run: |
           V=`echo ${{ steps.get_release.outputs.tag_name }} | sed -e's/v//g' | sed -e's/V//g'`; \
@@ -45,17 +45,6 @@ jobs:
           files=('iast-core.jar') && \
           for FILE in ${files[@]};do FILE_HASH=`sha256sum ${FILE} | awk '{print $1}'`; echo "${{ github.event.repository.name }},${FILE},${FILE_HASH}" >> version.txt; done \
 
-      - name: Upload version file to oss
-        id: upload_version_file_to_oss
-        uses: tvrcgo/upload-to-oss@master
-        with:
-          key-id: ${{ secrets.OSS_KEY_ID }}
-          key-secret: ${{ secrets.OSS_KEY_SECRET }}
-          region: oss-cn-beijing
-          bucket: huoqi-public
-          assets: |
-            ./version.txt:/iast/release-version/${{ github.event.repository.name }}/${{ steps.get_release_version.outputs.VERSION }}/version.txt
-
       - uses: manyuanrong/setup-ossutil@v2.0
         with:
           endpoint: "oss-cn-beijing.aliyuncs.com"
@@ -63,5 +52,8 @@ jobs:
           access-key-secret: ${{ secrets.OSS_KEY_SECRET }}
 
       - run: |
-          ossutil cp -rf release/iast-agent.jar oss://dongtai/agent/java/iast-agent.jar --meta x-oss-object-acl:public-read
-          ossutil cp -rf release/lib/ oss://dongtai/agent/java/ --meta x-oss-object-acl:public-read
+         ossutil cp ./version.txt oss://huoqi-public/iast/release-version/${{ github.event.repository.name }}/${{ steps.get_release_version.outputs.VERSION }}/version.txt
+
+#      - run: |
+#          ossutil cp -rf release/iast-agent.jar oss://dongtai/agent/java/iast-agent.jar --meta x-oss-object-acl:public-read
+#          ossutil cp -rf release/lib/ oss://dongtai/agent/java/ --meta x-oss-object-acl:public-read
