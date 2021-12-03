@@ -109,7 +109,9 @@ jobs:
 
           echo "shutdown tomcat"
           ps aux
-          ps aux|grep tomcat|awk '{print $2}' | xargs -I {} kill -9 {}
+          PID=$(ps aux|grep "org.apache.catalina.startup.Bootstrap start" |awk '{print $2}')
+          echo "tomcat pid is: $PID"
+          kill -9 $PID
 
       - name: Benchmark-Vulns-Test
         run: |
