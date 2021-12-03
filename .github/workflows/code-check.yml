@@ -108,13 +108,14 @@ jobs:
           sleep 120
 
           echo "shutdown tomcat"
-          ps aux
           PID=$(ps aux|grep "org.apache.catalina.startup.Bootstrap start" |awk '{print $2}')
           echo "tomcat pid is: $PID"
-          kill -9 $PID
+          kill $PID
+          ps aux
 
       - name: Benchmark-Vulns-Test
         run: |
+          pwd
           git clone https://github.com/exexute/BenchmarkJava.git
           cd BenchmarkJava
           mvn clean package cargo:start -Pdeploywdongtai
