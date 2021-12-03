@@ -108,9 +108,9 @@ jobs:
           sleep 120
 
           echo "shutdown tomcat"
-          PID=$(ps aux|grep "org.apache.catalina.startup.Bootstrap start" |awk '{print $2}')
+          PID=$(ps aux|grep "org.apache.catalina.startup.Bootstrap start"|grep -v grep |awk '{print $2}')
           echo "tomcat pid is: $PID"
-          kill $PID
+          kill -kill $PID
           ps aux
 
       - name: Benchmark-Vulns-Test
