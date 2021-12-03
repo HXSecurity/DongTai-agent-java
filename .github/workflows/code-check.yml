@@ -115,13 +115,13 @@ jobs:
 
       - name: Benchmark-Vulns-Test
         run: |
-          pwd
+          cd ..
           git clone https://github.com/exexute/BenchmarkJava.git
           cd BenchmarkJava
           mvn clean package cargo:start -Pdeploywdongtai
 
-          cp DongTai-agent-java/release/iast-agent.jar tools/DongTai/
-          cp DongTai-agent-java/release/lib/*.jar target/cargo/installs/apache-tomcat-8.5.70/apache-tomcat-8.5.70/temp
+          cp ../DongTai-agent-java/release/iast-agent.jar tools/DongTai/
+          cp ../DongTai-agent-java/release/lib/*.jar target/cargo/installs/apache-tomcat-8.5.70/apache-tomcat-8.5.70/temp
 
           nohup mvn clean package cargo:run -Pdeploywdongtai &
           
