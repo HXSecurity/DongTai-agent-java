@@ -149,7 +149,7 @@ jobs:
           bash runCrawler.sh
 
           echo "waiting for report upload..."          
-          sleep 1800
+          sleep 3000
 
 
   Upload-To-OSS:
