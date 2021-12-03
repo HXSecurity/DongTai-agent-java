@@ -107,18 +107,25 @@ jobs:
           echo "waitting for send vuls data"
           sleep 600
 
+          echo "shutdown tomcat"
+          ps aux|grep tomcat|awk '{print $2}' | xargs -I {} kill -9 {}
+
       - name: Benchmark-Vulns-Test
         run: |
-          # download Benchmark
           git clone https://github.com/exexute/BenchmarkJava.git
           cd BenchmarkJava
           mvn clean package cargo:start -Pdeploywdongtai
-          # Copy Agent To Benchmark
+
           cp DongTai-agent-java/release/iast-agent.jar tools/DongTai/
           cp DongTai-agent-java/release/lib/*.jar target/cargo/installs/apache-tomcat-8.5.70/apache-tomcat-8.5.70/temp
-          # Run Benchmark
-          nohup bash tools/DongTai/runBenchmark_wDongTai.sh &
+
+          nohup mvn clean package cargo:run -Pdeploywdongtai &
+          
           sleep 600
+
+          echo "shutdown tomcat"
+          #ps aux|grep tomcat|awk '{print $2}' | xargs -I {} kill -9 {}
+
 
   Upload-To-OSS:
     name: Upload To TEST OSS
