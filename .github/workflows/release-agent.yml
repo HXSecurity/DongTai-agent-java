@@ -22,14 +22,14 @@ jobs:
         with:
           maven-version: 3.2.5
 
-      - name: Get release
-        id: get_release
-        uses: bruceadams/get-release@v1.2.2
+      - name: Get the release version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
 
       - name: Get release version
         id: get_release_version
         run: |
-          V=`echo ${{ steps.get_release.outputs.tag_name }} | sed -e's/v//g' | sed -e's/V//g'`; \
+          V=`echo ${{ steps.get_version.outputs.VERSION }} | sed -e's/v//g' | sed -e's/V//g'`; \
           echo ::set-output name=VERSION::${V}
 
       - name: Build with Maven
