@@ -85,8 +85,7 @@ jobs:
 
           echo "copy dongtai agent java to tomcat..."
           cp DongTai-agent-java/release/iast-agent.jar apache-tomcat-8.5.40/iast/agent.jar
-          cp DongTai-agent-java/release/lib/iast-core.jar apache-tomcat-8.5.40/temp/iast-core.jar
-          cp DongTai-agent-java/release/lib/iast-inject.jar apache-tomcat-8.5.40/temp/iast-inject.jar
+          cp DongTai-agent-java/release/lib/*.jar apache-tomcat-8.5.40/temp/
           cd apache-tomcat-8.5.40
 
           echo "init mysql"
@@ -106,17 +105,43 @@ jobs:
           ./spider.sh
 
           echo "waitting for send vuls data"
-          sleep 600
+          sleep 120
+
+          echo "shutdown tomcat"
+          PID=$(ps aux|grep "org.apache.catalina.startup.Bootstrap start"|grep -v grep |awk '{print $2}')
+          echo "tomcat pid is: $PID"
+          kill $PID
+          ps aux
 
       - name: Benchmark-Vulns-Test
         run: |
-          pwd
-          ls -l
-          java -version
-          mvn -version
-          # download Benchmark
-          # Copy Agent To Benchmark
-          # Run
+          cd ..
+          git clone https://github.com/exexute/BenchmarkJava.git
+          cd BenchmarkJava
+          mvn clean package cargo:start -Pdeploywdongtai
+
+          cp ../DongTai-agent-java/release/iast-agent.jar tools/DongTai/dongtai.jar
+          cp ../DongTai-agent-java/release/lib/*.jar target/cargo/installs/apache-tomcat-8.5.70/apache-tomcat-8.5.70/temp
+
+          echo "run benchmark in backend"
+          export JAVA_TOOL_OPTIONS="-Dproject.create=true -Dproject.version=${{ github.event_name }}-${{ github.run_number }}"
+          nohup mvn package cargo:run -Pdeploywdongtai &
+
+          echo "wait for benchmark start..."          
+          sleep 60
+
+          echo "build Crawler"
+          git clone https://github.com/OWASP-Benchmark/BenchmarkUtils.git
+          cd BenchmarkUtils
+          mvn install
+
+          echo "run Crawler.sh"
+          cd ..
+          bash runCrawler.sh
+
+          echo "waiting for report upload..."          
+          sleep 1800
+
 
   Upload-To-OSS:
     name: Upload To TEST OSS
