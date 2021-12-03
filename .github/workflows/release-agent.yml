@@ -55,6 +55,6 @@ jobs:
          cd ${{ github.workspace }}/release/lib/ && \
          ossutil cp version.txt oss://huoqi-public/iast/release-version/${{ github.event.repository.name }}/${{ steps.get_release_version.outputs.VERSION }}/version.txt
 
-#      - run: |
-#          ossutil cp -rf release/iast-agent.jar oss://dongtai/agent/java/iast-agent.jar --meta x-oss-object-acl:public-read
-#          ossutil cp -rf release/lib/ oss://dongtai/agent/java/ --meta x-oss-object-acl:public-read
+      - run: |
+          ossutil cp -rf release/iast-agent.jar oss://dongtai/agent/java/iast-agent.jar --meta x-oss-object-acl:public-read
+          ossutil cp -rf release/lib/ oss://dongtai/agent/java/ --meta x-oss-object-acl:public-read
