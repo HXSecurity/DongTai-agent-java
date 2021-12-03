@@ -1,11 +1,18 @@
 ## DongTai-agent-java
+---
+[English version](README.md)
 
-[![django-project](https://img.shields.io/badge/django%20versions-3.0.3-blue)](https://www.djangoproject.com/)
-[![dongtai-project](https://img.shields.io/badge/dongtai%20versions-beta-green)](https://github.com/huoxianclub/dongtai)
-[![dongtai--agent--java](https://img.shields.io/badge/dongtai--agent--java-v1.0.0-lightgrey)](https://github.com/huoxianclub/dongtai-web)
-[![license GPL-3.0](https://img.shields.io/github/license/HXSecurity/DongTai-agent-java)](https://github.com/HXSecurity/DongTai-agent-java/blob/main/LICENSE)
+[![license Apache-2.0](https://img.shields.io/github/license/HXSecurity/DongTai-agent-java)](https://github.com/HXSecurity/DongTai-agent-java/blob/main/LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/HXSecurity/DongTai-agent-java.svg?label=Stars&logo=github)](https://github.com/HXSecurity/DongTai-agent-java)
+[![GitHub forks](https://img.shields.io/github/forks/HXSecurity/DongTai-Agent-Java?label=Forks&logo=github)](https://github.com/HXSecurity/DongTai-agent-java)
+[![GitHub Contributors](https://img.shields.io/github/contributors-anon/HXSecurity/DongTai-agent-java?label=Contributors&logo=github)](https://github.com/HXSecurity/DongTai-agent-java)
 
-- [English document](README.md)
+
+[![CI](https://github.com/HXSecurity/DongTai-agent-java/actions/workflows/release-agent.yml/badge.svg)](https://github.com/HXSecurity/DongTai-agent-java/actions/workflows/release-agent.yml)
+[![Github Version](https://img.shields.io/github/v/release/HXSecurity/DongTai-agent-java?display_name=tag&include_prereleases&sort=semver)](https://github.com/HXSecurity/DongTai-agent-java/releases)
+[![Release downloads](https://shields.io/github/downloads/HXSecurity/DongTai-Agent-Java/total)](https://github.com/HXSecurity/DongTai-agent-java/releases)
+
+
 
 ## 项目介绍
 
