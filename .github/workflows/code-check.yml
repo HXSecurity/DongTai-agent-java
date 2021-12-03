@@ -124,10 +124,11 @@ jobs:
           cp ../DongTai-agent-java/release/lib/*.jar target/cargo/installs/apache-tomcat-8.5.70/apache-tomcat-8.5.70/temp
 
           echo "run benchmark in backend"
+          export JAVA_TOOL_OPTIONS="-Dproject.create=true -Dproject.version=${{ github.event_name }}-${{ github.run_number }}"
           nohup mvn package cargo:run -Pdeploywdongtai &
 
           echo "wait for benchmark start..."          
-          sleep 120
+          sleep 60
 
           echo "build Crawler"
           git clone https://github.com/OWASP-Benchmark/BenchmarkUtils.git
@@ -139,7 +140,7 @@ jobs:
           bash runCrawler.sh
 
           echo "waiting for report upload..."          
-          sleep 120
+          sleep 600
 
 
   Upload-To-OSS:
