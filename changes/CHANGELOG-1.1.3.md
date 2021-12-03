@@ -13,7 +13,7 @@ All issues and pull requests are [here](https://github.com/HXSecurity/DongTai-ag
 
 **Contributors**
 
-@exexute, @langligelang, @Nizernizer, @luzhongyang
+@exexute, @langligelang, @Nizernizer and @luzhongyang
 
 
 ------------------
