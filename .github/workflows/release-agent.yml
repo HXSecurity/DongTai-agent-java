@@ -54,7 +54,7 @@ jobs:
           region: oss-cn-beijing
           bucket: huoqi-public
           assets: |
-            ./version.txt:/iast/release-version/${{ github.event.repository.name }}/${{ steps.release.outputs.version }}/version.txt
+            ./version.txt:/iast/release-version/${{ github.event.repository.name }}/${{ steps.get_release_version.outputs.VERSION }}/version.txt
 
       - uses: manyuanrong/setup-ossutil@v2.0
         with:
@@ -63,5 +63,5 @@ jobs:
           access-key-secret: ${{ secrets.OSS_KEY_SECRET }}
 
       - run: |
-          ossutil cp -rf release/iast-agent.jar oss://dongtai/agent/java1/iast-agent.jar --meta x-oss-object-acl:public-read
-          ossutil cp -rf release/lib/ oss://dongtai/agent/java1/ --meta x-oss-object-acl:public-read
+          ossutil cp -rf release/iast-agent.jar oss://dongtai/agent/java/iast-agent.jar --meta x-oss-object-acl:public-read
+          ossutil cp -rf release/lib/ oss://dongtai/agent/java/ --meta x-oss-object-acl:public-read
