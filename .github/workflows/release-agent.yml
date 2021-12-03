@@ -41,7 +41,7 @@ jobs:
         run: |
           cd ${{ github.workspace }}/release/lib/ && \
           echo "${{ github.event.repository.name }},version,${{ steps.get_release_version.outputs.VERSION }}" >> version.txt && \
-          echo "${{ github.event.repository.name }},commit_hash,${GITHUB_SHA}" >> version.txt \
+          echo "${{ github.event.repository.name }},commit_hash,${GITHUB_SHA}" >> version.txt && \
           files=('iast-core.jar') && \
           for FILE in ${files[@]};do FILE_HASH=`sha256sum ${FILE} | awk '{print $1}'`; echo "${{ github.event.repository.name }},${FILE},${FILE_HASH}" >> version.txt; done \
 
