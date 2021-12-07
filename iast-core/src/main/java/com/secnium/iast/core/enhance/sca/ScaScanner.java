@@ -1,13 +1,16 @@
 package com.secnium.iast.core.enhance.sca;
 
 import com.secnium.iast.core.report.AssestReport;
+import com.secnium.iast.core.util.LogUtils;
+import org.slf4j.Logger;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.JarURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Enumeration;
-import java.util.HashSet;
+import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -19,6 +22,7 @@ public class ScaScanner {
     private static final String ALGORITHM = "SHA-1";
     private static final String JAR = ".jar";
     private static volatile HashSet<String> scannedClassSet = new HashSet<String>();
+    private static Boolean isClassPath = false;
 
     /**
      * @param url
@@ -35,8 +39,28 @@ public class ScaScanner {
         ) {
             return;
         }
+        isClassPathStart();
         ScaScanThread scanThread = new ScaScanThread(url);
         scanThread.start();
+    }
+
+    private static void isClassPathStart() {
+        if (!isClassPath) {
+            String property = System.getProperty("java.class.path");
+            String[] split = property.split(":");
+            for (String string : split) {
+                try {
+                    File file = new File(string);
+                    URL url = file.toURI().toURL();
+                    ScaScanThread scanThread = new ScaScanThread(url);
+                    scanThread.start();
+                } catch (MalformedURLException e) {
+                    Logger logger = LogUtils.getLogger(ScaScanner.class);
+                    logger.error(e.getMessage());
+                }
+            }
+            isClassPath = true;
+        }
     }
 
     /**
