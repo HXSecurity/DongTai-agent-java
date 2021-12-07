@@ -52,6 +52,7 @@ public class RequestWrapper extends HttpServletRequestWrapper {
                 assert bufferedReader != null;
                 bufferedReader.close();
             } catch (IOException e) {
+                // fixme: add logger for solve exception
                 e.printStackTrace();
             }
         }
