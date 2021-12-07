@@ -26,8 +26,8 @@ public class RequestWrapper extends HttpServletRequestWrapper {
     }
 
     public static boolean allowedContentType(String contentType) {
-        return contentType.contains("application/json")
-                || contentType.contains("application/xml");
+        return contentType != null && (contentType.contains("application/json")
+                || contentType.contains("application/xml"));
     }
 
     private RequestWrapper(HttpServletRequest request) {

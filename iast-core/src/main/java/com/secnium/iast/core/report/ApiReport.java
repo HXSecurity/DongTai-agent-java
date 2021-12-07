@@ -2,20 +2,20 @@ package com.secnium.iast.core.report;
 
 import com.secnium.iast.core.EngineManager;
 import com.secnium.iast.core.handler.vulscan.ReportConstant;
+import com.secnium.iast.core.util.Constants;
+import java.util.Map;
 import org.json.JSONObject;
 
-import java.util.Map;
-
 /**
- * 发送应用接口
+ * send api sitemap
  *
  * @author niuerzhuang@huoxian.cn
  */
 public class ApiReport {
 
     public static void sendReport(Map<String, Object> apiList) {
-         String report = createReport(apiList);
-         EngineManager.sendNewReport(report);
+        String report = createReport(apiList);
+        ReportThread.send(Constants.API_REPORT_UPLOAD, report);
     }
 
     private static String createReport(Map<String, Object> apiList) {

@@ -3,6 +3,8 @@ package com.secnium.iast.core.handler.vulscan.normal;
 import com.secnium.iast.core.EngineManager;
 import com.secnium.iast.core.handler.vulscan.IVulScan;
 import com.secnium.iast.core.handler.vulscan.ReportConstant;
+import com.secnium.iast.core.report.ReportThread;
+import com.secnium.iast.core.util.Constants;
 import com.secnium.iast.core.util.StackUtils;
 import com.secnium.iast.core.util.base64.Base64Encoder;
 import java.util.Map;
@@ -49,8 +51,7 @@ public abstract class AbstractNormalVulScan implements IVulScan {
         for (StackTraceElement element : stacks) {
             vulStacks.put(element.toString());
         }
-
-        EngineManager.sendNewReport(report.toString());
+        ReportThread.send(Constants.API_REPORT_UPLOAD, report.toString());
     }
 
     protected StackTraceElement[] getLatestStack() {

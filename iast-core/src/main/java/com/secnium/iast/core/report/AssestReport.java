@@ -2,6 +2,7 @@ package com.secnium.iast.core.report;
 
 import com.secnium.iast.core.EngineManager;
 import com.secnium.iast.core.handler.vulscan.ReportConstant;
+import com.secnium.iast.core.util.Constants;
 import org.json.JSONObject;
 
 
@@ -14,7 +15,7 @@ public class AssestReport {
 
     public static void sendReport(String packagePath, String packageName, String signature, String algorithm) {
         String report = createReport(packagePath, packageName, signature, algorithm);
-        EngineManager.sendNewReport(report);
+        ReportThread.send(Constants.API_REPORT_UPLOAD, report);
     }
 
     private static String createReport(String packagePath, String packageName, String signature, String algorithm) {
