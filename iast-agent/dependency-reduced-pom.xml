@@ -3,7 +3,7 @@
   <parent>
     <artifactId>iast</artifactId>
     <groupId>com.secnium.iast</groupId>
-    <version>1.1.3</version>
+    <version>${iast.version}</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>iast-agent</artifactId>

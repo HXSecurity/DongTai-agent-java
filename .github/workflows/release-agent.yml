@@ -32,8 +32,10 @@ jobs:
           V=`echo ${{ steps.get_version.outputs.VERSION }} | sed -e's/v//g' | sed -e's/V//g'`; \
           echo ::set-output name=VERSION::${V}
 
-      - name: Build with Maven
-        run: mvn -B package -Dmaven.test.skip=true
+      - name: Build and Publish Maven Package
+        run: |
+          mvn -B package -Dmaven.test.skip=true
+          mvn -B -DuseGitHubPackages=true deploy
 
       - name: Generate version file
         run: |
@@ -50,8 +52,8 @@ jobs:
           access-key-secret: ${{ secrets.OSS_KEY_SECRET }}
 
       - run: |
-         cd ${{ github.workspace }}/release/lib/ && \
-         ossutil cp version.txt oss://huoqi-public/iast/release-version/${{ github.event.repository.name }}/${{ steps.get_release_version.outputs.VERSION }}/version.txt
+          cd ${{ github.workspace }}/release/lib/ && \
+          ossutil cp version.txt oss://huoqi-public/iast/release-version/${{ github.event.repository.name }}/${{ steps.get_release_version.outputs.VERSION }}/version.txt
 
       - run: |
           ossutil cp -rf release/iast-agent.jar oss://dongtai/agent/java/iast-agent.jar --meta x-oss-object-acl:public-read
