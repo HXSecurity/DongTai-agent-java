@@ -135,6 +135,10 @@ public class PropertyUtils {
         return "com.secnium.iast.resources/whitelist.txt";
     }
 
+    public String getBlackUrl() {
+        return "com.secnium.iast.resources/blackurl.txt";
+    }
+
     public String getBlackExtFilePath() {
         return "com.secnium.iast.resources/blackext.txt";
     }

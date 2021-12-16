@@ -160,12 +160,16 @@ public class HttpImpl {
         if (ConfigMatcher.disableExtension((String) requestMeta.get("requestURI"))) {
             return;
         }
-        // todo: add custom header escape
-        EngineManager.enterHttpEntry(requestMeta);
         if (logger.isDebugEnabled()) {
             logger.debug("HTTP Request:{} {} from: {}", requestMeta.get("method"), requestMeta.get("requestURI"),
                     event.signature);
         }
+
+        if (ConfigMatcher.getBlackUrl( requestMeta)) {
+            return;
+        }
+        // todo: add custom header escape
+        EngineManager.enterHttpEntry(requestMeta);
     }
 
     private static final Logger logger = LogUtils.getLogger(HttpImpl.class);

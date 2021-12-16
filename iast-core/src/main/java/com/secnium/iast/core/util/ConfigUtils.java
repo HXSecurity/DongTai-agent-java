@@ -69,4 +69,22 @@ public class ConfigUtils {
         }
         return extStringArray;
     }
+
+    public static HashSet loadConfigFromFileByLine(String filename) {
+        HashSet<String> container = new HashSet<String>();
+        InputStream fis = null;
+        try {
+            fis = getResourceAsStreamFromFilename(filename);
+            LineIterator lineIterator = IOUtils.lineIterator(fis, (String) null);
+            while (lineIterator.hasNext()) {
+                String line = lineIterator.nextLine().trim();
+                container.add(line);
+            }
+        } catch (IOException e) {
+            logger.error("读取配置文件：{} 失败，错误信息：{}", filename, e);
+            ErrorLogReport.sendErrorLog(ThrowableUtils.getStackTrace(e));
+        }
+        return container;
+    }
+
 }

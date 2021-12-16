@@ -3,7 +3,10 @@ package com.secnium.iast.core.util.matcher;
 import com.secnium.iast.core.PropertyUtils;
 import com.secnium.iast.core.util.ConfigUtils;
 import com.secnium.iast.core.util.LogUtils;
+
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -28,6 +31,8 @@ public class ConfigMatcher {
     private final static AbstractMatcher FRAMEWORK_CLASS = new FrameworkClass();
     private final static AbstractMatcher SERVER_CLASS = new ServerClass();
 
+    private final static Set<String> BLACK_URL;
+
 
     /**
      * 检查后缀黑名单
@@ -40,6 +45,39 @@ public class ConfigMatcher {
             return false;
         }
         return StringUtils.endsWithAny(uri, DISABLE_EXT);
+    }
+
+    public static boolean getBlackUrl(Map<String, Object> request) {
+        if (request == null || request.isEmpty()) {
+            return false;
+        }
+        String uri = (String)request.get("requestURI");
+        String headers =  (String)request.get("headers");
+        Map<String,String> headerMap = new HashMap();
+        if(null!=headers && headers.length()>=1){
+            String[] headerlines = headers.split("\\n");
+            for(String headerline : headerlines){
+                String[] headervalue = headerline.split(":");
+                if(headervalue.length ==2)
+                    headerMap.put(headervalue[0].toLowerCase(),headervalue[1]);
+            }
+        }
+        for(String string : BLACK_URL){
+            String[] strings = string.split(" ");
+            switch (Integer.parseInt(strings[1])){
+                case 1:
+                    if(uri.contains(strings[0])) {
+                        return true;
+                    }
+                case 2:
+                    if(null != headerMap.get(strings[0].toLowerCase())) {
+                        return true;
+                    }
+                default:
+                    continue;
+            }
+        }
+        return false;
     }
 
     private static boolean inHookBlacklist(String className) {
@@ -112,12 +150,15 @@ public class ConfigMatcher {
         final PropertyUtils cfg = PropertyUtils.getInstance();
         String blackListFuncFile = cfg.getBlackFunctionFilePath();
         String blackList = cfg.getBlackClassFilePath();
+        String blackUrl =  cfg.getBlackUrl();
         String disableExtList = cfg.getBlackExtFilePath();
 
         HashSet<String>[] items = ConfigUtils.loadConfigFromFile(blackListFuncFile);
         BLACKS = items[0];
         END_WITH_BLACKS = items[2].toArray(new String[0]);
         START_WITH_BLACKS = items[1].toArray(new String[0]);
+
+        BLACK_URL=ConfigUtils.loadConfigFromFileByLine(blackUrl);
 
         items = ConfigUtils.loadConfigFromFile(blackList);
         START_ARRAY = items[1].toArray(new String[0]);
