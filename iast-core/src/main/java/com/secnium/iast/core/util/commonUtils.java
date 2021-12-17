@@ -33,7 +33,7 @@ public class commonUtils {
 
 
     public static boolean subContain(String fieldName, String item) {
-        return fieldName.contains(item);
+        return fieldName.equalsIgnoreCase(item);
     }
 
     public static boolean isEmpty(String name) {
