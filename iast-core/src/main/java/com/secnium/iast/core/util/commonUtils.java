@@ -32,8 +32,8 @@ public class commonUtils {
     }
 
 
-    public static boolean subContain(String fieldname, String target) {
-        return true;
+    public static boolean subContain(String fieldName, String item) {
+        return fieldName.contains(item);
     }
 
     public static boolean isEmpty(String name) {

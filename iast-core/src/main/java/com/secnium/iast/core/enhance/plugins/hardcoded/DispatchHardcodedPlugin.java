@@ -1,8 +1,8 @@
 package com.secnium.iast.core.enhance.plugins.hardcoded;
 
 import com.secnium.iast.core.enhance.IastContext;
+import com.secnium.iast.core.enhance.plugins.AbstractClassVisitor;
 import com.secnium.iast.core.enhance.plugins.DispatchPlugin;
-import com.secnium.iast.core.util.AsmUtils;
 import com.secnium.iast.core.util.LogUtils;
 import com.secnium.iast.core.util.commonUtils;
 import java.lang.reflect.Modifier;
@@ -22,7 +22,10 @@ public class DispatchHardcodedPlugin implements DispatchPlugin {
 
     @Override
     public ClassVisitor dispatch(ClassVisitor classVisitor, IastContext context) {
-        classVisitor = new ExtractClassContent(classVisitor);
+        if (!context.isBootstrapClassLoader()) {
+            classVisitor = new ExtractClassContent(classVisitor, context);
+            return classVisitor;
+        }
         return classVisitor;
     }
 
@@ -31,12 +34,12 @@ public class DispatchHardcodedPlugin implements DispatchPlugin {
         return null;
     }
 
-    private class ExtractClassContent extends ClassVisitor {
+    private class ExtractClassContent extends AbstractClassVisitor {
 
         private String source;
 
-        public ExtractClassContent(ClassVisitor classVisitor) {
-            super(AsmUtils.api, classVisitor);
+        public ExtractClassContent(ClassVisitor classVisitor, IastContext context) {
+            super(classVisitor, context);
         }
 
         @Override
@@ -48,13 +51,17 @@ public class DispatchHardcodedPlugin implements DispatchPlugin {
         @Override
         public FieldVisitor visitField(int access, String name, String desc, String signature, Object value) {
             FieldVisitor fieldVisitor = super.visitField(access, name, desc, signature, value);
-            if ("[B".equals(desc) && isKeysField(name)) {
-                logger.trace("Source is {}" + this.source);
-            } else if ("Ljava/lang/String;".equals(desc) && isStaticAndFinal(access) && isPassField(name)
-                    && !isWrongPrefix(name) && value instanceof String) {
-                String fieldName = (String) value;
-                if (!commonUtils.isEmpty(fieldName) && !valueMatcher(fieldName)) {
-                    logger.trace("Source is " + this.source);
+            if (null != value) {
+                if ("[B".equals(desc) && isKeysField(name)) {
+                    logger.error("File: {}, Path: {}, isJavaClass: {}, Field: {}, Value: {}", source,
+                            context.getClassName(), context.isBootstrapClassLoader(), name, value);
+                } else if ("Ljava/lang/String;".equals(desc) && isStaticAndFinal(access) && isPassField(name)
+                        && !isWrongPrefix(name) && value instanceof String) {
+                    String fieldValue = (String) value;
+                    if (!commonUtils.isEmpty(fieldValue) && !valueMatcher(fieldValue)) {
+                        logger.error("File: {}, Path: {}, isJavaClass: {}, Field: {}, Value: {}", source,
+                                context.getClassName(), context.isBootstrapClassLoader(), name, value);
+                    }
                 }
             }
             return fieldVisitor;
@@ -77,8 +84,9 @@ public class DispatchHardcodedPlugin implements DispatchPlugin {
         }
 
         private boolean containArrayItem(String name, String[] arrays) {
-            for (String array : arrays) {
-                if (commonUtils.subContain(name, array)) {
+            name = name.toLowerCase();
+            for (String item : arrays) {
+                if (commonUtils.subContain(name, item)) {
                     return true;
                 }
             }
@@ -98,5 +106,9 @@ public class DispatchHardcodedPlugin implements DispatchPlugin {
         private final String[] notPrefixes = {"date", "forgot", "form", "encode", "pattern", "prefix", "prop", "suffix",
                 "url"};
 
+        @Override
+        public boolean hasTransformed() {
+            return false;
+        }
     }
 }

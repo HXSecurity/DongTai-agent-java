@@ -10,6 +10,7 @@ import java.util.Properties;
  * @author dongzhiyong@huoxian.cn
  */
 public class PropertyUtils {
+
     private static PropertyUtils instance;
     public Properties cfg = null;
     private String iastName;
@@ -157,27 +158,44 @@ public class PropertyUtils {
         return "true".equals(getDumpClassState());
     }
 
+    /**
+     * get agent replay http request time
+     *
+     * @return
+     */
     public long getReplayInterval() {
         if (replayInterval == -1L) {
-            replayInterval = Long.valueOf(System.getProperty("iast.service.replay.interval", cfg.getProperty("iast.service.replay.interval", "5000")));
+            replayInterval = Long.valueOf(System.getProperty("iast.service.replay.interval",
+                    cfg.getProperty("iast.service.replay.interval", "5000")));
         }
         return replayInterval;
     }
 
+    /**
+     * @return
+     */
+    @Deprecated
     public long getReportInterval() {
         if (reportInterval == -1L) {
-            reportInterval = Long.valueOf(System.getProperty("iast.service.report.interval", cfg.getProperty("iast.service.report.interval", "60000")));
+            reportInterval = Long.valueOf(System.getProperty("iast.service.report.interval",
+                    cfg.getProperty("iast.service.report.interval", "60000")));
         }
         return reportInterval;
     }
 
     public long getHeartBeatInterval() {
         if (heartBeatInterval == -1L) {
-            heartBeatInterval = Long.valueOf(System.getProperty("iast.service.heartbeat.interval", cfg.getProperty("iast.service.heartbeat.interval", "30")));
+            heartBeatInterval = Long.valueOf(System.getProperty("iast.service.heartbeat.interval",
+                    cfg.getProperty("iast.service.heartbeat.interval", "60")));
         }
         return heartBeatInterval;
     }
 
+    /**
+     * get OpenAPI Service Address
+     *
+     * @return OpenAPI Service Address
+     */
     public String getBaseUrl() {
         if (null == serverUrl) {
             serverUrl = System.getProperty("iast.server.url", cfg.getProperty("iast.server.url"));
@@ -192,6 +210,7 @@ public class PropertyUtils {
         return namespace;
     }
 
+    @Deprecated
     public String getEngineName() {
         if (null == engineName) {
             engineName = System.getProperty("engine.name", cfg.getProperty("engine.name", "agent"));
@@ -199,6 +218,7 @@ public class PropertyUtils {
         return engineName;
     }
 
+    @Deprecated
     public String getProjectName() {
         if (null == projectName) {
             projectName = System.getProperty("project.name", cfg.getProperty("project.name", "Demo Project"));
@@ -213,6 +233,7 @@ public class PropertyUtils {
         return mode;
     }
 
+    @Deprecated
     public boolean isHunterMode() {
         return "hunter".equals(getMode());
     }
@@ -232,6 +253,7 @@ public class PropertyUtils {
         return "local".equals(getServerMode());
     }
 
+    @Deprecated
     public boolean isRemote() {
         return "remote".equals(getServerMode());
     }
@@ -256,7 +278,8 @@ public class PropertyUtils {
 
     public int getProxyPort() {
         if (-1 == proxyPort) {
-            proxyPort = Integer.parseInt(System.getProperty("iast.proxy.port", cfg.getProperty("iast.proxy.port", "80")));
+            proxyPort = Integer
+                    .parseInt(System.getProperty("iast.proxy.port", cfg.getProperty("iast.proxy.port", "80")));
         }
         return proxyPort;
     }
@@ -272,6 +295,7 @@ public class PropertyUtils {
         return "true".equalsIgnoreCase(getDebugFlag());
     }
 
+    @Deprecated
     public Integer isAutoCreateProject() {
         if (null == isAutoCreateProject) {
             String result = System.getProperty("project.create", cfg.getProperty("project.create", "false"));
@@ -284,7 +308,7 @@ public class PropertyUtils {
         return isAutoCreateProject;
     }
 
-
+    @Deprecated
     public String getProjectVersion() {
         return System.getProperty("project.version", cfg.getProperty("project.version", "V1.0"));
     }

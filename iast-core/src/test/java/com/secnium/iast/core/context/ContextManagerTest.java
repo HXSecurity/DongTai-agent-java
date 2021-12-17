@@ -6,7 +6,7 @@ public class ContextManagerTest {
 
     @Test
     public void testGetGlobalTraceId() {
-        String traceId = ContextManager.getOrCreateGlobalTraceId("", 1);
+        String traceId = ContextManager.getOrCreateGlobalTraceId("", "/", 1);
         System.out.println("Current TraceId: " + traceId);
         System.out.println("Next TraceId: " + ContextManager.getSegmentId());
         System.out.println("Next TraceId: " + ContextManager.getSegmentId());

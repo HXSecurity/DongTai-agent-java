@@ -102,7 +102,7 @@
                                     <pattern>oshi</pattern>
                                     <shadedPattern>${shade-prefix}.oshi</shadedPattern>
                                 </relocation>
-                                <relocation>
+                                <relocation>com.sun.jna
                                     <pattern>com.sun.jna</pattern>
                                     <shadedPattern>${shade-prefix}.com.sun.jna</shadedPattern>
                                 </relocation>
@@ -207,12 +207,6 @@
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>${json.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.github.oshi</groupId>
-            <artifactId>oshi-core</artifactId>
-            <version>${oshi-core.version}</version>
         </dependency>
 
         <dependency>

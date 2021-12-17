@@ -5,7 +5,6 @@ import com.secnium.iast.core.enhance.plugins.AbstractClassVisitor;
 import com.secnium.iast.core.report.ErrorLogReport;
 import com.secnium.iast.core.util.AsmUtils;
 import com.secnium.iast.core.util.ReflectUtils;
-import com.secnium.iast.core.util.ThrowableUtils;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
@@ -31,7 +30,8 @@ public class SpringAutoBindingAdapter extends AbstractClassVisitor {
     }
 
     @Override
-    public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
+    public MethodVisitor visitMethod(int access, String name, String descriptor, String signature,
+            String[] exceptions) {
         SpringAutoBindingAdviceAdapter methodVisitor = (SpringAutoBindingAdviceAdapter) super.visitMethod(access,
                 name,
                 descriptor,
@@ -51,9 +51,9 @@ public class SpringAutoBindingAdapter extends AbstractClassVisitor {
     private static class SpringAutoBindingAdviceAdapter extends AdviceAdapter {
 
         SpringAutoBindingAdviceAdapter(MethodVisitor methodVisitor,
-                                       int access,
-                                       String name,
-                                       String descriptor) {
+                int access,
+                String name,
+                String descriptor) {
             super(AsmUtils.api, methodVisitor, access, name, descriptor);
         }
 
@@ -69,9 +69,10 @@ public class SpringAutoBindingAdapter extends AbstractClassVisitor {
     static {
         try {
             classtype = Type.getType(SpringAutoBindingDispatchImpl.class);
-            onbind = Method.getMethod(ReflectUtils.getPublicMethodFromClass(SpringAutoBindingDispatchImpl.class, "onDoBind"));
+            onbind = Method
+                    .getMethod(ReflectUtils.getPublicMethodFromClass(SpringAutoBindingDispatchImpl.class, "onDoBind"));
         } catch (NoSuchMethodException e) {
-            ErrorLogReport.sendErrorLog(ThrowableUtils.getStackTrace(e));
+            ErrorLogReport.sendErrorLog(e);
         }
 
     }

@@ -105,6 +105,19 @@
   </build>
   <dependencies>
     <dependency>
+      <groupId>com.github.olivergondza</groupId>
+      <artifactId>maven-jdk-tools-wrapper</artifactId>
+      <version>0.1</version>
+      <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>jdk.tools</artifactId>
+          <groupId>jdk.tools</groupId>
+        </exclusion>
+      </exclusions>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.13.1</version>
@@ -115,13 +128,6 @@
           <groupId>org.hamcrest</groupId>
         </exclusion>
       </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>com.sun</groupId>
-      <artifactId>tools</artifactId>
-      <version>${sun.tools.version}</version>
-      <scope>system</scope>
-      <systemPath>${sun.tools.systempath}</systemPath>
     </dependency>
   </dependencies>
 </project>

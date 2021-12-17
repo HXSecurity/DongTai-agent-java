@@ -1,14 +1,17 @@
 package com.secnium.iast.core;
 
 import com.secnium.iast.core.engines.IEngine;
-import com.secnium.iast.core.engines.impl.*;
+import com.secnium.iast.core.engines.impl.ConfigEngine;
+import com.secnium.iast.core.engines.impl.SandboxEngine;
+import com.secnium.iast.core.engines.impl.ServiceEngine;
+import com.secnium.iast.core.engines.impl.SpyEngine;
+import com.secnium.iast.core.engines.impl.TransformEngine;
 import com.secnium.iast.core.report.StartUpTimeReport;
 import com.secnium.iast.core.util.LogUtils;
-import org.slf4j.Logger;
-
 import java.lang.instrument.Instrumentation;
 import java.util.ArrayList;
 import java.util.ListIterator;
+import org.slf4j.Logger;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -45,8 +48,13 @@ public class AgentEngine {
     }
 
 
-    public static void install(String mode, String propertiesFilePath, Integer agentId, Instrumentation inst, String agentFile) {
+    public static void install(String mode, String propertiesFilePath, Integer agentId, Instrumentation inst,
+            String agentFile) {
         long start = System.currentTimeMillis();
+        if ("true".equals(System.getProperty("DongTai.IAST.Status"))) {
+            logger.info("DongTai IAST has Installed.");
+            return;
+        }
         logger.info("DongTai Engine is about to be installed, the installation mode is {}", mode);
         PropertyUtils propertiesUtils = PropertyUtils.getInstance(propertiesFilePath);
         EngineManager.setAgentPath(agentFile);
@@ -59,7 +67,9 @@ public class AgentEngine {
         Integer startupTime = (int) agentEngine.getStartUpTime();
         StartUpTimeReport.sendReport(EngineManager.getAgentId(), startupTime);
         EngineManager.agentStarted();
-        logger.info("DongTai Engine is successfully installed to the JVM, and it takes {} s", agentEngine.getStartUpTime() / 1000);
+        System.setProperty("DongTai.IAST.Status", "true");
+        logger.info("DongTai Engine is successfully installed to the JVM, and it takes {} s",
+                agentEngine.getStartUpTime() / 1000);
     }
 
     public static void start() {

@@ -5,18 +5,22 @@ import com.secnium.iast.agent.IastProperties;
 import com.secnium.iast.agent.manager.EngineManager;
 import com.secnium.iast.agent.middlewarerecognition.IServer;
 import com.secnium.iast.agent.middlewarerecognition.ServerDetect;
-import com.secnium.iast.agent.util.http.HttpClientUtils;
+import com.secnium.iast.agent.util.LogUtils;
 import com.secnium.iast.agent.util.base64.Base64Encoder;
-
-import org.json.JSONObject;
-
-import java.net.*;
+import com.secnium.iast.agent.util.http.HttpClientUtils;
+import java.net.Inet6Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.Enumeration;
+import org.json.JSONObject;
 
 /**
  * @author dongzhiyong@huoxian.cn
  */
 public class AgentRegisterReport {
+
     private static AgentRegisterReport INSTANCE;
     private String projectName = null;
     private Integer agentId = -1;
@@ -42,7 +46,8 @@ public class AgentRegisterReport {
         object.put(Constant.KEY_HOSTNAME, AgentRegisterReport.getInternalHostName());
         object.put(Constant.KEY_LANGUAGE, Constant.LANGUAGE);
         object.put(Constant.KEY_NETWORK, readIpInfo());
-        object.put(Constant.KEY_SERVER_ENV, Base64Encoder.encodeBase64String(System.getProperties().toString().getBytes()).replaceAll("\n", ""));
+        object.put(Constant.KEY_SERVER_ENV,
+                Base64Encoder.encodeBase64String(System.getProperties().toString().getBytes()).replaceAll("\n", ""));
         object.put(Constant.KEY_CONTAINER_NAME, null == server ? "" : server.getName());
         object.put(Constant.KEY_CONTAINER_VERSION, null == server ? "" : server.getVersion());
         object.put(Constant.KEY_SERVER_PATH, serverDetect.getWebServerPath());
@@ -63,7 +68,9 @@ public class AgentRegisterReport {
         if (AGENT_NAME == null) {
             String osName = System.getProperty("os.name");
             String hostname = getInternalHostName();
-            AGENT_NAME = osName + "-" + hostname + "-" + Constant.AGENT_VERSION_VALUE + "-" + IastProperties.getInstance().getEngineName();
+            AGENT_NAME =
+                    osName + "-" + hostname + "-" + Constant.AGENT_VERSION_VALUE + "-" + IastProperties.getInstance()
+                            .getEngineName();
         }
         return AGENT_NAME;
     }
@@ -165,12 +172,16 @@ public class AgentRegisterReport {
                         continue;
                     }
                     if (first) {
-                        sb.append("{\"name\"").append(":").append("\"").append(networkInterface.getDisplayName()).append("\"");
-                        sb.append(",\"ip\"").append(":").append("\"").append(inetAddress.getHostAddress()).append("\"}");
+                        sb.append("{\"name\"").append(":").append("\"").append(networkInterface.getDisplayName())
+                                .append("\"");
+                        sb.append(",\"ip\"").append(":").append("\"").append(inetAddress.getHostAddress())
+                                .append("\"}");
                         first = false;
                     } else {
-                        sb.append(",{\"name\"").append(":").append("\"").append(networkInterface.getDisplayName()).append("\"");
-                        sb.append(",\"ip\"").append(":").append("\"").append(inetAddress.getHostAddress()).append("\"}");
+                        sb.append(",{\"name\"").append(":").append("\"").append(networkInterface.getDisplayName())
+                                .append("\"");
+                        sb.append(",\"ip\"").append(":").append("\"").append(inetAddress.getHostAddress())
+                                .append("\"}");
                     }
                 }
             }
@@ -183,6 +194,7 @@ public class AgentRegisterReport {
     public void register() {
         try {
             String msg = generateAgentRegisterMsg();
+            LogUtils.info("register agent");
             StringBuilder responseRaw = HttpClientUtils.sendPost(Constant.API_AGENT_REGISTER, msg);
             if (!isRegistered()) {
                 setAgentData(responseRaw);

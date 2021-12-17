@@ -22,25 +22,24 @@ jobs:
         with:
           maven-version: 3.2.5
 
-      - name: Get the release version
-        id: get_version
-        run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
-
-      - name: Get release version
-        id: get_release_version
+      - id: release
         run: |
-          V=`echo ${{ steps.get_version.outputs.VERSION }} | sed -e's/v//g' | sed -e's/V//g'`; \
-          echo ::set-output name=VERSION::${V}
+          TAG_NAME=${{ github.event.release.tag_name }}
+          ID=`echo ${TAG_NAME##v}`
+          echo "::set-output name=VERSION::$ID"
 
       - name: Build and Publish Maven Package
         run: |
+          bash .github/workflows/version_update.sh "${{ steps.release.outputs.VERSION }}"
           mvn -B package -Dmaven.test.skip=true
           mvn -B -DuseGitHubPackages=true deploy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Generate version file
         run: |
           cd ${{ github.workspace }}/release/lib/ && \
-          echo "${{ github.event.repository.name }},version,${{ steps.get_release_version.outputs.VERSION }}" >> version.txt && \
+          echo "${{ github.event.repository.name }},version,${{ steps.release.outputs.VERSION }}" >> version.txt && \
           echo "${{ github.event.repository.name }},commit_hash,${GITHUB_SHA}" >> version.txt && \
           files=('iast-core.jar') && \
           for FILE in ${files[@]};do FILE_HASH=`sha256sum ${FILE} | awk '{print $1}'`; echo "${{ github.event.repository.name }},${FILE},${FILE_HASH}" >> version.txt; done \
@@ -53,7 +52,7 @@ jobs:
 
       - run: |
           cd ${{ github.workspace }}/release/lib/ && \
-          ossutil cp version.txt oss://huoqi-public/iast/release-version/${{ github.event.repository.name }}/${{ steps.get_release_version.outputs.VERSION }}/version.txt
+          ossutil cp version.txt oss://huoqi-public/iast/release-version/${{ github.event.repository.name }}/${{ steps.release.outputs.VERSION }}/version.txt
 
       - run: |
           ossutil cp -rf release/iast-agent.jar oss://dongtai/agent/java/iast-agent.jar --meta x-oss-object-acl:public-read
