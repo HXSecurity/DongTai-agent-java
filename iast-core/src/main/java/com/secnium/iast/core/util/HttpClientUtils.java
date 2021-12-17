@@ -2,12 +2,8 @@ package com.secnium.iast.core.util;
 
 import com.secnium.iast.core.PropertyUtils;
 import com.secnium.iast.core.report.ErrorLogReport;
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
@@ -160,6 +156,44 @@ public class HttpClientUtils {
             logger.info("The remote file {} was successfully written to the local cache", fileURI);
         } catch (Exception ignore) {
             logger.error("The remote file {} download failure, please check the iast-token", fileURI);
+        }
+    }
+
+    public static void sendJsonPost(String httpUrl, String report) {
+        OutputStreamWriter out = null;
+        BufferedReader in = null;
+        StringBuilder result = new StringBuilder();
+        HttpURLConnection conn = null;
+        try{
+            URL url = new URL(httpUrl);
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setDoOutput(true);
+            conn.setDoInput(true);
+            conn.setRequestProperty("Content-type", "application/json; charset=utf-8");
+            conn.setRequestProperty("Accept", "application/json");
+            conn.setRequestProperty("Authorization", "Token " + PropertyUtils.getInstance().getIastServerToken());
+            out = new OutputStreamWriter(conn.getOutputStream());
+            out.write(report);
+            out.flush();
+            out.close();
+            if (200 == conn.getResponseCode()){
+                in = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+                String line;
+                while ((line = in.readLine()) != null){
+                    result.append(line);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (out != null) {
+                    out.close();
+                }
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+            }
         }
     }
 
