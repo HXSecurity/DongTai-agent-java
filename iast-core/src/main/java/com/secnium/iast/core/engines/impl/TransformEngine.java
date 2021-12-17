@@ -5,7 +5,6 @@ import com.secnium.iast.core.engines.IEngine;
 import com.secnium.iast.core.enhance.IastClassFileTransformer;
 import com.secnium.iast.core.report.ErrorLogReport;
 import com.secnium.iast.core.util.LogUtils;
-import com.secnium.iast.core.util.ThrowableUtils;
 import java.lang.instrument.Instrumentation;
 import org.slf4j.Logger;
 
@@ -30,7 +29,7 @@ public class TransformEngine implements IEngine {
             logger.info("The sub-module of data acquisition and analysis is successfully installed");
         } catch (Throwable cause) {
             logger.error("Failed to install the sub-module of data collection and analysis");
-            ErrorLogReport.sendErrorLog(ThrowableUtils.getStackTrace(cause));
+            ErrorLogReport.sendErrorLog(cause);
         }
     }
 

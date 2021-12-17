@@ -251,8 +251,8 @@ public class MethodEvent {
             } else {
                 sb.append(value.toString());
             }
-        } catch (Exception convertObjectToStringError) {
-            ErrorLogReport.sendErrorLog(ThrowableUtils.getStackTrace(convertObjectToStringError));
+        } catch (Exception e) {
+            ErrorLogReport.sendErrorLog(e);
         }
         return sb.toString().trim();
     }

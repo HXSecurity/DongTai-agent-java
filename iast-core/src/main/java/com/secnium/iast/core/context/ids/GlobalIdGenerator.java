@@ -25,6 +25,8 @@ public class GlobalIdGenerator {
      */
     public static String generate(Integer agentId) {
         return PROCESS_ID
+                + "-"
+                + UUID.randomUUID().toString().replaceAll("-", "")
                 + "."
                 + agentId
                 + "."

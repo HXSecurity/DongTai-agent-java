@@ -189,7 +189,7 @@ public class HttpClientUtils {
             sc.init(null, trustAllCerts, new java.security.SecureRandom());
             HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
         } catch (Exception e) {
-            ErrorLogReport.sendErrorLog(ThrowableUtils.getStackTrace(e));
+            ErrorLogReport.sendErrorLog(e);
         }
     }
 

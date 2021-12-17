@@ -2,12 +2,11 @@ package com.secnium.iast.core.enhance;
 
 import com.secnium.iast.core.util.LogUtils;
 import com.secnium.iast.core.util.matcher.ConfigMatcher;
-import org.slf4j.Logger;
-
 import java.lang.instrument.Instrumentation;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import org.slf4j.Logger;
 
 /**
  * 判断类 是否允许hook
@@ -54,9 +53,7 @@ public class IastClassHookPointMatcher {
     }
 
     /**
-     * 查找需要修改的类
-     * 1.配置文件中定义的类
-     * 2.全量用户类(todo)
+     * 查找需要修改的类 1.配置文件中定义的类 2.全量用户类(todo)
      *
      * @param inst                用于操作字节码的instrumentation对象
      * @param isRemoveUnsupported 是否不hook不受支持的类
@@ -71,7 +68,8 @@ public class IastClassHookPointMatcher {
 
             if (isRemoveUnsupported && !inst.isModifiableClass(clazz)) {
                 if (classHookManager.logger.isDebugEnabled()) {
-                    classHookManager.logger.debug("remove from findForReTransform, because class:" + clazz.getName() + " is unModifiable");
+                    classHookManager.logger.debug("remove from findForReTransform, because class:" + clazz.getName()
+                            + " is unModifiable");
                 }
                 continue;
             }
@@ -96,7 +94,9 @@ public class IastClassHookPointMatcher {
                 // 这里没有办法穷举出所有的异常情况，所以catch Throwable来完成异常容灾处理
                 // 当解析类出现异常的时候，直接简单粗暴的认为根本没有这个类就好了
                 if (classHookManager.logger.isDebugEnabled()) {
-                    classHookManager.logger.debug("remove from findForReTransform, because loading class:" + clazz.getName() + " occur an exception", cause);
+                    classHookManager.logger
+                            .debug("remove from findForReTransform, because loading class:" + clazz.getName()
+                                    + " occur an exception", cause);
                 }
             }
         }

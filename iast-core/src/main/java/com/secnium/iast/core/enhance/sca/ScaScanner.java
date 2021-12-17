@@ -2,17 +2,17 @@ package com.secnium.iast.core.enhance.sca;
 
 import com.secnium.iast.core.report.AssestReport;
 import com.secnium.iast.core.util.LogUtils;
-import org.slf4j.Logger;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.JarURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
+import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import org.slf4j.Logger;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -145,22 +145,22 @@ public class ScaScanner {
             String jarPackageFilePath = packageUrl.getFile();
             File jarPackageFile = new File(jarPackageFilePath);
             String packagePath = jarPackageFile.getParent();
-            if (jarPackageFilePath.startsWith("file:") && jarPackageFilePath.endsWith(".jar!/") && jarPackageFilePath
-                    .contains("BOOT-INF") && !scannedClassSet.contains(packagePath)) {
+            if (!scannedClassSet.contains(packagePath) && jarPackageFilePath.startsWith("file:") && jarPackageFilePath
+                    .endsWith(".jar!/") && jarPackageFilePath.contains("BOOT-INF")) {
                 scannedClassSet.add(packagePath);
                 jarPackageFilePath = jarPackageFilePath.replace("file:", "");
                 jarPackageFilePath = jarPackageFilePath.substring(0, jarPackageFilePath.indexOf("!/"));
                 this.scanWithJarPackage(jarPackageFilePath);
-            } else if (jarPackageFilePath.endsWith(".jar") && jarPackageFilePath.contains("WEB-INF") && !scannedClassSet
-                    .contains(packagePath)) {
+            } else if (!scannedClassSet.contains(packagePath) && jarPackageFilePath.endsWith(".jar")
+                    && jarPackageFilePath.contains("WEB-INF")) {
                 scannedClassSet.add(packagePath);
                 File packagePathFile = new File(packagePath);
                 File[] packagePathFiles = packagePathFile.listFiles();
                 for (File tempPackagePathFile : packagePathFiles != null ? packagePathFiles : new File[0]) {
                     scan(tempPackagePathFile);
                 }
-            } else if (jarPackageFilePath.endsWith(".jar") && jarPackageFilePath.contains("repository")
-                    && !scannedClassSet.contains(jarPackageFilePath)) {
+            } else if (!scannedClassSet.contains(jarPackageFilePath) && jarPackageFilePath.endsWith(".jar")
+                    && jarPackageFilePath.contains("repository")) {
                 scannedClassSet.add(jarPackageFilePath);
                 scan(jarPackageFile);
             }
