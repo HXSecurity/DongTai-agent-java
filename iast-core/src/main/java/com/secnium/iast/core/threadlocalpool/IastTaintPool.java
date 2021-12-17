@@ -50,6 +50,7 @@ public class IastTaintPool extends ThreadLocal<HashSet<Object>> {
             }
         } else if (obj instanceof Map) {
             this.get().add(obj);
+            event.addTargetHash(obj.hashCode());
             if (isSource) {
                 Map<String, String[]> tempMap = (Map<String, String[]>) obj;
                 Set<Map.Entry<String, String[]>> entries = tempMap.entrySet();
