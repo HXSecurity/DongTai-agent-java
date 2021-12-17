@@ -1,8 +1,11 @@
 package com.secnium.iast.agent;
 
 import com.secnium.iast.agent.util.LogUtils;
-
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URLDecoder;
 import java.util.Properties;
 
@@ -10,6 +13,7 @@ import java.util.Properties;
  * @author dongzhiyong@huoxian.cn
  */
 public class IastProperties {
+
     private static IastProperties instance;
     public Properties cfg = new Properties();
     private String iastServerToken;
@@ -27,7 +31,8 @@ public class IastProperties {
         if (null == instance) {
             instance = new IastProperties(null);
         }
-        return instance;    }
+        return instance;
+    }
 
     private IastProperties(String path) {
         try {
@@ -44,7 +49,8 @@ public class IastProperties {
             if (path != null) {
                 propertiesFilePath = path;
             } else {
-                agentFile = new File(IastProperties.class.getProtectionDomain().getCodeSource().getLocation().getFile());
+                agentFile = new File(
+                        IastProperties.class.getProtectionDomain().getCodeSource().getLocation().getFile());
                 basePath = agentFile.getParentFile().getPath();
                 propertiesFilePath = basePath + File.separator + "config" + File.separator + "iast.properties";
                 propertiesFilePath = URLDecoder.decode(propertiesFilePath, "utf-8");
@@ -80,7 +86,8 @@ public class IastProperties {
             ByteArrayInputStream inputStream = new ByteArrayInputStream(data);
             cfg.load(inputStream);
 
-            LogUtils.info("The engine configuration file is initialized successfully. file is " + propertiesFile.toString());
+            LogUtils.info(
+                    "The engine configuration file is initialized successfully. file is " + propertiesFile.toString());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -114,7 +121,18 @@ public class IastProperties {
 
     public String getProjectName() {
         if (null == projectName) {
-            projectName = System.getProperty("project.name", cfg.getProperty("project.name", "Demo Project"));
+            projectName = System.getProperty(
+                    "project.name",
+                    System.getProperty(
+                            "mse.appName",
+                            System.getProperty(
+                                    "arms.appName",
+                                    System.getProperty(
+                                            "service.name",
+                                            cfg.getProperty("project.name", "Demo Project")
+                                    )
+                            ))
+            );
         }
         return projectName;
     }
@@ -139,7 +157,8 @@ public class IastProperties {
 
     public int getProxyPort() {
         if (-1 == proxyPort) {
-            proxyPort = Integer.parseInt(System.getProperty("iast.proxy.port", cfg.getProperty("iast.proxy.port", "80")));
+            proxyPort = Integer
+                    .parseInt(System.getProperty("iast.proxy.port", cfg.getProperty("iast.proxy.port", "80")));
         }
         return proxyPort;
     }
@@ -147,9 +166,9 @@ public class IastProperties {
     public Integer isAutoCreateProject() {
         if (null == isAutoCreateProject) {
             String result = System.getProperty("project.create", cfg.getProperty("project.create", "false"));
-            if (result.equals("false")) {
+            if ("false".equals(result)) {
                 isAutoCreateProject = 0;
-            } else if (result.equals("true")) {
+            } else if ("true".equals(result)) {
                 isAutoCreateProject = 1;
             }
         }
@@ -157,7 +176,7 @@ public class IastProperties {
     }
 
     public String getProjectVersion() {
-        return System.getProperty("project.version", cfg.getProperty("project.version","V1.0"));
+        return System.getProperty("project.version", cfg.getProperty("project.version", "V1.0"));
     }
 
 }

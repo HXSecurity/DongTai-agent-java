@@ -14,6 +14,7 @@ public class ReportConstant {
     public static final int REPORT_VULN_DYNAMIC = 0x22;
     public static final int REPORT_VULN_OVER_POWER = 0x23;
     public static final int REPORT_VULN_SAAS_POOL = 0x24;
+    public static final int REPORT_VUL_HARDCORD = 0x25;
     public static final int REPORT_AUTH_ADD = 0x31;
     public static final int REPORT_AUTH_UPDATE = 0x32;
     public static final int REPORT_ERROR_LOG = 0x51;

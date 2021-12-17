@@ -43,7 +43,7 @@ jobs:
             ${{ runner.os }}-mvn-
       - name: Mvn Install
         if: steps.mvn-cache.outputs.cache-hit != 'true'
-        run: mvn compile -Dmaven.test.skip=true
+        run: mvn -B compile -Dmaven.test.skip=true
 
   Build-Agent:
     name: Build Java Agent

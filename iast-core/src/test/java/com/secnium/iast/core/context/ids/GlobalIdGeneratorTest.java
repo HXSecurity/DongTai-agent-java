@@ -8,6 +8,10 @@ public class GlobalIdGeneratorTest {
     public void testGenerate() {
         String traceId = GlobalIdGenerator.generate(1);
         System.out.println(traceId);
+
+        System.out.println(GlobalIdGenerator.generate(1));
+
+        System.out.println(GlobalIdGenerator.generate(1));
     }
 
 }

@@ -23,10 +23,9 @@ public class AgentLauncher {
      * @param inst inst
      */
     public static void premain(String args, Instrumentation inst) {
-        System.setProperty("sun.net.http.allowRestrictedHeaders","true");
+        System.setProperty("sun.net.http.allowRestrictedHeaders", "true");
         LAUNCH_MODE = LAUNCH_MODE_AGENT;
         try {
-            Agent.appendToolsPath();
             install(inst);
         } catch (Exception e) {
             e.printStackTrace();
@@ -82,6 +81,8 @@ public class AgentLauncher {
                 EngineMonitor.isCoreRegisterStart = true;
             }
             loadEngine(inst);
+        } else {
+            LogUtils.error("Agent register failed. Start without DongTai IAST.");
         }
     }
 

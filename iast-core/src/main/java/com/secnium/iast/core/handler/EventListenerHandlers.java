@@ -67,13 +67,13 @@ public class EventListenerHandlers {
                             PropagatorImpl.solvePropagator(event, INVOKE_ID_SEQUENCER);
                         } else if (HookType.SOURCE.equals(hookType)) {
                             SourceImpl.solveSource(event, INVOKE_ID_SEQUENCER);
-                        } else if (HookType.SINK.equals(hookType)&& !EngineManager.TAINT_POOL.get().isEmpty()) {
+                        } else if (HookType.SINK.equals(hookType) && !EngineManager.TAINT_POOL.get().isEmpty()) {
                             SinkImpl.solveSink(event);
                         }
                     }
                 }
             } catch (Exception e) {
-                ErrorLogReport.sendErrorLog(ThrowableUtils.getStackTrace(e));
+                ErrorLogReport.sendErrorLog(e);
             } finally {
                 EngineManager.turnOnLingzhi();
             }
@@ -90,7 +90,7 @@ public class EventListenerHandlers {
                 EngineManager.turnOffLingzhi();
                 // todo: 后续重放时，启用
             } catch (Exception e) {
-                ErrorLogReport.sendErrorLog(ThrowableUtils.getStackTrace(e));
+                ErrorLogReport.sendErrorLog(e);
                 ret = Injecter.Ret.newInstanceForReturn(object);
             } finally {
                 EngineManager.turnOnLingzhi();
@@ -111,7 +111,7 @@ public class EventListenerHandlers {
         try {
             EngineManager.SCOPE_TRACKER.enterPropagation();
         } catch (Exception e) {
-            ErrorLogReport.sendErrorLog(ThrowableUtils.getStackTrace(e));
+            ErrorLogReport.sendErrorLog(e);
         }
     }
 
@@ -119,7 +119,7 @@ public class EventListenerHandlers {
         try {
             EngineManager.SCOPE_TRACKER.leavePropagation();
         } catch (Exception e) {
-            ErrorLogReport.sendErrorLog(ThrowableUtils.getStackTrace(e));
+            ErrorLogReport.sendErrorLog(e);
         }
     }
 
@@ -135,7 +135,7 @@ public class EventListenerHandlers {
         try {
             EngineManager.SCOPE_TRACKER.enterSource();
         } catch (Exception e) {
-            ErrorLogReport.sendErrorLog(ThrowableUtils.getStackTrace(e));
+            ErrorLogReport.sendErrorLog(e);
         }
     }
 
@@ -143,7 +143,7 @@ public class EventListenerHandlers {
         try {
             EngineManager.SCOPE_TRACKER.leaveSource();
         } catch (Exception e) {
-            ErrorLogReport.sendErrorLog(ThrowableUtils.getStackTrace(e));
+            ErrorLogReport.sendErrorLog(e);
         }
     }
 
@@ -159,7 +159,7 @@ public class EventListenerHandlers {
         try {
             EngineManager.SCOPE_TRACKER.enterSink();
         } catch (Exception e) {
-            ErrorLogReport.sendErrorLog(ThrowableUtils.getStackTrace(e));
+            ErrorLogReport.sendErrorLog(e);
         }
     }
 
@@ -167,7 +167,7 @@ public class EventListenerHandlers {
         try {
             EngineManager.SCOPE_TRACKER.leaveSink();
         } catch (Exception e) {
-            ErrorLogReport.sendErrorLog(ThrowableUtils.getStackTrace(e));
+            ErrorLogReport.sendErrorLog(e);
         }
     }
 
@@ -191,7 +191,7 @@ public class EventListenerHandlers {
         try {
             EngineManager.SCOPE_TRACKER.enterHttp();
         } catch (Exception e) {
-            ErrorLogReport.sendErrorLog(ThrowableUtils.getStackTrace(e));
+            ErrorLogReport.sendErrorLog(e);
         }
     }
 
@@ -207,7 +207,7 @@ public class EventListenerHandlers {
                 EngineManager.cleanThreadState();
             }
         } catch (Exception e) {
-            ErrorLogReport.sendErrorLog(ThrowableUtils.getStackTrace(e));
+            ErrorLogReport.sendErrorLog(e);
             EngineManager.cleanThreadState();
         }
     }
@@ -221,7 +221,7 @@ public class EventListenerHandlers {
         try {
             return EngineManager.SCOPE_TRACKER.isFirstLevelHttp();
         } catch (Exception e) {
-            ErrorLogReport.sendErrorLog(ThrowableUtils.getStackTrace(e));
+            ErrorLogReport.sendErrorLog(e);
         }
         return false;
     }
@@ -241,7 +241,7 @@ public class EventListenerHandlers {
         try {
             return (Boolean) EngineManager.REQUEST_CONTEXT.get().get("replay-request");
         } catch (Exception e) {
-            ErrorLogReport.sendErrorLog(ThrowableUtils.getStackTrace(e));
+            ErrorLogReport.sendErrorLog(e);
         }
         return false;
     }

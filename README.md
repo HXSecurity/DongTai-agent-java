@@ -34,7 +34,7 @@ Dongtai-agent-java consists of `agent.jar`, `iast-core-jar`, `iast-inject. Jar` 
 
 ## Quick Start
 
-Please refer to the [Quick Start](https://hxsecurity.github.io/DongTai-Doc/#/doc/tutorial/quickstart).
+Please refer to the [Quick Start](https://doc.dongtai.io).
 
 ## Quick Development
 

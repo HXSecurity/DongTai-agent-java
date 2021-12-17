@@ -12,7 +12,6 @@ import com.secnium.iast.core.enhance.sca.ScaScanner;
 import com.secnium.iast.core.report.ErrorLogReport;
 import com.secnium.iast.core.util.AsmUtils;
 import com.secnium.iast.core.util.LogUtils;
-import com.secnium.iast.core.util.ThrowableUtils;
 import com.secnium.iast.core.util.matcher.ConfigMatcher;
 import java.io.File;
 import java.io.IOException;
@@ -20,7 +19,6 @@ import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
 import java.security.CodeSource;
 import java.security.ProtectionDomain;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import org.apache.commons.lang3.time.StopWatch;
@@ -41,8 +39,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
     private final Instrumentation inst;
     private final String namespace;
     private final PropertyUtils properties;
-    private final PluginRegister PLUGINS = new PluginRegister();
-    private final List<String> transformerClasses = new ArrayList<String>();
+    private final PluginRegister plugins;
 
 
     IastClassFileTransformer(Instrumentation inst) {
@@ -51,6 +48,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
         this.namespace = EngineManager.getNamespace();
         this.isDumpClass = EngineManager.isEnableDumpClass();
         this.properties = PropertyUtils.getInstance();
+        this.plugins = new PluginRegister();
     }
 
     /**
@@ -82,13 +80,14 @@ public class IastClassFileTransformer implements ClassFileTransformer {
         }
 
         try {
-            final CodeSource codeSource = (protectionDomain != null) ? protectionDomain.getCodeSource() : null;
-            if (codeSource != null) {
-                ScaScanner.scanForSCA(codeSource.getLocation(), internalClassName);
+            if (loader != null) {
+                final CodeSource codeSource = (protectionDomain != null) ? protectionDomain.getCodeSource() : null;
+                if (codeSource != null) {
+                    ScaScanner.scanForSCA(codeSource.getLocation(), internalClassName);
+                }
             }
 
-            // class hook
-            if (ConfigMatcher.isHookPoint(internalClassName, loader)) {
+            if (null != classBeingRedefined || ConfigMatcher.isHookPoint(internalClassName, loader)) {
                 byte[] sourceCodeBak = new byte[srcByteCodeArray.length];
                 System.arraycopy(srcByteCodeArray, 0, sourceCodeBak, 0, srcByteCodeArray.length);
                 final ClassReader cr = new ClassReader(sourceCodeBak);
@@ -102,14 +101,13 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                 HashSet<String> ancestors = COMMON_UTILS.getAncestors(className, superName, interfaces);
 
                 final ClassWriter cw = createClassWriter(loader, cr);
-                ClassVisitor cv = PLUGINS.initial(cw, IastContext.build(className, ancestors, interfaces,
+                ClassVisitor cv = plugins.initial(cw, IastContext.build(className, ancestors, interfaces,
                         flags, loader == null, namespace));
 
                 if (cv instanceof AbstractClassVisitor) {
                     cr.accept(cv, ClassReader.EXPAND_FRAMES);
                     AbstractClassVisitor dumpClassVisitor = (AbstractClassVisitor) cv;
                     if (dumpClassVisitor.hasTransformed()) {
-                        transformerClasses.add(internalClassName);
                         if (logger.isDebugEnabled() && null != clock) {
                             clock.stop();
                             logger.debug("conversion class {} is successful, and it takes {}ms.", internalClassName,
@@ -126,7 +124,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                 }
             }
         } catch (Throwable cause) {
-            ErrorLogReport.sendErrorLog(ThrowableUtils.getStackTrace(cause));
+            ErrorLogReport.sendErrorLog(cause);
         } finally {
             if (isRunning) {
                 EngineManager.turnOnLingzhi();
@@ -240,7 +238,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                             total);
                 }
             } catch (Throwable t) {
-                ErrorLogReport.sendErrorLog(ThrowableUtils.getStackTrace(t));
+                ErrorLogReport.sendErrorLog(t);
             }
         }
     }

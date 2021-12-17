@@ -22,7 +22,7 @@ final public class DispatchTechnologyPlugin implements DispatchPlugin {
     private String classname;
     private final Logger logger = LogUtils.getLogger(DispatchTechnologyPlugin.class);
 
-    DispatchTechnologyPlugin() {
+    public DispatchTechnologyPlugin() {
         this.technologyMap = new HashMap<String, Map<String, String>>();
         initTechnology();
     }
