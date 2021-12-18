@@ -1,6 +1,7 @@
 package com.secnium.iast.core.util.matcher;
 
 import com.secnium.iast.core.PropertyUtils;
+import com.secnium.iast.core.report.ErrorLogReport;
 import com.secnium.iast.core.util.ConfigUtils;
 import com.secnium.iast.core.util.LogUtils;
 
@@ -8,6 +9,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import com.secnium.iast.core.util.ThrowableUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 
@@ -48,34 +51,30 @@ public class ConfigMatcher {
     }
 
     public static boolean getBlackUrl(Map<String, Object> request) {
-        if (request == null || request.isEmpty()) {
-            return false;
-        }
-        String uri = (String)request.get("requestURI");
-        String headers =  (String)request.get("headers");
-        Map<String,String> headerMap = new HashMap();
-        if(null!=headers && headers.length()>=1){
-            String[] headerlines = headers.split("\\n");
-            for(String headerline : headerlines){
-                String[] headervalue = headerline.split(":");
-                if(headervalue.length ==2)
-                    headerMap.put(headervalue[0].toLowerCase(),headervalue[1]);
+        try {
+            if (request == null || request.isEmpty()) {
+                return false;
             }
-        }
-        for(String string : BLACK_URL){
-            String[] strings = string.split(" ");
-            switch (Integer.parseInt(strings[1])){
-                case 1:
-                    if(uri.contains(strings[0])) {
-                        return true;
-                    }
-                case 2:
-                    if(null != headerMap.get(strings[0].toLowerCase())) {
-                        return true;
-                    }
-                default:
-                    continue;
+            String uri = (String) request.get("requestURI");
+            HashMap headers = (HashMap) request.get("headers");
+            for (String string : BLACK_URL) {
+                String[] strings = string.split(" ");
+                switch (Integer.parseInt(strings[1])) {
+                    case 1:
+                        if (uri.contains(strings[0])) {
+                            return true;
+                        }
+                    case 2:
+                        if (null != headers.get(strings[0].toLowerCase())) {
+                            return true;
+                        }
+                    default:
+                        continue;
+                }
             }
+        }catch (Exception e){
+            logger.info("dongtai getBalckurl error");
+            ErrorLogReport.sendErrorLog(ThrowableUtils.getStackTrace(e));
         }
         return false;
     }
