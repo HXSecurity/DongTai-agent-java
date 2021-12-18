@@ -13,6 +13,6 @@ public class StartUpTimeReport {
         report.put(ReportConstant.AGENT_ID, id);
         report.put(ReportConstant.STARTUP_TIME, startUpTime);
 
-        ReportThread.send("/api/v1/agent/startuptime", report.toString());
+        ReportThread.send("/api/v1/agent/gzipstartuptime", report.toString());
     }
 }
