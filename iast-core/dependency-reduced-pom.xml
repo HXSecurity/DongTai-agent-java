@@ -85,10 +85,6 @@
                   <pattern>javax.xml.stream</pattern>
                   <shadedPattern>${shade-prefix}.javax.xml.stream</shadedPattern>
                 </relocation>
-                <relocation>
-                  <pattern>com.sun.jna</pattern>
-                  <shadedPattern>${shade-prefix}.com.sun.jna</shadedPattern>
-                </relocation>
               </relocations>
             </configuration>
           </execution>

@@ -160,8 +160,13 @@ public class HttpImpl {
         if (ConfigMatcher.disableExtension((String) requestMeta.get("requestURI"))) {
             return;
         }
+        if (ConfigMatcher.getBlackUrl( requestMeta)) {
+            return;
+        }
+
         // todo: add custom header escape
         EngineManager.enterHttpEntry(requestMeta);
+
         if (logger.isDebugEnabled()) {
             logger.debug("HTTP Request:{} {} from: {}", requestMeta.get("method"), requestMeta.get("requestURI"),
                     event.signature);

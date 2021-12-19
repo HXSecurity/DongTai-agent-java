@@ -1,0 +1,3 @@
+/discovery/ok 1
+/actuator 1
+isTest 2

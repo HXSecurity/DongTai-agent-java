@@ -1,10 +1,16 @@
 package com.secnium.iast.core.util.matcher;
 
 import com.secnium.iast.core.PropertyUtils;
+import com.secnium.iast.core.report.ErrorLogReport;
 import com.secnium.iast.core.util.ConfigUtils;
 import com.secnium.iast.core.util.LogUtils;
+
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+
+import com.secnium.iast.core.util.ThrowableUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 
@@ -28,6 +34,8 @@ public class ConfigMatcher {
     private final static AbstractMatcher FRAMEWORK_CLASS = new FrameworkClass();
     private final static AbstractMatcher SERVER_CLASS = new ServerClass();
 
+    private final static Set<String> BLACK_URL;
+
 
     /**
      * 检查后缀黑名单
@@ -40,6 +48,35 @@ public class ConfigMatcher {
             return false;
         }
         return StringUtils.endsWithAny(uri, DISABLE_EXT);
+    }
+
+    public static boolean getBlackUrl(Map<String, Object> request) {
+        try {
+            if (request == null || request.isEmpty()) {
+                return false;
+            }
+            String uri = (String) request.get("requestURI");
+            HashMap headers = (HashMap) request.get("headers");
+            for (String string : BLACK_URL) {
+                String[] strings = string.split(" ");
+                switch (Integer.parseInt(strings[1])) {
+                    case 1:
+                        if (uri.contains(strings[0])) {
+                            return true;
+                        }
+                    case 2:
+                        if (null != headers.get(strings[0].toLowerCase())) {
+                            return true;
+                        }
+                    default:
+                        continue;
+                }
+            }
+        }catch (Exception e){
+            logger.info("dongtai getBalckurl error");
+            ErrorLogReport.sendErrorLog(ThrowableUtils.getStackTrace(e));
+        }
+        return false;
     }
 
     private static boolean inHookBlacklist(String className) {
@@ -112,12 +149,15 @@ public class ConfigMatcher {
         final PropertyUtils cfg = PropertyUtils.getInstance();
         String blackListFuncFile = cfg.getBlackFunctionFilePath();
         String blackList = cfg.getBlackClassFilePath();
+        String blackUrl =  cfg.getBlackUrl();
         String disableExtList = cfg.getBlackExtFilePath();
 
         HashSet<String>[] items = ConfigUtils.loadConfigFromFile(blackListFuncFile);
         BLACKS = items[0];
         END_WITH_BLACKS = items[2].toArray(new String[0]);
         START_WITH_BLACKS = items[1].toArray(new String[0]);
+
+        BLACK_URL=ConfigUtils.loadConfigFromFileByLine(blackUrl);
 
         items = ConfigUtils.loadConfigFromFile(blackList);
         START_ARRAY = items[1].toArray(new String[0]);

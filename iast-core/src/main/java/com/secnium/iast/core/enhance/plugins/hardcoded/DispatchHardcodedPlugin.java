@@ -1,5 +1,6 @@
 package com.secnium.iast.core.enhance.plugins.hardcoded;
 
+import com.secnium.iast.core.EngineManager;
 import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.AbstractClassVisitor;
 import com.secnium.iast.core.enhance.plugins.DispatchPlugin;
@@ -123,6 +124,7 @@ public class DispatchHardcodedPlugin implements DispatchPlugin {
             JSONObject detail = new JSONObject();
             report.put(ReportConstant.REPORT_KEY, ReportConstant.REPORT_VUL_HARDCORD);
             report.put(ReportConstant.REPORT_VALUE_KEY, detail);
+            detail.put(ReportConstant.AGENT_ID, EngineManager.getAgentId());
             detail.put("file", fileName);
             detail.put("class", className);
             detail.put("isJdk", isJDKClass);
