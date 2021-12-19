@@ -1,12 +1,11 @@
 package com.secnium.iast.core.enhance.asm;
 
+import static com.secnium.iast.core.enhance.asm.SandboxReflectUtils.unCaughtGetClassDeclaredJavaMethod;
+
 import com.secnium.iast.core.EngineManager;
 import com.secnium.iast.core.handler.EventListenerHandlers;
 import com.secnium.iast.core.handler.controller.TrackerHelper;
-
 import java.lang.iast.inject.Injecter;
-
-import static com.secnium.iast.core.enhance.asm.SandboxReflectUtils.unCaughtGetClassDeclaredJavaMethod;
 
 /**
  * Spy类操作工具类
@@ -66,9 +65,14 @@ public class SpyUtils {
                 unCaughtGetClassDeclaredJavaMethod(EventListenerHandlers.class, "leaveHttp", Object.class),
                 unCaughtGetClassDeclaredJavaMethod(EventListenerHandlers.class, "isFirstLevelHttp"),
                 unCaughtGetClassDeclaredJavaMethod(EventListenerHandlers.class, "hasTaintValue"),
-                unCaughtGetClassDeclaredJavaMethod(EventListenerHandlers.class, "cloneRequest", Object.class, boolean.class),
+                unCaughtGetClassDeclaredJavaMethod(EventListenerHandlers.class, "cloneRequest", Object.class,
+                        boolean.class),
                 unCaughtGetClassDeclaredJavaMethod(EventListenerHandlers.class, "isReplayRequest"),
-                unCaughtGetClassDeclaredJavaMethod(EventListenerHandlers.class, "cloneResponse", Object.class, boolean.class)
+                unCaughtGetClassDeclaredJavaMethod(EventListenerHandlers.class, "cloneResponse", Object.class,
+                        boolean.class),
+                unCaughtGetClassDeclaredJavaMethod(EventListenerHandlers.class, "enterDubbo"),
+                unCaughtGetClassDeclaredJavaMethod(EventListenerHandlers.class, "leaveDubbo"),
+                unCaughtGetClassDeclaredJavaMethod(EventListenerHandlers.class, "isFirstLevelDubbo")
         );
     }
 

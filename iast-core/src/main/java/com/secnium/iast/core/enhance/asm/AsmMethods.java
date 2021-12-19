@@ -1,37 +1,38 @@
 package com.secnium.iast.core.enhance.asm;
 
+import java.lang.iast.inject.Injecter;
 import org.objectweb.asm.commons.Method;
 
-import java.lang.iast.inject.Injecter;
-
 /**
- * 常用的ASM method 集合
- * 省得我到处声明
+ * 常用的ASM method 集合 省得我到处声明
  *
  * @author luanjia@taobao.com
- * @date 16/5/21
- * Modified by dongzhiyong@huoxian.cn
+ * @date 16/5/21 Modified by dongzhiyong@huoxian.cn
  */
 public interface AsmMethods {
 
     class InnerHelper {
+
         private InnerHelper() {
         }
 
         static Method getAsmMethod(final Class<?> clazz,
-                                   final String methodName,
-                                   final Class<?>... parameterClassArray) {
-            return Method.getMethod(SandboxReflectUtils.unCaughtGetClassDeclaredJavaMethod(clazz, methodName, parameterClassArray));
+                final String methodName,
+                final Class<?>... parameterClassArray) {
+            return Method.getMethod(
+                    SandboxReflectUtils.unCaughtGetClassDeclaredJavaMethod(clazz, methodName, parameterClassArray));
         }
     }
 
     /**
-     * asm method of {@link Injecter#spyMethodOnBefore(Object, Object[], String, String, String, String, String, String, Object, String, boolean, int)}
+     * asm method of {@link Injecter#spyMethodOnBefore(Object, Object[], String, String, String, String, String, String,
+     * Object, String, boolean, int)}
      */
     Method ASM_METHOD_Spy$spyMethodOnBefore = InnerHelper.getAsmMethod(
             Injecter.class,
             "spyMethodOnBefore",
-            Object.class, Object[].class, String.class, String.class, String.class, String.class, String.class, String.class, Object.class, String.class, boolean.class, int.class
+            Object.class, Object[].class, String.class, String.class, String.class, String.class, String.class,
+            String.class, Object.class, String.class, boolean.class, int.class
     );
 
     /**
@@ -190,6 +191,40 @@ public interface AsmMethods {
             String.class,
             Object.class,
             boolean.class
+    );
+
+
+    /**
+     * asm method of {@link Injecter#enterDubbo(String)}
+     *
+     * @since 1.1.4
+     */
+    Method ASM_METHOD_Spy$enterDubbo = InnerHelper.getAsmMethod(
+            Injecter.class,
+            "enterDubbo",
+            String.class
+    );
+
+    /**
+     * asm method of {@link Injecter#leaveDubbo(String)}
+     *
+     * @since 1.1.4
+     */
+    Method ASM_METHOD_Spy$leaveDubbo = InnerHelper.getAsmMethod(
+            Injecter.class,
+            "leaveDubbo",
+            String.class
+    );
+
+    /**
+     * asm method of {@link Injecter#isFirstLevelDubbo(String)}
+     *
+     * @since 1.1.4
+     */
+    Method ASM_METHOD_Spy$isFirstLevelDubbo = InnerHelper.getAsmMethod(
+            Injecter.class,
+            "isFirstLevelDubbo",
+            String.class
     );
 
 }

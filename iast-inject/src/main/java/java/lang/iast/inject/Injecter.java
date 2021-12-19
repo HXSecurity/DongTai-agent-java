@@ -4,7 +4,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -15,9 +14,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class Injecter {
 
     /**
-     * 控制Spy是否在发生异常时主动对外抛出
-     * T:主动对外抛出，会中断方法
-     * F:不对外抛出，只将异常信息打印出来
+     * 控制Spy是否在发生异常时主动对外抛出 T:主动对外抛出，会中断方法 F:不对外抛出，只将异常信息打印出来
      */
     public static volatile boolean isSpyThrowException = false;
 
@@ -45,25 +42,28 @@ public class Injecter {
      * @param ON_THROWS_METHOD ON_THROWS 回调
      */
     public static void init(final String namespace,
-                            final Method ON_BEFORE_METHOD,
-                            final Method ON_RETURN_METHOD,
-                            final Method ON_THROWS_METHOD,
-                            final Method ENTER_PROPAGATOR,
-                            final Method LEAVE_PROPAGATOR,
-                            final Method IS_FIRST_LEVEL_PROPAGATOR,
-                            final Method ENTER_SOURCE,
-                            final Method LEAVE_SOURCE,
-                            final Method IS_FIRST_LEVEL_SOURCE,
-                            final Method ENTER_SINK,
-                            final Method LEAVE_SINK,
-                            final Method IS_FIRST_LEVEL_SINK,
-                            final Method ENTER_HTTP,
-                            final Method LEAVE_HTTP,
-                            final Method IS_FIRST_LEVEL_HTTP,
-                            final Method HAS_TAINT,
-                            final Method CLONE_REQUEST,
-                            final Method IS_REPLAY_REQUEST,
-                            final Method CLONE_RESPONSE
+            final Method ON_BEFORE_METHOD,
+            final Method ON_RETURN_METHOD,
+            final Method ON_THROWS_METHOD,
+            final Method ENTER_PROPAGATOR,
+            final Method LEAVE_PROPAGATOR,
+            final Method IS_FIRST_LEVEL_PROPAGATOR,
+            final Method ENTER_SOURCE,
+            final Method LEAVE_SOURCE,
+            final Method IS_FIRST_LEVEL_SOURCE,
+            final Method ENTER_SINK,
+            final Method LEAVE_SINK,
+            final Method IS_FIRST_LEVEL_SINK,
+            final Method ENTER_HTTP,
+            final Method LEAVE_HTTP,
+            final Method IS_FIRST_LEVEL_HTTP,
+            final Method HAS_TAINT,
+            final Method CLONE_REQUEST,
+            final Method IS_REPLAY_REQUEST,
+            final Method CLONE_RESPONSE,
+            final Method ENTER_DUBBO,
+            final Method LEAVE_DUBBO,
+            final Method IS_FIRST_LEVEL_DUBBO
     ) {
         NAMESPACE_METHOD_HOOK_MAP.put(
                 namespace,
@@ -86,7 +86,10 @@ public class Injecter {
                         HAS_TAINT,
                         CLONE_REQUEST,
                         IS_REPLAY_REQUEST,
-                        CLONE_RESPONSE
+                        CLONE_RESPONSE,
+                        ENTER_DUBBO,
+                        LEAVE_DUBBO,
+                        IS_FIRST_LEVEL_DUBBO
                 )
         );
     }
@@ -107,21 +110,6 @@ public class Injecter {
     }
 
 
-    // 全局序列
-    private static final AtomicInteger sequenceRef = new AtomicInteger(1000);
-
-    /**
-     * 生成全局唯一序列，
-     * 在JVM-SANDBOX中允许多个命名空间的存在，不同的命名空间下listenerId/objectId将会被植入到同一份字节码中，
-     * 此时需要用全局的ID生成策略规避不同的命名空间
-     *
-     * @return 全局自增序列
-     */
-    public static int nextSequence() {
-        return sequenceRef.getAndIncrement();
-    }
-
-
     private static void handleException(Throwable cause) throws Throwable {
         if (isSpyThrowException) {
             throw cause;
@@ -133,24 +121,26 @@ public class Injecter {
 
 
     public static void spyMethodOnBefore(final Object retValue,
-                                         final Object[] argumentArray,
-                                         final String namespace,
-                                         final String framework,
-                                         final String javaClassName,
-                                         final String matchClassName,
-                                         final String javaMethodName,
-                                         final String javaMethodDesc,
-                                         final Object target,
-                                         final String signCode,
-                                         final boolean isStatic,
-                                         final int hookType) throws Throwable {
+            final Object[] argumentArray,
+            final String namespace,
+            final String framework,
+            final String javaClassName,
+            final String matchClassName,
+            final String javaMethodName,
+            final String javaMethodDesc,
+            final Object target,
+            final String signCode,
+            final boolean isStatic,
+            final int hookType) throws Throwable {
         final Thread thread = Thread.currentThread();
         if (!selfCallBarrier.isEnter(thread)) {
             final SelfCallBarrier.Node node = selfCallBarrier.enter(thread);
             try {
                 final MethodHook hook = NAMESPACE_METHOD_HOOK_MAP.get(namespace);
                 if (null != hook) {
-                    hook.ON_BEFORE_METHOD.invoke(null, framework, javaClassName, matchClassName, javaMethodName, javaMethodDesc, target, argumentArray, retValue, signCode, isStatic, hookType);
+                    hook.ON_BEFORE_METHOD
+                            .invoke(null, framework, javaClassName, matchClassName, javaMethodName, javaMethodDesc,
+                                    target, argumentArray, retValue, signCode, isStatic, hookType);
                 }
             } catch (Throwable cause) {
                 handleException(cause);
@@ -161,8 +151,8 @@ public class Injecter {
     }
 
     public static void spyMethodOnReturn(final Object retValue,
-                                         final String namespace,
-                                         final int listenerId
+            final String namespace,
+            final int listenerId
     ) throws Throwable {
         final Thread thread = Thread.currentThread();
         if (!selfCallBarrier.isEnter(thread)) {
@@ -181,8 +171,8 @@ public class Injecter {
     }
 
     public static Ret spyMethodOnThrows(final Throwable throwable,
-                                        final String namespace,
-                                        final int listenerId) throws Throwable {
+            final String namespace,
+            final int listenerId) throws Throwable {
         final Thread thread = Thread.currentThread();
         if (selfCallBarrier.isEnter(thread)) {
             return Ret.RET_NONE;
@@ -577,6 +567,7 @@ public class Injecter {
     public static class SelfCallBarrier {
 
         public static class Node {
+
             private final Thread thread;
             private final ReentrantLock lock;
             private Node pre;
@@ -710,26 +701,32 @@ public class Injecter {
         private final Method CLONE_REQUEST;
         private final Method IS_REPLAY_REQUEST;
         private final Method CLONE_RESPONSE;
+        final Method ENTER_DUBBO;
+        final Method LEAVE_DUBBO;
+        final Method IS_FIRST_LEVEL_DUBBO;
 
         public MethodHook(final Method on_before_method,
-                          final Method on_return_method,
-                          final Method on_throws_method,
-                          final Method ENTER_PROPAGATOR,
-                          final Method LEAVE_PROPAGATOR,
-                          final Method IS_TOP_LEVEL_PROPAGATOR,
-                          final Method ENTER_SOURCE,
-                          final Method LEAVE_SOURCE,
-                          final Method IS_TOP_LEVEL_SOURCE,
-                          final Method ENTER_SINK,
-                          final Method LEAVE_SINK,
-                          final Method IS_TOP_LEVEL_SINK,
-                          final Method ENTER_HTTP,
-                          final Method LEAVE_HTTP,
-                          final Method IS_TOP_LEVEL_HTTP,
-                          final Method HAS_TAINT,
-                          final Method CLONE_REQUEST,
-                          final Method IS_REPLAY_REQUEST,
-                          final Method CLONE_RESPONSE) {
+                final Method on_return_method,
+                final Method on_throws_method,
+                final Method ENTER_PROPAGATOR,
+                final Method LEAVE_PROPAGATOR,
+                final Method IS_TOP_LEVEL_PROPAGATOR,
+                final Method ENTER_SOURCE,
+                final Method LEAVE_SOURCE,
+                final Method IS_TOP_LEVEL_SOURCE,
+                final Method ENTER_SINK,
+                final Method LEAVE_SINK,
+                final Method IS_TOP_LEVEL_SINK,
+                final Method ENTER_HTTP,
+                final Method LEAVE_HTTP,
+                final Method IS_TOP_LEVEL_HTTP,
+                final Method HAS_TAINT,
+                final Method CLONE_REQUEST,
+                final Method IS_REPLAY_REQUEST,
+                final Method CLONE_RESPONSE,
+                final Method ENTER_DUBBO,
+                final Method LEAVE_DUBBO,
+                final Method IS_FIRST_LEVEL_DUBBO) {
             assert null != on_before_method;
             assert null != on_return_method;
             assert null != on_throws_method;
@@ -752,7 +749,80 @@ public class Injecter {
             this.CLONE_REQUEST = CLONE_REQUEST;
             this.IS_REPLAY_REQUEST = IS_REPLAY_REQUEST;
             this.CLONE_RESPONSE = CLONE_RESPONSE;
+            this.ENTER_DUBBO = ENTER_DUBBO;
+            this.LEAVE_DUBBO = LEAVE_DUBBO;
+            this.IS_FIRST_LEVEL_DUBBO = IS_FIRST_LEVEL_DUBBO;
         }
+    }
+
+    /**
+     * enter Dubbo Method
+     *
+     * @param namespace namespace
+     * @since 1.1.4
+     */
+    public static void enterDubbo(final String namespace) {
+        final Thread thread = Thread.currentThread();
+        if (!selfCallBarrier.isEnter(thread)) {
+            final SelfCallBarrier.Node node = selfCallBarrier.enter(thread);
+            try {
+                final MethodHook hook = NAMESPACE_METHOD_HOOK_MAP.get(namespace);
+                if (null != hook) {
+                    hook.ENTER_DUBBO.invoke(null);
+                }
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            } finally {
+                selfCallBarrier.exit(thread, node);
+            }
+        }
+    }
+
+    /**
+     * leave Dubbo Method
+     *
+     * @param namespace
+     * @since 1.1.4
+     */
+    public static void leaveDubbo(final String namespace) {
+        final Thread thread = Thread.currentThread();
+        if (!selfCallBarrier.isEnter(thread)) {
+            final SelfCallBarrier.Node node = selfCallBarrier.enter(thread);
+            try {
+                final MethodHook hook = NAMESPACE_METHOD_HOOK_MAP.get(namespace);
+                if (null != hook) {
+                    hook.LEAVE_DUBBO.invoke(null);
+                }
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            } finally {
+                selfCallBarrier.exit(thread, node);
+            }
+        }
+    }
+
+    public static boolean isFirstLevelDubbo(final String namespace) {
+        final Thread thread = Thread.currentThread();
+        if (!selfCallBarrier.isEnter(thread)) {
+            final SelfCallBarrier.Node node = selfCallBarrier.enter(thread);
+            try {
+                final MethodHook hook = NAMESPACE_METHOD_HOOK_MAP.get(namespace);
+                if (null != hook) {
+                    return (Boolean) hook.IS_FIRST_LEVEL_DUBBO.invoke(null);
+                }
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            } finally {
+                selfCallBarrier.exit(thread, node);
+            }
+        }
+        return false;
     }
 
 }

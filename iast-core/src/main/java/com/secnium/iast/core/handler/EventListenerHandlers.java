@@ -3,6 +3,7 @@ package com.secnium.iast.core.handler;
 import com.secnium.iast.core.EngineManager;
 import com.secnium.iast.core.enhance.plugins.api.spring.SpringApplicationImpl;
 import com.secnium.iast.core.handler.controller.HookType;
+import com.secnium.iast.core.handler.controller.impl.DubboImpl;
 import com.secnium.iast.core.handler.controller.impl.HttpImpl;
 import com.secnium.iast.core.handler.controller.impl.PropagatorImpl;
 import com.secnium.iast.core.handler.controller.impl.SinkImpl;
@@ -10,7 +11,6 @@ import com.secnium.iast.core.handler.controller.impl.SourceImpl;
 import com.secnium.iast.core.handler.graphy.GraphBuilder;
 import com.secnium.iast.core.handler.models.MethodEvent;
 import com.secnium.iast.core.report.ErrorLogReport;
-import com.secnium.iast.core.util.ThrowableUtils;
 import java.lang.iast.inject.Injecter;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -39,7 +39,7 @@ public class EventListenerHandlers {
             final int hookType
     ) {
         // 如果已经进入scope，则检查是否遇到suorce点、sink点等
-        if (HookType.HTTP.equals(hookType)) {
+        if (HookType.HTTP.equals(hookType) || HookType.DUBBO.equals(hookType)) {
             if (!EngineManager.isLingzhiRunning()) {
                 EngineManager.turnOnLingzhi();
             }
@@ -54,7 +54,7 @@ public class EventListenerHandlers {
                             javaMethodDesc, signature, object, argumentArray, retValue, framework, isStatic, null);
                     SpringApplicationImpl.getWebApplicationContext(event);
                 } else {
-                    boolean isEnterHttpEntryPoint = EngineManager.ENTER_HTTP_ENTRYPOINT.isEnterHttp();
+                    boolean isEnterHttpEntryPoint = EngineManager.isEnterHttp();
                     boolean isHttpEntryMethod = HookType.HTTP.equals(hookType) || HookType.DUBBO.equals(hookType);
                     if (isEnterHttpEntryPoint || isHttpEntryMethod) {
                         MethodEvent event = new MethodEvent(0, -1, javaClassName, matchClassName, javaMethodName,
@@ -62,7 +62,7 @@ public class EventListenerHandlers {
                         if (HookType.HTTP.equals(hookType)) {
                             HttpImpl.solveHttp(event);
                         } else if (HookType.DUBBO.equals(hookType)) {
-                            System.out.println("Enter Dubbo");
+                            DubboImpl.solveDubbo(event, INVOKE_ID_SEQUENCER);
                         } else if (HookType.PROPAGATOR.equals(hookType) && !EngineManager.TAINT_POOL.get().isEmpty()) {
                             PropagatorImpl.solvePropagator(event, INVOKE_ID_SEQUENCER);
                         } else if (HookType.SOURCE.equals(hookType)) {
@@ -201,7 +201,7 @@ public class EventListenerHandlers {
     public static void leaveHttp(Object response) {
         try {
             EngineManager.SCOPE_TRACKER.leaveHttp();
-            if (EngineManager.SCOPE_TRACKER.isExitedHttp() && EngineManager.ENTER_HTTP_ENTRYPOINT.isEnterHttp()) {
+            if (EngineManager.SCOPE_TRACKER.isExitedHttp() && EngineManager.isEnterHttp()) {
                 EngineManager.maintainRequestCount();
                 GraphBuilder.buildAndReport(response);
                 EngineManager.cleanThreadState();
@@ -256,4 +256,45 @@ public class EventListenerHandlers {
     public static Object cloneResponse(Object response, boolean isJakarta) {
         return HttpImpl.cloneResponse(response);
     }
+
+    /**
+     * @since 1.1.4
+     */
+    public static void enterDubbo() {
+        try {
+            EngineManager.SCOPE_TRACKER.enterDubbo();
+        } catch (Exception e) {
+            ErrorLogReport.sendErrorLog(e);
+        }
+    }
+
+    /**
+     * @since 1.1.4
+     */
+    public static void leaveDubbo() {
+        try {
+            EngineManager.SCOPE_TRACKER.leaveHttp();
+            if (EngineManager.SCOPE_TRACKER.isExitedHttp() && EngineManager.isEnterHttp()) {
+                EngineManager.maintainRequestCount();
+                //GraphBuilder.buildAndReport(response);
+                EngineManager.cleanThreadState();
+            }
+        } catch (Exception e) {
+            ErrorLogReport.sendErrorLog(e);
+            EngineManager.cleanThreadState();
+        }
+    }
+
+    /**
+     * @since 1.1.4
+     */
+    public static boolean isFirstLevelDubbo() {
+        try {
+            return EngineManager.SCOPE_TRACKER.isFirstLevelDubbo();
+        } catch (Exception e) {
+            ErrorLogReport.sendErrorLog(e);
+        }
+        return false;
+    }
+
 }

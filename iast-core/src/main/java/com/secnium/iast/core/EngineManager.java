@@ -39,7 +39,7 @@ public class EngineManager {
 
     private static final BooleanTheadLocal AGENT_STATUS = new BooleanTheadLocal(false);
     private static final BooleanTheadLocal TRANSFORM_STATE = new BooleanTheadLocal(false);
-    public static final BooleanTheadLocal ENTER_HTTP_ENTRYPOINT = new BooleanTheadLocal(false);
+    private static final BooleanTheadLocal ENTER_HTTP_ENTRYPOINT = new BooleanTheadLocal(false);
     public static final RequestContext REQUEST_CONTEXT = new RequestContext();
     public static final IastTrackMap TRACK_MAP = new IastTrackMap();
     public static final IastTaintPool TAINT_POOL = new IastTaintPool();
@@ -257,9 +257,9 @@ public class EngineManager {
             }
         }
         Map<String, String> headers = (Map<String, String>) requestMeta.get("headers");
-        if(headers.containsKey("dt-traceid")){
+        if (headers.containsKey("dt-traceid")) {
             ContextManager.getOrCreateGlobalTraceId(headers.get("dt-traceid"), EngineManager.getAgentId());
-        }else{
+        } else {
             String newTraceId = ContextManager.getOrCreateGlobalTraceId(null, EngineManager.getAgentId());
             headers.put("dt-traceid", newTraceId);
         }
@@ -268,5 +268,40 @@ public class EngineManager {
         TRACK_MAP.set(new HashMap<Integer, MethodEvent>(1024));
         TAINT_POOL.set(new HashSet<Object>());
         TAINT_HASH_CODES.set(new HashSet<Integer>());
+    }
+
+    /**
+     *
+     * @param dubboService
+     * @param attachments
+     * @since 1.1.4
+     */
+    public static void enterDubboEntry(String dubboService, Map<String, String> attachments) {
+        if (attachments != null) {
+            if (attachments.containsKey(ContextManager.getHeaderKey())) {
+                ContextManager.getOrCreateGlobalTraceId(attachments.get(ContextManager.getHeaderKey()), EngineManager.getAgentId());
+            } else {
+                attachments.put(ContextManager.getHeaderKey(), ContextManager.getSegmentId());
+            }
+        }
+        if(ENTER_HTTP_ENTRYPOINT.isEnterHttp()){
+            return;
+        }
+        // todo: register server
+        ENTER_HTTP_ENTRYPOINT.enterHttpEntryPoint();
+        // fixme: 保存请求信息
+        //REQUEST_CONTEXT.set(attachments);
+        TRACK_MAP.set(new HashMap<Integer, MethodEvent>(1024));
+        TAINT_POOL.set(new HashSet<Object>());
+        TAINT_HASH_CODES.set(new HashSet<Integer>());
+    }
+
+    /**
+     *
+     * @return
+     * @since 1.1.4
+     */
+    public static boolean isEnterHttp(){
+        return ENTER_HTTP_ENTRYPOINT.isEnterHttp();
     }
 }

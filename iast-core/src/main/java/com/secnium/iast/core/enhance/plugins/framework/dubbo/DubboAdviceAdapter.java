@@ -11,7 +11,8 @@ import org.objectweb.asm.MethodVisitor;
  */
 public class DubboAdviceAdapter extends AbstractAdviceAdapter {
 
-    public DubboAdviceAdapter(MethodVisitor mv, int access, String name, String desc, String signCode, IastContext context) {
+    public DubboAdviceAdapter(MethodVisitor mv, int access, String name, String desc, String signCode,
+            IastContext context) {
         super(mv, access, name, desc, context, "dubbo", signCode);
     }
 
@@ -19,25 +20,51 @@ public class DubboAdviceAdapter extends AbstractAdviceAdapter {
     protected void before() {
         mark(tryLabel);
         Label elseLabel = new Label();
-        push(context.getNamespace());
-        invokeStatic(ASM_TYPE_SPY, ASM_METHOD_Spy$enterHttp);
 
-        push(context.getNamespace());
-        invokeStatic(ASM_TYPE_SPY, ASM_METHOD_Spy$isFirstLevelHttp);
+        enterDubbo();
+        isFirstLevelDubbo();
         mv.visitJumpInsn(EQ, elseLabel);
-
         captureMethodState(-1, HookType.DUBBO.getValue(), false);
-
-        // 标记进入source点
         mark(elseLabel);
     }
 
     @Override
     protected void after(int opcode) {
-        if (!isThrow(opcode)) {
-            loadReturn(opcode);
-        }
-        push(context.getNamespace());
-        invokeStatic(ASM_TYPE_SPY, ASM_METHOD_Spy$leaveHttp);
+//        if (!isThrow(opcode)) {
+//            loadReturn(opcode);
+//        }
+//        leaveDubbo();
     }
+
+    /**
+     * mark for enter dubbo method
+     * <p>
+     * since: 1.1.4
+     */
+    private void enterDubbo() {
+        push(context.getNamespace());
+        invokeStatic(ASM_TYPE_SPY, ASM_METHOD_Spy$enterDubbo);
+    }
+
+    /**
+     * Determine whether it is the first layer of Dubbo method call
+     * <p>
+     * since: 1.1.4
+     */
+    private void isFirstLevelDubbo() {
+        push(context.getNamespace());
+        invokeStatic(ASM_TYPE_SPY, ASM_METHOD_Spy$isFirstLevelDubbo);
+    }
+
+    /**
+     * mark for leave dubbo method
+     * <p>
+     * since: 1.1.4
+     */
+    private void leaveDubbo() {
+        push(context.getNamespace());
+        invokeStatic(ASM_TYPE_SPY, ASM_METHOD_Spy$leaveDubbo);
+    }
+
+
 }
