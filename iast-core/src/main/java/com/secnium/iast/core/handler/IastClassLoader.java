@@ -7,6 +7,7 @@ import java.net.URLClassLoader;
  * @author dongzhiyong@huoxian.cn
  */
 public class IastClassLoader extends URLClassLoader {
+
     public IastClassLoader(ClassLoader classLoader, URL[] adapterJar) {
         super(adapterJar, classLoader);
     }
@@ -16,8 +17,7 @@ public class IastClassLoader extends URLClassLoader {
         try {
             return super.loadClass(s);
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            return null;
         }
-        return null;
     }
 }
