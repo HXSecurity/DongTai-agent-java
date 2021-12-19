@@ -11,6 +11,7 @@ iast-inject/target/
 iast-agent/target/
 UnitText/target/
 target/
+**/dependency-reduced-pom.xml
 
 ## for eclipse and vscode
 .classpath
