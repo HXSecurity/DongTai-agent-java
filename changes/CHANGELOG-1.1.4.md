@@ -21,8 +21,3 @@ Release Notes.
 **Contributors**
 
 @exexute, @langligelang, @Nizernizer and @Maskhe
-
-
-------------------
-
-Find change logs of all versions [here](changes).
