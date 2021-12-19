@@ -86,10 +86,6 @@
                   <shadedPattern>${shade-prefix}.javax.xml.stream</shadedPattern>
                 </relocation>
                 <relocation>
-                  <pattern>oshi</pattern>
-                  <shadedPattern>${shade-prefix}.oshi</shadedPattern>
-                </relocation>
-                <relocation>
                   <pattern>com.sun.jna</pattern>
                   <shadedPattern>${shade-prefix}.com.sun.jna</shadedPattern>
                 </relocation>
