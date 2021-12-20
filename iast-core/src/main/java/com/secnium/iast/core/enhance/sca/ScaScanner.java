@@ -1,18 +1,15 @@
 package com.secnium.iast.core.enhance.sca;
 
 import com.secnium.iast.core.report.AssestReport;
-import com.secnium.iast.core.util.LogUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.JarURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import org.slf4j.Logger;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -22,62 +19,98 @@ public class ScaScanner {
     private static final String ALGORITHM = "SHA-1";
     private static final String JAR = ".jar";
     private static volatile HashSet<String> scannedClassSet = new HashSet<String>();
-    private static Boolean isClassPath = false;
+    private static volatile Boolean isClassPath = false;
+
+    private static boolean isJarLibs(String packageFile) {
+        return packageFile.startsWith("file:") && packageFile.endsWith(".jar!/") && packageFile.contains("BOOT-INF");
+    }
+
+    private static boolean isWarLibs(String packageFile) {
+        return packageFile.endsWith(".jar") && packageFile.contains("WEB-INF");
+    }
+
+    private static boolean isLocalMavenRepo(String packageFile) {
+        return packageFile.endsWith(".jar") && packageFile.contains("repository");
+    }
+
+    private static boolean isClassPath() {
+        return false;
+    }
+
 
     /**
-     * @param url
+     * @param packageFile
      * @param internalClassName
      */
-    public static void scanForSCA(URL url, String internalClassName) {
-        if (url == null
-                || internalClassName == null
+    public static void scanForSCA(String packageFile, String internalClassName) {
+        if (internalClassName == null
                 || internalClassName.startsWith("com/secnium/iast/")
                 || internalClassName.startsWith("java/lang/iast/")
                 || internalClassName.startsWith("cn/huoxian/iast/")
                 || internalClassName.startsWith("com/sun/")
                 || internalClassName.startsWith("sun/")
+                || packageFile.isEmpty()
         ) {
             return;
         }
-        isClassPathStart();
-        ScaScanThread scanThread = new ScaScanThread(url);
-        scanThread.start();
-    }
 
-    private static void isClassPathStart() {
-        if (!isClassPath) {
-            String property = System.getProperty("java.class.path");
-            String[] split = property.split(":");
-            for (String string : split) {
-                try {
-                    File file = new File(string);
-                    URL url = file.toURI().toURL();
-                    ScaScanThread scanThread = new ScaScanThread(url);
-                    scanThread.start();
-                } catch (MalformedURLException e) {
-                    Logger logger = LogUtils.getLogger(ScaScanner.class);
-                    logger.error(e.getMessage());
-                }
+        File jarPackageFile = new File(packageFile);
+        String packagePath = jarPackageFile.getParent();
+        ScaScanThread thread = null;
+        if (isJarLibs(packageFile)) {
+            packageFile = packageFile.replace("file:", "");
+            packageFile = packageFile.substring(0, packageFile.indexOf("!/"));
+            if (!scannedClassSet.contains(packageFile)) {
+                scannedClassSet.add(packageFile);
+                thread = new ScaScanThread(packagePath, 2);
             }
-            isClassPath = true;
+        } else if (isWarLibs(packageFile) && !scannedClassSet.contains(packagePath)) {
+            scannedClassSet.add(packagePath);
+            thread = new ScaScanThread(packagePath, 1);
+        } else if (!scannedClassSet.contains(packageFile) && isLocalMavenRepo(packageFile)) {
+            scannedClassSet.add(packageFile);
+            thread = new ScaScanThread(packagePath, 3);
+        }
+        if (null != thread) {
+            thread.start();
         }
     }
+
+//    private static void isClassPathStart() {
+//        if (!isClassPath) {
+//            String property = System.getProperty("java.class.path");
+//            String[] split = property.split(":");
+//            for (String string : split) {
+//                try {
+//                    File file = new File(string);
+//                    URL url = file.toURI().toURL();
+//                    ScaScanThread scanThread = new ScaScanThread(url);
+//                    scanThread.start();
+//                } catch (MalformedURLException e) {
+//                    Logger logger = LogUtils.getLogger(ScaScanner.class);
+//                    logger.error(e.getMessage());
+//                }
+//            }
+//            isClassPath = true;
+//        }
+//    }
 
     /**
      * Asynchronous analysis of third-party dependent components
      */
     private static class ScaScanThread extends Thread {
 
-        private final URL packageUrl;
+        private final String packagePath;
+        private int scaType;
 
         /**
-         * Allocates a new {@code Thread} object. This constructor has the same effect as {@linkplain
-         * #Thread(ThreadGroup, Runnable, String) Thread} {@code (null, null, gname)}, where {@code gname} is a newly
-         * generated name. Automatically generated names are of the form {@code "Thread-"+}<i>n</i>, where <i>n</i> is
-         * an integer.
+         * Allocates a new {@code Thread} object. This constructor has the same effect as  {@code (null, null, gname)},
+         * where {@code gname} is a newly generated name. Automatically generated names are of the form {@code
+         * "Thread-"+}<i>n</i>, where <i>n</i> is an integer.
          */
-        public ScaScanThread(URL packageUrl) {
-            this.packageUrl = packageUrl;
+        public ScaScanThread(String packagePath, int scaType) {
+            this.packagePath = packagePath;
+            this.scaType = scaType;
         }
 
         public void scan(File file) {
@@ -101,9 +134,18 @@ public class ScaScanner {
             return jarConnection.getInputStream();
         }
 
-        public void scanWithJarPackage(String path) {
+        private void scanWarLib(String packagePath) {
+            File packagePathFile = new File(packagePath);
+            File[] packagePathFiles = packagePathFile.listFiles();
+            for (File tempPackagePathFile : packagePathFiles != null ? packagePathFiles : new File[0]) {
+                scan(tempPackagePathFile);
+            }
+        }
+
+
+        private void scanJarLib(String packagePath) {
             try {
-                JarFile file = new JarFile(path);
+                JarFile file = new JarFile(packagePath);
                 Enumeration<JarEntry> entries = file.entries();
                 String entryName;
                 while (entries.hasMoreElements()) {
@@ -112,13 +154,13 @@ public class ScaScanner {
                     if (!entryName.endsWith(".jar")) {
                         continue;
                     }
-                    InputStream is = getJarInputStream(path, entryName);
+                    InputStream is = getJarInputStream(packagePath, entryName);
                     String signature = SignatureAlgorithm.getSignature(is, ScaScanner.ALGORITHM);
                     String packageName = entry.getName();
                     if (signature == null) {
                         continue;
                     }
-                    AssestReport.sendReport("jar:file:" + path + "!/" + entryName, packageName, signature,
+                    AssestReport.sendReport("jar:file:" + packagePath + "!/" + entryName, packageName, signature,
                             ScaScanner.ALGORITHM);
                 }
             } catch (IOException e) {
@@ -142,27 +184,17 @@ public class ScaScanner {
          */
         @Override
         public void run() {
-            String jarPackageFilePath = packageUrl.getFile();
-            File jarPackageFile = new File(jarPackageFilePath);
-            String packagePath = jarPackageFile.getParent();
-            if (!scannedClassSet.contains(packagePath) && jarPackageFilePath.startsWith("file:") && jarPackageFilePath
-                    .endsWith(".jar!/") && jarPackageFilePath.contains("BOOT-INF")) {
-                scannedClassSet.add(packagePath);
-                jarPackageFilePath = jarPackageFilePath.replace("file:", "");
-                jarPackageFilePath = jarPackageFilePath.substring(0, jarPackageFilePath.indexOf("!/"));
-                this.scanWithJarPackage(jarPackageFilePath);
-            } else if (!scannedClassSet.contains(packagePath) && jarPackageFilePath.endsWith(".jar")
-                    && jarPackageFilePath.contains("WEB-INF")) {
-                scannedClassSet.add(packagePath);
-                File packagePathFile = new File(packagePath);
-                File[] packagePathFiles = packagePathFile.listFiles();
-                for (File tempPackagePathFile : packagePathFiles != null ? packagePathFiles : new File[0]) {
-                    scan(tempPackagePathFile);
-                }
-            } else if (!scannedClassSet.contains(jarPackageFilePath) && jarPackageFilePath.endsWith(".jar")
-                    && jarPackageFilePath.contains("repository")) {
-                scannedClassSet.add(jarPackageFilePath);
-                scan(jarPackageFile);
+            switch (scaType) {
+                case 1:
+                    scanWarLib(packagePath);
+                    break;
+                case 2:
+                    scanJarLib(packagePath);
+                    break;
+                case 3:
+                    scan(new File(packagePath));
+                default:
+                    break;
             }
         }
     }

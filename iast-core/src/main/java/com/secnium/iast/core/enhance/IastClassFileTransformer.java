@@ -82,8 +82,8 @@ public class IastClassFileTransformer implements ClassFileTransformer {
         try {
             if (loader != null) {
                 final CodeSource codeSource = (protectionDomain != null) ? protectionDomain.getCodeSource() : null;
-                if (codeSource != null) {
-                    ScaScanner.scanForSCA(codeSource.getLocation(), internalClassName);
+                if (codeSource != null && codeSource.getLocation() != null) {
+                    ScaScanner.scanForSCA(codeSource.getLocation().getFile(), internalClassName);
                 }
             }
 
