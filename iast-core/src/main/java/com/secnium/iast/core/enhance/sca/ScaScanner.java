@@ -217,6 +217,8 @@ public class ScaScanner {
                     break;
                 case 3:
                     scan(new File(packagePath));
+                    AssestReport.sendReport(this.scaReport.toString());
+                    break;
                 default:
                     break;
             }
