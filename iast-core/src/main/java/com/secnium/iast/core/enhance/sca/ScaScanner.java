@@ -3,17 +3,23 @@ package com.secnium.iast.core.enhance.sca;
 import com.secnium.iast.core.EngineManager;
 import com.secnium.iast.core.handler.vulscan.ReportConstant;
 import com.secnium.iast.core.report.AssestReport;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.JarURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+
+import com.secnium.iast.core.util.LogUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -23,6 +29,7 @@ public class ScaScanner {
     private static final String ALGORITHM = "SHA-1";
     private static final String JAR = ".jar";
     private static volatile HashSet<String> scannedClassSet = new HashSet<String>();
+    private static volatile HashSet<String> scaPackageSet = new HashSet<String>();
     private static volatile Boolean isClassPath = false;
 
     private static boolean isJarLibs(String packageFile) {
@@ -36,11 +43,6 @@ public class ScaScanner {
     private static boolean isLocalMavenRepo(String packageFile) {
         return packageFile.endsWith(".jar") && packageFile.contains("repository");
     }
-
-    private static boolean isClassPath() {
-        return false;
-    }
-
 
     /**
      * @param packageFile
@@ -74,30 +76,17 @@ public class ScaScanner {
         } else if (!scannedClassSet.contains(packageFile) && isLocalMavenRepo(packageFile)) {
             scannedClassSet.add(packageFile);
             thread = new ScaScanThread(packagePath, 3);
+        } else if (!isClassPath) {
+            String property = System.getProperty("java.class.path");
+            String[] packages = property.split(":");
+            Collections.addAll(scaPackageSet, packages);
+            isClassPath = true;
+            thread = new ScaScanThread(packagePath, 4);
         }
         if (null != thread) {
             thread.start();
         }
     }
-
-//    private static void isClassPathStart() {
-//        if (!isClassPath) {
-//            String property = System.getProperty("java.class.path");
-//            String[] split = property.split(":");
-//            for (String string : split) {
-//                try {
-//                    File file = new File(string);
-//                    URL url = file.toURI().toURL();
-//                    ScaScanThread scanThread = new ScaScanThread(url);
-//                    scanThread.start();
-//                } catch (MalformedURLException e) {
-//                    Logger logger = LogUtils.getLogger(ScaScanner.class);
-//                    logger.error(e.getMessage());
-//                }
-//            }
-//            isClassPath = true;
-//        }
-//    }
 
     /**
      * Asynchronous analysis of third-party dependent components
@@ -150,6 +139,20 @@ public class ScaScanner {
                     .openConnection();
 
             return jarConnection.getInputStream();
+        }
+
+        public void scanClassPath(HashSet<String> packages) {
+            for (String packagefile:packages){
+                if (packagefile.endsWith(JAR)){
+                    File file = new File(packagefile);
+                    JSONObject packageObj = new JSONObject();
+                    packageObj.put(ReportConstant.SCA_PACKAGE_PATH, packagefile);
+                    packageObj.put(ReportConstant.SCA_PACKAGE_NAME, file.getName());
+                    packageObj.put(ReportConstant.SCA_PACKAGE_SIGNATURE, SignatureAlgorithm.getSignature(file, ScaScanner.ALGORITHM));
+                    packageObj.put(ReportConstant.SCA_PACKAGE_ALGORITHM, ScaScanner.ALGORITHM);
+                    this.packages.put(packageObj);
+                }
+            }
         }
 
         private void scanWarLib(String packagePath) {
@@ -209,19 +212,21 @@ public class ScaScanner {
             switch (scaType) {
                 case 1:
                     scanWarLib(packagePath);
-                    AssestReport.sendReport(scaReport.toString());
                     break;
                 case 2:
                     scanJarLib(packagePath);
-                    AssestReport.sendReport(scaReport.toString());
                     break;
                 case 3:
                     scan(new File(packagePath));
-                    AssestReport.sendReport(this.scaReport.toString());
+                    break;
+                case 4:
+                    scanClassPath(scaPackageSet);
                     break;
                 default:
                     break;
             }
+            AssestReport.sendReport(this.scaReport.toString());
+
         }
     }
 }
