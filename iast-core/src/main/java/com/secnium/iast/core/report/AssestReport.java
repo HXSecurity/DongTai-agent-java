@@ -18,6 +18,10 @@ public class AssestReport {
         ReportThread.send(Constants.API_REPORT_UPLOAD, report);
     }
 
+    public static void sendReport(String report) {
+        ReportThread.send(Constants.API_REPORT_UPLOAD, report);
+    }
+
     private static String createReport(String packagePath, String packageName, String signature, String algorithm) {
         JSONObject report = new JSONObject();
         JSONObject detail = new JSONObject();

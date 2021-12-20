@@ -1,5 +1,7 @@
 package com.secnium.iast.core.enhance.sca;
 
+import com.secnium.iast.core.EngineManager;
+import com.secnium.iast.core.handler.vulscan.ReportConstant;
 import com.secnium.iast.core.report.AssestReport;
 import java.io.File;
 import java.io.IOException;
@@ -10,6 +12,8 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -101,7 +105,9 @@ public class ScaScanner {
     private static class ScaScanThread extends Thread {
 
         private final String packagePath;
-        private int scaType;
+        private final int scaType;
+        private final JSONObject scaReport;
+        private final JSONArray packages;
 
         /**
          * Allocates a new {@code Thread} object. This constructor has the same effect as  {@code (null, null, gname)},
@@ -111,6 +117,13 @@ public class ScaScanner {
         public ScaScanThread(String packagePath, int scaType) {
             this.packagePath = packagePath;
             this.scaType = scaType;
+            this.scaReport = new JSONObject();
+            this.packages = new JSONArray();
+            scaReport.put(ReportConstant.REPORT_KEY, ReportConstant.REPORT_SCA_BATCH);
+            JSONObject detail = new JSONObject();
+            detail.put(ReportConstant.AGENT_ID, EngineManager.getAgentId());
+            detail.put("packages", packages);
+            scaReport.put(ReportConstant.REPORT_VALUE_KEY, detail);
         }
 
         public void scan(File file) {
@@ -120,7 +133,12 @@ public class ScaScanner {
                     String packageName = file.getName();
                     String signature = SignatureAlgorithm.getSignature(file, ScaScanner.ALGORITHM);
                     if (null != signature) {
-                        AssestReport.sendReport(filePath, packageName, signature, ScaScanner.ALGORITHM);
+                        JSONObject packageObj = new JSONObject();
+                        packageObj.put(ReportConstant.SCA_PACKAGE_PATH, packagePath);
+                        packageObj.put(ReportConstant.SCA_PACKAGE_NAME, packageName);
+                        packageObj.put(ReportConstant.SCA_PACKAGE_SIGNATURE, signature);
+                        packageObj.put(ReportConstant.SCA_PACKAGE_ALGORITHM, ScaScanner.ALGORITHM);
+                        packages.put(packageObj);
                     }
                 }
             }
@@ -160,8 +178,12 @@ public class ScaScanner {
                     if (signature == null) {
                         continue;
                     }
-                    AssestReport.sendReport("jar:file:" + packagePath + "!/" + entryName, packageName, signature,
-                            ScaScanner.ALGORITHM);
+                    JSONObject packageObj = new JSONObject();
+                    packageObj.put(ReportConstant.SCA_PACKAGE_PATH, "jar:file:" + packagePath + "!/" + entryName);
+                    packageObj.put(ReportConstant.SCA_PACKAGE_NAME, packageName);
+                    packageObj.put(ReportConstant.SCA_PACKAGE_SIGNATURE, signature);
+                    packageObj.put(ReportConstant.SCA_PACKAGE_ALGORITHM, ScaScanner.ALGORITHM);
+                    packages.put(packageObj);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -187,9 +209,11 @@ public class ScaScanner {
             switch (scaType) {
                 case 1:
                     scanWarLib(packagePath);
+                    AssestReport.sendReport(scaReport.toString());
                     break;
                 case 2:
                     scanJarLib(packagePath);
+                    AssestReport.sendReport(scaReport.toString());
                     break;
                 case 3:
                     scan(new File(packagePath));
