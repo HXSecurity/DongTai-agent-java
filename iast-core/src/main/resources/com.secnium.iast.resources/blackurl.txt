@@ -1,3 +1,5 @@
 /discovery/ok 1
 /actuator 1
 isTest 2
+/internalHeartBeat/_health 1
+/internalHeartBeat/_check 1

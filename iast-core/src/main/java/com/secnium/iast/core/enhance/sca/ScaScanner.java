@@ -3,23 +3,17 @@ package com.secnium.iast.core.enhance.sca;
 import com.secnium.iast.core.EngineManager;
 import com.secnium.iast.core.handler.vulscan.ReportConstant;
 import com.secnium.iast.core.report.AssestReport;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.JarURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-
-import com.secnium.iast.core.util.LogUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.slf4j.Logger;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -29,7 +23,6 @@ public class ScaScanner {
     private static final String ALGORITHM = "SHA-1";
     private static final String JAR = ".jar";
     private static volatile HashSet<String> scannedClassSet = new HashSet<String>();
-    private static volatile HashSet<String> scaPackageSet = new HashSet<String>();
     private static volatile Boolean isClassPath = false;
 
     private static boolean isJarLibs(String packageFile) {
@@ -77,11 +70,8 @@ public class ScaScanner {
             scannedClassSet.add(packageFile);
             thread = new ScaScanThread(packagePath, 3);
         } else if (!isClassPath) {
-            String property = System.getProperty("java.class.path");
-            String[] packages = property.split(":");
-            Collections.addAll(scaPackageSet, packages);
             isClassPath = true;
-            thread = new ScaScanThread(packagePath, 4);
+            thread = new ScaScanThread(System.getProperty("java.class.path"), 4);
         }
         if (null != thread) {
             thread.start();
@@ -141,14 +131,16 @@ public class ScaScanner {
             return jarConnection.getInputStream();
         }
 
-        public void scanClassPath(HashSet<String> packages) {
-            for (String packagefile:packages){
-                if (packagefile.endsWith(JAR)){
-                    File file = new File(packagefile);
+        public void scanClassPath(String packagesPath) {
+            String[] packages = packagesPath.split(":");
+            for (String packagePath : packages) {
+                if (packagePath.endsWith(JAR)) {
+                    File file = new File(packagePath);
                     JSONObject packageObj = new JSONObject();
-                    packageObj.put(ReportConstant.SCA_PACKAGE_PATH, packagefile);
+                    packageObj.put(ReportConstant.SCA_PACKAGE_PATH, packagePath);
                     packageObj.put(ReportConstant.SCA_PACKAGE_NAME, file.getName());
-                    packageObj.put(ReportConstant.SCA_PACKAGE_SIGNATURE, SignatureAlgorithm.getSignature(file, ScaScanner.ALGORITHM));
+                    packageObj.put(ReportConstant.SCA_PACKAGE_SIGNATURE,
+                            SignatureAlgorithm.getSignature(file, ScaScanner.ALGORITHM));
                     packageObj.put(ReportConstant.SCA_PACKAGE_ALGORITHM, ScaScanner.ALGORITHM);
                     this.packages.put(packageObj);
                 }
@@ -220,7 +212,7 @@ public class ScaScanner {
                     scan(new File(packagePath));
                     break;
                 case 4:
-                    scanClassPath(scaPackageSet);
+                    scanClassPath(packagePath);
                     break;
                 default:
                     break;
