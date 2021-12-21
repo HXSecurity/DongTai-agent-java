@@ -10,6 +10,7 @@ public class ReportConstant {
     public static final String REPORT_KEY = "type";
     public static final int REPORT_HEART_BEAT = 0x01;
     public static final int REPORT_SCA = 0x11;
+    public static final int REPORT_SCA_BATCH = 0x12;
     public static final int REPORT_VULN_NORNAL = 0x21;
     public static final int REPORT_VULN_DYNAMIC = 0x22;
     public static final int REPORT_VULN_OVER_POWER = 0x23;
