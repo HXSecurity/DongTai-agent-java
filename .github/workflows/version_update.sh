@@ -18,4 +18,4 @@ git config --global user.email '1528360120@qq.com'
 git add .
 git commit -m "Update: change version from $OLD_VERSION to $NEW_VERSION"
 
-git push "https://$GITHUB_ACTOR:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git" HEAD:"release-$NEW_VERSION"
+git push "https://$GITHUB_ACTOR:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git" "release-$NEW_VERSION"
