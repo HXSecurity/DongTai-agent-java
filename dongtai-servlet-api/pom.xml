@@ -5,13 +5,13 @@
     <parent>
         <artifactId>iast</artifactId>
         <groupId>com.secnium.iast</groupId>
-        <version>${iast.version}</version>
+        <version>1.1.4</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>cn.huoxian.iast</groupId>
     <artifactId>dongtai-servlet-api</artifactId>
-    <version>${iast.version}</version>
+    <version>1.1.4</version>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -35,7 +35,7 @@
         <dependency>
             <groupId>cn.huoxian.iast</groupId>
             <artifactId>dongtai-spring-api</artifactId>
-            <version>${iast.version}</version>
+            <version>1.1.4</version>
         </dependency>
     </dependencies>
 
