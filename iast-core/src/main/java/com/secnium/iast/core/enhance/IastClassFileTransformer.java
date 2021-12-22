@@ -56,7 +56,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
      *
      * @param loader              类加载器
      * @param internalClassName   内部类的名字
-     * @param classBeingRedefined
+     * @param classBeingRedefined 当前类是否是通过 retransform 过来的
      * @param protectionDomain
      * @param srcByteCodeArray    字节码
      * @return 修改后的字节码，为null时，不进行修改
