@@ -61,7 +61,7 @@ public class ScaScanner {
             packageFile = packageFile.substring(0, packageFile.indexOf("!/"));
             if (!scannedClassSet.contains(packageFile)) {
                 scannedClassSet.add(packageFile);
-                thread = new ScaScanThread(packagePath, 2);
+                thread = new ScaScanThread(packageFile, 2);
             }
         } else if (isWarLibs(packageFile) && !scannedClassSet.contains(packagePath)) {
             scannedClassSet.add(packagePath);
