@@ -246,6 +246,10 @@ public class PropertyUtils {
         return "normal".equals(getMode());
     }
 
+    /**
+     * After version 1.1.4, change the default server mode to local.
+     * @return server mode
+     */
     private String getServerMode() {
         if (null == serverMode) {
             serverMode = System.getProperty("iast.server.mode", cfg.getProperty("iast.server.mode", "local"));
