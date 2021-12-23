@@ -248,7 +248,7 @@ public class PropertyUtils {
 
     private String getServerMode() {
         if (null == serverMode) {
-            serverMode = System.getProperty("iast.server.mode", "remote");
+            serverMode = System.getProperty("iast.server.mode", cfg.getProperty("iast.server.mode", "local"));
         }
         return serverMode;
     }
