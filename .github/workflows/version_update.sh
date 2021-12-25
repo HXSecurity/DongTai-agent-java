@@ -13,7 +13,6 @@ mvn -q versions:set -DnewVersion="$NEW_VERSION"
 mvn -q versions:update-child-modules
 mvn -q versions:commit
 
-git bran
 git config --global user.name '$GITHUB_ACTOR-bot'
 git config --global user.email '$GITHUB_ACTOR-bot@dongtai.io'
 git add .
