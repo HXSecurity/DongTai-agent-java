@@ -11,14 +11,15 @@ import org.objectweb.asm.MethodVisitor;
  */
 public class DubboAdviceAdapter extends AbstractAdviceAdapter {
 
+    private int athrowCounts = 0;
+
     public DubboAdviceAdapter(MethodVisitor mv, int access, String name, String desc, String signCode,
             IastContext context) {
         super(mv, access, name, desc, context, "dubbo", signCode);
     }
 
     @Override
-    protected void before() {
-        mark(tryLabel);
+    protected void onMethodEnter() {
         Label elseLabel = new Label();
 
         enterDubbo();
@@ -29,11 +30,29 @@ public class DubboAdviceAdapter extends AbstractAdviceAdapter {
     }
 
     @Override
+    protected void onMethodExit(int opcode) {
+    }
+
+    /**
+     * 方法结束前，如何判断是否需要throw、return，解决堆栈未对齐
+     *
+     * @param maxStack
+     * @param maxLocals
+     */
+    @Override
+    public void visitMaxs(int maxStack, int maxLocals) {
+        leaveDubbo();
+        mv.visitMaxs(maxStack, maxLocals);
+    }
+
+    @Override
+    protected void before() {
+
+    }
+
+    @Override
     protected void after(int opcode) {
-//        if (!isThrow(opcode)) {
-//            loadReturn(opcode);
-//        }
-//        leaveDubbo();
+
     }
 
     /**
@@ -42,7 +61,7 @@ public class DubboAdviceAdapter extends AbstractAdviceAdapter {
      * since: 1.1.4
      */
     private void enterDubbo() {
-        push(context.getNamespace());
+        push("DongTai");
         invokeStatic(ASM_TYPE_SPY, ASM_METHOD_Spy$enterDubbo);
     }
 
