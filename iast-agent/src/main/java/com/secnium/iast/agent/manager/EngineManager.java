@@ -328,10 +328,10 @@ public class EngineManager {
      * @param jarPath 引擎的物理路径
      * @return true-引擎不存在；false-引擎存在
      */
-    private static boolean engineNotExist(final String jarPath) {
+    private boolean engineNotExist(final String jarPath) {
         LogUtils.info("Check if the engine[" + jarPath + "] needs to be updated");
-        String isDebug = System.getProperty("debug");
-        if ("true".equals(isDebug)) {
+
+        if (properties.isDebug()) {
             LogUtils.info("current mode: debug, load engine from " + jarPath);
             File tempFile = new File(jarPath);
             return !tempFile.exists();

@@ -52,7 +52,7 @@ public class MonitorDaemonThread implements Runnable {
 
     private void threadSleep() {
         try {
-            long milliseconds = 10 * 1000L;
+            long milliseconds = 60 * 1000L;
             Thread.sleep(milliseconds);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();

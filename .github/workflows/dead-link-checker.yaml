@@ -17,7 +17,6 @@
 name: Dead Link Checker
 
 on:
-  push:
   pull_request:
 
 concurrency:

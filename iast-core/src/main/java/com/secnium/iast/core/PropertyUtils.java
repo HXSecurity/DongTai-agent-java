@@ -294,7 +294,7 @@ public class PropertyUtils {
 
     private String getDebugFlag() {
         if (debugFlag == null) {
-            debugFlag = System.getProperty("debug", "false");
+            debugFlag = System.getProperty("dongtai.debug", "false");
         }
         return debugFlag;
     }

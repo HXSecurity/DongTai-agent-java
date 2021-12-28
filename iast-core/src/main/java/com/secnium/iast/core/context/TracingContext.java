@@ -38,7 +38,7 @@ public class TracingContext {
                 + getNextSpanId();
     }
 
-    public String getHeaderKey() {
+    public static String getHeaderKey() {
         return "dt-traceid";
     }
 

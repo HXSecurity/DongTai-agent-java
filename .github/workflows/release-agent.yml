@@ -1,4 +1,4 @@
-name: Maven Package
+name: Release Java Agent
 
 on:
   release:

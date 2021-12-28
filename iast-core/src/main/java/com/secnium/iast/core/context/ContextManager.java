@@ -28,7 +28,6 @@ public class ContextManager {
     }
 
     public static String getHeaderKey() {
-        TracingContext context = CONTEXT.get();
-        return context.getHeaderKey();
+        return TracingContext.getHeaderKey();
     }
 }

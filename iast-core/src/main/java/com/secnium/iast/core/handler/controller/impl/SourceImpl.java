@@ -43,7 +43,7 @@ public class SourceImpl {
         }
     }
 
-    private static void handlerCustomModel(MethodEvent event) {
+    public static void handlerCustomModel(MethodEvent event) {
         try {
             Class<?> sourceClass = event.returnValue.getClass();
             if (sourceClass.getClassLoader() == null) {

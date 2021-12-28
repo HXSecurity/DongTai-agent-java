@@ -6,6 +6,7 @@ import com.secnium.iast.core.handler.controller.TrackerHelper;
  * @author dongzhiyong@huoxian.cn
  */
 public class IastScopeTracker extends ThreadLocal<TrackerHelper> {
+
     @Override
     protected TrackerHelper initialValue() {
         return new TrackerHelper();
@@ -23,7 +24,7 @@ public class IastScopeTracker extends ThreadLocal<TrackerHelper> {
         return this.get().isFirstLevelHttp();
     }
 
-    public boolean isExitedHttp(){
+    public boolean isExitedHttp() {
         return this.get().isExitedHttp();
     }
 
@@ -66,4 +67,26 @@ public class IastScopeTracker extends ThreadLocal<TrackerHelper> {
     public boolean hasTaintValue() {
         return this.get().hasTaintValue();
     }
+
+    /**
+     * @since 1.1.4
+     */
+    public void enterDubbo() {
+        this.get().enterDubbo();
+    }
+
+    /**
+     * @since 1.1.4
+     */
+    public void leaveDubbo() {
+        this.get().leaveDubbo();
+    }
+
+    /**
+     * @since 1.1.4
+     */
+    public boolean isFirstLevelDubbo() {
+        return this.get().isFirstLevelDubbo();
+    }
+
 }

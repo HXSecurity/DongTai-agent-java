@@ -24,6 +24,7 @@ public class IastProperties {
     private String proxyHost;
     private int proxyPort = -1;
     private Integer isAutoCreateProject;
+    private String debugFlag = null;
 
     private String propertiesFilePath;
 
@@ -177,6 +178,17 @@ public class IastProperties {
 
     public String getProjectVersion() {
         return System.getProperty("project.version", cfg.getProperty("project.version", "V1.0"));
+    }
+
+    private String getDebugFlag() {
+        if (debugFlag == null) {
+            debugFlag = System.getProperty("dongtai.debug", "false");
+        }
+        return debugFlag;
+    }
+
+    public boolean isDebug() {
+        return "true".equalsIgnoreCase(getDebugFlag());
     }
 
 }
