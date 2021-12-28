@@ -34,7 +34,7 @@ public class AttachLauncher {
                 }
             }
 
-            vmObj.loadAgent(AGENT_PATH, "token=" + args);
+            vmObj.loadAgent(AGENT_PATH, args);
             LogUtils.info("attach to process " + pid + " success.");
         } finally {
             if (null != vmObj) {
