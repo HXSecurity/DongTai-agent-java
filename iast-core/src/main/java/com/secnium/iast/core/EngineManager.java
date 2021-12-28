@@ -295,9 +295,9 @@ public class EngineManager {
                 requestHeaders.put(entry.getKey(), entry.getValue());
             }
             Map<String, Object> requestMeta = new HashMap<String, Object>(12);
-            requestMeta.put("protocol", "dubbo " + requestHeaders.get("dubbo"));
+            requestMeta.put("protocol", "dubbo/" + requestHeaders.get("dubbo"));
             requestMeta.put("scheme", "dubbo");
-            requestMeta.put("method", "dubbo");
+            requestMeta.put("method", "RPC");
             requestMeta.put("secure", "true");
             requestMeta.put("requestURL", dubboService.split("\\?")[0]);
             requestMeta.put("requestURI", requestHeaders.get("path"));
@@ -307,7 +307,6 @@ public class EngineManager {
             requestMeta.put("body", "");
             requestMeta.put("contextPath", "");
             requestMeta.put("replay-request", false);
-
 
             REQUEST_CONTEXT.set(requestMeta);
         }
