@@ -273,7 +273,7 @@ public class EngineManager {
     /**
      * @param dubboService
      * @param attachments
-     * @since 1.1.4
+     * @since 1.2.0
      */
     public static void enterDubboEntry(String dubboService, Map<String, String> attachments) {
         if (attachments != null) {
@@ -318,7 +318,7 @@ public class EngineManager {
 
     /**
      * @return
-     * @since 1.1.4
+     * @since 1.2.0
      */
     public static boolean isEnterHttp() {
         return ENTER_HTTP_ENTRYPOINT.isEnterEntry();

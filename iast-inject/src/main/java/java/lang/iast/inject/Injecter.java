@@ -759,7 +759,7 @@ public class Injecter {
      * enter Dubbo Method
      *
      * @param namespace namespace
-     * @since 1.1.4
+     * @since 1.2.0
      */
     public static void enterDubbo(final String namespace) {
         final Thread thread = Thread.currentThread();
@@ -784,7 +784,7 @@ public class Injecter {
      * leave Dubbo Method
      *
      * @param namespace
-     * @since 1.1.4
+     * @since 1.2.0
      */
     public static void leaveDubbo(final String namespace) {
         final Thread thread = Thread.currentThread();

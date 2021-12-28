@@ -247,7 +247,7 @@ public class PropertyUtils {
     }
 
     /**
-     * After version 1.1.4, change the default server mode to local.
+     * After version 1.2.0, change the default server mode to local.
      * @return server mode
      */
     private String getServerMode() {
