@@ -84,7 +84,7 @@ public class GraphBuilder {
 
     public static String convertToReport(List<GraphNode> nodeList, Object response) {
         Map<String, Object> requestMeta = EngineManager.REQUEST_CONTEXT.get();
-        Map<String, Object> responseMeta = getResponseMeta(response);
+        Map<String, Object> responseMeta = response == null ? null : getResponseMeta(response);
         JSONObject report = new JSONObject();
         JSONObject detail = new JSONObject();
         JSONArray methodPool = new JSONArray();

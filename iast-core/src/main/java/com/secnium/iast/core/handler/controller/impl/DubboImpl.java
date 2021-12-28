@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author owefsad
- * @since 1.1.4
+ * @since 1.2.0
  */
 public class DubboImpl {
 
@@ -24,9 +24,11 @@ public class DubboImpl {
         String dubboService = getUrl(invoker);
         Map<String, String> attachments = getAttachments(invocation);
         EngineManager.enterDubboEntry(dubboService, attachments);
+
         if (EngineManager.isEnterHttp()) {
             return;
         }
+
         Object[] arguments = getArguments(invocation);
         if (arguments != null && arguments.length > 0) {
             Set<Object> validArguments = new HashSet<Object>(arguments.length);

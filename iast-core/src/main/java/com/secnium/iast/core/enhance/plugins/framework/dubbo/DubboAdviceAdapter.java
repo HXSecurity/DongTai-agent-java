@@ -31,18 +31,14 @@ public class DubboAdviceAdapter extends AbstractAdviceAdapter {
 
     @Override
     protected void onMethodExit(int opcode) {
-    }
-
-    /**
-     * 方法结束前，如何判断是否需要throw、return，解决堆栈未对齐
-     *
-     * @param maxStack
-     * @param maxLocals
-     */
-    @Override
-    public void visitMaxs(int maxStack, int maxLocals) {
-        leaveDubbo();
-        mv.visitMaxs(maxStack, maxLocals);
+        if (opcode == ATHROW) {
+            if (athrowCounts == 0) {
+                athrowCounts++;
+                leaveDubbo();
+            }
+        } else {
+            leaveDubbo();
+        }
     }
 
     @Override
@@ -53,6 +49,17 @@ public class DubboAdviceAdapter extends AbstractAdviceAdapter {
     @Override
     protected void after(int opcode) {
 
+    }
+
+    /**
+     * 方法结束前，如何判断是否需要throw、return，解决堆栈未对齐
+     *
+     * @param maxStack
+     * @param maxLocals
+     */
+    @Override
+    public void visitMaxs(int maxStack, int maxLocals) {
+        mv.visitMaxs(maxStack, maxLocals);
     }
 
     /**

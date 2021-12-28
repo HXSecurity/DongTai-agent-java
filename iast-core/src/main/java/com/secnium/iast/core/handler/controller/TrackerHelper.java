@@ -40,7 +40,7 @@ public class TrackerHelper {
      * @return 布尔值，true，是第一层；false，非第一层
      */
     public boolean isFirstLevelPropagator() {
-        return isEnableLingzhi() && this.enterHttp > 0 && this.sourceLevel == 0 && this.leaveSource == 1
+        return isEnableLingzhi() && isEnterEntry() && this.sourceLevel == 0 && this.leaveSource == 1
                 && this.propagationDepth == 1;
     }
 
@@ -76,7 +76,7 @@ public class TrackerHelper {
     }
 
     public boolean isFirstLevelSource() {
-        return isEnableLingzhi() && this.enterHttp > 0 && this.sourceLevel == 1;
+        return isEnableLingzhi() && isEnterEntry() && this.sourceLevel == 1;
     }
 
     public boolean isFirstLevelHttp() {
@@ -84,12 +84,11 @@ public class TrackerHelper {
     }
 
     public boolean isFirstLevelSink() {
-        return isEnableLingzhi() && this.enterHttp > 0 && this.sourceLevel == 0 && this.leaveSource == 1
-                && this.sinkDepth == 1;
+        return isFirstLevel(this.sinkDepth);
     }
 
     public boolean hasTaintValue() {
-        return isEnableLingzhi() && this.enterHttp > 0 && this.sourceLevel == 0 && this.leaveSource == 1;
+        return isFirstLevel(1);
     }
 
     public boolean isEnableLingzhi() {
@@ -110,6 +109,28 @@ public class TrackerHelper {
 
     public boolean isFirstLevelDubbo() {
         return isEnableLingzhi() && this.dubboLevel == 1;
+    }
+
+    public boolean isExitedDubbo() {
+        return dubboLevel == 0;
+    }
+
+    private boolean isEnterEntry() {
+        return enterHttp > 0 || dubboLevel > 0;
+    }
+
+    private boolean isFirstLevel(int targetLevel) {
+        if (!isEnableLingzhi()) {
+            return false;
+        }
+        if (this.enterHttp > 0) {
+            return this.sourceLevel == 0 && this.leaveSource == 1
+                    && targetLevel == 1;
+        }
+        if (this.dubboLevel > 0) {
+            return targetLevel == 1;
+        }
+        return false;
     }
 
     @Override

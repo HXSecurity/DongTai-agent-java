@@ -89,4 +89,12 @@ public class IastScopeTracker extends ThreadLocal<TrackerHelper> {
         return this.get().isFirstLevelDubbo();
     }
 
+    /**
+     * @since 1.1.4
+     * @return
+     */
+    public boolean isExitedDubbo() {
+        return this.get().isExitedDubbo();
+    }
+
 }
