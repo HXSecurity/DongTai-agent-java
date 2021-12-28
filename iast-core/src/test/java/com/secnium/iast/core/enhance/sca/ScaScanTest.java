@@ -12,7 +12,7 @@ public class ScaScanTest {
         };
 
         for (String packagePath : packagePaths) {
-            ScaScanner.scanForSCA(new URL(packagePath), "");
+            ScaScanner.scanForSCA(new URL(packagePath).getFile(), "");
         }
     }
 

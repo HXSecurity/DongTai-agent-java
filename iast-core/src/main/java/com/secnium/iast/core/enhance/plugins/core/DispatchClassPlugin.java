@@ -110,7 +110,7 @@ public class DispatchClassPlugin implements DispatchPlugin {
                     mv = new JSRInlinerAdapter(mv, access, name, desc, signature, exceptions);
                 }
 
-                if (transformed && logger.isDebugEnabled()) {
+                if (transformed && logger.isDebugEnabled() && null != framework) {
                     logger.debug("rewrite method {} for listener[framework={},class={}]", iastMethodSignature,
                             framework, context.getClassName());
                 }

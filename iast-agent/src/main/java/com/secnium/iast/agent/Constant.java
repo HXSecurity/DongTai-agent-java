@@ -1,7 +1,5 @@
 package com.secnium.iast.agent;
 
-import java.lang.management.ManagementFactory;
-
 /**
  * @author dongzhiyong@huoxian.cn
  */
