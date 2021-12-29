@@ -272,7 +272,7 @@ public class EventListenerHandlers {
     public static void leaveDubbo() {
         try {
             EngineManager.leaveDubbo();
-            if (EngineManager.isExitedDubbo()) {
+            if (EngineManager.isExitedDubbo() && !EngineManager.isEnterHttp()) {
                 EngineManager.maintainRequestCount();
                 GraphBuilder.buildAndReport(null);
                 EngineManager.cleanThreadState();
