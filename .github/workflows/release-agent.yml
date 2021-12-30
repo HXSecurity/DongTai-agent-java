@@ -30,9 +30,7 @@ jobs:
 
       - name: Build and Publish Maven Package
         run: |
-          bash .github/workflows/version_update.sh "${{ steps.release.outputs.VERSION }}"
-          mvn -B package -Dmaven.test.skip=true
-          mvn -B -Dmaven.test.skip=true -DuseGitHubPackages=true deploy
+          bash .github/workflows/scripts/version_update.sh "${{ steps.release.outputs.VERSION }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

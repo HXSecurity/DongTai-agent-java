@@ -5,7 +5,7 @@
     <parent>
         <artifactId>iast</artifactId>
         <groupId>com.secnium.iast</groupId>
-        <version>1.1.4</version>
+        <version>1.2.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 

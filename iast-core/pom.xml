@@ -7,7 +7,7 @@
     <parent>
         <groupId>com.secnium.iast</groupId>
         <artifactId>iast</artifactId>
-        <version>1.1.4</version>
+        <version>1.2.0</version>
     </parent>
     <artifactId>iast-core</artifactId>
     <name>iast-core</name>
@@ -144,7 +144,7 @@
         <dependency>
             <groupId>com.secnium.iast</groupId>
             <artifactId>iast-inject</artifactId>
-            <version>1.1.4</version>
+            <version>1.2.0</version>
             <scope>provided</scope>
         </dependency>
 

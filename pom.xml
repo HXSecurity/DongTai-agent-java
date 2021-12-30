@@ -5,7 +5,6 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <iast.version>1.1.4</iast.version>
         <shade-prefix>com.secnium.iast.thirdparty</shade-prefix>
 
         <maven.compiler.source>1.6</maven.compiler.source>
@@ -40,7 +39,7 @@
 
     <groupId>com.secnium.iast</groupId>
     <artifactId>iast</artifactId>
-    <version>1.1.4</version>
+    <version>1.2.0</version>
     <packaging>pom</packaging>
 
     <name>dongtai-agent-java</name>
@@ -115,12 +114,12 @@
             <dependency>
                 <groupId>com.secnium.iast</groupId>
                 <artifactId>iast-inject</artifactId>
-                <version>1.1.4</version>
+                <version>1.2.0</version>
             </dependency>
             <dependency>
                 <groupId>com.secnium.iast</groupId>
                 <artifactId>iast-core</artifactId>
-                <version>1.1.4</version>
+                <version>1.2.0</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>
