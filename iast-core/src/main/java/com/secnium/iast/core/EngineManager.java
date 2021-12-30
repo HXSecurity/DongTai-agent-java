@@ -4,8 +4,6 @@ import com.secnium.iast.core.context.ContextManager;
 import com.secnium.iast.core.handler.IastClassLoader;
 import com.secnium.iast.core.handler.models.IastReplayModel;
 import com.secnium.iast.core.handler.models.MethodEvent;
-import com.secnium.iast.core.middlewarerecognition.IastServer;
-import com.secnium.iast.core.middlewarerecognition.ServerDetect;
 import com.secnium.iast.core.threadlocalpool.BooleanThreadLocal;
 import com.secnium.iast.core.threadlocalpool.IastScopeTracker;
 import com.secnium.iast.core.threadlocalpool.IastServerPort;
@@ -82,7 +80,8 @@ public class EngineManager {
      * @return
      */
     public static Boolean isLingzhiRunning() {
-        return LINGZHI_RUNNING.get() != null && LINGZHI_RUNNING.get();
+        Boolean status = LINGZHI_RUNNING.get();
+        return status != null && status;
     }
 
     public static EngineManager getInstance() {
@@ -106,12 +105,6 @@ public class EngineManager {
     private EngineManager(final PropertyUtils cfg,
             final Instrumentation inst) {
         this.cfg = cfg;
-
-        ServerDetect serverDetect = ServerDetect.getInstance();
-        if (serverDetect.getWebserver() != null) {
-            logger.info("WebServer [ name={}, path={} ]", serverDetect.getWebserver().getName(),
-                    serverDetect.getWebServerPath());
-        }
     }
 
     /**

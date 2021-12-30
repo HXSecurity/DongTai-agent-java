@@ -24,7 +24,7 @@ public class EventListenerHandlers {
     /**
      * 调用序列生成器
      */
-    public static final AtomicInteger INVOKE_ID_SEQUENCER = new AtomicInteger(1000);
+    public static final AtomicInteger INVOKE_ID_SEQUENCER = new AtomicInteger(1);
 
     public static void onBefore(final String framework,
             final String javaClassName,
@@ -146,7 +146,8 @@ public class EventListenerHandlers {
 
     public static boolean isFirstLevelSource() {
         try {
-            return EngineManager.SCOPE_TRACKER.isFirstLevelSource();
+            return EngineManager.isEngineEnable() && EngineManager.SCOPE_TRACKER
+                    .isFirstLevelSource();
         } catch (Exception e) {
             return false;
         }
@@ -170,7 +171,7 @@ public class EventListenerHandlers {
 
     public static boolean isFirstLevelSink() {
         try {
-            return EngineManager.isTopLevelSink();
+            return EngineManager.isEngineEnable() && EngineManager.isTopLevelSink();
         } catch (Exception e) {
             return false;
         }
@@ -216,7 +217,8 @@ public class EventListenerHandlers {
      */
     public static boolean isFirstLevelHttp() {
         try {
-            return EngineManager.SCOPE_TRACKER.isFirstLevelHttp();
+            return EngineManager.isEngineEnable() && EngineManager.SCOPE_TRACKER
+                    .isFirstLevelHttp();
         } catch (Exception e) {
             ErrorLogReport.sendErrorLog(e);
         }
@@ -288,7 +290,7 @@ public class EventListenerHandlers {
      */
     public static boolean isFirstLevelDubbo() {
         try {
-            return EngineManager.isFirstLevelDubbo();
+            return EngineManager.isEngineEnable() && EngineManager.isFirstLevelDubbo();
         } catch (Exception e) {
             ErrorLogReport.sendErrorLog(e);
         }

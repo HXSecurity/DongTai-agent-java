@@ -21,6 +21,7 @@ public class BooleanThreadLocal extends ThreadLocal<Boolean> {
     }
 
     public boolean isEnterEntry() {
-        return this.get() != null && this.get();
+        Boolean status = this.get();
+        return status != null && status;
     }
 }

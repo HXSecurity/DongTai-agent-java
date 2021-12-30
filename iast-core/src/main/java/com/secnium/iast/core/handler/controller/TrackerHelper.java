@@ -1,7 +1,5 @@
 package com.secnium.iast.core.handler.controller;
 
-import com.secnium.iast.core.EngineManager;
-
 /**
  * @author dongzhiyong@huoxian.cn
  */
@@ -40,7 +38,7 @@ public class TrackerHelper {
      * @return 布尔值，true，是第一层；false，非第一层
      */
     public boolean isFirstLevelPropagator() {
-        return isEnableLingzhi() && isEnterEntry() && this.sourceLevel == 0 && this.leaveSource == 1
+        return isEnterEntry() && this.sourceLevel == 0 && this.leaveSource == 1
                 && this.propagationDepth == 1;
     }
 
@@ -76,11 +74,11 @@ public class TrackerHelper {
     }
 
     public boolean isFirstLevelSource() {
-        return isEnableLingzhi() && isEnterEntry() && this.sourceLevel == 1;
+        return isEnterEntry() && this.sourceLevel == 1;
     }
 
     public boolean isFirstLevelHttp() {
-        return isEnableLingzhi() && this.enterHttp == 1;
+        return this.enterHttp == 1;
     }
 
     public boolean isFirstLevelSink() {
@@ -89,10 +87,6 @@ public class TrackerHelper {
 
     public boolean hasTaintValue() {
         return isFirstLevel(1);
-    }
-
-    public boolean isEnableLingzhi() {
-        return EngineManager.isEngineEnable();
     }
 
     public boolean isExitedHttp() {
@@ -108,7 +102,7 @@ public class TrackerHelper {
     }
 
     public boolean isFirstLevelDubbo() {
-        return isEnableLingzhi() && this.dubboLevel == 1;
+        return this.dubboLevel == 1;
     }
 
     public boolean isExitedDubbo() {
@@ -120,9 +114,6 @@ public class TrackerHelper {
     }
 
     private boolean isFirstLevel(int targetLevel) {
-        if (!isEnableLingzhi()) {
-            return false;
-        }
         if (this.enterHttp > 0) {
             return this.sourceLevel == 0 && this.leaveSource == 1
                     && targetLevel == 1;
@@ -131,18 +122,6 @@ public class TrackerHelper {
             return targetLevel == 1;
         }
         return false;
-    }
-
-    @Override
-    public String toString() {
-        return "TrackerHelper{" +
-                "trackCounts=" + trackCounts +
-                ", propagationDepth=" + propagationDepth +
-                ", sourceLevel=" + sourceLevel +
-                ", enterHttp=" + enterHttp +
-                ", leaveSource=" + leaveSource +
-                ", sinkDepth=" + sinkDepth +
-                '}';
     }
 
 }
