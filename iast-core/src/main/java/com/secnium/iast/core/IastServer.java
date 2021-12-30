@@ -1,4 +1,4 @@
-package com.secnium.iast.core.middlewarerecognition;
+package com.secnium.iast.core;
 
 public class IastServer {
     private String serverAddr;

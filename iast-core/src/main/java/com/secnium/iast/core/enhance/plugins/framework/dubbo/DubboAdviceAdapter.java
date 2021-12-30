@@ -31,18 +31,14 @@ public class DubboAdviceAdapter extends AbstractAdviceAdapter {
 
     @Override
     protected void onMethodExit(int opcode) {
-    }
-
-    /**
-     * 方法结束前，如何判断是否需要throw、return，解决堆栈未对齐
-     *
-     * @param maxStack
-     * @param maxLocals
-     */
-    @Override
-    public void visitMaxs(int maxStack, int maxLocals) {
-        leaveDubbo();
-        mv.visitMaxs(maxStack, maxLocals);
+        if (opcode == ATHROW) {
+            if (athrowCounts == 0) {
+                athrowCounts++;
+                leaveDubbo();
+            }
+        } else {
+            leaveDubbo();
+        }
     }
 
     @Override
@@ -56,9 +52,20 @@ public class DubboAdviceAdapter extends AbstractAdviceAdapter {
     }
 
     /**
+     * 方法结束前，如何判断是否需要throw、return，解决堆栈未对齐
+     *
+     * @param maxStack
+     * @param maxLocals
+     */
+    @Override
+    public void visitMaxs(int maxStack, int maxLocals) {
+        mv.visitMaxs(maxStack, maxLocals);
+    }
+
+    /**
      * mark for enter dubbo method
      * <p>
-     * since: 1.1.4
+     * since: 1.2.0
      */
     private void enterDubbo() {
         push("DongTai");
@@ -68,7 +75,7 @@ public class DubboAdviceAdapter extends AbstractAdviceAdapter {
     /**
      * Determine whether it is the first layer of Dubbo method call
      * <p>
-     * since: 1.1.4
+     * since: 1.2.0
      */
     private void isFirstLevelDubbo() {
         push(context.getNamespace());
@@ -78,7 +85,7 @@ public class DubboAdviceAdapter extends AbstractAdviceAdapter {
     /**
      * mark for leave dubbo method
      * <p>
-     * since: 1.1.4
+     * since: 1.2.0
      */
     private void leaveDubbo() {
         push(context.getNamespace());

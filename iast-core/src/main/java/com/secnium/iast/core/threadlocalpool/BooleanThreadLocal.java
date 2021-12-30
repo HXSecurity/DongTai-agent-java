@@ -3,10 +3,11 @@ package com.secnium.iast.core.threadlocalpool;
 /**
  * @author dongzhiyong@huoxian.cn
  */
-public class BooleanTheadLocal extends ThreadLocal<Boolean> {
+public class BooleanThreadLocal extends ThreadLocal<Boolean> {
+
     boolean defaultValue;
 
-    public BooleanTheadLocal(Boolean defaultValue) {
+    public BooleanThreadLocal(Boolean defaultValue) {
         this.defaultValue = defaultValue;
     }
 
@@ -15,11 +16,12 @@ public class BooleanTheadLocal extends ThreadLocal<Boolean> {
         return null;
     }
 
-    public void enterHttpEntryPoint() {
+    public void enterEntry() {
         this.set(true);
     }
 
-    public boolean isEnterHttp() {
-        return this.get() != null && this.get();
+    public boolean isEnterEntry() {
+        Boolean status = this.get();
+        return status != null && status;
     }
 }

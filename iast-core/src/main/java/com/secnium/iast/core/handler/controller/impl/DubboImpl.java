@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author owefsad
- * @since 1.1.4
+ * @since 1.2.0
  */
 public class DubboImpl {
 
@@ -24,9 +24,11 @@ public class DubboImpl {
         String dubboService = getUrl(invoker);
         Map<String, String> attachments = getAttachments(invocation);
         EngineManager.enterDubboEntry(dubboService, attachments);
+
         if (EngineManager.isEnterHttp()) {
             return;
         }
+
         Object[] arguments = getArguments(invocation);
         if (arguments != null && arguments.length > 0) {
             Set<Object> validArguments = new HashSet<Object>(arguments.length);
@@ -55,7 +57,7 @@ public class DubboImpl {
     /**
      * @param invoker Object of Invoker
      * @return dubbo service full str, eg: dubbo://192.168.1.104:20880/org.apache.skywalking.demo.interfaces.HelloService?anyhost=true&application=dubbo-provider&bind.ip=192.168.1.104&bind.port=20880&dubbo=2.6.2&generic=false&interface=org.apache.skywalking.demo.interfaces.HelloService&methods=sayHello&pid=22816&revision=1.0.0&side=provider&timeout=60000&timestamp=1639933330390&version=1.0.0
-     * @since 1.1.4
+     * @since 1.2.0
      */
     public static String getUrl(Object invoker) {
         try {
@@ -73,7 +75,7 @@ public class DubboImpl {
      *
      * @param invocation object of Invocation
      * @return Map<String, String>
-     * @since 1.1.4
+     * @since 1.2.0
      */
     public static Map<String, String> getAttachments(Object invocation) {
         try {
@@ -90,7 +92,7 @@ public class DubboImpl {
      *
      * @param invocation object of Invocation
      * @return Object[]
-     * @since 1.1.4
+     * @since 1.2.0
      */
     public static Object[] getArguments(Object invocation) {
         try {

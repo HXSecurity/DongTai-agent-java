@@ -69,24 +69,32 @@ public class IastScopeTracker extends ThreadLocal<TrackerHelper> {
     }
 
     /**
-     * @since 1.1.4
+     * @since 1.2.0
      */
     public void enterDubbo() {
         this.get().enterDubbo();
     }
 
     /**
-     * @since 1.1.4
+     * @since 1.2.0
      */
     public void leaveDubbo() {
         this.get().leaveDubbo();
     }
 
     /**
-     * @since 1.1.4
+     * @since 1.2.0
      */
     public boolean isFirstLevelDubbo() {
         return this.get().isFirstLevelDubbo();
+    }
+
+    /**
+     * @since 1.2.0
+     * @return
+     */
+    public boolean isExitedDubbo() {
+        return this.get().isExitedDubbo();
     }
 
 }

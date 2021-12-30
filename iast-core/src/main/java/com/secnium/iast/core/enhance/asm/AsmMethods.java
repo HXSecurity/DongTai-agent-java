@@ -197,7 +197,7 @@ public interface AsmMethods {
     /**
      * asm method of {@link Injecter#enterDubbo(String)}
      *
-     * @since 1.1.4
+     * @since 1.2.0
      */
     Method ASM_METHOD_Spy$enterDubbo = InnerHelper.getAsmMethod(
             Injecter.class,
@@ -208,7 +208,7 @@ public interface AsmMethods {
     /**
      * asm method of {@link Injecter#leaveDubbo(String)}
      *
-     * @since 1.1.4
+     * @since 1.2.0
      */
     Method ASM_METHOD_Spy$leaveDubbo = InnerHelper.getAsmMethod(
             Injecter.class,
@@ -219,7 +219,7 @@ public interface AsmMethods {
     /**
      * asm method of {@link Injecter#isFirstLevelDubbo(String)}
      *
-     * @since 1.1.4
+     * @since 1.2.0
      */
     Method ASM_METHOD_Spy$isFirstLevelDubbo = InnerHelper.getAsmMethod(
             Injecter.class,

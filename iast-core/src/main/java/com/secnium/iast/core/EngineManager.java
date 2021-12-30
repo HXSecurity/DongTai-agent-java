@@ -4,9 +4,7 @@ import com.secnium.iast.core.context.ContextManager;
 import com.secnium.iast.core.handler.IastClassLoader;
 import com.secnium.iast.core.handler.models.IastReplayModel;
 import com.secnium.iast.core.handler.models.MethodEvent;
-import com.secnium.iast.core.middlewarerecognition.IastServer;
-import com.secnium.iast.core.middlewarerecognition.ServerDetect;
-import com.secnium.iast.core.threadlocalpool.BooleanTheadLocal;
+import com.secnium.iast.core.threadlocalpool.BooleanThreadLocal;
 import com.secnium.iast.core.threadlocalpool.IastScopeTracker;
 import com.secnium.iast.core.threadlocalpool.IastServerPort;
 import com.secnium.iast.core.threadlocalpool.IastTaintHashCodes;
@@ -37,16 +35,16 @@ public class EngineManager {
     public static Integer AGENT_ID;
     public static String AGENT_PATH;
 
-    private static final BooleanTheadLocal AGENT_STATUS = new BooleanTheadLocal(false);
-    private static final BooleanTheadLocal TRANSFORM_STATE = new BooleanTheadLocal(false);
-    private static final BooleanTheadLocal ENTER_HTTP_ENTRYPOINT = new BooleanTheadLocal(false);
+    private static final BooleanThreadLocal AGENT_STATUS = new BooleanThreadLocal(false);
+    private static final BooleanThreadLocal TRANSFORM_STATE = new BooleanThreadLocal(false);
+    private static final BooleanThreadLocal ENTER_HTTP_ENTRYPOINT = new BooleanThreadLocal(false);
     public static final RequestContext REQUEST_CONTEXT = new RequestContext();
     public static final IastTrackMap TRACK_MAP = new IastTrackMap();
     public static final IastTaintPool TAINT_POOL = new IastTaintPool();
     public static final IastTaintHashCodes TAINT_HASH_CODES = new IastTaintHashCodes();
     public static final IastScopeTracker SCOPE_TRACKER = new IastScopeTracker();
     private static final IastServerPort LOGIN_LOGIC_WEIGHT = new IastServerPort();
-    private static final BooleanTheadLocal LINGZHI_RUNNING = new BooleanTheadLocal(false);
+    private static final BooleanThreadLocal LINGZHI_RUNNING = new BooleanThreadLocal(false);
     public static IastServer SERVER;
 
     private static final ArrayBlockingQueue<IastReplayModel> REPLAY_QUEUE = new ArrayBlockingQueue<IastReplayModel>(
@@ -82,7 +80,8 @@ public class EngineManager {
      * @return
      */
     public static Boolean isLingzhiRunning() {
-        return LINGZHI_RUNNING.get() != null && LINGZHI_RUNNING.get();
+        Boolean status = LINGZHI_RUNNING.get();
+        return status != null && status;
     }
 
     public static EngineManager getInstance() {
@@ -106,12 +105,6 @@ public class EngineManager {
     private EngineManager(final PropertyUtils cfg,
             final Instrumentation inst) {
         this.cfg = cfg;
-
-        ServerDetect serverDetect = ServerDetect.getInstance();
-        if (serverDetect.getWebserver() != null) {
-            logger.info("WebServer [ name={}, path={} ]", serverDetect.getWebserver().getName(),
-                    serverDetect.getWebServerPath());
-        }
     }
 
     /**
@@ -263,7 +256,7 @@ public class EngineManager {
             String newTraceId = ContextManager.getOrCreateGlobalTraceId(null, EngineManager.getAgentId());
             headers.put("dt-traceid", newTraceId);
         }
-        ENTER_HTTP_ENTRYPOINT.enterHttpEntryPoint();
+        ENTER_HTTP_ENTRYPOINT.enterEntry();
         REQUEST_CONTEXT.set(requestMeta);
         TRACK_MAP.set(new HashMap<Integer, MethodEvent>(1024));
         TAINT_POOL.set(new HashSet<Object>());
@@ -271,37 +264,77 @@ public class EngineManager {
     }
 
     /**
-     *
      * @param dubboService
      * @param attachments
-     * @since 1.1.4
+     * @since 1.2.0
      */
     public static void enterDubboEntry(String dubboService, Map<String, String> attachments) {
         if (attachments != null) {
             if (attachments.containsKey(ContextManager.getHeaderKey())) {
-                ContextManager.getOrCreateGlobalTraceId(attachments.get(ContextManager.getHeaderKey()), EngineManager.getAgentId());
+                ContextManager.getOrCreateGlobalTraceId(attachments.get(ContextManager.getHeaderKey()),
+                        EngineManager.getAgentId());
             } else {
                 attachments.put(ContextManager.getHeaderKey(), ContextManager.getSegmentId());
             }
         }
-        if(ENTER_HTTP_ENTRYPOINT.isEnterHttp()){
+        if (ENTER_HTTP_ENTRYPOINT.isEnterEntry()) {
             return;
         }
+
         // todo: register server
-        ENTER_HTTP_ENTRYPOINT.enterHttpEntryPoint();
-        // fixme: 保存请求信息
-        //REQUEST_CONTEXT.set(attachments);
+        if (attachments != null) {
+            Map<String, String> requestHeaders = new HashMap<String, String>(attachments.size());
+            for (Map.Entry<String, String> entry : attachments.entrySet()) {
+                requestHeaders.put(entry.getKey(), entry.getValue());
+            }
+            Map<String, Object> requestMeta = new HashMap<String, Object>(12);
+            requestMeta.put("protocol", "dubbo/" + requestHeaders.get("dubbo"));
+            requestMeta.put("scheme", "dubbo");
+            requestMeta.put("method", "RPC");
+            requestMeta.put("secure", "true");
+            requestMeta.put("requestURL", dubboService.split("\\?")[0]);
+            requestMeta.put("requestURI", requestHeaders.get("path"));
+            requestMeta.put("remoteAddr", "");
+            requestMeta.put("queryString", "");
+            requestMeta.put("headers", requestHeaders);
+            requestMeta.put("body", "");
+            requestMeta.put("contextPath", "");
+            requestMeta.put("replay-request", false);
+
+            REQUEST_CONTEXT.set(requestMeta);
+        }
+
         TRACK_MAP.set(new HashMap<Integer, MethodEvent>(1024));
         TAINT_POOL.set(new HashSet<Object>());
         TAINT_HASH_CODES.set(new HashSet<Integer>());
     }
 
     /**
-     *
      * @return
-     * @since 1.1.4
+     * @since 1.2.0
      */
-    public static boolean isEnterHttp(){
-        return ENTER_HTTP_ENTRYPOINT.isEnterHttp();
+    public static boolean isEnterHttp() {
+        return ENTER_HTTP_ENTRYPOINT.isEnterEntry();
+    }
+
+    /**
+     * @since 1.2.0
+     */
+    public static void leaveDubbo() {
+        SCOPE_TRACKER.leaveDubbo();
+    }
+
+    /**
+     * @since 1.2.0
+     */
+    public static boolean isExitedDubbo() {
+        return SCOPE_TRACKER.isExitedDubbo();
+    }
+
+    /**
+     * @since 1.2.0
+     */
+    public static boolean isFirstLevelDubbo() {
+        return SCOPE_TRACKER.isFirstLevelDubbo();
     }
 }
