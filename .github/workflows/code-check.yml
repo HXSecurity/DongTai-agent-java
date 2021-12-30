@@ -94,7 +94,10 @@ jobs:
           password: test
 
       - name: OpenRASP-Vulns-Test
-        run: bash .github/workflows/openrasp-test.sh
+        run: |
+          pwd
+          ls
+          bash .github/workflows/openrasp-test.sh
 
       - name: Benchmark-Vulns-Test
         run: bash .github/workflows/benchmark-test.sh
