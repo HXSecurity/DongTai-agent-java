@@ -99,9 +99,11 @@ public class HttpRequestReplay extends AbstractThread {
             String[] headerItems = decodeHeaders.trim().split("\n");
             for (String item : headerItems) {
                 int splitCharIndex = item.indexOf(":");
-                String key = item.substring(0, splitCharIndex);
-                String value = item.substring(splitCharIndex + 1);
-                headers.put(key, value);
+                if (splitCharIndex >= 0) {
+                    String key = item.substring(0, splitCharIndex);
+                    String value = item.substring(splitCharIndex + 1);
+                    headers.put(key, value);
+                }
             }
         }
 
