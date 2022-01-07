@@ -1,19 +1,19 @@
 package com.secnium.iast.core.util;
 
 import com.secnium.iast.core.report.ErrorLogReport;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.LineIterator;
-import org.slf4j.Logger;
+import com.secnium.iast.log.DongTaiLog;
 
 /**
  * @author dongzhiyong@huoxian.cn
  */
 public class ConfigUtils {
-
-    private final static Logger logger = LogUtils.getLogger(ConfigUtils.class);
 
     /**
      * 通过文件名从资源加载器中加载资源
@@ -46,7 +46,7 @@ public class ConfigUtils {
                 }
             }
         } catch (IOException e) {
-            logger.error("读取配置文件：{} 失败，错误信息：{}", filename, e);
+            DongTaiLog.error("读取配置文件：{} 失败，错误信息：{}", filename, e);
             ErrorLogReport.sendErrorLog(e);
         }
         return new HashSet[]{container, startWith, endWith};
@@ -63,7 +63,7 @@ public class ConfigUtils {
                 extStringArray = exts.split(",");
             }
         } catch (IOException e) {
-            logger.error("读取后缀配置文件：{} 失败，错误信息：{}", filename, e);
+            DongTaiLog.error("读取后缀配置文件：{} 失败，错误信息：{}", filename, e);
             ErrorLogReport.sendErrorLog(e);
         }
         return extStringArray;
@@ -80,7 +80,7 @@ public class ConfigUtils {
                 container.add(line);
             }
         } catch (IOException e) {
-            logger.error("读取配置文件：{} 失败，错误信息：{}", filename, e);
+            DongTaiLog.error("读取配置文件：{} 失败，错误信息：{}", filename, e);
             ErrorLogReport.sendErrorLog(ThrowableUtils.getStackTrace(e));
         }
         return container;

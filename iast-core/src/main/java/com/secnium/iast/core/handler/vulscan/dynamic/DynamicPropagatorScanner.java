@@ -3,17 +3,17 @@ package com.secnium.iast.core.handler.vulscan.dynamic;
 import com.secnium.iast.core.EngineManager;
 import com.secnium.iast.core.context.ContextManager;
 import com.secnium.iast.core.handler.EventListenerHandlers;
-import com.secnium.iast.core.handler.controller.impl.SinkImpl;
 import com.secnium.iast.core.handler.models.IastSinkModel;
 import com.secnium.iast.core.handler.models.MethodEvent;
 import com.secnium.iast.core.handler.vulscan.IVulScan;
-import com.secnium.iast.core.util.LogUtils;
 import com.secnium.iast.core.util.StackUtils;
 import com.secnium.iast.core.util.TaintPoolUtils;
+
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashSet;
-import org.slf4j.Logger;
+
+import com.secnium.iast.log.DongTaiLog;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -33,8 +33,6 @@ public class DynamicPropagatorScanner implements IVulScan {
             .substring(1);
     private static String HTTP_CLIENT_4 = " org.apache.commons.httpclient.HttpClient.executeMethod(org.apache.commons.httpclient.HostConfiguration,org.apache.commons.httpclient.HttpMethod,org.apache.commons.httpclient.HttpState)"
             .substring(1);
-
-    private final Logger logger = LogUtils.getLogger(SinkImpl.class);
 
     @Override
     public void scan(IastSinkModel sink, MethodEvent event) {
@@ -89,7 +87,7 @@ public class DynamicPropagatorScanner implements IVulScan {
         boolean hitTaintPool = false;
         if (isRedirectVul(sink.getType(), event.signature)) {
             String attribute = String.valueOf(event.argumentArray[0]);
-            logger.debug("add Header method, attribute name is {} ", attribute);
+            DongTaiLog.debug("add Header method, attribute name is {} ", attribute);
             if (attributeIsLocation(attribute)) {
                 Object attributeValue = event.argumentArray[1];
                 hitTaintPool = TaintPoolUtils.poolContains(attributeValue, event);

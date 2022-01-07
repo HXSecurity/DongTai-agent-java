@@ -2,10 +2,11 @@ package com.secnium.iast.core.enhance.plugins.framework.j2ee.jsp;
 
 import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.DispatchPlugin;
-import com.secnium.iast.core.util.LogUtils;
+
 import java.util.Set;
+
 import org.objectweb.asm.ClassVisitor;
-import org.slf4j.Logger;
+import com.secnium.iast.log.DongTaiLog;
 
 /**
  * 处理jsp include方法的文件包含
@@ -17,7 +18,6 @@ public class DispatchJsp implements DispatchPlugin {
     private static final String JSP_PAGE = " javax.servlet.jsp.JspPage".substring(1);
     private static final String JSP_BASE = " org.apache.jasper.runtime.HttpJspBase".substring(1);
     private Set<String> ancestors;
-    private final Logger logger = LogUtils.getLogger(getClass());
 
     @Override
     public ClassVisitor dispatch(ClassVisitor classVisitor, IastContext context) {
@@ -25,8 +25,8 @@ public class DispatchJsp implements DispatchPlugin {
 
         String matchClassname = isMatch();
         if (null != matchClassname) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("JspPage match class for {} from {}", context.getClassName(), matchClassname);
+            if (DongTaiLog.isDebugEnabled()) {
+                DongTaiLog.debug("JspPage match class for {} from {}", context.getClassName(), matchClassname);
             }
             context.setMatchClassName(matchClassname);
             // JspPageAdapter

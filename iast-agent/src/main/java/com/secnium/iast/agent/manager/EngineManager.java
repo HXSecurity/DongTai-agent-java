@@ -2,8 +2,8 @@ package com.secnium.iast.agent.manager;
 
 import com.secnium.iast.agent.*;
 import com.secnium.iast.agent.report.AgentRegisterReport;
-import com.secnium.iast.agent.util.LogUtils;
 import com.secnium.iast.agent.util.http.HttpClientUtils;
+import com.secnium.iast.log.DongTaiLog;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -134,7 +134,7 @@ public class EngineManager {
             final File classPath = new File(new File(fileName).getParent());
 
             if (!classPath.mkdirs() && !classPath.exists()) {
-                LogUtils.info("Check or create local file cache path, path is " + classPath);
+                DongTaiLog.info("Check or create local file cache path, path is " + classPath);
             }
             FileOutputStream fileOutputStream = new FileOutputStream(fileName);
             byte[] dataBuffer = new byte[1024];
@@ -142,10 +142,10 @@ public class EngineManager {
             while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
                 fileOutputStream.write(dataBuffer, 0, bytesRead);
             }
-            LogUtils.info("The remote file " + fileUrl + " was successfully written to the local cache.");
+            DongTaiLog.info("The remote file " + fileUrl + " was successfully written to the local cache.");
             status = true;
         } catch (Exception ignore) {
-            LogUtils.error("The remote file " + fileUrl + " download failure, please check the iast-token.");
+            DongTaiLog.error("The remote file " + fileUrl + " download failure, please check the iast-token.");
         }
         return status;
     }
@@ -164,7 +164,7 @@ public class EngineManager {
 
     public boolean downloadEnginePackage() {
         if (engineNotExist(getInjectPackageCachePath()) || engineNotExist(getEnginePackageCachePath())) {
-            LogUtils.info("Engine does not exist in local cache, the engine will be downloaded.");
+            DongTaiLog.info("Engine does not exist in local cache, the engine will be downloaded.");
             return updateEnginePackage();
         } else {
             return true;
@@ -184,11 +184,11 @@ public class EngineManager {
                     .invoke(null, launchMode, this.properties.getPropertiesFilePath(), AgentRegisterReport.getAgentFlag(), inst, agentPath);
             return true;
         } catch (IOException e) {
-            LogUtils.error("DongTai engine start failed, please contact staff for help.");
+            DongTaiLog.error("DongTai engine start failed, please contact staff for help.");
         } catch (ClassNotFoundException e) {
-            LogUtils.error(" DongTai engine start failed, please contact staff for help.");
+            DongTaiLog.error(" DongTai engine start failed, please contact staff for help.");
         } catch (Throwable throwable) {
-            LogUtils.error("DongTai engine start failed, please contact staff for help.");
+            DongTaiLog.error("DongTai engine start failed, please contact staff for help.");
             throwable.printStackTrace();
         }
         return false;
@@ -202,18 +202,18 @@ public class EngineManager {
         try {
             if (classOfEngine != null) {
                 classOfEngine.getMethod("start").invoke(null);
-                LogUtils.info("DongTai engine start successfully.");
+                DongTaiLog.info("DongTai engine start successfully.");
                 return true;
             }
             return false;
         } catch (InvocationTargetException e) {
-            LogUtils.error("DongTai engine start failed, please contact staff for help.");
+            DongTaiLog.error("DongTai engine start failed, please contact staff for help.");
         } catch (NoSuchMethodException e) {
-            LogUtils.error("DongTai engine start failed, please contact staff for help.");
+            DongTaiLog.error("DongTai engine start failed, please contact staff for help.");
         } catch (IllegalAccessException e) {
-            LogUtils.error("DongTai engine start failed, please contact staff for help.");
+            DongTaiLog.error("DongTai engine start failed, please contact staff for help.");
         } catch (Throwable throwable) {
-            LogUtils.error("DongTai engine start failed, please contact staff for help.");
+            DongTaiLog.error("DongTai engine start failed, please contact staff for help.");
             throwable.printStackTrace();
         }
         return false;
@@ -229,23 +229,23 @@ public class EngineManager {
         try {
             if (classOfEngine != null) {
                 classOfEngine.getMethod("stop").invoke(null);
-                LogUtils.info("DongTai engine stop successfully.");
+                DongTaiLog.info("DongTai engine stop successfully.");
                 return true;
             }
             return false;
         } catch (InvocationTargetException e) {
-            LogUtils.error("DongTai engine stop failed, please contact staff for help.");
+            DongTaiLog.error("DongTai engine stop failed, please contact staff for help.");
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
             e.printStackTrace(pw);
-            LogUtils.error(sw.toString());
+            DongTaiLog.error(sw.toString());
         } catch (NoSuchMethodException e) {
-            LogUtils.error("DongTai engine stop failed, please contact staff for help.");
+            DongTaiLog.error("DongTai engine stop failed, please contact staff for help.");
         } catch (IllegalAccessException e) {
-            LogUtils.error("DongTai engine stop failed, please contact staff for help.");
+            DongTaiLog.error("DongTai engine stop failed, please contact staff for help.");
             e.printStackTrace();
         } catch (Throwable throwable) {
-            LogUtils.error("DongTai engine stop failed, please contact staff for help.");
+            DongTaiLog.error("DongTai engine stop failed, please contact staff for help.");
             throwable.printStackTrace();
         }
         return false;
@@ -329,10 +329,10 @@ public class EngineManager {
      * @return true-引擎不存在；false-引擎存在
      */
     private boolean engineNotExist(final String jarPath) {
-        LogUtils.info("Check if the engine[" + jarPath + "] needs to be updated");
+        DongTaiLog.info("Check if the engine[" + jarPath + "] needs to be updated");
 
         if (properties.isDebug()) {
-            LogUtils.info("current mode: debug, load engine from " + jarPath);
+            DongTaiLog.info("current mode: debug, load engine from " + jarPath);
             File tempFile = new File(jarPath);
             return !tempFile.exists();
         } else {

@@ -3,8 +3,8 @@ package com.secnium.iast.agent.monitor;
 import com.secnium.iast.agent.*;
 import com.secnium.iast.agent.manager.EngineManager;
 import com.secnium.iast.agent.report.AgentRegisterReport;
-import com.secnium.iast.agent.util.LogUtils;
 import com.secnium.iast.agent.util.http.HttpClientUtils;
+import com.secnium.iast.log.DongTaiLog;
 import org.json.JSONObject;
 
 /**
@@ -31,10 +31,10 @@ public class EngineMonitor implements IMonitor {
             isCoreRegisterStart = true;
             startEngine();
         }else if ("coreStop".equals(status) && isCoreRegisterStart) {
-            LogUtils.info("engine stop");
+            DongTaiLog.info("engine stop");
             engineManager.stop();
         } else if ("coreStart".equals(status) && isCoreRegisterStart) {
-            LogUtils.info("engine start");
+            DongTaiLog.info("engine start");
             engineManager.start();
         }
     }
@@ -57,7 +57,7 @@ public class EngineMonitor implements IMonitor {
         status = status && engineManager.install();
         status = status && engineManager.start();
         if (!status) {
-            LogUtils.info("DongTai IAST started failure");
+            DongTaiLog.info("DongTai IAST started failure");
         }
     }
 }

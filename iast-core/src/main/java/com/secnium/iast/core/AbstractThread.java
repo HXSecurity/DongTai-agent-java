@@ -1,8 +1,7 @@
 package com.secnium.iast.core;
 
 
-import com.secnium.iast.core.util.LogUtils;
-import org.slf4j.Logger;
+import com.secnium.iast.log.DongTaiLog;
 
 import java.io.IOException;
 
@@ -12,7 +11,6 @@ import java.io.IOException;
  * @author dongzhiyong@huoxian.cn
  */
 public abstract class AbstractThread extends Thread {
-    private final Logger logger = LogUtils.getLogger(getClass());
 
     @Override
     public void run() {
@@ -23,9 +21,9 @@ public abstract class AbstractThread extends Thread {
         try {
             send();
         } catch (IOException e) {
-            logger.error("report error reason: ", e);
+            DongTaiLog.error("report error reason: {}", e);
         } catch (Exception e) {
-            logger.error("report error, reason: ", e);
+            DongTaiLog.error("report error, reason: {}", e);
         }
         if (isRunning) {
             EngineManager.turnOnLingzhi();

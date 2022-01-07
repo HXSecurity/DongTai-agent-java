@@ -3,18 +3,16 @@ package com.secnium.iast.core.enhance.plugins.framework.j2ee.dispatch;
 import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.AbstractClassVisitor;
 import com.secnium.iast.core.util.AsmUtils;
-import com.secnium.iast.core.util.LogUtils;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
-import org.slf4j.Logger;
+import com.secnium.iast.log.DongTaiLog;
 
 /**
  * @author dongzhiyong@huoxian.cn
  */
 public class ServletDispatcherAdapter extends AbstractClassVisitor {
 
-    private final Logger logger = LogUtils.getLogger(getClass());
     private final String HTTP_SERVLET_REQUEST = " javax.servlet.http.HttpServletRequest".substring(1);
     private final String HTTP_SERVLET_RESPONSE = " javax.servlet.http.HttpServletResponse".substring(1);
     private final String SERVLET_REQUEST = " javax.servlet.ServletRequest".substring(1);
@@ -47,16 +45,16 @@ public class ServletDispatcherAdapter extends AbstractClassVisitor {
                 (this.isJakarta && isJakartaArgs(typeOfArgs)) ||
                 (this.isFaces && isFacesArgs(typeOfArgs))
         ) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Adding HTTP tracking for type {}", context.getClassName());
+            if (DongTaiLog.isDebugEnabled()) {
+                DongTaiLog.debug("Adding HTTP tracking for type {}", context.getClassName());
             }
 
             mv = new ServletDispatcherAdviceAdapter(mv, access, name, desc, signCode, context, isJakarta);
             transformed = true;
         }
         if (transformed) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("rewrite method {}.{} for listener[match={}]", context.getClassName(), name, context.getMatchClassName());
+            if (DongTaiLog.isDebugEnabled()) {
+                DongTaiLog.debug("rewrite method {}.{} for listener[match={}]", context.getClassName(), name, context.getMatchClassName());
             }
         }
 

@@ -2,6 +2,7 @@ package com.secnium.iast.core.util;
 
 import com.secnium.iast.core.PropertyUtils;
 import com.secnium.iast.core.report.ErrorLogReport;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -20,7 +21,8 @@ import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
-import org.slf4j.Logger;
+
+import com.secnium.iast.log.DongTaiLog;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -39,8 +41,6 @@ public class HttpClientUtils {
     private final static PropertyUtils PROPERTIES = PropertyUtils.getInstance();
     private final static Proxy PROXY = loadProxy();
 
-    private static final Logger logger = LogUtils.getLogger(HttpClientUtils.class);
-
     public static StringBuilder sendGet(String uri, String arg, String value) {
         try {
             if (arg != null && value != null) {
@@ -58,14 +58,14 @@ public class HttpClientUtils {
         StringBuilder response;
         response = sendRequest(HttpMethods.POST, PROPERTIES.getBaseUrl(), uri, value, null, PROXY);
         if (PROPERTIES.isDebug()) {
-            logger.debug("cn.huoxian.iast url is {}, resp is {}", uri, response.toString());
+            DongTaiLog.debug("cn.huoxian.iast url is {}, resp is {}", uri, response.toString());
         }
         return response;
     }
 
 
     private static StringBuilder sendRequest(HttpMethods method, String baseUrl, String urlStr, String data,
-            HashMap<String, String> headers, Proxy proxy) throws Exception {
+                                             HashMap<String, String> headers, Proxy proxy) throws Exception {
         HttpURLConnection connection = null;
         StringBuilder response = new StringBuilder();
         try {
@@ -149,7 +149,7 @@ public class HttpClientUtils {
             final File classPath = new File(new File(fileName).getParent());
 
             if (!classPath.mkdirs() && !classPath.exists()) {
-                logger.info("Check or create local file cache path, path is {}", classPath);
+                DongTaiLog.info("Check or create local file cache path, path is {}", classPath);
             }
             FileOutputStream fileOutputStream = new FileOutputStream(fileName);
             byte[] dataBuffer = new byte[1024];
@@ -157,9 +157,9 @@ public class HttpClientUtils {
             while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
                 fileOutputStream.write(dataBuffer, 0, bytesRead);
             }
-            logger.info("The remote file {} was successfully written to the local cache", fileURI);
+            DongTaiLog.info("The remote file {} was successfully written to the local cache", fileURI);
         } catch (Exception ignore) {
-            logger.error("The remote file {} download failure, please check the iast-token", fileURI);
+            DongTaiLog.error("The remote file {} download failure, please check the iast-token", fileURI);
         }
     }
 

@@ -6,9 +6,8 @@ import com.secnium.iast.core.handler.vulscan.ReportConstant;
 import com.secnium.iast.core.replay.HttpRequestReplay;
 import com.secnium.iast.core.util.Constants;
 import com.secnium.iast.core.util.HttpClientUtils;
-import com.secnium.iast.core.util.LogUtils;
 import org.json.JSONObject;
-import org.slf4j.Logger;
+import com.secnium.iast.log.DongTaiLog;
 
 /**
  * 上报agent队列与请求数量
@@ -16,8 +15,6 @@ import org.slf4j.Logger;
  * @author dongzhiyong@huoxian.cn
  */
 public class AgentQueueReport extends AbstractThread {
-
-    private final Logger logger = LogUtils.getLogger(getClass());
 
     public static String generateHeartBeatMsg() {
         JSONObject report = new JSONObject();
@@ -45,7 +42,7 @@ public class AgentQueueReport extends AbstractThread {
             StringBuilder response = HttpClientUtils.sendPost(Constants.API_REPORT_UPLOAD, generateHeartBeatMsg());
             HttpRequestReplay.sendReplayRequest(response);
         } catch (Exception e) {
-            logger.error("agent queue reported failed. reason: ", e);
+            DongTaiLog.error("agent queue reported failed. reason: {}", e);
         }
     }
 }

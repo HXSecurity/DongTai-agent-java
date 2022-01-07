@@ -5,8 +5,8 @@ import com.secnium.iast.core.PropertyUtils;
 import com.secnium.iast.core.handler.IastClassLoader;
 import com.secnium.iast.core.handler.models.MethodEvent;
 import com.secnium.iast.core.util.HttpClientUtils;
-import com.secnium.iast.core.util.LogUtils;
 import com.secnium.iast.core.util.matcher.ConfigMatcher;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -14,7 +14,8 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
-import org.slf4j.Logger;
+
+import com.secnium.iast.log.DongTaiLog;
 
 /**
  * Http方法处理入口
@@ -151,8 +152,8 @@ public class HttpImpl {
      */
     public static void solveHttp(MethodEvent event)
             throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        if (logger.isDebugEnabled()) {
-            logger.debug(EngineManager.SCOPE_TRACKER.get().toString());
+        if (DongTaiLog.isDebugEnabled()) {
+            DongTaiLog.debug(EngineManager.SCOPE_TRACKER.get().toString());
         }
 
         Map<String, Object> requestMeta = getRequestMeta(event.argumentArray[0]);
@@ -160,18 +161,17 @@ public class HttpImpl {
         if (ConfigMatcher.disableExtension((String) requestMeta.get("requestURI"))) {
             return;
         }
-        if (ConfigMatcher.getBlackUrl( requestMeta)) {
+        if (ConfigMatcher.getBlackUrl(requestMeta)) {
             return;
         }
 
         // todo: add custom header escape
         EngineManager.enterHttpEntry(requestMeta);
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("HTTP Request:{} {} from: {}", requestMeta.get("method"), requestMeta.get("requestURI"),
+        if (DongTaiLog.isDebugEnabled()) {
+            DongTaiLog.debug("HTTP Request:{} {} from: {}", requestMeta.get("method"), requestMeta.get("requestURI"),
                     event.signature);
         }
     }
 
-    private static final Logger logger = LogUtils.getLogger(HttpImpl.class);
 }

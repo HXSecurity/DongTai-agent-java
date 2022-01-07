@@ -4,8 +4,10 @@ import com.secnium.iast.agent.manager.EngineManager;
 import com.secnium.iast.agent.monitor.EngineMonitor;
 import com.secnium.iast.agent.monitor.MonitorDaemonThread;
 import com.secnium.iast.agent.report.AgentRegisterReport;
-import com.secnium.iast.agent.util.LogUtils;
+import com.secnium.iast.log.DongTaiLog;
+
 import java.lang.instrument.Instrumentation;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -40,7 +42,7 @@ public class AgentLauncher {
      */
     public static void agentmain(String featureString, Instrumentation inst) {
         if ("uninstall".equals(featureString)) {
-            LogUtils.info("Engine is about to be uninstalled");
+            DongTaiLog.info("Engine is about to be uninstalled");
             uninstall();
         } else {
             LAUNCH_MODE = LAUNCH_MODE_ATTACH;
@@ -72,17 +74,17 @@ public class AgentLauncher {
         IastProperties iastProperties = IastProperties.getInstance();
         Boolean send = AgentRegisterReport.send();
         if (send) {
-            LogUtils.info("Agent has successfully registered with " + iastProperties.getBaseUrl());
+            DongTaiLog.info("Agent has successfully registered with " + iastProperties.getBaseUrl());
             Boolean agentStat = AgentRegisterReport.agentStat();
             if (!agentStat) {
                 EngineMonitor.isCoreRegisterStart = false;
-                LogUtils.info("The agent was not audited. Disable enabling.");
+                DongTaiLog.info("The agent was not audited. Disable enabling.");
             } else {
                 EngineMonitor.isCoreRegisterStart = true;
             }
             loadEngine(inst);
         } else {
-            LogUtils.error("Agent register failed. Start without DongTai IAST.");
+            DongTaiLog.error("Agent register failed. Start without DongTai IAST.");
         }
     }
 

@@ -5,8 +5,7 @@ import com.secnium.iast.core.enhance.plugins.AbstractClassVisitor;
 import com.secnium.iast.core.enhance.plugins.DispatchPlugin;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
-import org.slf4j.Logger;
-import com.secnium.iast.core.util.LogUtils;
+import com.secnium.iast.log.DongTaiLog;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +19,6 @@ final public class DispatchTechnologyPlugin implements DispatchPlugin {
 
     private final Map<String, Map<String, String>> technologyMap;
     private String classname;
-    private final Logger logger = LogUtils.getLogger(DispatchTechnologyPlugin.class);
 
     public DispatchTechnologyPlugin() {
         this.technologyMap = new HashMap<String, Map<String, String>>();
@@ -72,7 +70,7 @@ final public class DispatchTechnologyPlugin implements DispatchPlugin {
         classname = context.getClassName();
         String matchClassName = isMatch();
         if (matchClassName != null) {
-            logger.debug("current class {} hit rule \"Technology\"", classname);
+            DongTaiLog.debug("current class {} hit rule \"Technology\"", classname);
             context.setMatchClassName(matchClassName);
             classVisitor = new ClassVisit(classVisitor, context, this.technologyMap.get(matchClassName));
         }
@@ -88,7 +86,6 @@ final public class DispatchTechnologyPlugin implements DispatchPlugin {
     }
 
     public static class ClassVisit extends AbstractClassVisitor {
-        private final Logger logger = LogUtils.getLogger(getClass());
         private final Map<String, String> technologyMapDetail;
 
         ClassVisit(ClassVisitor classVisitor, IastContext context, Map<String, String> technologyMapDetail) {
@@ -107,7 +104,7 @@ final public class DispatchTechnologyPlugin implements DispatchPlugin {
             String technologyName = this.technologyMapDetail.get(name);
             if (technologyName != null) {
                 // todo: 后续增加应用保存和发送回服务器
-                logger.debug("discover {} technology", technologyName);
+                DongTaiLog.debug("discover {} technology", technologyName);
             }
             return mv;
         }

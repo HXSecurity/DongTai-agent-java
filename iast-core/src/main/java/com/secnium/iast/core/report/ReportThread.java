@@ -2,15 +2,13 @@ package com.secnium.iast.core.report;
 
 import com.secnium.iast.core.EngineManager;
 import com.secnium.iast.core.util.HttpClientUtils;
-import com.secnium.iast.core.util.LogUtils;
-import org.slf4j.Logger;
+import com.secnium.iast.log.DongTaiLog;
 
 /**
  * @author owefsad
  */
 public class ReportThread extends Thread {
 
-    private final Logger logger = LogUtils.getLogger(ReportThread.class);
     private final String report;
     private final String uri;
 
@@ -40,7 +38,7 @@ public class ReportThread extends Thread {
         try {
             HttpClientUtils.sendPost(uri, report);
         } catch (Exception e) {
-            logger.error("report error, reason: ", e);
+            DongTaiLog.error("report error, reason: {}", e);
         }
         if (isRunning) {
             EngineManager.turnOnLingzhi();
