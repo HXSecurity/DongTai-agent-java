@@ -7,18 +7,18 @@ import com.secnium.iast.core.engines.impl.ServiceEngine;
 import com.secnium.iast.core.engines.impl.SpyEngine;
 import com.secnium.iast.core.engines.impl.TransformEngine;
 import com.secnium.iast.core.report.StartUpTimeReport;
-import com.secnium.iast.core.util.LogUtils;
+
 import java.lang.instrument.Instrumentation;
 import java.util.ArrayList;
 import java.util.ListIterator;
-import org.slf4j.Logger;
+
+import com.secnium.iast.log.DongTaiLog;
 
 /**
  * @author dongzhiyong@huoxian.cn
  */
 public class AgentEngine {
 
-    private static final Logger logger = LogUtils.getLogger(AgentEngine.class);
     private static AgentEngine instance;
 
     public long getStartUpTime() {
@@ -49,13 +49,13 @@ public class AgentEngine {
 
 
     public static void install(String mode, String propertiesFilePath, Integer agentId, Instrumentation inst,
-            String agentFile) {
+                               String agentFile) {
         long start = System.currentTimeMillis();
         if ("true".equals(System.getProperty("DongTai.IAST.Status"))) {
-            logger.info("DongTai IAST has Installed.");
+            DongTaiLog.info("DongTai IAST has Installed.");
             return;
         }
-        logger.info("DongTai Engine is about to be installed, the installation mode is {}", mode);
+        DongTaiLog.info("DongTai Engine is about to be installed, the installation mode is {}", mode);
         PropertyUtils propertiesUtils = PropertyUtils.getInstance(propertiesFilePath);
         EngineManager.setAgentPath(agentFile);
         EngineManager.setAgentId(agentId);
@@ -68,28 +68,28 @@ public class AgentEngine {
         StartUpTimeReport.sendReport(EngineManager.getAgentId(), startupTime);
         EngineManager.agentStarted();
         System.setProperty("DongTai.IAST.Status", "true");
-        logger.info("DongTai Engine is successfully installed to the JVM, and it takes {} s",
+        DongTaiLog.info("DongTai Engine is successfully installed to the JVM, and it takes {} s",
                 agentEngine.getStartUpTime() / 1000);
     }
 
     public static void start() {
-        logger.info("Turn on the engine");
+        DongTaiLog.info("Turn on the engine");
         EngineManager.turnOnEngine();
-        logger.info("Engine opened successfully");
+        DongTaiLog.info("Engine opened successfully");
     }
 
     public static void stop() {
-        logger.info("Turn off the engine");
+        DongTaiLog.info("Turn off the engine");
         EngineManager.turnOffEngine();
-        logger.info("Engine shut down successfully");
+        DongTaiLog.info("Engine shut down successfully");
     }
 
     public static void destroy(String mode, String propertiesFilePath, Instrumentation inst) {
-        logger.info("Uninstall engine");
+        DongTaiLog.info("Uninstall engine");
         AgentEngine agentEngine = AgentEngine.getInstance();
         assert agentEngine != null;
         agentEngine.destroy();
-        logger.info("Engine uninstallation succeeded");
+        DongTaiLog.info("Engine uninstallation succeeded");
     }
 
 

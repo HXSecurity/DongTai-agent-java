@@ -4,8 +4,7 @@ import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.AbstractClassVisitor;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
-import org.slf4j.Logger;
-import com.secnium.iast.core.util.LogUtils;
+import com.secnium.iast.log.DongTaiLog;
 
 import java.lang.reflect.Modifier;
 
@@ -29,8 +28,8 @@ public class RequestVisitor extends AbstractClassVisitor {
 
         int bool = (!Modifier.isNative(access) && !Modifier.isAbstract(access)) ? 1 : 0;
         if (1 == bool && "recycle".equals(name)) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Instrumenting Tomcat's ByteChunk recycle() method");
+            if (DongTaiLog.isDebugEnabled()) {
+                DongTaiLog.debug("Instrumenting Tomcat's ByteChunk recycle() method");
             }
 
             mv = new RequestAdapter(mv, access, name, desc, context);
@@ -39,5 +38,4 @@ public class RequestVisitor extends AbstractClassVisitor {
         return mv;
     }
 
-    private final Logger logger = LogUtils.getLogger(getClass());
 }
