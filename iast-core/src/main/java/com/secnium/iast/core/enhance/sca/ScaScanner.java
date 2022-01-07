@@ -131,7 +131,13 @@ public class ScaScanner {
         }
 
         public void scanClassPath(String packagesPath) {
-            String[] packages = packagesPath.split(":");
+            String osName = System.getProperty("os.name").toLowerCase();
+            String[] packages;
+            if (osName.contains("windows")){
+                packages = packagesPath.split(";");
+            }else {
+                packages = packagesPath.split(":");
+            }
             for (String packagePath : packages) {
                 if (packagePath.endsWith(JAR)) {
                     File file = new File(packagePath);
