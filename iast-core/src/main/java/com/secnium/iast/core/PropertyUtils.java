@@ -94,7 +94,7 @@ public class PropertyUtils {
 
     public String getIastServerToken() {
         if (null == iastServerToken) {
-            iastServerToken = System.getProperty("dongtai.server.token", cfg.getProperty("dongtai.server.token"));
+            iastServerToken = System.getProperty("dongtai.server.token", cfg.getProperty("iast.server.token"));
         }
         return iastServerToken;
     }
@@ -202,7 +202,7 @@ public class PropertyUtils {
      */
     public String getBaseUrl() {
         if (null == serverUrl) {
-            serverUrl = System.getProperty("dongtai.server.url", cfg.getProperty("dongtai.server.url"));
+            serverUrl = System.getProperty("dongtai.server.url", cfg.getProperty("iast.server.url"));
         }
         return serverUrl;
     }
