@@ -21,19 +21,15 @@ public class PropertyUtils {
     private String dumpClassState;
     private String iastDumpPath;
     private Long heartBeatInterval = -1L;
-    private Long reportInterval = -1L;
     private Long replayInterval = -1L;
     private String serverUrl;
     private String namespace;
-    private String engineName;
-    private String projectName;
     private String mode;
     private String serverMode;
     private String proxyEnableStatus;
     private String proxyHost;
     private int proxyPort = -1;
     private String debugFlag;
-    private Integer isAutoCreateProject;
 
     private final String propertiesFilePath;
 
@@ -52,7 +48,6 @@ public class PropertyUtils {
         this.propertiesFilePath = propertiesFilePath;
         init();
     }
-
 
     /**
      * 根据配置文件初始化单例配置类
@@ -94,7 +89,7 @@ public class PropertyUtils {
 
     public String getIastServerToken() {
         if (null == iastServerToken) {
-            iastServerToken = System.getProperty("dongtai.server.token", cfg.getProperty("dongtai.server.token"));
+            iastServerToken = System.getProperty("dongtai.server.token", cfg.getProperty("iast.server.token"));
         }
         return iastServerToken;
     }
@@ -120,20 +115,12 @@ public class PropertyUtils {
         return "true".equals(getAllHookState());
     }
 
-    public String getSourceFilePath() {
-        return "com.secnium.iast.resources/sources.txt";
-    }
-
     public String getBlackFunctionFilePath() {
         return "com.secnium.iast.resources/blacklistfunc.txt";
     }
 
     public String getBlackClassFilePath() {
         return "com.secnium.iast.resources/blacklist.txt";
-    }
-
-    public String getWhiteClassFilePath() {
-        return "com.secnium.iast.resources/whitelist.txt";
     }
 
     public String getBlackUrl() {
@@ -175,18 +162,6 @@ public class PropertyUtils {
         return replayInterval;
     }
 
-    /**
-     * @return
-     */
-    @Deprecated
-    public long getReportInterval() {
-        if (reportInterval == -1L) {
-            reportInterval = Long.valueOf(System.getProperty("iast.service.report.interval",
-                    cfg.getProperty("iast.service.report.interval", "60000")));
-        }
-        return reportInterval;
-    }
-
     public long getHeartBeatInterval() {
         if (heartBeatInterval == -1L) {
             heartBeatInterval = Long.valueOf(System.getProperty("iast.service.heartbeat.interval",
@@ -202,7 +177,7 @@ public class PropertyUtils {
      */
     public String getBaseUrl() {
         if (null == serverUrl) {
-            serverUrl = System.getProperty("dongtai.server.url", cfg.getProperty("dongtai.server.url"));
+            serverUrl = System.getProperty("dongtai.server.url", cfg.getProperty("iast.server.url"));
         }
         return serverUrl;
     }
@@ -214,32 +189,11 @@ public class PropertyUtils {
         return namespace;
     }
 
-    @Deprecated
-    public String getEngineName() {
-        if (null == engineName) {
-            engineName = System.getProperty("engine.name", cfg.getProperty("engine.name", "agent"));
-        }
-        return engineName;
-    }
-
-    @Deprecated
-    public String getProjectName() {
-        if (null == projectName) {
-            projectName = System.getProperty("project.name", cfg.getProperty("project.name", "Demo Project"));
-        }
-        return projectName;
-    }
-
     private String getMode() {
         if (null == mode) {
             mode = System.getProperty("iast.mode", cfg.getProperty("iast.mode", "normal"));
         }
         return mode;
-    }
-
-    @Deprecated
-    public boolean isHunterMode() {
-        return "hunter".equals(getMode());
     }
 
     public boolean isNormalMode() {
@@ -248,6 +202,7 @@ public class PropertyUtils {
 
     /**
      * After version 1.2.0, change the default server mode to local.
+     *
      * @return server mode
      */
     private String getServerMode() {
@@ -259,11 +214,6 @@ public class PropertyUtils {
 
     public boolean isLocal() {
         return "local".equals(getServerMode());
-    }
-
-    @Deprecated
-    public boolean isRemote() {
-        return "remote".equals(getServerMode());
     }
 
     private String getProxyEnableStatus() {
@@ -301,24 +251,6 @@ public class PropertyUtils {
 
     public boolean isDebug() {
         return "true".equalsIgnoreCase(getDebugFlag());
-    }
-
-    @Deprecated
-    public Integer isAutoCreateProject() {
-        if (null == isAutoCreateProject) {
-            String result = System.getProperty("project.create", cfg.getProperty("project.create", "false"));
-            if (result.equals("false")) {
-                isAutoCreateProject = 0;
-            } else if (result.equals("true")) {
-                isAutoCreateProject = 1;
-            }
-        }
-        return isAutoCreateProject;
-    }
-
-    @Deprecated
-    public String getProjectVersion() {
-        return System.getProperty("project.version", cfg.getProperty("project.version", "V1.0"));
     }
 
     public Integer getResponseLength() {

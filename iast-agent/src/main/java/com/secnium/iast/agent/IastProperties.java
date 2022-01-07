@@ -131,7 +131,7 @@ public class IastProperties {
                                     System.getProperty(
                                             "service.name",
                                             System.getProperty("app.name",
-                                                    System.getProperty("projgect.name",
+                                                    System.getProperty("project.name",
                                                             cfg.getProperty("project.name", "Demo Project"))
                                             )
 
