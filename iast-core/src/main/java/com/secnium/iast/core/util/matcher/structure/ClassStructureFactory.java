@@ -1,8 +1,7 @@
 package com.secnium.iast.core.util.matcher.structure;
 
 
-import org.slf4j.Logger;
-import com.secnium.iast.core.util.LogUtils;
+import com.secnium.iast.log.DongTaiLog;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,8 +16,6 @@ import java.io.InputStream;
  */
 public class ClassStructureFactory {
 
-    private static final Logger logger = LogUtils.getLogger(ClassStructureFactory.class);
-
     /**
      * 通过Class类字节流来构造类结构
      *
@@ -31,7 +28,7 @@ public class ClassStructureFactory {
         try {
             return new ClassStructureImplByAsm(classInputStream, loader);
         } catch (IOException cause) {
-            logger.warn("create class structure failed by using ASM, return null. loader=" + loader + ";", cause);
+            DongTaiLog.warn("create class structure failed by using ASM, return null. loader=" + loader + ";", cause);
             return null;
         }
     }

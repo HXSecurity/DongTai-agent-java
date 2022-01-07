@@ -11,8 +11,8 @@ import com.secnium.iast.core.enhance.plugins.PluginRegister;
 import com.secnium.iast.core.enhance.sca.ScaScanner;
 import com.secnium.iast.core.report.ErrorLogReport;
 import com.secnium.iast.core.util.AsmUtils;
-import com.secnium.iast.core.util.LogUtils;
 import com.secnium.iast.core.util.matcher.ConfigMatcher;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.instrument.ClassFileTransformer;
@@ -21,11 +21,12 @@ import java.security.CodeSource;
 import java.security.ProtectionDomain;
 import java.util.HashSet;
 import java.util.List;
+
 import org.apache.commons.lang3.time.StopWatch;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
-import org.slf4j.Logger;
+import com.secnium.iast.log.DongTaiLog;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -34,7 +35,6 @@ public class IastClassFileTransformer implements ClassFileTransformer {
 
     private final IastClassAncestorQuery COMMON_UTILS = IastClassAncestorQuery.getInstance();
 
-    private final Logger logger;
     private final boolean isDumpClass;
     private final Instrumentation inst;
     private final String namespace;
@@ -43,7 +43,6 @@ public class IastClassFileTransformer implements ClassFileTransformer {
 
 
     IastClassFileTransformer(Instrumentation inst) {
-        this.logger = LogUtils.getLogger(getClass());
         this.inst = inst;
         this.namespace = EngineManager.getNamespace();
         this.isDumpClass = EngineManager.isEnableDumpClass();
@@ -63,10 +62,10 @@ public class IastClassFileTransformer implements ClassFileTransformer {
      */
     @Override
     public byte[] transform(final ClassLoader loader,
-            final String internalClassName,
-            final Class<?> classBeingRedefined,
-            final ProtectionDomain protectionDomain,
-            final byte[] srcByteCodeArray) {
+                            final String internalClassName,
+                            final Class<?> classBeingRedefined,
+                            final ProtectionDomain protectionDomain,
+                            final byte[] srcByteCodeArray) {
         EngineManager.enterTransform();
         boolean isRunning = EngineManager.isLingzhiRunning();
         if (isRunning) {
@@ -74,7 +73,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
         }
 
         StopWatch clock = null;
-        if (logger.isDebugEnabled()) {
+        if (DongTaiLog.isDebugEnabled()) {
             clock = new StopWatch();
             clock.start();
         }
@@ -108,17 +107,17 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                     cr.accept(cv, ClassReader.EXPAND_FRAMES);
                     AbstractClassVisitor dumpClassVisitor = (AbstractClassVisitor) cv;
                     if (dumpClassVisitor.hasTransformed()) {
-                        if (logger.isDebugEnabled() && null != clock) {
+                        if (DongTaiLog.isDebugEnabled() && null != clock) {
                             clock.stop();
-                            logger.debug("conversion class {} is successful, and it takes {}ms.", internalClassName,
+                            DongTaiLog.debug("conversion class {} is successful, and it takes {}ms.", internalClassName,
                                     clock.getTime());
                         }
                         return dumpClassIfNecessary(cr.getClassName(), cw.toByteArray(), srcByteCodeArray);
                     }
                 } else {
-                    if (logger.isDebugEnabled() && null != clock) {
+                    if (DongTaiLog.isDebugEnabled() && null != clock) {
                         clock.stop();
-                        logger.debug("failed to convert the class {}, and it takes {} ms", internalClassName,
+                        DongTaiLog.debug("failed to convert the class {}, and it takes {} ms", internalClassName,
                                 clock.getTime());
                     }
                 }
@@ -132,7 +131,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
             EngineManager.leaveTransform();
         }
 
-        return srcByteCodeArray;
+        return null;
     }
 
     /**
@@ -142,7 +141,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
      * @return ClassWriter
      */
     private ClassWriter createClassWriter(final ClassLoader targetClassLoader,
-            final ClassReader cr) {
+                                          final ClassReader cr) {
         return new ClassWriter(cr, COMPUTE_FRAMES | COMPUTE_MAXS) {
 
             /*
@@ -184,17 +183,17 @@ public class IastClassFileTransformer implements ClassFileTransformer {
             final File classPath = new File(enhancedClass.getParent());
 
             if (!classPath.mkdirs() && !classPath.exists()) {
-                logger.warn("create dump classpath={} failed.", classPath);
+                DongTaiLog.warn("create dump classpath={} failed.", classPath);
                 return data;
             }
 
             writeByteArrayToFile(enhancedClass, data);
             writeByteArrayToFile(originalClass, originalData);
-            if (logger.isDebugEnabled()) {
-                logger.debug("dump class {} to {} success.", className, enhancedClass);
+            if (DongTaiLog.isDebugEnabled()) {
+                DongTaiLog.debug("dump class {} to {} success.", className, enhancedClass);
             }
         } catch (IOException e) {
-            logger.error("dump class {} failed. reason: {}", className, e);
+            DongTaiLog.error("dump class {} failed. reason: {}", className, e);
         }
 
         return data;
@@ -233,8 +232,8 @@ public class IastClassFileTransformer implements ClassFileTransformer {
             try {
                 inst.retransformClasses(waitingReTransformClass);
 
-                if (logger.isDebugEnabled()) {
-                    logger.debug("reTransform class {} success, index={};total={};", waitingReTransformClass, index - 1,
+                if (DongTaiLog.isDebugEnabled()) {
+                    DongTaiLog.debug("reTransform class {} success, index={};total={};", waitingReTransformClass, index - 1,
                             total);
                 }
             } catch (Throwable t) {

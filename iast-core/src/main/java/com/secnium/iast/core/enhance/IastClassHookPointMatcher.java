@@ -1,12 +1,13 @@
 package com.secnium.iast.core.enhance;
 
-import com.secnium.iast.core.util.LogUtils;
 import com.secnium.iast.core.util.matcher.ConfigMatcher;
+
 import java.lang.instrument.Instrumentation;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import org.slf4j.Logger;
+
+import com.secnium.iast.log.DongTaiLog;
 
 /**
  * 判断类 是否允许hook
@@ -15,7 +16,6 @@ import org.slf4j.Logger;
  */
 public class IastClassHookPointMatcher {
 
-    private final Logger logger = LogUtils.getLogger(getClass());
     private final Instrumentation inst;
 
     public IastClassHookPointMatcher(Instrumentation inst) {
@@ -67,8 +67,8 @@ public class IastClassHookPointMatcher {
             final Class<?> clazz = itForLoaded.next();
 
             if (isRemoveUnsupported && !inst.isModifiableClass(clazz)) {
-                if (classHookManager.logger.isDebugEnabled()) {
-                    classHookManager.logger.debug("remove from findForReTransform, because class:" + clazz.getName()
+                if (DongTaiLog.isDebugEnabled()) {
+                    DongTaiLog.debug("remove from findForReTransform, because class:" + clazz.getName()
                             + " is unModifiable");
                 }
                 continue;
@@ -79,12 +79,12 @@ public class IastClassHookPointMatcher {
                 ClassLoader loader = clazz.getClassLoader();
                 if (ConfigMatcher.isHookPoint(className, loader)) {
                     classes.add(clazz);
-                    if (classHookManager.logger.isDebugEnabled()) {
-                        classHookManager.logger.debug("findForReTransform: class " + clazz.getName() + " is added");
+                    if (DongTaiLog.isDebugEnabled()) {
+                        DongTaiLog.debug("findForReTransform: class " + clazz.getName() + " is added");
                     }
                 } else {
-                    if (classHookManager.logger.isDebugEnabled()) {
-                        classHookManager.logger.debug("findForReTransform: class " + clazz.getName() + " is ignored");
+                    if (DongTaiLog.isDebugEnabled()) {
+                        DongTaiLog.debug("findForReTransform: class " + clazz.getName() + " is ignored");
                     }
                 }
             } catch (Throwable cause) {
@@ -93,10 +93,9 @@ public class IastClassHookPointMatcher {
                 // 所以当尝试获取这个类更多详细信息的时候会引起关联类的ClassNotFoundException等未知的错误（取决于底层ClassLoader的实现）
                 // 这里没有办法穷举出所有的异常情况，所以catch Throwable来完成异常容灾处理
                 // 当解析类出现异常的时候，直接简单粗暴的认为根本没有这个类就好了
-                if (classHookManager.logger.isDebugEnabled()) {
-                    classHookManager.logger
-                            .debug("remove from findForReTransform, because loading class:" + clazz.getName()
-                                    + " occur an exception", cause);
+                if (DongTaiLog.isDebugEnabled()) {
+                    DongTaiLog.debug("remove from findForReTransform, because loading class:" + clazz.getName()
+                            + " occur an exception", cause);
                 }
             }
         }

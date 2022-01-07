@@ -1,7 +1,8 @@
 package com.secnium.iast.agent.monitor;
 
 import com.secnium.iast.agent.manager.EngineManager;
-import com.secnium.iast.agent.util.LogUtils;
+import com.secnium.iast.log.DongTaiLog;
+
 import java.util.ArrayList;
 
 /**
@@ -22,10 +23,10 @@ public class MonitorDaemonThread implements Runnable {
         this.engineManager = engineManager;
         try {
             delayTime = Integer.parseInt(System.getProperty("iast.engine.delay.time", "0"));
-            LogUtils.info("engine delay time is " + delayTime + " s");
+            DongTaiLog.info("engine delay time is " + delayTime + " s");
             delayTime = delayTime * 1000;
         } catch (Exception e) {
-            LogUtils.error("engine delay time must be int,eg: 10、20");
+            DongTaiLog.error("engine delay time must be int,eg: 10、20");
             delayTime = 0;
         }
     }
@@ -65,7 +66,7 @@ public class MonitorDaemonThread implements Runnable {
         status = status && engineManager.install();
         status = status && engineManager.start();
         if (!status) {
-            LogUtils.info("DongTai IAST started failure");
+            DongTaiLog.info("DongTai IAST started failure");
         }
     }
 }

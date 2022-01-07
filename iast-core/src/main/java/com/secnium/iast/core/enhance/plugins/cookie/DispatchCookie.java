@@ -2,10 +2,11 @@ package com.secnium.iast.core.enhance.plugins.cookie;
 
 import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.DispatchPlugin;
-import com.secnium.iast.core.util.LogUtils;
+
 import java.util.Set;
+
 import org.objectweb.asm.ClassVisitor;
-import org.slf4j.Logger;
+import com.secnium.iast.log.DongTaiLog;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -25,8 +26,8 @@ public class DispatchCookie implements DispatchPlugin {
         classname = context.getClassName();
         String matchClassname = isMatch();
         if (null != matchClassname) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Cookie match class for {} from {}", classname, matchClassname);
+            if (DongTaiLog.isDebugEnabled()) {
+                DongTaiLog.debug("Cookie match class for {} from {}", classname, matchClassname);
             }
             context.setMatchClassName(matchClassname);
             classVisitor = new CookieAdapter(classVisitor, context);
@@ -60,5 +61,4 @@ public class DispatchCookie implements DispatchPlugin {
     }
 
 
-    private final Logger logger = LogUtils.getLogger(getClass());
 }

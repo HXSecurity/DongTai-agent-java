@@ -9,15 +9,15 @@ import com.secnium.iast.core.handler.vulscan.ReportConstant;
 import com.secnium.iast.core.handler.vulscan.normal.AbstractNormalVulScan;
 import com.secnium.iast.core.report.ReportThread;
 import com.secnium.iast.core.util.Constants;
-import com.secnium.iast.core.util.LogUtils;
 import com.secnium.iast.core.util.base64.Base64Encoder;
+
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.slf4j.Logger;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -106,7 +106,7 @@ public class GraphBuilder {
         detail.put(ReportConstant.REQ_BODY, requestMeta.get("body"));
         detail.put(ReportConstant.RES_HEADER, responseMeta == null ? ""
                 : Base64Encoder.encodeBase64String(responseMeta.get("headers").toString().getBytes())
-                        .replaceAll("\n", ""));
+                .replaceAll("\n", ""));
         detail.put(ReportConstant.RES_BODY, responseMeta == null ? "" : responseMeta.get("body"));
         detail.put(ReportConstant.CONTEXT_PATH, requestMeta.get("contextPath"));
         detail.put(ReportConstant.REPLAY_REQUEST, requestMeta.get("replay-request"));
@@ -119,6 +119,4 @@ public class GraphBuilder {
 
         return report.toString();
     }
-
-    private static final Logger logger = LogUtils.getLogger(GraphBuilder.class);
 }

@@ -5,15 +5,17 @@ import com.secnium.iast.agent.IastProperties;
 import com.secnium.iast.agent.manager.EngineManager;
 import com.secnium.iast.agent.middlewarerecognition.IServer;
 import com.secnium.iast.agent.middlewarerecognition.ServerDetect;
-import com.secnium.iast.agent.util.LogUtils;
 import com.secnium.iast.agent.util.base64.Base64Encoder;
 import com.secnium.iast.agent.util.http.HttpClientUtils;
+
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Enumeration;
+
+import com.secnium.iast.log.DongTaiLog;
 import org.json.JSONObject;
 
 /**
@@ -194,7 +196,7 @@ public class AgentRegisterReport {
     public void register() {
         try {
             String msg = generateAgentRegisterMsg();
-            LogUtils.info("register agent");
+            DongTaiLog.info("register agent");
             StringBuilder responseRaw = HttpClientUtils.sendPost(Constant.API_AGENT_REGISTER, msg);
             if (!isRegistered()) {
                 setAgentData(responseRaw);

@@ -7,7 +7,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 
-import com.secnium.iast.agent.util.LogUtils;
+import com.secnium.iast.log.DongTaiLog;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -47,16 +47,16 @@ public class Agent {
                 String jdkVersion = getJdkVersion();
                 if ("1".equals(jdkVersion) && appendToolsPath()) {
                     AttachLauncher.attach(pid, attachArgs);
-                    LogUtils.info("engine " + attachArgs + " successfully. pid: " + pid);
+                    DongTaiLog.info("engine " + attachArgs + " successfully. pid: " + pid);
                 } else {
                     AttachLauncher.attach(pid, attachArgs);
-                    LogUtils.info("engine " + attachArgs + " successfully. pid: " + pid);
+                    DongTaiLog.info("engine " + attachArgs + " successfully. pid: " + pid);
                 }
             } else {
                 formatter.printHelp("java -jar agent.jar", attachOptions, true);
             }
         } catch (Throwable t) {
-            LogUtils.error("Start DongTai Agent failed, exception stack trace: ");
+            DongTaiLog.error("Start DongTai Agent failed, exception stack trace: ");
             t.printStackTrace();
             System.exit(-1);
         }
@@ -69,7 +69,7 @@ public class Agent {
      */
     public static String getJdkVersion() {
         String jdkVersion = System.getProperty("java.version", "1.8");
-        LogUtils.info("current jdk version is : " + jdkVersion);
+        DongTaiLog.info("current jdk version is : " + jdkVersion);
         String[] jdkVersionItem = jdkVersion.split("\\.");
         boolean isHighJdk = true;
         if (jdkVersionItem.length > 1 && ("6".equals(jdkVersionItem[1]) || "7".equals(jdkVersionItem[1]) || "8"

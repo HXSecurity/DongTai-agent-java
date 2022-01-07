@@ -5,6 +5,7 @@ import com.secnium.iast.agent.manager.EngineManager;
 import com.secnium.iast.agent.report.AgentRegisterReport;
 import com.secnium.iast.agent.util.LogUtils;
 import com.secnium.iast.agent.util.http.HttpClientUtils;
+import com.secnium.iast.log.DongTaiLog;
 import org.json.JSONObject;
 
 /**
@@ -29,13 +30,13 @@ public class EngineMonitor implements IMonitor {
         } else if (status.equals(this.currentStatus)) {
             return;
         } else if ("coreStop".equals(status)) {
-            LogUtils.info("engine stop");
+            DongTaiLog.info("engine stop");
             engineManager.stop();
-            if (currentStatus == null){
+            if (currentStatus == null) {
                 return;
             }
         } else if ("coreStart".equals(status)) {
-            LogUtils.info("engine start");
+            DongTaiLog.info("engine start");
             engineManager.start();
         }
         this.currentStatus = status;

@@ -11,7 +11,7 @@ import com.secnium.iast.core.threadlocalpool.IastTaintHashCodes;
 import com.secnium.iast.core.threadlocalpool.IastTaintPool;
 import com.secnium.iast.core.threadlocalpool.IastTrackMap;
 import com.secnium.iast.core.threadlocalpool.RequestContext;
-import com.secnium.iast.core.util.LogUtils;
+
 import java.io.File;
 import java.lang.instrument.Instrumentation;
 import java.lang.reflect.Method;
@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
-import org.slf4j.Logger;
 
 /**
  * 存储全局信息
@@ -29,7 +28,6 @@ import org.slf4j.Logger;
  */
 public class EngineManager {
 
-    private static final Logger logger = LogUtils.getLogger(EngineManager.class);
     private static EngineManager instance;
     private final PropertyUtils cfg;
     public static Integer AGENT_ID;
@@ -103,7 +101,7 @@ public class EngineManager {
     }
 
     private EngineManager(final PropertyUtils cfg,
-            final Instrumentation inst) {
+                          final Instrumentation inst) {
         this.cfg = cfg;
     }
 

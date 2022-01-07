@@ -4,11 +4,10 @@ import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.AbstractClassVisitor;
 import com.secnium.iast.core.enhance.plugins.framework.j2ee.dispatch.ServletDispatcherAdviceAdapter;
 import com.secnium.iast.core.util.AsmUtils;
-import com.secnium.iast.core.util.LogUtils;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
-import org.slf4j.Logger;
+import com.secnium.iast.log.DongTaiLog;
 
 
 /**
@@ -16,7 +15,6 @@ import org.slf4j.Logger;
  */
 public class JspPageAdapter extends AbstractClassVisitor {
 
-    private final Logger logger = LogUtils.getLogger(getClass());
 
     JspPageAdapter(ClassVisitor classVisitor, IastContext context) {
         super(classVisitor, context);
@@ -47,8 +45,8 @@ public class JspPageAdapter extends AbstractClassVisitor {
         @Override
         public void visitMethodInsn(int opc, String owner, String name, String desc, boolean isInterface) {
             if (owner.endsWith("JspRuntimeLibrary") && "include".equals(name)) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("[com.secnium.iast] enter include method" + owner + "." + name);
+                if (DongTaiLog.isDebugEnabled()) {
+                    DongTaiLog.debug("[com.secnium.iast] enter include method" + owner + "." + name);
                 }
 
                 int j = newLocal(Type.getType(Object.class));

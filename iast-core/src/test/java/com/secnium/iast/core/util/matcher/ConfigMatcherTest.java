@@ -9,19 +9,19 @@ public class ConfigMatcherTest {
      * // CGLIB$$的类不hook
      * if (hook && className.contains("CGLIB$$")) {
      * hook = false;
-     * logger.debug("ignore transform {} in loader={}. Reason: classname is a aop class by CGLIB", className, loader);
+     * DongTaiLog.debug("ignore transform {} in loader={}. Reason: classname is a aop class by CGLIB", className, loader);
      * }
      * <p>
      * //$$Lambda$
      * if (hook && className.contains("$$Lambda$")) {
      * hook = false;
-     * logger.debug("ignore transform {} in loader={}. Reason: classname is a aop class by Lambda", className, loader);
+     * DongTaiLog.debug("ignore transform {} in loader={}. Reason: classname is a aop class by Lambda", className, loader);
      * }
      * <p>
      * //$$Lambda$
      * if (hook && className.contains("_$$_jvst")) {
      * hook = false;
-     * logger.debug("ignore transform {} in loader={}. Reason: classname is a aop class", className, loader);
+     * DongTaiLog.debug("ignore transform {} in loader={}. Reason: classname is a aop class", className, loader);
      * }
      * <p>
      * 执行时长：46329000 纳秒.

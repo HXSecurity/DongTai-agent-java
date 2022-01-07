@@ -3,16 +3,16 @@ package com.secnium.iast.core.engines.impl;
 import com.secnium.iast.core.PropertyUtils;
 import com.secnium.iast.core.ServiceFactory;
 import com.secnium.iast.core.engines.IEngine;
-import com.secnium.iast.core.util.LogUtils;
+
 import java.lang.instrument.Instrumentation;
-import org.slf4j.Logger;
+
+import com.secnium.iast.log.DongTaiLog;
 
 /**
  * @author dongzhiyong@huoxian.cn
  */
 public class ServiceEngine implements IEngine {
 
-    private final Logger logger = LogUtils.getLogger(getClass());
     private ServiceFactory serviceFactory;
 
     @Override
@@ -23,9 +23,9 @@ public class ServiceEngine implements IEngine {
 
     @Override
     public void start() {
-        logger.info("Start the data reporting submodule");
+        DongTaiLog.info("Start the data reporting submodule");
         serviceFactory.start();
-        logger.info("The data reporting submodule started successfully");
+        DongTaiLog.info("The data reporting submodule started successfully");
     }
 
     @Override
@@ -35,8 +35,8 @@ public class ServiceEngine implements IEngine {
 
     @Override
     public void destroy() {
-        logger.info("Destroy the data reporting submodule");
+        DongTaiLog.info("Destroy the data reporting submodule");
         serviceFactory.destory();
-        logger.info("The data reporting submodule is destroyed successfully");
+        DongTaiLog.info("The data reporting submodule is destroyed successfully");
     }
 }

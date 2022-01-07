@@ -1,9 +1,9 @@
 package com.secnium.iast.agent.monitor;
 
-import com.secnium.iast.agent.util.LogUtils;
 import com.secnium.iast.agent.IastProperties;
 import com.secnium.iast.agent.manager.EngineManager;
 import com.secnium.iast.agent.report.AgentRegisterReport;
+import com.secnium.iast.log.DongTaiLog;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import oshi.SystemInfo;
@@ -43,7 +43,7 @@ public class PerformanceMonitor implements IMonitor {
         return free / max;
     }
 
-    public static Integer getCpuUsage(){
+    public static Integer getCpuUsage() {
         return CPU_USAGE;
     }
 
@@ -65,7 +65,7 @@ public class PerformanceMonitor implements IMonitor {
         long iowait = ticks[CentralProcessor.TickType.IOWAIT.getIndex()] - prevTicks[CentralProcessor.TickType.IOWAIT.getIndex()];
         long idle = ticks[CentralProcessor.TickType.IDLE.getIndex()] - prevTicks[CentralProcessor.TickType.IDLE.getIndex()];
         long totalCpu = user + nice + cSys + idle + iowait + irq + softirq + steal;
-        CPU_USAGE = (int)((1.0 - (idle * 1.0 / totalCpu)) * 100);
+        CPU_USAGE = (int) ((1.0 - (idle * 1.0 / totalCpu)) * 100);
         return CPU_USAGE;
     }
 
@@ -120,11 +120,11 @@ public class PerformanceMonitor implements IMonitor {
         if (isStart(UsedRate, preStatus)) {
             this.engineManager.start();
             this.engineManager.setRunningStatus(0);
-            LogUtils.info("The current CPU usage is " + UsedRate + "%, lower than the threshold " + AGENT_THRESHOLD_VALUE + "%，and the detection engine is starting");
+            DongTaiLog.info("The current CPU usage is " + UsedRate + "%, lower than the threshold " + AGENT_THRESHOLD_VALUE + "%，and the detection engine is starting");
         } else if (isStop(UsedRate, preStatus)) {
             this.engineManager.stop();
             this.engineManager.setRunningStatus(1);
-            LogUtils.info("The current CPU usage is " + UsedRate + "%, higher than the threshold " + AGENT_THRESHOLD_VALUE + "%，and the detection engine is stopping");
+            DongTaiLog.info("The current CPU usage is " + UsedRate + "%, higher than the threshold " + AGENT_THRESHOLD_VALUE + "%，and the detection engine is stopping");
         }
     }
 

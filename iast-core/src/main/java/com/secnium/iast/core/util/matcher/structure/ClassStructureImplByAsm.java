@@ -11,8 +11,7 @@ import com.secnium.iast.core.util.matcher.structure.PrimitiveClassStructure.Prim
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.objectweb.asm.*;
-import org.slf4j.Logger;
-import com.secnium.iast.core.util.LogUtils;
+import com.secnium.iast.log.DongTaiLog;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -231,7 +230,6 @@ class ArrayClassStructure extends EmptyClassStructure {
  */
 public class ClassStructureImplByAsm extends FamilyClassStructure {
 
-    private final Logger logger = LogUtils.getLogger(getClass());
     private final ClassReader classReader;
     private final ClassLoader loader;
     private final Access access;
@@ -322,7 +320,7 @@ public class ClassStructureImplByAsm extends FamilyClassStructure {
                     return classStructure;
                 } catch (Throwable cause) {
                     // ignore
-                    logger.warn("new instance class structure by using ASM failed, will return null. class=" + javaClassName + ";loader=" + loader + ";",
+                    DongTaiLog.warn("new instance class structure by using ASM failed, will return null. class=" + javaClassName + ";loader=" + loader + ";",
                             cause);
                     classStructureCache.put(pair, null);
                 } finally {

@@ -3,7 +3,6 @@ package com.secnium.iast.core.util.matcher;
 import com.secnium.iast.core.PropertyUtils;
 import com.secnium.iast.core.report.ErrorLogReport;
 import com.secnium.iast.core.util.ConfigUtils;
-import com.secnium.iast.core.util.LogUtils;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,7 +11,7 @@ import java.util.Set;
 
 import com.secnium.iast.core.util.ThrowableUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
+import com.secnium.iast.log.DongTaiLog;
 
 /**
  * 各种匹配方法（通过配置文件匹配）
@@ -20,8 +19,6 @@ import org.slf4j.Logger;
  * @author dongzhiyong@huoxian.cn
  */
 public class ConfigMatcher {
-
-    private final static Logger logger = LogUtils.getLogger(ConfigMatcher.class);
 
     private final static Set<String> BLACKS;
     private final static String[] START_WITH_BLACKS;
@@ -72,8 +69,8 @@ public class ConfigMatcher {
                         continue;
                 }
             }
-        }catch (Exception e){
-            logger.info("dongtai getBalckurl error");
+        } catch (Exception e) {
+            DongTaiLog.info("dongtai getBalckurl error");
             ErrorLogReport.sendErrorLog(ThrowableUtils.getStackTrace(e));
         }
         return false;
@@ -112,30 +109,30 @@ public class ConfigMatcher {
                 || className.startsWith("java/lang/iast/")
                 || className.startsWith("cn/huoxian/iast/")
         ) {
-            logger.trace("ignore transform {} in loader={}. Reason: classname is startswith com/secnium/iast/",
+            DongTaiLog.trace("ignore transform {} in loader={}. Reason: classname is startswith com/secnium/iast/",
                     className, loader);
             return false;
         }
 
         if (className.contains("CGLIB$$")) {
-            logger.trace("ignore transform {} in loader={}. Reason: classname is a aop class by CGLIB", className,
+            DongTaiLog.trace("ignore transform {} in loader={}. Reason: classname is a aop class by CGLIB", className,
                     loader);
             return false;
         }
 
         if (className.contains("$$Lambda$")) {
-            logger.trace("ignore transform {} in loader={}. Reason: classname is a aop class by Lambda", className,
+            DongTaiLog.trace("ignore transform {} in loader={}. Reason: classname is a aop class by Lambda", className,
                     loader);
             return false;
         }
 
         if (className.contains("_$$_jvst")) {
-            logger.trace("ignore transform {} in loader={}. Reason: classname is a aop class", className, loader);
+            DongTaiLog.trace("ignore transform {} in loader={}. Reason: classname is a aop class", className, loader);
             return false;
         }
 
         if (ConfigMatcher.inHookBlacklist(className)) {
-            logger.trace("ignore transform {} in loader={}. reason: class is in blacklist", className, loader);
+            DongTaiLog.trace("ignore transform {} in loader={}. reason: class is in blacklist", className, loader);
             return false;
         }
         return true;
@@ -149,7 +146,7 @@ public class ConfigMatcher {
         final PropertyUtils cfg = PropertyUtils.getInstance();
         String blackListFuncFile = cfg.getBlackFunctionFilePath();
         String blackList = cfg.getBlackClassFilePath();
-        String blackUrl =  cfg.getBlackUrl();
+        String blackUrl = cfg.getBlackUrl();
         String disableExtList = cfg.getBlackExtFilePath();
 
         HashSet<String>[] items = ConfigUtils.loadConfigFromFile(blackListFuncFile);
@@ -157,7 +154,7 @@ public class ConfigMatcher {
         END_WITH_BLACKS = items[2].toArray(new String[0]);
         START_WITH_BLACKS = items[1].toArray(new String[0]);
 
-        BLACK_URL=ConfigUtils.loadConfigFromFileByLine(blackUrl);
+        BLACK_URL = ConfigUtils.loadConfigFromFileByLine(blackUrl);
 
         items = ConfigUtils.loadConfigFromFile(blackList);
         START_ARRAY = items[1].toArray(new String[0]);

@@ -7,15 +7,15 @@ import com.secnium.iast.core.enhance.plugins.DispatchPlugin;
 import com.secnium.iast.core.handler.vulscan.ReportConstant;
 import com.secnium.iast.core.report.ReportThread;
 import com.secnium.iast.core.util.Constants;
-import com.secnium.iast.core.util.LogUtils;
 import com.secnium.iast.core.util.base64.Base64Encoder;
 import com.secnium.iast.core.util.commonUtils;
+
 import java.lang.reflect.Modifier;
 import java.util.regex.Pattern;
+
 import org.json.JSONObject;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.FieldVisitor;
-import org.slf4j.Logger;
 
 /**
  * 检测字节码中使用硬编码的转换类
@@ -24,7 +24,6 @@ import org.slf4j.Logger;
  */
 public class DispatchHardcodedPlugin implements DispatchPlugin {
 
-    private final Logger logger = LogUtils.getLogger(getClass());
 
     @Override
     public ClassVisitor dispatch(ClassVisitor classVisitor, IastContext context) {
@@ -119,7 +118,7 @@ public class DispatchHardcodedPlugin implements DispatchPlugin {
         }
 
         private void sendVulReport(String fileName, String className, boolean isJDKClass, String fieldName,
-                String value) {
+                                   String value) {
             JSONObject report = new JSONObject();
             JSONObject detail = new JSONObject();
             report.put(ReportConstant.REPORT_KEY, ReportConstant.REPORT_VUL_HARDCORD);
