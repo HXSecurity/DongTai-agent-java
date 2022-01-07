@@ -14,7 +14,6 @@ import com.secnium.iast.core.handler.models.IastSinkModel;
 import com.secnium.iast.core.handler.vulscan.VulnType;
 import com.secnium.iast.core.util.AsmUtils;
 import com.secnium.iast.core.util.LogUtils;
-import com.secnium.iast.core.util.matcher.ConfigMatcher;
 import com.secnium.iast.core.util.matcher.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
@@ -84,8 +83,9 @@ public class DispatchClassPlugin implements DispatchPlugin {
 
         ClassVisit(ClassVisitor classVisitor, IastContext context) {
             super(classVisitor, context);
-            String className = context.getClassName();
-            this.isAppClass = ConfigMatcher.isAppClass(className);
+            this.isAppClass = false;
+            //String className = context.getClassName();
+            //this.isAppClass = ConfigMatcher.isAppClass(className);
         }
 
         @Override
