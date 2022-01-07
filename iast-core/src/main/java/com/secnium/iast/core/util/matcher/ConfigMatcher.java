@@ -4,13 +4,11 @@ import com.secnium.iast.core.PropertyUtils;
 import com.secnium.iast.core.report.ErrorLogReport;
 import com.secnium.iast.core.util.ConfigUtils;
 import com.secnium.iast.core.util.LogUtils;
-
+import com.secnium.iast.core.util.ThrowableUtils;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import com.secnium.iast.core.util.ThrowableUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 
@@ -72,7 +70,7 @@ public class ConfigMatcher {
                         continue;
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             logger.info("dongtai getBalckurl error");
             ErrorLogReport.sendErrorLog(ThrowableUtils.getStackTrace(e));
         }
@@ -103,17 +101,8 @@ public class ConfigMatcher {
      * @return 是否支持hook
      */
     public static boolean isHookPoint(String className, ClassLoader loader) {
-        if (className == null) {
-            return false;
-        }
-
-        // todo: 计算startsWith、contains与正则匹配的时间损耗
-        if (className.startsWith("com/secnium/iast/")
-                || className.startsWith("java/lang/iast/")
-                || className.startsWith("cn/huoxian/iast/")
-        ) {
-            logger.trace("ignore transform {} in loader={}. Reason: classname is startswith com/secnium/iast/",
-                    className, loader);
+        if (ConfigMatcher.inHookBlacklist(className)) {
+            logger.trace("ignore transform {} in loader={}. reason: class is in blacklist", className, loader);
             return false;
         }
 
@@ -134,10 +123,16 @@ public class ConfigMatcher {
             return false;
         }
 
-        if (ConfigMatcher.inHookBlacklist(className)) {
-            logger.trace("ignore transform {} in loader={}. reason: class is in blacklist", className, loader);
+        // todo: 计算startsWith、contains与正则匹配的时间损耗
+        if (className.startsWith("com/secnium/iast/")
+                || className.startsWith("java/lang/iast/")
+                || className.startsWith("cn/huoxian/iast/")
+        ) {
+            logger.trace("ignore transform {} in loader={}. Reason: classname is startswith com/secnium/iast/",
+                    className, loader);
             return false;
         }
+
         return true;
     }
 
@@ -149,7 +144,7 @@ public class ConfigMatcher {
         final PropertyUtils cfg = PropertyUtils.getInstance();
         String blackListFuncFile = cfg.getBlackFunctionFilePath();
         String blackList = cfg.getBlackClassFilePath();
-        String blackUrl =  cfg.getBlackUrl();
+        String blackUrl = cfg.getBlackUrl();
         String disableExtList = cfg.getBlackExtFilePath();
 
         HashSet<String>[] items = ConfigUtils.loadConfigFromFile(blackListFuncFile);
@@ -157,7 +152,7 @@ public class ConfigMatcher {
         END_WITH_BLACKS = items[2].toArray(new String[0]);
         START_WITH_BLACKS = items[1].toArray(new String[0]);
 
-        BLACK_URL=ConfigUtils.loadConfigFromFileByLine(blackUrl);
+        BLACK_URL = ConfigUtils.loadConfigFromFileByLine(blackUrl);
 
         items = ConfigUtils.loadConfigFromFile(blackList);
         START_ARRAY = items[1].toArray(new String[0]);

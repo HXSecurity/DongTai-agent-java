@@ -13,7 +13,6 @@ import com.secnium.iast.core.threadlocalpool.IastTrackMap;
 import com.secnium.iast.core.threadlocalpool.RequestContext;
 import com.secnium.iast.core.util.LogUtils;
 import java.io.File;
-import java.lang.instrument.Instrumentation;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.HashMap;
@@ -29,14 +28,12 @@ import org.slf4j.Logger;
  */
 public class EngineManager {
 
-    private static final Logger logger = LogUtils.getLogger(EngineManager.class);
     private static EngineManager instance;
     private final PropertyUtils cfg;
     public static Integer AGENT_ID;
     public static String AGENT_PATH;
 
     private static final BooleanThreadLocal AGENT_STATUS = new BooleanThreadLocal(false);
-    private static final BooleanThreadLocal TRANSFORM_STATE = new BooleanThreadLocal(false);
     private static final BooleanThreadLocal ENTER_HTTP_ENTRYPOINT = new BooleanThreadLocal(false);
     public static final RequestContext REQUEST_CONTEXT = new RequestContext();
     public static final IastTrackMap TRACK_MAP = new IastTrackMap();
@@ -56,14 +53,6 @@ public class EngineManager {
 
     public static void agentStarted() {
         AGENT_STATUS.set(true);
-    }
-
-    public static void enterTransform() {
-        TRANSFORM_STATE.set(true);
-    }
-
-    public static void leaveTransform() {
-        TRANSFORM_STATE.set(false);
     }
 
     public static void turnOnLingzhi() {
@@ -88,12 +77,12 @@ public class EngineManager {
         return instance;
     }
 
-    public static EngineManager getInstance(PropertyUtils cfg, Instrumentation inst) {
+    public static EngineManager getInstance(PropertyUtils cfg) {
         if (instance == null) {
-            if (cfg == null || inst == null) {
+            if (cfg == null) {
                 return null;
             }
-            instance = new EngineManager(cfg, inst);
+            instance = new EngineManager(cfg);
         }
         return instance;
     }
@@ -102,8 +91,7 @@ public class EngineManager {
         instance = null;
     }
 
-    private EngineManager(final PropertyUtils cfg,
-            final Instrumentation inst) {
+    private EngineManager(final PropertyUtils cfg) {
         this.cfg = cfg;
     }
 
