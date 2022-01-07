@@ -17,8 +17,8 @@ import org.json.JSONObject;
 public abstract class AbstractNormalVulScan implements IVulScan {
 
     /**
-     * @param stacks
-     * @param vulType
+     * @param stacks  Method Call Stack
+     * @param vulType vulnerability
      */
     public void sendReport(StackTraceElement[] stacks, String vulType) {
         Map<String, Object> requestMeta = EngineManager.REQUEST_CONTEXT.get();

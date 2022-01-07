@@ -4,12 +4,11 @@ import com.secnium.iast.core.PropertyUtils;
 import com.secnium.iast.core.report.ErrorLogReport;
 import com.secnium.iast.core.util.ConfigUtils;
 
+import com.secnium.iast.core.util.ThrowableUtils;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import com.secnium.iast.core.util.ThrowableUtils;
 import org.apache.commons.lang3.StringUtils;
 import com.secnium.iast.log.DongTaiLog;
 
@@ -100,15 +99,7 @@ public class ConfigMatcher {
      * @return 是否支持hook
      */
     public static boolean isHookPoint(String className, ClassLoader loader) {
-        if (className == null) {
-            return false;
-        }
-
-        // todo: 计算startsWith、contains与正则匹配的时间损耗
-        if (className.startsWith("com/secnium/iast/")
-                || className.startsWith("java/lang/iast/")
-                || className.startsWith("cn/huoxian/iast/")
-        ) {
+        if (ConfigMatcher.inHookBlacklist(className)) {
             DongTaiLog.trace("ignore transform {} in loader={}. Reason: classname is startswith com/secnium/iast/",
                     className, loader);
             return false;
@@ -130,11 +121,16 @@ public class ConfigMatcher {
             DongTaiLog.trace("ignore transform {} in loader={}. Reason: classname is a aop class", className, loader);
             return false;
         }
-
-        if (ConfigMatcher.inHookBlacklist(className)) {
-            DongTaiLog.trace("ignore transform {} in loader={}. reason: class is in blacklist", className, loader);
+      
+        // todo: 计算startsWith、contains与正则匹配的时间损耗
+        if (className.startsWith("com/secnium/iast/")
+                || className.startsWith("java/lang/iast/")
+                || className.startsWith("cn/huoxian/iast/")
+        ) {
+            DongTaiLog.trace("ignore transform {} in loader={}. Reason: class is in blacklist", className, loader);
             return false;
         }
+
         return true;
     }
 

@@ -18,7 +18,7 @@ public class HttpResponse {
         HttpServletResponse response = (HttpServletResponse) res;
         Map<String, Object> responseMeta = new HashMap<String, Object>(2);
         responseMeta.put("headers", getHeaders(response));
-        responseMeta.put("body", getBody(response));
+        responseMeta.put("body", getResponseData(response));
         return responseMeta;
     }
 
@@ -48,6 +48,25 @@ public class HttpResponse {
         return header.toString();
     }
 
+    private static byte[] getResponseData(HttpServletResponse response) {
+        if (response instanceof ResponseWrapper) {
+            try {
+                byte[] responseData = ((ResponseWrapper) response).getResponseData();
+                if (responseBodyLength == null || responseBodyLength > responseData.length) {
+                    return responseData;
+                }
+
+                byte[] copiedData = new byte[responseBodyLength];
+                System.arraycopy(responseData, 0, copiedData, 0, responseBodyLength);
+                return copiedData;
+            } catch (Exception ignored) {
+
+            }
+        }
+        return new byte[0];
+    }
+
+
     /**
      * 获取响应体
      *
@@ -70,20 +89,21 @@ public class HttpResponse {
                     }
                 }
                 try {
-                    if (responseBodyLength == null){
+                    if (responseBodyLength == null) {
                         responseStr = new String(responseData, charSet);
-                    }else {
+                    } else {
                         responseStr = new String(responseData, 0, responseBodyLength, charSet);
                     }
                 } catch (UnsupportedEncodingException e) {
-                    if (responseBodyLength == null){
+                    if (responseBodyLength == null) {
                         responseStr = new String(responseData);
-                    }else {
+                    } else {
                         responseStr = new String(responseData, 0, responseBodyLength);
                     }
                 }
 
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
 
         }
         return responseStr;

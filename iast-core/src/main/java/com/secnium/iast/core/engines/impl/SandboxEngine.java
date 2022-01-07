@@ -3,21 +3,20 @@ package com.secnium.iast.core.engines.impl;
 import com.secnium.iast.core.EngineManager;
 import com.secnium.iast.core.PropertyUtils;
 import com.secnium.iast.core.engines.IEngine;
-import com.secnium.iast.log.DongTaiLog;
 
+import com.secnium.iast.log.DongTaiLog;
 import java.lang.instrument.Instrumentation;
+import org.slf4j.Logger;
 
 /**
  * @author dongzhiyong@huoxian.cn
  */
 public class SandboxEngine implements IEngine {
-    private Instrumentation inst;
     private PropertyUtils cfg;
 
     @Override
     public void init(PropertyUtils cfg, Instrumentation inst) {
         this.cfg = cfg;
-        this.inst = inst;
     }
 
     @Override
@@ -25,7 +24,7 @@ public class SandboxEngine implements IEngine {
         if (DongTaiLog.isDebugEnabled()) {
             DongTaiLog.debug("initing global control instance");
         }
-        EngineManager.getInstance(cfg, inst);
+        EngineManager.getInstance(cfg);
         if (DongTaiLog.isDebugEnabled()) {
             DongTaiLog.debug("inited global control instance");
         }

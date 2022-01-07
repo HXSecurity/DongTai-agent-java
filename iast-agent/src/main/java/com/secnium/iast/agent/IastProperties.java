@@ -101,7 +101,7 @@ public class IastProperties {
 
     public String getIastServerToken() {
         if (null == iastServerToken) {
-            iastServerToken = cfg.getProperty("iast.server.token");
+            iastServerToken = System.getProperty("dongtai.server.token", cfg.getProperty("iast.server.token"));
         }
         return iastServerToken;
     }
@@ -109,7 +109,7 @@ public class IastProperties {
 
     public String getBaseUrl() {
         if (null == serverUrl) {
-            serverUrl = System.getProperty("iast.server.url", cfg.getProperty("iast.server.url"));
+            serverUrl = System.getProperty("dongtai.server.url", cfg.getProperty("iast.server.url"));
         }
         return serverUrl;
     }
@@ -124,16 +124,21 @@ public class IastProperties {
     public String getProjectName() {
         if (null == projectName) {
             projectName = System.getProperty(
-                    "project.name",
+                    "dongtai.app.name",
                     System.getProperty(
                             "mse.appName",
                             System.getProperty(
                                     "arms.appName",
                                     System.getProperty(
                                             "service.name",
-                                            cfg.getProperty("project.name", "Demo Project")
+                                            System.getProperty("app.name",
+                                                    System.getProperty("projgect.name",
+                                                            cfg.getProperty("project.name", "Demo Project"))
+                                            )
+
                                     )
-                            ))
+                            )
+                    )
             );
         }
         return projectName;

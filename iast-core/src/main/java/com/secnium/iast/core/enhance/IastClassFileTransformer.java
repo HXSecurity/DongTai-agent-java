@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
+import java.net.URL;
 import java.security.CodeSource;
 import java.security.ProtectionDomain;
 import java.util.HashSet;
@@ -62,11 +63,14 @@ public class IastClassFileTransformer implements ClassFileTransformer {
      */
     @Override
     public byte[] transform(final ClassLoader loader,
-                            final String internalClassName,
-                            final Class<?> classBeingRedefined,
-                            final ProtectionDomain protectionDomain,
-                            final byte[] srcByteCodeArray) {
-        EngineManager.enterTransform();
+            final String internalClassName,
+            final Class<?> classBeingRedefined,
+            final ProtectionDomain protectionDomain,
+            final byte[] srcByteCodeArray) {
+        // if className is null, then, skip
+        if (internalClassName == null) {
+            return null;
+        }
         boolean isRunning = EngineManager.isLingzhiRunning();
         if (isRunning) {
             EngineManager.turnOffLingzhi();
@@ -79,10 +83,11 @@ public class IastClassFileTransformer implements ClassFileTransformer {
         }
 
         try {
-            if (loader != null) {
-                final CodeSource codeSource = (protectionDomain != null) ? protectionDomain.getCodeSource() : null;
-                if (codeSource != null && codeSource.getLocation() != null) {
-                    ScaScanner.scanForSCA(codeSource.getLocation().getFile(), internalClassName);
+            if (loader != null && protectionDomain != null) {
+                final CodeSource codeSource = protectionDomain.getCodeSource();
+                URL location = codeSource.getLocation();
+                if (location != null) {
+                    ScaScanner.scanForSCA(location.getFile(), internalClassName);
                 }
             }
 
@@ -128,7 +133,6 @@ public class IastClassFileTransformer implements ClassFileTransformer {
             if (isRunning) {
                 EngineManager.turnOnLingzhi();
             }
-            EngineManager.leaveTransform();
         }
 
         return null;

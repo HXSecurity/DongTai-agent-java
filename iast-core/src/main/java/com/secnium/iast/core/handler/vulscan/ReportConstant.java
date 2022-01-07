@@ -8,6 +8,7 @@ package com.secnium.iast.core.handler.vulscan;
 public class ReportConstant {
 
     public static final String REPORT_KEY = "type";
+    public static final String REPORT_TYPE = "version";
     public static final int REPORT_HEART_BEAT = 0x01;
     public static final int REPORT_SCA = 0x11;
     public static final int REPORT_SCA_BATCH = 0x12;

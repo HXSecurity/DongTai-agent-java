@@ -42,8 +42,7 @@ public class ScaScanner {
      * @param internalClassName
      */
     public static void scanForSCA(String packageFile, String internalClassName) {
-        if (internalClassName == null
-                || internalClassName.startsWith("com/secnium/iast/")
+        if (internalClassName.startsWith("com/secnium/iast/")
                 || internalClassName.startsWith("java/lang/iast/")
                 || internalClassName.startsWith("cn/huoxian/iast/")
                 || internalClassName.startsWith("com/sun/")

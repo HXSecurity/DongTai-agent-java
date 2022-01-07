@@ -17,11 +17,7 @@ public class HttpRequest {
 
     public static Map<String, Object> getRequest(Object req) {
         HttpServletRequest request = (HttpServletRequest) req;
-        try {
-            request.setCharacterEncoding("UTF-8");
-        } catch (Throwable ignored) {
 
-        }
         Map<String, Object> requestMeta = new HashMap<String, Object>(16);
         requestMeta.put("contextPath", request.getContextPath());
         requestMeta.put("servletPath", request.getServletPath());
@@ -44,7 +40,7 @@ public class HttpRequest {
 
     private static Map<String, String> getHeaders(HttpServletRequest request) {
         Enumeration<?> headerNames = request.getHeaderNames();
-        Map<String, String> headers = new HashMap<>();
+        Map<String, String> headers = new HashMap<>(32);
         while (headerNames.hasMoreElements()) {
             String name = (String) headerNames.nextElement();
             String value = request.getHeader(name);
@@ -78,6 +74,8 @@ public class HttpRequest {
                     }
                     return postBody.toString();
                 } else {
+                    // fixme: 此处导致中文乱码
+                    request.setCharacterEncoding("UTF-8");
                     Enumeration<?> parameterNames = request.getParameterNames();
                     String param;
                     boolean first = true;
