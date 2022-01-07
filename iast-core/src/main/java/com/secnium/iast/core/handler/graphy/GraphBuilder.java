@@ -90,6 +90,7 @@ public class GraphBuilder {
         JSONArray methodPool = new JSONArray();
 
         report.put(ReportConstant.REPORT_KEY, ReportConstant.REPORT_VULN_SAAS_POOL);
+        report.put(ReportConstant.REPORT_TYPE, "v2");
         report.put(ReportConstant.REPORT_VALUE_KEY, detail);
 
         detail.put(ReportConstant.AGENT_ID, EngineManager.getAgentId());
@@ -103,11 +104,13 @@ public class GraphBuilder {
         detail.put(ReportConstant.QUERY_STRING, requestMeta.get("queryString"));
         detail.put(ReportConstant.REQ_HEADER,
                 AbstractNormalVulScan.getEncodedHeader((Map<String, String>) requestMeta.get("headers")));
+        // 设置请求体
         detail.put(ReportConstant.REQ_BODY, requestMeta.get("body"));
         detail.put(ReportConstant.RES_HEADER, responseMeta == null ? ""
                 : Base64Encoder.encodeBase64String(responseMeta.get("headers").toString().getBytes())
                         .replaceAll("\n", ""));
-        detail.put(ReportConstant.RES_BODY, responseMeta == null ? "" : responseMeta.get("body"));
+        detail.put(ReportConstant.RES_BODY, responseMeta == null ? "" : Base64Encoder.encodeBase64String(
+                (byte[]) responseMeta.get("body")));
         detail.put(ReportConstant.CONTEXT_PATH, requestMeta.get("contextPath"));
         detail.put(ReportConstant.REPLAY_REQUEST, requestMeta.get("replay-request"));
 
