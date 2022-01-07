@@ -23812,7 +23812,6 @@ java/lang/management/*
 java/lang/ref/*
 java/lang/reflect/*
 java/lang/AbstractMethodError
-java/lang/AbstractStringBuilder
 java/lang/annotation/Documented
 java/lang/ApplicationShutdownHooks
 java/lang/ApplicationShutdownHooks$1
@@ -34566,6 +34565,7 @@ org/apache/logging/log4j/Marker
 org/apache/logging/log4j/MarkerManager
 org/apache/logging/log4j/MarkerManager$Log4jMarker
 org/apache/logging/log4j/ThreadContext$ContextStack
+org/apache/logging/log4j/ThreadContext$EmptyThreadContextStack
 org/apache/logging/log4j/core/AbstractLifeCycle
 org/apache/logging/log4j/core/Appender
 org/apache/logging/log4j/core/ErrorHandler
@@ -34751,7 +34751,6 @@ org/apache/logging/log4j/core/lookup/EnvironmentLookup
 org/apache/logging/log4j/core/lookup/Interpolator
 org/apache/logging/log4j/core/lookup/JavaLookup
 org/apache/logging/log4j/core/lookup/JmxRuntimeInputArgumentsLookup
-org/apache/logging/log4j/core/lookup/JndiLookup
 org/apache/logging/log4j/core/lookup/Log4jLookup
 org/apache/logging/log4j/core/lookup/MainMapLookup
 org/apache/logging/log4j/core/lookup/MapLookup
