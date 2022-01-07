@@ -4,7 +4,7 @@ package com.secnium.iast.agent;
  * @author dongzhiyong@huoxian.cn
  */
 public class Constant {
-    public static final String AGENT_VERSION_VALUE = "v1.2.0";
+    public static final String AGENT_VERSION_VALUE = "v1.3.0";
     public static final String LANGUAGE = "JAVA";
 
     public final static String API_AGENT_REGISTER = "/api/v1/agent/register";
