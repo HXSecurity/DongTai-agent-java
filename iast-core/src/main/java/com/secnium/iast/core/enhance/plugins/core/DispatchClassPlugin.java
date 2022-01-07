@@ -13,7 +13,6 @@ import com.secnium.iast.core.handler.models.IastHookRuleModel;
 import com.secnium.iast.core.handler.models.IastSinkModel;
 import com.secnium.iast.core.handler.vulscan.VulnType;
 import com.secnium.iast.core.util.AsmUtils;
-import com.secnium.iast.core.util.matcher.ConfigMatcher;
 import com.secnium.iast.core.util.matcher.Method;
 
 import java.lang.reflect.Modifier;

@@ -6,7 +6,6 @@ import com.secnium.iast.core.engines.IEngine;
 
 import com.secnium.iast.log.DongTaiLog;
 import java.lang.instrument.Instrumentation;
-import org.slf4j.Logger;
 
 /**
  * @author dongzhiyong@huoxian.cn
