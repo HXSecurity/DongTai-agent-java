@@ -23,7 +23,7 @@ public class CryptoBadMacVulScan extends AbstractNormalVulScan {
         Asserts.NOT_NULL("sink.mac.params", arguments);
 
         Matcher matcher;
-        for (Integer pos : taintPos) {
+        for (int pos : taintPos) {
             try {
                 matcher = GOOD_MAC_PAT.matcher((CharSequence) arguments[pos]);
                 if (matcher.find()) {

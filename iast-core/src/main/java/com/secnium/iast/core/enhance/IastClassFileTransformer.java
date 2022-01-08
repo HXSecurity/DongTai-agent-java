@@ -23,6 +23,7 @@ import java.security.ProtectionDomain;
 import java.util.HashSet;
 import java.util.List;
 
+import java.util.Set;
 import org.apache.commons.lang3.time.StopWatch;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
@@ -102,7 +103,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                 final String className = cr.getClassName();
                 COMMON_UTILS.setLoader(loader);
                 COMMON_UTILS.saveAncestors(className, superName, interfaces);
-                HashSet<String> ancestors = COMMON_UTILS.getAncestors(className, superName, interfaces);
+                Set<String> ancestors = COMMON_UTILS.getAncestors(className, superName, interfaces);
 
                 final ClassWriter cw = createClassWriter(loader, cr);
                 ClassVisitor cv = plugins.initial(cw, IastContext.build(className, ancestors, interfaces,

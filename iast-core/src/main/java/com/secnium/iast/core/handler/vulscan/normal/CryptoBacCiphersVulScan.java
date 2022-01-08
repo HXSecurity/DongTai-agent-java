@@ -23,7 +23,7 @@ public class CryptoBacCiphersVulScan extends AbstractNormalVulScan {
         Asserts.NOT_NULL("sink.params.value", arguments);
 
         Matcher matcher;
-        for (Integer pos : taintPos) {
+        for (int pos : taintPos) {
             try {
                 matcher = GOOD_CIPHERS.matcher((CharSequence) arguments[pos]);
                 if (matcher.find()) {

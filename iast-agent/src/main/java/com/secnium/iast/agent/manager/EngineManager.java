@@ -143,6 +143,7 @@ public class EngineManager {
                 fileOutputStream.write(dataBuffer, 0, bytesRead);
             }
             DongTaiLog.info("The remote file " + fileUrl + " was successfully written to the local cache.");
+            fileOutputStream.close();
             status = true;
         } catch (Exception ignore) {
             DongTaiLog.error("The remote file " + fileUrl + " download failure, please check the iast-token.");

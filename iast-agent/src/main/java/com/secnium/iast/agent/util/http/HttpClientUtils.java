@@ -34,7 +34,6 @@ public class HttpClientUtils {
     private final static IastProperties PROPERTIES = IastProperties.getInstance();
     private final static Proxy PROXY = loadProxy();
 
-//    private static final Logger logger = LogUtils.getLogger(HttpClientUtils.class);
 
     public static StringBuilder sendGet(String uri, String arg, String value) {
         try {
@@ -73,8 +72,8 @@ public class HttpClientUtils {
                 connection = proxy == null ? (HttpURLConnection) url.openConnection()
                         : (HttpURLConnection) url.openConnection(proxy);
             }
-            connection.setReadTimeout(10*1000);
-            connection.setConnectTimeout(10*1000);
+            connection.setReadTimeout(10 * 1000);
+            connection.setConnectTimeout(10 * 1000);
 
             connection.setRequestMethod(method.name());
             if (HttpMethods.POST.equals(method)) {

@@ -57,7 +57,9 @@ public class PropertyUtils {
             File propertiesFile = new File(propertiesFilePath);
             if (propertiesFile.exists()) {
                 cfg = new Properties();
-                cfg.load(new FileInputStream(propertiesFile));
+                FileInputStream fis = new FileInputStream(propertiesFile);
+                cfg.load(fis);
+                fis.close();
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();

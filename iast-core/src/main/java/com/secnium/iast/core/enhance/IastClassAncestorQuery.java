@@ -66,8 +66,8 @@ public class IastClassAncestorQuery {
      * @param interfaces     当前类实现的接口列表
      * @return 当前类的类族
      */
-    public synchronized HashSet<String> getAncestors(String className, String superClassName, String[] interfaces) {
-        HashSet<String> ancestors = (HashSet<String>) this.classAncestorMap.get(className);
+    public synchronized Set<String> getAncestors(String className, String superClassName, String[] interfaces) {
+        Set<String> ancestors = this.classAncestorMap.get(className);
 
         if (!isNullOrEmpty(superClassName) && !BASE_CLASS.equals(superClassName)) {
             addClassToAncestor(superClassName, ancestors);
