@@ -15,7 +15,7 @@ public class CookieFlagsMissingVulScan extends AbstractNormalVulScan {
         Asserts.NOT_NULL("sink.params.position", sink.getPos());
         Asserts.NOT_NULL("sink.params.value", event.argumentArray);
 
-        for (Integer pos : taintPos) {
+        for (int pos : taintPos) {
             try {
                 Boolean flag = (Boolean) arguments[pos];
                 if (flag) {
