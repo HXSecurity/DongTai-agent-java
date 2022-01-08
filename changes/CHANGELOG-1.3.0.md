@@ -12,10 +12,4 @@ Release Notes.
 * Add log by @Nizernizer in https://github.com/HXSecurity/DongTai-agent-java/pull/216
 
 **Contributors**
-
 @Nizernizer, @wayswei and @exexute
-
-
-------------------
-
-Find change logs of all versions [here](changes).
