@@ -133,9 +133,9 @@ public class ScaScanner {
         public void scanClassPath(String packagesPath) {
             String osName = System.getProperty("os.name").toLowerCase();
             String[] packages;
-            if (osName.contains("windows")){
+            if (osName.contains("windows")) {
                 packages = packagesPath.split(";");
-            }else {
+            } else {
                 packages = packagesPath.split(":");
             }
             for (String packagePath : packages) {
@@ -165,6 +165,7 @@ public class ScaScanner {
             try {
                 JarFile file = new JarFile(packagePath);
                 Enumeration<JarEntry> entries = file.entries();
+                file.close();
                 String entryName;
                 while (entries.hasMoreElements()) {
                     JarEntry entry = entries.nextElement();

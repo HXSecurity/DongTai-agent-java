@@ -22,7 +22,7 @@ public class IastClassLoader extends URLClassLoader {
     private final String path;
 
     public IastClassLoader(final String namespace,
-                           final String jarFilePath) throws MalformedURLException {
+            final String jarFilePath) throws MalformedURLException {
         super(new URL[]{new URL("file:" + jarFilePath)});
         this.path = jarFilePath;
         this.toString = String.format("IastClassLoader[namespace=%s;path=%s;]", namespace, path);
@@ -55,7 +55,6 @@ public class IastClassLoader extends URLClassLoader {
             return loadedClass;
         }
 
-
         try {
             Class<?> aClass = findClass(name);
             if (resolve) {
@@ -75,7 +74,7 @@ public class IastClassLoader extends URLClassLoader {
 
     @SuppressWarnings("unused")
     public void closeIfPossible() {
-
+        // JDK6版本的 URLClassLoader 未继承Closeable接口，无法自动关闭，需要手动释放
         if (this instanceof Closeable) {
             try {
                 ((Closeable) this).close();
@@ -84,17 +83,18 @@ public class IastClassLoader extends URLClassLoader {
             return;
         }
 
-
         // 对于JDK6的版本，URLClassLoader要关闭起来就显得有点麻烦，这里弄了一大段代码来稍微处理下
         // 而且还不能保证一定释放干净了，至少释放JAR文件句柄是没有什么问题了
         try {
             final Object sun_misc_URLClassPath = forceGetDeclaredFieldValue(URLClassLoader.class, "ucp", this);
-            final Object java_util_Collection = forceGetDeclaredFieldValue(sun_misc_URLClassPath.getClass(), "loaders", sun_misc_URLClassPath);
+            final Object java_util_Collection = forceGetDeclaredFieldValue(sun_misc_URLClassPath.getClass(), "loaders",
+                    sun_misc_URLClassPath);
 
             for (final Object sun_misc_URLClassPath_JarLoader :
                     ((Collection) java_util_Collection).toArray()) {
                 try {
-                    final JarFile java_util_jar_JarFile = forceGetDeclaredFieldValue(sun_misc_URLClassPath_JarLoader.getClass(), "jar", sun_misc_URLClassPath_JarLoader);
+                    final JarFile java_util_jar_JarFile = forceGetDeclaredFieldValue(
+                            sun_misc_URLClassPath_JarLoader.getClass(), "jar", sun_misc_URLClassPath_JarLoader);
                     java_util_jar_JarFile.close();
                 } catch (Throwable t) {
                     // if we got this far, this is probably not a JAR loader so skip it
@@ -107,7 +107,8 @@ public class IastClassLoader extends URLClassLoader {
 
     }
 
-    private <T> T forceGetDeclaredFieldValue(Class<?> clazz, String name, Object target) throws NoSuchFieldException, IllegalAccessException {
+    private <T> T forceGetDeclaredFieldValue(Class<?> clazz, String name, Object target)
+            throws NoSuchFieldException, IllegalAccessException {
         final Field field = clazz.getDeclaredField(name);
         field.setAccessible(true);
         return (T) field.get(target);

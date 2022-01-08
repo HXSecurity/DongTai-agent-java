@@ -26368,7 +26368,6 @@ javax/naming/CompoundName
 javax/naming/ConfigurationException
 javax/naming/Context
 javax/naming/ContextNotEmptyException
-javax/naming/InitialContext
 javax/naming/InvalidNameException
 javax/naming/LinkException
 javax/naming/LinkRef
