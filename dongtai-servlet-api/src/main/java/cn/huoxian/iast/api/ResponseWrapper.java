@@ -1,25 +1,27 @@
 package cn.huoxian.iast.api;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponseWrapper;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
 
 /**
  * @author dongzhiyong@huoxian.cn
  */
 public class ResponseWrapper extends HttpServletResponseWrapper {
-    private ServletOutputStream outputStream;
-    private PrintWriter writer;
-    private WrapperOutputStreamCopier copier;
+
+    private ServletOutputStream outputStream = null;
+    private PrintWriter writer = null;
+    private WrapperOutputStreamCopier copier = null;
 
     public static Object cloneResponse(Object response) {
-        if (response instanceof HttpServletResponse) {
-            return new ResponseWrapper((HttpServletResponse) response);
-        }
         return response;
+//        if (response instanceof HttpServletResponse) {
+//            return new ResponseWrapper((HttpServletResponse) response);
+//        }
+//        return response;
     }
 
     public ResponseWrapper(HttpServletResponse response) {

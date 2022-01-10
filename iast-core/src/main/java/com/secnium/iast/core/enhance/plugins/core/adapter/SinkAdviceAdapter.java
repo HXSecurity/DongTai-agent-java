@@ -48,7 +48,6 @@ public class SinkAdviceAdapter extends AbstractAdviceAdapter {
      * 进入sink方法的字节码
      */
     private void enterSink() {
-        push(context.getNamespace());
         invokeStatic(ASM_TYPE_SPY, ASM_METHOD_Spy$enterSink);
     }
 
@@ -56,7 +55,6 @@ public class SinkAdviceAdapter extends AbstractAdviceAdapter {
      * 判断是否位于顶级sink方法的字节码
      */
     private void isTopLevelSink() {
-        push(context.getNamespace());
         invokeStatic(ASM_TYPE_SPY, ASM_METHOD_Spy$isFirstLevelSink);
     }
 
@@ -64,7 +62,6 @@ public class SinkAdviceAdapter extends AbstractAdviceAdapter {
      * 判断是否进入http且具有污点 isTopLevelSink()
      */
     private void hasTaint() {
-        push(context.getNamespace());
         invokeStatic(ASM_TYPE_SPY, ASM_METHOD_Spy$hasTaint);
     }
 
@@ -72,7 +69,6 @@ public class SinkAdviceAdapter extends AbstractAdviceAdapter {
      * 离开sink方法的字节码
      */
     private void leaveSink() {
-        push(context.getNamespace());
         invokeStatic(ASM_TYPE_SPY, ASM_METHOD_Spy$leaveSink);
     }
 }

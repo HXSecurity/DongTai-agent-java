@@ -24,7 +24,6 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <includes>
-                    <include>logback-dongtai.xml</include>
                     <include>dongtai-servlet.jar</include>
                     <include>**/version</include>
                     <include>**/logo</include>

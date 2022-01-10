@@ -39,17 +39,14 @@ public class SourceAdviceAdapter extends AbstractAdviceAdapter {
     }
 
     private void enterSource() {
-        push(context.getNamespace());
         invokeStatic(ASM_TYPE_SPY, ASM_METHOD_Spy$enterSource);
     }
 
     private void leaveSource() {
-        push(context.getNamespace());
         invokeStatic(ASM_TYPE_SPY, ASM_METHOD_Spy$leaveSource);
     }
 
     private void isFirstLevelSource() {
-        push(context.getNamespace());
         invokeStatic(ASM_TYPE_SPY, ASM_METHOD_Spy$isFirstLevelSource);
     }
 }

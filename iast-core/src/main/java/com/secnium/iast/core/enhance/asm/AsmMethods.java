@@ -25,54 +25,54 @@ public interface AsmMethods {
     }
 
     /**
-     * asm method of {@link Injecter#spyMethodOnBefore(Object, Object[], String, String, String, String, String, String,
-     * Object, String, boolean, int)}
+     * asm method of {@link #spyMethodOnBefore(Object, Object[], String, String, String, String, Object, String,
+     * boolean, int)}
      */
     Method ASM_METHOD_Spy$spyMethodOnBefore = InnerHelper.getAsmMethod(
             Injecter.class,
             "spyMethodOnBefore",
             Object.class, Object[].class, String.class, String.class, String.class, String.class, String.class,
-            String.class, Object.class, String.class, boolean.class, int.class
+            Object.class, String.class, boolean.class, int.class
     );
 
     /**
-     * asm method of {@link Injecter#spyMethodOnReturn(Object, String, int)}
+     * asm method of {@link #spyMethodOnReturn(Object, int)}
      */
     Method ASM_METHOD_Spy$spyMethodOnReturn = InnerHelper.getAsmMethod(
             Injecter.class,
             "spyMethodOnReturn",
-            Object.class, String.class, int.class
+            Object.class,
+            int.class
     );
 
     /**
-     * asm method of {@link Injecter#spyMethodOnThrows(Throwable, String, int)}
+     * asm method of {@link #spyMethodOnThrows(Throwable, int)}
      */
     Method ASM_METHOD_Spy$spyMethodOnThrows = InnerHelper.getAsmMethod(
             Injecter.class,
             "spyMethodOnThrows",
-            Throwable.class, String.class, int.class
+            Throwable.class,
+            int.class
     );
 
     /**
-     * asm method of {@link Injecter#spyMethodEnterPropagator(String)}
+     * asm method of {@link #spyMethodEnterPropagator()}
      */
     Method ASM_METHOD_Spy$spyMethodEnterPropagator = InnerHelper.getAsmMethod(
             Injecter.class,
-            "spyMethodEnterPropagator",
-            String.class
+            "spyMethodEnterPropagator"
     );
 
     /**
-     * asm method of {@link Injecter#spyMethodLeavePropagator(String)}
+     * asm method of {@link #spyMethodLeavePropagator()}
      */
     Method ASM_METHOD_Spy$spyMethodLeavePropagator = InnerHelper.getAsmMethod(
             Injecter.class,
-            "spyMethodLeavePropagator",
-            String.class
+            "spyMethodLeavePropagator"
     );
 
     /**
-     * asm method of {@link Injecter#isFirstLevelPropagator(String)}
+     * asm method of {@link #isFirstLevelPropagator()}
      */
     Method ASM_METHOD_Spy$isFirstLevelPropagator = InnerHelper.getAsmMethod(
             Injecter.class,
@@ -81,150 +81,134 @@ public interface AsmMethods {
     );
 
     /**
-     * asm method of {@link Injecter#enterSink(String)}
+     * asm method of {@link #enterSink()}
      */
     Method ASM_METHOD_Spy$enterSink = InnerHelper.getAsmMethod(
             Injecter.class,
-            "enterSink",
-            String.class
+            "enterSink"
     );
 
     /**
-     * asm method of {@link Injecter#leaveSink(String)}
+     * asm method of {@link #leaveSink()}
      */
     Method ASM_METHOD_Spy$leaveSink = InnerHelper.getAsmMethod(
             Injecter.class,
-            "leaveSink",
-            String.class
+            "leaveSink"
     );
 
     /**
-     * asm method of {@link Injecter#isFirstLevelSink(String)}
+     * asm method of {@link #isFirstLevelSink()}
      */
     Method ASM_METHOD_Spy$isFirstLevelSink = InnerHelper.getAsmMethod(
             Injecter.class,
-            "isFirstLevelSink",
-            String.class
+            "isFirstLevelSink"
     );
 
     Method ASM_METHOD_Spy$hasTaint = InnerHelper.getAsmMethod(
             Injecter.class,
-            "hasTaint",
-            String.class
+            "hasTaint"
     );
 
     /**
-     * asm method of {@link Injecter#enterSource(String)}
+     * asm method of {@link #enterSource()}
      */
     Method ASM_METHOD_Spy$enterSource = InnerHelper.getAsmMethod(
             Injecter.class,
-            "enterSource",
-            String.class
+            "enterSource"
     );
 
     /**
-     * asm method of {@link Injecter#leaveSource(String)}
+     * asm method of {@link #leaveSource()}
      */
     Method ASM_METHOD_Spy$leaveSource = InnerHelper.getAsmMethod(
             Injecter.class,
-            "leaveSource",
-            String.class
+            "leaveSource"
     );
 
     /**
-     * asm method of {@link Injecter#isFirstLevelSource(String)}
+     * asm method of {@link #isFirstLevelSource()}
      */
     Method ASM_METHOD_Spy$isFirstLevelSource = InnerHelper.getAsmMethod(
             Injecter.class,
-            "isFirstLevelSource",
-            String.class
+            "isFirstLevelSource"
     );
 
     /**
-     * asm method of {@link Injecter#enterHttp(String)}
+     * asm method of {@link #enterHttp()}
      */
     Method ASM_METHOD_Spy$enterHttp = InnerHelper.getAsmMethod(
             Injecter.class,
-            "enterHttp",
-            String.class
+            "enterHttp"
     );
 
     /**
-     * asm method of {@link Injecter#leaveHttp(String, Object)}
+     * asm method of {@link #leaveHttp(Object)}
      */
     Method ASM_METHOD_Spy$leaveHttp = InnerHelper.getAsmMethod(
             Injecter.class,
             "leaveHttp",
-            String.class,
             Object.class
     );
 
     /**
-     * asm method of {@link Injecter#isFirstLevelHttp(String)}
+     * asm method of {@link #isFirstLevelHttp()}
      */
     Method ASM_METHOD_Spy$isFirstLevelHttp = InnerHelper.getAsmMethod(
             Injecter.class,
-            "isFirstLevelHttp",
-            String.class
+            "isFirstLevelHttp"
     );
 
     /**
-     * asm method of {@link Injecter#cloneRequest(String, Object, boolean)}
+     * asm method of {@link #cloneRequest(Object, boolean)}
      */
     Method ASM_METHOD_Spy$cloneRequest = InnerHelper.getAsmMethod(
             Injecter.class,
             "cloneRequest",
-            String.class,
             Object.class,
             boolean.class
     );
 
     Method ASM_METHOD_Spy$isReplayRequest = InnerHelper.getAsmMethod(
             Injecter.class,
-            "isReplayRequest",
-            String.class
+            "isReplayRequest"
     );
 
     Method ASM_METHOD_Spy$cloneResponse = InnerHelper.getAsmMethod(
             Injecter.class,
             "cloneResponse",
-            String.class,
             Object.class,
             boolean.class
     );
 
 
     /**
-     * asm method of {@link Injecter#enterDubbo(String)}
+     * asm method of {@link #enterDubbo()}
      *
      * @since 1.2.0
      */
     Method ASM_METHOD_Spy$enterDubbo = InnerHelper.getAsmMethod(
             Injecter.class,
-            "enterDubbo",
-            String.class
+            "enterDubbo"
     );
 
     /**
-     * asm method of {@link Injecter#leaveDubbo(String)}
+     * asm method of {@link #leaveDubbo()}
      *
      * @since 1.2.0
      */
     Method ASM_METHOD_Spy$leaveDubbo = InnerHelper.getAsmMethod(
             Injecter.class,
-            "leaveDubbo",
-            String.class
+            "leaveDubbo"
     );
 
     /**
-     * asm method of {@link Injecter#isFirstLevelDubbo(String)}
+     * asm method of {@link #isFirstLevelDubbo()}
      *
      * @since 1.2.0
      */
     Method ASM_METHOD_Spy$isFirstLevelDubbo = InnerHelper.getAsmMethod(
             Injecter.class,
-            "isFirstLevelDubbo",
-            String.class
+            "isFirstLevelDubbo"
     );
 
 }
