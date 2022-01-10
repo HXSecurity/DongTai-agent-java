@@ -31,7 +31,6 @@ public class PropagateAdviceAdapter extends AbstractAdviceAdapter {
             if (!ENABLE_ALL_HOOK) {
                 Label elseLabel = new Label();
                 Label endLabel = new Label();
-                push(context.getNamespace());
                 invokeStatic(ASM_TYPE_SPY, ASM_METHOD_Spy$isFirstLevelPropagator);
                 mv.visitJumpInsn(EQ, elseLabel);
                 captureMethodState(opcode, HookType.PROPAGATOR.getValue(), true);
@@ -47,12 +46,10 @@ public class PropagateAdviceAdapter extends AbstractAdviceAdapter {
     }
 
     private void enterPropagator() {
-        push(context.getNamespace());
         invokeStatic(ASM_TYPE_SPY, ASM_METHOD_Spy$spyMethodEnterPropagator);
     }
 
     private void leavePropagator() {
-        push(context.getNamespace());
         invokeStatic(ASM_TYPE_SPY, ASM_METHOD_Spy$spyMethodLeavePropagator);
     }
 }

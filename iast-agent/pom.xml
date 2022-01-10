@@ -112,10 +112,6 @@
                                     <pattern>org.apache.commons</pattern>
                                     <shadedPattern>${shade-prefix}.org.apache.commons</shadedPattern>
                                 </relocation>
-                                <relocation>
-                                    <pattern>org.slf4j</pattern>
-                                    <shadedPattern>${shade-prefix}.org.slf4j</shadedPattern>
-                                </relocation>
                             </relocations>
 
                             <filters>

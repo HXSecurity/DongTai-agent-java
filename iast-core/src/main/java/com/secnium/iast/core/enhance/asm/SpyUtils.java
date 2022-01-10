@@ -23,12 +23,11 @@ public class SpyUtils {
     public synchronized static void init(final String namespace) {
         EngineManager.SCOPE_TRACKER.set(new TrackerHelper());
         // 注册接口单例对象，将各模块的实现类传递进去
-        if (Injecter.isInit(namespace)) {
+        if (Injecter.isInit()) {
             return;
         }
 
         Injecter.init(
-                namespace,
                 unCaughtGetClassDeclaredJavaMethod(EventListenerHandlers.class, "onBefore",
                         String.class,
                         String.class,
@@ -82,7 +81,7 @@ public class SpyUtils {
      * @param namespace 命名空间
      */
     public synchronized static void clean(final String namespace) {
-        Injecter.clean(namespace);
+        Injecter.clean();
     }
 
 }

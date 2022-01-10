@@ -2,9 +2,6 @@ package java.lang.iast.inject;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * 间谍类，藏匿在各个ClassLoader中
@@ -20,28 +17,25 @@ public class Injecter {
 
     private static final Class<Ret> SPY_RET_CLASS = Ret.class;
 
-    private static final Map<String, MethodHook> NAMESPACE_METHOD_HOOK_MAP
-            = new ConcurrentHashMap<String, MethodHook>();
+    private static MethodHook METHOD_HOOK_HANDLER;
 
     /**
      * 判断间谍类是否已经完成初始化
      *
-     * @param namespace 命名空间
      * @return TRUE:已完成初始化;FALSE:未完成初始化;
      */
-    public static boolean isInit(final String namespace) {
-        return NAMESPACE_METHOD_HOOK_MAP.containsKey(namespace);
+    public static boolean isInit() {
+        return null != METHOD_HOOK_HANDLER;
     }
 
     /**
      * 初始化间谍
      *
-     * @param namespace        命名空间
      * @param ON_BEFORE_METHOD ON_BEFORE 回调
      * @param ON_RETURN_METHOD ON_RETURN 回调
      * @param ON_THROWS_METHOD ON_THROWS 回调
      */
-    public static void init(final String namespace,
+    public static void init(
             final Method ON_BEFORE_METHOD,
             final Method ON_RETURN_METHOD,
             final Method ON_THROWS_METHOD,
@@ -65,43 +59,41 @@ public class Injecter {
             final Method LEAVE_DUBBO,
             final Method IS_FIRST_LEVEL_DUBBO
     ) {
-        NAMESPACE_METHOD_HOOK_MAP.put(
-                namespace,
-                new MethodHook(
-                        ON_BEFORE_METHOD,
-                        ON_RETURN_METHOD,
-                        ON_THROWS_METHOD,
-                        ENTER_PROPAGATOR,
-                        LEAVE_PROPAGATOR,
-                        IS_FIRST_LEVEL_PROPAGATOR,
-                        ENTER_SOURCE,
-                        LEAVE_SOURCE,
-                        IS_FIRST_LEVEL_SOURCE,
-                        ENTER_SINK,
-                        LEAVE_SINK,
-                        IS_FIRST_LEVEL_SINK,
-                        ENTER_HTTP,
-                        LEAVE_HTTP,
-                        IS_FIRST_LEVEL_HTTP,
-                        HAS_TAINT,
-                        CLONE_REQUEST,
-                        IS_REPLAY_REQUEST,
-                        CLONE_RESPONSE,
-                        ENTER_DUBBO,
-                        LEAVE_DUBBO,
-                        IS_FIRST_LEVEL_DUBBO
-                )
+        if (null == METHOD_HOOK_HANDLER) {
+            return;
+        }
+        METHOD_HOOK_HANDLER = new MethodHook(
+                ON_BEFORE_METHOD,
+                ON_RETURN_METHOD,
+                ON_THROWS_METHOD,
+                ENTER_PROPAGATOR,
+                LEAVE_PROPAGATOR,
+                IS_FIRST_LEVEL_PROPAGATOR,
+                ENTER_SOURCE,
+                LEAVE_SOURCE,
+                IS_FIRST_LEVEL_SOURCE,
+                ENTER_SINK,
+                LEAVE_SINK,
+                IS_FIRST_LEVEL_SINK,
+                ENTER_HTTP,
+                LEAVE_HTTP,
+                IS_FIRST_LEVEL_HTTP,
+                HAS_TAINT,
+                CLONE_REQUEST,
+                IS_REPLAY_REQUEST,
+                CLONE_RESPONSE,
+                ENTER_DUBBO,
+                LEAVE_DUBBO,
+                IS_FIRST_LEVEL_DUBBO
         );
     }
 
     /**
      * 清理间谍钩子方法
      *
-     * @param namespace 命名空间
      */
-    public static void clean(final String namespace) {
-        NAMESPACE_METHOD_HOOK_MAP.remove(namespace);
-
+    public static void clean() {
+        METHOD_HOOK_HANDLER = null;
     }
 
 
@@ -115,7 +107,6 @@ public class Injecter {
 
     public static void spyMethodOnBefore(final Object retValue,
             final Object[] argumentArray,
-            final String namespace,
             final String framework,
             final String javaClassName,
             final String matchClassName,
@@ -124,13 +115,12 @@ public class Injecter {
             final Object target,
             final String signCode,
             final boolean isStatic,
-            final int hookType) throws Throwable {
+            final int METHOD_HOOK_HANDLERType) throws Throwable {
         try {
-            final MethodHook hook = NAMESPACE_METHOD_HOOK_MAP.get(namespace);
-            if (null != hook) {
-                hook.ON_BEFORE_METHOD
+            if (null != METHOD_HOOK_HANDLER) {
+                METHOD_HOOK_HANDLER.ON_BEFORE_METHOD
                         .invoke(null, framework, javaClassName, matchClassName, javaMethodName, javaMethodDesc,
-                                target, argumentArray, retValue, signCode, isStatic, hookType);
+                                target, argumentArray, retValue, signCode, isStatic, METHOD_HOOK_HANDLERType);
             }
         } catch (Throwable cause) {
             handleException(cause);
@@ -138,13 +128,12 @@ public class Injecter {
     }
 
     public static void spyMethodOnReturn(final Object retValue,
-            final String namespace,
             final int listenerId
     ) throws Throwable {
         try {
-            final MethodHook hook = NAMESPACE_METHOD_HOOK_MAP.get(namespace);
-            if (null != hook) {
-                hook.ON_RETURN_METHOD.invoke(null, listenerId, SPY_RET_CLASS, retValue);
+
+            if (null != METHOD_HOOK_HANDLER) {
+                METHOD_HOOK_HANDLER.ON_RETURN_METHOD.invoke(null, listenerId, SPY_RET_CLASS, retValue);
             }
         } catch (Throwable cause) {
             handleException(cause);
@@ -152,25 +141,24 @@ public class Injecter {
     }
 
     public static Ret spyMethodOnThrows(final Throwable throwable,
-            final String namespace,
             final int listenerId) throws Throwable {
         try {
-            final MethodHook hook = NAMESPACE_METHOD_HOOK_MAP.get(namespace);
-            if (null == hook) {
+
+            if (null == METHOD_HOOK_HANDLER) {
                 return Ret.RET_NONE;
             }
-            return (Ret) hook.ON_THROWS_METHOD.invoke(null, listenerId, SPY_RET_CLASS, throwable);
+            return (Ret) METHOD_HOOK_HANDLER.ON_THROWS_METHOD.invoke(null, listenerId, SPY_RET_CLASS, throwable);
         } catch (Throwable cause) {
             handleException(cause);
             return Ret.RET_NONE;
         }
     }
 
-    public static void spyMethodEnterPropagator(final String namespace) {
+    public static void spyMethodEnterPropagator() {
         try {
-            final MethodHook hook = NAMESPACE_METHOD_HOOK_MAP.get(namespace);
-            if (null != hook) {
-                hook.ENTER_PROPAGATOR.invoke(null);
+
+            if (null != METHOD_HOOK_HANDLER) {
+                METHOD_HOOK_HANDLER.ENTER_PROPAGATOR.invoke(null);
             }
         } catch (IllegalAccessException e) {
             e.printStackTrace();
@@ -179,11 +167,11 @@ public class Injecter {
         }
     }
 
-    public static void spyMethodLeavePropagator(final String namespace) {
+    public static void spyMethodLeavePropagator() {
         try {
-            final MethodHook hook = NAMESPACE_METHOD_HOOK_MAP.get(namespace);
-            if (null != hook) {
-                hook.LEAVE_PROPAGATOR.invoke(null);
+
+            if (null != METHOD_HOOK_HANDLER) {
+                METHOD_HOOK_HANDLER.LEAVE_PROPAGATOR.invoke(null);
             }
         } catch (IllegalAccessException e) {
             e.printStackTrace();
@@ -192,40 +180,11 @@ public class Injecter {
         }
     }
 
-    public static boolean isFirstLevelPropagator(final String namespace) {
+    public static boolean isFirstLevelPropagator() {
         try {
-            final MethodHook hook = NAMESPACE_METHOD_HOOK_MAP.get(namespace);
-            if (null != hook) {
-                return (Boolean) hook.IS_TOP_LEVEL_PROPAGATOR.invoke(null);
-            }
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
 
-    public static boolean isFirstLevelSink(final String namespace) {
-        try {
-            final MethodHook hook = NAMESPACE_METHOD_HOOK_MAP.get(namespace);
-            if (null != hook) {
-                return (Boolean) hook.IS_TOP_LEVEL_SINK.invoke(null);
-            }
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
-
-        return false;
-    }
-
-    public static boolean hasTaint(final String namespace) {
-        try {
-            final MethodHook hook = NAMESPACE_METHOD_HOOK_MAP.get(namespace);
-            if (null != hook) {
-                return (Boolean) hook.HAS_TAINT.invoke(null);
+            if (null != METHOD_HOOK_HANDLER) {
+                return (Boolean) METHOD_HOOK_HANDLER.IS_TOP_LEVEL_PROPAGATOR.invoke(null);
             }
         } catch (IllegalAccessException e) {
             e.printStackTrace();
@@ -235,37 +194,26 @@ public class Injecter {
         return false;
     }
 
-    public static void enterSink(final String namespace) {
+    public static boolean isFirstLevelSink() {
         try {
-            final MethodHook hook = NAMESPACE_METHOD_HOOK_MAP.get(namespace);
-            if (null != hook) {
-                hook.ENTER_SINK.invoke(null);
+
+            if (null != METHOD_HOOK_HANDLER) {
+                return (Boolean) METHOD_HOOK_HANDLER.IS_TOP_LEVEL_SINK.invoke(null);
             }
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (InvocationTargetException e) {
             e.printStackTrace();
         }
+
+        return false;
     }
 
-    public static void leaveSink(final String namespace) {
+    public static boolean hasTaint() {
         try {
-            final MethodHook hook = NAMESPACE_METHOD_HOOK_MAP.get(namespace);
-            if (null != hook) {
-                hook.LEAVE_SINK.invoke(null);
-            }
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
-    }
 
-    public static boolean isFirstLevelSource(final String namespace) {
-        try {
-            final MethodHook hook = NAMESPACE_METHOD_HOOK_MAP.get(namespace);
-            if (null != hook) {
-                return (Boolean) hook.IS_TOP_LEVEL_SOURCE.invoke(null);
+            if (null != METHOD_HOOK_HANDLER) {
+                return (Boolean) METHOD_HOOK_HANDLER.HAS_TAINT.invoke(null);
             }
         } catch (IllegalAccessException e) {
             e.printStackTrace();
@@ -275,11 +223,11 @@ public class Injecter {
         return false;
     }
 
-    public static void enterSource(final String namespace) {
+    public static void enterSink() {
         try {
-            final MethodHook hook = NAMESPACE_METHOD_HOOK_MAP.get(namespace);
-            if (null != hook) {
-                hook.ENTER_SOURCE.invoke(null);
+
+            if (null != METHOD_HOOK_HANDLER) {
+                METHOD_HOOK_HANDLER.ENTER_SINK.invoke(null);
             }
         } catch (IllegalAccessException e) {
             e.printStackTrace();
@@ -288,11 +236,11 @@ public class Injecter {
         }
     }
 
-    public static void leaveSource(final String namespace) {
+    public static void leaveSink() {
         try {
-            final MethodHook hook = NAMESPACE_METHOD_HOOK_MAP.get(namespace);
-            if (null != hook) {
-                hook.LEAVE_SOURCE.invoke(null);
+
+            if (null != METHOD_HOOK_HANDLER) {
+                METHOD_HOOK_HANDLER.LEAVE_SINK.invoke(null);
             }
         } catch (IllegalAccessException e) {
             e.printStackTrace();
@@ -301,11 +249,24 @@ public class Injecter {
         }
     }
 
-    public static void enterHttp(final String namespace) {
+    public static boolean isFirstLevelSource() {
         try {
-            final MethodHook hook = NAMESPACE_METHOD_HOOK_MAP.get(namespace);
-            if (null != hook) {
-                hook.ENTER_HTTP.invoke(null);
+
+            if (null != METHOD_HOOK_HANDLER) {
+                return (Boolean) METHOD_HOOK_HANDLER.IS_TOP_LEVEL_SOURCE.invoke(null);
+            }
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public static void enterSource() {
+        try {
+            if (null != METHOD_HOOK_HANDLER) {
+                METHOD_HOOK_HANDLER.ENTER_SOURCE.invoke(null);
             }
         } catch (IllegalAccessException e) {
             e.printStackTrace();
@@ -314,11 +275,11 @@ public class Injecter {
         }
     }
 
-    public static void leaveHttp(final String namespace, final Object response) {
+    public static void leaveSource() {
         try {
-            final MethodHook hook = NAMESPACE_METHOD_HOOK_MAP.get(namespace);
-            if (null != hook) {
-                hook.LEAVE_HTTP.invoke(null, response);
+
+            if (null != METHOD_HOOK_HANDLER) {
+                METHOD_HOOK_HANDLER.LEAVE_SOURCE.invoke(null);
             }
         } catch (IllegalAccessException e) {
             e.printStackTrace();
@@ -327,11 +288,37 @@ public class Injecter {
         }
     }
 
-    public static boolean isFirstLevelHttp(final String namespace) {
+    public static void enterHttp() {
         try {
-            final MethodHook hook = NAMESPACE_METHOD_HOOK_MAP.get(namespace);
-            if (null != hook) {
-                return (Boolean) hook.IS_TOP_LEVEL_HTTP.invoke(null);
+
+            if (null != METHOD_HOOK_HANDLER) {
+                METHOD_HOOK_HANDLER.ENTER_HTTP.invoke(null);
+            }
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void leaveHttp(final Object response) {
+        try {
+
+            if (null != METHOD_HOOK_HANDLER) {
+                METHOD_HOOK_HANDLER.LEAVE_HTTP.invoke(null, response);
+            }
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static boolean isFirstLevelHttp() {
+        try {
+
+            if (null != METHOD_HOOK_HANDLER) {
+                return (Boolean) METHOD_HOOK_HANDLER.IS_TOP_LEVEL_HTTP.invoke(null);
             }
         } catch (IllegalAccessException e) {
             e.printStackTrace();
@@ -344,16 +331,15 @@ public class Injecter {
     /**
      * 克隆Request对象
      *
-     * @param namespace
      * @param req
      * @return
      * @throws Throwable
      */
-    public static Object cloneRequest(final String namespace, Object req, boolean isJakarta) throws Throwable {
+    public static Object cloneRequest(Object req, boolean isJakarta) throws Throwable {
         try {
-            final MethodHook hook = NAMESPACE_METHOD_HOOK_MAP.get(namespace);
-            if (null != hook) {
-                return hook.CLONE_REQUEST.invoke(null, req, isJakarta);
+
+            if (null != METHOD_HOOK_HANDLER) {
+                return METHOD_HOOK_HANDLER.CLONE_REQUEST.invoke(null, req, isJakarta);
             }
         } catch (Throwable cause) {
             handleException(cause);
@@ -361,11 +347,11 @@ public class Injecter {
         return req;
     }
 
-    public static boolean isReplayRequest(final String namespace) throws Throwable {
+    public static boolean isReplayRequest() throws Throwable {
         try {
-            final MethodHook hook = NAMESPACE_METHOD_HOOK_MAP.get(namespace);
-            if (null != hook) {
-                return (Boolean) hook.IS_REPLAY_REQUEST.invoke(null);
+
+            if (null != METHOD_HOOK_HANDLER) {
+                return (Boolean) METHOD_HOOK_HANDLER.IS_REPLAY_REQUEST.invoke(null);
             }
         } catch (Throwable cause) {
             handleException(cause);
@@ -376,16 +362,15 @@ public class Injecter {
     /**
      * 克隆Response对象
      *
-     * @param namespace
      * @param response
      * @return
      * @throws Throwable
      */
-    public static Object cloneResponse(final String namespace, Object response, boolean isJakarta) throws Throwable {
+    public static Object cloneResponse(Object response, boolean isJakarta) throws Throwable {
         try {
-            final MethodHook hook = NAMESPACE_METHOD_HOOK_MAP.get(namespace);
-            if (null != hook) {
-                return hook.CLONE_RESPONSE.invoke(null, response, isJakarta);
+
+            if (null != METHOD_HOOK_HANDLER) {
+                return METHOD_HOOK_HANDLER.CLONE_RESPONSE.invoke(null, response, isJakarta);
             }
         } catch (Throwable cause) {
             handleException(cause);
@@ -517,14 +502,13 @@ public class Injecter {
     /**
      * enter Dubbo Method
      *
-     * @param namespace namespace
      * @since 1.2.0
      */
-    public static void enterDubbo(final String namespace) {
+    public static void enterDubbo() {
         try {
-            final MethodHook hook = NAMESPACE_METHOD_HOOK_MAP.get(namespace);
-            if (null != hook) {
-                hook.ENTER_DUBBO.invoke(null);
+
+            if (null != METHOD_HOOK_HANDLER) {
+                METHOD_HOOK_HANDLER.ENTER_DUBBO.invoke(null);
             }
         } catch (IllegalAccessException e) {
             e.printStackTrace();
@@ -536,14 +520,13 @@ public class Injecter {
     /**
      * leave Dubbo Method
      *
-     * @param namespace
      * @since 1.2.0
      */
-    public static void leaveDubbo(final String namespace) {
+    public static void leaveDubbo() {
         try {
-            final MethodHook hook = NAMESPACE_METHOD_HOOK_MAP.get(namespace);
-            if (null != hook) {
-                hook.LEAVE_DUBBO.invoke(null);
+
+            if (null != METHOD_HOOK_HANDLER) {
+                METHOD_HOOK_HANDLER.LEAVE_DUBBO.invoke(null);
             }
         } catch (IllegalAccessException e) {
             e.printStackTrace();
@@ -552,11 +535,11 @@ public class Injecter {
         }
     }
 
-    public static boolean isFirstLevelDubbo(final String namespace) {
+    public static boolean isFirstLevelDubbo() {
         try {
-            final MethodHook hook = NAMESPACE_METHOD_HOOK_MAP.get(namespace);
-            if (null != hook) {
-                return (Boolean) hook.IS_FIRST_LEVEL_DUBBO.invoke(null);
+
+            if (null != METHOD_HOOK_HANDLER) {
+                return (Boolean) METHOD_HOOK_HANDLER.IS_FIRST_LEVEL_DUBBO.invoke(null);
             }
         } catch (IllegalAccessException e) {
             e.printStackTrace();

@@ -78,7 +78,6 @@ public class DubboAdviceAdapter extends AbstractAdviceAdapter {
      * since: 1.2.0
      */
     private void isFirstLevelDubbo() {
-        push(context.getNamespace());
         invokeStatic(ASM_TYPE_SPY, ASM_METHOD_Spy$isFirstLevelDubbo);
     }
 
@@ -88,7 +87,6 @@ public class DubboAdviceAdapter extends AbstractAdviceAdapter {
      * since: 1.2.0
      */
     private void leaveDubbo() {
-        push(context.getNamespace());
         invokeStatic(ASM_TYPE_SPY, ASM_METHOD_Spy$leaveDubbo);
     }
 
