@@ -17,7 +17,7 @@
     </properties>
 
     <build>
-        <finalName>dongtai-spring-api</finalName>
+        <finalName>iast-log</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
