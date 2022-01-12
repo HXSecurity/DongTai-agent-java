@@ -142,8 +142,9 @@ public class EngineManager {
             while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
                 fileOutputStream.write(dataBuffer, 0, bytesRead);
             }
-            DongTaiLog.info("The remote file " + fileUrl + " was successfully written to the local cache.");
+            in.close();
             fileOutputStream.close();
+            DongTaiLog.info("The remote file " + fileUrl + " was successfully written to the local cache.");
             status = true;
         } catch (Exception ignore) {
             DongTaiLog.error("The remote file " + fileUrl + " download failure, please check the iast-token.");
@@ -174,7 +175,9 @@ public class EngineManager {
 
     public boolean install() {
         try {
-            inst.appendToBootstrapClassLoaderSearch(new JarFile(new File(EngineManager.getInjectPackageCachePath())));
+            JarFile file = new JarFile(new File(EngineManager.getInjectPackageCachePath()));
+            inst.appendToBootstrapClassLoaderSearch(file);
+            file.close();
             ClassLoader iastClassLoader = IAST_CLASS_LOADER_CACHE.get(IAST_NAMESPACE);
             if (iastClassLoader == null) {
                 iastClassLoader = loadOrDefineClassLoader(EngineManager.getEnginePackageCachePath());
@@ -273,13 +276,10 @@ public class EngineManager {
         }
 
         try {
-            // 卸载字节码
             if (classOfEngine != null) {
                 classOfEngine.getMethod("destroy", String.class, String.class, Instrumentation.class)
                         .invoke(null, launchMode, this.properties.getPropertiesFilePath(), inst);
                 Agent.appendToolsPath();
-                //no necessary to do detach here
-                // AttachLauncher.detach(ppid);
             }
         } catch (IllegalAccessException e) {
             e.printStackTrace();
