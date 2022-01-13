@@ -21,6 +21,19 @@ public class AttachLauncher {
             DongTaiLog.info("trying attach to process " + pid + ", agent address is " + AGENT_PATH);
             vmObj = VirtualMachine.attach(pid);
             Properties targetSystemProperties = vmObj.getSystemProperties();
+            if ("install".equals(args)) {
+                String protectState = targetSystemProperties.getProperty("protect.by.dongtai", "0");
+                if ("1".equals(protectState)) {
+                    DongTaiLog.info("DongTai already installed.");
+                    return;
+                }
+            } else if ("uninstall".equals(args)) {
+                String protectState = targetSystemProperties.getProperty("protect.by.dongtai", "0");
+                if (!"1".equals(protectState)) {
+                    DongTaiLog.info("DongTai not installed.");
+                    return;
+                }
+            }
             String targetJavaVersion = JavaVersionUtils.javaVersionStr(targetSystemProperties);
             String currentJavaVersion = JavaVersionUtils.javaVersionStr();
             if (targetJavaVersion != null && currentJavaVersion != null) {

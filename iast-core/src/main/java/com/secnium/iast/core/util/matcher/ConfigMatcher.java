@@ -3,14 +3,12 @@ package com.secnium.iast.core.util.matcher;
 import com.secnium.iast.core.PropertyUtils;
 import com.secnium.iast.core.report.ErrorLogReport;
 import com.secnium.iast.core.util.ConfigUtils;
-
 import com.secnium.iast.core.util.ThrowableUtils;
-import java.util.HashMap;
+import com.secnium.iast.log.DongTaiLog;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
-import com.secnium.iast.log.DongTaiLog;
 
 /**
  * 各种匹配方法（通过配置文件匹配）
@@ -52,7 +50,7 @@ public class ConfigMatcher {
                 return false;
             }
             String uri = (String) request.get("requestURI");
-            HashMap headers = (HashMap) request.get("headers");
+            Map<String, String> headers = (Map<String, String>) request.get("headers");
             for (String string : BLACK_URL) {
                 String[] strings = string.split(" ");
                 switch (Integer.parseInt(strings[1])) {
@@ -121,7 +119,7 @@ public class ConfigMatcher {
             DongTaiLog.trace("ignore transform {} in loader={}. Reason: classname is a aop class", className, loader);
             return false;
         }
-      
+
         // todo: 计算startsWith、contains与正则匹配的时间损耗
         if (className.startsWith("com/secnium/iast/")
                 || className.startsWith("java/lang/iast/")

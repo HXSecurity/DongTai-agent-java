@@ -68,7 +68,6 @@ public class DubboAdviceAdapter extends AbstractAdviceAdapter {
      * since: 1.2.0
      */
     private void enterDubbo() {
-        push("DongTai");
         invokeStatic(ASM_TYPE_SPY, ASM_METHOD_Spy$enterDubbo);
     }
 

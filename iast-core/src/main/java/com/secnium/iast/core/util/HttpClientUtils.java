@@ -2,7 +2,7 @@ package com.secnium.iast.core.util;
 
 import com.secnium.iast.core.PropertyUtils;
 import com.secnium.iast.core.report.ErrorLogReport;
-
+import com.secnium.iast.log.DongTaiLog;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -21,8 +21,6 @@ import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
-
-import com.secnium.iast.log.DongTaiLog;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -64,8 +62,9 @@ public class HttpClientUtils {
     }
 
 
-    private static StringBuilder sendRequest(HttpMethods method, String baseUrl, String urlStr, String data,
-                                             HashMap<String, String> headers, Proxy proxy) throws Exception {
+    private synchronized static StringBuilder sendRequest(HttpMethods method, String baseUrl, String urlStr,
+            String data,
+            HashMap<String, String> headers, Proxy proxy) throws Exception {
         HttpURLConnection connection = null;
         StringBuilder response = new StringBuilder();
         try {

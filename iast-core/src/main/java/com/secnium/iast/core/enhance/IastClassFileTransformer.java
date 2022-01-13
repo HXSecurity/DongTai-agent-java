@@ -12,7 +12,7 @@ import com.secnium.iast.core.enhance.sca.ScaScanner;
 import com.secnium.iast.core.report.ErrorLogReport;
 import com.secnium.iast.core.util.AsmUtils;
 import com.secnium.iast.core.util.matcher.ConfigMatcher;
-
+import com.secnium.iast.log.DongTaiLog;
 import java.io.File;
 import java.io.IOException;
 import java.lang.instrument.ClassFileTransformer;
@@ -20,15 +20,12 @@ import java.lang.instrument.Instrumentation;
 import java.net.URL;
 import java.security.CodeSource;
 import java.security.ProtectionDomain;
-import java.util.HashSet;
 import java.util.List;
-
 import java.util.Set;
 import org.apache.commons.lang3.time.StopWatch;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
-import com.secnium.iast.log.DongTaiLog;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -69,7 +66,8 @@ public class IastClassFileTransformer implements ClassFileTransformer {
             final ProtectionDomain protectionDomain,
             final byte[] srcByteCodeArray) {
         // if className is null, then, skip
-        if (internalClassName == null) {
+        if (internalClassName == null || internalClassName.startsWith("com/secnium/iast/") || internalClassName
+                .startsWith("java/lang/iast/") || internalClassName.startsWith("cn/huoxian/iast/")) {
             return null;
         }
         boolean isRunning = EngineManager.isLingzhiRunning();
@@ -87,7 +85,9 @@ public class IastClassFileTransformer implements ClassFileTransformer {
             if (loader != null && protectionDomain != null) {
                 final CodeSource codeSource = protectionDomain.getCodeSource();
                 URL location = codeSource.getLocation();
-                if (location != null) {
+                if (location != null && !internalClassName.startsWith("com/sun/") && !internalClassName
+                        .startsWith("sun/") && !location.getFile().isEmpty()
+                ) {
                     ScaScanner.scanForSCA(location.getFile(), internalClassName);
                 }
             }
@@ -128,7 +128,8 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                     }
                 }
             }
-        } catch (Throwable cause) {
+        } catch (
+                Throwable cause) {
             ErrorLogReport.sendErrorLog(cause);
         } finally {
             if (isRunning) {
@@ -146,7 +147,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
      * @return ClassWriter
      */
     private ClassWriter createClassWriter(final ClassLoader targetClassLoader,
-                                          final ClassReader cr) {
+            final ClassReader cr) {
         return new ClassWriter(cr, COMPUTE_FRAMES | COMPUTE_MAXS) {
 
             /*
@@ -238,7 +239,8 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                 inst.retransformClasses(waitingReTransformClass);
 
                 if (DongTaiLog.isDebugEnabled()) {
-                    DongTaiLog.debug("reTransform class {} success, index={};total={};", waitingReTransformClass, index - 1,
+                    DongTaiLog.debug("reTransform class {} success, index={};total={};", waitingReTransformClass,
+                            index - 1,
                             total);
                 }
             } catch (Throwable t) {

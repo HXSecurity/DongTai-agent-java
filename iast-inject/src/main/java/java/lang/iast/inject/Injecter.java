@@ -59,7 +59,7 @@ public class Injecter {
             final Method LEAVE_DUBBO,
             final Method IS_FIRST_LEVEL_DUBBO
     ) {
-        if (null == METHOD_HOOK_HANDLER) {
+        if (null != METHOD_HOOK_HANDLER) {
             return;
         }
         METHOD_HOOK_HANDLER = new MethodHook(
@@ -90,7 +90,6 @@ public class Injecter {
 
     /**
      * 清理间谍钩子方法
-     *
      */
     public static void clean() {
         METHOD_HOOK_HANDLER = null;
