@@ -13,17 +13,14 @@ import com.secnium.iast.log.DongTaiLog;
  */
 public class SpyEngine implements IEngine {
 
-    private PropertyUtils cfg;
-
     @Override
     public void init(PropertyUtils cfg, Instrumentation inst) {
-        this.cfg = cfg;
     }
 
     @Override
     public void start() {
         DongTaiLog.info("Register spy submodule");
-        SpyUtils.init(cfg.getNamespace());
+        SpyUtils.init();
         DongTaiLog.info("Spy sub-module registered successfully");
     }
 
@@ -35,7 +32,7 @@ public class SpyEngine implements IEngine {
     @Override
     public void destroy() {
         DongTaiLog.info("Uninstall the spy submodule");
-        SpyUtils.clean(cfg.getNamespace());
+        SpyUtils.clean();
         DongTaiLog.info("Spy submodule uninstalled successfully");
     }
 }

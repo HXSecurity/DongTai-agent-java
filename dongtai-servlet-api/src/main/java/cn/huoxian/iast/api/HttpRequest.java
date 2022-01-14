@@ -71,8 +71,9 @@ public class HttpRequest {
                     while ((str = reader.readLine()) != null) {
                         postBody.append(str);
                     }
-                    inputStream.close();
                     reader.close();
+                    isReader.close();
+                    inputStream.close();
                     return postBody.toString();
                 } else {
                     request.setCharacterEncoding("UTF-8");

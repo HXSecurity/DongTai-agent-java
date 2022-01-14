@@ -5,9 +5,7 @@ import com.secnium.iast.agent.monitor.EngineMonitor;
 import com.secnium.iast.agent.monitor.MonitorDaemonThread;
 import com.secnium.iast.agent.report.AgentRegisterReport;
 import com.secnium.iast.log.DongTaiLog;
-
 import java.lang.instrument.Instrumentation;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -25,10 +23,14 @@ public class AgentLauncher {
      * @param inst inst
      */
     public static void premain(String args, Instrumentation inst) {
+        if (System.getProperty("protect.by.dongtai", null) != null) {
+            return;
+        }
         System.setProperty("sun.net.http.allowRestrictedHeaders", "true");
         LAUNCH_MODE = LAUNCH_MODE_AGENT;
         try {
             install(inst);
+            System.setProperty("protect.by.dongtai", "1");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -37,18 +39,29 @@ public class AgentLauncher {
     /**
      * install agent with attach
      *
-     * @param featureString boot args [namespace,token,ip,port,prop]
-     * @param inst          inst
+     * @param args boot args [namespace,token,ip,port,prop]
+     * @param inst inst
      */
-    public static void agentmain(String featureString, Instrumentation inst) {
-        if ("uninstall".equals(featureString)) {
+    public static void agentmain(String args, Instrumentation inst) {
+        System.out.println(System.getProperty("protect.by.dongtai", null));
+        if ("uninstall".equals(args)) {
+            if (System.getProperty("protect.by.dongtai", null) == null) {
+                DongTaiLog.info("DongTai wasn't installed.");
+                return;
+            }
             DongTaiLog.info("Engine is about to be uninstalled");
             uninstall();
+            System.setProperty("protect.by.dongtai", null);
         } else {
+            if (System.getProperty("protect.with.dongtai", null) != null) {
+                DongTaiLog.info("DongTai already installed.");
+                return;
+            }
             LAUNCH_MODE = LAUNCH_MODE_ATTACH;
             try {
                 Agent.appendToolsPath();
                 install(inst);
+                System.setProperty("protect.with.dongtai", "1");
             } catch (Exception e) {
                 e.printStackTrace();
             }

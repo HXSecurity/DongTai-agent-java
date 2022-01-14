@@ -18,9 +18,8 @@ public class SpyUtils {
     /**
      * 初始化Spy类
      *
-     * @param namespace 命名空间
      */
-    public synchronized static void init(final String namespace) {
+    public synchronized static void init() {
         EngineManager.SCOPE_TRACKER.set(new TrackerHelper());
         // 注册接口单例对象，将各模块的实现类传递进去
         if (Injecter.isInit()) {
@@ -78,9 +77,8 @@ public class SpyUtils {
     /**
      * 清理Spy中的命名空间
      *
-     * @param namespace 命名空间
      */
-    public synchronized static void clean(final String namespace) {
+    public synchronized static void clean() {
         Injecter.clean();
     }
 

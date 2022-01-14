@@ -72,6 +72,9 @@ public class HttpRequest {
                     while ((str = reader.readLine()) != null) {
                         postBody.append(str);
                     }
+                    reader.close();
+                    isReader.close();
+                    inputStream.close();
                     return postBody.toString();
                 } else {
                     // fixme: 此处导致中文乱码

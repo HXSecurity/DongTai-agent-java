@@ -13,7 +13,7 @@ cp ../DongTai-agent-java/release/iast-agent.jar tools/DongTai/dongtai.jar
 cp ../DongTai-agent-java/release/lib/*.jar target/cargo/installs/apache-tomcat-8.5.70/apache-tomcat-8.5.70/temp
 
 echo "run benchmark in backend"
-export JAVA_TOOL_OPTIONS="-Dproject.create=true -Dproject.version=${{ github.event_name }}-${{ github.run_number }}"
+export JAVA_TOOL_OPTIONS="-Dproject.create=true -Ddongtai.app.name=$1 -Dproject.version=$2"
 nohup mvn package cargo:run -Pdeploywdongtai &
 
 echo "wait for benchmark start..."

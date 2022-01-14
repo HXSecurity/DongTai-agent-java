@@ -19,7 +19,7 @@ mysql -uroot -pyuhjnbGYUI -h127.0.0.1 -e "FLUSH PRIVILEGES;"
 mysql -uroot -pyuhjnbGYUI -h127.0.0.1 -e 'show DATABASES;'
 
 echo "start catalina and waitting 30s..."
-export JAVA_TOOL_OPTIONS="-Dproject.create=true -Dproject.version=${{ github.event_name }}-${{ github.run_number }}"
+export JAVA_TOOL_OPTIONS="-Dproject.create=true -Ddongtai.app.name=$1 -Dproject.version=$2"
 ./bin/startup.sh 2>/dev/null
 
 check_times=0

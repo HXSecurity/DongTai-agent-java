@@ -76,8 +76,7 @@ public interface AsmMethods {
      */
     Method ASM_METHOD_Spy$isFirstLevelPropagator = InnerHelper.getAsmMethod(
             Injecter.class,
-            "isFirstLevelPropagator",
-            String.class
+            "isFirstLevelPropagator"
     );
 
     /**
