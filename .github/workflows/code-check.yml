@@ -94,10 +94,10 @@ jobs:
           password: test
 
       - name: OpenRASP-Vulns-Test
-        run: bash .github/workflows/scripts/openrasp-test.sh
+        run: bash .github/workflows/scripts/openrasp-test.sh "OpenRASP" "${{ github.event_name }}-${{ github.run_number }}"
 
       - name: Benchmark-Vulns-Test
-        run: bash .github/workflows/scripts/benchmark-test.sh
+        run: bash .github/workflows/scripts/benchmark-test.sh "OWASP-Benchmark" "${{ github.event_name }}-${{ github.run_number }}"
 
 
   Upload-To-OSS:
