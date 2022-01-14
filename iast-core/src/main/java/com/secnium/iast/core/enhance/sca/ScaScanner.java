@@ -3,6 +3,7 @@ package com.secnium.iast.core.enhance.sca;
 import com.secnium.iast.core.EngineManager;
 import com.secnium.iast.core.handler.vulscan.ReportConstant;
 import com.secnium.iast.core.report.AssestReport;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,6 +13,8 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+
+import com.secnium.iast.log.DongTaiLog;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -67,8 +70,12 @@ public class ScaScanner {
             thread = new ScaScanThread(packagePath, 1);
         } else if (!scannedClassSet.contains(packageFile) && isLocalMavenRepo(packageFile)) {
             scannedClassSet.add(packageFile);
-            thread = new ScaScanThread(packagePath, 3);
-        } else if (!isClassPath) {
+            thread = new ScaScanThread(packageFile, 3);
+        } else if (packageFile.endsWith(".jar") && !scannedClassSet.contains(packageFile)) {
+            scannedClassSet.add(packageFile);
+            thread = new ScaScanThread(packageFile, 3);
+        }
+        if (!isClassPath) {
             isClassPath = true;
             thread = new ScaScanThread(System.getProperty("java.class.path"), 4);
         }
@@ -165,31 +172,29 @@ public class ScaScanner {
             try {
                 JarFile file = new JarFile(packagePath);
                 Enumeration<JarEntry> entries = file.entries();
-                file.close();
                 String entryName;
                 while (entries.hasMoreElements()) {
                     JarEntry entry = entries.nextElement();
                     entryName = entry.getName();
-                    if (!entryName.endsWith(".jar")) {
-                        continue;
+                    if (entryName.endsWith(".jar")) {
+                        InputStream is = getJarInputStream(packagePath, entryName);
+                        String signature = SignatureAlgorithm.getSignature(is, ScaScanner.ALGORITHM);
+                        String packageName = entry.getName();
+                        if (signature == null) {
+                            continue;
+                        }
+                        JSONObject packageObj = new JSONObject();
+                        packageObj.put(ReportConstant.SCA_PACKAGE_PATH, "jar:file:" + packagePath + "!/" + entryName);
+                        packageObj.put(ReportConstant.SCA_PACKAGE_NAME, packageName);
+                        packageObj.put(ReportConstant.SCA_PACKAGE_SIGNATURE, signature);
+                        packageObj.put(ReportConstant.SCA_PACKAGE_ALGORITHM, ScaScanner.ALGORITHM);
+                        packages.put(packageObj);
                     }
-                    InputStream is = getJarInputStream(packagePath, entryName);
-                    String signature = SignatureAlgorithm.getSignature(is, ScaScanner.ALGORITHM);
-                    String packageName = entry.getName();
-                    if (signature == null) {
-                        continue;
-                    }
-                    JSONObject packageObj = new JSONObject();
-                    packageObj.put(ReportConstant.SCA_PACKAGE_PATH, "jar:file:" + packagePath + "!/" + entryName);
-                    packageObj.put(ReportConstant.SCA_PACKAGE_NAME, packageName);
-                    packageObj.put(ReportConstant.SCA_PACKAGE_SIGNATURE, signature);
-                    packageObj.put(ReportConstant.SCA_PACKAGE_ALGORITHM, ScaScanner.ALGORITHM);
-                    packages.put(packageObj);
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                DongTaiLog.error(e.getMessage());
             } catch (Exception e) {
-                e.printStackTrace();
+                DongTaiLog.error(e.getMessage());
             }
         }
 
@@ -203,7 +208,6 @@ public class ScaScanner {
          *
          * @see #start()
          * @see #stop()
-         * @see #Thread(ThreadGroup, Runnable, String)
          */
         @Override
         public void run() {

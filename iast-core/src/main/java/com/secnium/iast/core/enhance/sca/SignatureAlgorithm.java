@@ -27,7 +27,8 @@ public class SignatureAlgorithm {
             while ((len = is.read(buffer)) > 0) {
                 digest.update(buffer, 0, len);
             }
-            signature = new BigInteger(1, digest.digest()).toString(16);
+            BigInteger bigInteger = new BigInteger(1, digest.digest());
+            signature = String.format("%040x", bigInteger);
         } catch (IOException e) {
             DongTaiLog.error("calc jar signature error[IOException], msg: %s{}", e);
         } catch (NoSuchAlgorithmException e) {
