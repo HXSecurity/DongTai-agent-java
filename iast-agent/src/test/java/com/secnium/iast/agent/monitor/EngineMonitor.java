@@ -3,7 +3,6 @@ package com.secnium.iast.agent.monitor;
 import com.secnium.iast.agent.*;
 import com.secnium.iast.agent.manager.EngineManager;
 import com.secnium.iast.agent.report.AgentRegisterReport;
-import com.secnium.iast.agent.util.LogUtils;
 import com.secnium.iast.agent.util.http.HttpClientUtils;
 import com.secnium.iast.log.DongTaiLog;
 import org.json.JSONObject;

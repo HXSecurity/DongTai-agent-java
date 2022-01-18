@@ -2,8 +2,8 @@ package com.secnium.iast.agent;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
+import java.util.Arrays;
 
-import com.secnium.iast.agent.util.LogUtils;
 import org.junit.Test;
 
 public class AgentTest {
@@ -17,7 +17,6 @@ public class AgentTest {
             pid = "94008";
             AttachLauncher.attach(pid, "");
         } catch (Throwable e) {
-            LogUtils.error("Start DongTai Agent failed, exception stack trace: ");
             e.printStackTrace();
             System.exit(-1);
         }
