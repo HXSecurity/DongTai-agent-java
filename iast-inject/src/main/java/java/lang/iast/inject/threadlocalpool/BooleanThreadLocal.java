@@ -1,9 +1,6 @@
-package com.secnium.iast.core.threadlocalpool;
+package java.lang.iast.inject.threadlocalpool;
 
-/**
- * @author dongzhiyong@huoxian.cn
- */
-public class BooleanThreadLocal extends ThreadLocal<Boolean> {
+public class BooleanThreadLocal extends ThreadLocal<Boolean>{
 
     boolean defaultValue;
 

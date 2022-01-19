@@ -2,6 +2,7 @@ package com.secnium.iast.core.handler.controller.impl;
 
 import com.secnium.iast.core.EngineManager;
 import com.secnium.iast.core.PropertyUtils;
+import com.secnium.iast.core.handler.EventListenerHandlers;
 import com.secnium.iast.core.handler.IastClassLoader;
 import com.secnium.iast.core.handler.models.MethodEvent;
 import com.secnium.iast.core.util.HttpClientUtils;
@@ -159,12 +160,14 @@ public class HttpImpl {
         Map<String, Object> requestMeta = getRequestMeta(event.argumentArray[0]);
         // todo Consider increasing the capture of html request responses
         if (ConfigMatcher.disableExtension((String) requestMeta.get("requestURI"))) {
+            EventListenerHandlers.enterHttp.setFalse();
             return;
         }
         if (ConfigMatcher.getBlackUrl(requestMeta)) {
+            EventListenerHandlers.enterHttp.setFalse();
             return;
         }
-
+        EventListenerHandlers.enterHttp.enterEntry();
         // todo: add custom header escape
         EngineManager.enterHttpEntry(requestMeta);
 

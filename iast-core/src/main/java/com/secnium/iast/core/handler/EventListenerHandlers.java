@@ -11,6 +11,8 @@ import com.secnium.iast.core.handler.controller.impl.SourceImpl;
 import com.secnium.iast.core.handler.graphy.GraphBuilder;
 import com.secnium.iast.core.handler.models.MethodEvent;
 import com.secnium.iast.core.report.ErrorLogReport;
+import com.secnium.iast.core.threadlocalpool.BooleanThreadLocal;
+
 import java.lang.iast.inject.Injecter;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -26,17 +28,19 @@ public class EventListenerHandlers {
      */
     public static final AtomicInteger INVOKE_ID_SEQUENCER = new AtomicInteger(1);
 
+    public static BooleanThreadLocal enterHttp = new BooleanThreadLocal(false);
+
     public static void onBefore(final String framework,
-            final String javaClassName,
-            final String matchClassName,
-            final String javaMethodName,
-            final String javaMethodDesc,
-            final Object object,
-            final Object[] argumentArray,
-            final Object retValue,
-            final String signature,
-            final boolean isStatic,
-            final int hookType
+                                final String javaClassName,
+                                final String matchClassName,
+                                final String javaMethodName,
+                                final String javaMethodDesc,
+                                final Object object,
+                                final Object[] argumentArray,
+                                final Object retValue,
+                                final String signature,
+                                final boolean isStatic,
+                                final int hookType
     ) {
         if (!EngineManager.isLingzhiRunning() && (HookType.HTTP.equals(hookType) || HookType.DUBBO.equals(hookType))) {
             EngineManager.turnOnLingzhi();
@@ -60,11 +64,11 @@ public class EventListenerHandlers {
                             HttpImpl.solveHttp(event);
                         } else if (HookType.DUBBO.equals(hookType)) {
                             DubboImpl.solveDubbo(event, INVOKE_ID_SEQUENCER);
-                        } else if (HookType.PROPAGATOR.equals(hookType) && !EngineManager.TAINT_POOL.get().isEmpty()) {
+                        } else if (HookType.PROPAGATOR.equals(hookType) && !EngineManager.TAINT_POOL.get().isEmpty() && enterHttp.isEnterEntry()) {
                             PropagatorImpl.solvePropagator(event, INVOKE_ID_SEQUENCER);
-                        } else if (HookType.SOURCE.equals(hookType)) {
+                        } else if (HookType.SOURCE.equals(hookType) && enterHttp.isEnterEntry()) {
                             SourceImpl.solveSource(event, INVOKE_ID_SEQUENCER);
-                        } else if (HookType.SINK.equals(hookType) && !EngineManager.TAINT_POOL.get().isEmpty()) {
+                        } else if (HookType.SINK.equals(hookType) && !EngineManager.TAINT_POOL.get().isEmpty() && enterHttp.isEnterEntry()) {
                             SinkImpl.solveSink(event);
                         }
                     }
@@ -78,8 +82,8 @@ public class EventListenerHandlers {
     }
 
     public static Object onReturn(final int listenerId,
-            final Class<?> spyRetClassInTargetClassLoader,
-            final Object object) throws Throwable {
+                                  final Class<?> spyRetClassInTargetClassLoader,
+                                  final Object object) throws Throwable {
         // 判断sign是否需要hook
         Injecter.Ret ret = null;
         if (EngineManager.isLingzhiRunning()) {
@@ -99,8 +103,8 @@ public class EventListenerHandlers {
     }
 
     public static Object onThrows(final int listenerId,
-            final Class<?> spyRetClassInTargetClassLoader,
-            final Throwable throwable) throws Throwable {
+                                  final Class<?> spyRetClassInTargetClassLoader,
+                                  final Throwable throwable) throws Throwable {
         return null;
     }
 
@@ -198,6 +202,7 @@ public class EventListenerHandlers {
      */
     public static void leaveHttp(Object response) {
         try {
+            EventListenerHandlers.enterHttp.setFalse();
             EngineManager.SCOPE_TRACKER.leaveHttp();
             if (EngineManager.SCOPE_TRACKER.isExitedHttp() && EngineManager.isEnterHttp()) {
                 EngineManager.maintainRequestCount();

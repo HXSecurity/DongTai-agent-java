@@ -1,5 +1,6 @@
 package java.lang.iast.inject;
 
+import java.lang.iast.inject.threadlocalpool.BooleanThreadLocal;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -14,6 +15,8 @@ public class Injecter {
      * 控制Spy是否在发生异常时主动对外抛出 T:主动对外抛出，会中断方法 F:不对外抛出，只将异常信息打印出来
      */
     public static volatile boolean isSpyThrowException = false;
+
+    private static BooleanThreadLocal isEnterHttp = new BooleanThreadLocal(false);
 
     private static final Class<Ret> SPY_RET_CLASS = Ret.class;
 
@@ -105,16 +108,16 @@ public class Injecter {
 
 
     public static void spyMethodOnBefore(final Object retValue,
-            final Object[] argumentArray,
-            final String framework,
-            final String javaClassName,
-            final String matchClassName,
-            final String javaMethodName,
-            final String javaMethodDesc,
-            final Object target,
-            final String signCode,
-            final boolean isStatic,
-            final int METHOD_HOOK_HANDLERType) throws Throwable {
+                                         final Object[] argumentArray,
+                                         final String framework,
+                                         final String javaClassName,
+                                         final String matchClassName,
+                                         final String javaMethodName,
+                                         final String javaMethodDesc,
+                                         final Object target,
+                                         final String signCode,
+                                         final boolean isStatic,
+                                         final int METHOD_HOOK_HANDLERType) throws Throwable {
         try {
             if (null != METHOD_HOOK_HANDLER) {
                 METHOD_HOOK_HANDLER.ON_BEFORE_METHOD
@@ -127,7 +130,7 @@ public class Injecter {
     }
 
     public static void spyMethodOnReturn(final Object retValue,
-            final int listenerId
+                                         final int listenerId
     ) throws Throwable {
         try {
 
@@ -140,7 +143,7 @@ public class Injecter {
     }
 
     public static Ret spyMethodOnThrows(final Throwable throwable,
-            final int listenerId) throws Throwable {
+                                        final int listenerId) throws Throwable {
         try {
 
             if (null == METHOD_HOOK_HANDLER) {
@@ -156,7 +159,7 @@ public class Injecter {
     public static void spyMethodEnterPropagator() {
         try {
 
-            if (null != METHOD_HOOK_HANDLER) {
+            if (isEnterHttp.isEnterEntry() && null != METHOD_HOOK_HANDLER) {
                 METHOD_HOOK_HANDLER.ENTER_PROPAGATOR.invoke(null);
             }
         } catch (IllegalAccessException e) {
@@ -169,7 +172,7 @@ public class Injecter {
     public static void spyMethodLeavePropagator() {
         try {
 
-            if (null != METHOD_HOOK_HANDLER) {
+            if (isEnterHttp.isEnterEntry() && null != METHOD_HOOK_HANDLER) {
                 METHOD_HOOK_HANDLER.LEAVE_PROPAGATOR.invoke(null);
             }
         } catch (IllegalAccessException e) {
@@ -182,7 +185,7 @@ public class Injecter {
     public static boolean isFirstLevelPropagator() {
         try {
 
-            if (null != METHOD_HOOK_HANDLER) {
+            if (isEnterHttp.isEnterEntry() && null != METHOD_HOOK_HANDLER) {
                 return (Boolean) METHOD_HOOK_HANDLER.IS_TOP_LEVEL_PROPAGATOR.invoke(null);
             }
         } catch (IllegalAccessException e) {
@@ -196,7 +199,7 @@ public class Injecter {
     public static boolean isFirstLevelSink() {
         try {
 
-            if (null != METHOD_HOOK_HANDLER) {
+            if (isEnterHttp.isEnterEntry() && null != METHOD_HOOK_HANDLER) {
                 return (Boolean) METHOD_HOOK_HANDLER.IS_TOP_LEVEL_SINK.invoke(null);
             }
         } catch (IllegalAccessException e) {
@@ -225,7 +228,7 @@ public class Injecter {
     public static void enterSink() {
         try {
 
-            if (null != METHOD_HOOK_HANDLER) {
+            if (isEnterHttp.isEnterEntry() && null != METHOD_HOOK_HANDLER) {
                 METHOD_HOOK_HANDLER.ENTER_SINK.invoke(null);
             }
         } catch (IllegalAccessException e) {
@@ -238,7 +241,7 @@ public class Injecter {
     public static void leaveSink() {
         try {
 
-            if (null != METHOD_HOOK_HANDLER) {
+            if (isEnterHttp.isEnterEntry() && null != METHOD_HOOK_HANDLER) {
                 METHOD_HOOK_HANDLER.LEAVE_SINK.invoke(null);
             }
         } catch (IllegalAccessException e) {
@@ -251,7 +254,7 @@ public class Injecter {
     public static boolean isFirstLevelSource() {
         try {
 
-            if (null != METHOD_HOOK_HANDLER) {
+            if (isEnterHttp.isEnterEntry() && null != METHOD_HOOK_HANDLER) {
                 return (Boolean) METHOD_HOOK_HANDLER.IS_TOP_LEVEL_SOURCE.invoke(null);
             }
         } catch (IllegalAccessException e) {
@@ -264,7 +267,7 @@ public class Injecter {
 
     public static void enterSource() {
         try {
-            if (null != METHOD_HOOK_HANDLER) {
+            if (isEnterHttp.isEnterEntry() && null != METHOD_HOOK_HANDLER) {
                 METHOD_HOOK_HANDLER.ENTER_SOURCE.invoke(null);
             }
         } catch (IllegalAccessException e) {
@@ -277,7 +280,7 @@ public class Injecter {
     public static void leaveSource() {
         try {
 
-            if (null != METHOD_HOOK_HANDLER) {
+            if (isEnterHttp.isEnterEntry() && null != METHOD_HOOK_HANDLER) {
                 METHOD_HOOK_HANDLER.LEAVE_SOURCE.invoke(null);
             }
         } catch (IllegalAccessException e) {
@@ -297,13 +300,15 @@ public class Injecter {
             e.printStackTrace();
         } catch (InvocationTargetException e) {
             e.printStackTrace();
+        } finally {
+            isEnterHttp.enterEntry();
         }
     }
 
     public static void leaveHttp(final Object response) {
         try {
 
-            if (null != METHOD_HOOK_HANDLER) {
+            if (isEnterHttp.isEnterEntry() && null != METHOD_HOOK_HANDLER) {
                 METHOD_HOOK_HANDLER.LEAVE_HTTP.invoke(null, response);
             }
         } catch (IllegalAccessException e) {
@@ -316,7 +321,7 @@ public class Injecter {
     public static boolean isFirstLevelHttp() {
         try {
 
-            if (null != METHOD_HOOK_HANDLER) {
+            if (isEnterHttp.isEnterEntry() && null != METHOD_HOOK_HANDLER) {
                 return (Boolean) METHOD_HOOK_HANDLER.IS_TOP_LEVEL_HTTP.invoke(null);
             }
         } catch (IllegalAccessException e) {
@@ -449,27 +454,27 @@ public class Injecter {
         final Method IS_FIRST_LEVEL_DUBBO;
 
         public MethodHook(final Method on_before_method,
-                final Method on_return_method,
-                final Method on_throws_method,
-                final Method ENTER_PROPAGATOR,
-                final Method LEAVE_PROPAGATOR,
-                final Method IS_TOP_LEVEL_PROPAGATOR,
-                final Method ENTER_SOURCE,
-                final Method LEAVE_SOURCE,
-                final Method IS_TOP_LEVEL_SOURCE,
-                final Method ENTER_SINK,
-                final Method LEAVE_SINK,
-                final Method IS_TOP_LEVEL_SINK,
-                final Method ENTER_HTTP,
-                final Method LEAVE_HTTP,
-                final Method IS_TOP_LEVEL_HTTP,
-                final Method HAS_TAINT,
-                final Method CLONE_REQUEST,
-                final Method IS_REPLAY_REQUEST,
-                final Method CLONE_RESPONSE,
-                final Method ENTER_DUBBO,
-                final Method LEAVE_DUBBO,
-                final Method IS_FIRST_LEVEL_DUBBO) {
+                          final Method on_return_method,
+                          final Method on_throws_method,
+                          final Method ENTER_PROPAGATOR,
+                          final Method LEAVE_PROPAGATOR,
+                          final Method IS_TOP_LEVEL_PROPAGATOR,
+                          final Method ENTER_SOURCE,
+                          final Method LEAVE_SOURCE,
+                          final Method IS_TOP_LEVEL_SOURCE,
+                          final Method ENTER_SINK,
+                          final Method LEAVE_SINK,
+                          final Method IS_TOP_LEVEL_SINK,
+                          final Method ENTER_HTTP,
+                          final Method LEAVE_HTTP,
+                          final Method IS_TOP_LEVEL_HTTP,
+                          final Method HAS_TAINT,
+                          final Method CLONE_REQUEST,
+                          final Method IS_REPLAY_REQUEST,
+                          final Method CLONE_RESPONSE,
+                          final Method ENTER_DUBBO,
+                          final Method LEAVE_DUBBO,
+                          final Method IS_FIRST_LEVEL_DUBBO) {
             assert null != on_before_method;
             assert null != on_return_method;
             assert null != on_throws_method;
