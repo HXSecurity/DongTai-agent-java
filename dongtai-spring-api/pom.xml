@@ -25,6 +25,11 @@
             <version>5.2.8.RELEASE</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.secnium.iast</groupId>
+            <artifactId>iast-log</artifactId>
+            <version>1.2.0</version>
+        </dependency>
     </dependencies>
 
     <build>

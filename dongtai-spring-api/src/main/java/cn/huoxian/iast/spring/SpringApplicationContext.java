@@ -1,5 +1,6 @@
 package cn.huoxian.iast.spring;
 
+import com.secnium.iast.log.DongTaiLog;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
@@ -24,114 +25,116 @@ public class SpringApplicationContext {
         Map<String, RequestMappingHandlerMapping> requestMappings = BeanFactoryUtils.beansOfTypeIncludingAncestors(applicationContext, RequestMappingHandlerMapping.class, true, false);
         LocalVariableTableParameterNameDiscoverer methodParameters = new LocalVariableTableParameterNameDiscoverer();
         List<ApiDataModel> apiList = new ArrayList<>();
-        for (RequestMappingHandlerMapping handlerMapping : requestMappings.values()) {
-            if (handlerMapping != null) {
-                Map<RequestMappingInfo, HandlerMethod> methodMap = handlerMapping.getHandlerMethods();
-                for (RequestMappingInfo info : methodMap.keySet()) {
-                    ApiDataModel apiDataModel = new ApiDataModel();
-                    HandlerMethod handlerMethod = methodMap.get(info);
-                    String clazz = handlerMethod.getBeanType().toString().substring(6);
-                    apiDataModel.setClazz(clazz);
-                    String method = info.getMethodsCondition().toString().replace("[", "").replace("]", "");
-                    String[] methods;
-                    if ("".equals(method)) {
-                        methods = new String[2];
-                        methods[0] = "GET";
-                        methods[1] = "POST";
-                    } else {
-                        methods = new String[1];
-                        methods[0] = method;
+        RequestMappingHandlerMapping handlerMapping = requestMappings.get("requestMappingHandlerMapping");
+        if (handlerMapping != null) {
+            Map<RequestMappingInfo, HandlerMethod> methodMap = handlerMapping.getHandlerMethods();
+            for (RequestMappingInfo info : methodMap.keySet()) {
+                ApiDataModel apiDataModel = new ApiDataModel();
+                HandlerMethod handlerMethod = methodMap.get(info);
+                String clazz = handlerMethod.getBeanType().toString().substring(6);
+                apiDataModel.setClazz(clazz);
+                String method = info.getMethodsCondition().toString().replace("[", "").replace("]", "");
+                String[] methods;
+                if ("".equals(method)) {
+                    methods = new String[]{"GET", "POST"};
+                }else if (method.contains(" || ")){
+                    methods = method.split(" \\|\\| ");
+                } else {
+                    methods = new String[]{method};
+                }
+                apiDataModel.setMethod(methods);
+                Method declaredMethod = null;
+                try {
+                    HandlerMethod handlerMethodData = methodMap.get(info);
+                    String beanType = handlerMethodData.getBeanType().toString().substring(6);
+                    apiDataModel.setController(beanType);
+                    Method methodData = handlerMethodData.getMethod();
+                    String methodName = methodData.getName();
+                    Parameter[] parameters = methodData.getParameters();
+                    List<Class<?>> parameterList = new ArrayList<>();
+                    for (Parameter parameter : parameters
+                    ) {
+                        parameterList.add(parameter.getType());
                     }
-                    apiDataModel.setMethod(methods);
-                    Method declaredMethod = null;
-                    try {
-                        HandlerMethod handlerMethodData = methodMap.get(info);
-                        String beanType = handlerMethodData.getBeanType().toString().substring(6);
-                        apiDataModel.setController(beanType);
-                        Method methodData = handlerMethodData.getMethod();
-                        String methodName = methodData.getName();
-                        Parameter[] parameters = methodData.getParameters();
-                        List<Class<?>> parameterList = new ArrayList<>();
-                        for (Parameter parameter : parameters
-                        ) {
-                            parameterList.add(parameter.getType());
+                    int parameterListSize = parameterList.size();
+                    Class<?>[] classes = new Class[parameterListSize];
+                    for (int i = 0; i < parameterListSize; i++) {
+                        classes[i] = parameterList.get(i);
+                    }
+                    declaredMethod = AopUtils.getTargetClass(applicationContext.getBean(handlerMethod.getBean().toString())).getDeclaredMethod(methodName, classes);
+                    parameters = declaredMethod.getParameters();
+                    List<Map<String, String>> parameterMaps = new ArrayList<>();
+                    String[] params = methodParameters.getParameterNames(methodData);
+                    int i = 0;
+                    for (Parameter parameter : parameters
+                    ) {
+                        Map<String, String> parameterMap = new HashMap<>();
+                        String classType = parameter.getType().toString();
+                        if (classType.contains(" ")) {
+                            classType = classType.substring(classType.indexOf(" ") + 1);
                         }
-                        int parameterListSize = parameterList.size();
-                        Class<?>[] classes = new Class[parameterListSize];
-                        for (int i = 0; i < parameterListSize; i++) {
-                            classes[i] = parameterList.get(i);
-                        }
-                        declaredMethod = AopUtils.getTargetClass(applicationContext.getBean(handlerMethod.getBean().toString())).getDeclaredMethod(methodName, classes);
-                        parameters = declaredMethod.getParameters();
-                        List<Map<String, String>> parameterMaps = new ArrayList<>();
-                        String[] params = methodParameters.getParameterNames(methodData);
-                        int i = 0;
-                        for (Parameter parameter : parameters
+                        Annotation[] declaredAnnotations = parameter.getDeclaredAnnotations();
+                        StringBuilder annos = new StringBuilder();
+                        for (Annotation annotation : declaredAnnotations
                         ) {
-                            Map<String, String> parameterMap = new HashMap<>();
-                            String classType = parameter.getType().toString();
-                            if (classType.contains(" ")) {
-                                classType = classType.substring(classType.indexOf(" ") + 1);
+                            String anno = annotation.annotationType().toString();
+                            anno = anno.substring(anno.lastIndexOf(".") + 1);
+                            switch (anno) {
+                                case "PathVariable":
+                                    anno = "restful访问参数";
+                                    break;
+                                case "RequestHeader":
+                                    anno = "Header参数";
+                                    break;
+                                case "CookieValue":
+                                    anno = "Cookie参数";
+                                    break;
+                                case "RequestParam":
+                                    anno = "GET请求参数";
+                                    break;
+                                case "RequestBody":
+                                    anno = "POST请求的body参数";
+                                    break;
+                                case "Validated":
+                                    anno = "GET请求参数对象";
+                                    break;
                             }
-                            Annotation[] declaredAnnotations = parameter.getDeclaredAnnotations();
-                            StringBuilder annos = new StringBuilder();
-                            for (Annotation annotation : declaredAnnotations
-                            ) {
-                                String anno = annotation.annotationType().toString();
-                                anno = anno.substring(anno.lastIndexOf(".") + 1);
-                                switch (anno) {
-                                    case "PathVariable":
-                                        anno = "restful访问参数";
-                                        break;
-                                    case "RequestHeader":
-                                        anno = "Header参数";
-                                        break;
-                                    case "CookieValue":
-                                        anno = "Cookie参数";
-                                        break;
-                                    case "RequestParam":
-                                        anno = "GET请求参数";
-                                        break;
-                                    case "RequestBody":
-                                        anno = "POST请求的body参数";
-                                        break;
-                                    case "Validated":
-                                        anno = "GET请求参数对象";
-                                        break;
-                                }
-                                annos.append(anno);
-                            }
-                            assert params != null;
+                            annos.append(anno);
+                        }
+                        if (params != null){
                             parameterMap.put("name", params[i]);
-                            parameterMap.put("type", classType);
-                            parameterMap.put("annotation", String.valueOf(annos));
-                            parameterMaps.add(parameterMap);
-                            i = i + 1;
+                        }else {
+                            parameterMap.put("name", "null");
                         }
-                        apiDataModel.setParameters(parameterMaps);
-                        String returnType = declaredMethod.getReturnType().toString();
-                        if (returnType.contains("class ")) {
-                            returnType = declaredMethod.getReturnType().toString().substring(6);
-                        }
-                        apiDataModel.setReturnType(returnType);
-                    } catch (NoSuchMethodException ignore) {
+                        parameterMap.put("type", classType);
+                        parameterMap.put("annotation", String.valueOf(annos));
+                        parameterMaps.add(parameterMap);
+                        i = i + 1;
                     }
+                    apiDataModel.setParameters(parameterMaps);
+                    String returnType = declaredMethod.getReturnType().toString();
+                    if (returnType.contains("class ")) {
+                        returnType = declaredMethod.getReturnType().toString().substring(6);
+                    }
+                    apiDataModel.setReturnType(returnType);
+                } catch (NoSuchMethodException e) {
+                    DongTaiLog.error(e.getMessage());
+                }
 
 
-                    PatternsRequestCondition patternsCondition = info.getPatternsCondition();
-                    Set<String> patterns = patternsCondition.getPatterns();
-                    if (patterns.size() > 1) {
-                        for (String s : patterns
-                        ) {
-                            String uri =applicationContext.getApplicationName() + s.replace("[", "").replace("]", "");
-                            apiDataModel.setUrl(uri);
-                            apiList.add(apiDataModel);
-                        }
-                    } else {
-                        String uri = applicationContext.getApplicationName() + info.getPatternsCondition().toString().replace("[", "").replace("]", "");
+                PatternsRequestCondition patternsCondition = info.getPatternsCondition();
+                Set<String> patterns = patternsCondition.getPatterns();
+                if (patterns.size() > 1) {
+                    for (String s : patterns
+                    ) {
+                        String uri = applicationContext.getApplicationName() + s.replace("[", "").replace("]", "");
                         apiDataModel.setUrl(uri);
                         apiList.add(apiDataModel);
                     }
+                } else {
+                    String uri = applicationContext.getApplicationName() + info.getPatternsCondition().toString().replace("[", "").replace("]", "");
+                    apiDataModel.setUrl(uri);
+                    apiList.add(apiDataModel);
                 }
             }
         }

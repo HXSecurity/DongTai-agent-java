@@ -1,8 +1,10 @@
 package com.secnium.iast.core.enhance.plugins.api.spring;
 
 import com.secnium.iast.core.handler.IastClassLoader;
+import com.secnium.iast.core.handler.api.GetApiThread;
 import com.secnium.iast.core.handler.controller.impl.HttpImpl;
 import com.secnium.iast.core.handler.models.MethodEvent;
+import com.secnium.iast.log.DongTaiLog;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -27,13 +29,8 @@ public class SpringApplicationImpl {
             Object applicationContext = event.returnValue;
             createClassLoader(applicationContext);
             loadApplicationContext();
-            Map<String, Object> invoke = null;
-            try {
-                invoke = (Map<String, Object>) getAPI.invoke(null, applicationContext);
-                sendReport(invoke);
-                isSend = true;
-            } catch (Exception ignored) {
-            }
+            GetApiThread getApiThread = new GetApiThread(applicationContext);
+            getApiThread.start();
         }
     }
 
@@ -47,7 +44,7 @@ public class SpringApplicationImpl {
                 }
             }
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            DongTaiLog.error(e.getMessage());
         }
     }
 
@@ -58,7 +55,7 @@ public class SpringApplicationImpl {
                 proxyClass = iastClassLoader.loadClass("cn.huoxian.iast.spring.SpringApplicationContext");
                 getAPI = proxyClass.getDeclaredMethod("getAPI", Object.class);
             } catch (NoSuchMethodException e) {
-                e.printStackTrace();
+                DongTaiLog.error(e.getMessage());
             }
         }
     }
