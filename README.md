@@ -17,11 +17,11 @@
 
 Dongtai-agent-java is DongTai Iast's data acquisition tool for Java applications. In a Java application with the iast agent added, the required data is collected by rewriting class bytecode, and then the data is sent to dongtai-OpenAPI service, and then the cloud engine processes the data to determine whether there are security holes.
 
-Dongtai-agent-java consists of `agent.jar`, `iast-core-jar`, `iast-inject. Jar` and `dongtai-servlet.jar`:
+Dongtai-agent-java consists of `agent.jar`, `dongtai-core-jar`, `dongtai-spy. Jar` and `dongtai-servlet.jar`:
 
 - `agent.jar` It is used to manage agent life cycle and configuration. The life cycle of the Agent includes downloading, installing, starting, stopping, restarting, and uninstalling the agent. Agent configuration includes application startup mode, vulnerability verification mode, whether to enable agent, etc.
-- `iast-core.jar ` The main functions of iast-core.jar are: bytecode piling, data collection, data preprocessing, data reporting, third-party component management, etc.
-- `iast-inject.jar` It is used to inject into the BootStrap ClassLoader. The data collection method in 'iast-core.jar' is then invoked in the target application.
+- `dongtai-core.jar ` The main functions of dongtai-core.jar are: bytecode piling, data collection, data preprocessing, data reporting, third-party component management, etc.
+- `dongtai-inject.jar` It is used to inject into the BootStrap ClassLoader. The data collection method in 'iast-core.jar' is then invoked in the target application.
 - `dongtai-servlet.jar` It is used to obtain the requests sent by the application and the responses received. It is used for data display and request replay.
 
 ## Application Scenarios
@@ -58,20 +58,20 @@ Please refer to the [Quick Start](https://doc.dongtai.io).
 
    ```
    release
-   ├── iast-agent.jar
+   ├── dongtai-agent.jar
    └── lib
        ├── dongtai-servlet.jar
-       ├── iast-core.jar
-       └── iast-inject.jar
+       ├── dongtai-core.jar
+       └── dongtai-spy.jar
    ```
 
-5. Copy `iast-core.jar`、`iast-inject.jar`、`dongtai-servlet.jar` to the system temporary directory. Get the system temporary directory to run the following Java code:
+5. Copy `dongtai-core.jar`、`dongtai-spy.jar`、`dongtai-servlet.jar` to the system temporary directory. Get the system temporary directory to run the following Java code:
 
    ```
    System.getProperty("java.io.tmpdir");
    ```
 
-6. Run the application and test the code (for example, SpringBoot) : `java -javaagent:/path/to/iast-agent.jar -Ddebug=true -jar app.jar`
+6. Run the application and test the code (for example, SpringBoot) : `java -javaagent:/path/to/dongtai-agent.jar -Ddebug=true -jar app.jar`
 
 7. Contribute code. If you want to contribute code to the DongTai IAST team, please read the full [contribution guide](https://github.com/HXSecurity/DongTai/blob/main/CONTRIBUTING.md).
 

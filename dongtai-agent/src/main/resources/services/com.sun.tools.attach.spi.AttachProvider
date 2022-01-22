@@ -1,0 +1,4 @@
+sun.tools.attach.LinuxAttachProvider
+sun.tools.attach.WindowsAttachProvider
+sun.tools.attach.BsdAttachProvider
+sun.tools.attach.SolarisAttachProvider

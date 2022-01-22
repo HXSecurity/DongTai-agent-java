@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <shade-prefix>com.secnium.iast.thirdparty</shade-prefix>
+        <shade-prefix>io.dongtai.iast.thirdparty</shade-prefix>
 
         <maven.compiler.source>1.6</maven.compiler.source>
         <maven.compiler.target>1.6</maven.compiler.target>
@@ -35,9 +35,9 @@
         <oshi-core.version>3.13.6</oshi-core.version>
     </properties>
 
-    <groupId>com.secnium.iast</groupId>
+    <groupId>io.dongtai.iast</groupId>
     <artifactId>iast</artifactId>
-    <version>1.2.0</version>
+    <version>1.3.0</version>
     <packaging>pom</packaging>
 
     <name>dongtai-agent-java</name>
@@ -93,13 +93,12 @@
     </build>
 
     <modules>
-        <module>iast-agent</module>
-        <module>iast-inject</module>
-        <module>iast-core</module>
-        <module>dongtai-jakarta-api</module>
-        <module>dongtai-servlet-api</module>
+        <module>dongtai-agent</module>
+        <module>dongtai-spy</module>
+        <module>dongtai-core</module>
         <module>dongtai-spring-api</module>
-        <module>iast-log</module>
+        <module>dongtai-log</module>
+        <module>dongtai-api</module>
     </modules>
 
     <dependencyManagement>
@@ -111,14 +110,14 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>com.secnium.iast</groupId>
-                <artifactId>iast-inject</artifactId>
-                <version>1.2.0</version>
+                <groupId>io.dongtai.iast</groupId>
+                <artifactId>dongtai-spy</artifactId>
+                <version>1.3.0</version>
             </dependency>
             <dependency>
-                <groupId>com.secnium.iast</groupId>
-                <artifactId>iast-core</artifactId>
-                <version>1.2.0</version>
+                <groupId>io.dongtai.iast</groupId>
+                <artifactId>dongtai-core</artifactId>
+                <version>1.3.0</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>

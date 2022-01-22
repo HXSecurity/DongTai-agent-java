@@ -3,10 +3,10 @@ NEW_VERSION=$1
 
 echo "curent path: `pwd`, change version $OLD_VERSION to $NEW_VERSION"
 
-sed -i "s/v$OLD_VERSION/v$NEW_VERSION/g" dongtai-jakarta-api/src/main/java/cn/huoxian/iast/api/ResponseWrapper.java
-sed -i "s/v$OLD_VERSION/v$NEW_VERSION/g" dongtai-servlet-api/src/main/java/cn/huoxian/iast/api/ResponseWrapper.java
-sed -i "s/v$OLD_VERSION/v$NEW_VERSION/g" iast-agent/src/main/java/com/secnium/iast/agent/Constant.java
-sed -i "s/$OLD_VERSION/$NEW_VERSION/g" iast-agent/src/main/resources/iast.properties
+sed -i "s/v$OLD_VERSION/v$NEW_VERSION/g" dongtai-api/src/main/io/dongtai/api/jakarta/JakartaResponseWrapper.java
+sed -i "s/v$OLD_VERSION/v$NEW_VERSION/g" dongtai-api/src/main/io/dongtai/api/servlet2/ServletResponseWrapper.java
+sed -i "s/v$OLD_VERSION/v$NEW_VERSION/g" dongtai-agent/src/main/java/com/secnium/iast/agent/Constant.java
+sed -i "s/$OLD_VERSION/$NEW_VERSION/g" dongtai-agent/src/main/resources/iast.properties
 
 mvn -B package -Dmaven.test.skip=true
 
