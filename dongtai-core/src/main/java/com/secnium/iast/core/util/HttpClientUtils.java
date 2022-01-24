@@ -62,8 +62,7 @@ public class HttpClientUtils {
     }
 
 
-    private static StringBuilder sendRequest(HttpMethods method, String baseUrl, String urlStr,
-            String data,
+    private static StringBuilder sendRequest(HttpMethods method, String baseUrl, String urlStr, String data,
             HashMap<String, String> headers, Proxy proxy) throws Exception {
         HttpURLConnection connection = null;
         StringBuilder response = new StringBuilder();

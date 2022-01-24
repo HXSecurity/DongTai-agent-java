@@ -27,7 +27,6 @@ import java.util.jar.JarFile;
  */
 public class EngineManager {
 
-    private static final String IAST_NAMESPACE = "DONGTAI";
     private static final String ENGINE_ENTRYPOINT_CLASS = "com.secnium.iast.core.AgentEngine";
     private static final String INJECT_PACKAGE_REMOTE_URI = "/api/v1/engine/download?engineName=dongtai-spy";
     private static final String ENGINE_PACKAGE_REMOTE_URI = "/api/v1/engine/download?engineName=dongtai-core";

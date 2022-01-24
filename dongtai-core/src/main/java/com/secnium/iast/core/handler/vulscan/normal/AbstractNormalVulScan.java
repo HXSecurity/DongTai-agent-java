@@ -51,7 +51,7 @@ public abstract class AbstractNormalVulScan implements IVulScan {
         for (StackTraceElement element : stacks) {
             vulStacks.put(element.toString());
         }
-        ThreadPools.send(Constants.API_REPORT_UPLOAD, report.toString());
+        ThreadPools.sendPriorityReport(Constants.API_REPORT_UPLOAD, report.toString());
     }
 
     protected StackTraceElement[] getLatestStack() {

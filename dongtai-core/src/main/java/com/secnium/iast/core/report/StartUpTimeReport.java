@@ -13,6 +13,6 @@ public class StartUpTimeReport {
         report.put(ReportConstant.AGENT_ID, id);
         report.put(ReportConstant.STARTUP_TIME, startUpTime);
 
-        ThreadPools.send("/api/v1/agent/gzipstartuptime", report.toString());
+        ThreadPools.sendReport("/api/v1/agent/gzipstartuptime", report.toString());
     }
 }

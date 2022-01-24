@@ -25,11 +25,15 @@ public class TrackerHelper {
     }
 
     public void enterPropagation() {
-        this.propagationDepth++;
+        if (isEnterEntry()) {
+            this.propagationDepth++;
+        }
     }
 
     public void leavePropagation() {
-        this.propagationDepth--;
+        if (isEnterEntry()) {
+            this.propagationDepth--;
+        }
     }
 
     /**
@@ -51,13 +55,17 @@ public class TrackerHelper {
     }
 
     public void enterSource() {
-        this.sourceLevel++;
+        if (isEnterEntry()) {
+            this.sourceLevel++;
+        }
     }
 
     public void leaveSource() {
-        this.sourceLevel--;
-        if (enterHttp > 0 && leaveSource == 0) {
-            leaveSource = 1;
+        if (isEnterEntry()) {
+            this.sourceLevel--;
+            if (enterHttp > 0 && leaveSource == 0) {
+                leaveSource = 1;
+            }
         }
     }
 
@@ -66,11 +74,15 @@ public class TrackerHelper {
     }
 
     public void enterSink() {
-        this.sinkDepth++;
+        if (isEnterEntry()) {
+            this.sinkDepth++;
+        }
     }
 
     public void leaveSink() {
-        this.sinkDepth--;
+        if (isEnterEntry()) {
+            this.sinkDepth--;
+        }
     }
 
     public boolean isFirstLevelSource() {

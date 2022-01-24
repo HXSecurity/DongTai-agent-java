@@ -15,7 +15,7 @@ public class ApiReport {
 
     public static void sendReport(Map<String, Object> apiList) {
         String report = createReport(apiList);
-        ThreadPools.send(Constants.API_REPORT_UPLOAD, report);
+        ThreadPools.sendReport(Constants.API_REPORT_UPLOAD, report);
     }
 
     private static String createReport(Map<String, Object> apiList) {

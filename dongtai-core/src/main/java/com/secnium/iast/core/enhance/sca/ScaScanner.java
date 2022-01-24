@@ -3,7 +3,8 @@ package com.secnium.iast.core.enhance.sca;
 import com.secnium.iast.core.EngineManager;
 import com.secnium.iast.core.handler.vulscan.ReportConstant;
 import com.secnium.iast.core.report.AssestReport;
-
+import com.secnium.iast.core.report.ThreadPools;
+import com.secnium.iast.log.DongTaiLog;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,8 +14,6 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-
-import com.secnium.iast.log.DongTaiLog;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -47,30 +46,26 @@ public class ScaScanner {
     public static void scanForSCA(String packageFile, String internalClassName) {
         File jarPackageFile = new File(packageFile);
         String packagePath = jarPackageFile.getParent();
-        ScaScanThread thread = null;
         if (isJarLibs(packageFile)) {
             packageFile = packageFile.replace("file:", "");
             packageFile = packageFile.substring(0, packageFile.indexOf("!/"));
             if (!scannedClassSet.contains(packageFile)) {
                 scannedClassSet.add(packageFile);
-                thread = new ScaScanThread(packageFile, 2);
+                ThreadPools.execute(new ScaScanThread(packageFile, 2));
             }
         } else if (isWarLibs(packageFile) && !scannedClassSet.contains(packagePath)) {
             scannedClassSet.add(packagePath);
-            thread = new ScaScanThread(packagePath, 1);
+            ThreadPools.execute(new ScaScanThread(packagePath, 1));
         } else if (!scannedClassSet.contains(packageFile) && isLocalMavenRepo(packageFile)) {
             scannedClassSet.add(packageFile);
-            thread = new ScaScanThread(packageFile, 3);
+            ThreadPools.execute(new ScaScanThread(packageFile, 3));
         } else if (packageFile.endsWith(".jar") && !scannedClassSet.contains(packageFile)) {
             scannedClassSet.add(packageFile);
-            thread = new ScaScanThread(packageFile, 3);
+            ThreadPools.execute(new ScaScanThread(packageFile, 3));
         }
         if (!isClassPath) {
             isClassPath = true;
-            thread = new ScaScanThread(System.getProperty("java.class.path"), 4);
-        }
-        if (null != thread) {
-            thread.start();
+            ThreadPools.execute(new ScaScanThread(System.getProperty("java.class.path"), 4));
         }
     }
 

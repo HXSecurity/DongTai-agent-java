@@ -25,7 +25,7 @@ public class GraphBuilder {
     public static void buildAndReport(Object request, Object response) {
         List<GraphNode> nodeList = build();
         String report = convertToReport(nodeList, request, response);
-        ThreadPools.send(Constants.API_REPORT_UPLOAD, report);
+        ThreadPools.sendPriorityReport(Constants.API_REPORT_UPLOAD, report);
     }
 
     /**

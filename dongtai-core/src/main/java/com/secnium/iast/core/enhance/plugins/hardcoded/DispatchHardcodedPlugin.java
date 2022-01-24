@@ -130,7 +130,7 @@ public class DispatchHardcodedPlugin implements DispatchPlugin {
             detail.put("isJdk", isJDKClass);
             detail.put("field", fieldName);
             detail.put("value", value);
-            ThreadPools.send(Constants.API_REPORT_UPLOAD, report.toString());
+            ThreadPools.sendPriorityReport(Constants.API_REPORT_UPLOAD, report.toString());
         }
     }
 }
