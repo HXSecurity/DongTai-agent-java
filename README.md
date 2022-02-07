@@ -71,7 +71,7 @@ Please refer to the [Quick Start](https://doc.dongtai.io).
    System.getProperty("java.io.tmpdir");
    ```
 
-6. Run the application and test the code (for example, SpringBoot) : `java -javaagent:/path/to/iast-agent.jar -Ddebug=true -jar app.jar`
+6. Run the application and test the code (for example, SpringBoot) : `java -javaagent:/path/to/iast-agent.jar -Ddongtai.debug=true -jar app.jar`
 
 7. Contribute code. If you want to contribute code to the DongTai IAST team, please read the full [contribution guide](https://github.com/HXSecurity/DongTai/blob/main/CONTRIBUTING.md).
 

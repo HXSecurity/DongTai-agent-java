@@ -75,7 +75,7 @@ DongTai-agent-java 由`agent.jar`、`iast-core.jar `、`iast-inject.jar`、`dong
    System.getProperty("java.io.tmpdir");
    ```
 
-6. 运行应用，测试代码（以SpringBoot应用为例）：`java -javaagent:/path/to/iast-agent.jar -Ddebug=true -jar app.jar`
+6. 运行应用，测试代码（以SpringBoot应用为例）：`java -javaagent:/path/to/iast-agent.jar -Ddongtai.debug=true -jar app.jar`
 
 7. 贡献代码。如果您想要向洞态 IAST 团队贡献代码，请阅读完整的[贡献指南](https://github.com/HXSecurity/DongTai/blob/main/CONTRIBUTING.md)
 
