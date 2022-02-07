@@ -16,13 +16,13 @@
 
 ## 项目介绍
 
-DongTai-agent-java 是**洞态IAST** 针对 Java 应用开发的数据采集端。在添加 iast-agent 代理的 Java 应用中，通过改写类字节码的方式采集所需数据，然后将数据发送至 DongTai-openapi 服务，再由云端引擎处理数据判断是否存在安全漏洞。
+DongTai-agent-java 是**洞态IAST** 针对 Java 应用开发的数据采集端。在添加 dongtai-agent 代理的 Java 应用中，通过改写类字节码的方式采集所需数据，然后将数据发送至 DongTai-openapi 服务，再由云端引擎处理数据判断是否存在安全漏洞。
 
-DongTai-agent-java 由`agent.jar`、`iast-core.jar `、`iast-inject.jar`、`dongtai-servlet.jar`四部分构成，其中：
+DongTai-agent-java 由`agent.jar`、`dongtai-core.jar `、`dongtai-inject.jar`、`dongtai-servlet.jar`四部分构成，其中：
 
 - `agent.jar`用来管理 agent 的生命周期和配置。agent 的生命周期包括下载、安装、启动、停止、重启、卸载。agent 的配置包括配置应用启动模式、漏洞检验模式、是否开启代理等。
-- `iast-core.jar`是核心 jar 包，其主要功能是：字节码插桩、数据采集、数据预处理、数据上报、第三方组件管理等。
-- `iast-inject.jar`是间谍 jar 包，用于注入至`BootStrap ClassLoader`，后续在目标应用中调用`iast-core.jar`中的数据采集方法
+- `dongtai-core.jar`是核心 jar 包，其主要功能是：字节码插桩、数据采集、数据预处理、数据上报、第三方组件管理等。
+- `dongtai-inject.jar`是间谍 jar 包，用于注入至`BootStrap ClassLoader`，后续在目标应用中调用`dongtai-core.jar`中的数据采集方法
 - `dongtai-servlet.jar`用于获取应用发送的请求以及收到的响应，用于数据展示以及请求重放功能。
 
 ## 应用场景
@@ -62,20 +62,20 @@ DongTai-agent-java 由`agent.jar`、`iast-core.jar `、`iast-inject.jar`、`dong
 
    ```
    release
-   ├── iast-agent.jar
+   ├── dongtai-agent.jar
    └── lib
        ├── dongtai-servlet.jar
-       ├── iast-core.jar
-       └── iast-inject.jar
+       ├── dongtai-core.jar
+       └── dongtai-inject.jar
    ```
 
-5. 拷贝`iast-core.jar`、`iast-inject.jar`、`dongtai-servlet.jar`到系统临时目录。获取系统临时目录可运行以下 Java 代码：
+5. 拷贝`dongtai-core.jar`、`dongtai-inject.jar`、`dongtai-servlet.jar`到系统临时目录。获取系统临时目录可运行以下 Java 代码：
 
    ```java
    System.getProperty("java.io.tmpdir");
    ```
 
-6. 运行应用，测试代码（以SpringBoot应用为例）：`java -javaagent:/path/to/iast-agent.jar -Ddebug=true -jar app.jar`
+6. 运行应用，测试代码（以SpringBoot应用为例）：`java -javaagent:/path/to/dongtai-agent.jar -Ddongtai.debug=true -jar app.jar`
 
 7. 贡献代码。如果您想要向洞态 IAST 团队贡献代码，请阅读完整的[贡献指南](https://github.com/HXSecurity/DongTai/blob/main/CONTRIBUTING.md)
 

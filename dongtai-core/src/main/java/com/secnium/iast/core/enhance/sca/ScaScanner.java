@@ -25,6 +25,7 @@ public class ScaScanner {
     private static final String ALGORITHM = "SHA-1";
     private static final String JAR = ".jar";
     private static volatile HashSet<String> scannedClassSet = new HashSet<String>();
+    private static volatile HashSet<String> scaSet = new HashSet<String>();
     private static volatile Boolean isClassPath = false;
 
     private static boolean isJarLibs(String packageFile) {
@@ -62,6 +63,10 @@ public class ScaScanner {
         } else if (packageFile.endsWith(".jar") && !scannedClassSet.contains(packageFile)) {
             scannedClassSet.add(packageFile);
             ThreadPools.execute(new ScaScanThread(packageFile, 3));
+        } else if (!scaSet.contains(packageFile) && isLocalMavenRepo(packageFile)) {
+            scaSet.add(packageFile);
+        } else if (packageFile.endsWith(".jar") && !scaSet.contains(packageFile)) {
+            scaSet.add(packageFile);
         }
         if (!isClassPath) {
             isClassPath = true;
