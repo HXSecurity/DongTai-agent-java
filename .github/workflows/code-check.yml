@@ -32,6 +32,7 @@ on:
 jobs:
   Cache-Dependencies:
     name: Cache dependencies
+    if: github.repository == 'HXSecurity/DongTai-agent-java'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -140,7 +141,7 @@ jobs:
       - run: |
           ossutil cp -rf release/iast-agent.jar oss://dongtai/agent_test/java/iast-agent.jar --meta x-oss-object-acl:public-read
           ossutil cp -rf release/lib/ oss://dongtai/agent_test/java/ --meta x-oss-object-acl:public-read
-          
+
       - name: Trigger Openapi Workflow
         uses: benc-uk/workflow-dispatch@v1
         with:

@@ -6,9 +6,9 @@
 
 ## for maven
 pom.xml.versionsBackup
-iast-core/target/
-iast-inject/target/
-iast-agent/target/
+dongtai-core/target/
+dongtai-spy/target/
+dongtai-agent/target/
 UnitText/target/
 target/
 **/dependency-reduced-pom.xml

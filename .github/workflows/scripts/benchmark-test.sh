@@ -9,11 +9,11 @@ echo "build benchmark with dongtai"
 mvn clean package cargo:start -Pdeploywdongtai
 
 echo "copy local package to temp directory"
-cp ../DongTai-agent-java/release/iast-agent.jar tools/DongTai/dongtai.jar
+cp ../DongTai-agent-java/release/dongtai-agent.jar tools/DongTai/dongtai.jar
 cp ../DongTai-agent-java/release/lib/*.jar target/cargo/installs/apache-tomcat-8.5.70/apache-tomcat-8.5.70/temp
 
 echo "run benchmark in backend"
-export JAVA_TOOL_OPTIONS="-Dproject.create=true -Ddongtai.app.name=$1 -Dproject.version=$2"
+export JAVA_TOOL_OPTIONS="-Ddongtai.app.create=true -Ddongtai.app.name=$1 -Ddongtai.app.version=$2"
 nohup mvn package cargo:run -Pdeploywdongtai &
 
 echo "wait for benchmark start..."

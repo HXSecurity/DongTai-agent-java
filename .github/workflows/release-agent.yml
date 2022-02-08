@@ -7,6 +7,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    if: github.repository == 'HXSecurity/DongTai-agent-java'
     permissions:
       contents: write
       packages: write
@@ -39,7 +40,7 @@ jobs:
           cd ${{ github.workspace }}/release/lib/ && \
           echo "${{ github.event.repository.name }},version,${{ steps.release.outputs.VERSION }}" >> version.txt && \
           echo "${{ github.event.repository.name }},commit_hash,${GITHUB_SHA}" >> version.txt && \
-          files=('iast-core.jar') && \
+          files=('dongtai-core.jar') && \
           for FILE in ${files[@]};do FILE_HASH=`sha256sum ${FILE} | awk '{print $1}'`; echo "${{ github.event.repository.name }},${FILE},${FILE_HASH}" >> version.txt; done \
 
       - uses: manyuanrong/setup-ossutil@v2.0
@@ -53,5 +54,5 @@ jobs:
           ossutil cp version.txt oss://huoqi-public/iast/release-version/${{ github.event.repository.name }}/${{ steps.release.outputs.VERSION }}/version.txt
 
       - run: |
-          ossutil cp -rf release/iast-agent.jar oss://dongtai/agent/java/iast-agent.jar --meta x-oss-object-acl:public-read
+          ossutil cp -rf release/dongtai-agent.jar oss://dongtai/agent/java/dongtai-agent.jar --meta x-oss-object-acl:public-read
           ossutil cp -rf release/lib/ oss://dongtai/agent/java/ --meta x-oss-object-acl:public-read

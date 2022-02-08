@@ -6,7 +6,7 @@ wget https://github.com/exexute/github_action_samples/releases/download/1.0.0/ap
 unzip apache-tomcat-8.5.40.zip 1>/dev/null
 
 echo "copy dongtai agent java to tomcat..."
-cp DongTai-agent-java/release/iast-agent.jar apache-tomcat-8.5.40/iast/agent.jar
+cp DongTai-agent-java/release/dongtai-agent.jar apache-tomcat-8.5.40/iast/agent.jar
 cp DongTai-agent-java/release/lib/*.jar apache-tomcat-8.5.40/temp/
 cd apache-tomcat-8.5.40
 
@@ -19,7 +19,7 @@ mysql -uroot -pyuhjnbGYUI -h127.0.0.1 -e "FLUSH PRIVILEGES;"
 mysql -uroot -pyuhjnbGYUI -h127.0.0.1 -e 'show DATABASES;'
 
 echo "start catalina and waitting 30s..."
-export JAVA_TOOL_OPTIONS="-Dproject.create=true -Ddongtai.app.name=$1 -Dproject.version=$2"
+export JAVA_TOOL_OPTIONS="-Ddongtai.app.create=true -Ddongtai.app.name=$1 -Ddongtai.app.version=$2"
 ./bin/startup.sh 2>/dev/null
 
 check_times=0
