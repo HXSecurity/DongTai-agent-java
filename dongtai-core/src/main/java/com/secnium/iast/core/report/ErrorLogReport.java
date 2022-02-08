@@ -26,7 +26,7 @@ public class ErrorLogReport {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
             t.printStackTrace(pw);
-            sendErrorLog(t);
+            sendErrorLog(t.toString());
         }
     }
 
