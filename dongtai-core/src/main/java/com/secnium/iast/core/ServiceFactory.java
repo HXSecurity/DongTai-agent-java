@@ -1,8 +1,8 @@
 package com.secnium.iast.core;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.secnium.iast.core.replay.HttpRequestReplay;
 import com.secnium.iast.core.report.AgentQueueReport;
+
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -12,11 +12,10 @@ import java.util.concurrent.TimeUnit;
  */
 public class ServiceFactory {
 
+    private static boolean RUNNING = false;
     private static ServiceFactory INSTANCE;
     private final ScheduledExecutorService queueService;
-    private final ScheduledExecutorService replayService;
 
-    HttpRequestReplay requestReplay = null;
     AgentQueueReport agentQueueSender = null;
 
     public static ServiceFactory getInstance() {
@@ -26,30 +25,22 @@ public class ServiceFactory {
         return INSTANCE;
     }
 
+    public static void startService() {
+        if (!ServiceFactory.RUNNING) {
+            ServiceFactory.RUNNING = true;
+            ServiceFactory.getInstance().start();
+        }
+    }
+
     public ServiceFactory() {
         this.queueService = Executors
                 .newSingleThreadScheduledExecutor(
                         new ThreadFactoryBuilder().setNameFormat("DongTai-HeartBeat").build());
-        this.replayService = Executors
-                .newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("DongTai-Replay").build());
-    }
-
-    public void init() {
-        agentQueueSender = new AgentQueueReport();
-        requestReplay = new HttpRequestReplay();
     }
 
     public void start() {
+        agentQueueSender = new AgentQueueReport();
         queueService.scheduleWithFixedDelay(agentQueueSender, 0, PropertyUtils.getInstance().getHeartBeatInterval(),
                 TimeUnit.SECONDS);
-        replayService.scheduleWithFixedDelay(requestReplay, 0, PropertyUtils.getInstance().getReplayInterval(),
-                TimeUnit.MILLISECONDS);
-    }
-
-    public void stop() {
-        // todo: 考虑是否需要挂起线程
-    }
-
-    public void destory() {
     }
 }

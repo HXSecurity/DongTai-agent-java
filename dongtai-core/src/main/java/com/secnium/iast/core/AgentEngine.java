@@ -2,10 +2,10 @@ package com.secnium.iast.core;
 
 import com.secnium.iast.core.engines.IEngine;
 import com.secnium.iast.core.engines.impl.ConfigEngine;
-import com.secnium.iast.core.engines.impl.ServiceEngine;
 import com.secnium.iast.core.engines.impl.TransformEngine;
 import com.secnium.iast.core.report.StartUpTimeReport;
 import com.secnium.iast.log.DongTaiLog;
+
 import java.lang.instrument.Instrumentation;
 import java.util.ArrayList;
 import java.util.ListIterator;
@@ -28,7 +28,6 @@ public class AgentEngine {
 
     public AgentEngine() {
         engines.add(new ConfigEngine());
-        engines.add(new ServiceEngine());
         engines.add(new TransformEngine());
     }
 

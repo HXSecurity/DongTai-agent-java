@@ -1,7 +1,5 @@
 package com.secnium.iast.core.replay;
 
-import com.secnium.iast.core.AbstractThread;
-import com.secnium.iast.core.EngineManager;
 import com.secnium.iast.core.handler.models.IastReplayModel;
 import com.secnium.iast.core.util.HttpClientHostnameVerifier;
 import com.secnium.iast.core.util.HttpClientUtils;
@@ -34,41 +32,13 @@ import java.util.Map;
  *
  * @author dongzhiyong@huoxian.cn
  */
-public class HttpRequestReplay extends AbstractThread {
+public class HttpRequestReplay implements Runnable {
     private static final String PROTOCOL_HTTPS = "https";
     public final static HostnameVerifier DO_NOT_VERIFY = new HttpClientHostnameVerifier();
+    private final StringBuilder replayRequestRaw;
 
-
-    /**
-     * @param replayRequestRaw
-     */
-    public static void sendReplayRequest(StringBuilder replayRequestRaw) {
-        try {
-            JSONObject resp = new JSONObject(replayRequestRaw.toString());
-            Integer statusCode = (Integer) resp.get("status");
-            if (statusCode == 201) {
-                String data = resp.get("data").toString();
-                if (!"[]".equals(data)) {
-                    JSONArray replayRequests = (JSONArray) resp.get("data");
-                    for (int index = 0, total = replayRequests.length(); index < total; index++) {
-                        JSONObject replayRequest = (JSONObject) replayRequests.get(index);
-                        IastReplayModel replayModel = new IastReplayModel(
-                                replayRequest.get("method"),
-                                replayRequest.get("uri"),
-                                replayRequest.get("params"),
-                                replayRequest.get("body"),
-                                replayRequest.get("header"),
-                                replayRequest.get("id"),
-                                replayRequest.get("relation_id"),
-                                replayRequest.get("replay_type"));
-                        if (replayModel.isValid()) {
-                            EngineManager.sendReplayModel(replayModel);
-                        }
-                    }
-                }
-            }
-        } catch (Throwable ignore) {
-        }
+    public HttpRequestReplay(StringBuilder replayRequestRaw) {
+        this.replayRequestRaw = replayRequestRaw;
     }
 
 
@@ -168,10 +138,32 @@ public class HttpRequestReplay extends AbstractThread {
     }
 
     @Override
-    protected void send() {
-        while (EngineManager.hasReplayData()) {
-            IastReplayModel model = EngineManager.getReplayModel();
-            doReplay(model);
+    public void run() {
+        try {
+            JSONObject resp = new JSONObject(replayRequestRaw.toString());
+            Integer statusCode = (Integer) resp.get("status");
+            if (statusCode == 201) {
+                String data = resp.get("data").toString();
+                if (!"[]".equals(data)) {
+                    JSONArray replayRequests = (JSONArray) resp.get("data");
+                    for (int index = 0, total = replayRequests.length(); index < total; index++) {
+                        JSONObject replayRequest = (JSONObject) replayRequests.get(index);
+                        IastReplayModel replayModel = new IastReplayModel(
+                                replayRequest.get("method"),
+                                replayRequest.get("uri"),
+                                replayRequest.get("params"),
+                                replayRequest.get("body"),
+                                replayRequest.get("header"),
+                                replayRequest.get("id"),
+                                replayRequest.get("relation_id"),
+                                replayRequest.get("replay_type"));
+                        if (replayModel.isValid()) {
+                            doReplay(replayModel);
+                        }
+                    }
+                }
+            }
+        } catch (Throwable ignore) {
         }
     }
 }

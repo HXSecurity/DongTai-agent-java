@@ -8,13 +8,10 @@ import com.secnium.iast.agent.middlewarerecognition.ServerDetect;
 import com.secnium.iast.agent.util.base64.Base64Encoder;
 import com.secnium.iast.agent.util.http.HttpClientUtils;
 import com.secnium.iast.log.DongTaiLog;
-import java.net.Inet6Address;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
-import java.net.UnknownHostException;
+
+import java.net.*;
 import java.util.Enumeration;
+
 import org.json.JSONObject;
 
 /**
@@ -26,12 +23,9 @@ public class AgentRegisterReport {
     private String projectName = null;
     private Integer agentId = -1;
     private static Integer coreRegisterStart = 1;
-    final ServerDetect serverDetect = ServerDetect.getInstance();
-    final IServer server = serverDetect.getWebserver();
+    final IServer server = ServerDetect.getWebserver();
     private static String AGENT_NAME = null;
     private static String HOST_NAME = null;
-    private static String SERVER_ADDR = null;
-    private static Integer SERVER_PORT = null;
 
     /**
      * 创建agent注册报告
@@ -51,9 +45,9 @@ public class AgentRegisterReport {
                 Base64Encoder.encodeBase64String(System.getProperties().toString().getBytes()).replaceAll("\n", ""));
         object.put(Constant.KEY_CONTAINER_NAME, null == server ? "" : server.getName());
         object.put(Constant.KEY_CONTAINER_VERSION, null == server ? "" : server.getVersion());
-        object.put(Constant.KEY_SERVER_PATH, serverDetect.getWebServerPath());
-        object.put(Constant.KEY_SERVER_ADDR, null != SERVER_ADDR ? SERVER_ADDR : "");
-        object.put(Constant.KEY_SERVER_PORT, null != SERVER_PORT ? SERVER_PORT : "");
+        object.put(Constant.KEY_SERVER_PATH, ServerDetect.getWebServerPath());
+        object.put(Constant.KEY_SERVER_ADDR, "");
+        object.put(Constant.KEY_SERVER_PORT, "");
         object.put(Constant.KEY_AUTO_CREATE_PROJECT, IastProperties.getInstance().isAutoCreateProject());
         object.put(Constant.KEY_PROJECT_VERSION, IastProperties.getInstance().getProjectVersion());
 
@@ -194,17 +188,28 @@ public class AgentRegisterReport {
 
     public void register() {
         try {
+            if (server == null) {
+                DongTaiLog.warn("Can't Recognize Web Service");
+                return;
+            } else {
+                DongTaiLog.info("DongTai will install for {} Service", server.getName());
+            }
             String msg = generateAgentRegisterMsg();
-            DongTaiLog.info("register agent");
             StringBuilder responseRaw = HttpClientUtils.sendPost(Constant.API_AGENT_REGISTER, msg);
             if (!isRegistered()) {
                 setAgentData(responseRaw);
             }
         } catch (SocketTimeoutException e) {
-            DongTaiLog.error("Agent registration to {} failed 10 seconds later, cause: timed out, token: {}",
+            DongTaiLog.error("Agent registration to {} failed 10 seconds later, Reason: {}, token: {}",
                     IastProperties.getInstance().getBaseUrl(), IastProperties.getInstance().getIastServerToken());
+        } catch (NullPointerException e) {
+            DongTaiLog.error("Agent registration to {} failed, Token: {}, Reason: {}", IastProperties.getInstance().getBaseUrl(), IastProperties.getInstance().getIastServerToken(), e.getMessage());
+        } catch (ConnectException e) {
+            DongTaiLog.error("Agent registration failed, Reason: Failed to connect to {}, please check with `curl -v {}`", IastProperties.getInstance().getBaseUrl(), IastProperties.getInstance().getBaseUrl());
         } catch (Exception e) {
             e.printStackTrace();
+            DongTaiLog.error("Agent registration to {} failed 10 seconds later, cause: {}, token: {}",
+                    IastProperties.getInstance().getBaseUrl(), e.getMessage(), IastProperties.getInstance().getIastServerToken());
         }
     }
 
@@ -233,9 +238,4 @@ public class AgentRegisterReport {
         return coreRegisterStart == 1;
     }
 
-    public static void reportServerMessage(String serverAddr, Integer serverPort) {
-        SERVER_ADDR = serverAddr;
-        SERVER_PORT = serverPort;
-        send();
-    }
 }

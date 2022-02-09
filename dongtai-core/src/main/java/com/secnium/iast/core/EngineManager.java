@@ -1,8 +1,6 @@
 package com.secnium.iast.core;
 
 import com.secnium.iast.core.context.ContextManager;
-import com.secnium.iast.core.handler.IastClassLoader;
-import com.secnium.iast.core.handler.models.IastReplayModel;
 import com.secnium.iast.core.handler.models.MethodEvent;
 import com.secnium.iast.core.threadlocalpool.BooleanThreadLocal;
 import com.secnium.iast.core.threadlocalpool.IastScopeTracker;
@@ -11,13 +9,10 @@ import com.secnium.iast.core.threadlocalpool.IastTaintHashCodes;
 import com.secnium.iast.core.threadlocalpool.IastTaintPool;
 import com.secnium.iast.core.threadlocalpool.IastTrackMap;
 import com.secnium.iast.core.threadlocalpool.RequestContext;
-import java.io.File;
-import java.lang.reflect.Method;
-import java.net.URL;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.concurrent.ArrayBlockingQueue;
 
 /**
  * 存储全局信息
@@ -43,9 +38,6 @@ public class EngineManager {
     private static final BooleanThreadLocal LINGZHI_RUNNING = new BooleanThreadLocal(false);
     public static final BooleanThreadLocal IS_TRANSFORMING = new BooleanThreadLocal(false);
     public static IastServer SERVER;
-
-    private static final ArrayBlockingQueue<IastReplayModel> REPLAY_QUEUE = new ArrayBlockingQueue<IastReplayModel>(
-            4096);
 
     private static boolean logined = false;
     private static int reqCounts = 0;
@@ -150,18 +142,6 @@ public class EngineManager {
         return instance.supportLazyHook;
     }
 
-    public static boolean hasReplayData() {
-        return !REPLAY_QUEUE.isEmpty();
-    }
-
-    public static IastReplayModel getReplayModel() {
-        return REPLAY_QUEUE.poll();
-    }
-
-    public static void sendReplayModel(IastReplayModel replayModel) {
-        REPLAY_QUEUE.offer(replayModel);
-    }
-
     public static boolean getIsLoginLogic() {
         return LOGIN_LOGIC_WEIGHT.get() != null && LOGIN_LOGIC_WEIGHT.get().equals(2);
     }
@@ -207,22 +187,14 @@ public class EngineManager {
     }
 
     public static void enterHttpEntry(Map<String, Object> requestMeta) {
+        ServiceFactory.startService();
         if (null == SERVER) {
+            // todo: read server addr and send to OpenAPI Service
             SERVER = new IastServer(
                     (String) requestMeta.get("serverName"),
                     (Integer) requestMeta.get("serverPort"),
                     true
             );
-            // fixme: 将该功能抽象至独立模块进行处理
-//            try {
-//                ClassLoader iastClassLoader = new IastClassLoader(EngineManager.class.getClassLoader(),
-//                        new URL[]{new File(getAgentPath()).toURI().toURL()});
-//                Class<?> proxyClass = iastClassLoader.loadClass("com.secnium.iast.agent.report.AgentRegisterReport");
-//                Method reportServerMessage = proxyClass
-//                        .getDeclaredMethod("reportServerMessage", String.class, Integer.class);
-//                reportServerMessage.invoke(null, SERVER.getServerAddr(), SERVER.getServerPort());
-//            } catch (Exception ignored) {
-//            }
         }
         Map<String, String> headers = (Map<String, String>) requestMeta.get("headers");
         if (headers.containsKey("dt-traceid")) {
@@ -261,6 +233,10 @@ public class EngineManager {
             Map<String, String> requestHeaders = new HashMap<String, String>(attachments.size());
             for (Map.Entry<String, String> entry : attachments.entrySet()) {
                 requestHeaders.put(entry.getKey(), entry.getValue());
+            }
+            if (null == SERVER) {
+                // todo: read server addr and send to OpenAPI Service
+                SERVER = new IastServer(requestHeaders.get("dubbo"), 0, true);
             }
             Map<String, Object> requestMeta = new HashMap<String, Object>(12);
             requestMeta.put("protocol", "dubbo/" + requestHeaders.get("dubbo"));

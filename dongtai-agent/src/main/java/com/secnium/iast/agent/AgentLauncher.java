@@ -5,6 +5,7 @@ import com.secnium.iast.agent.monitor.EngineMonitor;
 import com.secnium.iast.agent.monitor.MonitorDaemonThread;
 import com.secnium.iast.agent.report.AgentRegisterReport;
 import com.secnium.iast.log.DongTaiLog;
+
 import java.lang.instrument.Instrumentation;
 
 /**
@@ -95,6 +96,7 @@ public class AgentLauncher {
             } else {
                 EngineMonitor.isCoreRegisterStart = true;
             }
+            Runtime.getRuntime().addShutdownHook(new ShutdownThread());
             loadEngine(inst);
         } else {
             DongTaiLog.error("Agent register failed. Start without DongTai IAST.");
@@ -114,6 +116,5 @@ public class AgentLauncher {
         agentMonitorDaemonThread.setPriority(1);
         agentMonitorDaemonThread.setName("dongtai-monitor");
         agentMonitorDaemonThread.start();
-        Runtime.getRuntime().addShutdownHook(new ShutdownThread());
     }
 }

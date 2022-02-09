@@ -21,8 +21,6 @@ import java.util.Map;
  */
 public class HttpImpl {
 
-    private static Method iastRequestMethod;
-    private static Method iastResponseMethod;
     private static Method cloneRequestMethod;
     private static Method cloneResponseMethod;
     private static Class<?> CLASS_OF_SERVLET_PROXY;

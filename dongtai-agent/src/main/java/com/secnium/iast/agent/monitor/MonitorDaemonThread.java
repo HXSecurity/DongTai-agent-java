@@ -44,6 +44,7 @@ public class MonitorDaemonThread implements Runnable {
             }
         }
         while (!isExit) {
+            // check for webapi
             for (IMonitor monitor : this.monitorTasks) {
                 monitor.check();
             }

@@ -1,20 +1,20 @@
 package com.secnium.iast.core.report;
 
-import com.secnium.iast.core.AbstractThread;
 import com.secnium.iast.core.EngineManager;
 import com.secnium.iast.core.handler.vulscan.ReportConstant;
-import com.secnium.iast.core.replay.HttpRequestReplay;
 import com.secnium.iast.core.util.Constants;
 import com.secnium.iast.core.util.HttpClientUtils;
-import org.json.JSONObject;
 import com.secnium.iast.log.DongTaiLog;
+import org.json.JSONObject;
+
+import java.io.IOException;
 
 /**
  * 上报agent队列与请求数量
  *
  * @author dongzhiyong@huoxian.cn
  */
-public class AgentQueueReport extends AbstractThread {
+public class AgentQueueReport implements Runnable {
 
     public static String generateHeartBeatMsg() {
         JSONObject report = new JSONObject();
@@ -31,18 +31,22 @@ public class AgentQueueReport extends AbstractThread {
         return report.toString();
     }
 
-    /**
-     * 发送请求
-     *
-     * @throws Exception 捕获发送报告过程中出现的异常
-     */
     @Override
-    protected void send() throws Exception {
+    public void run() {
+        boolean isRunning = EngineManager.isLingzhiRunning();
+        if (isRunning) {
+            EngineManager.turnOffLingzhi();
+        }
         try {
-            StringBuilder response = HttpClientUtils.sendPost(Constants.API_REPORT_UPLOAD, generateHeartBeatMsg());
-            HttpRequestReplay.sendReplayRequest(response);
+            StringBuilder replayRequestRaw = HttpClientUtils.sendPost(Constants.API_REPORT_UPLOAD, generateHeartBeatMsg());
+            ThreadPools.submitReplayTask(replayRequestRaw);
+        } catch (IOException e) {
+            DongTaiLog.error("report error reason: {}", e);
         } catch (Exception e) {
-            DongTaiLog.error("agent queue reported failed. reason: {}", e);
+            DongTaiLog.error("report error, reason: {}", e);
+        }
+        if (isRunning) {
+            EngineManager.turnOnLingzhi();
         }
     }
 }
