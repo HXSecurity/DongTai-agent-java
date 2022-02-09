@@ -22,7 +22,7 @@ public class DubboService implements IServer {
 
     @Override
     public String getName() {
-        return null;
+        return "Dubbo";
     }
 
     @Override

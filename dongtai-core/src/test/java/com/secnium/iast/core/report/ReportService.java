@@ -11,10 +11,6 @@ public class ReportService {
 
         private String jobName;
 
-        MyScheduledExecutor() {
-
-        }
-
         MyScheduledExecutor(String jobName) {
             this.jobName = jobName;
         }

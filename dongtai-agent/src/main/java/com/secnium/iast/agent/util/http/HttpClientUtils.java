@@ -106,7 +106,6 @@ public class HttpClientUtils {
             if (connection.getResponseCode() != 200) {
                 throw new NullPointerException(connection.getResponseCode() + " " + connection.getResponseMessage());
             }
-            System.out.println(connection.getResponseCode());
             InputStream is = connection.getInputStream();
             BufferedReader rd = new BufferedReader(new InputStreamReader(is));
             String line;
@@ -116,8 +115,6 @@ public class HttpClientUtils {
             }
             rd.close();
             return response;
-        } catch (Exception e) {
-            throw e;
         } finally {
             if (connection != null) {
                 connection.disconnect();
