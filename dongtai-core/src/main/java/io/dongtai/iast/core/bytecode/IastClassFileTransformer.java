@@ -275,6 +275,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
             }
         }
         System.out.println("finish reTransform: " + stopWatch.getTime());
+        System.out.println("Transform Method: " + getTransformTime());
     }
 
 }
