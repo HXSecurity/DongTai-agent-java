@@ -6,7 +6,7 @@ import java.lang.management.RuntimeMXBean;
  * @author dongzhiyong@huoxian.cn
  */
 public interface IServer {
-    boolean isMatch(RuntimeMXBean paramRuntimeMXBean);
+    boolean isMatch(RuntimeMXBean paramRuntimeMXBean, ClassLoader loader);
 
     String getName();
 

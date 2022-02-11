@@ -5,7 +5,7 @@ import com.secnium.iast.agent.IastClassLoader;
 import com.secnium.iast.agent.IastProperties;
 import com.secnium.iast.agent.report.AgentRegisterReport;
 import com.secnium.iast.agent.util.http.HttpClientUtils;
-import com.secnium.iast.log.DongTaiLog;
+import io.dongtai.log.DongTaiLog;
 import org.json.JSONObject;
 
 import java.io.*;

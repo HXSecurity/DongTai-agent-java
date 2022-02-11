@@ -1,10 +1,11 @@
 package com.secnium.iast.agent;
 
 import com.secnium.iast.agent.util.JavaVersionUtils;
-import com.secnium.iast.log.DongTaiLog;
+import io.dongtai.log.DongTaiLog;
 import com.sun.tools.attach.AgentLoadException;
 import com.sun.tools.attach.AttachNotSupportedException;
 import com.sun.tools.attach.VirtualMachine;
+
 import java.io.IOException;
 import java.util.Properties;
 

@@ -1,5 +1,7 @@
 package com.secnium.iast.agent.middlewarerecognition;
 
+import com.secnium.iast.agent.Agent;
+import com.secnium.iast.agent.AgentLauncher;
 import com.secnium.iast.agent.middlewarerecognition.dubbo.DubboService;
 import com.secnium.iast.agent.middlewarerecognition.gRPC.GrpcService;
 import com.secnium.iast.agent.middlewarerecognition.jboss.JBoss;
@@ -15,6 +17,7 @@ import com.secnium.iast.agent.middlewarerecognition.websphere.WebSphere;
 import java.io.File;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
+import java.util.Map;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -35,13 +38,18 @@ public class ServerDetect {
             new SpringService(),
             new ServletService(),
             new DubboService(),
-            new GrpcService()
+            new GrpcService(),
+            new UnknownService()
     };
 
     public static IServer getWebserver() {
+        if (AgentLauncher.LAUNCH_MODE.equals(AgentLauncher.LAUNCH_MODE_ATTACH)) {
+            return new UnknownService();
+        }
         RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
         for (IServer server : SERVERS) {
-            if (server.isMatch(runtimeMXBean)) {
+            if (server.isMatch(runtimeMXBean, loader)) {
                 return server;
             }
         }

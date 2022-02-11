@@ -1,5 +1,6 @@
 package com.secnium.iast.core.enhance.sca;
 
+import io.dongtai.iast.core.bytecode.sca.SignatureAlgorithm;
 import org.junit.Test;
 
 import java.io.File;

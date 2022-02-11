@@ -6,16 +6,16 @@ import java.lang.management.RuntimeMXBean;
 
 public class ServletService implements IServer {
     @Override
-    public boolean isMatch(RuntimeMXBean paramRuntimeMXBean) {
+    public boolean isMatch(RuntimeMXBean paramRuntimeMXBean, ClassLoader loader) {
         try {
-            Thread.currentThread().getContextClassLoader().loadClass("javax.servlet.ServletRequest");
+            loader.loadClass("javax.servlet.ServletRequest");
             return true;
-        } catch (ClassNotFoundException ignored) {
+        } catch (Exception ignored) {
         }
         try {
-            Thread.currentThread().getContextClassLoader().loadClass("jakarta.servlet.ServletRequest");
+            loader.loadClass("jakarta.servlet.ServletRequest");
             return true;
-        } catch (ClassNotFoundException ignored) {
+        } catch (Exception ignored) {
         }
         return false;
     }

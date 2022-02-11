@@ -6,9 +6,9 @@ import java.lang.management.RuntimeMXBean;
 
 public class SpringService implements IServer {
     @Override
-    public boolean isMatch(RuntimeMXBean paramRuntimeMXBean) {
+    public boolean isMatch(RuntimeMXBean paramRuntimeMXBean, ClassLoader loader) {
         try {
-            Class<?> classOfSpringContext = Thread.currentThread().getContextClassLoader().loadClass("org.springframework.web.context.ConfigurableWebApplicationContext");
+            loader.loadClass("org.springframework.web.context.ConfigurableWebApplicationContext");
             return true;
         } catch (Exception e) {
 

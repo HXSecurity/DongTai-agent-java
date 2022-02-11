@@ -1332,6 +1332,11 @@ com/arjuna/common/util/exceptions/SavePropertiesException
 com/arjuna/common/util/logging/LogFactory
 com/arjuna/common/util/logging/LogNoi18n
 com/arjuna/common/util/logging/Logi18n
+com/bea/core/repackaged/springframework/beans/factory/xml/BeanDefinitionParserDelegate
+com/bea/core/repackaged/springframework/beans/factory/xml/BeansDtdResolver
+com/bea/core/repackaged/springframework/beans/factory/xml/DefaultBeanDefinitionDocumentReader
+com/bea/core/repackaged/springframework/beans/factory/xml/DefaultDocumentLoader
+com/bea/core/repackaged/springframework/beans/factory/xml/DefaultNamespaceHandlerResolver
 com/arjuna/common/util/propertyservice/FileLocator
 com/arjuna/common/util/propertyservice/PropertiesFactory
 com/arjuna/common/util/propertyservice/PropertyManager

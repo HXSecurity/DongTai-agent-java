@@ -1,7 +1,7 @@
 package com.secnium.iast.agent;
 
 import com.secnium.iast.agent.monitor.MonitorDaemonThread;
-import com.secnium.iast.log.DongTaiLog;
+import io.dongtai.log.DongTaiLog;
 
 public class ShutdownThread extends Thread {
 

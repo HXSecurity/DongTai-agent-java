@@ -1,10 +1,14 @@
 package com.secnium.iast.core;
 
-import com.secnium.iast.core.engines.IEngine;
-import com.secnium.iast.core.engines.impl.ConfigEngine;
-import com.secnium.iast.core.engines.impl.TransformEngine;
-import com.secnium.iast.core.report.StartUpTimeReport;
-import com.secnium.iast.log.DongTaiLog;
+import io.dongtai.iast.core.bytecode.IastClassFileTransformer;
+import io.dongtai.iast.core.init.IEngine;
+import io.dongtai.iast.core.init.impl.ConfigEngine;
+import io.dongtai.iast.core.init.impl.TransformEngine;
+import io.dongtai.iast.core.service.StartUpTimeReport;
+import io.dongtai.log.DongTaiLog;
+import io.dongtai.iast.core.EngineManager;
+import io.dongtai.iast.core.utils.PropertyUtils;
+import org.apache.commons.lang3.time.StopWatch;
 
 import java.lang.instrument.Instrumentation;
 import java.util.ArrayList;
@@ -33,26 +37,28 @@ public class AgentEngine {
 
 
     public static void install(String mode, String propertiesFilePath, Integer agentId, Instrumentation inst,
-            String agentFile) {
+                               String agentFile) {
         if ("true".equals(System.getProperty("DongTai.IAST.Status"))) {
             DongTaiLog.info("DongTai IAST has Installed.");
             return;
         }
-        long start = System.currentTimeMillis();
-
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
         DongTaiLog.info("DongTai Engine is about to be installed, the installation mode is {}", mode);
         PropertyUtils cfg = PropertyUtils.getInstance(propertiesFilePath);
         EngineManager.getInstance(agentId);
         AgentEngine agentEngine = AgentEngine.getInstance();
         agentEngine.init(mode, cfg, inst);
+        // Time consuming location
         agentEngine.run();
         System.setProperty("DongTai.IAST.Status", "true");
 
-        long startupTime = System.currentTimeMillis() - start;
-        StartUpTimeReport.sendReport(EngineManager.getAgentId(), (int) startupTime);
+        stopWatch.stop();
+        StartUpTimeReport.sendReport(EngineManager.getAgentId(), (int) stopWatch.getTime());
         EngineManager.agentStarted();
-        DongTaiLog.info("DongTai Engine is successfully installed to the JVM, and it takes {} s",
-                startupTime / 1000);
+        IastClassFileTransformer transformer = IastClassFileTransformer.getInstance(inst);
+        DongTaiLog.info("DongTai Engine is successfully installed to the JVM, and it takes {} s, transform takes {} ms",
+                stopWatch.getTime() / 1000, transformer.getTransformTime());
     }
 
     public static void start() {

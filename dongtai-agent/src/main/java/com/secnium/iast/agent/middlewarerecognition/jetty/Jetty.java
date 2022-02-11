@@ -1,7 +1,6 @@
 package com.secnium.iast.agent.middlewarerecognition.jetty;
 
 
-
 import com.secnium.iast.agent.middlewarerecognition.IServer;
 
 import java.io.*;
@@ -22,7 +21,7 @@ import java.lang.management.RuntimeMXBean;
 public class Jetty implements IServer {
 
     @Override
-    public boolean isMatch(RuntimeMXBean runtimeMXBean) {
+    public boolean isMatch(RuntimeMXBean runtimeMXBean, ClassLoader loader) {
         String classPath = runtimeMXBean.getClassPath();
         String javaCommand = runtimeMXBean.getSystemProperties().get("sun.java.command");
         return classPath.contains("start.jar") && javaCommand.contains("org.eclipse.jetty.start.Main");

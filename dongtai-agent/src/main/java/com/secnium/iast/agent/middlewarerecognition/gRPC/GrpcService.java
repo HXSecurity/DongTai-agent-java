@@ -6,9 +6,9 @@ import java.lang.management.RuntimeMXBean;
 
 public class GrpcService implements IServer {
     @Override
-    public boolean isMatch(RuntimeMXBean paramRuntimeMXBean) {
+    public boolean isMatch(RuntimeMXBean paramRuntimeMXBean, ClassLoader loader) {
         try {
-            Class<?> classOfGrpcServer = Thread.currentThread().getContextClassLoader().loadClass("io.grpc.internal.ServerImpl");
+            loader.loadClass("io.grpc.internal.ServerImpl");
             return true;
         } catch (ClassNotFoundException e) {
             return false;

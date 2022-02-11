@@ -1,6 +1,6 @@
 package com.secnium.iast.agent;
 
-import com.secnium.iast.log.DongTaiLog;
+import io.dongtai.log.DongTaiLog;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;

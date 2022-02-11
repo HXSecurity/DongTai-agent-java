@@ -7,7 +7,7 @@ import com.secnium.iast.agent.middlewarerecognition.IServer;
 import com.secnium.iast.agent.middlewarerecognition.ServerDetect;
 import com.secnium.iast.agent.util.base64.Base64Encoder;
 import com.secnium.iast.agent.util.http.HttpClientUtils;
-import com.secnium.iast.log.DongTaiLog;
+import io.dongtai.log.DongTaiLog;
 
 import java.net.*;
 import java.util.Enumeration;

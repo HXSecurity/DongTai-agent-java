@@ -1,5 +1,6 @@
 package com.secnium.iast.core.threadlocalpool;
 
+import io.dongtai.iast.core.utils.threadlocal.IastTaintPool;
 import org.junit.Test;
 
 import java.util.ArrayList;

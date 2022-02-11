@@ -9,8 +9,8 @@ import java.lang.management.RuntimeMXBean;
 public class TomcatV7 extends AbstractTomcat {
 
     @Override
-    public boolean isMatch(RuntimeMXBean paramRuntimeMXBean) {
-        return isMatch(paramRuntimeMXBean, TomcatVersion.V7);
+    public boolean isMatch(RuntimeMXBean paramRuntimeMXBean, ClassLoader loader) {
+        return isMatch(paramRuntimeMXBean, loader, TomcatVersion.V7);
     }
 
     @Override

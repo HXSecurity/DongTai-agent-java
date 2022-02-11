@@ -1,6 +1,6 @@
 package cn.huoxian.iast.spring;
 
-import com.secnium.iast.log.DongTaiLog;
+import io.dongtai.log.DongTaiLog;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;

@@ -12,11 +12,11 @@ abstract class AbstractTomcat implements IServer {
     private static final String BOOTSTRAP = "bootstrap.jar";
     private static final String COMMAND = " org.apache.catalina.startup.Bootstrap start".substring(1);
 
-    protected static boolean isMatch(RuntimeMXBean paramRuntimeMXBean, TomcatVersion paramw) {
-        return isBootstrap(paramRuntimeMXBean) && isMatchVersion(paramw);
+    protected static boolean isMatch(RuntimeMXBean paramRuntimeMXBean, ClassLoader loader, TomcatVersion paramw) {
+        return isBootstrap(paramRuntimeMXBean, loader) && isMatchVersion(paramw);
     }
 
-    private static boolean isBootstrap(RuntimeMXBean paramRuntimeMXBean) {
+    private static boolean isBootstrap(RuntimeMXBean paramRuntimeMXBean, ClassLoader loader) {
         String classPath = paramRuntimeMXBean.getClassPath();
         String startCmd = paramRuntimeMXBean.getSystemProperties().get("sun.java.command");
         return classPath.contains(BOOTSTRAP) && startCmd.equals(COMMAND);

@@ -1,7 +1,7 @@
 package com.secnium.iast.core;
 
-import com.secnium.iast.core.util.base64.Base64Decoder;
-import com.secnium.iast.core.util.base64.Base64Encoder;
+import io.dongtai.iast.core.utils.base64.Base64Decoder;
+import io.dongtai.iast.core.utils.base64.Base64Encoder;
 import org.junit.Test;
 
 import java.io.UnsupportedEncodingException;

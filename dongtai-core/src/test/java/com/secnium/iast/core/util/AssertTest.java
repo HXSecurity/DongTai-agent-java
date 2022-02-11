@@ -1,5 +1,6 @@
 package com.secnium.iast.core.util;
 
+import io.dongtai.iast.core.utils.Asserts;
 import org.junit.Test;
 
 public class AssertTest {

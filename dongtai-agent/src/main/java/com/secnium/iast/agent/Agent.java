@@ -7,7 +7,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 
-import com.secnium.iast.log.DongTaiLog;
+import io.dongtai.log.DongTaiLog;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -31,6 +31,10 @@ public class Agent {
 
         attachOptions.addOption(build("p", "pid", "webserver process id"));
         attachOptions.addOption(build("m", "mode", "optional: install uninstall"));
+        attachOptions.addOption(build("debug", "debug", "optional: debug mode"));
+        attachOptions.addOption(build("app_name", "app_name", "optional: DongTai Application Name, default: ExampleApplication"));
+        attachOptions.addOption(build("app_create", "app_create", "optional: DongTai Application Auto Create, default: false"));
+        attachOptions.addOption(build("app_version", "app_version", "optional: DongTai Application Version, default: v1.0"));
 
         CommandLineParser parser = new DefaultParser();
         HelpFormatter formatter = new HelpFormatter();
@@ -41,15 +45,27 @@ public class Agent {
             if (result.hasOption("p") && result.hasOption("m")) {
                 String pid = result.getOptionValue("p");
                 String mode = result.getOptionValue("m");
-                String attachArgs = null;
-                attachArgs = mode;
+                StringBuilder attachArgs = new StringBuilder();
+                attachArgs.append("mode=").append(mode);
+                if (result.hasOption("debug")) {
+                    attachArgs.append("&debug=").append(result.getOptionValue("debug"));
+                }
+                if (result.hasOption("app_create")) {
+                    attachArgs.append("&appCreate=").append(result.getOptionValue("app_create"));
+                }
+                if (result.hasOption("app_name")) {
+                    attachArgs.append("&appName=").append(result.getOptionValue("app_name"));
+                }
+                if (result.hasOption("app_version")) {
+                    attachArgs.append("&appVersion=").append(result.getOptionValue("app_version"));
+                }
 
                 String jdkVersion = getJdkVersion();
                 if ("1".equals(jdkVersion) && appendToolsPath()) {
-                    AttachLauncher.attach(pid, attachArgs);
+                    AttachLauncher.attach(pid, attachArgs.toString());
                     DongTaiLog.info("engine " + attachArgs + " successfully. pid: " + pid);
                 } else {
-                    AttachLauncher.attach(pid, attachArgs);
+                    AttachLauncher.attach(pid, attachArgs.toString());
                     DongTaiLog.info("engine " + attachArgs + " successfully. pid: " + pid);
                 }
             } else {

@@ -1,7 +1,6 @@
 package com.secnium.iast.agent.util.http;
 
 import com.secnium.iast.agent.IastProperties;
-import com.secnium.iast.log.DongTaiLog;
 
 import java.io.BufferedReader;
 import java.io.InputStream;

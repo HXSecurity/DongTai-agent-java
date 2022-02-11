@@ -50,7 +50,7 @@ public class WebSphere implements IServer {
     }
 
     @Override
-    public boolean isMatch(RuntimeMXBean paramRuntimeMXBean) {
+    public boolean isMatch(RuntimeMXBean paramRuntimeMXBean, ClassLoader loader) {
         WebSphereVersion webSphereVersion = WebSphere.recognize();
         return false;
     }

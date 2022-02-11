@@ -6,16 +6,16 @@ import java.lang.management.RuntimeMXBean;
 
 public class DubboService implements IServer {
     @Override
-    public boolean isMatch(RuntimeMXBean paramRuntimeMXBean) {
+    public boolean isMatch(RuntimeMXBean paramRuntimeMXBean, ClassLoader loader) {
         try {
-            Thread.currentThread().getContextClassLoader().loadClass("org.apache.dubbo.monitor.support.MonitorFilter");
+            loader.loadClass("org.apache.dubbo.monitor.support.MonitorFilter");
             return true;
-        } catch (ClassNotFoundException ignored) {
+        } catch (Exception ignored) {
         }
         try {
-            Thread.currentThread().getContextClassLoader().loadClass("com.alibaba.dubbo.monitor.support.MonitorFilter");
+            loader.loadClass("com.alibaba.dubbo.monitor.support.MonitorFilter");
             return true;
-        } catch (ClassNotFoundException ignored) {
+        } catch (Exception ignored) {
         }
         return false;
     }
