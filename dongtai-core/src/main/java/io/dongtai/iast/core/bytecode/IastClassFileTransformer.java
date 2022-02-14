@@ -260,20 +260,26 @@ public class IastClassFileTransformer implements ClassFileTransformer {
         System.out.println("find for transform: " + stopWatch.getTime());
         final int total = waitingReTransformClasses.size();
         int index = 0;
+
         for (final Class<?> waitingReTransformClass : waitingReTransformClasses) {
             index++;
             try {
                 inst.retransformClasses(waitingReTransformClass);
-
                 if (DongTaiLog.isDebugEnabled()) {
                     DongTaiLog.debug("reTransform class {} success, index={};total={};", waitingReTransformClass,
                             index - 1,
                             total);
                 }
             } catch (Throwable t) {
+                t.printStackTrace();
                 ErrorLogReport.sendErrorLog(t);
             }
         }
+//        try {
+//            inst.retransformClasses((Class<?>[]) waitingReTransformClasses.toArray());
+//        } catch (Throwable t) {
+//            t.printStackTrace();
+//        }
         System.out.println("finish reTransform: " + stopWatch.getTime());
         System.out.println("Transform Method: " + getTransformTime());
     }

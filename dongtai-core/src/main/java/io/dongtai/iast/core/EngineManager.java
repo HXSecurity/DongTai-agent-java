@@ -29,7 +29,6 @@ public class EngineManager {
     private final boolean supportLazyHook;
     private final boolean saveBytecode;
 
-    private static final BooleanThreadLocal AGENT_STATUS = new BooleanThreadLocal(false);
     private static final BooleanThreadLocal ENTER_HTTP_ENTRYPOINT = new BooleanThreadLocal(false);
     public static final RequestContext REQUEST_CONTEXT = new RequestContext();
     public static final IastTrackMap TRACK_MAP = new IastTrackMap();
@@ -37,23 +36,19 @@ public class EngineManager {
     public static final IastTaintHashCodes TAINT_HASH_CODES = new IastTaintHashCodes();
     public static final IastScopeTracker SCOPE_TRACKER = new IastScopeTracker();
     private static final IastServerPort LOGIN_LOGIC_WEIGHT = new IastServerPort();
-    private static final BooleanThreadLocal LINGZHI_RUNNING = new BooleanThreadLocal(false);
+    private static final BooleanThreadLocal DONGTAI_STATE = new BooleanThreadLocal(false);
     public static IastServer SERVER;
 
     private static boolean logined = false;
     private static int reqCounts = 0;
     private static int enableLingzhi = 0;
 
-    public static void agentStarted() {
-        AGENT_STATUS.set(true);
-    }
-
     public static void turnOnLingzhi() {
-        LINGZHI_RUNNING.set(true);
+        DONGTAI_STATE.set(true);
     }
 
     public static void turnOffLingzhi() {
-        LINGZHI_RUNNING.set(false);
+        DONGTAI_STATE.set(false);
     }
 
     /**
@@ -62,7 +57,7 @@ public class EngineManager {
      * @return
      */
     public static Boolean isLingzhiRunning() {
-        Boolean status = LINGZHI_RUNNING.get();
+        Boolean status = DONGTAI_STATE.get();
         return status != null && status;
     }
 
@@ -134,7 +129,7 @@ public class EngineManager {
      *
      * @return true - 引擎已启动；false - 引擎未启动
      */
-    public static boolean isEngineEnable() {
+    public static boolean isEngineRunning() {
         return EngineManager.enableLingzhi == 1;
     }
 

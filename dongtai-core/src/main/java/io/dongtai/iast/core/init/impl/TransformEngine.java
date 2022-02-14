@@ -26,14 +26,9 @@ public class TransformEngine implements IEngine {
     @Override
     public void start() {
         try {
-            StopWatch stopWatch = new StopWatch();
-            stopWatch.start();
             DongTaiLog.info("Install data acquisition and analysis sub-modules");
             inst.addTransformer(classFileTransformer, true);
-            System.out.println("Add Transformer: " + stopWatch.getTime());
             classFileTransformer.reTransform();
-            System.out.println("reTransformer: " + stopWatch.getTime());
-            stopWatch.stop();
             DongTaiLog.info("The sub-module of data acquisition and analysis is successfully installed");
         } catch (Throwable cause) {
             DongTaiLog.error("Failed to install the sub-module of data collection and analysis");

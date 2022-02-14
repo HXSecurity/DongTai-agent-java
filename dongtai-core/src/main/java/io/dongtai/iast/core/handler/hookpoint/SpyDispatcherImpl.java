@@ -11,6 +11,7 @@ import io.dongtai.iast.core.handler.hookpoint.controller.impl.SourceImpl;
 import io.dongtai.iast.core.handler.hookpoint.graphy.GraphBuilder;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.service.ErrorLogReport;
+
 import java.lang.dongtai.SpyDispatcher;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -65,7 +66,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public boolean isFirstLevelHttp() {
         try {
-            return EngineManager.isEngineEnable() && EngineManager.SCOPE_TRACKER
+            return EngineManager.isEngineRunning() && EngineManager.SCOPE_TRACKER
                     .isFirstLevelHttp();
         } catch (Exception e) {
             ErrorLogReport.sendErrorLog(e);
@@ -142,7 +143,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public boolean isFirstLevelDubbo() {
         try {
-            return EngineManager.isEngineEnable() && EngineManager.isFirstLevelDubbo();
+            return EngineManager.isEngineRunning() && EngineManager.isFirstLevelDubbo();
         } catch (Exception e) {
             ErrorLogReport.sendErrorLog(e);
         }
@@ -186,7 +187,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public boolean isFirstLevelSource() {
         try {
-            return EngineManager.isEngineEnable() && EngineManager.SCOPE_TRACKER
+            return EngineManager.isEngineRunning() && EngineManager.SCOPE_TRACKER
                     .isFirstLevelSource();
         } catch (Exception e) {
             return false;
@@ -230,7 +231,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public boolean isFirstLevelPropagator() {
         try {
-            return EngineManager.SCOPE_TRACKER.isFirstLevelPropagator();
+            return EngineManager.isEngineRunning() && EngineManager.SCOPE_TRACKER.isFirstLevelPropagator();
         } catch (Exception e) {
             return false;
         }
@@ -273,7 +274,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public boolean isFirstLevelSink() {
         try {
-            return EngineManager.isEngineEnable() && EngineManager.isTopLevelSink();
+            return EngineManager.isEngineRunning() && EngineManager.isTopLevelSink();
         } catch (Exception e) {
             return false;
         }

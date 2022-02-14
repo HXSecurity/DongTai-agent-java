@@ -55,7 +55,6 @@ public class AgentEngine {
 
         stopWatch.stop();
         StartUpTimeReport.sendReport(EngineManager.getAgentId(), (int) stopWatch.getTime());
-        EngineManager.agentStarted();
         IastClassFileTransformer transformer = IastClassFileTransformer.getInstance(inst);
         DongTaiLog.info("DongTai Engine is successfully installed to the JVM, and it takes {} s, transform takes {} ms",
                 stopWatch.getTime() / 1000, transformer.getTransformTime());
