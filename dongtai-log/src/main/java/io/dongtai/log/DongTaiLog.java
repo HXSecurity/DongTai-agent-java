@@ -202,7 +202,7 @@ public class DongTaiLog {
             String computed = from;
             if (arguments != null && arguments.length != 0) {
                 for (Object argument : arguments) {
-                    computed = computed.replaceFirst("\\{\\}", Matcher.quoteReplacement(argument.toString()));
+                    computed = computed.replaceFirst("\\{\\}", argument == null ? "NULL" : Matcher.quoteReplacement(argument.toString()));
                 }
             }
             return computed;

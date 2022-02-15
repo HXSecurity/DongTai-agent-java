@@ -3,6 +3,7 @@ package io.dongtai.iast.core.service;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.ReportConstant;
 import io.dongtai.iast.core.utils.Constants;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
@@ -23,6 +24,7 @@ public class ErrorLogReport {
     }
 
     public static void sendErrorLog(Throwable t) {
+        t.printStackTrace();
         if (ENABLE_UPLOAD) {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);

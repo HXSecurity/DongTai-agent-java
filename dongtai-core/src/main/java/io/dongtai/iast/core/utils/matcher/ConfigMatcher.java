@@ -5,9 +5,12 @@ import io.dongtai.iast.core.service.ErrorLogReport;
 import io.dongtai.iast.core.utils.ConfigUtils;
 import io.dongtai.iast.core.utils.ThrowableUtils;
 import io.dongtai.log.DongTaiLog;
+
+import java.lang.instrument.Instrumentation;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -28,6 +31,7 @@ public class ConfigMatcher {
     private final AbstractMatcher INTERNAL_CLASS = new InternalClass();
     private final AbstractMatcher FRAMEWORK_CLASS = new FrameworkClass();
     private final AbstractMatcher SERVER_CLASS = new ServerClass();
+    private Instrumentation inst;
 
     private final Set<String> BLACK_URL;
 
@@ -45,7 +49,7 @@ public class ConfigMatcher {
         String blackUrl = cfg.getBlackUrl();
         String disableExtList = cfg.getBlackExtFilePath();
 
-        HashSet<String>[] items = ConfigUtils.loadConfigFromFile(blackListFuncFile);
+        Set<String>[] items = ConfigUtils.loadConfigFromFile(blackListFuncFile);
         BLACKS = items[0];
         END_WITH_BLACKS = items[2].toArray(new String[0]);
         START_WITH_BLACKS = items[1].toArray(new String[0]);
@@ -118,46 +122,69 @@ public class ConfigMatcher {
         }
     }
 
+    public void setInst(Instrumentation inst) {
+        this.inst = inst;
+    }
+
+    /**
+     * @param clazz
+     * @return
+     * @since 1.4.0
+     */
+    public boolean isHookClassPoint(Class<?> clazz) {
+        if (!inst.isModifiableClass(clazz)) {
+            return false;
+        }
+        if (clazz.isInterface()) {
+            return false;
+        }
+        String className = clazz.getName().replace('.', '/');
+        return isHookPoint(className);
+    }
+
     /**
      * 判断当前类是否在hook点黑名单。hook黑名单： 1.agent自身的类； 2.已知的框架类、中间件类； 3.类名为null； 4.JDK内部类且不在hook点配置白名单中； 5.接口
      *
      * @param className jvm内部类名，如：java/lang/Runtime
-     * @param loader    当前类的classLoader
      * @return 是否支持hook
      */
-    public boolean isHookPoint(String className, ClassLoader loader) {
-        if (inHookBlacklist(className)) {
-            DongTaiLog.trace("ignore transform {} in loader={}. Reason: classname is startswith com/secnium/iast/",
-                    className, loader);
+    public boolean isHookPoint(String className) {
+        if (className.startsWith("[")) {
+            DongTaiLog.trace("ignore transform {}. Reason: class is a Array Type", className);
             return false;
         }
-
+        if (className.contains("/$Proxy")) {
+            DongTaiLog.trace("ignore transform {}. Reason: classname is a aop class by Proxy", className);
+            return false;
+        }
+        if (className.startsWith("com/secnium/iast/")
+                || className.startsWith("java/lang/iast/")
+                || className.startsWith("cn/huoxian/iast/")
+                || className.startsWith("io/dongtai/")
+                || className.startsWith("oshi/")
+                || className.startsWith("com/sun/jna/")
+        ) {
+            DongTaiLog.trace("ignore transform {}. Reason: class is in blacklist", className);
+            return false;
+        }
+        if (inHookBlacklist(className)) {
+            DongTaiLog.trace("ignore transform {}. Reason: classname is startswith com/secnium/iast/", className);
+            return false;
+        }
         if (className.contains("CGLIB$$")) {
-            DongTaiLog.trace("ignore transform {} in loader={}. Reason: classname is a aop class by CGLIB", className,
-                    loader);
+            DongTaiLog.trace("ignore transform {}. Reason: classname is a aop class by CGLIB", className);
             return false;
         }
 
         if (className.contains("$$Lambda$")) {
-            DongTaiLog.trace("ignore transform {} in loader={}. Reason: classname is a aop class by Lambda", className,
-                    loader);
+            DongTaiLog.trace("ignore transform {}. Reason: classname is a aop class by Lambda", className);
             return false;
         }
 
         if (className.contains("_$$_jvst")) {
-            DongTaiLog.trace("ignore transform {} in loader={}. Reason: classname is a aop class", className, loader);
+            DongTaiLog.trace("ignore transform {}. Reason: classname is a aop class", className);
             return false;
         }
-
-        // todo: 计算startsWith、contains与正则匹配的时间损耗
-        if (className.startsWith("com/secnium/iast/")
-                || className.startsWith("java/lang/iast/")
-                || className.startsWith("cn/huoxian/iast/")
-        ) {
-            DongTaiLog.trace("ignore transform {} in loader={}. Reason: class is in blacklist", className, loader);
-            return false;
-        }
-
         return true;
     }
 

@@ -2,7 +2,7 @@ package com.secnium.iast.core.enhance;
 
 import org.junit.Test;
 
-public class IastClassAncestorQueryTest {
+public class IastClassDiagramTest {
     @Test
     public void scanJarForAccesstor() {
 

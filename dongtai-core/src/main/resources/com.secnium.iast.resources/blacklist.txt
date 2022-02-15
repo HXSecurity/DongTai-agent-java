@@ -12,6 +12,8 @@ org/jacoco/*
 # self package - need't hook
 com/secnium/*
 org/jruby/*
+uri_3a_classloader_3a_/*
+org/asciidoctor/*
 com/sun/jmx/remote/*
 # apple package
 apple/*

@@ -124,6 +124,16 @@
                                     </excludes>
                                 </filter>
                             </filters>
+                            <relocations>
+                                <relocation>
+                                    <pattern>org.</pattern>
+                                    <shadedPattern>${shade-prefix}.org.</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>oshi.</pattern>
+                                    <shadedPattern>${shade-prefix}.oshi.</shadedPattern>
+                                </relocation>
+                            </relocations>
                         </configuration>
                     </execution>
                 </executions>

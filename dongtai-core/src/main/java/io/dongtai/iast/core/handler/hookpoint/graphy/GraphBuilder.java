@@ -2,7 +2,7 @@ package io.dongtai.iast.core.handler.hookpoint.graphy;
 
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.utils.PropertyUtils;
-import io.dongtai.iast.core.bytecode.enhance.IastClassAncestorQuery;
+import io.dongtai.iast.core.bytecode.enhance.IastClassDiagram;
 import io.dongtai.iast.core.handler.hookpoint.controller.impl.HttpImpl;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.ReportConstant;
@@ -47,7 +47,7 @@ public class GraphBuilder {
                             event.getCallerClass(),
                             event.getCallerMethod(),
                             event.getCallerLine(),
-                            event.object != null ? IastClassAncestorQuery
+                            event.object != null ? IastClassDiagram
                                     .getFamilyFromClass(event.object.getClass().getName().replace("\\.", "/")) : null,
                             event.getMatchClassName(),
                             event.getOriginClassName(),

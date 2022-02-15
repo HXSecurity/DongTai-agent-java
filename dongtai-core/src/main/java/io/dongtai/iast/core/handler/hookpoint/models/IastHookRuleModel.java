@@ -59,6 +59,14 @@ public class IastHookRuleModel {
         ModelBuilder.buildRemote();
     }
 
+    public static IastHookRuleModel getInstance() {
+        return instance;
+    }
+
+    public boolean isHookClass(String className) {
+        return hookClassnames.contains(className) || hookSuperClassnames.contains(className);
+    }
+
     /**
      * 创建IASTHook规则单例对象
      *

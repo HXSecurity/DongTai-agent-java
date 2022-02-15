@@ -2,6 +2,7 @@ package io.dongtai.iast.core.bytecode.enhance;
 
 import io.dongtai.iast.core.service.ErrorLogReport;
 import io.dongtai.iast.core.utils.ThrowableUtils;
+
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
@@ -13,6 +14,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
 import org.json.JSONObject;
 import org.objectweb.asm.ClassReader;
 
@@ -21,9 +23,9 @@ import org.objectweb.asm.ClassReader;
  *
  * @author dongzhiyong@huoxian.cn
  */
-public class IastClassAncestorQuery {
+public class IastClassDiagram {
 
-    private final Map<String, Set<String>> classAncestorMap;
+    private final Map<String, Set<String>> diagrams;
     private static final Map<String, List<String>> DEFAULT_INTERFACE_LIST_MAP;
     private static final String BASE_CLASS = "java/lang/Object";
 
@@ -32,30 +34,40 @@ public class IastClassAncestorQuery {
     }
 
     private ClassLoader loader;
-    private static IastClassAncestorQuery instance;
+    private static IastClassDiagram instance;
 
-    public static IastClassAncestorQuery getInstance() {
+    public static IastClassDiagram getInstance() {
         if (instance == null) {
-            instance = new IastClassAncestorQuery();
+            instance = new IastClassDiagram();
         }
         return instance;
     }
 
-    private IastClassAncestorQuery() {
-        this.classAncestorMap = new ConcurrentHashMap<String, Set<String>>();
+    public Set<String> getDiagram(String className) {
+        return diagrams.get(className);
+    }
+
+    public void setDiagram(String className, Set<String> diagram) {
+        diagrams.put(className, diagram);
+    }
+
+    private IastClassDiagram() {
+        this.diagrams = new ConcurrentHashMap<String, Set<String>>();
     }
 
     public synchronized void saveAncestors(String className, String superName, String[] interfaces) {
-        Set<String> ancestorSet = this.classAncestorMap.get(className);
+        Set<String> ancestorSet = this.diagrams.get(className);
         ancestorSet = ancestorSet == null ? new HashSet<String>() : ancestorSet;
 
+        ancestorSet.add(className);
         if (!BASE_CLASS.equals(superName)) {
-            ancestorSet.add(superName);
+            ancestorSet.add(superName.replace("/", "."));
+        }
+        for (String interfaceClazzName : interfaces) {
+            ancestorSet.add(interfaceClazzName.replace("/", "."));
         }
 
-        Collections.addAll(ancestorSet, interfaces);
-
-        this.classAncestorMap.put(className, ancestorSet);
+        this.diagrams.put(className, ancestorSet);
     }
 
     /**
@@ -67,7 +79,7 @@ public class IastClassAncestorQuery {
      * @return 当前类的类族
      */
     public synchronized Set<String> getAncestors(String className, String superClassName, String[] interfaces) {
-        Set<String> ancestors = this.classAncestorMap.get(className);
+        Set<String> ancestors = this.diagrams.get(className);
 
         if (!isNullOrEmpty(superClassName) && !BASE_CLASS.equals(superClassName)) {
             addClassToAncestor(superClassName, ancestors);
@@ -87,7 +99,7 @@ public class IastClassAncestorQuery {
     }
 
     private void addClassToAncestor(String className, Set<String> ancestors) {
-        Set<String> set = this.classAncestorMap.get(className);
+        Set<String> set = this.diagrams.get(className);
         if (null != set) {
             for (String subClassName : set) {
                 if (!ancestors.contains(subClassName)) {
@@ -105,12 +117,12 @@ public class IastClassAncestorQuery {
                     if (tempDefaultMap != null) {
                         ancestors.addAll(tempDefaultMap);
                     }
-                    Set<String> tempClassMap = classAncestorMap.get(tempClass);
+                    Set<String> tempClassMap = diagrams.get(tempClass);
                     if (tempClassMap != null) {
                         ancestors.addAll(tempClassMap);
                     }
                 }
-                this.classAncestorMap.put(className, tempClassFamily);
+                this.diagrams.put(className, tempClassFamily);
             }
         }
         List<String> list = DEFAULT_INTERFACE_LIST_MAP.get(className);
@@ -177,11 +189,11 @@ public class IastClassAncestorQuery {
      * todo 利用类名查找实现的接口列表、继承的父类
      */
     public static Set<String> getFamilyFromClass(String className) {
-        return instance == null ? null : instance.classAncestorMap.get(className);
+        return instance == null ? null : instance.diagrams.get(className);
     }
 
     static {
-        DEFAULT_INTERFACE_LIST_MAP = new HashMap();
+        DEFAULT_INTERFACE_LIST_MAP = new HashMap<String, List<String>>();
         DEFAULT_INTERFACE_LIST_MAP.put(" org/apache/jasper/runtime/HttpJspBase".substring(1),
                 Collections.singletonList(" javax/servlet/jsp/JspPage".substring(1)));
         DEFAULT_INTERFACE_LIST_MAP.put(" javax/servlet/http/HttpServletResponse".substring(1),

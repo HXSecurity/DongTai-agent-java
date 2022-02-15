@@ -5,6 +5,7 @@ import io.dongtai.iast.core.service.ErrorLogReport;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.LineIterator;
@@ -25,7 +26,7 @@ public class ConfigUtils {
         return ConfigUtils.class.getClassLoader().getResourceAsStream(filename);
     }
 
-    public static HashSet[] loadConfigFromFile(String filename) {
+    public static Set<String>[] loadConfigFromFile(String filename) {
         HashSet<String> container = new HashSet<String>();
         HashSet<String> startWith = new HashSet<String>();
         HashSet<String> endWith = new HashSet<String>();
@@ -69,8 +70,8 @@ public class ConfigUtils {
         return extStringArray;
     }
 
-    public static HashSet loadConfigFromFileByLine(String filename) {
-        HashSet<String> container = new HashSet<String>();
+    public static Set<String> loadConfigFromFileByLine(String filename) {
+        Set<String> container = new HashSet<String>();
         InputStream fis = null;
         try {
             fis = getResourceAsStreamFromFilename(filename);

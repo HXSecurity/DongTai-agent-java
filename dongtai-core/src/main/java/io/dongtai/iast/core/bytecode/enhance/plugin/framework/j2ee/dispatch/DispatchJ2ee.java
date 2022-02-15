@@ -24,11 +24,11 @@ public class DispatchJ2ee implements DispatchPlugin {
     @Override
     public ClassVisitor dispatch(ClassVisitor classVisitor, IastContext context) {
         String className = context.getClassName();
-        Set<String> ancestors = context.getAncestors();
+        Set<String> diagram = context.getAncestors();
 
         if (Modifier.isInterface(context.getFlags())) {
             DongTaiLog.trace("Ignoring interface " + className);
-        } else if (isServletDispatch(className, ancestors) || isJakartaServlet(className)) {
+        } else if (isServletDispatch(className, diagram) || isJakartaServlet(className)) {
             classVisitor = new ServletDispatcherAdapter(classVisitor, context);
         }
         return classVisitor;
@@ -39,10 +39,10 @@ public class DispatchJ2ee implements DispatchPlugin {
         return null;
     }
 
-    private boolean isServletDispatch(String className, Set<String> ancestors) {
+    private boolean isServletDispatch(String className, Set<String> diagram) {
         boolean isServlet = FACES_SERVLET.equals(className);
         isServlet = (isServlet || HTTP_SERVLET.equals(className));
-        return (isServlet || ancestors.contains(FILTER) || ancestors.contains(FILTER_CHAIN));
+        return (isServlet || diagram.contains(FILTER) || diagram.contains(FILTER_CHAIN));
     }
 
     private boolean isJakartaServlet(String className) {

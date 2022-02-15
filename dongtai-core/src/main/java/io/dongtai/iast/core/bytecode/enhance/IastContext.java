@@ -45,23 +45,15 @@ public class IastContext {
 
 
     public void setClassName(String className) {
-        this.className = className.replace('/', '.');
+        this.className = className;
     }
 
     public void setAncestor(Set<String> ancestors) {
-        Set<String> copyedAncestors = new HashSet<String>();
-        for (String className : ancestors) {
-            copyedAncestors.add(className.replace('/', '.'));
-        }
-        this.ancestors = copyedAncestors;
+        this.ancestors = ancestors;
     }
 
     public void setInterface(String[] interfaces) {
-        String[] copyedInterfaces = new String[interfaces.length];
-        for (int index = 0; index < interfaces.length; index++) {
-            copyedInterfaces[index] = interfaces[index].replace('/', '.');
-        }
-        this.interfaces = copyedInterfaces;
+        this.interfaces = interfaces;
     }
 
     public void setFlags(int flags) {
