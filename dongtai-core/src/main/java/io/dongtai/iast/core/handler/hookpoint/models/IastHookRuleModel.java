@@ -24,9 +24,9 @@ public class IastHookRuleModel {
     private final HashMap<String, String> interfaces;
     private final HashMap<String, String> hooks = new HashMap<String, String>();
 
-    private final HashSet<String> prefixHookClassName;
+    private final HashSet<String> suffixHookPoints;
     private final HashSet<String> hookClassnames;
-    private final HashSet<String> hookSuperClassnames;
+    private final HashSet<String> superClassHookPoints;
     private final HashMap<String, Integer> hooksValue;
     private static IastHookRuleModel instance;
 
@@ -38,17 +38,30 @@ public class IastHookRuleModel {
                               HashMap<String, String> classs,
                               HashMap<Pattern, String> prefixHooks,
                               HashSet<String> hookClassnames,
-                              HashSet<String> hookSuperClassnames,
-                              HashSet<String> prefixHookClassName,
+                              HashSet<String> superClassHookPoints,
+                              HashSet<String> suffixHookPoints,
                               HashMap<String, Integer> hooksValue) {
         this.sinks = sinks;
         this.propagators = propagators;
         this.interfaces = interfaces;
         this.hooks.putAll(interfaces);
         this.hooks.putAll(classs);
-        this.prefixHookClassName = prefixHookClassName;
-        this.hookClassnames = hookClassnames;
-        this.hookSuperClassnames = hookSuperClassnames;
+        this.suffixHookPoints = new HashSet<>();
+        this.suffixHookPoints.add(".dubbo.monitor.support.MonitorFilter");
+        this.suffixHookPoints.addAll(suffixHookPoints);
+        this.hookClassnames = new HashSet<String>();
+        this.hookClassnames.add(" javax.servlet.Filter".substring(1));
+        this.hookClassnames.add(" javax.servlet.FilterChain".substring(1));
+        this.hookClassnames.add(" javax.servlet.http.HttpServlet".substring(1));
+        this.hookClassnames.add(" jakarta.servlet.http.HttpServlet".substring(1));
+        this.hookClassnames.add(" javax.faces.webapp.FacesServlet".substring(1));
+        this.hookClassnames.add(" javax.servlet.jsp.JspPage".substring(1));
+        this.hookClassnames.add(" org.apache.jasper.runtime.HttpJspBase".substring(1));
+        this.hookClassnames.add(" org.springframework.web.servlet.FrameworkServlet".substring(1));
+        this.hookClassnames.add(" javax.servlet.http.Cookie".substring(1));
+        this.hookClassnames.add(" org/springframework/web/servlet/mvc/annotation/AnnotationMethodHandlerAdapter$ServletHandlerMethodInvoker".substring(1));
+        this.hookClassnames.addAll(hookClassnames);
+        this.superClassHookPoints = superClassHookPoints;
         this.hooksValue = hooksValue;
     }
 
@@ -64,7 +77,7 @@ public class IastHookRuleModel {
     }
 
     public boolean isHookClass(String className) {
-        return hookClassnames.contains(className) || hookSuperClassnames.contains(className);
+        return hookClassnames.contains(className) || superClassHookPoints.contains(className) || hookBySuffix(className);
     }
 
     /**
@@ -139,9 +152,9 @@ public class IastHookRuleModel {
      * @param classname 全限定类名，如：java/lang/String
      * @return 是否需要被HOOK
      */
-    public static boolean classIsNeededHookByName(String classname) {
+    public static boolean hookByName(String classname) {
         if (instance != null) {
-            return instance.hookClassnames.contains(classname) || classIsNeededHookByClassNamePrefix(classname);
+            return instance.hookClassnames.contains(classname) || hookBySuffix(classname);
         } else {
             return false;
         }
@@ -156,9 +169,9 @@ public class IastHookRuleModel {
      * @param classname 全限定类名，如：java/lang/String
      * @return 是否需要被HOOK
      */
-    public static boolean classIsNeededHookBySuperClassName(String classname) {
+    public static boolean hookBySuperClass(String classname) {
         if (instance != null) {
-            return instance.hookSuperClassnames.contains(classname);
+            return instance.superClassHookPoints.contains(classname);
         } else {
             return false;
         }
@@ -170,9 +183,9 @@ public class IastHookRuleModel {
      * @param classname 根据前缀检测类是否需要hook
      * @return true-需要hook，false-不需要hook
      */
-    private static boolean classIsNeededHookByClassNamePrefix(String classname) {
-        for (String prefix : instance.prefixHookClassName) {
-            if (classname.startsWith(prefix)) {
+    private static boolean hookBySuffix(String classname) {
+        for (String suffix : instance.suffixHookPoints) {
+            if (classname.endsWith(suffix)) {
                 return true;
             }
         }

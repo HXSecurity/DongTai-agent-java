@@ -58,12 +58,12 @@ public class DispatchClassPlugin implements DispatchPlugin {
 
     @Override
     public String isMatch() {
-        if (IastHookRuleModel.classIsNeededHookByName(className)) {
+        if (IastHookRuleModel.hookByName(className)) {
             return className;
         }
 
         for (String superClassName : ancestors) {
-            if (IastHookRuleModel.classIsNeededHookBySuperClassName(superClassName)) {
+            if (IastHookRuleModel.hookBySuperClass(superClassName)) {
                 return superClassName;
             }
         }
