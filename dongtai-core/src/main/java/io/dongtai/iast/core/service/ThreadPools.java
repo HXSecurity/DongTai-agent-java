@@ -1,7 +1,6 @@
 package io.dongtai.iast.core.service;
 
 import io.dongtai.iast.core.replay.HttpRequestReplay;
-import io.dongtai.iast.core.service.ReportThread;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;

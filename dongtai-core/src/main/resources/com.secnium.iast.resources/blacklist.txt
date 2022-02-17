@@ -23808,6 +23808,7 @@ java/lang/ThreadLocal$SuppliedThreadLocal
 java/lang/ThreadLocal$ThreadLocalMap
 java/lang/ThreadLocal$ThreadLocalMap$Entry
 java/lang/Throwable$PrintStreamOrWriter
+java/lang/Throwable$WrappedPrintStream
 java/lang/UNIXProcess
 java/lang/UnsatisfiedLinkError
 java/lang/UnsupportedClassVersionError

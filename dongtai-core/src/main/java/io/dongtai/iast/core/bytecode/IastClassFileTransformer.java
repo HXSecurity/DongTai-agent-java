@@ -119,22 +119,13 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                             final Class<?> classBeingRedefined,
                             final ProtectionDomain protectionDomain,
                             final byte[] srcByteCodeArray) {
-        // if className is null, then, skip
-        matchClock.resume();
-        if (internalClassName == null || internalClassName.startsWith("com/secnium/iast/") || internalClassName.startsWith("java/lang/iast/") || internalClassName.startsWith("cn/huoxian/iast/")) {
-            matchClock.suspend();
+        if (internalClassName == null || internalClassName.startsWith("io/dongtai/") || internalClassName.startsWith("com/secnium/iast/") || internalClassName.startsWith("java/lang/iast/") || internalClassName.startsWith("cn/huoxian/iast/")) {
             return null;
         }
-
+        matchClock.resume();
         boolean isRunning = EngineManager.isLingzhiRunning();
         if (isRunning) {
             EngineManager.turnOffLingzhi();
-        }
-
-        StopWatch clock = null;
-        if (DongTaiLog.isDebugEnabled()) {
-            clock = new StopWatch();
-            clock.start();
         }
 
         try {
@@ -173,18 +164,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                     AbstractClassVisitor dumpClassVisitor = (AbstractClassVisitor) cv;
                     if (dumpClassVisitor.hasTransformed()) {
                         transformCount++;
-                        if (DongTaiLog.isDebugEnabled() && null != clock) {
-                            clock.stop();
-                            DongTaiLog.debug("conversion class {} is successful, and it takes {}ms.", internalClassName,
-                                    clock.getTime());
-                        }
                         return dumpClassIfNecessary(cr.getClassName(), cw.toByteArray(), srcByteCodeArray);
-                    }
-                } else {
-                    if (DongTaiLog.isDebugEnabled() && null != clock) {
-                        clock.stop();
-                        DongTaiLog.debug("failed to convert the class {}, and it takes {} ms", internalClassName,
-                                clock.getTime());
                     }
                 }
             }

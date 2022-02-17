@@ -158,7 +158,9 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public void enterSource() {
         try {
-            EngineManager.SCOPE_TRACKER.enterSource();
+            if (EngineManager.isLingzhiRunning()) {
+                EngineManager.SCOPE_TRACKER.enterSource();
+            }
         } catch (Exception e) {
             ErrorLogReport.sendErrorLog(e);
         }
@@ -172,7 +174,9 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public void leaveSource() {
         try {
-            EngineManager.SCOPE_TRACKER.leaveSource();
+            if (EngineManager.isLingzhiRunning()) {
+                EngineManager.SCOPE_TRACKER.leaveSource();
+            }
         } catch (Exception e) {
             ErrorLogReport.sendErrorLog(e);
         }
@@ -187,7 +191,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public boolean isFirstLevelSource() {
         try {
-            return EngineManager.isEngineRunning() && EngineManager.SCOPE_TRACKER
+            return EngineManager.isLingzhiRunning() && EngineManager.isEngineRunning() && EngineManager.SCOPE_TRACKER
                     .isFirstLevelSource();
         } catch (Exception e) {
             return false;
@@ -202,7 +206,9 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public void enterPropagator() {
         try {
-            EngineManager.SCOPE_TRACKER.enterPropagation();
+            if (EngineManager.isLingzhiRunning()) {
+                EngineManager.SCOPE_TRACKER.enterPropagation();
+            }
         } catch (Exception e) {
             ErrorLogReport.sendErrorLog(e);
         }
@@ -216,7 +222,9 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public void leavePropagator() {
         try {
-            EngineManager.SCOPE_TRACKER.leavePropagation();
+            if (EngineManager.isLingzhiRunning()) {
+                EngineManager.SCOPE_TRACKER.leavePropagation();
+            }
         } catch (Exception e) {
             ErrorLogReport.sendErrorLog(e);
         }
@@ -231,7 +239,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public boolean isFirstLevelPropagator() {
         try {
-            return EngineManager.isEngineRunning() && EngineManager.SCOPE_TRACKER.isFirstLevelPropagator();
+            return EngineManager.isLingzhiRunning() && EngineManager.isEngineRunning() && EngineManager.SCOPE_TRACKER.isFirstLevelPropagator();
         } catch (Exception e) {
             return false;
         }
@@ -245,7 +253,9 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public void enterSink() {
         try {
-            EngineManager.SCOPE_TRACKER.enterSink();
+            if (EngineManager.isLingzhiRunning()) {
+                EngineManager.SCOPE_TRACKER.enterSink();
+            }
         } catch (Exception e) {
             ErrorLogReport.sendErrorLog(e);
         }
@@ -259,7 +269,9 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public void leaveSink() {
         try {
-            EngineManager.SCOPE_TRACKER.leaveSink();
+            if (EngineManager.isLingzhiRunning()) {
+                EngineManager.SCOPE_TRACKER.leaveSink();
+            }
         } catch (Exception e) {
             ErrorLogReport.sendErrorLog(e);
         }
@@ -274,7 +286,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public boolean isFirstLevelSink() {
         try {
-            return EngineManager.isEngineRunning() && EngineManager.isTopLevelSink();
+            return EngineManager.isLingzhiRunning() && EngineManager.isEngineRunning() && EngineManager.isTopLevelSink();
         } catch (Exception e) {
             return false;
         }
@@ -298,8 +310,8 @@ public class SpyDispatcherImpl implements SpyDispatcher {
      */
     @Override
     public boolean collectMethodPool(Object instance, Object[] argumentArray, Object retValue, String framework,
-            String className, String matchClassName, String methodName, String methodSign, boolean isStatic,
-            int hookType) {
+                                     String className, String matchClassName, String methodName, String methodSign, boolean isStatic,
+                                     int hookType) {
         if (!EngineManager.isLingzhiRunning() && (HookType.HTTP.equals(hookType) || HookType.DUBBO.equals(hookType))) {
             EngineManager.turnOnLingzhi();
         }

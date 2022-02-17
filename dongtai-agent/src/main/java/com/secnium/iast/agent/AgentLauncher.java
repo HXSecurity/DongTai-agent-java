@@ -98,6 +98,7 @@ public class AgentLauncher {
      */
     private static void install(final Instrumentation inst) {
         IastProperties iastProperties = IastProperties.getInstance();
+        DongTaiLog.info("try to register agent to: " + iastProperties.getBaseUrl());
         Boolean send = AgentRegisterReport.send();
         if (send) {
             DongTaiLog.info("Agent has successfully registered with " + iastProperties.getBaseUrl());

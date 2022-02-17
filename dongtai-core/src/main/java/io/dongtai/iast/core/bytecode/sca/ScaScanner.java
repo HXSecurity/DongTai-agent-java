@@ -4,8 +4,10 @@ import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.ReportConstant;
 import io.dongtai.iast.core.service.ThreadPools;
 import io.dongtai.log.DongTaiLog;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.JarURLConnection;
 import java.net.URL;
@@ -13,8 +15,6 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -180,8 +180,6 @@ public class ScaScanner {
                         packages.put(packageObj);
                     }
                 }
-            } catch (IOException e) {
-                DongTaiLog.error(e.getMessage());
             } catch (Exception e) {
                 DongTaiLog.error(e.getMessage());
             }
