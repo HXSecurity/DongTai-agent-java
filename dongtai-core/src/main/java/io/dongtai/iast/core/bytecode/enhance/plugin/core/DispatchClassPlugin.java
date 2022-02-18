@@ -78,8 +78,6 @@ public class DispatchClassPlugin implements DispatchPlugin {
         ClassVisit(ClassVisitor classVisitor, IastContext context) {
             super(classVisitor, context);
             this.isAppClass = false;
-            //String className = context.getClassName();
-            //this.isAppClass = ConfigMatcher.isAppClass(className);
         }
 
         @Override

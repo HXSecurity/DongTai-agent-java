@@ -98,13 +98,17 @@ public class IastClassDiagram {
 
     }
 
+    /**
+     * @param className java/lang/Object
+     * @param ancestors dirgrams, java.lang.Object Set
+     */
     private void addClassToAncestor(String className, Set<String> ancestors) {
-        Set<String> set = this.diagrams.get(className);
+        Set<String> set = this.diagrams.get(className.replace("/", "."));
         if (null != set) {
             for (String subClassName : set) {
                 if (!ancestors.contains(subClassName)) {
-                    ancestors.add(className);
-                    addClassToAncestor(subClassName, ancestors);
+                    ancestors.add(subClassName);
+                    addClassToAncestor(subClassName.replace(".", "/"), ancestors);
                 }
             }
         } else {
@@ -122,14 +126,14 @@ public class IastClassDiagram {
                         ancestors.addAll(tempClassMap);
                     }
                 }
-                this.diagrams.put(className, tempClassFamily);
+                this.diagrams.put(className.replace("/", "."), tempClassFamily);
             }
         }
         List<String> list = DEFAULT_INTERFACE_LIST_MAP.get(className);
         if (null != list) {
             for (String interfaceName : list) {
                 if (!ancestors.contains(className)) {
-                    ancestors.add(className);
+                    ancestors.add(interfaceName);
                     addClassToAncestor(interfaceName, ancestors);
                 }
             }
@@ -163,11 +167,11 @@ public class IastClassDiagram {
                     String[] interfaces = cr.getInterfaces();
                     String superclass = cr.getSuperName();
                     if (!(BASE_CLASS.equals(superclass) || null == superclass)) {
-                        ancestors.add(superclass);
+                        ancestors.add(superclass.replace("/", "."));
                         queue.offer(superclass);
                     }
-                    ancestors.addAll(Arrays.asList(interfaces));
                     for (String tempInterface : interfaces) {
+                        ancestors.add(tempInterface.replace("/", "."));
                         queue.offer(tempInterface);
                     }
                 }
@@ -194,17 +198,17 @@ public class IastClassDiagram {
 
     static {
         DEFAULT_INTERFACE_LIST_MAP = new HashMap<String, List<String>>();
-        DEFAULT_INTERFACE_LIST_MAP.put(" org/apache/jasper/runtime/HttpJspBase".substring(1),
-                Collections.singletonList(" javax/servlet/jsp/JspPage".substring(1)));
-        DEFAULT_INTERFACE_LIST_MAP.put(" javax/servlet/http/HttpServletResponse".substring(1),
-                Collections.singletonList(" javax/servlet/ServletResponse".substring(1)));
-        DEFAULT_INTERFACE_LIST_MAP.put(" javax/servlet/http/HttpServletRequest".substring(1),
-                Collections.singletonList(" javax/servlet/ServletRequest".substring(1)));
-        DEFAULT_INTERFACE_LIST_MAP.put(" weblogic/servlet/internal/ServletRequestImpl".substring(1),
-                Collections.singletonList(" javax/servlet/ServletRequest".substring(1)));
-        DEFAULT_INTERFACE_LIST_MAP.put(" weblogic/servlet/jsp/JspBase".substring(1),
-                Collections.singletonList(" javax/servlet/http/HttpServlet".substring(1)));
-        DEFAULT_INTERFACE_LIST_MAP.put(" com/mysql/jdbc/Statement".substring(1),
-                Collections.singletonList(" java/sql/Statement".substring(1)));
+        DEFAULT_INTERFACE_LIST_MAP.put(" org.apache.jasper.runtime.HttpJspBase".substring(1),
+                Collections.singletonList(" javax.servlet.jsp.JspPage".substring(1)));
+        DEFAULT_INTERFACE_LIST_MAP.put(" javax.servlet.http.HttpServletResponse".substring(1),
+                Collections.singletonList(" javax.servlet.ServletResponse".substring(1)));
+        DEFAULT_INTERFACE_LIST_MAP.put(" javax.servlet.http.HttpServletRequest".substring(1),
+                Collections.singletonList(" javax.servlet.ServletRequest".substring(1)));
+        DEFAULT_INTERFACE_LIST_MAP.put(" weblogic.servlet.internal.ServletRequestImpl".substring(1),
+                Collections.singletonList(" javax.servlet.ServletRequest".substring(1)));
+        DEFAULT_INTERFACE_LIST_MAP.put(" weblogic.servlet.jsp.JspBase".substring(1),
+                Collections.singletonList(" javax.servlet.http.HttpServlet".substring(1)));
+        DEFAULT_INTERFACE_LIST_MAP.put(" com.mysql.jdbc.Statement".substring(1),
+                Collections.singletonList(" java.sql.Statement".substring(1)));
     }
 }

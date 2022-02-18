@@ -142,6 +142,9 @@ jobs:
           ossutil cp -rf release/iast-agent.jar oss://dongtai/agent_test/java/iast-agent.jar --meta x-oss-object-acl:public-read
           ossutil cp -rf release/lib/ oss://dongtai/agent_test/java/ --meta x-oss-object-acl:public-read
 
+          ossutil cp -rf release/iast-agent.jar oss://dongtai/agent_test/java/latest/iast-agent.jar --meta x-oss-object-acl:public-read
+          ossutil cp -rf release/lib/ oss://dongtai/agent_test/java/latest/ --meta x-oss-object-acl:public-read
+
       - name: Trigger Openapi Workflow
         uses: benc-uk/workflow-dispatch@v1
         with:
