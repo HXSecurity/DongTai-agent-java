@@ -13,7 +13,7 @@ public final class PackageManager {
 
     public Package getPackage() {
         try {
-            Class clazz = Thread.currentThread().getContextClassLoader().loadClass(this.classname);
+            Class<?> clazz = Thread.currentThread().getContextClassLoader().loadClass(this.classname);
             return clazz.getPackage();
         } catch (Exception e) {
             return null;

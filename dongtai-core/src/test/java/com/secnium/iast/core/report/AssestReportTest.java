@@ -1,8 +1,5 @@
 package com.secnium.iast.core.report;
 
-import com.secnium.iast.core.PropertyUtils;
-import org.junit.Test;
-
 public class AssestReportTest {
 
     /*@Test

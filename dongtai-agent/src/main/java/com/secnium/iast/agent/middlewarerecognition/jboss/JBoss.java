@@ -25,7 +25,7 @@ public class JBoss implements IServer {
      * @return true: 匹配；false：不匹配
      */
     @Override
-    public boolean isMatch(RuntimeMXBean runtimeMXBean) {
+    public boolean isMatch(RuntimeMXBean runtimeMXBean, ClassLoader loader) {
         String classPath = runtimeMXBean.getClassPath();
         String command = runtimeMXBean.getSystemProperties().get("sun.java.command");
         return classPath.contains("run.jar") && command.contains("org.jboss.Main");

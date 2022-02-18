@@ -1,7 +1,6 @@
 package com.secnium.iast.agent.middlewarerecognition.jboss;
 
 
-
 import com.secnium.iast.agent.middlewarerecognition.IServer;
 
 import java.lang.management.RuntimeMXBean;
@@ -13,7 +12,7 @@ import java.lang.management.RuntimeMXBean;
  */
 public class JBossAS implements IServer {
     @Override
-    public boolean isMatch(RuntimeMXBean runtimeMXBean) {
+    public boolean isMatch(RuntimeMXBean runtimeMXBean, ClassLoader loader) {
         return runtimeMXBean.getSystemProperties().get("jboss.server.base.dir") != null;
     }
 

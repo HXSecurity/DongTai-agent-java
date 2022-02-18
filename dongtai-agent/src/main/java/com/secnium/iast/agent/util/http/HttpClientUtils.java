@@ -1,6 +1,7 @@
 package com.secnium.iast.agent.util.http;
 
 import com.secnium.iast.agent.IastProperties;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -56,7 +57,7 @@ public class HttpClientUtils {
 
 
     private static StringBuilder sendRequest(HttpMethods method, String baseUrl, String urlStr, String data,
-            HashMap<String, String> headers, Proxy proxy) throws Exception {
+                                             HashMap<String, String> headers, Proxy proxy) throws Exception {
         HttpURLConnection connection = null;
         StringBuilder response = new StringBuilder();
         try {
@@ -101,6 +102,9 @@ public class HttpClientUtils {
                 wr.write(data.getBytes(Charset.forName("UTF-8")));
                 wr.close();
             }
+            if (connection.getResponseCode() != 200) {
+                throw new NullPointerException(connection.getResponseCode() + " " + connection.getResponseMessage());
+            }
             InputStream is = connection.getInputStream();
             BufferedReader rd = new BufferedReader(new InputStreamReader(is));
             String line;
@@ -110,8 +114,6 @@ public class HttpClientUtils {
             }
             rd.close();
             return response;
-        } catch (Exception e) {
-            throw e;
         } finally {
             if (connection != null) {
                 connection.disconnect();

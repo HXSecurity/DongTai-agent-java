@@ -9,9 +9,10 @@ import java.lang.management.RuntimeMXBean;
 public final class TomcatV5 extends AbstractTomcat {
 
     @Override
-    public boolean isMatch(RuntimeMXBean paramRuntimeMXBean) {
-        return isMatch(paramRuntimeMXBean, TomcatVersion.V5);
+    public boolean isMatch(RuntimeMXBean paramRuntimeMXBean, ClassLoader loader) {
+        return isMatch(paramRuntimeMXBean, loader, TomcatVersion.V5);
     }
+
 
     @Override
     public String getName() {

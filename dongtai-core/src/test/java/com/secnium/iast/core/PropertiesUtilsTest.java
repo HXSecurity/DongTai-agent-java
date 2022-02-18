@@ -1,5 +1,6 @@
 package com.secnium.iast.core;
 
+import io.dongtai.iast.core.utils.PropertyUtils;
 import org.junit.Test;
 
 public class PropertiesUtilsTest {

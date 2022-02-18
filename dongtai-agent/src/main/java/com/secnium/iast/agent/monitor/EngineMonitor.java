@@ -4,7 +4,7 @@ import com.secnium.iast.agent.*;
 import com.secnium.iast.agent.manager.EngineManager;
 import com.secnium.iast.agent.report.AgentRegisterReport;
 import com.secnium.iast.agent.util.http.HttpClientUtils;
-import com.secnium.iast.log.DongTaiLog;
+import io.dongtai.log.DongTaiLog;
 import org.json.JSONObject;
 
 /**

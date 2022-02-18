@@ -12,7 +12,7 @@ import java.lang.management.RuntimeMXBean;
  */
 public class WebLogic implements IServer {
     @Override
-    public boolean isMatch(RuntimeMXBean paramRuntimeMXBean) {
+    public boolean isMatch(RuntimeMXBean paramRuntimeMXBean, ClassLoader loader) {
         File runFile = new File(".", "bin/startWebLogic.sh");
         File configFile = new File(".", "init-info/domain-info.xml");
         return runFile.exists() && configFile.exists();

@@ -1,7 +1,6 @@
 package com.secnium.iast.agent.middlewarerecognition.spring;
 
 
-
 import com.secnium.iast.agent.middlewarerecognition.IServer;
 
 import java.lang.management.RuntimeMXBean;
@@ -18,9 +17,9 @@ public class Tomcat implements IServer {
     private String version;
 
     @Override
-    public boolean isMatch(RuntimeMXBean paramRuntimeMXBean) {
+    public boolean isMatch(RuntimeMXBean paramRuntimeMXBean, ClassLoader loader) {
         try {
-            Class serverInfo = Thread.currentThread().getContextClassLoader().loadClass(TOMCAT_SERVER_INFO);
+            Class<?> serverInfo = loader.loadClass(TOMCAT_SERVER_INFO);
             name = (String) serverInfo.getMethod("getServerInfo").invoke(null);
             version = (String) serverInfo.getMethod("getServerNumber").invoke(null);
             return true;

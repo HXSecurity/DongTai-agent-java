@@ -4,17 +4,20 @@ import com.secnium.iast.agent.manager.EngineManager;
 import com.secnium.iast.agent.monitor.EngineMonitor;
 import com.secnium.iast.agent.monitor.MonitorDaemonThread;
 import com.secnium.iast.agent.report.AgentRegisterReport;
-import com.secnium.iast.log.DongTaiLog;
+import io.dongtai.log.DongTaiLog;
+
 import java.lang.instrument.Instrumentation;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author dongzhiyong@huoxian.cn
  */
 public class AgentLauncher {
 
-    private static final String LAUNCH_MODE_AGENT = "agent";
-    private static final String LAUNCH_MODE_ATTACH = "attach";
-    private static String LAUNCH_MODE;
+    public static final String LAUNCH_MODE_AGENT = "agent";
+    public static final String LAUNCH_MODE_ATTACH = "attach";
+    public static String LAUNCH_MODE;
 
     /**
      * install agent with premain
@@ -30,7 +33,6 @@ public class AgentLauncher {
         LAUNCH_MODE = LAUNCH_MODE_AGENT;
         try {
             install(inst);
-            System.setProperty("protect.by.dongtai", "1");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -43,8 +45,9 @@ public class AgentLauncher {
      * @param inst inst
      */
     public static void agentmain(String args, Instrumentation inst) {
-        System.out.println(System.getProperty("protect.by.dongtai", null));
-        if ("uninstall".equals(args)) {
+        DongTaiLog.info(System.getProperty("protect.by.dongtai", "Current Application Run Without DongTai"));
+        Map<String, String> argsMap = parseArgs(args);
+        if ("uninstall".equals(argsMap.get("mode"))) {
             if (System.getProperty("protect.by.dongtai", null) == null) {
                 DongTaiLog.info("DongTai wasn't installed.");
                 return;
@@ -59,9 +62,19 @@ public class AgentLauncher {
             }
             LAUNCH_MODE = LAUNCH_MODE_ATTACH;
             try {
-                Agent.appendToolsPath();
+                if (argsMap.containsKey("debug")) {
+                    System.setProperty("dongtai.debug", argsMap.get("debug"));
+                }
+                if (argsMap.containsKey("appCreate")) {
+                    System.setProperty("dongtai.app.create", argsMap.get("appCreate"));
+                }
+                if (argsMap.containsKey("appName")) {
+                    System.setProperty("dongtai.app.name", argsMap.get("appName"));
+                }
+                if (argsMap.containsKey("appVersion")) {
+                    System.setProperty("dongtai.app.version", argsMap.get("appVersion"));
+                }
                 install(inst);
-                System.setProperty("protect.with.dongtai", "1");
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -85,6 +98,7 @@ public class AgentLauncher {
      */
     private static void install(final Instrumentation inst) {
         IastProperties iastProperties = IastProperties.getInstance();
+        DongTaiLog.info("try to register agent to: " + iastProperties.getBaseUrl());
         Boolean send = AgentRegisterReport.send();
         if (send) {
             DongTaiLog.info("Agent has successfully registered with " + iastProperties.getBaseUrl());
@@ -95,7 +109,9 @@ public class AgentLauncher {
             } else {
                 EngineMonitor.isCoreRegisterStart = true;
             }
+            Runtime.getRuntime().addShutdownHook(new ShutdownThread());
             loadEngine(inst);
+            System.setProperty("protect.by.dongtai", "1");
         } else {
             DongTaiLog.error("Agent register failed. Start without DongTai IAST.");
         }
@@ -114,6 +130,15 @@ public class AgentLauncher {
         agentMonitorDaemonThread.setPriority(1);
         agentMonitorDaemonThread.setName("dongtai-monitor");
         agentMonitorDaemonThread.start();
-        Runtime.getRuntime().addShutdownHook(new ShutdownThread());
+    }
+
+    private static Map<String, String> parseArgs(String args) {
+        Map<String, String> argsMap = new HashMap<String, String>();
+        String[] argsItems = args.split("&");
+        for (String argsItem : argsItems) {
+            String[] argItems = argsItem.split("=");
+            argsMap.put(argItems[0], argItems[1]);
+        }
+        return argsMap;
     }
 }

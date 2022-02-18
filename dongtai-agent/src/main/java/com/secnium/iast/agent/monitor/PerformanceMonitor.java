@@ -3,7 +3,7 @@ package com.secnium.iast.agent.monitor;
 import com.secnium.iast.agent.IastProperties;
 import com.secnium.iast.agent.manager.EngineManager;
 import com.secnium.iast.agent.report.AgentRegisterReport;
-import com.secnium.iast.log.DongTaiLog;
+import io.dongtai.log.DongTaiLog;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import oshi.SystemInfo;

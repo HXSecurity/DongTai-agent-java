@@ -1,6 +1,7 @@
 package com.secnium.iast.agent;
 
-import com.secnium.iast.log.DongTaiLog;
+import io.dongtai.log.DongTaiLog;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -87,8 +88,7 @@ public class IastProperties {
             ByteArrayInputStream inputStream = new ByteArrayInputStream(data);
             cfg.load(inputStream);
 
-            DongTaiLog.info(
-                    "The engine configuration file is initialized successfully. file is " + propertiesFile.toString());
+            DongTaiLog.info("DongTai configuration has initialized successfully. config: " + propertiesFile.toString());
         } catch (IOException e) {
             e.printStackTrace();
         }
