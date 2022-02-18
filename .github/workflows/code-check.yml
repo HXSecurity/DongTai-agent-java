@@ -6,15 +6,6 @@ name: Build Agent and Upload To OSS
 on:
   push:
     branches: [ main ]
-    paths-ignore:
-      - '.github/**'
-      - 'changes/**'
-      - 'deploy/**'
-      - '**.md'
-      - '**.yml'
-      - '**.xml'
-      - 'LICENSE'
-      - '.gitignore'
   pull_request:
     branches: [ main ]
     paths-ignore:
