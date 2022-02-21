@@ -228,57 +228,38 @@ public class MethodEvent {
 
     public String obj2String(Object value) {
         StringBuilder sb = new StringBuilder();
-        if (null == value) {
-            return "";
-        }
         try {
-            // 判断是否是基本类型的数组，基本类型的数组无法类型转换为Object[]，导致java.lang.ClassCastException异常
-            if (value.getClass().isArray() && !value.getClass().getComponentType().isPrimitive()) {
-                Object[] taints = (Object[]) value;
-                for (Object taint : taints) {
-                    if (taint != null) {
-                        if (taint.getClass().isArray() && !taint.getClass().getComponentType().isPrimitive()) {
-                            Object[] subTaints = (Object[]) taint;
-                            for (Object subTaint : subTaints) {
-                                sb.append(subTaint.toString()).append(" ");
-                            }
-                        } else {
-                            sb.append(taint.toString()).append(" ");
-                        }
-                    }
-                }
-            } else {
-                sb.append(value.toString());
-            }
+            sb.append(value.toString());
         } catch (Exception e) {
-            ErrorLogReport.sendErrorLog(e);
+            sb.append("CustomObjectValue");
         }
-        return sb.toString().trim();
-    }
-
-    public JSONObject toReport() {
-        JSONObject methodReport = new JSONObject();
-        methodReport.put("classname", object == null ? matchClassName : object.getClass().getName());
-        methodReport.put("methodname", methodName);
-
-        if (!source) {
-            if (inValue == null) {
-                methodReport.put("in", obj2String(argumentArray));
-            } else {
-                methodReport.put("in", obj2String(inValue));
-            }
-        } else {
-            methodReport.put("in", "");
-        }
-
-        if (outValue == null) {
-            methodReport.put("out", obj2String(returnValue));
-        } else {
-            methodReport.put("out", obj2String(outValue));
-        }
-        methodReport.put("stack", callStacks);
-
-        return methodReport;
+        return sb.toString();
+//        if (null == value) {
+//            return "";
+//        }
+//        try {
+//            // 判断是否是基本类型的数组，基本类型的数组无法类型转换为Object[]，导致java.lang.ClassCastException异常
+//            if (value.getClass().isArray() && !value.getClass().getComponentType().isPrimitive()) {
+//                Object[] taints = (Object[]) value;
+//                for (Object taint : taints) {
+//                    if (taint != null) {
+//                        if (taint.getClass().isArray() && !taint.getClass().getComponentType().isPrimitive()) {
+//                            Object[] subTaints = (Object[]) taint;
+//                            for (Object subTaint : subTaints) {
+//                                sb.append(subTaint.toString()).append(" ");
+//                            }
+//                        } else {
+//                            sb.append(taint.toString()).append(" ");
+//                        }
+//                    }
+//                }
+//            } else {
+//                sb.append(value.toString());
+//            }
+//        } catch (Exception e) {
+//            ErrorLogReport.sendErrorLog(e);
+//        }
+//        return sb.toString().trim();
     }
 
     @Override
