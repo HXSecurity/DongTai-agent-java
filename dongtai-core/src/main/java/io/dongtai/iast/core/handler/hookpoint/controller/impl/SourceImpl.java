@@ -51,6 +51,7 @@ public class SourceImpl {
             }
             String className = sourceClass.getName();
             if (className.startsWith("cn.huoxian.iast.api.") ||
+                    className.startsWith("io.dongtai.api.") ||
                     VALUES_ENUMERATOR.equals(className) ||
                     className.startsWith(SPRING_OBJECT)
             ) {
