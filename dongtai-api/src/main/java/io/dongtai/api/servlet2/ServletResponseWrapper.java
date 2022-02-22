@@ -1,20 +1,19 @@
 package io.dongtai.api.servlet2;
 
 import io.dongtai.api.DongTaiResponse;
+
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponseWrapper;
 
 public class ServletResponseWrapper extends HttpServletResponseWrapper implements DongTaiResponse {
 
     private ServletOutputStream outputStream = null;
-    private PrintWriter writer = null;
     private ServletWrapperOutputStreamCopier copier = null;
 
     public ServletResponseWrapper(HttpServletResponse response) {
@@ -28,9 +27,6 @@ public class ServletResponseWrapper extends HttpServletResponseWrapper implement
 
     @Override
     public ServletOutputStream getOutputStream() throws IOException {
-        if (writer != null) {
-            throw new IllegalStateException("getOutputStream() has already been called over once");
-        }
         if (outputStream == null) {
             outputStream = getResponse().getOutputStream();
             copier = new ServletWrapperOutputStreamCopier(outputStream);
@@ -40,21 +36,12 @@ public class ServletResponseWrapper extends HttpServletResponseWrapper implement
 
     @Override
     public PrintWriter getWriter() throws IOException {
-        if (outputStream != null) {
-            throw new IllegalStateException("getWriter() has already been called over once");
-        }
-        if (writer == null) {
-            copier = new ServletWrapperOutputStreamCopier(getResponse().getOutputStream());
-            writer = new PrintWriter(new OutputStreamWriter(copier, getResponse().getCharacterEncoding()), true);
-        }
-        return writer;
+        return getResponse().getWriter();
     }
 
     @Override
     public void flushBuffer() throws IOException {
-        if (writer != null) {
-            writer.flush();
-        } else if (copier != null) {
+        if (copier != null) {
             copier.flush();
         }
     }

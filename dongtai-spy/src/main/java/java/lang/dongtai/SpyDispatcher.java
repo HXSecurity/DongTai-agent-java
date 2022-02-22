@@ -141,7 +141,6 @@ public interface SpyDispatcher {
      * @param framework
      * @param className
      * @param matchClassName
-     * @param methodSign
      * @param instance       current class install object value, null if static class
      * @param signCode
      * @param isStatic
@@ -150,6 +149,6 @@ public interface SpyDispatcher {
      * @since 1.3.1
      */
     boolean collectMethodPool(Object instance, Object[] argumentArray, Object retValue, String framework,
-            String className, String matchClassName, String methodName, String signCode,
-            boolean isStatic, int handlerType);
+                              String className, String matchClassName, String methodName, String signCode,
+                              boolean isStatic, int handlerType);
 }
