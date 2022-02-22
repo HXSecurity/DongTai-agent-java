@@ -37,13 +37,10 @@ public class IastProperties {
     }
 
     private IastProperties(String path) {
-        try {
-            init(path);
-        } catch (ClassNotFoundException ignored) {
-        }
+        init(path);
     }
 
-    public void init(String path) throws ClassNotFoundException {
+    public void init(String path){
         String basePath = null;
         File agentFile;
         File propertiesFile;
@@ -63,7 +60,9 @@ public class IastProperties {
             if (!propertiesFile.exists()) {
                 if (!propertiesFile.getParentFile().exists()) {
                     if (!propertiesFile.getParentFile().mkdirs()) {
-                        throw new NullPointerException("配置文件创建失败");
+                        instance = null;
+                        DongTaiLog.error("DongTai configuration has initialized failed.");
+                        return;
                     }
                 }
                 propertiesFile.createNewFile();
@@ -90,7 +89,9 @@ public class IastProperties {
 
             DongTaiLog.info("DongTai configuration has initialized successfully. config: " + propertiesFile.toString());
         } catch (IOException e) {
-            e.printStackTrace();
+            instance = null;
+            DongTaiLog.error("DongTai configuration has initialized failed.");
+            DongTaiLog.debug(e);
         }
     }
 

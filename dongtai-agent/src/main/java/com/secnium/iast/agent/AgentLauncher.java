@@ -98,6 +98,10 @@ public class AgentLauncher {
      */
     private static void install(final Instrumentation inst) {
         IastProperties iastProperties = IastProperties.getInstance();
+        if (iastProperties == null){
+            DongTaiLog.error("Insufficient Agent permissions, profile creation failed. Start without DongTai IAST.");
+            return;
+        }
         DongTaiLog.info("try to register agent to: " + iastProperties.getBaseUrl());
         Boolean send = AgentRegisterReport.send();
         if (send) {
