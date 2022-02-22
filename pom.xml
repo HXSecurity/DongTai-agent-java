@@ -93,12 +93,12 @@
     </build>
 
     <modules>
-        <module>dongtai-agent</module>
         <module>dongtai-spy</module>
         <module>dongtai-core</module>
         <module>dongtai-spring-api</module>
         <module>dongtai-log</module>
         <module>dongtai-api</module>
+        <module>dongtai-agent</module>
     </modules>
 
     <dependencyManagement>
