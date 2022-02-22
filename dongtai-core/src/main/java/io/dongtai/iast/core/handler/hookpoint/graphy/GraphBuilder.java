@@ -11,6 +11,7 @@ import io.dongtai.iast.core.service.ThreadPools;
 import io.dongtai.iast.core.utils.Constants;
 import io.dongtai.iast.core.utils.base64.Base64Encoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.json.JSONArray;
@@ -93,7 +94,7 @@ public class GraphBuilder {
                 : Base64Encoder.encodeBase64String(responseMeta.get("headers").toString().getBytes())
                         .replaceAll("\n", ""));
         detail.put(ReportConstant.RES_BODY, responseMeta == null ? "" : Base64Encoder.encodeBase64String(
-                (byte[]) responseMeta.get("body")));
+                getResponseBody(responseMeta)));
         detail.put(ReportConstant.CONTEXT_PATH, requestMeta.get("contextPath"));
         detail.put(ReportConstant.REPLAY_REQUEST, requestMeta.get("replay-request"));
 
@@ -104,5 +105,19 @@ public class GraphBuilder {
         }
 
         return report.toString();
+    }
+
+    private static byte[] getResponseBody(Map<String, Object> responseMeta){
+        Integer responseLength = PropertyUtils.getInstance().getResponseLength();
+        byte[] responseBody = (byte[]) responseMeta.get("body");
+        if (responseLength > 0){
+            byte[] newResponseBody = new byte[responseLength];
+            newResponseBody = Arrays.copyOfRange(responseBody,0,responseLength);
+            return newResponseBody;
+        }else if (responseLength == 0){
+            return new byte[0];
+        }else {
+            return responseBody;
+        }
     }
 }

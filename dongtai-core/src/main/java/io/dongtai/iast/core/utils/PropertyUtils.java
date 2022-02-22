@@ -248,6 +248,6 @@ public class PropertyUtils {
     }
 
     public Integer getResponseLength() {
-        return Integer.parseInt(System.getProperty("response.length", cfg.getProperty("response.length")));
+        return Integer.parseInt(System.getProperty("dongtai.response.length", cfg.getProperty("dongtai.response.length","-1")));
     }
 }
