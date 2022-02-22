@@ -29,6 +29,7 @@ public class PropertyUtils {
     private String proxyHost;
     private int proxyPort = -1;
     private String debugFlag;
+    private Integer responseLength;
 
     private final String propertiesFilePath;
 
@@ -248,6 +249,9 @@ public class PropertyUtils {
     }
 
     public Integer getResponseLength() {
-        return Integer.parseInt(System.getProperty("dongtai.response.length", cfg.getProperty("dongtai.response.length","-1")));
+        if(responseLength == null){
+            responseLength = Integer.parseInt(System.getProperty("dongtai.response.length", cfg.getProperty("dongtai.response.length","-1")));
+        }
+        return responseLength;
     }
 }
