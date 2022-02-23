@@ -48,10 +48,6 @@ public class AgentLauncher {
         DongTaiLog.info(System.getProperty("protect.by.dongtai", "Current Application Run Without DongTai"));
         Map<String, String> argsMap = parseArgs(args);
         if ("uninstall".equals(argsMap.get("mode"))) {
-            if (System.getProperty("protect.by.dongtai", null) == null) {
-                DongTaiLog.info("DongTai wasn't installed.");
-                return;
-            }
             DongTaiLog.info("Engine is about to be uninstalled");
             uninstall();
             System.setProperty("protect.by.dongtai", null);
