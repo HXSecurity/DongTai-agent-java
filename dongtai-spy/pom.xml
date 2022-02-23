@@ -12,7 +12,7 @@
     <artifactId>dongtai-spy</artifactId>
 
     <name>dongtai-spy</name>
-    
+
     <build>
         <finalName>dongtai-spy</finalName>
         <plugins>
@@ -54,7 +54,7 @@
                         <phase>package</phase>
                         <configuration>
                             <tasks>
-                                <copy todir="./../release/lib">
+                                <copy todir="./../dongtai-agent/src/main/resources/bin">
                                     <fileset dir="target/">
                                         <include name="dongtai-spy.jar"/>
                                     </fileset>

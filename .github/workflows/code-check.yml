@@ -75,7 +75,6 @@ jobs:
         run: |
           mvn -version
           mvn -B package -Dmaven.test.skip=true
-          ls -l release
 
       - uses: shogo82148/actions-setup-mysql@v1
         with:
@@ -121,8 +120,6 @@ jobs:
         run: |
           mvn -version
           mvn -B package -Dmaven.test.skip=true
-          ls -l release
-          ls -l release/lib
 
       - uses: manyuanrong/setup-ossutil@v2.0
         with:
@@ -130,11 +127,11 @@ jobs:
           access-key-id: ${{ secrets.OSS_KEY_ID }}
           access-key-secret: ${{ secrets.OSS_KEY_SECRET }}
       - run: |
-          ossutil cp -rf release/dongtai-agent.jar oss://dongtai/agent_test/java/dongtai-agent.jar --meta x-oss-object-acl:public-read
-          ossutil cp -rf release/lib/ oss://dongtai/agent_test/java/ --meta x-oss-object-acl:public-read
+          ossutil cp -rf dongtai-agent/target/dongtai-agent.jar oss://dongtai/agent_test/java/dongtai-agent.jar --meta x-oss-object-acl:public-read
+          ossutil cp -rf dongtai-agent/src/main/resources/bin/ oss://dongtai/agent_test/java/ --meta x-oss-object-acl:public-read
 
-          ossutil cp -rf release/dongtai-agent.jar oss://dongtai/agent_test/java/latest/dongtai-agent.jar --meta x-oss-object-acl:public-read
-          ossutil cp -rf release/lib/ oss://dongtai/agent_test/java/latest/ --meta x-oss-object-acl:public-read
+          ossutil cp -rf dongtai-agent/target/dongtai-agent.jar oss://dongtai/agent_test/java/latest/dongtai-agent.jar --meta x-oss-object-acl:public-read
+          ossutil cp -rf dongtai-agent/src/main/resources/bin/ oss://dongtai/agent_test/java/latest/ --meta x-oss-object-acl:public-read
 
       - name: Trigger Openapi Workflow
         uses: benc-uk/workflow-dispatch@v1
