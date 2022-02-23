@@ -15,12 +15,12 @@ public class WebLogic implements IServer {
     public boolean isMatch(RuntimeMXBean paramRuntimeMXBean, ClassLoader loader) {
         File runFile = new File(".", "bin/startWebLogic.sh");
         File configFile = new File(".", "init-info/domain-info.xml");
-        System.setProperty("UseSunHttpHandler", "true");
         return runFile.exists() && configFile.exists();
     }
 
     @Override
     public String getName() {
+        setHttpHandler();
         return "WebLogic";
     }
 
@@ -28,5 +28,9 @@ public class WebLogic implements IServer {
     public String getVersion() {
         // 从xml中解析版本
         return "WebLogic";
+    }
+
+    private void setHttpHandler(){
+        System.setProperty("UseSunHttpHandler", "true");
     }
 }
