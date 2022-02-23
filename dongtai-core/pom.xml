@@ -112,7 +112,7 @@
                         <phase>package</phase>
                         <configuration>
                             <tasks>
-                                <copy todir="./../release/lib">
+                                <copy todir="./../dongtai-agent/src/main/resources/bin">
                                     <fileset dir="target/">
                                         <include name="dongtai-core.jar"/>
                                     </fileset>

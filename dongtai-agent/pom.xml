@@ -13,15 +13,6 @@
     <name>dongtai-agent</name>
 
     <dependencies>
-        <!-- for com.sun.tools.attach.VirtualMachine api -->
-        <dependency>
-            <groupId>com.github.olivergondza</groupId>
-            <artifactId>maven-jdk-tools-wrapper</artifactId>
-            <version>0.1</version>
-            <scope>provided</scope>
-            <optional>true</optional>
-        </dependency>
-
         <!-- https://mvnrepository.com/artifact/commons-cli/commons-cli -->
         <dependency>
             <groupId>commons-cli</groupId>
@@ -92,9 +83,9 @@
                 <configuration>
                     <archive>
                         <manifestEntries>
-                            <Premain-Class>com.secnium.iast.agent.AgentLauncher</Premain-Class>
-                            <Agent-Class>com.secnium.iast.agent.AgentLauncher</Agent-Class>
-                            <Main-Class>com.secnium.iast.agent.Agent</Main-Class>
+                            <Premain-Class>io.dongtai.iast.agent.AgentLauncher</Premain-Class>
+                            <Agent-Class>io.dongtai.iast.agent.AgentLauncher</Agent-Class>
+                            <Main-Class>io.dongtai.iast.agent.Agent</Main-Class>
                             <Can-Redefine-Classes>true</Can-Redefine-Classes>
                             <Can-Retransform-Classes>true</Can-Retransform-Classes>
                             <Built-By>DongTai</Built-By>
@@ -142,28 +133,6 @@
                                 </relocation>
                             </relocations>
                         </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-lib-src-webapps</id>
-                        <phase>package</phase>
-                        <configuration>
-                            <tasks>
-                                <copy todir="./../release">
-                                    <fileset dir="target/">
-                                        <include name="dongtai-agent.jar"/>
-                                    </fileset>
-                                </copy>
-                            </tasks>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
                     </execution>
                 </executions>
             </plugin>
