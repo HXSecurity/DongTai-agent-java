@@ -59,12 +59,10 @@ public class ScaScanner {
         } else if (!scannedClassSet.contains(packageFile) && isLocalMavenRepo(packageFile)) {
             scannedClassSet.add(packageFile);
             ThreadPools.execute(new ScaScanThread(packageFile, 3));
-        } else if (packageFile.endsWith(".jar") && !scannedClassSet.contains(packageFile)) {
-            scannedClassSet.add(packageFile);
+        } else if (packageFile.endsWith(".jar") && !scaSet.contains(packageFile)) {
+            scaSet.add(packageFile);
             ThreadPools.execute(new ScaScanThread(packageFile, 3));
         } else if (!scaSet.contains(packageFile) && isLocalMavenRepo(packageFile)) {
-            scaSet.add(packageFile);
-        } else if (packageFile.endsWith(".jar") && !scaSet.contains(packageFile)) {
             scaSet.add(packageFile);
         }
         if (!isClassPath) {
