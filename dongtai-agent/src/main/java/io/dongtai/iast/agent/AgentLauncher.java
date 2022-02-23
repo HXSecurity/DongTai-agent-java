@@ -48,6 +48,10 @@ public class AgentLauncher {
         DongTaiLog.info(System.getProperty("protect.by.dongtai", "Current Application Run Without DongTai"));
         Map<String, String> argsMap = parseArgs(args);
         if ("uninstall".equals(argsMap.get("mode"))) {
+            if (System.getProperty("protect.by.dongtai", null) == null) {
+                DongTaiLog.info("DongTai wasn't installed.");
+                return;
+            }
             DongTaiLog.info("Engine is about to be uninstalled");
             uninstall();
             System.setProperty("protect.by.dongtai", null);
@@ -69,6 +73,12 @@ public class AgentLauncher {
                 }
                 if (argsMap.containsKey("appVersion")) {
                     System.setProperty("dongtai.app.version", argsMap.get("appVersion"));
+                }
+                if (argsMap.containsKey("dongtaiServer")) {
+                    System.setProperty("dongtai.server.url", argsMap.get("dongtaiServer"));
+                }
+                if (argsMap.containsKey("dongtaiToken")) {
+                    System.setProperty("dongtai.server.token", argsMap.get("dongtaiToken"));
                 }
                 install(inst);
             } catch (Exception e) {
@@ -94,10 +104,6 @@ public class AgentLauncher {
      */
     private static void install(final Instrumentation inst) {
         IastProperties iastProperties = IastProperties.getInstance();
-        if (iastProperties == null){
-            DongTaiLog.error("Insufficient Agent permissions, profile creation failed. Start without DongTai IAST.");
-            return;
-        }
         DongTaiLog.info("try to register agent to: " + iastProperties.getBaseUrl());
         Boolean send = AgentRegisterReport.send();
         if (send) {

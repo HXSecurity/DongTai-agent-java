@@ -30,6 +30,8 @@ public class Agent {
         attachOptions.addOption(build("app_name", "app_name", "optional: DongTai Application Name, default: ExampleApplication"));
         attachOptions.addOption(build("app_create", "app_create", "optional: DongTai Application Auto Create, default: false"));
         attachOptions.addOption(build("app_version", "app_version", "optional: DongTai Application Version, default: v1.0"));
+        attachOptions.addOption(build("dongtai_server", "dongtai_server", "optional: DongTai server url"));
+        attachOptions.addOption(build("dongtai_token", "dongtai_token", "optional: DongTai server token"));
 
         CommandLineParser parser = new DefaultParser();
         HelpFormatter formatter = new HelpFormatter();
@@ -52,6 +54,12 @@ public class Agent {
             }
             if (result.hasOption("app_version")) {
                 attachArgs.append("&appVersion=").append(result.getOptionValue("app_version"));
+            }
+            if (result.hasOption("dongtai_server")) {
+                attachArgs.append("&dongtaiServer=").append(result.getOptionValue("dongtai_server"));
+            }
+            if (result.hasOption("dongtai_token")) {
+                attachArgs.append("&dongtaiToken=").append(result.getOptionValue("dongtai_token"));
             }
             return new String[]{pid, attachArgs.toString()};
         } else {
