@@ -41,7 +41,13 @@ public class Agent {
         if (result.hasOption("p") && result.hasOption("m")) {
             String pid = result.getOptionValue("p");
             String mode = result.getOptionValue("m");
-            StringBuilder attachArgs = new StringBuilder(AGENT_PATH + "=");
+            StringBuilder attachArgs = new StringBuilder();
+            if (isWindows() && AGENT_PATH.startsWith("/")) {
+                attachArgs.append(AGENT_PATH.substring(1)).append("=");
+            } else {
+                attachArgs.append(AGENT_PATH).append("=");
+            }
+
             attachArgs.append("mode=").append(mode);
             if (result.hasOption("debug")) {
                 attachArgs.append("&debug=").append(result.getOptionValue("debug"));
