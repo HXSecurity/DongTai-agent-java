@@ -20,6 +20,7 @@ public class WebLogic implements IServer {
 
     @Override
     public String getName() {
+        setHttpHandler();
         return "WebLogic";
     }
 
@@ -27,5 +28,9 @@ public class WebLogic implements IServer {
     public String getVersion() {
         // 从xml中解析版本
         return "WebLogic";
+    }
+
+    private void setHttpHandler(){
+        System.setProperty("UseSunHttpHandler", "true");
     }
 }

@@ -74,6 +74,12 @@ public class AgentLauncher {
                 if (argsMap.containsKey("appVersion")) {
                     System.setProperty("dongtai.app.version", argsMap.get("appVersion"));
                 }
+                if (argsMap.containsKey("dongtaiServer")) {
+                    System.setProperty("dongtai.server.url", argsMap.get("dongtaiServer"));
+                }
+                if (argsMap.containsKey("dongtaiToken")) {
+                    System.setProperty("dongtai.server.token", argsMap.get("dongtaiToken"));
+                }
                 install(inst);
             } catch (Exception e) {
                 e.printStackTrace();
