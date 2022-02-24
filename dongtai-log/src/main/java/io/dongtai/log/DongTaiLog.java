@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
+import io.dongtai.log.IastProperties;
 
 /**
  * @author niuerzhuang@huoxian.cn
@@ -17,7 +18,6 @@ public class DongTaiLog {
     static boolean enableWriteToFile;
     static String filePath;
     static boolean enableColor;
-    private static final IastProperties iastProperties;
     public static java.util.logging.Level LEVEL = java.util.logging.Level.CONFIG;
 
     private static final String RESET = "\033[0m";
@@ -215,7 +215,7 @@ public class DongTaiLog {
     }
 
     public static boolean isDebugEnabled() {
-        if ("debug".equals(iastProperties.getLogLevel())) {
+        if ("debug".equals(IastProperties.getLogLevel())) {
             level(Level.ALL);
             return true;
         } else {
@@ -244,13 +244,12 @@ public class DongTaiLog {
     }
 
     static {
-        iastProperties = IastProperties.getInstance();
-        if ("true".equals(iastProperties.enableLogFile())) {
+        if ("true".equals(IastProperties.enableLogFile())) {
             enableWriteToFile = true;
-        } else if ("false".equals(iastProperties.enableLogFile())) {
+        } else if ("false".equals(IastProperties.enableLogFile())) {
             enableWriteToFile = false;
         }
-        filePath = iastProperties.getLogPath();
+        filePath = IastProperties.getLogPath();
         if (enableWriteToFile) {
             File f = new File(filePath);
             if (!f.exists()) {
