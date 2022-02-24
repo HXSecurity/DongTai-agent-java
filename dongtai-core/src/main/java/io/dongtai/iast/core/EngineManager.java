@@ -16,6 +16,7 @@ import io.dongtai.iast.core.utils.PropertyUtils;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 存储全局信息
@@ -36,6 +37,9 @@ public class EngineManager {
     public static final IastTaintHashCodes TAINT_HASH_CODES = new IastTaintHashCodes();
     public static final IastScopeTracker SCOPE_TRACKER = new IastScopeTracker();
     private static final IastServerPort LOGIN_LOGIC_WEIGHT = new IastServerPort();
+    /**
+     * 标记是否位于 IAST 的代码中，如果该值为 true 表示 iast 在运行中；如果 该值为 false 表示当前位置在iast的代码中，所有iast逻辑都bypass，直接退出
+     */
     private static final BooleanThreadLocal DONGTAI_STATE = new BooleanThreadLocal(false);
     public static IastServer SERVER;
 
@@ -196,7 +200,7 @@ public class EngineManager {
         }
         ENTER_HTTP_ENTRYPOINT.enterEntry();
         REQUEST_CONTEXT.set(requestMeta);
-        TRACK_MAP.set(new HashMap<Integer, MethodEvent>(1024));
+        TRACK_MAP.set(new ConcurrentHashMap<>(1024));
         TAINT_POOL.set(new HashSet<Object>());
         TAINT_HASH_CODES.set(new HashSet<Integer>());
     }
