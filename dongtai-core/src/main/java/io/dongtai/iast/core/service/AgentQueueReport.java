@@ -33,10 +33,6 @@ public class AgentQueueReport implements Runnable {
 
     @Override
     public void run() {
-        boolean isRunning = EngineManager.isLingzhiRunning();
-        if (isRunning) {
-            EngineManager.turnOffLingzhi();
-        }
         try {
             StringBuilder replayRequestRaw = HttpClientUtils.sendPost(Constants.API_REPORT_UPLOAD, generateHeartBeatMsg());
             ThreadPools.submitReplayTask(replayRequestRaw);
@@ -44,9 +40,6 @@ public class AgentQueueReport implements Runnable {
             DongTaiLog.error("send agent status failure, reason: {}", e);
         } catch (Exception e) {
             DongTaiLog.error("send API Queue to {} error, reason: {}", Constants.API_REPORT_UPLOAD, e);
-        }
-        if (isRunning) {
-            EngineManager.turnOnLingzhi();
         }
     }
 }

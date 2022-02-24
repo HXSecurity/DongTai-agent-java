@@ -200,7 +200,7 @@ public class EngineManager {
         }
         ENTER_HTTP_ENTRYPOINT.enterEntry();
         REQUEST_CONTEXT.set(requestMeta);
-        TRACK_MAP.set(new ConcurrentHashMap<>(1024));
+        TRACK_MAP.set(new HashMap<Integer, MethodEvent>(1024));
         TAINT_POOL.set(new HashSet<Object>());
         TAINT_HASH_CODES.set(new HashSet<Integer>());
     }

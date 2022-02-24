@@ -52,7 +52,7 @@ public class IastProperties {
             InputStream is = IastProperties.class.getClassLoader().getResourceAsStream("iast.properties");
             cfg.load(is);
 
-            DongTaiLog.info("DongTai configuration has initialized successfully. config: " + propertiesFilePath);
+            DongTaiLog.info("DongTai Config: " + propertiesFilePath);
         } catch (IOException e) {
             e.printStackTrace();
         }

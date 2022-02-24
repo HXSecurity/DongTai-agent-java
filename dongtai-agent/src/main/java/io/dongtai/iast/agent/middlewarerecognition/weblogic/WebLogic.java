@@ -1,7 +1,6 @@
 package io.dongtai.iast.agent.middlewarerecognition.weblogic;
 
 
-
 import io.dongtai.iast.agent.middlewarerecognition.IServer;
 
 import java.io.File;
@@ -20,7 +19,6 @@ public class WebLogic implements IServer {
 
     @Override
     public String getName() {
-        setHttpHandler();
         return "WebLogic";
     }
 
@@ -28,9 +26,5 @@ public class WebLogic implements IServer {
     public String getVersion() {
         // 从xml中解析版本
         return "WebLogic";
-    }
-
-    private void setHttpHandler(){
-        System.setProperty("UseSunHttpHandler", "true");
     }
 }

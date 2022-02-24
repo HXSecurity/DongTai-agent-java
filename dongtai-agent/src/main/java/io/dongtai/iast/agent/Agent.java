@@ -139,7 +139,6 @@ public class Agent {
             agentArgs = parseAgentArgs(args);
             if (agentArgs != null) {
                 // todo: 自动搜索需要attach的进程
-                // todo: extract jattach
                 extractJattach();
                 doAttach(agentArgs[0], agentArgs[1]);
             }
