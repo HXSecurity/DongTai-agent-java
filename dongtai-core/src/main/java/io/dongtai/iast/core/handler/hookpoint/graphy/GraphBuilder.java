@@ -10,10 +10,12 @@ import io.dongtai.iast.core.handler.hookpoint.vulscan.normal.AbstractNormalVulSc
 import io.dongtai.iast.core.service.ThreadPools;
 import io.dongtai.iast.core.utils.Constants;
 import io.dongtai.iast.core.utils.base64.Base64Encoder;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -89,10 +91,10 @@ public class GraphBuilder {
         detail.put(ReportConstant.REQ_HEADER,
                 AbstractNormalVulScan.getEncodedHeader((Map<String, String>) requestMeta.get("headers")));
         // 设置请求体
-        detail.put(ReportConstant.REQ_BODY, HttpImpl.getPostBody(request));
+        detail.put(ReportConstant.REQ_BODY, request == null ? "" : HttpImpl.getPostBody(request));
         detail.put(ReportConstant.RES_HEADER, responseMeta == null ? ""
                 : Base64Encoder.encodeBase64String(responseMeta.get("headers").toString().getBytes())
-                        .replaceAll("\n", ""));
+                .replaceAll("\n", ""));
         detail.put(ReportConstant.RES_BODY, responseMeta == null ? "" : Base64Encoder.encodeBase64String(
                 getResponseBody(responseMeta)));
         detail.put(ReportConstant.CONTEXT_PATH, requestMeta.get("contextPath"));
@@ -107,16 +109,16 @@ public class GraphBuilder {
         return report.toString();
     }
 
-    private static byte[] getResponseBody(Map<String, Object> responseMeta){
+    private static byte[] getResponseBody(Map<String, Object> responseMeta) {
         Integer responseLength = PropertyUtils.getInstance().getResponseLength();
         byte[] responseBody = (byte[]) responseMeta.get("body");
-        if (responseLength > 0){
+        if (responseLength > 0) {
             byte[] newResponseBody = new byte[responseLength];
-            newResponseBody = Arrays.copyOfRange(responseBody,0,responseLength);
+            newResponseBody = Arrays.copyOfRange(responseBody, 0, responseLength);
             return newResponseBody;
-        }else if (responseLength == 0){
+        } else if (responseLength == 0) {
             return new byte[0];
-        }else {
+        } else {
             return responseBody;
         }
     }

@@ -7,6 +7,7 @@ import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.utils.HttpClientUtils;
 import io.dongtai.iast.core.utils.matcher.ConfigMatcher;
 import io.dongtai.log.DongTaiLog;
+
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -25,24 +26,20 @@ public class HttpImpl {
     private static Method cloneResponseMethod;
     private static Class<?> CLASS_OF_SERVLET_PROXY;
     private static IastClassLoader iastClassLoader;
-    public static volatile File IAST_REQUEST_JAR_PACKAGE;
+    public static File IAST_REQUEST_JAR_PACKAGE;
+
+    static {
+        IAST_REQUEST_JAR_PACKAGE = new File(System.getProperty("java.io.tmpdir") + File.separator + "dongtai-api.jar");
+        if (!IAST_REQUEST_JAR_PACKAGE.exists()) {
+            HttpClientUtils.downloadRemoteJar("/api/v1/engine/download?engineName=dongtai-api", IAST_REQUEST_JAR_PACKAGE.getAbsolutePath());
+        }
+    }
 
 
     private static void createClassLoader(Object req) {
         try {
             if (iastClassLoader != null) {
                 return;
-            }
-            if (PropertyUtils.getInstance().isDebug()) {
-                IAST_REQUEST_JAR_PACKAGE = new File(
-                        System.getProperty("java.io.tmpdir") + File.separator + "dongtai-api.jar");
-            } else {
-                IAST_REQUEST_JAR_PACKAGE = new File(
-                        System.getProperty("java.io.tmpdir") + File.separator + "dongtai-api.jar");
-                HttpClientUtils.downloadRemoteJar(
-                        "/api/v1/engine/download?engineName=dongtai-api",
-                        IAST_REQUEST_JAR_PACKAGE.getAbsolutePath()
-                );
             }
             if (IAST_REQUEST_JAR_PACKAGE.exists()) {
                 iastClassLoader = new IastClassLoader(
@@ -59,17 +56,6 @@ public class HttpImpl {
             e.printStackTrace();
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
-        }
-    }
-
-    private static void loadCloneRequestMethod() {
-        if (cloneRequestMethod == null) {
-            try {
-                cloneRequestMethod = CLASS_OF_SERVLET_PROXY
-                        .getDeclaredMethod("cloneRequest", Object.class, boolean.class);
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-            }
         }
     }
 
@@ -90,15 +76,17 @@ public class HttpImpl {
      * @return
      */
     public static Object cloneRequest(Object req, boolean isJakarta) {
-
+        if (req == null) {
+            return null;
+        }
         try {
-            createClassLoader(req);
+            if (cloneRequestMethod == null) {
+                createClassLoader(req);
+            }
             return cloneRequestMethod.invoke(null, req, isJakarta);
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
             return req;
         } catch (InvocationTargetException e) {
-            e.printStackTrace();
             return req;
         }
     }
@@ -110,15 +98,19 @@ public class HttpImpl {
      * @return dongtai response object
      */
     public static Object cloneResponse(Object response, boolean isJakarta) {
+        if (response == null) {
+            return null;
+        }
         try {
-            loadCloneResponseMethod();
+            if (cloneResponseMethod == null) {
+                loadCloneResponseMethod();
+            }
             return cloneResponseMethod.invoke(null, response, isJakarta);
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            return response;
         } catch (InvocationTargetException e) {
-            e.printStackTrace();
+            return response;
         }
-        return response;
     }
 
     public static Map<String, Object> getRequestMeta(Object request)

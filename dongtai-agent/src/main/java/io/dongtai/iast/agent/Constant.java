@@ -36,4 +36,6 @@ public class Constant {
     public static final String KEY_DISK = "disk";
     public static final String KEY_RETURN_QUEUE = "returnQueue";
 
+    public static final String THREAD_PREFIX = "DongTai-IAST-";
+
 }

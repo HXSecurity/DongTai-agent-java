@@ -19,6 +19,17 @@ public class AgentLauncher {
     public static final String LAUNCH_MODE_ATTACH = "attach";
     public static String LAUNCH_MODE;
 
+    static {
+        /**
+         * fix bug: agent use sun.net.http, then allowRestrictedHeaders is false, so some custom server has wrong
+         */
+        System.setProperty("sun.net.http.allowRestrictedHeaders", "true");
+        /**
+         * fix bug: java.lang.ClassCastException: weblogic.net.http.SOAPHttpsURLConnection cannot be cast to javax.net.ssl.HttpsURLConnection
+         */
+        System.setProperty("UseSunHttpHandler", "true");
+    }
+
     /**
      * install agent with premain
      *
@@ -29,7 +40,6 @@ public class AgentLauncher {
         if (System.getProperty("protect.by.dongtai", null) != null) {
             return;
         }
-        System.setProperty("sun.net.http.allowRestrictedHeaders", "true");
         LAUNCH_MODE = LAUNCH_MODE_AGENT;
         try {
             install(inst);
@@ -45,7 +55,7 @@ public class AgentLauncher {
      * @param inst inst
      */
     public static void agentmain(String args, Instrumentation inst) {
-        DongTaiLog.info(System.getProperty("protect.by.dongtai", "Current Application Run Without DongTai"));
+        DongTaiLog.info("Protect By DongTai IAST: " + System.getProperty("protect.by.dongtai", "false"));
         Map<String, String> argsMap = parseArgs(args);
         if ("uninstall".equals(argsMap.get("mode"))) {
             if (System.getProperty("protect.by.dongtai", null) == null) {
@@ -56,7 +66,7 @@ public class AgentLauncher {
             uninstall();
             System.setProperty("protect.by.dongtai", null);
         } else {
-            if (System.getProperty("protect.with.dongtai", null) != null) {
+            if (System.getProperty("protect.by.dongtai", null) != null) {
                 DongTaiLog.info("DongTai already installed.");
                 return;
             }
@@ -104,23 +114,22 @@ public class AgentLauncher {
      */
     private static void install(final Instrumentation inst) {
         IastProperties iastProperties = IastProperties.getInstance();
-        DongTaiLog.info("Current DongTai Java Agent version: "+Constant.AGENT_VERSION_VALUE);
-        DongTaiLog.info("try to register agent to: " + iastProperties.getBaseUrl());
+        DongTaiLog.info("DongTai Agent Version: {}, DongTai Server: {}", Constant.AGENT_VERSION_VALUE, iastProperties.getBaseUrl());
         Boolean send = AgentRegisterReport.send();
         if (send) {
-            DongTaiLog.info("Agent has successfully registered with " + iastProperties.getBaseUrl());
+            DongTaiLog.info("Agent registered successfully.");
             Boolean agentStat = AgentRegisterReport.agentStat();
             if (!agentStat) {
                 EngineMonitor.isCoreRegisterStart = false;
-                DongTaiLog.info("The agent was not audited. Disable enabling.");
+                DongTaiLog.info("Agent wait for confirm.");
             } else {
                 EngineMonitor.isCoreRegisterStart = true;
             }
             Runtime.getRuntime().addShutdownHook(new ShutdownThread());
             loadEngine(inst);
-            System.setProperty("protect.by.dongtai", "1");
+            System.setProperty("protect.by.dongtai", "true");
         } else {
-            DongTaiLog.error("Agent register failed. Start without DongTai IAST.");
+            DongTaiLog.error("Agent registered failed. Start without DongTai IAST.");
         }
     }
 
@@ -134,7 +143,7 @@ public class AgentLauncher {
 
         agentMonitorDaemonThread.setDaemon(true);
         agentMonitorDaemonThread.setPriority(1);
-        agentMonitorDaemonThread.setName("dongtai-monitor");
+        agentMonitorDaemonThread.setName(Constant.THREAD_PREFIX + "-monitor");
         agentMonitorDaemonThread.start();
     }
 

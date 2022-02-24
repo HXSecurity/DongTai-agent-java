@@ -45,12 +45,19 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public void leaveHttp(Object request, Object response) {
         try {
-            EngineManager.SCOPE_TRACKER.leaveHttp();
-            if (EngineManager.SCOPE_TRACKER.isExitedHttp() && EngineManager.isEnterHttp()) {
-                EngineManager.maintainRequestCount();
-                GraphBuilder.buildAndReport(request, response);
-                EngineManager.cleanThreadState();
+            if (EngineManager.isLingzhiRunning()) {
+                EngineManager.turnOffLingzhi();
+
+                EngineManager.SCOPE_TRACKER.leaveHttp();
+                if (EngineManager.SCOPE_TRACKER.isExitedHttp() && EngineManager.isEnterHttp()) {
+                    EngineManager.maintainRequestCount();
+                    GraphBuilder.buildAndReport(request, response);
+                    EngineManager.cleanThreadState();
+                }
+
+                EngineManager.turnOnLingzhi();
             }
+
         } catch (Exception e) {
             ErrorLogReport.sendErrorLog(e);
             EngineManager.cleanThreadState();
@@ -122,11 +129,17 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public void leaveDubbo() {
         try {
-            EngineManager.leaveDubbo();
-            if (EngineManager.isExitedDubbo() && !EngineManager.isEnterHttp()) {
-                EngineManager.maintainRequestCount();
-                GraphBuilder.buildAndReport(null, null);
-                EngineManager.cleanThreadState();
+            if (EngineManager.isLingzhiRunning()) {
+                EngineManager.turnOffLingzhi();
+
+                EngineManager.leaveDubbo();
+                if (EngineManager.isExitedDubbo() && !EngineManager.isEnterHttp()) {
+                    EngineManager.maintainRequestCount();
+                    GraphBuilder.buildAndReport(null, null);
+                    EngineManager.cleanThreadState();
+                }
+
+                EngineManager.turnOnLingzhi();
             }
         } catch (Exception e) {
             ErrorLogReport.sendErrorLog(e);
