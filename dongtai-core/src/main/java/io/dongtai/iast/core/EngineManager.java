@@ -3,13 +3,7 @@ package io.dongtai.iast.core;
 import io.dongtai.iast.core.handler.context.ContextManager;
 import io.dongtai.iast.core.handler.hookpoint.IastServer;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
-import io.dongtai.iast.core.utils.threadlocal.BooleanThreadLocal;
-import io.dongtai.iast.core.utils.threadlocal.IastScopeTracker;
-import io.dongtai.iast.core.utils.threadlocal.IastServerPort;
-import io.dongtai.iast.core.utils.threadlocal.IastTaintHashCodes;
-import io.dongtai.iast.core.utils.threadlocal.IastTaintPool;
-import io.dongtai.iast.core.utils.threadlocal.IastTrackMap;
-import io.dongtai.iast.core.utils.threadlocal.RequestContext;
+import io.dongtai.iast.core.utils.threadlocal.*;
 import io.dongtai.iast.core.service.ServiceFactory;
 import io.dongtai.iast.core.utils.PropertyUtils;
 
@@ -41,6 +35,14 @@ public class EngineManager {
      * 标记是否位于 IAST 的代码中，如果该值为 true 表示 iast 在运行中；如果 该值为 false 表示当前位置在iast的代码中，所有iast逻辑都bypass，直接退出
      */
     private static final BooleanThreadLocal DONGTAI_STATE = new BooleanThreadLocal(false);
+    /**
+     * hook点降级开关
+     */
+    public static final BooleanThreadLocal DONGTAI_HOOK_FALLBACK = new BooleanThreadLocal(false);
+    /**
+     * hook点高频命中限速器
+     */
+    public static final RateLimiterThreadLocal HOOK_RATE_LIMITER = new RateLimiterThreadLocal(500, 10);
     public static IastServer SERVER;
 
     private static boolean logined = false;
@@ -63,6 +65,20 @@ public class EngineManager {
     public static Boolean isLingzhiRunning() {
         Boolean status = DONGTAI_STATE.get();
         return status != null && status;
+    }
+
+    /**
+     * hook点是否降级
+     */
+    public static boolean isHookPointFallback() {
+        return DONGTAI_HOOK_FALLBACK.get() != null && EngineManager.DONGTAI_HOOK_FALLBACK.get();
+    }
+
+    /**
+     * 打开hook点降级开关
+     */
+    public static void openHookPointFallback() {
+        DONGTAI_HOOK_FALLBACK.set(true);
     }
 
     public static EngineManager getInstance() {
@@ -99,6 +115,8 @@ public class EngineManager {
         EngineManager.TAINT_POOL.remove();
         EngineManager.TAINT_HASH_CODES.remove();
         EngineManager.SCOPE_TRACKER.remove();
+        EngineManager.DONGTAI_HOOK_FALLBACK.remove();
+        EngineManager.HOOK_RATE_LIMITER.remove();
     }
 
     public static void maintainRequestCount() {

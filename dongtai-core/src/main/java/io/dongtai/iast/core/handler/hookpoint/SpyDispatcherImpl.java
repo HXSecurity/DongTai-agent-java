@@ -11,6 +11,7 @@ import io.dongtai.iast.core.handler.hookpoint.controller.impl.SourceImpl;
 import io.dongtai.iast.core.handler.hookpoint.graphy.GraphBuilder;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.service.ErrorLogReport;
+import io.dongtai.log.DongTaiLog;
 
 import java.lang.dongtai.SpyDispatcher;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -325,6 +326,16 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     public boolean collectMethodPool(Object instance, Object[] argumentArray, Object retValue, String framework,
                                      String className, String matchClassName, String methodName, String methodSign, boolean isStatic,
                                      int hookType) {
+        // hook点降级判断
+        if (EngineManager.isHookPointFallback()) {
+            return false;
+        }
+        // 尝试获取hook限速令牌,耗尽时降级
+        if (!EngineManager.HOOK_RATE_LIMITER.acquire()) {
+            DongTaiLog.warn("collectMethodPool hookPoint Fallback!hookType: " + hookType + ",Method: " + className + "." + methodName);
+            EngineManager.openHookPointFallback();
+            return false;
+        }
         if (!EngineManager.isLingzhiRunning() && (HookType.HTTP.equals(hookType) || HookType.DUBBO.equals(hookType))) {
             EngineManager.turnOnLingzhi();
         }
