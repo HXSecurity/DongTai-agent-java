@@ -92,9 +92,9 @@ public class Agent {
                 DongTaiLog.error("attach failure, please try again with command: {}", Arrays.toString(execution));
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            DongTaiLog.error(e);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            DongTaiLog.error(e);
         }
     }
 
@@ -143,9 +143,9 @@ public class Agent {
                 doAttach(agentArgs[0], agentArgs[1]);
             }
         } catch (ParseException e) {
-            e.printStackTrace();
+            DongTaiLog.error(e);
         } catch (IOException e) {
-            e.printStackTrace();
+            DongTaiLog.error(e);
         }
     }
 

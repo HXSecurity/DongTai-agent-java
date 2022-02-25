@@ -1,5 +1,7 @@
 package io.dongtai.iast.core.utils;
 
+import io.dongtai.log.DongTaiLog;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -62,9 +64,9 @@ public class PropertyUtils {
                 fis.close();
             }
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            DongTaiLog.error(e);
         } catch (IOException e) {
-            e.printStackTrace();
+            DongTaiLog.error(e);
         }
     }
 

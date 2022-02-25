@@ -54,7 +54,7 @@ public class IastProperties {
 
             DongTaiLog.info("DongTai Config: " + propertiesFilePath);
         } catch (IOException e) {
-            e.printStackTrace();
+            DongTaiLog.error(e);
         }
     }
 

@@ -44,7 +44,7 @@ public class AgentLauncher {
         try {
             install(inst);
         } catch (Exception e) {
-            e.printStackTrace();
+            DongTaiLog.error(e);
         }
     }
 
@@ -92,7 +92,7 @@ public class AgentLauncher {
                 }
                 install(inst);
             } catch (Exception e) {
-                e.printStackTrace();
+                DongTaiLog.error(e);
             }
         }
     }

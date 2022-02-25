@@ -320,7 +320,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
             } catch (InternalError ignored) {
             } catch (Exception e) {
                 DongTaiLog.error("transform class failure, class: {}, reason: {}", clazz.getCanonicalName(), e.getMessage());
-                e.printStackTrace();
+                DongTaiLog.debug(e);
             }
         }
         stopWatch.stop();

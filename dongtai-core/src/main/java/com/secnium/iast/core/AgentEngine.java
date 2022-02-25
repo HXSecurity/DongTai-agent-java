@@ -47,8 +47,8 @@ public class AgentEngine {
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             @Override
             public void uncaughtException(Thread t, Throwable e) {
-                System.out.println("DongTai UncaughtExceptionHandler");
-                e.printStackTrace();
+                DongTaiLog.error("DongTai UncaughtExceptionHandler");
+                DongTaiLog.error(e);
             }
         });
         DongTaiLog.info("DongTai Engine is about to be installed, the installation mode is {}", mode);

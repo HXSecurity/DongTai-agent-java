@@ -7,6 +7,7 @@ import io.dongtai.iast.core.utils.Constants;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import io.dongtai.log.DongTaiLog;
 import org.json.JSONObject;
 
 /**
@@ -24,11 +25,11 @@ public class ErrorLogReport {
     }
 
     public static void sendErrorLog(Throwable t) {
-        t.printStackTrace();
+        DongTaiLog.error(t);
         if (ENABLE_UPLOAD) {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
-            t.printStackTrace(pw);
+            DongTaiLog.error(sw.toString());
             sendErrorLog(sw.toString());
         }
     }

@@ -29,7 +29,6 @@ public class EngineMonitor implements IMonitor {
 
         if ("coreRegisterStart".equals(status)) {
             isCoreRegisterStart = true;
-            startEngine();
         }else if ("coreStop".equals(status) && isCoreRegisterStart) {
             DongTaiLog.info("engine stop");
             engineManager.stop();

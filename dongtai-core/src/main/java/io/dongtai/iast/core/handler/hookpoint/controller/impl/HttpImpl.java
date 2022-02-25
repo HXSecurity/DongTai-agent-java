@@ -51,11 +51,10 @@ public class HttpImpl {
                         .getDeclaredMethod("cloneRequest", Object.class, boolean.class);
                 cloneResponseMethod = CLASS_OF_SERVLET_PROXY
                         .getDeclaredMethod("cloneResponse", Object.class, boolean.class);
+                IAST_REQUEST_JAR_PACKAGE.delete();
             }
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+        } catch (MalformedURLException | NoSuchMethodException e) {
+            DongTaiLog.error(e);
         }
     }
 
@@ -65,7 +64,7 @@ public class HttpImpl {
                 cloneResponseMethod = CLASS_OF_SERVLET_PROXY
                         .getDeclaredMethod("cloneResponse", Object.class, boolean.class);
             } catch (NoSuchMethodException e) {
-                e.printStackTrace();
+                DongTaiLog.error(e);
             }
         }
     }
@@ -84,9 +83,7 @@ public class HttpImpl {
                 createClassLoader(req);
             }
             return cloneRequestMethod.invoke(null, req, isJakarta);
-        } catch (IllegalAccessException e) {
-            return req;
-        } catch (InvocationTargetException e) {
+        } catch (IllegalAccessException | InvocationTargetException e) {
             return req;
         }
     }
@@ -106,9 +103,7 @@ public class HttpImpl {
                 loadCloneResponseMethod();
             }
             return cloneResponseMethod.invoke(null, response, isJakarta);
-        } catch (IllegalAccessException e) {
-            return response;
-        } catch (InvocationTargetException e) {
+        } catch (IllegalAccessException | InvocationTargetException e) {
             return response;
         }
     }
@@ -123,9 +118,7 @@ public class HttpImpl {
         try {
             Method methodOfRequestMeta = request.getClass().getDeclaredMethod("getPostBody");
             return (String) methodOfRequestMeta.invoke(request);
-        } catch (NoSuchMethodException ignored) {
-        } catch (IllegalAccessException ignored) {
-        } catch (InvocationTargetException ignored) {
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ignored) {
         }
         return null;
     }
@@ -135,9 +128,7 @@ public class HttpImpl {
         try {
             methodOfRequestMeta = response.getClass().getDeclaredMethod("getResponseMeta");
             return (Map<String, Object>) methodOfRequestMeta.invoke(response);
-        } catch (NoSuchMethodException ignored) {
-        } catch (IllegalAccessException ignored) {
-        } catch (InvocationTargetException ignored) {
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ignored) {
         }
         return null;
     }

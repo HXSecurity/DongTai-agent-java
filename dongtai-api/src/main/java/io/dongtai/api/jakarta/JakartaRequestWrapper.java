@@ -1,6 +1,7 @@
 package io.dongtai.api.jakarta;
 
 import io.dongtai.api.DongTaiRequest;
+import io.dongtai.log.DongTaiLog;
 import jakarta.servlet.ReadListener;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
@@ -52,7 +53,7 @@ public class JakartaRequestWrapper extends HttpServletRequestWrapper implements 
                     bufferedReader.close();
                 } catch (IOException e) {
                     // fixme: add logger for solve exception
-                    e.printStackTrace();
+                    DongTaiLog.error(e);
                 }
                 body = stringBuilder.toString();
                 isCachedBody = true;
@@ -161,7 +162,7 @@ public class JakartaRequestWrapper extends HttpServletRequestWrapper implements 
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            DongTaiLog.error(e);
         }
         return postBody.toString();
     }
