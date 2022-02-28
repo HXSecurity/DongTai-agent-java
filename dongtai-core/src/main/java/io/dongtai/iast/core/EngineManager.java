@@ -42,7 +42,7 @@ public class EngineManager {
     /**
      * hook点高频命中限速器
      */
-    public static final RateLimiterThreadLocal HOOK_RATE_LIMITER = new RateLimiterThreadLocal(5000, 10);
+    public static final RateLimiterThreadLocal HOOK_RATE_LIMITER = new RateLimiterThreadLocal(PropertyUtils.getInstance());
     public static IastServer SERVER;
 
     private static boolean logined = false;

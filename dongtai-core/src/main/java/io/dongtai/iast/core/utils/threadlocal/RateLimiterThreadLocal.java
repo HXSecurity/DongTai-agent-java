@@ -3,6 +3,7 @@ package io.dongtai.iast.core.utils.threadlocal;
 
 import com.google.common.util.concurrent.RateLimiter;
 import com.google.common.util.concurrent.RateLimiterWithCapacity;
+import io.dongtai.iast.core.utils.PropertyUtils;
 
 /**
  * 本地线程隔离限速器
@@ -24,9 +25,9 @@ public class RateLimiterThreadLocal extends ThreadLocal<RateLimiter> {
      */
     double initBurstSeconds;
 
-    public RateLimiterThreadLocal(double tokenPerSecond, double initBurstSeconds) {
-        this.tokenPerSecond = tokenPerSecond;
-        this.initBurstSeconds = initBurstSeconds;
+    public RateLimiterThreadLocal(PropertyUtils properties) {
+        this.tokenPerSecond = properties.getDefaultTokenPerSecond();
+        this.initBurstSeconds = properties.getDefaultInitBurstSeconds();
     }
 
     @Override

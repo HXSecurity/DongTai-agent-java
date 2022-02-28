@@ -32,6 +32,11 @@ public class PropertyUtils {
     private Integer responseLength;
 
     private final String propertiesFilePath;
+    /**
+     * 限流相关本地配置
+     */
+    private Double defaultTokenPerSecond;
+    private Double defaultInitBurstSeconds;
 
     public static PropertyUtils getInstance(String propertiesFilePath) {
         if (null == instance) {
@@ -254,4 +259,27 @@ public class PropertyUtils {
         }
         return responseLength;
     }
+
+    /**
+     * 本地默认配置-每秒获得令牌数
+     */
+    public double getDefaultTokenPerSecond() {
+        final String cfgKey = "iast.limit.hookRate.defaultTokenPerSecond";
+        if (defaultTokenPerSecond == null) {
+            defaultTokenPerSecond = Double.parseDouble(System.getProperty(cfgKey, cfg.getProperty(cfgKey, "5000")));
+        }
+        return defaultTokenPerSecond;
+    }
+
+    /**
+     * 本地默认配置-初始预放置令牌时间
+     */
+    public double getDefaultInitBurstSeconds() {
+        final String cfgKey = "iast.limit.hookRate.defaultInitBurstSeconds";
+        if (defaultInitBurstSeconds == null) {
+            defaultInitBurstSeconds = Double.parseDouble(System.getProperty(cfgKey, cfg.getProperty(cfgKey, "10")));
+        }
+        return defaultInitBurstSeconds;
+    }
+
 }
