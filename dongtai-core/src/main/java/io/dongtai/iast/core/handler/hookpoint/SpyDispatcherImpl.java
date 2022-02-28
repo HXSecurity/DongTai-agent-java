@@ -332,9 +332,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
         }
         // 尝试获取hook限速令牌,耗尽时降级
         if (!EngineManager.HOOK_RATE_LIMITER.acquire()) {
-            DongTaiLog.warn("HookPoint rate limit! hookType: " + hookType + ", method:" + className + "." + methodName
-                    + ", rate:" + EngineManager.HOOK_RATE_LIMITER.getRate());
-            EngineManager.openHookPointFallback();
+            EngineManager.openHookPointFallback(className, methodName, methodSign, hookType);
             return false;
         }
         if (!EngineManager.isLingzhiRunning() && (HookType.HTTP.equals(hookType) || HookType.DUBBO.equals(hookType))) {

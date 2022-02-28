@@ -1,11 +1,13 @@
 package io.dongtai.iast.core;
 
+import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.HookPointRateLimitReport;
 import io.dongtai.iast.core.handler.context.ContextManager;
 import io.dongtai.iast.core.handler.hookpoint.IastServer;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.utils.threadlocal.*;
 import io.dongtai.iast.core.service.ServiceFactory;
 import io.dongtai.iast.core.utils.PropertyUtils;
+import io.dongtai.log.DongTaiLog;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -78,7 +80,11 @@ public class EngineManager {
      * 打开hook点降级开关
      * 该开关打开后，在当前请求生命周期内，逻辑短路hook点
      */
-    public static void openHookPointFallback() {
+    public static void openHookPointFallback(String className, String method, String methodSign, int hookType) {
+        final double limitRate = EngineManager.HOOK_RATE_LIMITER.getRate();
+        DongTaiLog.info("HookPoint rate limit! hookType: " + hookType + ", method:" + className + "." + method
+                + ", sign:" + methodSign + " ,rate:" + limitRate);
+        HookPointRateLimitReport.sendReport(className, method, methodSign, hookType, limitRate);
         DONGTAI_HOOK_FALLBACK.set(true);
     }
 

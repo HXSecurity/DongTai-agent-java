@@ -39,6 +39,14 @@ public class ThreadPools {
 
     });
 
+    private static final ExecutorService LIMIT_REPORT_THREAD = new ThreadPoolExecutor(0, 5, 10L, TimeUnit.SECONDS,
+            new LinkedBlockingQueue<Runnable>(5120), new ThreadFactory() {
+        @Override
+        public Thread newThread(Runnable r) {
+            return new Thread(r, Constants.THREAD_NAME_PREFIX + "LimitReport-" + r.hashCode());
+        }
+    });
+
 
     public static void execute(Runnable r) {
         SCA_REPORT_THREAD.execute(r);
@@ -54,5 +62,9 @@ public class ThreadPools {
 
     public static void submitReplayTask(StringBuilder replayRequestRaw) {
         REPLAY_REQUEST_THREAD.execute(new HttpRequestReplay(replayRequestRaw));
+    }
+
+    public static void sendLimitReport(final String url, final String report) {
+        LIMIT_REPORT_THREAD.execute(new ReportThread(url, report));
     }
 }
