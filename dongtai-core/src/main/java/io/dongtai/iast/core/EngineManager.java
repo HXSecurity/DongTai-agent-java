@@ -42,7 +42,7 @@ public class EngineManager {
     /**
      * hook点高频命中限速器
      */
-    public static final RateLimiterThreadLocal HOOK_RATE_LIMITER = new RateLimiterThreadLocal(500, 10);
+    public static final RateLimiterThreadLocal HOOK_RATE_LIMITER = new RateLimiterThreadLocal(5000, 10);
     public static IastServer SERVER;
 
     private static boolean logined = false;
@@ -76,6 +76,7 @@ public class EngineManager {
 
     /**
      * 打开hook点降级开关
+     * 该开关打开后，在当前请求生命周期内，逻辑短路hook点
      */
     public static void openHookPointFallback() {
         DONGTAI_HOOK_FALLBACK.set(true);

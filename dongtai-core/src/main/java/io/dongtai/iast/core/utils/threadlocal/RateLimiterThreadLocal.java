@@ -35,6 +35,15 @@ public class RateLimiterThreadLocal extends ThreadLocal<RateLimiter> {
     }
 
     /**
+     * 获取限速器速率
+     *
+     * @return double 速率
+     */
+    public double getRate() {
+        return this.get().getRate();
+    }
+
+    /**
      * 尝试获取令牌(非阻塞)
      *
      * @return 是否获取成功
