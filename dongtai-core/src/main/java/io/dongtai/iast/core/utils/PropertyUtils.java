@@ -35,6 +35,7 @@ public class PropertyUtils {
     /**
      * 限流相关本地配置
      */
+    private Boolean autoFallback;
     private Double defaultTokenPerSecond;
     private Double defaultInitBurstSeconds;
 
@@ -258,6 +259,17 @@ public class PropertyUtils {
             responseLength = Integer.parseInt(System.getProperty("dongtai.response.length", cfg.getProperty("dongtai.response.length","-1")));
         }
         return responseLength;
+    }
+
+    /**
+     * 本地默认配置-是否开启自动降级
+     */
+    public boolean getAutoFallback() {
+        final String cfgKey = "iast.limit.autoFallback";
+        if (autoFallback == null) {
+            autoFallback = Boolean.parseBoolean(System.getProperty(cfgKey, cfg.getProperty(cfgKey, "true")));
+        }
+        return autoFallback;
     }
 
     /**

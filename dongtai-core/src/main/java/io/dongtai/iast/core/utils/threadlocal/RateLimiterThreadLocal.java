@@ -50,6 +50,10 @@ public class RateLimiterThreadLocal extends ThreadLocal<RateLimiter> {
      * @return 是否获取成功
      */
     public boolean acquire() {
+        // 未开启全局自动降级开关,不尝试获取令牌
+        if (!PropertyUtils.getInstance().getAutoFallback()) {
+            return true;
+        }
         return acquire(DEFAULT_PERMITS);
     }
 
