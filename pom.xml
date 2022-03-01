@@ -100,6 +100,7 @@
         <module>dongtai-log</module>
         <module>dongtai-api</module>
         <module>dongtai-agent</module>
+        <module>dongtai-common</module>
     </modules>
 
     <dependencyManagement>
