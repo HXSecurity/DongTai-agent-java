@@ -1,5 +1,6 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.limiter.breaker;
 
+import io.dongtai.iast.common.entity.performance.metrics.GarbageInfoMetrics;
 import io.dongtai.iast.common.entity.performance.metrics.MemoryUsageMetrics;
 import io.dongtai.iast.common.entity.performance.PerformanceMetrics;
 import io.dongtai.iast.common.enums.MetricsKey;
@@ -22,8 +23,8 @@ public class DefaultPerformanceBreaker {
         List<PerformanceMetrics> performanceMetrics = convert2MetricsList(contextString);
         performanceMetrics.forEach((metrics) -> {
             //todo
-            System.out.println(metrics.getMetricsKey().toString() + ":"
-                    + metrics.getMetricsValue(metrics.getMetricsKey().getValueType()));
+            System.out.println(metrics.getMetricsKey().toString());
+            System.out.println(metrics.getMetricsValue(metrics.getMetricsKey().getValueType()));
         });
 
     }
@@ -36,12 +37,12 @@ public class DefaultPerformanceBreaker {
      */
     private static List<PerformanceMetrics> convert2MetricsList(String contextString) {
         try {
-            final List<Class<?>> clazzWhiteList = Arrays.asList(PerformanceMetrics.class, MetricsKey.class, MemoryUsageMetrics.class);
+            final List<Class<?>> clazzWhiteList = Arrays.asList(PerformanceMetrics.class, MetricsKey.class,
+                    MemoryUsageMetrics.class, GarbageInfoMetrics.class, GarbageInfoMetrics.CollectionInfo.class);
             return SerializeUtils.deserialize2ArrayList(
                     contextString, PerformanceMetrics.class, clazzWhiteList);
         } catch (Exception e) {
-            e.printStackTrace();
-            DongTaiLog.warn("convert2MetricsList failed, err:{}, contextString:{}", e.getMessage(), contextString);
+            DongTaiLog.warn("convert2MetricsList failed, err:{}", e.getMessage());
             return new ArrayList<>();
         }
     }

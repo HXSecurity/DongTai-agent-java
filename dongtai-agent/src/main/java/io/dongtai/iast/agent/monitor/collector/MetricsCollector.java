@@ -16,11 +16,13 @@ public enum MetricsCollector {
     /**
      * JVM性能指标相关收集器
      */
-    CPU_USAGE_COLLECTOR(CPU_USAGE, CpuUsageCollector.class, "cpu使用率(单位:百分比)"),
+    CPU_USAGE_COLLECTOR(CPU_USAGE, CpuUsageCollector.class, "cpu使用率收集器"),
 
-    MEM_USAGE_COLLECTOR(MEM_USAGE, MemUsageCollector.class, "内存使用率(单位:百分比)"),
+    MEM_USAGE_COLLECTOR(MEM_USAGE, MemUsageCollector.class, "内存使用率收集器"),
 
-    MEM_NO_HEAP_USAGE_COLLECTOR(MEM_NO_HEAP_USAGE, MemNoHeapUsageCollector.class, "堆外内存使用率(单位:百分比)"),
+    MEM_NO_HEAP_USAGE_COLLECTOR(MEM_NO_HEAP_USAGE, MemNoHeapUsageCollector.class, "堆外内存使用率收集器"),
+
+    GARBAGE_INFO_COLLECTOR(GARBAGE_INFO, GarbageInfoCollector.class, "垃圾回收信息收集器"),
 
     ;
 

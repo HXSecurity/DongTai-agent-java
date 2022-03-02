@@ -52,6 +52,7 @@ public class PerformanceMonitor implements IMonitor {
         needCollectMetrics.add(MetricsKey.CPU_USAGE);
         needCollectMetrics.add(MetricsKey.MEM_USAGE);
         needCollectMetrics.add(MetricsKey.MEM_NO_HEAP_USAGE);
+        needCollectMetrics.add(MetricsKey.GARBAGE_INFO);
     }
 
     public double memUsedRate() {
