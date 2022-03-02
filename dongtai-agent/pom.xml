@@ -50,6 +50,11 @@
             <artifactId>dongtai-log</artifactId>
             <version>1.3.1</version>
         </dependency>
+        <dependency>
+            <groupId>io.dongtai.iast</groupId>
+            <artifactId>dongtai-common</artifactId>
+            <version>1.3.1</version>
+        </dependency>
 
         <dependency>
             <groupId>org.slf4j</groupId>

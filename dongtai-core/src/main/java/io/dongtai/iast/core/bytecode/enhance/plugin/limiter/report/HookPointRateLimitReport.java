@@ -1,4 +1,4 @@
-package io.dongtai.iast.core.bytecode.enhance.plugin.limiter;
+package io.dongtai.iast.core.bytecode.enhance.plugin.limiter.report;
 
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.ReportConstant;

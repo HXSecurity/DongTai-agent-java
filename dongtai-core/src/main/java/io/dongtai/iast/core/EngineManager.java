@@ -1,5 +1,6 @@
 package io.dongtai.iast.core;
 
+import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.report.HookPointRateLimitReport;
 import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.HookPointRateLimitReport;
 import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.RequestRateLimitReport;
 import io.dongtai.iast.core.enums.RequestTypeEnum;

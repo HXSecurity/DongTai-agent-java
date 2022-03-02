@@ -2,7 +2,11 @@ package io.dongtai.iast.agent.monitor;
 
 import io.dongtai.iast.agent.IastProperties;
 import io.dongtai.iast.agent.manager.EngineManager;
+import io.dongtai.iast.agent.monitor.collector.*;
 import io.dongtai.iast.agent.report.AgentRegisterReport;
+import io.dongtai.iast.common.entity.performance.PerformanceMetrics;
+import io.dongtai.iast.common.enums.MetricsKey;
+import io.dongtai.iast.common.utils.serialize.SerializeUtils;
 import io.dongtai.log.DongTaiLog;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -16,6 +20,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -32,9 +38,22 @@ public class PerformanceMonitor implements IMonitor {
     private static Integer CPU_USAGE = 0;
 
     private final EngineManager engineManager;
+    private final List<MetricsKey> needCollectMetrics = new ArrayList<MetricsKey>();
 
     public PerformanceMonitor(EngineManager engineManager) {
         this.engineManager = engineManager;
+        configCollectMetrics();
+    }
+
+    /**
+     * 配置需要收集的指标(todo:通过配置文件初始化)
+     */
+    private void configCollectMetrics() {
+        needCollectMetrics.add(MetricsKey.CPU_USAGE);
+        needCollectMetrics.add(MetricsKey.MEM_USAGE);
+        needCollectMetrics.add(MetricsKey.MEM_NO_HEAP_USAGE);
+        needCollectMetrics.add(MetricsKey.GARBAGE_INFO);
+        needCollectMetrics.add(MetricsKey.THREAD_INFO);
     }
 
     public double memUsedRate() {
@@ -114,8 +133,15 @@ public class PerformanceMonitor implements IMonitor {
      */
     @Override
     public void check() {
+        final List<PerformanceMetrics> performanceMetrics = collectPerformanceMetrics();
+        for (PerformanceMetrics metrics : performanceMetrics) {
+            if (metrics.getMetricsKey() == MetricsKey.CPU_USAGE) {
+                CPU_USAGE = metrics.getMetricsValue(Double.class).intValue();
+            }
+        }
+        checkPerformanceMetrics(performanceMetrics);
+        int UsedRate = CPU_USAGE;
         PerformanceMonitor.AGENT_THRESHOLD_VALUE = PerformanceMonitor.checkThresholdValue();
-        int UsedRate = cpuUsedRate();
         int preStatus = this.engineManager.getRunningStatus();
         if (isStart(UsedRate, preStatus)) {
             this.engineManager.start();
@@ -125,6 +151,41 @@ public class PerformanceMonitor implements IMonitor {
             this.engineManager.stop();
             this.engineManager.setRunningStatus(1);
             DongTaiLog.info("The current CPU usage is " + UsedRate + "%, higher than the threshold " + AGENT_THRESHOLD_VALUE + "%，and the detection engine is stopping");
+        }
+    }
+
+
+    /**
+     * 收集性能指标
+     *
+     * @return {@link List}<{@link PerformanceMetrics}>
+     */
+    private List<PerformanceMetrics> collectPerformanceMetrics() {
+        final List<PerformanceMetrics> metricsList = new ArrayList<PerformanceMetrics>();
+        for (MetricsKey metricsKey : needCollectMetrics) {
+            final MetricsBindCollectorEnum collectorEnum = MetricsBindCollectorEnum.getEnum(metricsKey);
+            if (collectorEnum != null) {
+                try {
+                    IPerformanceCollector collector = collectorEnum.getCollector().newInstance();
+                    metricsList.add(collector.getMetrics());
+                } catch (Throwable t) {
+                    DongTaiLog.error("getPerformanceMetrics failed, collector:{}, err:{}", collectorEnum, t.getMessage());
+                }
+            }
+        }
+        return metricsList;
+    }
+
+    /**
+     * 寻找性能监控熔断器类,反射调用进行性能熔断检查
+     */
+    private void checkPerformanceMetrics(List<PerformanceMetrics> performanceMetrics) {
+        try {
+            final Class<?> performanceBreaker = EngineManager.getPerformanceBreaker();
+            performanceBreaker.getMethod("checkPerformance", String.class)
+                    .invoke(null, SerializeUtils.serializeByList(performanceMetrics));
+        } catch (Throwable t) {
+            DongTaiLog.error("checkPerformanceMetrics failed, msg:{}, err:{}", t.getMessage(), t.getCause());
         }
     }
 

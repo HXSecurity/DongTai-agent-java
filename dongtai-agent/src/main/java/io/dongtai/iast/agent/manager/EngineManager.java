@@ -4,6 +4,7 @@ import io.dongtai.iast.agent.IastClassLoader;
 import io.dongtai.iast.agent.IastProperties;
 import io.dongtai.iast.agent.report.AgentRegisterReport;
 import io.dongtai.iast.agent.util.FileUtils;
+import io.dongtai.iast.agent.util.JavaVersionUtils;
 import io.dongtai.iast.agent.util.http.HttpClientUtils;
 import io.dongtai.log.DongTaiLog;
 import org.json.JSONObject;
@@ -25,6 +26,8 @@ import java.util.jar.JarFile;
 public class EngineManager {
 
     private static final String ENGINE_ENTRYPOINT_CLASS = "com.secnium.iast.core.AgentEngine";
+    private static final String PERFORMANCE_BREAKER_DEFAULT = "io.dongtai.iast.core.bytecode.enhance.plugin.limiter.breaker.DefaultPerformanceBreaker";
+    private static final String PERFORMANCE_BREAKER_NOP = "io.dongtai.iast.core.bytecode.enhance.plugin.limiter.breaker.NopPerformanceBreaker";
     private static final String INJECT_PACKAGE_REMOTE_URI = "/api/v1/engine/download?engineName=dongtai-spy";
     private static final String ENGINE_PACKAGE_REMOTE_URI = "/api/v1/engine/download?engineName=dongtai-core";
     private static final String API_PACKAGE_REMOTE_URI = "/api/v1/engine/download?engineName=dongtai-api";
@@ -69,6 +72,22 @@ public class EngineManager {
             INSTANCE = new EngineManager(inst, launchMode, ppid);
         }
         return INSTANCE;
+    }
+
+    /**
+     * 在核心包中加载并获取性能断路器类
+     *
+     * @return {@link Class}<{@link ?}>
+     * @throws ClassNotFoundException 未找到类异常
+     */
+    public static Class<?> getPerformanceBreaker() throws ClassNotFoundException {
+        String clazz;
+        if (JavaVersionUtils.isJava6() || JavaVersionUtils.isJava7()) {
+            clazz = PERFORMANCE_BREAKER_NOP;
+        } else {
+            clazz = PERFORMANCE_BREAKER_DEFAULT;
+        }
+        return IAST_CLASS_LOADER.loadClass(clazz);
     }
 
     /**
