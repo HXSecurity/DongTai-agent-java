@@ -1,7 +1,6 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.limiter.breaker;
 
-import io.dongtai.iast.common.entity.performance.metrics.GarbageInfoMetrics;
-import io.dongtai.iast.common.entity.performance.metrics.MemoryUsageMetrics;
+import io.dongtai.iast.common.entity.performance.metrics.*;
 import io.dongtai.iast.common.entity.performance.PerformanceMetrics;
 import io.dongtai.iast.common.enums.MetricsKey;
 import io.dongtai.iast.common.utils.serialize.SerializeUtils;
@@ -38,9 +37,8 @@ public class DefaultPerformanceBreaker {
     private static List<PerformanceMetrics> convert2MetricsList(String contextString) {
         try {
             final List<Class<?>> clazzWhiteList = Arrays.asList(PerformanceMetrics.class, MetricsKey.class,
-                    MemoryUsageMetrics.class, GarbageInfoMetrics.class, GarbageInfoMetrics.CollectionInfo.class);
-            return SerializeUtils.deserialize2ArrayList(
-                    contextString, PerformanceMetrics.class, clazzWhiteList);
+                    MemoryUsageMetrics.class, GarbageInfoMetrics.class, GarbageInfoMetrics.CollectionInfo.class, ThreadInfoMetrics.class);
+            return SerializeUtils.deserialize2ArrayList(contextString, PerformanceMetrics.class, clazzWhiteList);
         } catch (Exception e) {
             DongTaiLog.warn("convert2MetricsList failed, err:{}", e.getMessage());
             return new ArrayList<>();

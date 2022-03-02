@@ -1,9 +1,8 @@
 package io.dongtai.iast.agent.monitor.collector.impl;
 
-import io.dongtai.iast.agent.monitor.collector.IPerformanceCollector;
+import io.dongtai.iast.common.entity.performance.PerformanceMetrics;
 import io.dongtai.iast.common.entity.performance.metrics.MemoryUsageMetrics;
 import io.dongtai.iast.common.enums.MetricsKey;
-import io.dongtai.iast.common.entity.performance.PerformanceMetrics;
 
 import java.lang.management.ManagementFactory;
 
@@ -13,14 +12,11 @@ import java.lang.management.ManagementFactory;
  * @author chenyi
  * @date 2022/2/28
  */
-public class MemUsageCollector implements IPerformanceCollector {
+public class MemUsageCollector extends AbstractPerformanceCollector {
 
     @Override
     public PerformanceMetrics getMetrics() {
-        MemoryUsageMetrics memoryUsageMetrics = MemoryUsageMetrics.clone(ManagementFactory.getMemoryMXBean().getHeapMemoryUsage());
-        final PerformanceMetrics metrics = new PerformanceMetrics();
-        metrics.setMetricsKey(MetricsKey.MEM_USAGE);
-        metrics.setMetricsValue(memoryUsageMetrics);
-        return metrics;
+        MemoryUsageMetrics metricsValue = MemoryUsageMetrics.clone(ManagementFactory.getMemoryMXBean().getHeapMemoryUsage());
+        return buildMetricsData(MetricsKey.MEM_USAGE, metricsValue);
     }
 }

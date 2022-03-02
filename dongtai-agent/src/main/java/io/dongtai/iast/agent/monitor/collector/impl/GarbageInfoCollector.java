@@ -1,6 +1,5 @@
 package io.dongtai.iast.agent.monitor.collector.impl;
 
-import io.dongtai.iast.agent.monitor.collector.IPerformanceCollector;
 import io.dongtai.iast.common.entity.performance.PerformanceMetrics;
 import io.dongtai.iast.common.entity.performance.metrics.GarbageInfoMetrics;
 import io.dongtai.iast.common.enums.MetricsKey;
@@ -15,23 +14,18 @@ import java.util.List;
  * @author chenyi
  * @date 2022/3/1
  */
-public class GarbageInfoCollector implements IPerformanceCollector {
+public class GarbageInfoCollector extends AbstractPerformanceCollector {
 
     @Override
     public PerformanceMetrics getMetrics() {
-        final GarbageInfoMetrics garbageInfoMetrics = new GarbageInfoMetrics();
+        final GarbageInfoMetrics metricsValue = new GarbageInfoMetrics();
         // 获取当前有效的垃圾收集器
         final List<GarbageCollectorMXBean> garbageBeans = ManagementFactory.getGarbageCollectorMXBeans();
         for (GarbageCollectorMXBean each : garbageBeans) {
             if (each.isValid()) {
-                garbageInfoMetrics.addCollectionInfo(each.getName(), each.getCollectionCount(), each.getCollectionTime());
+                metricsValue.addCollectionInfo(each.getName(), each.getCollectionCount(), each.getCollectionTime());
             }
-
         }
-
-        final PerformanceMetrics metrics = new PerformanceMetrics();
-        metrics.setMetricsKey(MetricsKey.GARBAGE_INFO);
-        metrics.setMetricsValue(garbageInfoMetrics);
-        return metrics;
+        return buildMetricsData(MetricsKey.GARBAGE_INFO, metricsValue);
     }
 }

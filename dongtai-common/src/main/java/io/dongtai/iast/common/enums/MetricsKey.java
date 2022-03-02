@@ -22,6 +22,8 @@ public enum MetricsKey {
 
     GARBAGE_INFO("garbageInfo", GarbageInfoMetrics.class, "垃圾回收信息"),
 
+    THREAD_INFO("threadInfo", ThreadInfoMetrics.class, "线程信息"),
+
     ;
 
 

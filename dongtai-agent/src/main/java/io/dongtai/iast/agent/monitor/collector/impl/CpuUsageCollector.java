@@ -1,6 +1,5 @@
 package io.dongtai.iast.agent.monitor.collector.impl;
 
-import io.dongtai.iast.agent.monitor.collector.IPerformanceCollector;
 import io.dongtai.iast.common.enums.MetricsKey;
 import io.dongtai.iast.common.entity.performance.PerformanceMetrics;
 import oshi.SystemInfo;
@@ -14,7 +13,7 @@ import java.util.concurrent.TimeUnit;
  * @author chenyi
  * @date 2022/2/28
  */
-public class CpuUsageCollector implements IPerformanceCollector {
+public class CpuUsageCollector extends AbstractPerformanceCollector {
 
     @Override
     public PerformanceMetrics getMetrics() {
@@ -35,11 +34,9 @@ public class CpuUsageCollector implements IPerformanceCollector {
         long iowait = ticks[CentralProcessor.TickType.IOWAIT.getIndex()] - prevTicks[CentralProcessor.TickType.IOWAIT.getIndex()];
         long idle = ticks[CentralProcessor.TickType.IDLE.getIndex()] - prevTicks[CentralProcessor.TickType.IDLE.getIndex()];
         long totalCpu = user + nice + cSys + idle + iowait + irq + softirq + steal;
-        double cpuUsage = (1.0 - (idle * 1.0 / totalCpu)) * 100;
 
-        final PerformanceMetrics metrics = new PerformanceMetrics();
-        metrics.setMetricsKey(MetricsKey.CPU_USAGE);
-        metrics.setMetricsValue(cpuUsage);
-        return metrics;
+        Double cpuUsage = (1.0 - (idle * 1.0 / totalCpu)) * 100;
+        return buildMetricsData(MetricsKey.CPU_USAGE, cpuUsage);
     }
+
 }

@@ -53,6 +53,7 @@ public class PerformanceMonitor implements IMonitor {
         needCollectMetrics.add(MetricsKey.MEM_USAGE);
         needCollectMetrics.add(MetricsKey.MEM_NO_HEAP_USAGE);
         needCollectMetrics.add(MetricsKey.GARBAGE_INFO);
+        needCollectMetrics.add(MetricsKey.THREAD_INFO);
     }
 
     public double memUsedRate() {
@@ -162,7 +163,7 @@ public class PerformanceMonitor implements IMonitor {
     private List<PerformanceMetrics> collectPerformanceMetrics() {
         final List<PerformanceMetrics> metricsList = new ArrayList<PerformanceMetrics>();
         for (MetricsKey metricsKey : needCollectMetrics) {
-            final MetricsCollector collectorEnum = MetricsCollector.getEnum(metricsKey);
+            final MetricsBindCollectorEnum collectorEnum = MetricsBindCollectorEnum.getEnum(metricsKey);
             if (collectorEnum != null) {
                 try {
                     IPerformanceCollector collector = collectorEnum.getCollector().newInstance();

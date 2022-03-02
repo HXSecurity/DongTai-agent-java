@@ -1,7 +1,6 @@
 package io.dongtai.iast.common.entity.performance.metrics;
 
 import java.io.Serializable;
-import java.lang.management.MemoryUsage;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +9,7 @@ import java.util.List;
  *
  * @author chenyi
  * @date 2022/3/1
- * @see MemoryUsage
+ * @see java.lang.management.GarbageCollectorMXBean
  */
 public class GarbageInfoMetrics implements Serializable {
     private static final long serialVersionUID = -224612690928046790L;
