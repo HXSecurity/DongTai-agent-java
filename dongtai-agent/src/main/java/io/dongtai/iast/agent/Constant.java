@@ -36,6 +36,9 @@ public class Constant {
     public static final String KEY_DISK = "disk";
     public static final String KEY_RETURN_QUEUE = "returnQueue";
 
+    // 线程异常上报
+    public static  final int REPORT_ERROR_THREAD = 0x43;
+
     public static final String THREAD_PREFIX = "DongTai-IAST-";
 
 }

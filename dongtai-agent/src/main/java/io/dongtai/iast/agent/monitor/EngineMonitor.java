@@ -13,10 +13,18 @@ import org.json.JSONObject;
 public class EngineMonitor implements IMonitor {
     private final EngineManager engineManager;
     public static Boolean isCoreRegisterStart = false;
+    private final String name = "EngineMonitor";
+
 
     public EngineMonitor(EngineManager engineManager) {
         this.engineManager = engineManager;
     }
+
+    @Override
+    public String getName() {
+        return  Constant.THREAD_PREFIX + name;
+    }
+
 
     @Override
     public void check() {
@@ -58,6 +66,15 @@ public class EngineMonitor implements IMonitor {
         status = status && engineManager.start();
         if (!status) {
             DongTaiLog.info("DongTai IAST started failure");
+        }
+    }
+
+    @Override
+    public void run() {
+        while (!MonitorDaemonThread.isExit) {
+            DongTaiLog.info("Engine Monitor check");
+            this.check();
+            MonitorDaemonThread.threadSleep();
         }
     }
 }

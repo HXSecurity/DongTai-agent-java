@@ -1,5 +1,6 @@
 package io.dongtai.iast.agent.monitor;
 
+import io.dongtai.iast.agent.Constant;
 import io.dongtai.iast.agent.IastProperties;
 import io.dongtai.iast.agent.manager.EngineManager;
 import io.dongtai.iast.agent.report.AgentRegisterReport;
@@ -30,8 +31,13 @@ public class PerformanceMonitor implements IMonitor {
     private final static String AGENT_TOKEN = URLEncoder.encode(AgentRegisterReport.getAgentToken());
     private static Integer AGENT_THRESHOLD_VALUE;
     private static Integer CPU_USAGE = 0;
-
+    private final static String name = "PerformanceMonitor";
     private final EngineManager engineManager;
+
+    public String getName() {
+        return  Constant.THREAD_PREFIX + name;
+    }
+
 
     public PerformanceMonitor(EngineManager engineManager) {
         this.engineManager = engineManager;
@@ -178,5 +184,14 @@ public class PerformanceMonitor implements IMonitor {
 
     static {
         AGENT_THRESHOLD_VALUE = 100;
+    }
+
+    @Override
+    public void run() {
+        while(!MonitorDaemonThread.isExit) {
+            DongTaiLog.info("Performance Monitor check");
+            this.check();
+            MonitorDaemonThread.threadSleep();
+        }
     }
 }

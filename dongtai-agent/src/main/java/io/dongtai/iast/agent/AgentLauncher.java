@@ -143,7 +143,7 @@ public class AgentLauncher {
 
         agentMonitorDaemonThread.setDaemon(true);
         agentMonitorDaemonThread.setPriority(1);
-        agentMonitorDaemonThread.setName(Constant.THREAD_PREFIX + "-monitor");
+        agentMonitorDaemonThread.setName(Constant.THREAD_PREFIX + "MonitorDaemon");
         agentMonitorDaemonThread.start();
     }
 

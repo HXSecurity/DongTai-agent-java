@@ -13,11 +13,18 @@ import org.json.JSONObject;
  */
 public class EngineMonitor implements IMonitor {
     private String currentStatus = null;
+    private final String  name = "EngineMonitor";
     private final EngineManager engineManager;
 
     public EngineMonitor(EngineManager engineManager) {
         this.engineManager = engineManager;
     }
+
+    @Override
+    public String getName() {
+        return Constant.THREAD_PREFIX + name;
+    }
+
 
     @Override
     public void check() {
@@ -54,4 +61,15 @@ public class EngineMonitor implements IMonitor {
         }
         return "other";
     }
+
+    @Override
+    public void run() {
+        this.check();
+        try{
+            Thread.sleep(60 * 1000L);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
 }
