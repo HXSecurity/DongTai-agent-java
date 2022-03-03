@@ -229,13 +229,18 @@
         <dependency>
             <groupId>io.dongtai.iast</groupId>
             <artifactId>dongtai-common</artifactId>
-            <version>1.3.1</version>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-nop</artifactId>
+            <version>${oshi-core-slf.version}</version>
         </dependency>
         <!-- 限流熔断依赖begin -->
         <dependency>
             <groupId>io.github.resilience4j</groupId>
             <artifactId>resilience4j-circuitbreaker</artifactId>
-            <version>1.7.1</version>
+            <version>${resilience4j.version}</version>
         </dependency>
         <!-- 限流熔断依赖end -->
     </dependencies>

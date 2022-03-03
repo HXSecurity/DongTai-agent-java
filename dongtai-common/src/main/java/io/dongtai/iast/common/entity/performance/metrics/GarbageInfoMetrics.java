@@ -15,7 +15,7 @@ public class GarbageInfoMetrics implements Serializable {
     private static final long serialVersionUID = -224612690928046790L;
 
     /**
-     * 有效的内存管理器名称
+     * 有效的内存管理器列表
      */
     private final List<CollectionInfo> collectionInfoList = new ArrayList<CollectionInfo>();
 
