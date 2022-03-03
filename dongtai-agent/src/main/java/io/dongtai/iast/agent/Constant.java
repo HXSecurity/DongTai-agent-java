@@ -10,6 +10,7 @@ public class Constant {
     public final static String API_AGENT_REGISTER = "/api/v1/agent/register";
     public final static String API_REPORT_UPLOAD = "/api/v1/report/upload";
     public final static String API_ENGINE_ACTION = "/api/v1/engine/action";
+    public final static String API_Server_Config = "/api/v1/agent/threshold";
 
     public static final String KEY_NETWORK = "network";
     public static final String KEY_AGENT_VERSION = "version";

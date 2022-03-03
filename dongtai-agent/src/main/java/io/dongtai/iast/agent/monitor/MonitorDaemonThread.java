@@ -17,7 +17,7 @@ public class MonitorDaemonThread implements Runnable {
 
     public MonitorDaemonThread(EngineManager engineManager) {
         monitorTasks = new ArrayList<IMonitor>();
-        monitorTasks.add(new ThreadMonitor());
+        monitorTasks.add(new DaemonThreadMonitor());
         monitorTasks.add(new PerformanceMonitor(engineManager));
         monitorTasks.add(new EngineMonitor(engineManager));
         monitorTasks.add(new HeartBeatMonitor());
