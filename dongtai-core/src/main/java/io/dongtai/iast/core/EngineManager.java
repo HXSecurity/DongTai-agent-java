@@ -39,7 +39,7 @@ public class EngineManager {
      */
     private static final BooleanThreadLocal DONGTAI_STATE = new BooleanThreadLocal(false);
     /**
-     * 限制器管理器
+     * 限制器统一管理器
      */
     private final LimiterManager limiterManager;
     public static IastServer SERVER;
@@ -124,7 +124,7 @@ public class EngineManager {
         EngineManager.TAINT_HASH_CODES.remove();
         EngineManager.SCOPE_TRACKER.remove();
         LimitFallbackSwitch.clearHeavyHookFallback();
-        EngineManager.getInstance().limiterManager.getHookRateLimiter().remove();
+        EngineManager.getLimiterManager().getHookRateLimiter().remove();
     }
 
     public static void maintainRequestCount() {
