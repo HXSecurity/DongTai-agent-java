@@ -55,15 +55,6 @@ public class MonitorDaemonThread implements Runnable {
 
     //todo: 检测所有线程信息。
 
-    public static void threadSleep() {
-        try {
-            long milliseconds = 60 * 1000L;
-            Thread.sleep(milliseconds);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException(e);
-        }
-    }
 
     public void startEngine() {
         // todo: 下载功能优先走本地缓存

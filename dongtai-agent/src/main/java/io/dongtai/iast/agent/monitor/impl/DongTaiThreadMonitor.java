@@ -50,7 +50,7 @@ public class DongTaiThreadMonitor implements IMonitor {
         while (!MonitorDaemonThread.isExit) {
             DongTaiLog.info("Thread Monitor Check");
             this.check();
-            MonitorDaemonThread.threadSleep();
+            ThreadUtils.threadSleep(60);
         }
     }
 

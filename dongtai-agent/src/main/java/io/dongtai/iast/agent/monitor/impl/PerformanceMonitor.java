@@ -7,6 +7,7 @@ import io.dongtai.iast.agent.monitor.IMonitor;
 import io.dongtai.iast.agent.monitor.MonitorDaemonThread;
 import io.dongtai.iast.agent.monitor.collector.*;
 import io.dongtai.iast.agent.report.AgentRegisterReport;
+import io.dongtai.iast.agent.util.ThreadUtils;
 import io.dongtai.iast.common.entity.performance.PerformanceMetrics;
 import io.dongtai.iast.common.enums.MetricsKey;
 import io.dongtai.iast.common.utils.serialize.SerializeUtils;
@@ -254,7 +255,7 @@ public class PerformanceMonitor implements IMonitor {
         while(!MonitorDaemonThread.isExit) {
             DongTaiLog.info("Performance Monitor check");
             this.check();
-            MonitorDaemonThread.threadSleep();
+            ThreadUtils.threadSleep(60);
         }
     }
 }

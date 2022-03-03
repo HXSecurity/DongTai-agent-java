@@ -4,6 +4,7 @@ import io.dongtai.iast.agent.manager.EngineManager;
 import io.dongtai.iast.agent.monitor.IMonitor;
 import io.dongtai.iast.agent.monitor.MonitorDaemonThread;
 import io.dongtai.iast.agent.report.AgentRegisterReport;
+import io.dongtai.iast.agent.util.ThreadUtils;
 import io.dongtai.iast.agent.util.http.HttpClientUtils;
 import io.dongtai.iast.agent.Constant;
 import io.dongtai.log.DongTaiLog;
@@ -76,7 +77,7 @@ public class EngineMonitor implements IMonitor {
         while (!MonitorDaemonThread.isExit) {
             DongTaiLog.info("Engine Monitor check");
             this.check();
-            MonitorDaemonThread.threadSleep();
+            ThreadUtils.threadSleep(60);
         }
     }
 }

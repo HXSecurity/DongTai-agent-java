@@ -22,4 +22,13 @@ public class ThreadUtils {
         }
         return threadSet;
     }
+    public static void threadSleep(int seconds) {
+        try {
+            long milliseconds = seconds * 1000L;
+            Thread.sleep(milliseconds);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
+        }
+    }
 }

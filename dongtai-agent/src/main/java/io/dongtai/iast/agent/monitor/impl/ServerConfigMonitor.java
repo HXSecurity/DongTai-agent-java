@@ -4,6 +4,7 @@ import io.dongtai.iast.agent.Constant;
 import io.dongtai.iast.agent.monitor.IMonitor;
 import io.dongtai.iast.agent.monitor.MonitorDaemonThread;
 import io.dongtai.iast.agent.report.AgentRegisterReport;
+import io.dongtai.iast.agent.util.ThreadUtils;
 import io.dongtai.iast.agent.util.http.HttpClientUtils;
 import io.dongtai.log.DongTaiLog;
 import org.json.JSONObject;
@@ -29,7 +30,7 @@ public class ServerConfigMonitor implements IMonitor {
         while (!MonitorDaemonThread.isExit){
             DongTaiLog.info("Server Config Monitor Check");
             check();
-            MonitorDaemonThread.threadSleep();
+            ThreadUtils.threadSleep(60);
         }
     }
 
