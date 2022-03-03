@@ -1,7 +1,8 @@
-package io.dongtai.iast.agent.monitor;
+package io.dongtai.iast.agent.monitor.impl;
 
 import io.dongtai.iast.agent.Constant;
 import io.dongtai.iast.agent.monitor.IMonitor;
+import io.dongtai.iast.agent.monitor.MonitorDaemonThread;
 import io.dongtai.iast.agent.report.HeartBeatReport;
 import io.dongtai.iast.agent.util.http.HttpClientUtils;
 import io.dongtai.log.DongTaiLog;
