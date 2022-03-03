@@ -19,6 +19,7 @@ public class ReportConstant {
     public static final int REPORT_VUL_HARDCORD = 0x25;
     public static final int REPORT_AUTH_ADD = 0x31;
     public static final int REPORT_AUTH_UPDATE = 0x32;
+    public static final int REPORT_LIMIT_HOOK_POINT_RATE = 0x41;
     public static final int REPORT_ERROR_LOG = 0x51;
     public static final int REPORT_API = 0x61;
 
@@ -71,4 +72,14 @@ public class ReportConstant {
     public static final String KEY_RETURN_QUEUE = "returnQueue";
 
     public static final String STARTUP_TIME = "startupTime";
+
+    /**
+     * 限流相关
+     */
+    public static final String LIMIT_HOOK_POINT_CLASS_NAME = "className";
+    public static final String LIMIT_HOOK_POINT_METHOD = "method";
+    public static final String LIMIT_HOOK_POINT_METHOD_SIGN = "methodSign";
+    public static final String LIMIT_HOOK_POINT_TYPE = "hookType";
+    public static final String LIMIT_HOOK_POINT_RATE = "limitRate";
+
 }
