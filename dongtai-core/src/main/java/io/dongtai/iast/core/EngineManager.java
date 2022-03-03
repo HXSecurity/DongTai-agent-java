@@ -1,6 +1,8 @@
 package io.dongtai.iast.core;
 
+import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.LimiterManager;
 import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.report.HookPointRateLimitReport;
+import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.fallback.LimitFallbackSwitch;
 import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.HookPointRateLimitReport;
 import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.RequestRateLimitReport;
 import io.dongtai.iast.core.enums.RequestTypeEnum;
@@ -17,7 +19,6 @@ import io.dongtai.log.DongTaiLog;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 存储全局信息
@@ -43,8 +44,9 @@ public class EngineManager {
      */
     private static final BooleanThreadLocal DONGTAI_STATE = new BooleanThreadLocal(false);
     /**
-     * hook点降级开关
+     * 限制器统一管理器
      */
+    private final LimiterManager limiterManager;
     public static final BooleanThreadLocal DONGTAI_HOOK_FALLBACK = new BooleanThreadLocal(false);
     /**
      * hook点高频命中限速器
@@ -88,7 +90,7 @@ public class EngineManager {
      * hook点是否降级
      */
     public static boolean isHookPointFallback() {
-        return DONGTAI_HOOK_FALLBACK.get() != null && EngineManager.DONGTAI_HOOK_FALLBACK.get();
+        return LimitFallbackSwitch.isRequestFallback();
     }
 
     /**
@@ -96,11 +98,11 @@ public class EngineManager {
      * 该开关打开后，在当前请求生命周期内，逻辑短路hook点
      */
     public static void openHookPointFallback(String className, String method, String methodSign, int hookType) {
-        final double limitRate = EngineManager.HOOK_RATE_LIMITER.getRate();
+        final double limitRate = EngineManager.getLimiterManager().getHookRateLimiter().getRate();
         DongTaiLog.info("HookPoint rate limit! hookType: " + hookType + ", method:" + className + "." + method
                 + ", sign:" + methodSign + " ,rate:" + limitRate);
         HookPointRateLimitReport.sendReport(className, method, methodSign, hookType, limitRate);
-        DONGTAI_HOOK_FALLBACK.set(true);
+        LimitFallbackSwitch.setHeavyHookFallback(true);
     }
 
     /**
@@ -135,7 +137,11 @@ public class EngineManager {
         this.supportLazyHook = cfg.isEnableAllHook();
         this.saveBytecode = cfg.isEnableDumpClass();
         this.agentId = agentId;
+        this.limiterManager = LimiterManager.newInstance(cfg);
+    }
 
+    public static LimiterManager getLimiterManager() {
+        return instance.limiterManager;
     }
 
     /**
@@ -149,8 +155,8 @@ public class EngineManager {
         EngineManager.TAINT_POOL.remove();
         EngineManager.TAINT_HASH_CODES.remove();
         EngineManager.SCOPE_TRACKER.remove();
-        EngineManager.DONGTAI_HOOK_FALLBACK.remove();
-        EngineManager.HOOK_RATE_LIMITER.remove();
+        LimitFallbackSwitch.clearHeavyHookFallback();
+        EngineManager.getLimiterManager().getHookRateLimiter().remove();
     }
 
     public static void maintainRequestCount() {

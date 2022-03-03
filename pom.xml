@@ -34,6 +34,7 @@
         <jakarta.servlet-api>5.0.0</jakarta.servlet-api>
         <oshi-core.version>3.13.6</oshi-core.version>
         <oshi-core-slf.version>1.7.36</oshi-core-slf.version>
+        <resilience4j.version>1.7.1</resilience4j.version>
     </properties>
 
     <groupId>io.dongtai.iast</groupId>

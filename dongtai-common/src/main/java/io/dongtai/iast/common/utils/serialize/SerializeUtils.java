@@ -34,6 +34,10 @@ public class SerializeUtils {
         }
     };
 
+    private SerializeUtils() {
+        throw new IllegalStateException("Utility class");
+    }
+
     /**
      * 序列化对象
      */
