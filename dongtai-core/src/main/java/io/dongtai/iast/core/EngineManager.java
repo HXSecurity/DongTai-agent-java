@@ -137,7 +137,7 @@ public class EngineManager {
         this.supportLazyHook = cfg.isEnableAllHook();
         this.saveBytecode = cfg.isEnableDumpClass();
         this.agentId = agentId;
-        this.limiterManager = LimiterManager.newInstance(cfg);
+        this.limiterManager = LimiterManager.newInstance(cfg.cfg);
     }
 
     public static LimiterManager getLimiterManager() {

@@ -4,7 +4,7 @@ import io.dongtai.iast.common.entity.performance.metrics.*;
 import io.dongtai.iast.common.entity.performance.PerformanceMetrics;
 import io.dongtai.iast.common.enums.MetricsKey;
 import io.dongtai.iast.common.utils.serialize.SerializeUtils;
-import io.dongtai.iast.core.utils.PropertyUtils;
+import io.dongtai.iast.core.utils.RemoteConfigUtils;
 import io.dongtai.log.DongTaiLog;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
@@ -14,6 +14,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * 默认的性能熔断器实现(仅支持JDK8+)
@@ -27,13 +28,13 @@ public class DefaultPerformanceBreaker extends AbstractBreaker {
 
     private static CircuitBreaker breaker;
 
-    private static PropertyUtils cfg;
+    private static Properties cfg;
 
-    private DefaultPerformanceBreaker(PropertyUtils cfg) {
+    private DefaultPerformanceBreaker(Properties cfg) {
         super(cfg);
     }
 
-    public static AbstractBreaker newInstance(PropertyUtils cfg) {
+    public static AbstractBreaker newInstance(Properties cfg) {
         if (instance == null) {
             instance = new DefaultPerformanceBreaker(cfg);
         }
@@ -59,7 +60,7 @@ public class DefaultPerformanceBreaker extends AbstractBreaker {
     }
 
     @Override
-    protected void initBreaker(PropertyUtils cfg) {
+    protected void initBreaker(Properties cfg) {
         DefaultPerformanceBreaker.cfg = cfg;
         // 创建断路器自定义配置
         CircuitBreaker breaker = CircuitBreaker.of("iastPerformanceBreaker", CircuitBreakerConfig.custom()
@@ -94,16 +95,18 @@ public class DefaultPerformanceBreaker extends AbstractBreaker {
             //todo allCheck
         });
         // 最大阈值检查
-        performanceMetrics.forEach((metrics) -> {
-            if (metrics.getMetricsKey() == MetricsKey.CPU_USAGE) {
-                Double cpuUsage = metrics.getMetricsValue(Double.class);
-                //todo check
-                if (cpuUsage > 35) {
-                    throw new IllegalStateException("cpu limit:" + cpuUsage);
+        performanceMetrics.forEach((each) -> {
+            final List<PerformanceMetrics> performanceLimitMaxThreshold = RemoteConfigUtils.getPerformanceLimitMaxThreshold(cfg);
+            System.out.println(each.getMetricsKey().toString());
+            System.out.println(each.getMetricsValue(each.getMetricsKey().getValueType()));
+            for (PerformanceMetrics maxMetrics : performanceLimitMaxThreshold) {
+                if (maxMetrics.getMetricsKey() == each.getMetricsKey()) {
+                    //todo check
+                    System.out.println("maxLimit:"+each.getMetricsKey().getDesc()+"=>" + maxMetrics.getMetricsValue(each.getMetricsKey().getValueType()));
+                    // throw new IllegalStateException("cpu limit:" + cpuUsage);
+                    break;
                 }
             }
-            System.out.println(metrics.getMetricsKey().toString());
-            System.out.println(metrics.getMetricsValue(metrics.getMetricsKey().getValueType()));
         });
         return true;
     }
@@ -117,7 +120,8 @@ public class DefaultPerformanceBreaker extends AbstractBreaker {
     private static List<PerformanceMetrics> convert2MetricsList(String contextString) {
         try {
             final List<Class<?>> clazzWhiteList = Arrays.asList(PerformanceMetrics.class, MetricsKey.class,
-                    MemoryUsageMetrics.class, GarbageInfoMetrics.class, GarbageInfoMetrics.CollectionInfo.class, ThreadInfoMetrics.class);
+                    CpuInfoMetrics.class, MemoryUsageMetrics.class, GarbageInfoMetrics.class, GarbageInfoMetrics.CollectionInfo.class,
+                    ThreadInfoMetrics.class);
             return SerializeUtils.deserialize2ArrayList(contextString, PerformanceMetrics.class, clazzWhiteList);
         } catch (Exception e) {
             DongTaiLog.warn("convert2MetricsList failed, err:{}", e.getMessage());

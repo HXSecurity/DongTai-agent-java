@@ -1,7 +1,8 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.limiter.breaker;
 
-import io.dongtai.iast.core.utils.PropertyUtils;
 import io.dongtai.log.DongTaiLog;
+
+import java.util.Properties;
 
 /**
  * 断路器抽象
@@ -11,7 +12,7 @@ import io.dongtai.log.DongTaiLog;
  */
 public abstract class AbstractBreaker {
 
-    protected AbstractBreaker(PropertyUtils cfg) {
+    protected AbstractBreaker(Properties cfg) {
         initBreaker(cfg);
     }
 
@@ -30,6 +31,6 @@ public abstract class AbstractBreaker {
      *
      * @param cfg 配置
      */
-    protected abstract void initBreaker(PropertyUtils cfg);
+    protected abstract void initBreaker(Properties cfg);
 
 }

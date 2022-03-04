@@ -3,8 +3,9 @@ package io.dongtai.iast.core.bytecode.enhance.plugin.limiter;
 
 import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.breaker.AbstractBreaker;
 import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.breaker.DefaultPerformanceBreaker;
-import io.dongtai.iast.core.utils.PropertyUtils;
 import io.dongtai.iast.core.utils.threadlocal.RateLimiterThreadLocal;
+
+import java.util.Properties;
 
 /**
  * 限制器管理器
@@ -24,7 +25,7 @@ public class LimiterManager {
      */
     private final RateLimiterThreadLocal hookRateLimiter;
 
-    public static LimiterManager newInstance(PropertyUtils cfg) {
+    public static LimiterManager newInstance(Properties cfg) {
         //todo add properties
         if (instance == null) {
             instance = new LimiterManager(cfg);
@@ -32,7 +33,7 @@ public class LimiterManager {
         return instance;
     }
 
-    private LimiterManager(PropertyUtils cfg) {
+    private LimiterManager(Properties cfg) {
         this.performanceBreaker = DefaultPerformanceBreaker.newInstance(cfg);
         this.hookRateLimiter = new RateLimiterThreadLocal(cfg);
     }
