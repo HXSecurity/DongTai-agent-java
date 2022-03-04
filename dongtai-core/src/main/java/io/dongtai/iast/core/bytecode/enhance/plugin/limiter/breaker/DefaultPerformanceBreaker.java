@@ -1,9 +1,12 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.limiter.breaker;
 
-import io.dongtai.iast.common.entity.performance.metrics.*;
 import io.dongtai.iast.common.entity.performance.PerformanceMetrics;
+import io.dongtai.iast.common.entity.performance.metrics.*;
 import io.dongtai.iast.common.enums.MetricsKey;
 import io.dongtai.iast.common.utils.serialize.SerializeUtils;
+import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.checker.IPerformanceChecker;
+import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.checker.MetricsBindCheckerEnum;
+import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.fallback.LimitFallbackSwitch;
 import io.dongtai.iast.core.utils.RemoteConfigUtils;
 import io.dongtai.log.DongTaiLog;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
@@ -82,32 +85,43 @@ public class DefaultPerformanceBreaker extends AbstractBreaker {
                 .build());
         breaker.getEventPublisher()
                 .onStateTransition(event -> {
-                    //todo
-                    System.out.println("断路器状态转换:" + event.getStateTransition().getFromState() + "->" + event.getStateTransition().getToState());
+                    final CircuitBreaker.State toState = event.getStateTransition().getToState();
+                    if(toState== CircuitBreaker.State.OPEN){
+                        LimitFallbackSwitch.setPerformanceFallback(true);
+                    }else if(toState== CircuitBreaker.State.CLOSED){
+                        LimitFallbackSwitch.setPerformanceFallback(false);
+                    }
                 });
         DefaultPerformanceBreaker.breaker = breaker;
     }
 
     private static boolean checkMetricsWithAutoFallback(String contextString) {
         List<PerformanceMetrics> performanceMetrics = convert2MetricsList(contextString);
-        // 风险阈值检查
-        performanceMetrics.forEach((metrics) -> {
-            //todo allCheck
-        });
-        // 最大阈值检查
-        performanceMetrics.forEach((each) -> {
-            final List<PerformanceMetrics> performanceLimitMaxThreshold = RemoteConfigUtils.getPerformanceLimitMaxThreshold(cfg);
-            System.out.println(each.getMetricsKey().toString());
-            System.out.println(each.getMetricsValue(each.getMetricsKey().getValueType()));
-            for (PerformanceMetrics maxMetrics : performanceLimitMaxThreshold) {
-                if (maxMetrics.getMetricsKey() == each.getMetricsKey()) {
-                    //todo check
-                    System.out.println("maxLimit:"+each.getMetricsKey().getDesc()+"=>" + maxMetrics.getMetricsValue(each.getMetricsKey().getValueType()));
-                    // throw new IllegalStateException("cpu limit:" + cpuUsage);
-                    break;
+        // 检查每个性能是否达到风险值
+        int riskMetricsCount = 0;
+        final Integer maxRiskMetricsCount = RemoteConfigUtils.getMaxRiskMetricsCount(cfg);
+        if (maxRiskMetricsCount > 0) {
+            for (PerformanceMetrics metrics : performanceMetrics) {
+                final IPerformanceChecker performanceChecker = MetricsBindCheckerEnum.newCheckerInstance(metrics.getMetricsKey());
+                if (performanceChecker != null && performanceChecker.isPerformanceRisk(metrics, cfg)) {
+                    riskMetricsCount++;
+                }
+                //达到性能风险的指标数量超过阈值
+                if (riskMetricsCount >= maxRiskMetricsCount) {
+                    //todo ThreadPools.sendLimitReport();
+                    DongTaiLog.warn("performance risk num over limit! riskMetrics num:" + riskMetricsCount + ",threshold num:" + maxRiskMetricsCount);
+                    throw new IllegalStateException("performance risk num over limit!");
                 }
             }
-        });
+        }
+        // 检查每个性能是否达到限制值
+        for (PerformanceMetrics metrics : performanceMetrics) {
+            final IPerformanceChecker performanceChecker = MetricsBindCheckerEnum.newCheckerInstance(metrics.getMetricsKey());
+            if (performanceChecker != null && performanceChecker.isPerformanceOverLimit(metrics, cfg)) {
+                DongTaiLog.warn("performance over limit! riskMetrics metrics:" + metrics);
+                throw new IllegalStateException("performance over limit!");
+            }
+        }
         return true;
     }
 

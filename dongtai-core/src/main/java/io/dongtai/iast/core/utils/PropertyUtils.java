@@ -1,5 +1,8 @@
 package io.dongtai.iast.core.utils;
 
+import io.dongtai.iast.core.utils.json.GsonUtils;
+import io.dongtai.log.DongTaiLog;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -271,10 +274,19 @@ public class PropertyUtils {
         final String config = String.format("iast.remoteSync.%s", configKey);
         final Properties localConfig = cfg != null ? cfg : PropertyUtils.getInstance().cfg;
         final String property = System.getProperty(config, localConfig == null ? null : localConfig.getProperty(config, null));
-        if (property == null || !valueType.isInstance(valueType)) {
+        if (property == null) {
             return defaultValue;
         }
-        return valueType.cast(property);
+        try {
+            if (valueType.isInstance(valueType)) {
+                return valueType.cast(property);
+            } else {
+                return GsonUtils.castBaseTypeString2Obj(property, valueType);
+            }
+        } catch (Exception e) {
+            DongTaiLog.warn("cast remoteSyncConfig failed!key:{}, valueType:{}, property:{}, err:{}", config, valueType, property, e.getMessage());
+            return defaultValue;
+        }
     }
 
     public static <T> T getRemoteSyncLocalConfig(String configKey, Class<T> valueType, T defaultValue) {
