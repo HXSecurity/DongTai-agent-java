@@ -40,10 +40,12 @@ public class RemoteConfigUtils {
     /**
      * 同步远程配置
      *
-     * @param remoteConfigString 远程配置内容字符串
+     * @param remoteConfig 远程配置内容字符串
      */
-    public static void syncRemoteConfig(String remoteConfigString) {
+    public static void syncRemoteConfig(String remoteConfig) {
         //todo 拉取远端配置后解析并更新到内存中
+        DongTaiLog.info("Success Call syncRemoteConfig(), Param: " + remoteConfig);
+
     }
 
     // *************************************************************
