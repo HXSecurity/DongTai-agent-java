@@ -1,7 +1,8 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.limiter.checker;
 
 import io.dongtai.iast.common.entity.performance.PerformanceMetrics;
-import io.dongtai.iast.core.utils.PropertyUtils;
+
+import java.util.Properties;
 
 /**
  * 性能检测器接口
@@ -18,7 +19,7 @@ public interface IPerformanceChecker {
      * @param cfg                配置
      * @return boolean
      */
-    boolean isPerformanceRisk(PerformanceMetrics performanceMetrics, PropertyUtils cfg);
+    boolean isPerformanceRisk(PerformanceMetrics performanceMetrics, Properties cfg);
 
     /**
      * 性能是否达到限制值
@@ -27,5 +28,5 @@ public interface IPerformanceChecker {
      * @param cfg                配置
      * @return boolean
      */
-    boolean isPerformanceOverLimit(PerformanceMetrics performanceMetrics, PropertyUtils cfg);
+    boolean isPerformanceOverLimit(PerformanceMetrics performanceMetrics, Properties cfg);
 }

@@ -33,6 +33,7 @@ public class RemoteConfigUtils {
     /**
      * 性能熔断阈值相关配置
      */
+    private static Integer maxRiskMetricsCount;
     private static List<PerformanceMetrics> performanceLimitRiskThreshold;
     private static List<PerformanceMetrics> performanceLimitMaxThreshold;
 
@@ -109,6 +110,20 @@ public class RemoteConfigUtils {
     }
 
     /**
+     * 获取不允许超过风险阈值的指标数量(0为不限制，达到阈值数时熔断)
+     */
+    public static Integer getMaxRiskMetricsCount(Properties cfg) {
+        if (maxRiskMetricsCount == null) {
+            maxRiskMetricsCount = PropertyUtils.getRemoteSyncLocalConfig("performanceLimit.maxRiskMetricsCount", Integer.class, 3, cfg);
+        }
+        return maxRiskMetricsCount;
+    }
+
+    public static void setMaxRiskMetricsCount(Integer maxRiskMetricsCount) {
+        RemoteConfigUtils.maxRiskMetricsCount = maxRiskMetricsCount;
+    }
+
+    /**
      * 从配置文件中构建性能指标
      *
      * @param configPrefix 配置前缀
@@ -136,5 +151,4 @@ public class RemoteConfigUtils {
         }
         return performanceMetricsList;
     }
-
 }

@@ -160,7 +160,7 @@ public class EngineManager {
      * @return true - 引擎已启动；false - 引擎未启动
      */
     public static boolean isEngineRunning() {
-        return EngineManager.enableLingzhi == 1;
+        return !LimitFallbackSwitch.isEngineFallback() && EngineManager.enableLingzhi == 1;
     }
 
     public boolean supportLazyHook() {
