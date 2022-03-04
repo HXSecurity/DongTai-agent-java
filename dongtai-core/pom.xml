@@ -243,6 +243,11 @@
             <version>${resilience4j.version}</version>
         </dependency>
         <!-- 限流熔断依赖end -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>${gson.version}</version>
+        </dependency>
     </dependencies>
 
 </project>

@@ -3,7 +3,9 @@ package io.dongtai.iast.core.utils.threadlocal;
 
 import com.google.common.util.concurrent.RateLimiter;
 import com.google.common.util.concurrent.RateLimiterWithCapacity;
-import io.dongtai.iast.core.utils.PropertyUtils;
+import io.dongtai.iast.core.utils.RemoteConfigUtils;
+
+import java.util.Properties;
 
 /**
  * 本地线程隔离限速器
@@ -25,9 +27,9 @@ public class RateLimiterThreadLocal extends ThreadLocal<RateLimiter> {
      */
     double initBurstSeconds;
 
-    public RateLimiterThreadLocal(PropertyUtils properties) {
-        this.tokenPerSecond = properties.getDefaultTokenPerSecond();
-        this.initBurstSeconds = properties.getDefaultInitBurstSeconds();
+    public RateLimiterThreadLocal(Properties properties) {
+        this.tokenPerSecond = RemoteConfigUtils.getHookLimitTokenPerSecond(properties);
+        this.initBurstSeconds = RemoteConfigUtils.getHookLimitInitBurstSeconds(properties);
     }
 
     @Override
@@ -51,7 +53,7 @@ public class RateLimiterThreadLocal extends ThreadLocal<RateLimiter> {
      */
     public boolean acquire() {
         // 未开启全局自动降级开关,不尝试获取令牌
-        if (!PropertyUtils.getInstance().getAutoFallback()) {
+        if (!RemoteConfigUtils.enableAutoFallback()) {
             return true;
         }
         return acquire(DEFAULT_PERMITS);
