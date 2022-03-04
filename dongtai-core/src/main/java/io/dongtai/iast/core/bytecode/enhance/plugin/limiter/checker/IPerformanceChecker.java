@@ -15,18 +15,18 @@ public interface IPerformanceChecker {
     /**
      * 性能是否达到风险值
      *
-     * @param performanceMetrics 性能指标
+     * @param metrics 性能指标
      * @param cfg                配置
      * @return boolean
      */
-    boolean isPerformanceRisk(PerformanceMetrics performanceMetrics, Properties cfg);
+    boolean isPerformanceRisk(PerformanceMetrics metrics, Properties cfg);
 
     /**
      * 性能是否达到限制值
      *
-     * @param performanceMetrics 性能指标
+     * @param metrics 性能指标
      * @param cfg                配置
      * @return boolean
      */
-    boolean isPerformanceOverLimit(PerformanceMetrics performanceMetrics, Properties cfg);
+    boolean isPerformanceOverLimit(PerformanceMetrics metrics, Properties cfg);
 }

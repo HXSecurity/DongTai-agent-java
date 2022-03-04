@@ -2,10 +2,8 @@ package io.dongtai.iast.core.bytecode.enhance.plugin.limiter.checker.impl;
 
 import io.dongtai.iast.common.entity.performance.PerformanceMetrics;
 import io.dongtai.iast.common.entity.performance.metrics.CpuInfoMetrics;
-import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.checker.IPerformanceChecker;
-import io.dongtai.iast.core.utils.RemoteConfigUtils;
+import io.dongtai.iast.common.entity.performance.metrics.MemoryUsageMetrics;
 
-import java.util.List;
 import java.util.Properties;
 
 
@@ -15,32 +13,31 @@ import java.util.Properties;
  * @author chenyi
  * @date 2022/3/4
  */
-public class CpuUsageChecker implements IPerformanceChecker {
+public class CpuUsageChecker extends BasePerformanceChecker {
+
     @Override
-    public boolean isPerformanceRisk(PerformanceMetrics performanceMetrics, Properties cfg) {
-        final List<PerformanceMetrics> performanceLimitRiskThreshold = RemoteConfigUtils.getPerformanceLimitRiskThreshold(cfg);
-        for (PerformanceMetrics riskThreshold : performanceLimitRiskThreshold) {
-            if (riskThreshold.getMetricsKey() == performanceMetrics.getMetricsKey()) {
-                final Double riskCpuUsagePercentage = riskThreshold.getMetricsValue(CpuInfoMetrics.class).getCpuUsagePercentage();
-                final Double cpuUsagePercentage = performanceMetrics.getMetricsValue(CpuInfoMetrics.class).getCpuUsagePercentage();
-                if (cpuUsagePercentage >= riskCpuUsagePercentage) {
-                    return true;
-                }
+    public boolean isPerformanceRisk(PerformanceMetrics metrics, Properties cfg) {
+        final PerformanceMetrics thresholdMetrics = getMatchRiskThreshold(metrics.getMetricsKey(), cfg);
+        if (thresholdMetrics != null) {
+            final CpuInfoMetrics threshold = thresholdMetrics.getMetricsValue(CpuInfoMetrics.class);
+            final CpuInfoMetrics now = metrics.getMetricsValue(CpuInfoMetrics.class);
+            // cpu使用率
+            if (threshold.getCpuUsagePercentage() != null) {
+                return now.getCpuUsagePercentage() >= threshold.getCpuUsagePercentage();
             }
         }
         return false;
     }
 
     @Override
-    public boolean isPerformanceOverLimit(PerformanceMetrics performanceMetrics, Properties cfg) {
-        final List<PerformanceMetrics> performanceLimitMaxThreshold = RemoteConfigUtils.getPerformanceLimitMaxThreshold(cfg);
-        for (PerformanceMetrics maxThreshold : performanceLimitMaxThreshold) {
-            if (maxThreshold.getMetricsKey() == performanceMetrics.getMetricsKey()) {
-                final Double riskCpuUsagePercentage = maxThreshold.getMetricsValue(CpuInfoMetrics.class).getCpuUsagePercentage();
-                final Double cpuUsagePercentage = performanceMetrics.getMetricsValue(CpuInfoMetrics.class).getCpuUsagePercentage();
-                if (cpuUsagePercentage >= riskCpuUsagePercentage) {
-                    return true;
-                }
+    public boolean isPerformanceOverLimit(PerformanceMetrics metrics, Properties cfg) {
+        final PerformanceMetrics thresholdMetrics = getMatchMaxThreshold(metrics.getMetricsKey(), cfg);
+        if (thresholdMetrics != null) {
+            final CpuInfoMetrics threshold = thresholdMetrics.getMetricsValue(CpuInfoMetrics.class);
+            final CpuInfoMetrics now = metrics.getMetricsValue(CpuInfoMetrics.class);
+            // cpu使用率
+            if (threshold.getCpuUsagePercentage() != null) {
+                return now.getCpuUsagePercentage() >= threshold.getCpuUsagePercentage();
             }
         }
         return false;

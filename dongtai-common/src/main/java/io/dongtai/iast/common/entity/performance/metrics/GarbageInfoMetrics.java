@@ -81,11 +81,5 @@ public class GarbageInfoMetrics implements Serializable {
             this.collectionName = collectionName;
         }
 
-        @Override
-        public String toString() {
-            return "collectionName = " + collectionName +
-                    " collectionCount = " + collectionCount +
-                    " collectionTime = " + collectionTime;
-        }
     }
 }

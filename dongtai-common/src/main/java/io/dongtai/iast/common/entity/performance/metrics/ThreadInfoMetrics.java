@@ -48,10 +48,4 @@ public class ThreadInfoMetrics implements Serializable {
         this.daemonThreadCount = daemonThreadCount;
     }
 
-    @Override
-    public String toString() {
-        return "threadCount = " + threadCount +
-                " peakThreadCount = " + peakThreadCount +
-                " daemonThreadCount = " + daemonThreadCount;
-    }
 }
