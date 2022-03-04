@@ -5,6 +5,7 @@ import io.dongtai.iast.agent.manager.EngineManager;
 import io.dongtai.iast.agent.monitor.collector.*;
 import io.dongtai.iast.agent.report.AgentRegisterReport;
 import io.dongtai.iast.common.entity.performance.PerformanceMetrics;
+import io.dongtai.iast.common.entity.performance.metrics.CpuInfoMetrics;
 import io.dongtai.iast.common.enums.MetricsKey;
 import io.dongtai.iast.common.utils.serialize.SerializeUtils;
 import io.dongtai.log.DongTaiLog;
@@ -136,7 +137,8 @@ public class PerformanceMonitor implements IMonitor {
         final List<PerformanceMetrics> performanceMetrics = collectPerformanceMetrics();
         for (PerformanceMetrics metrics : performanceMetrics) {
             if (metrics.getMetricsKey() == MetricsKey.CPU_USAGE) {
-                CPU_USAGE = metrics.getMetricsValue(Double.class).intValue();
+                final CpuInfoMetrics cpuInfoMetrics = metrics.getMetricsValue(CpuInfoMetrics.class);
+                CPU_USAGE = cpuInfoMetrics.getCpuUsagePercentage().intValue();
             }
         }
         checkPerformanceMetrics(performanceMetrics);

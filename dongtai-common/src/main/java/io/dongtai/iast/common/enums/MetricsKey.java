@@ -14,7 +14,7 @@ public enum MetricsKey {
     /**
      * JVM相关性能指标枚举
      */
-    CPU_USAGE("cpuUsage", Double.class, "cpu使用率(单位:百分比)"),
+    CPU_USAGE("cpuUsage", CpuInfoMetrics.class, "cpu使用率"),
 
     MEM_USAGE("memoryUsage", MemoryUsageMetrics.class, "内存使用率"),
 

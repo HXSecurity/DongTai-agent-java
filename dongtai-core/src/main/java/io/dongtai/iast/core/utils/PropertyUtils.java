@@ -32,12 +32,6 @@ public class PropertyUtils {
     private Integer responseLength;
 
     private final String propertiesFilePath;
-    /**
-     * 限流相关本地配置
-     */
-    private Boolean autoFallback;
-    private Double defaultTokenPerSecond;
-    private Double defaultInitBurstSeconds;
 
     public static PropertyUtils getInstance(String propertiesFilePath) {
         if (null == instance) {
@@ -262,36 +256,29 @@ public class PropertyUtils {
     }
 
     /**
-     * 本地默认配置-是否开启自动降级
+     * 获取远端同步的本地配置项
+     *
+     * @param configKey    配置项
+     * @param valueType    值类型
+     * @param defaultValue 默认值
+     * @param cfg          本地properties配置(为空使用PropertyUtils的配置)
+     * @return {@link T} 值类型泛型
      */
-    public boolean getAutoFallback() {
-        final String cfgKey = "iast.limit.autoFallback";
-        if (autoFallback == null) {
-            autoFallback = Boolean.parseBoolean(System.getProperty(cfgKey, cfg.getProperty(cfgKey, "true")));
+    public static <T> T getRemoteSyncLocalConfig(String configKey, Class<T> valueType, T defaultValue, Properties cfg) {
+        if (configKey == null || valueType == null) {
+            return defaultValue;
         }
-        return autoFallback;
+        final String config = String.format("iast.remoteSync.%s", configKey);
+        final Properties localConfig = cfg != null ? cfg : PropertyUtils.getInstance().cfg;
+        final String property = System.getProperty(config, localConfig == null ? null : localConfig.getProperty(config, null));
+        if (property == null || !valueType.isInstance(valueType)) {
+            return defaultValue;
+        }
+        return valueType.cast(property);
     }
 
-    /**
-     * 本地默认配置-每秒获得令牌数
-     */
-    public double getDefaultTokenPerSecond() {
-        final String cfgKey = "iast.limit.hookRate.defaultTokenPerSecond";
-        if (defaultTokenPerSecond == null) {
-            defaultTokenPerSecond = Double.parseDouble(System.getProperty(cfgKey, cfg.getProperty(cfgKey, "5000")));
-        }
-        return defaultTokenPerSecond;
-    }
-
-    /**
-     * 本地默认配置-初始预放置令牌时间
-     */
-    public double getDefaultInitBurstSeconds() {
-        final String cfgKey = "iast.limit.hookRate.defaultInitBurstSeconds";
-        if (defaultInitBurstSeconds == null) {
-            defaultInitBurstSeconds = Double.parseDouble(System.getProperty(cfgKey, cfg.getProperty(cfgKey, "10")));
-        }
-        return defaultInitBurstSeconds;
+    public static <T> T getRemoteSyncLocalConfig(String configKey, Class<T> valueType, T defaultValue) {
+        return getRemoteSyncLocalConfig(configKey, valueType, defaultValue, null);
     }
 
 }

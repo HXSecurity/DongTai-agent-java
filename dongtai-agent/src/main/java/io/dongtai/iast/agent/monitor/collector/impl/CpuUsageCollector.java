@@ -1,7 +1,8 @@
 package io.dongtai.iast.agent.monitor.collector.impl;
 
-import io.dongtai.iast.common.enums.MetricsKey;
 import io.dongtai.iast.common.entity.performance.PerformanceMetrics;
+import io.dongtai.iast.common.entity.performance.metrics.CpuInfoMetrics;
+import io.dongtai.iast.common.enums.MetricsKey;
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
 
@@ -35,8 +36,9 @@ public class CpuUsageCollector extends AbstractPerformanceCollector {
         long idle = ticks[CentralProcessor.TickType.IDLE.getIndex()] - prevTicks[CentralProcessor.TickType.IDLE.getIndex()];
         long totalCpu = user + nice + cSys + idle + iowait + irq + softirq + steal;
 
-        Double cpuUsage = (1.0 - (idle * 1.0 / totalCpu)) * 100;
-        return buildMetricsData(MetricsKey.CPU_USAGE, cpuUsage);
+        CpuInfoMetrics metricsValue = new CpuInfoMetrics();
+        metricsValue.setCpuUsagePercentage((1.0 - (idle * 1.0 / totalCpu)) * 100);
+        return buildMetricsData(MetricsKey.CPU_USAGE, metricsValue);
     }
 
 }
