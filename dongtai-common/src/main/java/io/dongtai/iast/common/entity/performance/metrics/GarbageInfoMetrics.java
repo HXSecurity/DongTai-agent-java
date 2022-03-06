@@ -2,7 +2,9 @@ package io.dongtai.iast.common.entity.performance.metrics;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 垃圾回收信息指标
@@ -28,6 +30,17 @@ public class GarbageInfoMetrics implements Serializable {
         this.collectionInfoList.add(collectionInfo);
     }
 
+    public CollectionInfo getMatchedCollectionInfo(String collectionName) {
+        if (collectionName != null) {
+            for (CollectionInfo each : getCollectionInfoList()) {
+                if (collectionName.equals(each.getCollectionName())) {
+                    return each;
+                }
+            }
+        }
+        return null;
+    }
+
     public List<CollectionInfo> getCollectionInfoList() {
         return collectionInfoList;
     }
@@ -42,7 +55,6 @@ public class GarbageInfoMetrics implements Serializable {
      */
     public static class CollectionInfo implements Serializable {
         private static final long serialVersionUID = -6668180967516170799L;
-
         /**
          * 收集器名称
          */
@@ -50,26 +62,29 @@ public class GarbageInfoMetrics implements Serializable {
         /**
          * 收集次数
          */
-        public long collectionCount;
-
+        public Long collectionCount;
         /**
          * 收集时间
          */
-        public long collectionTime;
+        public Long collectionTime;
+        /**
+         * 是否是老年代收集器
+         */
+        public Boolean tenured;
 
-        public long getCollectionCount() {
+        public Long getCollectionCount() {
             return collectionCount;
         }
 
-        public void setCollectionCount(long collectionCount) {
+        public void setCollectionCount(Long collectionCount) {
             this.collectionCount = collectionCount;
         }
 
-        public long getCollectionTime() {
+        public Long getCollectionTime() {
             return collectionTime;
         }
 
-        public void setCollectionTime(long collectionTime) {
+        public void setCollectionTime(Long collectionTime) {
             this.collectionTime = collectionTime;
         }
 
@@ -79,7 +94,72 @@ public class GarbageInfoMetrics implements Serializable {
 
         public void setCollectionName(String collectionName) {
             this.collectionName = collectionName;
+            // 同时判断收集器年代
+            final GcGenerationAge gcGenerationAge = GcGenerationAge.fromGcName(collectionName);
+            this.tenured = gcGenerationAge == GcGenerationAge.OLD;
         }
 
+        public boolean isTenured() {
+            return tenured;
+        }
+
+        public void setTenured(boolean tenured) {
+            this.tenured = tenured;
+        }
+    }
+
+    /**
+     * 垃圾回收期gc年龄代
+     *
+     * @author me
+     * @date 2022/03/06
+     */
+    public enum GcGenerationAge {
+        /**
+         * 老年代
+         */
+        OLD,
+        /**
+         * 年轻的
+         */
+        YOUNG,
+        /**
+         * 未知
+         */
+        UNKNOWN;
+
+        private static final Map<String, GcGenerationAge> KNOWN_COLLECTORS = new HashMap<String, GcGenerationAge>() {
+            private static final long serialVersionUID = -7562565756559810887L;
+
+            {
+                // Serial收集器
+                put("MarkSweepCompact", OLD);
+                put("Copy", YOUNG);
+                // CMS收集器
+                put("ConcurrentMarkSweep", OLD);
+                put("ParNew", YOUNG);
+                // G1收集器
+                put("G1 Old Generation", OLD);
+                put("G1 Young Generation", YOUNG);
+                // Parallel收集器
+                put("PS MarkSweep", OLD);
+                put("PS Scavenge", YOUNG);
+                // IBM OpenJ9收集器
+                put("global", OLD);
+                put("scavenge", YOUNG);
+
+                put("partial gc", YOUNG);
+                put("global garbage collect", OLD);
+                // No-Op(JDK11+)
+                put("Epsilon", OLD);
+            }
+        };
+
+        public static GcGenerationAge fromGcName(String gcName) {
+            if (gcName == null || !KNOWN_COLLECTORS.containsKey(gcName)) {
+                return UNKNOWN;
+            }
+            return KNOWN_COLLECTORS.get(gcName);
+        }
     }
 }

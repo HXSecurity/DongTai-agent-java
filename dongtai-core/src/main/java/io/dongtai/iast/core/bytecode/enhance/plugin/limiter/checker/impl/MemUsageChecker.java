@@ -15,11 +15,11 @@ import java.util.Properties;
 public class MemUsageChecker extends BasePerformanceChecker {
 
     @Override
-    public boolean isPerformanceRisk(PerformanceMetrics metrics, Properties cfg) {
-        final PerformanceMetrics thresholdMetrics = getMatchRiskThreshold(metrics.getMetricsKey(), cfg);
+    public boolean isPerformanceRisk(PerformanceMetrics nowMetrics, Properties cfg) {
+        final PerformanceMetrics thresholdMetrics = getMatchRiskThreshold(nowMetrics.getMetricsKey(), cfg);
         if (thresholdMetrics != null) {
             final MemoryUsageMetrics threshold = thresholdMetrics.getMetricsValue(MemoryUsageMetrics.class);
-            final MemoryUsageMetrics now = metrics.getMetricsValue(MemoryUsageMetrics.class);
+            final MemoryUsageMetrics now = nowMetrics.getMetricsValue(MemoryUsageMetrics.class);
             // 内存使用率
             if (threshold.getMemUsagePercentage() != null) {
                 return now.getMemUsagePercentage() >= threshold.getMemUsagePercentage();
@@ -33,11 +33,11 @@ public class MemUsageChecker extends BasePerformanceChecker {
     }
 
     @Override
-    public boolean isPerformanceOverLimit(PerformanceMetrics metrics, Properties cfg) {
-        final PerformanceMetrics thresholdMetrics = getMatchMaxThreshold(metrics.getMetricsKey(), cfg);
+    public boolean isPerformanceOverLimit(PerformanceMetrics nowMetrics, Properties cfg) {
+        final PerformanceMetrics thresholdMetrics = getMatchMaxThreshold(nowMetrics.getMetricsKey(), cfg);
         if (thresholdMetrics != null) {
             final MemoryUsageMetrics threshold = thresholdMetrics.getMetricsValue(MemoryUsageMetrics.class);
-            final MemoryUsageMetrics now = metrics.getMetricsValue(MemoryUsageMetrics.class);
+            final MemoryUsageMetrics now = nowMetrics.getMetricsValue(MemoryUsageMetrics.class);
             // 内存使用率
             if (threshold.getMemUsagePercentage() != null) {
                 return now.getMemUsagePercentage() >= threshold.getMemUsagePercentage();

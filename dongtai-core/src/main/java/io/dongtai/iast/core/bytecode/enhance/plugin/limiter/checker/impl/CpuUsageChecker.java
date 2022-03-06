@@ -16,11 +16,11 @@ import java.util.Properties;
 public class CpuUsageChecker extends BasePerformanceChecker {
 
     @Override
-    public boolean isPerformanceRisk(PerformanceMetrics metrics, Properties cfg) {
-        final PerformanceMetrics thresholdMetrics = getMatchRiskThreshold(metrics.getMetricsKey(), cfg);
+    public boolean isPerformanceRisk(PerformanceMetrics nowMetrics, Properties cfg) {
+        final PerformanceMetrics thresholdMetrics = getMatchRiskThreshold(nowMetrics.getMetricsKey(), cfg);
         if (thresholdMetrics != null) {
             final CpuInfoMetrics threshold = thresholdMetrics.getMetricsValue(CpuInfoMetrics.class);
-            final CpuInfoMetrics now = metrics.getMetricsValue(CpuInfoMetrics.class);
+            final CpuInfoMetrics now = nowMetrics.getMetricsValue(CpuInfoMetrics.class);
             // cpu使用率
             if (threshold.getCpuUsagePercentage() != null) {
                 return now.getCpuUsagePercentage() >= threshold.getCpuUsagePercentage();
@@ -30,11 +30,11 @@ public class CpuUsageChecker extends BasePerformanceChecker {
     }
 
     @Override
-    public boolean isPerformanceOverLimit(PerformanceMetrics metrics, Properties cfg) {
-        final PerformanceMetrics thresholdMetrics = getMatchMaxThreshold(metrics.getMetricsKey(), cfg);
+    public boolean isPerformanceOverLimit(PerformanceMetrics nowMetrics, Properties cfg) {
+        final PerformanceMetrics thresholdMetrics = getMatchMaxThreshold(nowMetrics.getMetricsKey(), cfg);
         if (thresholdMetrics != null) {
             final CpuInfoMetrics threshold = thresholdMetrics.getMetricsValue(CpuInfoMetrics.class);
-            final CpuInfoMetrics now = metrics.getMetricsValue(CpuInfoMetrics.class);
+            final CpuInfoMetrics now = nowMetrics.getMetricsValue(CpuInfoMetrics.class);
             // cpu使用率
             if (threshold.getCpuUsagePercentage() != null) {
                 return now.getCpuUsagePercentage() >= threshold.getCpuUsagePercentage();
