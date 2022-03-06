@@ -95,8 +95,8 @@ public class GarbageInfoMetrics implements Serializable {
         public void setCollectionName(String collectionName) {
             this.collectionName = collectionName;
             // 同时判断收集器年代
-            final GcGenerationAge gcGenerationAge = GcGenerationAge.fromGcName(collectionName);
-            this.tenured = gcGenerationAge == GcGenerationAge.OLD;
+            final GcGenerationAgeEnum gcGenerationAgeEnum = GcGenerationAgeEnum.fromGcName(collectionName);
+            this.tenured = gcGenerationAgeEnum == GcGenerationAgeEnum.OLD;
         }
 
         public boolean isTenured() {
@@ -109,12 +109,12 @@ public class GarbageInfoMetrics implements Serializable {
     }
 
     /**
-     * 垃圾回收期gc年龄代
+     * 垃圾回收器GC年龄代枚举
      *
-     * @author me
+     * @author chenyi
      * @date 2022/03/06
      */
-    public enum GcGenerationAge {
+    public enum GcGenerationAgeEnum {
         /**
          * 老年代
          */
@@ -128,7 +128,7 @@ public class GarbageInfoMetrics implements Serializable {
          */
         UNKNOWN;
 
-        private static final Map<String, GcGenerationAge> KNOWN_COLLECTORS = new HashMap<String, GcGenerationAge>() {
+        private static final Map<String, GcGenerationAgeEnum> KNOWN_COLLECTORS = new HashMap<String, GcGenerationAgeEnum>() {
             private static final long serialVersionUID = -7562565756559810887L;
 
             {
@@ -155,7 +155,7 @@ public class GarbageInfoMetrics implements Serializable {
             }
         };
 
-        public static GcGenerationAge fromGcName(String gcName) {
+        public static GcGenerationAgeEnum fromGcName(String gcName) {
             if (gcName == null || !KNOWN_COLLECTORS.containsKey(gcName)) {
                 return UNKNOWN;
             }
