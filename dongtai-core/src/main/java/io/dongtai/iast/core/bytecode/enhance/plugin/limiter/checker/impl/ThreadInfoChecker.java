@@ -31,13 +31,11 @@ public class ThreadInfoChecker extends BasePerformanceChecker {
             final ThreadInfoMetrics threshold = thresholdMetrics.getMetricsValue(ThreadInfoMetrics.class);
             final ThreadInfoMetrics now = nowMetrics.getMetricsValue(ThreadInfoMetrics.class);
             // 当前线程数
-            if (threshold.getThreadCount() != null) {
-                return now.getThreadCount() >= threshold.getThreadCount();
+            if (threshold.getThreadCount() != null && now.getThreadCount() >= threshold.getThreadCount()) {
+                return true;
             }
             // todo: 比较洞态守护线程数
-            if (threshold.getDaemonThreadCount() != null) {
-                return now.getDaemonThreadCount() >= threshold.getDaemonThreadCount();
-            }
+            return threshold.getDaemonThreadCount() != null && now.getDaemonThreadCount() >= threshold.getDaemonThreadCount();
         }
         return false;
     }

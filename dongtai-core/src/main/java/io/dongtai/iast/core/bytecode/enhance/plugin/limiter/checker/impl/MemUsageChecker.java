@@ -17,35 +17,26 @@ public class MemUsageChecker extends BasePerformanceChecker {
     @Override
     public boolean isPerformanceRisk(PerformanceMetrics nowMetrics, Properties cfg) {
         final PerformanceMetrics thresholdMetrics = getMatchRiskThreshold(nowMetrics.getMetricsKey(), cfg);
-        if (thresholdMetrics != null) {
-            final MemoryUsageMetrics threshold = thresholdMetrics.getMetricsValue(MemoryUsageMetrics.class);
-            final MemoryUsageMetrics now = nowMetrics.getMetricsValue(MemoryUsageMetrics.class);
-            // 内存使用率
-            if (threshold.getMemUsagePercentage() != null) {
-                return now.getMemUsagePercentage() >= threshold.getMemUsagePercentage();
-            }
-            // 已用内存大小
-            if (threshold.getUsed() != null) {
-                return now.getUsed() >= threshold.getUsed();
-            }
-        }
-        return false;
+        return checkIsMemUsageOverThreshold(nowMetrics, thresholdMetrics);
     }
 
     @Override
     public boolean isPerformanceOverLimit(PerformanceMetrics nowMetrics, Properties cfg) {
         final PerformanceMetrics thresholdMetrics = getMatchMaxThreshold(nowMetrics.getMetricsKey(), cfg);
+        return checkIsMemUsageOverThreshold(nowMetrics, thresholdMetrics);
+    }
+
+    private boolean checkIsMemUsageOverThreshold(PerformanceMetrics nowMetrics, PerformanceMetrics thresholdMetrics) {
         if (thresholdMetrics != null) {
             final MemoryUsageMetrics threshold = thresholdMetrics.getMetricsValue(MemoryUsageMetrics.class);
             final MemoryUsageMetrics now = nowMetrics.getMetricsValue(MemoryUsageMetrics.class);
             // 内存使用率
-            if (threshold.getMemUsagePercentage() != null) {
-                return now.getMemUsagePercentage() >= threshold.getMemUsagePercentage();
+            if (threshold.getMemUsagePercentage() != null
+                    && now.getMemUsagePercentage() >= threshold.getMemUsagePercentage()) {
+                return true;
             }
             // 已用内存大小
-            if (threshold.getUsed() != null) {
-                return now.getUsed() >= threshold.getUsed();
-            }
+            return threshold.getUsed() != null && now.getUsed() >= threshold.getUsed();
         }
         return false;
     }
