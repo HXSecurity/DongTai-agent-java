@@ -31,9 +31,13 @@ public class GarbageInfoChecker extends BasePerformanceChecker {
             final GarbageInfoMetrics threshold = thresholdMetrics.getMetricsValue(GarbageInfoMetrics.class);
             final GarbageInfoMetrics now = nowMetrics.getMetricsValue(GarbageInfoMetrics.class);
             for (GarbageInfoMetrics.CollectionInfo each : now.getCollectionInfoList()) {
-                final GarbageInfoMetrics.CollectionInfo matchedThreshold = threshold.getMatchedCollectionInfo(each.getCollectionName());
+                GarbageInfoMetrics.CollectionInfo matchedThreshold = threshold.getMatchedCollectionInfo(each.getCollectionName());
+                // 未找到对应名称的收集器阈值配置时，尝试寻找不区分收集器名称的通用配置
                 if (matchedThreshold == null) {
-                    continue;
+                    matchedThreshold = threshold.getMatchedCollectionInfo(null);
+                    if (matchedThreshold == null) {
+                        continue;
+                    }
                 }
                 if (each.isTenured()) {
                     // 老年代比较gc次数和时间是否超过阈值

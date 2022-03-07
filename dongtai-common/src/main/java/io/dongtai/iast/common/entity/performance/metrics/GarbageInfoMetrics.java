@@ -30,10 +30,20 @@ public class GarbageInfoMetrics implements Serializable {
         this.collectionInfoList.add(collectionInfo);
     }
 
+    /**
+     * 获得匹配的收集器信息
+     *
+     * @param collectionName 收集器名称(传null时匹配的首个名称为null的收集器)
+     * @return {@link CollectionInfo}
+     */
     public CollectionInfo getMatchedCollectionInfo(String collectionName) {
-        if (collectionName != null) {
-            for (CollectionInfo each : getCollectionInfoList()) {
+        for (CollectionInfo each : getCollectionInfoList()) {
+            if (collectionName != null) {
                 if (collectionName.equals(each.getCollectionName())) {
+                    return each;
+                }
+            } else {
+                if (each.getCollectionName() == null) {
                     return each;
                 }
             }
@@ -120,7 +130,7 @@ public class GarbageInfoMetrics implements Serializable {
          */
         OLD,
         /**
-         * 年轻的
+         * 年轻代
          */
         YOUNG,
         /**
