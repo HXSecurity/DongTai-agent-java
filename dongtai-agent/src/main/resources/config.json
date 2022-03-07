@@ -1,0 +1,19 @@
+{
+  "enableAutoFallback": true,
+  "hookLimitTokenPerSecond": 5000,
+  "hookLimitInitBurstSeconds": 10,
+  "maxRiskMetricsCount": 3,
+  "performanceLimitRiskThreshold":
+    {
+      "cpuUsage":{"cpuUsagePercentage":50}
+    },
+  "performanceLimitMaxThreshold":
+    {
+      "cpuUsage":{"cpuUsagePercentage":50},
+      "memoryNoHeapUsage": {"init":100000,"used":100000,"committed":100000,"max":100000},
+      "threadInfo": {"threadCount":10000,"daemonThreadCount":1000},
+      "garbageInfo": {
+        "collectionInfoList":[{"collectionName":"Old","collectionCount":10,"collectionTime":1000}]
+      }
+    }
+}

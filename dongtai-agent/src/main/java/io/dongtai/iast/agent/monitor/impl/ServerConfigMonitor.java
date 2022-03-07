@@ -21,7 +21,26 @@ public class ServerConfigMonitor implements IMonitor {
 
     @Override
     public void check() {
-        String serverConfig = getConfigFromRemote();
+        //String serverConfig = getConfigFromRemote();
+        String serverConfig = "{" +
+                "  \"enableAutoFallback\": true," +
+                "  \"hookLimitTokenPerSecond\": 5001," +
+                "  \"hookLimitInitBurstSeconds\": 11," +
+                "  \"maxRiskMetricsCount\": 4," +
+                "  \"performanceLimitRiskThreshold\":" +
+                "    {" +
+                "      \"cpuUsage\":{\"cpuUsagePercentage\":51}," +
+                "    }," +
+                "  \"performanceLimitMaxThreshold\":" +
+                "    {" +
+                "      \"cpuUsage\":{\"cpuUsagePercentage\":51}," +
+                "      \"memoryNoHeapUsage\": {\"init\":100001,\"used\":100001,\"committed\":100001,\"max\":100001}," +
+                "      \"threadInfo\": {\"threadCount\":10001,\"daemonThreadCount\":1001}," +
+                "      \"garbageInfo\": {" +
+                "        \"collectionInfoList\":[{\"collectionName\":\"Old\",\"collectionCount\":11,\"collectionTime\":1001}]" +
+                "      }" +
+                "    }" +
+                "}";
         setConfigToLocal(serverConfig);
     }
 

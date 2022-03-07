@@ -4,10 +4,11 @@ import io.dongtai.iast.common.entity.performance.PerformanceMetrics;
 import io.dongtai.iast.common.enums.MetricsKey;
 import io.dongtai.iast.core.utils.json.GsonUtils;
 import io.dongtai.log.DongTaiLog;
+import io.github.resilience4j.core.metrics.Metrics;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * 远端配置工具类
@@ -46,7 +47,39 @@ public class RemoteConfigUtils {
     public static void syncRemoteConfig(String remoteConfig) {
         //todo 拉取远端配置后解析并更新到内存中
         DongTaiLog.info("Success Call syncRemoteConfig(), Param: " + remoteConfig);
+        JSONObject configJson = new JSONObject(remoteConfig);
+        enableAutoFallback = configJson.getBoolean("enableAutoFallback");
+        hookLimitTokenPerSecond = configJson.getDouble("hookLimitTokenPerSecond");
+        hookLimitInitBurstSeconds = configJson.getDouble("hookLimitInitBurstSeconds");
+        maxRiskMetricsCount = configJson.getInt("maxRiskMetricsCount");
+        JSONObject perfLimMaxThresholdJson = configJson.getJSONObject("performanceLimitMaxThreshold");
+        performanceLimitMaxThreshold = buildPerformanceMetricsFromJson(perfLimMaxThresholdJson.toString());
+        JSONObject perfLimRiskThresholdJson = configJson.getJSONObject("performanceLimitRiskThreshold");
+        performanceLimitRiskThreshold = buildPerformanceMetricsFromJson(perfLimRiskThresholdJson.toString());
+    }
 
+    private static List<PerformanceMetrics> buildPerformanceMetricsFromJson(String json){
+
+        List<PerformanceMetrics> performanceMetricsList  = new ArrayList<>();
+        JSONObject jsonObject = new JSONObject(json);
+        Set<String> keySet = jsonObject.keySet();
+        try {
+            for (MetricsKey each : MetricsKey.values()) {
+                PerformanceMetrics metrics = new PerformanceMetrics();
+                if (keySet.contains(each.getKey())) {
+                    DongTaiLog.info(each.getKey());
+                    String metricsValueJson = jsonObject.get(each.getKey()).toString();
+                    metrics.setMetricsKey(each);
+                    Object o  = GsonUtils.toObject(metricsValueJson, each.getValueType());
+                    metrics.setMetricsValue(GsonUtils.toObject(metricsValueJson, each.getValueType()));
+                    DongTaiLog.info(o.toString());
+                    performanceMetricsList.add(metrics);
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return performanceMetricsList;
     }
 
     // *************************************************************
