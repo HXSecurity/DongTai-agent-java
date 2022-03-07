@@ -1,6 +1,7 @@
 package io.dongtai.iast.core.utils.json;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapter;
 import com.google.gson.internal.Primitives;
 import com.google.gson.reflect.TypeToken;
@@ -23,7 +24,7 @@ public class GsonUtils {
     private static final Gson GSON;
 
     static {
-        GSON = new Gson();
+        GSON = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
     }
 
     private GsonUtils() {

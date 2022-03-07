@@ -17,7 +17,8 @@ import java.util.Properties;
  */
 public abstract class BasePerformanceChecker implements IPerformanceChecker {
 
-    protected PerformanceMetrics getMatchRiskThreshold(MetricsKey metrics, Properties cfg) {
+    @Override
+    public PerformanceMetrics getMatchRiskThreshold(MetricsKey metrics, Properties cfg) {
         final List<PerformanceMetrics> performanceLimitRiskThreshold = RemoteConfigUtils.getPerformanceLimitRiskThreshold(cfg);
         for (PerformanceMetrics riskThreshold : performanceLimitRiskThreshold) {
             if (riskThreshold.getMetricsKey() == metrics) {
@@ -27,7 +28,8 @@ public abstract class BasePerformanceChecker implements IPerformanceChecker {
         return null;
     }
 
-    protected PerformanceMetrics getMatchMaxThreshold(MetricsKey metrics, Properties cfg) {
+    @Override
+    public PerformanceMetrics getMatchMaxThreshold(MetricsKey metrics, Properties cfg) {
         final List<PerformanceMetrics> performanceLimitRiskThreshold = RemoteConfigUtils.getPerformanceLimitMaxThreshold(cfg);
         for (PerformanceMetrics riskThreshold : performanceLimitRiskThreshold) {
             if (riskThreshold.getMetricsKey() == metrics) {

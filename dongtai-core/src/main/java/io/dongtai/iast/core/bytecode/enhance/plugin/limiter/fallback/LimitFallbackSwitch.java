@@ -79,13 +79,11 @@ public class LimitFallbackSwitch {
 
     public static void setPerformanceFallback(boolean fallback) {
         if(fallback){
-            DongTaiLog.info("Engine performance fallback is open");
+            DongTaiLog.info("Engine performance fallback is open, Engine shut down successfully");
             PERFORMANCE_FALLBACK = true;
-            DongTaiLog.info("Engine shut down successfully");
         }else{
-            DongTaiLog.info("Engine performance fallback is close");
+            DongTaiLog.info("Engine performance fallback is close, Engine opened successfully");
             PERFORMANCE_FALLBACK = false;
-            DongTaiLog.info("Engine opened successfully");
         }
     }
 
