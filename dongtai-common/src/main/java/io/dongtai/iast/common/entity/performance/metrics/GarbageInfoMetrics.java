@@ -31,19 +31,15 @@ public class GarbageInfoMetrics implements Serializable {
     }
 
     /**
-     * 获得匹配的收集器信息
+     * 获得匹配名称的收集器信息
      *
-     * @param collectionName 收集器名称(传null时匹配的首个名称为null的收集器)
+     * @param collectionName 收集器名称
      * @return {@link CollectionInfo}
      */
-    public CollectionInfo getMatchedCollectionInfo(String collectionName) {
-        for (CollectionInfo each : getCollectionInfoList()) {
-            if (collectionName != null) {
+    public CollectionInfo getMatchedFirst(String collectionName) {
+        if (collectionName != null) {
+            for (CollectionInfo each : getCollectionInfoList()) {
                 if (collectionName.equals(each.getCollectionName())) {
-                    return each;
-                }
-            } else {
-                if (each.getCollectionName() == null) {
                     return each;
                 }
             }
