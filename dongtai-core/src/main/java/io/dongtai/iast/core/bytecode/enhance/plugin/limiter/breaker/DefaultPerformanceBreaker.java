@@ -83,6 +83,7 @@ public class DefaultPerformanceBreaker extends AbstractBreaker {
                 // 关注的失败异常类型
                 .recordExceptions(IllegalStateException.class)
                 .build());
+        // 断路器事件监听
         breaker.getEventPublisher()
                 .onStateTransition(event -> {
                     final CircuitBreaker.State toState = event.getStateTransition().getToState();
