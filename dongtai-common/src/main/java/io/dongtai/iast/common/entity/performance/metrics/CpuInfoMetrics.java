@@ -24,8 +24,4 @@ public class CpuInfoMetrics implements Serializable {
         this.cpuUsagePercentage = cpuUsagePercentage;
     }
 
-    @Override
-    public String toString() {
-        return "cpuUsagePercentage = " + cpuUsagePercentage;
-    }
 }

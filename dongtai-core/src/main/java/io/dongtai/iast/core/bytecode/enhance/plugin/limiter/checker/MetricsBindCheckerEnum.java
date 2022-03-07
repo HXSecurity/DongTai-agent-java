@@ -19,13 +19,13 @@ public enum MetricsBindCheckerEnum {
      */
     CPU_USAGE_CHECKER(CPU_USAGE, CpuUsageChecker.class, "绑定cpu使用率检查器"),
 
-//    MEM_USAGE_CHECKER(MEM_USAGE, MemUsageChecker.class, "绑定内存使用率检查器"),
-//
-//    MEM_NO_HEAP_USAGE_CHECKER(MEM_NO_HEAP_USAGE, MemNoHeapUsageChecker.class, "绑定堆外内存使用率检查器"),
-//
-//    GARBAGE_INFO_CHECKER(GARBAGE_INFO, GarbageInfoChecker.class, "绑定垃圾回收信息检查器"),
-//
-//    THREAD_INFO_CHECKER(THREAD_INFO, ThreadInfoChecker.class, "绑定线程信息检查器"),
+    MEM_USAGE_CHECKER(MEM_USAGE, MemUsageChecker.class, "绑定内存使用率检查器"),
+
+    MEM_NO_HEAP_USAGE_CHECKER(MEM_NO_HEAP_USAGE, MemUsageChecker.class, "绑定堆外内存使用率检查器"),
+
+    GARBAGE_INFO_CHECKER(GARBAGE_INFO, GarbageInfoChecker.class, "绑定垃圾回收信息检查器"),
+
+    THREAD_INFO_CHECKER(THREAD_INFO, ThreadInfoChecker.class, "绑定线程信息检查器"),
 
     ;
 
