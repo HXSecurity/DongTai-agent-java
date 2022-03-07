@@ -1,6 +1,7 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.limiter.fallback;
 
 import io.dongtai.iast.core.utils.threadlocal.BooleanThreadLocal;
+import io.dongtai.log.DongTaiLog;
 
 /**
  * 限制降级开关
@@ -43,11 +44,11 @@ public class LimitFallbackSwitch {
     }
 
     /**
-     * 是否对全局增强点降级
+     * 是否对引擎降级(全局增强点生效)
      *
      * @return boolean 是否发生降级
      */
-    public static boolean isGlobalFallback() {
+    public static boolean isEngineFallback() {
         return HEAVY_TRAFFIC_LIMIT_FALLBACK || PERFORMANCE_FALLBACK || EXCEPTION_FALLBACK;
     }
 
@@ -77,7 +78,13 @@ public class LimitFallbackSwitch {
     }
 
     public static void setPerformanceFallback(boolean fallback) {
-        PERFORMANCE_FALLBACK = fallback;
+        if(fallback){
+            DongTaiLog.info("Engine performance fallback is open, Engine shut down successfully");
+            PERFORMANCE_FALLBACK = true;
+        }else{
+            DongTaiLog.info("Engine performance fallback is close, Engine opened successfully");
+            PERFORMANCE_FALLBACK = false;
+        }
     }
 
     public static void setExceptionFallback(boolean fallback) {

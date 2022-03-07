@@ -1,9 +1,17 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.limiter.breaker;
 
-import io.dongtai.iast.common.entity.performance.metrics.*;
 import io.dongtai.iast.common.entity.performance.PerformanceMetrics;
+import io.dongtai.iast.common.entity.performance.metrics.CpuInfoMetrics;
+import io.dongtai.iast.common.entity.performance.metrics.GarbageInfoMetrics;
+import io.dongtai.iast.common.entity.performance.metrics.MemoryUsageMetrics;
+import io.dongtai.iast.common.entity.performance.metrics.ThreadInfoMetrics;
 import io.dongtai.iast.common.enums.MetricsKey;
 import io.dongtai.iast.common.utils.serialize.SerializeUtils;
+import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.checker.IPerformanceChecker;
+import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.checker.MetricsBindCheckerEnum;
+import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.fallback.LimitFallbackSwitch;
+import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.report.PerformanceLimitReport;
+import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.report.body.PerformanceBreakReportBody;
 import io.dongtai.iast.core.utils.RemoteConfigUtils;
 import io.dongtai.log.DongTaiLog;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
@@ -11,10 +19,7 @@ import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 import io.vavr.control.Try;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * 默认的性能熔断器实现(仅支持JDK8+)
@@ -53,8 +58,7 @@ public class DefaultPerformanceBreaker extends AbstractBreaker {
         }
         Try.ofSupplier(CircuitBreaker.decorateSupplier(breaker, () -> checkMetricsWithAutoFallback(contextString)))
                 .recover(throwable -> {
-                    //todo fallback
-                    System.out.println("执行降级方法" + throwable);
+                    DongTaiLog.info("performance is over threshold");
                     return false;
                 }).get();
     }
@@ -68,46 +72,59 @@ public class DefaultPerformanceBreaker extends AbstractBreaker {
                 .slidingWindowType(CircuitBreakerConfig.SlidingWindowType.COUNT_BASED)
                 .slidingWindowSize(2)
                 //失败率阈值百分比(>=51%)
-                .failureRateThreshold(50F)
+                .failureRateThreshold(51F)
                 //计算失败率或慢调用率之前所需的最小调用数
                 .minimumNumberOfCalls(2)
                 //自动从开启变成半开，等待30秒
                 .automaticTransitionFromOpenToHalfOpenEnabled(true)
-                .waitDurationInOpenState(Duration.ofSeconds(30))
+                .waitDurationInOpenState(Duration.ofSeconds(40))
                 // 半开时允许通过次数
                 .permittedNumberOfCallsInHalfOpenState(10)
                 // 关注的失败异常类型
                 .recordExceptions(IllegalStateException.class)
-                //.ignoreExceptions(BusinessException.class, OtherBusinessException.class)
                 .build());
+        // 断路器事件监听
         breaker.getEventPublisher()
                 .onStateTransition(event -> {
-                    //todo
-                    System.out.println("断路器状态转换:" + event.getStateTransition().getFromState() + "->" + event.getStateTransition().getToState());
+                    final CircuitBreaker.State toState = event.getStateTransition().getToState();
+                    if (toState == CircuitBreaker.State.OPEN) {
+                        PerformanceLimitReport.sendReport();
+                        LimitFallbackSwitch.setPerformanceFallback(true);
+                    } else if (toState == CircuitBreaker.State.CLOSED) {
+                        LimitFallbackSwitch.setPerformanceFallback(false);
+                    }
                 });
         DefaultPerformanceBreaker.breaker = breaker;
     }
 
     private static boolean checkMetricsWithAutoFallback(String contextString) {
         List<PerformanceMetrics> performanceMetrics = convert2MetricsList(contextString);
-        // 风险阈值检查
-        performanceMetrics.forEach((metrics) -> {
-            //todo allCheck
-        });
-        // 最大阈值检查
-        performanceMetrics.forEach((each) -> {
-            final List<PerformanceMetrics> performanceLimitMaxThreshold = RemoteConfigUtils.getPerformanceLimitMaxThreshold(cfg);
-            System.out.println(each.getMetricsKey().toString());
-            System.out.println(each.getMetricsValue(each.getMetricsKey().getValueType()));
-            for (PerformanceMetrics maxMetrics : performanceLimitMaxThreshold) {
-                if (maxMetrics.getMetricsKey() == each.getMetricsKey()) {
-                    //todo check
-                    System.out.println("maxLimit:"+each.getMetricsKey().getDesc()+"=>" + maxMetrics.getMetricsValue(each.getMetricsKey().getValueType()));
-                    // throw new IllegalStateException("cpu limit:" + cpuUsage);
-                    break;
+        // 检查每个性能是否达到风险值
+        int riskMetricsCount = 0;
+        final Integer maxRiskMetricsCount = RemoteConfigUtils.getMaxRiskMetricsCount(cfg);
+        if (maxRiskMetricsCount > 0) {
+            for (PerformanceMetrics metrics : performanceMetrics) {
+                final IPerformanceChecker performanceChecker = MetricsBindCheckerEnum.newCheckerInstance(metrics.getMetricsKey());
+                if (performanceChecker != null && performanceChecker.isPerformanceRisk(metrics, cfg)) {
+                    riskMetricsCount++;
+                }
+                //达到性能风险的指标数量超过阈值
+                if (riskMetricsCount >= maxRiskMetricsCount) {
+                    final PerformanceMetrics threshold = performanceChecker.getMatchRiskThreshold(metrics.getMetricsKey(), cfg);
+                    appendToOverThresholdLog(true, metrics, threshold, riskMetricsCount);
+                    throw new IllegalStateException("performance risk num over limit!");
                 }
             }
-        });
+        }
+        // 检查每个性能是否达到限制值
+        for (PerformanceMetrics metrics : performanceMetrics) {
+            final IPerformanceChecker performanceChecker = MetricsBindCheckerEnum.newCheckerInstance(metrics.getMetricsKey());
+            if (performanceChecker != null && performanceChecker.isPerformanceOverLimit(metrics, cfg)) {
+                final PerformanceMetrics threshold = performanceChecker.getMatchMaxThreshold(metrics.getMetricsKey(), cfg);
+                appendToOverThresholdLog(false, metrics, threshold, 1);
+                throw new IllegalStateException("performance over limit!");
+            }
+        }
         return true;
     }
 
@@ -128,4 +145,23 @@ public class DefaultPerformanceBreaker extends AbstractBreaker {
             return new ArrayList<>();
         }
     }
+
+    /**
+     * 追加性能超限日志记录
+     *
+     * @param isRisk       是否是风险阈值
+     * @param nowMetrics   当前指标
+     * @param threshold    阈值指标
+     * @param metricsCount 超限的指标数
+     */
+    private static void appendToOverThresholdLog(boolean isRisk, PerformanceMetrics nowMetrics, PerformanceMetrics threshold, Integer metricsCount) {
+        final PerformanceBreakReportBody.PerformanceOverThresholdLog breakLog = new PerformanceBreakReportBody.PerformanceOverThresholdLog();
+        breakLog.setDate(new Date());
+        breakLog.setOverThresholdType(isRisk ? 1 : 2);
+        breakLog.setNowMetrics(nowMetrics);
+        breakLog.setThreshold(threshold);
+        breakLog.setOverThresholdCount(metricsCount);
+        PerformanceLimitReport.appendPerformanceBreakLog(breakLog);
+    }
+
 }

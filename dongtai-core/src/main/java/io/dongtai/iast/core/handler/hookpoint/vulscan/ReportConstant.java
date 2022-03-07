@@ -21,6 +21,7 @@ public class ReportConstant {
     public static final int REPORT_AUTH_UPDATE = 0x32;
     public static final int REPORT_LIMIT_HOOK_POINT_RATE = 0x41;
     public static final int REPORT_LIMIT_REQUEST_RATE = 0x42;
+    public static final int REPORT_LIMIT_PERFORMANCE_FALLBACK = 0x43;
     public static final int REPORT_ERROR_LOG = 0x51;
     public static final int REPORT_API = 0x61;
 
@@ -87,5 +88,7 @@ public class ReportConstant {
      */
     public static final String LIMIT_REQUEST_TYPE = "requestType";
     public static final String LIMIT_REQUEST_RATE = "limitRate";
+
+    public static final String LIMIT_PERFORMANCE_OVER_THRESHOLD_LOG = "performanceOverThresholdLog";
 
 }
