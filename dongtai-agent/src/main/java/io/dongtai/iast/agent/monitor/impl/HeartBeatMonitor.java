@@ -31,7 +31,6 @@ public class HeartBeatMonitor implements IMonitor {
     public void run() {
         while (!MonitorDaemonThread.isExit) {
             this.check();
-            DongTaiLog.info("Heart Beat Monitor Check.");
             ThreadUtils.threadSleep(60);
         }
     }

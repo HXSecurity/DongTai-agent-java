@@ -255,7 +255,6 @@ public class PerformanceMonitor implements IMonitor {
     @Override
     public void run() {
         while(!MonitorDaemonThread.isExit) {
-            DongTaiLog.info("Performance Monitor check");
             this.check();
             ThreadUtils.threadSleep(60);
         }

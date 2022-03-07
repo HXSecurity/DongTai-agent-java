@@ -45,8 +45,6 @@ public class RemoteConfigUtils {
      * @param remoteConfig 远程配置内容字符串
      */
     public static void syncRemoteConfig(String remoteConfig) {
-        //todo 拉取远端配置后解析并更新到内存中
-        DongTaiLog.info("Success Call syncRemoteConfig(), Param: " + remoteConfig);
         JSONObject configJson = new JSONObject(remoteConfig);
         enableAutoFallback = configJson.getBoolean("enableAutoFallback");
         hookLimitTokenPerSecond = configJson.getDouble("hookLimitTokenPerSecond");
@@ -58,8 +56,12 @@ public class RemoteConfigUtils {
         performanceLimitRiskThreshold = buildPerformanceMetricsFromJson(perfLimRiskThresholdJson.toString());
     }
 
+    /**
+     * 将json转化为List<PerformanceMetrics>类型
+     * @param json
+     * @return
+     */
     private static List<PerformanceMetrics> buildPerformanceMetricsFromJson(String json){
-
         List<PerformanceMetrics> performanceMetricsList  = new ArrayList<>();
         JSONObject jsonObject = new JSONObject(json);
         Set<String> keySet = jsonObject.keySet();
@@ -70,9 +72,7 @@ public class RemoteConfigUtils {
                     DongTaiLog.info(each.getKey());
                     String metricsValueJson = jsonObject.get(each.getKey()).toString();
                     metrics.setMetricsKey(each);
-                    Object o  = GsonUtils.toObject(metricsValueJson, each.getValueType());
                     metrics.setMetricsValue(GsonUtils.toObject(metricsValueJson, each.getValueType()));
-                    DongTaiLog.info(o.toString());
                     performanceMetricsList.add(metrics);
                 }
             }

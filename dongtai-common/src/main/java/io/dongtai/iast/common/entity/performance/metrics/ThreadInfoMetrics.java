@@ -57,6 +57,10 @@ public class ThreadInfoMetrics implements Serializable {
         this.dongTaiThreadCount = dongTaiThreadCount;
     }
 
+    public Integer getDongTaiThreadCount() {
+        return dongTaiThreadCount;
+    }
+
     @Override
     public String toString() {
         return "threadCount = " + threadCount +

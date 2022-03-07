@@ -21,33 +21,13 @@ public class ServerConfigMonitor implements IMonitor {
 
     @Override
     public void check() {
-        //String serverConfig = getConfigFromRemote();
-        String serverConfig = "{" +
-                "  \"enableAutoFallback\": true," +
-                "  \"hookLimitTokenPerSecond\": 5001," +
-                "  \"hookLimitInitBurstSeconds\": 11," +
-                "  \"maxRiskMetricsCount\": 4," +
-                "  \"performanceLimitRiskThreshold\":" +
-                "    {" +
-                "      \"cpuUsage\":{\"cpuUsagePercentage\":51}," +
-                "    }," +
-                "  \"performanceLimitMaxThreshold\":" +
-                "    {" +
-                "      \"cpuUsage\":{\"cpuUsagePercentage\":51}," +
-                "      \"memoryNoHeapUsage\": {\"init\":100001,\"used\":100001,\"committed\":100001,\"max\":100001}," +
-                "      \"threadInfo\": {\"threadCount\":10001,\"daemonThreadCount\":1001}," +
-                "      \"garbageInfo\": {" +
-                "        \"collectionInfoList\":[{\"collectionName\":\"Old\",\"collectionCount\":11,\"collectionTime\":1001}]" +
-                "      }" +
-                "    }" +
-                "}";
+        String serverConfig = getConfigFromRemote();
         setConfigToLocal(serverConfig);
     }
 
     @Override
     public void run() {
         while (!MonitorDaemonThread.isExit){
-            DongTaiLog.info("Server Config Monitor Check");
             check();
             ThreadUtils.threadSleep(60);
         }
@@ -57,7 +37,6 @@ public class ServerConfigMonitor implements IMonitor {
      * 根据agentID获取服务端对Agent的配置
      */
     public String getConfigFromRemote(){
-        DongTaiLog.info("Get Server Config");
         JSONObject report = new JSONObject();
         StringBuilder response = new StringBuilder();
         report.put(Constant.KEY_AGENT_ID, AgentRegisterReport.getAgentFlag());
@@ -74,7 +53,6 @@ public class ServerConfigMonitor implements IMonitor {
      * 寻找远端配置工具类 反射调用进行阈值配置
      */
     public void setConfigToLocal(String serverConfig){
-        DongTaiLog.info("Set Config to Local");
         try {
             final Class<?> remoteConfigUtil = EngineManager.getRemoteConfigUtils();
             remoteConfigUtil.getMethod("syncRemoteConfig", String.class)

@@ -33,6 +33,7 @@ public class DongTaiThreadMonitor implements IMonitor {
                     notExistThreads.add(monitor.getName());
                 }
             }
+            // 上传洞态监控线程不存在的信息
             if (notExistThreads.size() > 0 ) {
                 detail.put("NotExistThread", notExistThreads.toString());
                 report.put(Constant.KEY_UPDATE_REPORT, Constant.REPORT_ERROR_THREAD);
@@ -48,7 +49,6 @@ public class DongTaiThreadMonitor implements IMonitor {
     @Override
     public void run() {
         while (!MonitorDaemonThread.isExit) {
-            DongTaiLog.info("Thread Monitor Check");
             this.check();
             ThreadUtils.threadSleep(60);
         }

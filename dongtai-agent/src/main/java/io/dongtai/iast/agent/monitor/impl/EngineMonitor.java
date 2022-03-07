@@ -75,7 +75,6 @@ public class EngineMonitor implements IMonitor {
     @Override
     public void run() {
         while (!MonitorDaemonThread.isExit) {
-            DongTaiLog.info("Engine Monitor check");
             this.check();
             ThreadUtils.threadSleep(60);
         }
