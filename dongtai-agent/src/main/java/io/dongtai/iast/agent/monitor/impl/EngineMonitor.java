@@ -31,22 +31,29 @@ public class EngineMonitor implements IMonitor {
 
     @Override
     public void check() {
-
         String status = checkForStatus();
-
-        if ("notcmd".equals(status)){
+        ServerCommandEnum serviceCmdEnum = ServerCommandEnum.getEnum(status);
+        if (serviceCmdEnum == null || serviceCmdEnum == ServerCommandEnum.NO_CMD) {
             return;
         }
-
-        if ("coreRegisterStart".equals(status)) {
-            isCoreRegisterStart = true;
-            startEngine();
-        }else if ("coreStop".equals(status) && isCoreRegisterStart) {
-            DongTaiLog.info("engine stop");
-            engineManager.stop();
-        } else if ("coreStart".equals(status) && isCoreRegisterStart) {
-            DongTaiLog.info("engine start");
-            engineManager.start();
+        DongTaiLog.info("receive system command. cmd:{}, desc:{}", serviceCmdEnum.getCommand(), serviceCmdEnum.getDesc());
+        switch (serviceCmdEnum) {
+            case CORE_REGISTER_START:
+                isCoreRegisterStart = true;
+                startEngine();
+                break;
+            case CORE_START:
+                DongTaiLog.info("engine start");
+                engineManager.start();
+                break;
+            case CORE_STOP:
+                DongTaiLog.info("engine stop");
+                engineManager.stop();
+                break;
+            case CORE_UNINSTALL:
+                DongTaiLog.info("engine uninstall");
+                engineManager.uninstall();
+            default:
         }
     }
 

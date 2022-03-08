@@ -64,7 +64,7 @@ public class AgentLauncher {
             }
             DongTaiLog.info("Engine is about to be uninstalled");
             uninstall();
-            System.setProperty("protect.by.dongtai", null);
+            System.clearProperty("protect.by.dongtai");
         } else {
             if (System.getProperty("protect.by.dongtai", null) != null) {
                 DongTaiLog.info("DongTai already installed.");

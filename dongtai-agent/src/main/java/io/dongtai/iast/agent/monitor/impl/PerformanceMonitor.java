@@ -41,6 +41,8 @@ public class PerformanceMonitor implements IMonitor {
     private final static String AGENT_TOKEN = URLEncoder.encode(AgentRegisterReport.getAgentToken());
     private static Integer AGENT_THRESHOLD_VALUE;
     private static Integer CPU_USAGE = 0;
+    private static List<PerformanceMetrics> PERFORMANCE_METRICS = new ArrayList<PerformanceMetrics>();
+
     private final static String name = "PerformanceMonitor";
     private final EngineManager engineManager;
     private final List<MetricsKey> needCollectMetrics = new ArrayList<MetricsKey>();
@@ -74,6 +76,10 @@ public class PerformanceMonitor implements IMonitor {
 
     public static Integer getCpuUsage() {
         return CPU_USAGE;
+    }
+
+    public static List<PerformanceMetrics> getPerformanceMetrics() {
+        return PERFORMANCE_METRICS;
     }
 
     public Integer cpuUsedRate() {
@@ -143,13 +149,11 @@ public class PerformanceMonitor implements IMonitor {
      */
     @Override
     public void check() {
+        // 收集性能指标数据
         final List<PerformanceMetrics> performanceMetrics = collectPerformanceMetrics();
-        for (PerformanceMetrics metrics : performanceMetrics) {
-            if (metrics.getMetricsKey() == MetricsKey.CPU_USAGE) {
-                final CpuInfoMetrics cpuInfoMetrics = metrics.getMetricsValue(CpuInfoMetrics.class);
-                CPU_USAGE = cpuInfoMetrics.getCpuUsagePercentage().intValue();
-            }
-        }
+        // 更新本地性能指标记录(用于定期上报)
+        updatePerformanceMetrics(performanceMetrics);
+        // 检查性能指标(用于熔断降级)
         checkPerformanceMetrics(performanceMetrics);
         int UsedRate = CPU_USAGE;
         PerformanceMonitor.AGENT_THRESHOLD_VALUE = PerformanceMonitor.checkThresholdValue();
@@ -163,6 +167,16 @@ public class PerformanceMonitor implements IMonitor {
             this.engineManager.setRunningStatus(1);
             DongTaiLog.info("The current CPU usage is " + UsedRate + "%, higher than the threshold " + AGENT_THRESHOLD_VALUE + "%，and the detection engine is stopping");
         }
+    }
+
+    private void updatePerformanceMetrics(List<PerformanceMetrics> performanceMetrics) {
+        for (PerformanceMetrics metrics : performanceMetrics) {
+            if (metrics.getMetricsKey() == MetricsKey.CPU_USAGE) {
+                final CpuInfoMetrics cpuInfoMetrics = metrics.getMetricsValue(CpuInfoMetrics.class);
+                CPU_USAGE = cpuInfoMetrics.getCpuUsagePercentage().intValue();
+            }
+        }
+        PERFORMANCE_METRICS = performanceMetrics;
     }
 
 
@@ -193,6 +207,9 @@ public class PerformanceMonitor implements IMonitor {
     private void checkPerformanceMetrics(List<PerformanceMetrics> performanceMetrics) {
         try {
             final Class<?> performanceBreaker = EngineManager.getPerformanceBreaker();
+            if (performanceBreaker == null) {
+                return;
+            }
             performanceBreaker.getMethod("checkPerformance", String.class)
                     .invoke(null, SerializeUtils.serializeByList(performanceMetrics));
         } catch (Throwable t) {

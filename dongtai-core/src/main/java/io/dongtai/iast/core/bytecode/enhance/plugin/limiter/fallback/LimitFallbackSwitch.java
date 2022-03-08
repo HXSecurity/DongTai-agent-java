@@ -66,7 +66,7 @@ public class LimitFallbackSwitch {
     }
 
     public static void setHeavyHookFallback(boolean fallback) {
-        HEAVY_HOOK_FALLBACK.set(true);
+        HEAVY_HOOK_FALLBACK.set(fallback);
     }
 
     public static void clearHeavyHookFallback() {

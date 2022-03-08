@@ -3,6 +3,7 @@ package io.dongtai.iast.common.entity.performance;
 import io.dongtai.iast.common.enums.MetricsKey;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 性能指标
@@ -16,6 +17,11 @@ public class PerformanceMetrics implements Serializable {
      * 指标枚举
      */
     private MetricsKey metricsKey;
+
+    /**
+     * 指标收集时间
+     */
+    private Date collectDate;
 
     /**
      * 指标度量值
@@ -36,5 +42,13 @@ public class PerformanceMetrics implements Serializable {
 
     public void setMetricsValue(Object metricsValue) {
         this.metricsValue = metricsValue;
+    }
+
+    public Date getCollectDate() {
+        return collectDate;
+    }
+
+    public void setCollectDate(Date collectDate) {
+        this.collectDate = collectDate;
     }
 }

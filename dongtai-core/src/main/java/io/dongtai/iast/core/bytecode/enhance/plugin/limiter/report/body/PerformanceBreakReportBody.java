@@ -4,8 +4,8 @@ import com.google.gson.annotations.SerializedName;
 import io.dongtai.iast.common.entity.performance.PerformanceMetrics;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.ReportConstant;
 
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -71,10 +71,10 @@ public class PerformanceBreakReportBody {
          */
         private Date breakDate;
         /**
-         * 熔断前超限日志
+         * 熔断前超限日志(最多保留30条)
          */
         @SerializedName(ReportConstant.LIMIT_PERFORMANCE_OVER_THRESHOLD_LOG)
-        private List<PerformanceOverThresholdLog> performanceOverThresholdLog = new ArrayList<>();
+        private LinkedList<PerformanceOverThresholdLog> performanceOverThresholdLog = new FixSizeLinkedList<>(30);
 
         public Integer getAgentId() {
             return agentId;
@@ -96,11 +96,25 @@ public class PerformanceBreakReportBody {
             return performanceOverThresholdLog;
         }
 
-        public void setPerformanceOverThresholdLog(List<PerformanceOverThresholdLog> performanceOverThresholdLog) {
-            this.performanceOverThresholdLog = performanceOverThresholdLog;
-        }
     }
 
+    public static class FixSizeLinkedList<T> extends LinkedList<T> {
+        private static final long serialVersionUID = 6147000002339841725L;
+        private final int capacity;
+
+        public FixSizeLinkedList(int capacity) {
+            super();
+            this.capacity = capacity;
+        }
+
+        @Override
+        public boolean add(T t) {
+            if (size() >= capacity) {
+                super.removeFirst();
+            }
+            return super.add(t);
+        }
+    }
 
     /**
      * 性能超限日志
