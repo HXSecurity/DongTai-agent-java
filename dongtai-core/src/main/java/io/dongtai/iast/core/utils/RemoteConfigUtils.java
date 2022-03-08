@@ -37,7 +37,7 @@ public class RemoteConfigUtils {
     private static Integer maxRiskMetricsCount;
     private static List<PerformanceMetrics> performanceLimitRiskThreshold;
     private static List<PerformanceMetrics> performanceLimitMaxThreshold;
-
+    private static String serverConfig = "";
 
     /**
      * 同步远程配置
@@ -45,15 +45,24 @@ public class RemoteConfigUtils {
      * @param remoteConfig 远程配置内容字符串
      */
     public static void syncRemoteConfig(String remoteConfig) {
-        JSONObject configJson = new JSONObject(remoteConfig);
-        enableAutoFallback = configJson.getBoolean("enableAutoFallback");
-        hookLimitTokenPerSecond = configJson.getDouble("hookLimitTokenPerSecond");
-        hookLimitInitBurstSeconds = configJson.getDouble("hookLimitInitBurstSeconds");
-        maxRiskMetricsCount = configJson.getInt("maxRiskMetricsCount");
-        JSONObject perfLimMaxThresholdJson = configJson.getJSONObject("performanceLimitMaxThreshold");
-        performanceLimitMaxThreshold = buildPerformanceMetricsFromJson(perfLimMaxThresholdJson.toString());
-        JSONObject perfLimRiskThresholdJson = configJson.getJSONObject("performanceLimitRiskThreshold");
-        performanceLimitRiskThreshold = buildPerformanceMetricsFromJson(perfLimRiskThresholdJson.toString());
+        // 和上次配置内容不一致时才重新更新配置文件
+        try {
+            if (!remoteConfig.equals(serverConfig)) {
+                JSONObject configJson = new JSONObject(remoteConfig);
+                enableAutoFallback = configJson.getBoolean("enableAutoFallback");
+                hookLimitTokenPerSecond = configJson.getDouble("hookLimitTokenPerSecond");
+                hookLimitInitBurstSeconds = configJson.getDouble("hookLimitInitBurstSeconds");
+                maxRiskMetricsCount = configJson.getInt("maxRiskMetricsCount");
+                JSONObject perfLimMaxThresholdJson = configJson.getJSONObject("performanceLimitMaxThreshold");
+                performanceLimitMaxThreshold = buildPerformanceMetricsFromJson(perfLimMaxThresholdJson.toString());
+                JSONObject perfLimRiskThresholdJson = configJson.getJSONObject("performanceLimitRiskThreshold");
+                performanceLimitRiskThreshold = buildPerformanceMetricsFromJson(perfLimRiskThresholdJson.toString());
+                serverConfig = remoteConfig;
+                DongTaiLog.info("Sync remote config successful.");
+            }
+        }catch (Throwable t){
+            DongTaiLog.warn("Sync remote config failed, msg: {}, error: {}",t.getMessage(),t.getCause());
+        }
     }
 
     /**
@@ -63,21 +72,20 @@ public class RemoteConfigUtils {
      */
     private static List<PerformanceMetrics> buildPerformanceMetricsFromJson(String json){
         List<PerformanceMetrics> performanceMetricsList  = new ArrayList<>();
+        try {
         JSONObject jsonObject = new JSONObject(json);
         Set<String> keySet = jsonObject.keySet();
-        try {
             for (MetricsKey each : MetricsKey.values()) {
                 PerformanceMetrics metrics = new PerformanceMetrics();
                 if (keySet.contains(each.getKey())) {
-                    DongTaiLog.info(each.getKey());
                     String metricsValueJson = jsonObject.get(each.getKey()).toString();
                     metrics.setMetricsKey(each);
                     metrics.setMetricsValue(GsonUtils.toObject(metricsValueJson, each.getValueType()));
                     performanceMetricsList.add(metrics);
                 }
             }
-        }catch (Exception e){
-            e.printStackTrace();
+        }catch (Throwable t){
+            DongTaiLog.warn("Build performance metrics from json failed, msg: {}, error: {}",t.getCause(),t.getMessage());
         }
         return performanceMetricsList;
     }

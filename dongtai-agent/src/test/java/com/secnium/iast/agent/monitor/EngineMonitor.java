@@ -67,8 +67,8 @@ public class EngineMonitor implements IMonitor {
         this.check();
         try{
             Thread.sleep(60 * 1000L);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        } catch (Throwable t) {
+            DongTaiLog.info("Start engine monitor failed, msg : {}, error : {}",t.getMessage(),t.getCause());
         }
     }
 

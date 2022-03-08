@@ -22,7 +22,16 @@ public class ServerConfigMonitor implements IMonitor {
     @Override
     public void check() {
         String serverConfig = getConfigFromRemote();
-        setConfigToLocal(serverConfig);
+        // 前期无法从服务端获取config，返回的serverConfig为""，不进行下一步配置客户端。
+        if(!serverConfig.equals("")){
+            //  获取的JSON字段不合法，抛异常，不进行下一步配置客户端
+            try {
+                JSONObject tempJson = new JSONObject(serverConfig);
+                setConfigToLocal(tempJson.toString());
+            }catch(Throwable t){
+                DongTaiLog.warn("Set server config to local failed, msg: {}, error: {}",t.getMessage(),t.getCause());
+            }
+        }
     }
 
     @Override
@@ -43,8 +52,9 @@ public class ServerConfigMonitor implements IMonitor {
         try {
             response = HttpClientUtils.sendPost(Constant.API_Server_Config,report.toString());
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Throwable t) {
+            // todo 现在无法获取服务端配置，不需要打印日志。等服务端上线后取消注释下面的代码
+            // DongTaiLog.warn("Get server config failed, msg:{}, err:{}",t.getMessage(),t.getCause());
         }
         return response.toString();
     }
@@ -57,8 +67,8 @@ public class ServerConfigMonitor implements IMonitor {
             final Class<?> remoteConfigUtil = EngineManager.getRemoteConfigUtils();
             remoteConfigUtil.getMethod("syncRemoteConfig", String.class)
                     .invoke(null, serverConfig);
-        } catch (Throwable t) {
-            DongTaiLog.error("syncRemoteConfig failed, msg:{}, err:{}", t.getMessage(), t.getCause());
+        //    引擎卸载后，无法调用core包里的方法。
+        } catch (Throwable ignored) {
         }
 
     }

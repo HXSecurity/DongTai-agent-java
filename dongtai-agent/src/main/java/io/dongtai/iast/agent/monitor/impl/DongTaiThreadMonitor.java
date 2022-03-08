@@ -35,13 +35,13 @@ public class DongTaiThreadMonitor implements IMonitor {
             }
             // 上传洞态监控线程不存在的信息
             if (notExistThreads.size() > 0 ) {
-                detail.put("NotExistThread", notExistThreads.toString());
+                detail.put(Constant.KEY_NOT_EXIST_THREADS, notExistThreads.toString());
                 report.put(Constant.KEY_UPDATE_REPORT, Constant.REPORT_ERROR_THREAD);
                 report.put(Constant.KEY_REPORT_VALUE, detail);
                 HttpClientUtils.sendPost(Constant.API_REPORT_UPLOAD,report.toString());
             }
-        }catch (Exception e){
-            e.printStackTrace();
+        }catch (Throwable t){
+            DongTaiLog.warn("Report error thread failed, msg:{}, err:{}",t.getMessage(),t.getCause());
         }
     }
 

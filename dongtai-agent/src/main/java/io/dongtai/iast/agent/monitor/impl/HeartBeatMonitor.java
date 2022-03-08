@@ -6,7 +6,6 @@ import io.dongtai.iast.agent.monitor.MonitorDaemonThread;
 import io.dongtai.iast.agent.report.HeartBeatReport;
 import io.dongtai.iast.agent.util.ThreadUtils;
 import io.dongtai.iast.agent.util.http.HttpClientUtils;
-import io.dongtai.log.DongTaiLog;
 
 public class HeartBeatMonitor implements IMonitor {
 
@@ -31,7 +30,7 @@ public class HeartBeatMonitor implements IMonitor {
     public void run() {
         while (!MonitorDaemonThread.isExit) {
             this.check();
-            ThreadUtils.threadSleep(60);
+            ThreadUtils.threadSleep(30);
         }
     }
 }

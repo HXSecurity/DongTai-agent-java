@@ -2,6 +2,7 @@ package io.dongtai.iast.agent.monitor;
 
 import io.dongtai.iast.agent.manager.EngineManager;
 import io.dongtai.iast.agent.monitor.impl.*;
+import io.dongtai.iast.agent.util.ThreadUtils;
 import io.dongtai.log.DongTaiLog;
 
 import java.util.ArrayList;
@@ -18,11 +19,11 @@ public class MonitorDaemonThread implements Runnable {
 
     public MonitorDaemonThread(EngineManager engineManager) {
         monitorTasks = new ArrayList<IMonitor>();
-        monitorTasks.add(new DongTaiThreadMonitor());
         monitorTasks.add(new PerformanceMonitor(engineManager));
         monitorTasks.add(new EngineMonitor(engineManager));
         monitorTasks.add(new HeartBeatMonitor());
         monitorTasks.add(new ServerConfigMonitor());
+        monitorTasks.add(new DongTaiThreadMonitor());
         this.engineManager = engineManager;
         try {
             delayTime = Integer.parseInt(System.getProperty("iast.engine.delay.time", "0"));
@@ -48,7 +49,13 @@ public class MonitorDaemonThread implements Runnable {
         }
         // 启动子线程执行monitor任务.
         for (IMonitor monitor : monitorTasks) {
+            // 延迟2s启动DongTaiThreadMonitor，以防首次加载时其他Monitor未能启动的情形出现。
+            if(monitor.getName().equals("DongTai-IAST-DongTaiThreadMonitor")) {
+                ThreadUtils.threadSleep(2);
+            }
             Thread monitorThread = new Thread(monitor, monitor.getName());
+            monitorThread.setDaemon(true);
+            monitorThread.setPriority(1);
             monitorThread.start();
         }
     }
