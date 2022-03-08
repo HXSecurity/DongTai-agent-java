@@ -23,8 +23,8 @@ public class RemoteConfigUtils {
     /**
      * 全局配置
      */
-    private static Boolean enableAutoFallback;
     private static String existsRemoteConfigMeta = "{}";
+    private static Boolean enableAutoFallback;
     /**
      * 高频hook限流相关配置
      */
@@ -34,7 +34,7 @@ public class RemoteConfigUtils {
      * 性能熔断阈值相关配置
      */
     private static Integer performanceBreakerWindowSize;
-    private static Float performanceBreakerFailureRate;
+    private static Double performanceBreakerFailureRate;
     private static Integer performanceBreakerWaitDuration;
     private static Integer maxRiskMetricsCount;
     private static List<PerformanceMetrics> performanceLimitRiskThreshold;
@@ -53,6 +53,9 @@ public class RemoteConfigUtils {
                 enableAutoFallback = configJson.getBoolean("enableAutoFallback");
                 hookLimitTokenPerSecond = configJson.getDouble("hookLimitTokenPerSecond");
                 hookLimitInitBurstSeconds = configJson.getDouble("hookLimitInitBurstSeconds");
+                performanceBreakerWindowSize = configJson.getInt("performanceBreakerWindowSize");
+                performanceBreakerFailureRate = configJson.getDouble("performanceBreakerFailureRate");
+                performanceBreakerWaitDuration = configJson.getInt("performanceBreakerWaitDuration");
                 maxRiskMetricsCount = configJson.getInt("maxRiskMetricsCount");
                 JSONObject perfLimMaxThresholdJson = configJson.getJSONObject("performanceLimitMaxThreshold");
                 performanceLimitMaxThreshold = buildPerformanceMetricsFromJson(perfLimMaxThresholdJson.toString());
@@ -149,15 +152,15 @@ public class RemoteConfigUtils {
     /**
      * 获取性能断路器失败率阈值
      */
-    public static Float getPerformanceBreakerFailureRate(Properties cfg) {
+    public static Double getPerformanceBreakerFailureRate(Properties cfg) {
         if (performanceBreakerFailureRate == null) {
             performanceBreakerFailureRate = PropertyUtils.getRemoteSyncLocalConfig("performanceLimit.performanceBreakerFailureRate",
-                    Float.class, 51F, cfg);
+                    Double.class, 51.0, cfg);
         }
         return performanceBreakerFailureRate;
     }
 
-    public static void setPerformanceBreakerFailureRate(Float performanceBreakerFailureRate) {
+    public static void setPerformanceBreakerFailureRate(Double performanceBreakerFailureRate) {
         RemoteConfigUtils.performanceBreakerFailureRate = performanceBreakerFailureRate;
     }
 
