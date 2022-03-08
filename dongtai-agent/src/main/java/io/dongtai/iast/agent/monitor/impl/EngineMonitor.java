@@ -3,6 +3,7 @@ package io.dongtai.iast.agent.monitor.impl;
 import io.dongtai.iast.agent.manager.EngineManager;
 import io.dongtai.iast.agent.monitor.IMonitor;
 import io.dongtai.iast.agent.monitor.MonitorDaemonThread;
+import io.dongtai.iast.agent.monitor.ServerCommandEnum;
 import io.dongtai.iast.agent.report.AgentRegisterReport;
 import io.dongtai.iast.agent.util.ThreadUtils;
 import io.dongtai.iast.agent.util.http.HttpClientUtils;
