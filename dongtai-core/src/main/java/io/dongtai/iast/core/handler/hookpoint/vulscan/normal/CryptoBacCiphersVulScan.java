@@ -3,6 +3,7 @@ package io.dongtai.iast.core.handler.hookpoint.vulscan.normal;
 import io.dongtai.iast.core.handler.hookpoint.models.IastSinkModel;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.utils.Asserts;
+import io.dongtai.log.DongTaiLog;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,7 +32,8 @@ public class CryptoBacCiphersVulScan extends AbstractNormalVulScan {
                 }
                 sendReport(getLatestStack(), sink.getType());
                 break;
-            } catch (Exception ignored) {
+            } catch (Exception e) {
+                DongTaiLog.debug(e);
             }
         }
     }

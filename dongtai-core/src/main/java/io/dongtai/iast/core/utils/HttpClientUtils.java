@@ -175,8 +175,8 @@ public class HttpClientUtils {
                 ));
                 return proxy;
             }
-        } catch (Throwable ignored) {
-
+        } catch (Throwable e) {
+            DongTaiLog.debug(e);
         }
         return null;
     }

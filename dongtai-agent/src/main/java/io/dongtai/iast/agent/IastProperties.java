@@ -3,12 +3,9 @@ package io.dongtai.iast.agent;
 import io.dongtai.iast.agent.util.FileUtils;
 import io.dongtai.log.DongTaiLog;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URLDecoder;
 import java.util.Properties;
 
 /**
@@ -40,7 +37,8 @@ public class IastProperties {
     private IastProperties() {
         try {
             init();
-        } catch (ClassNotFoundException ignored) {
+        } catch (ClassNotFoundException e) {
+            DongTaiLog.debug(e);
         }
     }
 

@@ -7,8 +7,6 @@ import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.log.DongTaiLog;
 
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 /**
  * niuerzhuang@huoxian.cn
@@ -32,13 +30,9 @@ public class SpringApplicationImpl {
     private static void createClassLoader(Object applicationContext) {
         try {
             if (iastClassLoader == null) {
-                if (HttpImpl.IAST_REQUEST_JAR_PACKAGE.exists()) {
-                    Class<?> applicationContextClass = applicationContext.getClass();
-                    URL[] adapterJar = new URL[]{HttpImpl.IAST_REQUEST_JAR_PACKAGE.toURI().toURL()};
-                    iastClassLoader = new IastClassLoader(applicationContextClass.getClassLoader(), adapterJar);
-                }
+                iastClassLoader = HttpImpl.getClassLoader();
             }
-        } catch (MalformedURLException e) {
+        } catch (Exception e) {
             DongTaiLog.error(e.getMessage());
         }
     }

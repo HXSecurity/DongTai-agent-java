@@ -1,6 +1,7 @@
 package io.dongtai.iast.agent.util.http;
 
 import io.dongtai.iast.agent.IastProperties;
+import io.dongtai.log.DongTaiLog;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -134,8 +135,8 @@ public class HttpClientUtils {
                 ));
                 return proxy;
             }
-        } catch (Throwable ignored) {
-
+        } catch (Throwable e) {
+            DongTaiLog.debug(e);
         }
         return null;
     }
@@ -146,7 +147,8 @@ public class HttpClientUtils {
             SSLContext sc = SSLContext.getInstance(SSL_SIGNATURE);
             sc.init(null, trustAllCerts, new java.security.SecureRandom());
             HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            DongTaiLog.debug(e);
         }
     }
 

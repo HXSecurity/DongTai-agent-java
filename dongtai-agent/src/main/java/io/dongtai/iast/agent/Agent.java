@@ -1,11 +1,6 @@
 package io.dongtai.iast.agent;
 
 import java.io.*;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.Arrays;
 
 import io.dongtai.iast.agent.util.FileUtils;

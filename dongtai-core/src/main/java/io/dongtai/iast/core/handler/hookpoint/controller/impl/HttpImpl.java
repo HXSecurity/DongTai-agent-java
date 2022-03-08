@@ -1,7 +1,6 @@
 package io.dongtai.iast.core.handler.hookpoint.controller.impl;
 
 import io.dongtai.iast.core.EngineManager;
-import io.dongtai.iast.core.utils.PropertyUtils;
 import io.dongtai.iast.core.handler.hookpoint.IastClassLoader;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.utils.HttpClientUtils;
@@ -118,7 +117,8 @@ public class HttpImpl {
         try {
             Method methodOfRequestMeta = request.getClass().getDeclaredMethod("getPostBody");
             return (String) methodOfRequestMeta.invoke(request);
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ignored) {
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            DongTaiLog.debug(e);
         }
         return null;
     }
@@ -128,7 +128,8 @@ public class HttpImpl {
         try {
             methodOfRequestMeta = response.getClass().getDeclaredMethod("getResponseMeta");
             return (Map<String, Object>) methodOfRequestMeta.invoke(response);
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ignored) {
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            DongTaiLog.debug(e);
         }
         return null;
     }
@@ -162,4 +163,7 @@ public class HttpImpl {
         }
     }
 
+    public static IastClassLoader getClassLoader(){
+        return iastClassLoader;
+    }
 }

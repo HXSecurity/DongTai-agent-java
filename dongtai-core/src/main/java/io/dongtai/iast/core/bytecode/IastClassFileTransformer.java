@@ -8,7 +8,6 @@ import io.dongtai.iast.core.bytecode.enhance.plugin.PluginRegister;
 import io.dongtai.iast.core.bytecode.sca.ScaScanner;
 import io.dongtai.iast.core.handler.hookpoint.SpyDispatcherImpl;
 import io.dongtai.iast.core.handler.hookpoint.models.IastHookRuleModel;
-import io.dongtai.iast.core.service.ErrorLogReport;
 import io.dongtai.iast.core.utils.AsmUtils;
 import io.dongtai.iast.core.utils.PropertyUtils;
 import io.dongtai.iast.core.utils.matcher.ConfigMatcher;
@@ -317,7 +316,8 @@ public class IastClassFileTransformer implements ClassFileTransformer {
         for (Class<?> clazz : waitingReTransformClasses) {
             try {
                 inst.retransformClasses(clazz);
-            } catch (InternalError ignored) {
+            } catch (InternalError e) {
+                DongTaiLog.debug(e);
             } catch (Exception e) {
                 DongTaiLog.error("transform class failure, class: {}, reason: {}", clazz.getCanonicalName(), e.getMessage());
                 DongTaiLog.debug(e);

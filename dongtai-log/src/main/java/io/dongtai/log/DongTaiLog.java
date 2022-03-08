@@ -239,7 +239,7 @@ public class DongTaiLog {
             o.flush();
             o.close();
         } catch (Exception e) {
-            DongTaiLog.error(e);
+            DongTaiLog.debug(e);
         }
     }
 
@@ -260,7 +260,7 @@ public class DongTaiLog {
                 try {
                     file.createNewFile();
                 } catch (IOException e) {
-                    DongTaiLog.error(e);
+                    DongTaiLog.debug(e);
                 }
             }
         }

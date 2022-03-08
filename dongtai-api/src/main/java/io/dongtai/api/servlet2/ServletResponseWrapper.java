@@ -1,6 +1,7 @@
 package io.dongtai.api.servlet2;
 
 import io.dongtai.api.DongTaiResponse;
+import io.dongtai.log.DongTaiLog;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
@@ -18,7 +19,7 @@ public class ServletResponseWrapper extends HttpServletResponseWrapper implement
 
     public ServletResponseWrapper(HttpServletResponse response) {
         super(response);
-        response.addHeader("DongTai", "v1.3.1");
+        response.addHeader("DongTai", "v1.3.2");
     }
 
     private String getLine() {
@@ -71,8 +72,8 @@ public class ServletResponseWrapper extends HttpServletResponseWrapper implement
             if (copier != null) {
                 return copier.getCopy();
             }
-        } catch (Exception ignored) {
-
+        } catch (Exception e) {
+            DongTaiLog.debug(e);
         }
         return new byte[0];
     }

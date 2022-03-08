@@ -53,7 +53,8 @@ public class PerformanceMonitor implements IMonitor {
         long[] prevTicks = processor.getSystemCpuLoadTicks();
         try {
             TimeUnit.SECONDS.sleep(1);
-        } catch (InterruptedException ignored) {
+        } catch (InterruptedException e) {
+            DongTaiLog.debug(e);
         }
         long[] ticks = processor.getSystemCpuLoadTicks();
         long nice = ticks[CentralProcessor.TickType.NICE.getIndex()] - prevTicks[CentralProcessor.TickType.NICE.getIndex()];
@@ -79,7 +80,8 @@ public class PerformanceMonitor implements IMonitor {
                 JSONObject cpuLimit = (JSONObject) limitArray.get(0);
                 thresholdValue = Integer.parseInt(cpuLimit.get("value").toString());
             }
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            DongTaiLog.debug(e);
         }
         return thresholdValue;
     }
@@ -155,18 +157,21 @@ public class PerformanceMonitor implements IMonitor {
                 }
                 result = sbf.toString();
             }
-        } catch (IOException ignored) {
+        } catch (IOException e) {
+            DongTaiLog.debug(e);
         } finally {
             if (null != br) {
                 try {
                     br.close();
-                } catch (IOException ignored) {
+                } catch (IOException e) {
+                    DongTaiLog.debug(e);
                 }
             }
             if (null != is) {
                 try {
                     is.close();
-                } catch (IOException ignored) {
+                } catch (IOException e) {
+                    DongTaiLog.debug(e);
                 }
             }
             if (null != connection) {

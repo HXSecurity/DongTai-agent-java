@@ -1,6 +1,7 @@
 package io.dongtai.iast.agent.middlewarerecognition.servlet;
 
 import io.dongtai.iast.agent.middlewarerecognition.IServer;
+import io.dongtai.log.DongTaiLog;
 
 import java.lang.management.RuntimeMXBean;
 
@@ -10,12 +11,14 @@ public class ServletService implements IServer {
         try {
             loader.loadClass("javax.servlet.ServletRequest");
             return true;
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            DongTaiLog.debug(e);
         }
         try {
             loader.loadClass("jakarta.servlet.ServletRequest");
             return true;
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            DongTaiLog.debug(e);
         }
         return false;
     }

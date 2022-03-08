@@ -232,12 +232,8 @@ public class EngineManager {
                     String.class)
                     .invoke(null, launchMode, this.properties.getPropertiesFilePath(),
                             AgentRegisterReport.getAgentFlag(), inst, agentPath);
-            if (spyFile.exists()){
-                spyFile.delete();
-            }
-            if (coreFile.exists()){
-                coreFile.delete();
-            }
+            File iastDir = new File(System.getProperty("java.io.tmpdir") + File.separator + "iast");
+            deleteCache(iastDir);
             return true;
         } catch (IOException e) {
             DongTaiLog.error("DongTai engine start failed, Reason: dongtai-spy.jar or dongtai-core.jar open failed. path: \n\tdongtai-core.jar: " + corePackage + "\n\tdongtai-spy.jar: " + spyPackage);
@@ -338,11 +334,25 @@ public class EngineManager {
         return true;
     }
 
-
     public static String getPID() {
         if (PID == null) {
             PID = ManagementFactory.getRuntimeMXBean().getName().split("@")[0];
         }
         return PID;
+    }
+
+    private static boolean deleteCache(File dir) {
+        if (dir.isDirectory()) {
+            String[] children = dir.list();
+            if (children != null) {
+                for (String child : children) {
+                    boolean success = deleteCache(new File(dir, child));
+                    if (!success) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return dir.delete();
     }
 }
