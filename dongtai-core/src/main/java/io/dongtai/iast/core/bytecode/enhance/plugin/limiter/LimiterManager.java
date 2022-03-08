@@ -26,7 +26,6 @@ public class LimiterManager {
     private final RateLimiterThreadLocal hookRateLimiter;
 
     public static LimiterManager newInstance(Properties cfg) {
-        //todo add properties
         if (instance == null) {
             instance = new LimiterManager(cfg);
         }
