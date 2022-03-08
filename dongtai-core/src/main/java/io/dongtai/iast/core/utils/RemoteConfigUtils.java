@@ -33,6 +33,9 @@ public class RemoteConfigUtils {
     /**
      * 性能熔断阈值相关配置
      */
+    private static Integer performanceBreakerWindowSize;
+    private static Float performanceBreakerFailureRate;
+    private static Integer performanceBreakerWaitDuration;
     private static Integer maxRiskMetricsCount;
     private static List<PerformanceMetrics> performanceLimitRiskThreshold;
     private static List<PerformanceMetrics> performanceLimitMaxThreshold;
@@ -90,6 +93,65 @@ public class RemoteConfigUtils {
     // *************************************************************
 
     /**
+     * 获取性能断路器统计窗口大小
+     */
+    public static Integer getPerformanceBreakerWindowSize(Properties cfg) {
+        if (performanceBreakerWindowSize == null) {
+            performanceBreakerWindowSize = PropertyUtils.getRemoteSyncLocalConfig("performanceLimit.performanceBreakerWindowSize",
+                    Integer.class, 2, cfg);
+        }
+        return performanceBreakerWindowSize;
+    }
+
+    public static void setPerformanceBreakerWindowSize(Integer performanceBreakerWindowSize) {
+        RemoteConfigUtils.performanceBreakerWindowSize = performanceBreakerWindowSize;
+    }
+
+    /**
+     * 获取性能断路器失败率阈值
+     */
+    public static Float getPerformanceBreakerFailureRate(Properties cfg) {
+        if (performanceBreakerFailureRate == null) {
+            performanceBreakerFailureRate = PropertyUtils.getRemoteSyncLocalConfig("performanceLimit.performanceBreakerFailureRate",
+                    Float.class, 51F, cfg);
+        }
+        return performanceBreakerFailureRate;
+    }
+
+    public static void setPerformanceBreakerFailureRate(Float performanceBreakerFailureRate) {
+        RemoteConfigUtils.performanceBreakerFailureRate = performanceBreakerFailureRate;
+    }
+
+    /**
+     * 获取性能断路器自动转半开的等待时间(单位:秒)
+     */
+    public static Integer getPerformanceBreakerWaitDuration(Properties cfg) {
+        if (performanceBreakerWaitDuration == null) {
+            performanceBreakerWaitDuration = PropertyUtils.getRemoteSyncLocalConfig("performanceLimit.performanceBreakerWaitDuration",
+                    Integer.class, 40, cfg);
+        }
+        return performanceBreakerWaitDuration;
+    }
+
+    public static void setPerformanceBreakerWaitDuration(Integer performanceBreakerWaitDuration) {
+        RemoteConfigUtils.performanceBreakerWaitDuration = performanceBreakerWaitDuration;
+    }
+
+    /**
+     * 获取不允许超过风险阈值的指标数量(0为不限制，达到阈值数时熔断)
+     */
+    public static Integer getMaxRiskMetricsCount(Properties cfg) {
+        if (maxRiskMetricsCount == null) {
+            maxRiskMetricsCount = PropertyUtils.getRemoteSyncLocalConfig("performanceLimit.maxRiskMetricsCount", Integer.class, 3, cfg);
+        }
+        return maxRiskMetricsCount;
+    }
+
+    public static void setMaxRiskMetricsCount(Integer maxRiskMetricsCount) {
+        RemoteConfigUtils.maxRiskMetricsCount = maxRiskMetricsCount;
+    }
+
+    /**
      * 获取性能限制风险阈值
      */
     public static List<PerformanceMetrics> getPerformanceLimitRiskThreshold(Properties cfg) {
@@ -107,20 +169,6 @@ public class RemoteConfigUtils {
             performanceLimitMaxThreshold = buildPerformanceMetrics("performanceLimit.maxThreshold", cfg);
         }
         return performanceLimitMaxThreshold;
-    }
-
-    /**
-     * 获取不允许超过风险阈值的指标数量(0为不限制，达到阈值数时熔断)
-     */
-    public static Integer getMaxRiskMetricsCount(Properties cfg) {
-        if (maxRiskMetricsCount == null) {
-            maxRiskMetricsCount = PropertyUtils.getRemoteSyncLocalConfig("performanceLimit.maxRiskMetricsCount", Integer.class, 3, cfg);
-        }
-        return maxRiskMetricsCount;
-    }
-
-    public static void setMaxRiskMetricsCount(Integer maxRiskMetricsCount) {
-        RemoteConfigUtils.maxRiskMetricsCount = maxRiskMetricsCount;
     }
 
     /**

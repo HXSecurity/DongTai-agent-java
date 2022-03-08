@@ -66,20 +66,23 @@ public class DefaultPerformanceBreaker extends AbstractBreaker {
     @Override
     protected void initBreaker(Properties cfg) {
         DefaultPerformanceBreaker.cfg = cfg;
+        final Integer breakerWindowSize = RemoteConfigUtils.getPerformanceBreakerWindowSize(cfg);
+        final Float breakerFailureRate = RemoteConfigUtils.getPerformanceBreakerFailureRate(cfg);
+        final Integer breakerWaitDuration = RemoteConfigUtils.getPerformanceBreakerWaitDuration(cfg);
         // 创建断路器自定义配置
         CircuitBreaker breaker = CircuitBreaker.of("iastPerformanceBreaker", CircuitBreakerConfig.custom()
-                // 基于次数的滑动窗口,窗口大小2
+                // 基于次数的滑动窗口(默认窗口大小2)
                 .slidingWindowType(CircuitBreakerConfig.SlidingWindowType.COUNT_BASED)
-                .slidingWindowSize(2)
-                //失败率阈值百分比(>=51%)
-                .failureRateThreshold(51F)
+                .slidingWindowSize(breakerWindowSize)
+                //失败率阈值百分比(默认>=51%)
+                .failureRateThreshold(breakerFailureRate)
                 //计算失败率或慢调用率之前所需的最小调用数
-                .minimumNumberOfCalls(2)
-                //自动从开启变成半开，等待30秒
+                .minimumNumberOfCalls(breakerWindowSize)
+                //自动从开启变成半开(默认等待40秒)
                 .automaticTransitionFromOpenToHalfOpenEnabled(true)
-                .waitDurationInOpenState(Duration.ofSeconds(40))
-                // 半开时允许通过次数
-                .permittedNumberOfCallsInHalfOpenState(10)
+                .waitDurationInOpenState(Duration.ofSeconds(breakerWaitDuration))
+                // 半开时允许通过次数(默认窗口大小*5)
+                .permittedNumberOfCallsInHalfOpenState(breakerWindowSize * 5)
                 // 关注的失败异常类型
                 .recordExceptions(IllegalStateException.class)
                 .build());

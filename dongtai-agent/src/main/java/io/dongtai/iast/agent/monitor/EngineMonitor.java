@@ -20,10 +20,9 @@ public class EngineMonitor implements IMonitor {
 
     @Override
     public void check() {
-
         String status = checkForStatus();
         ServerCommandEnum serviceCmdEnum = ServerCommandEnum.getEnum(status);
-        if (serviceCmdEnum == null) {
+        if (serviceCmdEnum == null || serviceCmdEnum == ServerCommandEnum.NO_CMD) {
             return;
         }
         DongTaiLog.info("receive system command. cmd:{}, desc:{}", serviceCmdEnum.getCommand(), serviceCmdEnum.getDesc());
@@ -43,7 +42,6 @@ public class EngineMonitor implements IMonitor {
             case CORE_UNINSTALL:
                 DongTaiLog.info("engine uninstall");
                 engineManager.uninstall();
-            case NO_CMD:
             default:
         }
     }
