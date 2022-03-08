@@ -56,6 +56,9 @@ public class DefaultPerformanceBreaker extends AbstractBreaker {
             DongTaiLog.info("the breaker need to be init,skip check.");
             return;
         }
+        if (!RemoteConfigUtils.enableAutoFallback()) {
+            return;
+        }
         Try.ofSupplier(CircuitBreaker.decorateSupplier(breaker, () -> checkMetricsWithAutoFallback(contextString)))
                 .recover(throwable -> {
                     DongTaiLog.info("performance is over threshold");

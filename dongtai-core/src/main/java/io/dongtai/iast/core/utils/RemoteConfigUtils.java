@@ -4,8 +4,6 @@ import io.dongtai.iast.common.entity.performance.PerformanceMetrics;
 import io.dongtai.iast.common.enums.MetricsKey;
 import io.dongtai.iast.core.utils.json.GsonUtils;
 import io.dongtai.log.DongTaiLog;
-import io.github.resilience4j.core.metrics.Metrics;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.*;
@@ -26,6 +24,7 @@ public class RemoteConfigUtils {
      * 全局配置
      */
     private static Boolean enableAutoFallback;
+    private static String existsRemoteConfigMeta = "{}";
     /**
      * 高频hook限流相关配置
      */
@@ -40,7 +39,6 @@ public class RemoteConfigUtils {
     private static Integer maxRiskMetricsCount;
     private static List<PerformanceMetrics> performanceLimitRiskThreshold;
     private static List<PerformanceMetrics> performanceLimitMaxThreshold;
-    private static String serverConfig = "";
 
     /**
      * 同步远程配置
@@ -50,7 +48,7 @@ public class RemoteConfigUtils {
     public static void syncRemoteConfig(String remoteConfig) {
         // 和上次配置内容不一致时才重新更新配置文件
         try {
-            if (!remoteConfig.equals(serverConfig)) {
+            if (!existsRemoteConfigMeta.equals(remoteConfig)) {
                 JSONObject configJson = new JSONObject(remoteConfig);
                 enableAutoFallback = configJson.getBoolean("enableAutoFallback");
                 hookLimitTokenPerSecond = configJson.getDouble("hookLimitTokenPerSecond");
@@ -60,18 +58,16 @@ public class RemoteConfigUtils {
                 performanceLimitMaxThreshold = buildPerformanceMetricsFromJson(perfLimMaxThresholdJson.toString());
                 JSONObject perfLimRiskThresholdJson = configJson.getJSONObject("performanceLimitRiskThreshold");
                 performanceLimitRiskThreshold = buildPerformanceMetricsFromJson(perfLimRiskThresholdJson.toString());
-                serverConfig = remoteConfig;
+                existsRemoteConfigMeta = remoteConfig;
                 DongTaiLog.info("Sync remote config successful.");
             }
-        }catch (Throwable t){
-            DongTaiLog.warn("Sync remote config failed, msg: {}, error: {}",t.getMessage(),t.getCause());
+        } catch (Throwable t) {
+            DongTaiLog.warn("Sync remote config failed, msg: {}, error: {}", t.getMessage(), t.getCause());
         }
     }
 
     /**
      * 将json转化为List<PerformanceMetrics>类型
-     * @param json
-     * @return
      */
     private static List<PerformanceMetrics> buildPerformanceMetricsFromJson(String json){
         List<PerformanceMetrics> performanceMetricsList  = new ArrayList<>();
