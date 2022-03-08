@@ -84,6 +84,7 @@ public class AgentEngine {
         AgentEngine agentEngine = AgentEngine.getInstance();
         assert agentEngine != null;
         agentEngine.destroy();
+        System.clearProperty("DongTai.IAST.Status");
         DongTaiLog.info("Engine uninstallation succeeded");
     }
 
