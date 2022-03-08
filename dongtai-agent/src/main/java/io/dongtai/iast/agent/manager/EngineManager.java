@@ -101,6 +101,9 @@ public class EngineManager {
      * @throws ClassNotFoundException
      */
     public static Class<?> getRemoteConfigUtils() throws ClassNotFoundException{
+        if (IAST_CLASS_LOADER == null) {
+            return null;
+        }
         return IAST_CLASS_LOADER.loadClass(REMOTE_CONFIG_UTIL);
     }
 
