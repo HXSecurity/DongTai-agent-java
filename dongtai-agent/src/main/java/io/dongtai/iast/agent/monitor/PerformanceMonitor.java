@@ -184,6 +184,9 @@ public class PerformanceMonitor implements IMonitor {
     private void checkPerformanceMetrics(List<PerformanceMetrics> performanceMetrics) {
         try {
             final Class<?> performanceBreaker = EngineManager.getPerformanceBreaker();
+            if (performanceBreaker == null) {
+                return;
+            }
             performanceBreaker.getMethod("checkPerformance", String.class)
                     .invoke(null, SerializeUtils.serializeByList(performanceMetrics));
         } catch (Throwable t) {

@@ -81,6 +81,9 @@ public class EngineManager {
      * @throws ClassNotFoundException 未找到类异常
      */
     public static Class<?> getPerformanceBreaker() throws ClassNotFoundException {
+        if (IAST_CLASS_LOADER == null) {
+            return null;
+        }
         String clazz;
         if (JavaVersionUtils.isJava6() || JavaVersionUtils.isJava7()) {
             clazz = PERFORMANCE_BREAKER_NOP;
