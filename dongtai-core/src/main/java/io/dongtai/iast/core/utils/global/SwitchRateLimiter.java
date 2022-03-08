@@ -7,12 +7,12 @@ import io.dongtai.iast.core.utils.RemoteConfigUtils;
 import java.util.Properties;
 
 /**
- * 全局请求限速器
+ * 熔断器开关限速器
  *
  * @author liyuan40
- * @date 2022/3/2 11:15
+ * @date 2022/3/7 18:10
  */
-public class RequestRateLimiter {
+public class SwitchRateLimiter {
     /**
      * 默认每次尝试获取的许可数
      */
@@ -28,9 +28,9 @@ public class RequestRateLimiter {
      */
     double initBurstSeconds;
 
-    public RequestRateLimiter(Properties properties) {
-        tokenPerSecond = RemoteConfigUtils.getRequestLimitTokenPerSecond(properties);
-        initBurstSeconds = RemoteConfigUtils.getRequestLimitInitBurstSeconds(properties);
+    public SwitchRateLimiter(Properties properties) {
+        tokenPerSecond = RemoteConfigUtils.getSwitchLimitTokenPerSecond(properties);
+        initBurstSeconds = RemoteConfigUtils.getSwitchLimitInitBurstSeconds(properties);
         rateLimiter = RateLimiterWithCapacity.createSmoothBurstyLimiter(tokenPerSecond, initBurstSeconds);
     }
 

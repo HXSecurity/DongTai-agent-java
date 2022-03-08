@@ -31,6 +31,12 @@ public class RemoteConfigUtils {
     private static Double hookLimitTokenPerSecond;
     private static Double hookLimitInitBurstSeconds;
     /**
+     * 高频请求限流相关配置
+     */
+    private static Double requestLimitTokenPerSecond;
+    private static Double requestLimitInitBurstSeconds;
+    private static Integer requestBreakerWaitDuration;
+    /**
      * 性能熔断阈值相关配置
      */
     private static Integer performanceBreakerWindowSize;
@@ -39,6 +45,13 @@ public class RemoteConfigUtils {
     private static Integer maxRiskMetricsCount;
     private static List<PerformanceMetrics> performanceLimitRiskThreshold;
     private static List<PerformanceMetrics> performanceLimitMaxThreshold;
+
+    /**
+     * 二次降级阈值相关配置
+     */
+    private static Double switchLimitTokenPerSecond;
+    private static Double switchLimitInitBurstSeconds;
+    private static Long switchOpenStatusDurationThreshold;
 
 
     /**
@@ -86,6 +99,72 @@ public class RemoteConfigUtils {
             hookLimitInitBurstSeconds = PropertyUtils.getRemoteSyncLocalConfig("hookLimit.initBurstSeconds", Double.class, 10.0, cfg);
         }
         return hookLimitInitBurstSeconds;
+    }
+
+    // *************************************************************
+    // 高频请求限流相关配置
+    // *************************************************************
+    /**
+     * 高频请求限流-每秒获得令牌数
+     */
+    public static Double getRequestLimitTokenPerSecond(Properties cfg) {
+        if (requestLimitTokenPerSecond == null) {
+            requestLimitTokenPerSecond = PropertyUtils.getRemoteSyncLocalConfig("requestLimit.tokenPerSecond", Double.class, 3.0, cfg);
+        }
+        return requestLimitTokenPerSecond;
+    }
+
+    /**
+     * 高频请求限流-初始预放置令牌时间
+     */
+    public static double getRequestLimitInitBurstSeconds(Properties cfg) {
+        if (requestLimitInitBurstSeconds == null) {
+            requestLimitInitBurstSeconds = PropertyUtils.getRemoteSyncLocalConfig("requestLimit.initBurstSeconds", Double.class, 1.0, cfg);
+        }
+        return requestLimitInitBurstSeconds;
+    }
+
+    /**
+     * 请求熔断器在 open 状态等待的时间，不能大于等于 switchOpenStatusDurationThreshold
+     */
+    public static int getRequestWaitDurationInOpenState(Properties cfg) {
+        if (requestBreakerWaitDuration == null) {
+            requestBreakerWaitDuration = PropertyUtils.getRemoteSyncLocalConfig("requestLimit.requestBreakerWaitDuration", Integer.class, 5, cfg);
+        }
+        return requestBreakerWaitDuration;
+    }
+
+    // *************************************************************
+    // 二次降级操作限流相关配置
+    // *************************************************************
+    /**
+     * 二次降级限流令牌桶-每秒获得令牌数
+     */
+    public static Double getSwitchLimitTokenPerSecond(Properties cfg) {
+        if (switchLimitTokenPerSecond == null) {
+            switchLimitTokenPerSecond = PropertyUtils.getRemoteSyncLocalConfig("switchLimit.tokenPerSecond", Double.class, 1.0, cfg);
+        }
+        return switchLimitTokenPerSecond;
+    }
+
+    /**
+     * 二次降级限流令牌桶-初始预放置令牌时间
+     */
+    public static double getSwitchLimitInitBurstSeconds(Properties cfg) {
+        if (switchLimitInitBurstSeconds == null) {
+            switchLimitInitBurstSeconds = PropertyUtils.getRemoteSyncLocalConfig("switchLimit.initBurstSeconds", Double.class, 1.0, cfg);
+        }
+        return switchLimitInitBurstSeconds;
+    }
+
+    /**
+     * 二次降级熔断器打开状态持续最大时间(ms)，大于等级该时间将触发降级
+     */
+    public static long getSwitchOpenStatusDurationThreshold(Properties cfg) {
+        if (switchOpenStatusDurationThreshold == null) {
+            switchOpenStatusDurationThreshold = PropertyUtils.getRemoteSyncLocalConfig("switchLimit.switchOpenStatusDurationThreshold", Long.class, 30000L, cfg);
+        }
+        return switchOpenStatusDurationThreshold;
     }
 
     // *************************************************************

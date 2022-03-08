@@ -3,15 +3,10 @@ package io.dongtai.iast.core.handler.hookpoint;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.bytecode.enhance.plugin.spring.SpringApplicationImpl;
 import io.dongtai.iast.core.handler.hookpoint.controller.HookType;
-import io.dongtai.iast.core.handler.hookpoint.controller.impl.DubboImpl;
-import io.dongtai.iast.core.handler.hookpoint.controller.impl.HttpImpl;
-import io.dongtai.iast.core.handler.hookpoint.controller.impl.PropagatorImpl;
-import io.dongtai.iast.core.handler.hookpoint.controller.impl.SinkImpl;
-import io.dongtai.iast.core.handler.hookpoint.controller.impl.SourceImpl;
+import io.dongtai.iast.core.handler.hookpoint.controller.impl.*;
 import io.dongtai.iast.core.handler.hookpoint.graphy.GraphBuilder;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.service.ErrorLogReport;
-import io.dongtai.log.DongTaiLog;
 
 import java.lang.dongtai.SpyDispatcher;
 import java.util.concurrent.atomic.AtomicInteger;

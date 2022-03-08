@@ -1,19 +1,15 @@
 package io.dongtai.iast.core;
 
 import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.LimiterManager;
-import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.report.HookPointRateLimitReport;
+import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.breaker.RequestBreaker;
 import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.fallback.LimitFallbackSwitch;
-import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.HookPointRateLimitReport;
-import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.RequestRateLimitReport;
-import io.dongtai.iast.core.enums.RequestTypeEnum;
+import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.report.HookPointRateLimitReport;
 import io.dongtai.iast.core.handler.context.ContextManager;
 import io.dongtai.iast.core.handler.hookpoint.IastServer;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
-import io.dongtai.iast.core.utils.threadlocal.*;
 import io.dongtai.iast.core.service.ServiceFactory;
 import io.dongtai.iast.core.utils.PropertyUtils;
-import io.dongtai.iast.core.utils.global.PerformanceFallback;
-import io.dongtai.iast.core.utils.global.RequestRateLimiter;
+import io.dongtai.iast.core.utils.threadlocal.*;
 import io.dongtai.log.DongTaiLog;
 
 import java.util.HashMap;
@@ -47,20 +43,6 @@ public class EngineManager {
      * 限制器统一管理器
      */
     private final LimiterManager limiterManager;
-    public static final BooleanThreadLocal DONGTAI_HOOK_FALLBACK = new BooleanThreadLocal(false);
-    /**
-     * hook点高频命中限速器
-     */
-    public static final RateLimiterThreadLocal HOOK_RATE_LIMITER = new RateLimiterThreadLocal(PropertyUtils.getInstance());
-    /**
-     * 性能熔断开关
-     */
-    public static final PerformanceFallback DONGTAI_PERFORMANCE_FALLBACK = new PerformanceFallback(false);
-    /**
-     * 高频请求限速器
-     */
-    public static final RequestRateLimiter GLOBAL_REQUEST_RATE_LIMITER = new RequestRateLimiter(1, 5);
-//    public static final GlobalRequestRateLimiter GLOBAL_REQUEST_RATE_LIMITER = new GlobalRequestRateLimiter(PropertyUtils.getInstance());
 
     public static IastServer SERVER;
 
@@ -103,18 +85,6 @@ public class EngineManager {
                 + ", sign:" + methodSign + " ,rate:" + limitRate);
         HookPointRateLimitReport.sendReport(className, method, methodSign, hookType, limitRate);
         LimitFallbackSwitch.setHeavyHookFallback(true);
-    }
-
-    /**
-     * 打开性能降级开关
-     *
-     * @param requestType 请求类型
-     */
-    public static void openPerformanceFallback(RequestTypeEnum requestType) {
-        final double limitRate = EngineManager.GLOBAL_REQUEST_RATE_LIMITER.getRate();
-        DongTaiLog.info("Request rate limit! RequestType:{},Rate:{}", requestType.getType(), limitRate);
-        DONGTAI_PERFORMANCE_FALLBACK.setDefaultValue(true);
-        RequestRateLimitReport.sendReport(requestType, limitRate);
     }
 
     public static EngineManager getInstance() {
@@ -240,9 +210,9 @@ public class EngineManager {
     }
 
     public static void enterHttpEntry(Map<String, Object> requestMeta) {
-        // 尝试获取请求限速令牌，耗尽时打开性能熔断器
-        if (!EngineManager.GLOBAL_REQUEST_RATE_LIMITER.acquire()) {
-            EngineManager.openPerformanceFallback(RequestTypeEnum.HTTP);
+        // 尝试获取请求限速令牌，耗尽时调用断路器方法
+        if (!EngineManager.getLimiterManager().getRequestRateLimiter().acquire()) {
+            RequestBreaker.checkRequestRate();
         }
 
         ServiceFactory.startService();
@@ -274,9 +244,9 @@ public class EngineManager {
      * @since 1.2.0
      */
     public static void enterDubboEntry(String dubboService, Map<String, String> attachments) {
-        // 尝试获取请求限速令牌，耗尽时打开性能熔断器
-        if (!EngineManager.GLOBAL_REQUEST_RATE_LIMITER.acquire()) {
-            EngineManager.openPerformanceFallback(RequestTypeEnum.DUBBO);
+        // 尝试获取请求限速令牌，耗尽时调用断路器方法
+        if (!EngineManager.getLimiterManager().getRequestRateLimiter().acquire()) {
+            RequestBreaker.checkRequestRate();
         }
 
         if (attachments != null) {

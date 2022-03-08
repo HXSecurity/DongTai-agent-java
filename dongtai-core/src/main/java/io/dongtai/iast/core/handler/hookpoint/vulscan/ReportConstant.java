@@ -22,6 +22,8 @@ public class ReportConstant {
     public static final int REPORT_LIMIT_HOOK_POINT_RATE = 0x41;
     public static final int REPORT_LIMIT_REQUEST_RATE = 0x42;
     public static final int REPORT_LIMIT_PERFORMANCE_FALLBACK = 0x43;
+    public static final int REPORT_LIMIT_EXCEPTION_RATE = 0x44;
+    public static final int REPORT_SECOND_FALLBACK = 0x46;
     public static final int REPORT_ERROR_LOG = 0x51;
     public static final int REPORT_API = 0x61;
 
@@ -86,8 +88,19 @@ public class ReportConstant {
     /**
      * 请求限流相关
      */
-    public static final String LIMIT_REQUEST_TYPE = "requestType";
-    public static final String LIMIT_REQUEST_RATE = "limitRate";
+    public static final String LIMIT_REQUEST_SWITCH_OPERATE = "switchOperate";
+    public static final String LIMIT_REQUEST_REAL_TIME_RATE = "realTimeRate";
+    public static final String LIMIT_REQUEST_RATE_THRESHOLD = "limitRateThreshold";
+    /**
+     * 异常熔断相关
+     */
+    public static final String LIMIT_EXCEPTION_SWITCH_OPERATE = "switchOperate";
+    public static final String LIMIT_EXCEPTION_REAL_TIME_RATE = "realTimeRate";
+    public static final String LIMIT_EXCEPTION_RATE_THRESHOLD = "limitRateThreshold";
+    /**
+     * 二次降级相关
+     */
+    public static final String SECOND_FALLBACK_REPORT_INFO = "secondFallbackInfo";
 
     public static final String LIMIT_PERFORMANCE_OVER_THRESHOLD_LOG = "performanceOverThresholdLog";
 
