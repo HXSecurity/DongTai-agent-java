@@ -1,8 +1,9 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.limiter.report;
 
-import io.dongtai.iast.core.EngineManager;
-import io.dongtai.iast.core.handler.hookpoint.vulscan.ReportConstant;
-import org.json.JSONObject;
+import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.report.body.SecondFallbackReportBody;
+import io.dongtai.iast.core.utils.json.GsonUtils;
+
+import java.util.LinkedList;
 
 /**
  * 二次降级发送报告
@@ -14,21 +15,10 @@ public class SecondFallbackReport extends AbstractLimitReport {
     /**
      * 发送报告
      *
-     * @param report 报告
+     * @param secondFallbackReportDetailLog 报告内容
      */
-    public static void sendSecondFallbackReport(JSONObject report) {
-        sendReport(createReport(report));
-    }
-
-    protected static String createReport(JSONObject reportJson) {
-        JSONObject report = new JSONObject();
-        JSONObject detail = new JSONObject();
-        report.put(ReportConstant.REPORT_KEY, ReportConstant.REPORT_SECOND_FALLBACK);
-        report.put(ReportConstant.REPORT_VALUE_KEY, detail);
-
-        detail.put(ReportConstant.AGENT_ID, EngineManager.getAgentId());
-        detail.put(ReportConstant.SECOND_FALLBACK_REPORT_INFO, reportJson);
-
-        return report.toString();
+    public static void sendReport(LinkedList<SecondFallbackReportBody.AbstractSecondFallbackReportLog> secondFallbackReportDetailLog) {
+        SecondFallbackReportBody reportBody = new SecondFallbackReportBody(secondFallbackReportDetailLog);
+        sendReport(GsonUtils.toJson(reportBody));
     }
 }

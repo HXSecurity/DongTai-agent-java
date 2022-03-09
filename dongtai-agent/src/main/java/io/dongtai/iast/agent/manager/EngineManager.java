@@ -77,7 +77,7 @@ public class EngineManager {
     }
 
     /**
-     * 在核心包中加载并获取二次降级开关类
+     * 在核心包中加载并获取限制降级开关类
      *
      * @return {@link Class}<{@link ?}>
      * @throws ClassNotFoundException 未找到类异常

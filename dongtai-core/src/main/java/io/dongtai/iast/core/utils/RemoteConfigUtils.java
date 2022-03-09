@@ -31,11 +31,11 @@ public class RemoteConfigUtils {
     private static Double hookLimitTokenPerSecond;
     private static Double hookLimitInitBurstSeconds;
     /**
-     * 高频请求限流相关配置
+     * 高频流量限流相关配置
      */
-    private static Double requestLimitTokenPerSecond;
-    private static Double requestLimitInitBurstSeconds;
-    private static Integer requestBreakerWaitDuration;
+    private static Double heavyTrafficLimitTokenPerSecond;
+    private static Double heavyTrafficLimitInitBurstSeconds;
+    private static Integer heavyTrafficBreakerWaitDuration;
     /**
      * 性能熔断阈值相关配置
      */
@@ -145,36 +145,36 @@ public class RemoteConfigUtils {
     }
 
     // *************************************************************
-    // 高频请求限流相关配置
+    // 高频流量限流相关配置
     // *************************************************************
     /**
-     * 高频请求限流-每秒获得令牌数
+     * 高频流量限流-每秒获得令牌数
      */
-    public static Double getRequestLimitTokenPerSecond(Properties cfg) {
-        if (requestLimitTokenPerSecond == null) {
-            requestLimitTokenPerSecond = PropertyUtils.getRemoteSyncLocalConfig("requestLimit.tokenPerSecond", Double.class, 3.0, cfg);
+    public static Double getHeavyTrafficLimitTokenPerSecond(Properties cfg) {
+        if (heavyTrafficLimitTokenPerSecond == null) {
+            heavyTrafficLimitTokenPerSecond = PropertyUtils.getRemoteSyncLocalConfig("heavyTrafficLimit.tokenPerSecond", Double.class, 100.0, cfg);
         }
-        return requestLimitTokenPerSecond;
+        return heavyTrafficLimitTokenPerSecond;
     }
 
     /**
-     * 高频请求限流-初始预放置令牌时间
+     * 高频流量限流-初始预放置令牌时间
      */
     public static double getRequestLimitInitBurstSeconds(Properties cfg) {
-        if (requestLimitInitBurstSeconds == null) {
-            requestLimitInitBurstSeconds = PropertyUtils.getRemoteSyncLocalConfig("requestLimit.initBurstSeconds", Double.class, 1.0, cfg);
+        if (heavyTrafficLimitInitBurstSeconds == null) {
+            heavyTrafficLimitInitBurstSeconds = PropertyUtils.getRemoteSyncLocalConfig("heavyTrafficLimit.initBurstSeconds", Double.class, 2.0, cfg);
         }
-        return requestLimitInitBurstSeconds;
+        return heavyTrafficLimitInitBurstSeconds;
     }
 
     /**
-     * 请求熔断器在 open 状态等待的时间，不能大于等于 switchOpenStatusDurationThreshold
+     * 高频流量熔断器在 open 状态等待的时间，不能大于等于 switchOpenStatusDurationThreshold
      */
     public static int getRequestWaitDurationInOpenState(Properties cfg) {
-        if (requestBreakerWaitDuration == null) {
-            requestBreakerWaitDuration = PropertyUtils.getRemoteSyncLocalConfig("requestLimit.requestBreakerWaitDuration", Integer.class, 5, cfg);
+        if (heavyTrafficBreakerWaitDuration == null) {
+            heavyTrafficBreakerWaitDuration = PropertyUtils.getRemoteSyncLocalConfig("heavyTrafficLimit.heavyTrafficBreakerWaitDuration", Integer.class, 10, cfg);
         }
-        return requestBreakerWaitDuration;
+        return heavyTrafficBreakerWaitDuration;
     }
 
     // *************************************************************
@@ -185,7 +185,7 @@ public class RemoteConfigUtils {
      */
     public static Double getSwitchLimitTokenPerSecond(Properties cfg) {
         if (switchLimitTokenPerSecond == null) {
-            switchLimitTokenPerSecond = PropertyUtils.getRemoteSyncLocalConfig("switchLimit.tokenPerSecond", Double.class, 1.0, cfg);
+            switchLimitTokenPerSecond = PropertyUtils.getRemoteSyncLocalConfig("switchLimit.tokenPerSecond", Double.class, 0.01, cfg);
         }
         return switchLimitTokenPerSecond;
     }
@@ -195,7 +195,7 @@ public class RemoteConfigUtils {
      */
     public static double getSwitchLimitInitBurstSeconds(Properties cfg) {
         if (switchLimitInitBurstSeconds == null) {
-            switchLimitInitBurstSeconds = PropertyUtils.getRemoteSyncLocalConfig("switchLimit.initBurstSeconds", Double.class, 1.0, cfg);
+            switchLimitInitBurstSeconds = PropertyUtils.getRemoteSyncLocalConfig("switchLimit.initBurstSeconds", Double.class, 200.0, cfg);
         }
         return switchLimitInitBurstSeconds;
     }

@@ -3,10 +3,9 @@ package io.dongtai.iast.core.bytecode.enhance.plugin.limiter;
 
 import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.breaker.AbstractBreaker;
 import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.breaker.DefaultPerformanceBreaker;
-import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.breaker.RequestBreaker;
-import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.fallback.LimitFallbackSwitch;
-import io.dongtai.iast.core.utils.global.RequestRateLimiter;
-import io.dongtai.iast.core.utils.global.SwitchRateLimiter;
+import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.breaker.HeavyTrafficBreaker;
+import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.bucket.HeavyTrafficRateLimiter;
+import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.bucket.SwitchRateLimiter;
 import io.dongtai.iast.core.utils.threadlocal.RateLimiterThreadLocal;
 
 import java.util.Properties;
@@ -26,9 +25,9 @@ public class LimiterManager {
     private final AbstractBreaker performanceBreaker;
 
     /**
-     * 请求断路器
+     * 高频流量断路器
      */
-    private final AbstractBreaker requestBreaker;
+    private final AbstractBreaker heavyTrafficBreaker;
 
     /**
      * hook点高频命中限速器
@@ -36,19 +35,14 @@ public class LimiterManager {
     private final RateLimiterThreadLocal hookRateLimiter;
 
     /**
-     * 高频请求限速器
+     * 高频流量限速器
      */
-    private final RequestRateLimiter requestRateLimiter;
+    private final HeavyTrafficRateLimiter heavyTrafficRateLimiter;
 
     /**
-     * 二次降级熔断器的熔断限速器
+     * 降级开关限速器
      */
     private final SwitchRateLimiter switchRateLimiter;
-
-    /**
-     * 二次降级开关
-     */
-    private final LimitFallbackSwitch limitFallbackSwitch;
 
     public static LimiterManager newInstance(Properties cfg) {
         if (instance == null) {
@@ -59,11 +53,10 @@ public class LimiterManager {
 
     private LimiterManager(Properties cfg) {
         this.performanceBreaker = DefaultPerformanceBreaker.newInstance(cfg);
-        this.requestBreaker = RequestBreaker.newInstance(cfg);
+        this.heavyTrafficBreaker = HeavyTrafficBreaker.newInstance(cfg);
         this.hookRateLimiter = new RateLimiterThreadLocal(cfg);
-        this.requestRateLimiter = new RequestRateLimiter(cfg);
+        this.heavyTrafficRateLimiter = new HeavyTrafficRateLimiter(cfg);
         this.switchRateLimiter = new SwitchRateLimiter(cfg);
-        this.limitFallbackSwitch = new LimitFallbackSwitch(cfg);
     }
 
     public AbstractBreaker getPerformanceBreaker() {
@@ -74,15 +67,11 @@ public class LimiterManager {
         return hookRateLimiter;
     }
 
-    public RequestRateLimiter getRequestRateLimiter() {
-        return requestRateLimiter;
+    public HeavyTrafficRateLimiter getHeavyTrafficRateLimiter() {
+        return heavyTrafficRateLimiter;
     }
 
     public SwitchRateLimiter getSwitchRateLimiter() {
         return switchRateLimiter;
-    }
-
-    public LimitFallbackSwitch getLimitFallbackSwitch() {
-        return limitFallbackSwitch;
     }
 }

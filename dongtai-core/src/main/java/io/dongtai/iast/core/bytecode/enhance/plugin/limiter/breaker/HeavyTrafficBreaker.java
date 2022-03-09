@@ -1,7 +1,8 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.limiter.breaker;
 
+import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.fallback.LimitFallbackSwitch;
-import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.report.RequestRateLimitReport;
+import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.report.HeavyTrafficRateLimitReport;
 import io.dongtai.iast.core.utils.RemoteConfigUtils;
 import io.dongtai.log.DongTaiLog;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
@@ -13,12 +14,12 @@ import java.util.Properties;
 import java.util.function.Predicate;
 
 /**
- * 请求断路器
+ * 高频流量断路器
  *
  * @author liyuan40
  * @date 2022/3/3 15:23
  */
-public class RequestBreaker extends AbstractBreaker {
+public class HeavyTrafficBreaker extends AbstractBreaker {
 
     private static AbstractBreaker instance;
 
@@ -26,32 +27,32 @@ public class RequestBreaker extends AbstractBreaker {
 
     private static Properties cfg;
 
-    private RequestBreaker(Properties cfg) {
+    private HeavyTrafficBreaker(Properties cfg) {
         super(cfg);
     }
 
     public static AbstractBreaker newInstance(Properties cfg) {
         if (instance == null) {
-            instance = new RequestBreaker(cfg);
+            instance = new HeavyTrafficBreaker(cfg);
         }
         return instance;
     }
 
     @Override
     protected void initBreaker(Properties cfg) {
-        RequestBreaker.cfg = cfg;
+        HeavyTrafficBreaker.cfg = cfg;
         final int breakerWaitDuration = RemoteConfigUtils.getRequestWaitDurationInOpenState(cfg);
         // 创建断路器自定义配置
-        CircuitBreaker breaker = CircuitBreaker.of("iastRequestBreaker", CircuitBreakerConfig.custom()
+        CircuitBreaker breaker = CircuitBreaker.of("iastHeavyTrafficBreaker", CircuitBreakerConfig.custom()
                 // 基于次数的滑动窗口
                 .slidingWindowType(CircuitBreakerConfig.SlidingWindowType.COUNT_BASED)
-                // 窗口大小固定为 1
+                // 窗口大小固定为 1，因为在进入断路器前使用了令牌桶限流，故超过限流速度即打开高频流量断路器
                 .slidingWindowSize(1)
                 //失败率阈值百分比(>=50%)
                 .failureRateThreshold(50F)
                 //计算失败率或慢调用率之前所需的最小调用数
                 .minimumNumberOfCalls(1)
-                //自动从开启变成半开，等待时间 x 秒
+                //自动从开启变成半开，等待时间从配置中读取
                 .automaticTransitionFromOpenToHalfOpenEnabled(true)
                 .waitDurationInOpenState(Duration.ofSeconds(breakerWaitDuration))
                 // 半开时允许通过次数，固定为 1
@@ -61,49 +62,31 @@ public class RequestBreaker extends AbstractBreaker {
                 .build());
         breaker.getEventPublisher()
                 .onStateTransition(event -> {
-                    DongTaiLog.info("RequestBreaker state transform:{}", event.getStateTransition());
-                    double failureRateOnStateTransition = breaker.getMetrics().getFailureRate();
-                    double failureRateThreshold = breaker.getCircuitBreakerConfig().getFailureRateThreshold();
+                    double trafficLimitRate = EngineManager.getLimiterManager().getHeavyTrafficRateLimiter().getTokenPerSecond();
                     // 断路器转为打开时，打开请求降级开关
                     CircuitBreaker.State state = event.getStateTransition().getToState();
                     if (state == CircuitBreaker.State.OPEN) {
-                        setRequestFallback(true, failureRateOnStateTransition, failureRateThreshold);
+                        LimitFallbackSwitch.setHeavyTrafficLimitFallback(true);
+                        HeavyTrafficRateLimitReport.sendReport(trafficLimitRate);
                     }
-
-                    // 断路器转为半开时，直接转为关闭
+                    // 因为本断路器的样本来自 EngineManager.enterHttpEntry()，打开后再也无法获取样本，会导致在 HALF_OPEN 阶段无法恢复到 CLOSE
                     if (state == CircuitBreaker.State.HALF_OPEN) {
                         breaker.transitionToClosedState();
                     }
-
                     // 关闭或半开断路器则关闭请求降级开关
                     if (state == CircuitBreaker.State.CLOSED) {
-                        setRequestFallback(false, failureRateOnStateTransition, failureRateThreshold);
+                        LimitFallbackSwitch.setHeavyTrafficLimitFallback(false);
                     }
                 });
-        RequestBreaker.breaker = breaker;
-
+        HeavyTrafficBreaker.breaker = breaker;
     }
 
     /**
-     * 操作大流量降级开关
-     *
-     * @param fallback                     开关状态（true=ON,false=OFF）
-     * @param failureRateOnStateTransition 触发本方法调用时的失败率
-     * @param failureRateThreshold         失败率阈值
+     * 检查流量速率
      */
-    private static void setRequestFallback(boolean fallback, double failureRateOnStateTransition, double failureRateThreshold) {
-        if (LimitFallbackSwitch.getHeavyTrafficLimitFallback() != fallback) {
-            LimitFallbackSwitch.setHeavyTrafficLimitFallback(fallback);
-            RequestRateLimitReport.sendReport(fallback, failureRateOnStateTransition, failureRateThreshold);
-        }
-    }
-
-    /**
-     * 检查请求速率
-     */
-    public static void checkRequestRate() {
+    public static void checkTrafficRate() {
         if (breaker == null) {
-            DongTaiLog.info("the RequestBreaker need to be init,skip check.");
+            DongTaiLog.info("the HeavyTrafficBreaker need to be init,skip check.");
             return;
         }
         Try.ofSupplier(CircuitBreaker.decorateSupplier(breaker, () -> false)).recover(throwable -> false).get();

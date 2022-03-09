@@ -1,4 +1,4 @@
-package io.dongtai.iast.core.utils.global;
+package io.dongtai.iast.core.bytecode.enhance.plugin.limiter.bucket;
 
 import com.google.common.util.concurrent.RateLimiter;
 import com.google.common.util.concurrent.RateLimiterWithCapacity;
@@ -7,31 +7,28 @@ import io.dongtai.iast.core.utils.RemoteConfigUtils;
 import java.util.Properties;
 
 /**
- * 全局异常限速器
+ * 高频流量限速器
  *
  * @author liyuan40
- * @date 2022/3/7 11:26
+ * @date 2022/3/2 11:15
  */
-public class ExceptionRateLimiter {
+public class HeavyTrafficRateLimiter {
     /**
      * 默认每次尝试获取的许可数
      */
     public static final int DEFAULT_PERMITS = 1;
 
     RateLimiter rateLimiter;
-    /**
-     * 每秒颁发令牌速率
-     */
-    double tokenPerSecond;
-    /**
-     * 初始预放置令牌时间
-     */
-    double initBurstSeconds;
 
-    public ExceptionRateLimiter(Properties properties) {
-//        tokenPerSecond = RemoteConfigUtils.getExceptionLimitTokenPerSecond(properties);
-//        initBurstSeconds = RemoteConfigUtils.getExceptionLimitInitBurstSeconds(properties);
-        rateLimiter = RateLimiterWithCapacity.createSmoothBurstyLimiter(tokenPerSecond, initBurstSeconds);
+    public HeavyTrafficRateLimiter(Properties properties) {
+        rateLimiter = RateLimiterWithCapacity.createSmoothBurstyLimiter(
+                RemoteConfigUtils.getHeavyTrafficLimitTokenPerSecond(properties),
+                RemoteConfigUtils.getRequestLimitInitBurstSeconds(properties)
+        );
+    }
+
+    public double getTokenPerSecond() {
+        return RemoteConfigUtils.getHeavyTrafficLimitTokenPerSecond(null);
     }
 
     /**

@@ -8,29 +8,29 @@ import io.dongtai.iast.agent.util.ThreadUtils;
 import io.dongtai.log.DongTaiLog;
 
 /**
- * 二次降级开关(大流量熔断器、性能熔断器、异常熔断器)监控器
+ * 限制降级开关(高频流量熔断器、性能熔断器)监控器
  *
  * @author liyuan40
  * @date 2022/3/7 20:03
  */
-public class LogicSwitchMonitor implements IMonitor {
+public class LimitFallbackSwitchMonitor implements IMonitor {
 
-    private final String name = "LogicSwitchMonitor";
+    private final String name = "LimitFallbackSwitchMonitor";
 
     private final EngineManager engineManager;
 
-    public LogicSwitchMonitor(EngineManager engineManager) {
+    public LimitFallbackSwitchMonitor(EngineManager engineManager) {
         this.engineManager = engineManager;
     }
 
     @Override
     public void check() {
-        Boolean isNeedTurnOffEngine = checkLogicSwitcher();
-        if (isNeedTurnOffEngine == null) {
+        Boolean isNeedSecondFallback = checkIsNeedSecondFallback();
+        if (isNeedSecondFallback == null) {
             return;
         }
 
-        if (isNeedTurnOffEngine) {
+        if (isNeedSecondFallback) {
             engineManager.uninstall();
         }
     }
@@ -41,19 +41,19 @@ public class LogicSwitchMonitor implements IMonitor {
     }
 
     /**
-     * 检查二次校验熔断器判断结果是否需要关闭引擎
+     * 检查是否需要二次降级
      *
      * @return boolean
      */
-    private Boolean checkLogicSwitcher() {
+    private Boolean checkIsNeedSecondFallback() {
         try {
             final Class<?> limitFallbackSwitch = EngineManager.getLimitFallbackSwitch();
             if (limitFallbackSwitch == null) {
                 return null;
             }
-            return (Boolean) limitFallbackSwitch.getMethod("isNeedTurnOffEngine").invoke(null);
+            return (Boolean) limitFallbackSwitch.getMethod("isNeedSecondFallback").invoke(null);
         } catch (Throwable t) {
-            DongTaiLog.error("checkLogicSwitcher failed, msg:{}, err:{}", t.getMessage(), t.getCause());
+            DongTaiLog.error("checkIsNeedSecondFallback failed, msg:{}, err:{}", t.getMessage(), t.getCause());
             return false;
         }
     }
