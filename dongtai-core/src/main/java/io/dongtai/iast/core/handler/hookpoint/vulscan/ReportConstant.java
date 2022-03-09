@@ -75,14 +75,19 @@ public class ReportConstant {
     public static final String STARTUP_TIME = "startupTime";
 
     /**
-     * 限流相关
+     * 高频hook降级报告相关
      */
+    public static final String LIMIT_HOOK_LIMIT_DATE = "limitDate";
     public static final String LIMIT_HOOK_POINT_CLASS_NAME = "className";
     public static final String LIMIT_HOOK_POINT_METHOD = "method";
     public static final String LIMIT_HOOK_POINT_METHOD_SIGN = "methodSign";
     public static final String LIMIT_HOOK_POINT_TYPE = "hookType";
     public static final String LIMIT_HOOK_POINT_RATE = "limitRate";
 
+    /**
+     * 性能降级报告相关
+     */
+    public static final String LIMIT_PERFORMANCE_BREAK_DATE = "breakDate";
     public static final String LIMIT_PERFORMANCE_OVER_THRESHOLD_LOG = "performanceOverThresholdLog";
 
 }
