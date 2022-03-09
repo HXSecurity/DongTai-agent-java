@@ -1,6 +1,10 @@
-package io.dongtai.iast.agent.monitor;
+package io.dongtai.iast.agent.monitor.impl;
 
+import io.dongtai.iast.agent.Constant;
 import io.dongtai.iast.agent.manager.EngineManager;
+import io.dongtai.iast.agent.monitor.IMonitor;
+import io.dongtai.iast.agent.monitor.MonitorDaemonThread;
+import io.dongtai.iast.agent.util.ThreadUtils;
 import io.dongtai.log.DongTaiLog;
 
 /**
@@ -10,6 +14,8 @@ import io.dongtai.log.DongTaiLog;
  * @date 2022/3/7 20:03
  */
 public class LogicSwitchMonitor implements IMonitor {
+
+    private final String name = "LogicSwitchMonitor";
 
     private final EngineManager engineManager;
 
@@ -29,6 +35,11 @@ public class LogicSwitchMonitor implements IMonitor {
         }
     }
 
+    @Override
+    public String getName() {
+        return Constant.THREAD_PREFIX + name;
+    }
+
     /**
      * 检查二次校验熔断器判断结果是否需要关闭引擎
      *
@@ -44,6 +55,14 @@ public class LogicSwitchMonitor implements IMonitor {
         } catch (Throwable t) {
             DongTaiLog.error("checkLogicSwitcher failed, msg:{}, err:{}", t.getMessage(), t.getCause());
             return false;
+        }
+    }
+
+    @Override
+    public void run() {
+        while(!MonitorDaemonThread.isExit) {
+            this.check();
+            ThreadUtils.threadSleep(60);
         }
     }
 }
