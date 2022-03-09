@@ -36,6 +36,10 @@ public class PerformanceMetrics implements Serializable {
         return type.cast(metricsValue);
     }
 
+    public Object getMetricsValue() {
+        return metricsValue;
+    }
+
     public void setMetricsKey(MetricsKey metricsKey) {
         this.metricsKey = metricsKey;
     }
