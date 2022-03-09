@@ -34,8 +34,8 @@ public class ThreadInfoChecker extends BasePerformanceChecker {
             if (threshold.getThreadCount() != null && now.getThreadCount() >= threshold.getThreadCount()) {
                 return true;
             }
-            // todo: 比较洞态守护线程数
-            return threshold.getDaemonThreadCount() != null && now.getDaemonThreadCount() >= threshold.getDaemonThreadCount();
+            // 比较洞态守护线程数
+            return threshold.getDongTaiThreadCount() != null && now.getDongTaiThreadCount() >= threshold.getDongTaiThreadCount();
         }
         return false;
     }

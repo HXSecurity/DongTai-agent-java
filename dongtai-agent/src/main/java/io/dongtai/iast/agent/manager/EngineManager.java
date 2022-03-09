@@ -29,6 +29,7 @@ public class EngineManager {
     private static final String PERFORMANCE_BREAKER_DEFAULT = "io.dongtai.iast.core.bytecode.enhance.plugin.limiter.breaker.DefaultPerformanceBreaker";
     private static final String PERFORMANCE_BREAKER_NOP = "io.dongtai.iast.core.bytecode.enhance.plugin.limiter.breaker.NopPerformanceBreaker";
     private static final String LIMIT_FALLBACK_SWITCH = "io.dongtai.iast.core.bytecode.enhance.plugin.limiter.fallback.LimitFallbackSwitch";
+    private static final String REMOTE_CONFIG_UTIL = "io.dongtai.iast.core.utils.RemoteConfigUtils";
     private static final String INJECT_PACKAGE_REMOTE_URI = "/api/v1/engine/download?engineName=dongtai-spy";
     private static final String ENGINE_PACKAGE_REMOTE_URI = "/api/v1/engine/download?engineName=dongtai-core";
     private static final String API_PACKAGE_REMOTE_URI = "/api/v1/engine/download?engineName=dongtai-api";
@@ -105,6 +106,19 @@ public class EngineManager {
             clazz = PERFORMANCE_BREAKER_DEFAULT;
         }
         return IAST_CLASS_LOADER.loadClass(clazz);
+    }
+
+    /**
+     * 在核心包中加载并获取远端配置工具类
+     *
+     * @return
+     * @throws ClassNotFoundException
+     */
+    public static Class<?> getRemoteConfigUtils() throws ClassNotFoundException{
+        if (IAST_CLASS_LOADER == null) {
+            return null;
+        }
+        return IAST_CLASS_LOADER.loadClass(REMOTE_CONFIG_UTIL);
     }
 
     /**

@@ -10,6 +10,7 @@ public class Constant {
     public final static String API_AGENT_REGISTER = "/api/v1/agent/register";
     public final static String API_REPORT_UPLOAD = "/api/v1/report/upload";
     public final static String API_ENGINE_ACTION = "/api/v1/engine/action";
+    public final static String API_Server_Config = "/api/v1/agent/threshold";
 
     public static final String KEY_NETWORK = "network";
     public static final String KEY_AGENT_VERSION = "version";
@@ -34,7 +35,12 @@ public class Constant {
     public static final String KEY_MEMORY = "memory";
     public static final String KEY_CPU = "cpu";
     public static final String KEY_DISK = "disk";
+    public static final String KEY_PERFORMANCE = "performance";
     public static final String KEY_RETURN_QUEUE = "returnQueue";
+
+    // 线程异常上报
+    public static final int REPORT_ERROR_THREAD = 0x45;
+    public static final String KEY_NOT_EXIST_THREADS = "NotExistThread";
 
     public static final String THREAD_PREFIX = "DongTai-IAST-";
 

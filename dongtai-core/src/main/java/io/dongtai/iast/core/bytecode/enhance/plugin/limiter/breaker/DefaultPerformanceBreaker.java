@@ -56,6 +56,9 @@ public class DefaultPerformanceBreaker extends AbstractBreaker {
             DongTaiLog.info("the breaker need to be init,skip check.");
             return;
         }
+        if (!RemoteConfigUtils.enableAutoFallback()) {
+            return;
+        }
         Try.ofSupplier(CircuitBreaker.decorateSupplier(breaker, () -> checkMetricsWithAutoFallback(contextString)))
                 .recover(throwable -> {
                     DongTaiLog.info("performance is over threshold");
@@ -67,7 +70,7 @@ public class DefaultPerformanceBreaker extends AbstractBreaker {
     protected void initBreaker(Properties cfg) {
         DefaultPerformanceBreaker.cfg = cfg;
         final Integer breakerWindowSize = RemoteConfigUtils.getPerformanceBreakerWindowSize(cfg);
-        final Float breakerFailureRate = RemoteConfigUtils.getPerformanceBreakerFailureRate(cfg);
+        final Double breakerFailureRate = RemoteConfigUtils.getPerformanceBreakerFailureRate(cfg);
         final Integer breakerWaitDuration = RemoteConfigUtils.getPerformanceBreakerWaitDuration(cfg);
         // 创建断路器自定义配置
         CircuitBreaker breaker = CircuitBreaker.of("iastPerformanceBreaker", CircuitBreakerConfig.custom()
@@ -75,7 +78,7 @@ public class DefaultPerformanceBreaker extends AbstractBreaker {
                 .slidingWindowType(CircuitBreakerConfig.SlidingWindowType.COUNT_BASED)
                 .slidingWindowSize(breakerWindowSize)
                 //失败率阈值百分比(默认>=51%)
-                .failureRateThreshold(breakerFailureRate)
+                .failureRateThreshold(breakerFailureRate.floatValue())
                 //计算失败率或慢调用率之前所需的最小调用数
                 .minimumNumberOfCalls(breakerWindowSize)
                 //自动从开启变成半开(默认等待40秒)

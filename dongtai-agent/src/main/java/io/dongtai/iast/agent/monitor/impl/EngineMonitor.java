@@ -1,7 +1,11 @@
-package io.dongtai.iast.agent.monitor;
+package io.dongtai.iast.agent.monitor.impl;
 
 import io.dongtai.iast.agent.manager.EngineManager;
+import io.dongtai.iast.agent.monitor.IMonitor;
+import io.dongtai.iast.agent.monitor.MonitorDaemonThread;
+import io.dongtai.iast.agent.monitor.ServerCommandEnum;
 import io.dongtai.iast.agent.report.AgentRegisterReport;
+import io.dongtai.iast.agent.util.ThreadUtils;
 import io.dongtai.iast.agent.util.http.HttpClientUtils;
 import io.dongtai.iast.agent.Constant;
 import io.dongtai.log.DongTaiLog;
@@ -13,10 +17,18 @@ import org.json.JSONObject;
 public class EngineMonitor implements IMonitor {
     private final EngineManager engineManager;
     public static Boolean isCoreRegisterStart = false;
+    private final String name = "EngineMonitor";
+
 
     public EngineMonitor(EngineManager engineManager) {
         this.engineManager = engineManager;
     }
+
+    @Override
+    public String getName() {
+        return  Constant.THREAD_PREFIX + name;
+    }
+
 
     @Override
     public void check() {
@@ -65,6 +77,14 @@ public class EngineMonitor implements IMonitor {
         status = status && engineManager.start();
         if (!status) {
             DongTaiLog.info("DongTai IAST started failure");
+        }
+    }
+
+    @Override
+    public void run() {
+        while (!MonitorDaemonThread.isExit) {
+            this.check();
+            ThreadUtils.threadSleep(60);
         }
     }
 }

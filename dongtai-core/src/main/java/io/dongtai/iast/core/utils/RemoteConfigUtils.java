@@ -4,10 +4,9 @@ import io.dongtai.iast.common.entity.performance.PerformanceMetrics;
 import io.dongtai.iast.common.enums.MetricsKey;
 import io.dongtai.iast.core.utils.json.GsonUtils;
 import io.dongtai.log.DongTaiLog;
+import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * 远端配置工具类
@@ -24,6 +23,7 @@ public class RemoteConfigUtils {
     /**
      * 全局配置
      */
+    private static String existsRemoteConfigMeta = "{}";
     private static Boolean enableAutoFallback;
     /**
      * 高频hook限流相关配置
@@ -40,7 +40,7 @@ public class RemoteConfigUtils {
      * 性能熔断阈值相关配置
      */
     private static Integer performanceBreakerWindowSize;
-    private static Float performanceBreakerFailureRate;
+    private static Double performanceBreakerFailureRate;
     private static Integer performanceBreakerWaitDuration;
     private static Integer maxRiskMetricsCount;
     private static List<PerformanceMetrics> performanceLimitRiskThreshold;
@@ -57,10 +57,53 @@ public class RemoteConfigUtils {
     /**
      * 同步远程配置
      *
-     * @param remoteConfigString 远程配置内容字符串
+     * @param remoteConfig 远程配置内容字符串
      */
-    public static void syncRemoteConfig(String remoteConfigString) {
-        //todo 拉取远端配置后解析并更新到内存中
+    public static void syncRemoteConfig(String remoteConfig) {
+        // 和上次配置内容不一致时才重新更新配置文件
+        try {
+            if (!existsRemoteConfigMeta.equals(remoteConfig)) {
+                JSONObject configJson = new JSONObject(remoteConfig);
+                enableAutoFallback = configJson.getBoolean("enableAutoFallback");
+                hookLimitTokenPerSecond = configJson.getDouble("hookLimitTokenPerSecond");
+                hookLimitInitBurstSeconds = configJson.getDouble("hookLimitInitBurstSeconds");
+                performanceBreakerWindowSize = configJson.getInt("performanceBreakerWindowSize");
+                performanceBreakerFailureRate = configJson.getDouble("performanceBreakerFailureRate");
+                performanceBreakerWaitDuration = configJson.getInt("performanceBreakerWaitDuration");
+                maxRiskMetricsCount = configJson.getInt("maxRiskMetricsCount");
+                JSONObject perfLimMaxThresholdJson = configJson.getJSONObject("performanceLimitMaxThreshold");
+                performanceLimitMaxThreshold = buildPerformanceMetricsFromJson(perfLimMaxThresholdJson.toString());
+                JSONObject perfLimRiskThresholdJson = configJson.getJSONObject("performanceLimitRiskThreshold");
+                performanceLimitRiskThreshold = buildPerformanceMetricsFromJson(perfLimRiskThresholdJson.toString());
+                existsRemoteConfigMeta = remoteConfig;
+                DongTaiLog.info("Sync remote config successful.");
+            }
+        } catch (Throwable t) {
+            DongTaiLog.warn("Sync remote config failed, msg: {}, error: {}", t.getMessage(), t.getCause());
+        }
+    }
+
+    /**
+     * 将json转化为List<PerformanceMetrics>类型
+     */
+    private static List<PerformanceMetrics> buildPerformanceMetricsFromJson(String json){
+        List<PerformanceMetrics> performanceMetricsList  = new ArrayList<>();
+        try {
+        JSONObject jsonObject = new JSONObject(json);
+        Set<String> keySet = jsonObject.keySet();
+            for (MetricsKey each : MetricsKey.values()) {
+                PerformanceMetrics metrics = new PerformanceMetrics();
+                if (keySet.contains(each.getKey())) {
+                    String metricsValueJson = jsonObject.get(each.getKey()).toString();
+                    metrics.setMetricsKey(each);
+                    metrics.setMetricsValue(GsonUtils.toObject(metricsValueJson, each.getValueType()));
+                    performanceMetricsList.add(metrics);
+                }
+            }
+        }catch (Throwable t){
+            DongTaiLog.warn("Build performance metrics from json failed, msg: {}, error: {}",t.getCause(),t.getMessage());
+        }
+        return performanceMetricsList;
     }
 
     // *************************************************************
@@ -102,72 +145,6 @@ public class RemoteConfigUtils {
     }
 
     // *************************************************************
-    // 高频请求限流相关配置
-    // *************************************************************
-    /**
-     * 高频请求限流-每秒获得令牌数
-     */
-    public static Double getRequestLimitTokenPerSecond(Properties cfg) {
-        if (requestLimitTokenPerSecond == null) {
-            requestLimitTokenPerSecond = PropertyUtils.getRemoteSyncLocalConfig("requestLimit.tokenPerSecond", Double.class, 3.0, cfg);
-        }
-        return requestLimitTokenPerSecond;
-    }
-
-    /**
-     * 高频请求限流-初始预放置令牌时间
-     */
-    public static double getRequestLimitInitBurstSeconds(Properties cfg) {
-        if (requestLimitInitBurstSeconds == null) {
-            requestLimitInitBurstSeconds = PropertyUtils.getRemoteSyncLocalConfig("requestLimit.initBurstSeconds", Double.class, 1.0, cfg);
-        }
-        return requestLimitInitBurstSeconds;
-    }
-
-    /**
-     * 请求熔断器在 open 状态等待的时间，不能大于等于 switchOpenStatusDurationThreshold
-     */
-    public static int getRequestWaitDurationInOpenState(Properties cfg) {
-        if (requestBreakerWaitDuration == null) {
-            requestBreakerWaitDuration = PropertyUtils.getRemoteSyncLocalConfig("requestLimit.requestBreakerWaitDuration", Integer.class, 5, cfg);
-        }
-        return requestBreakerWaitDuration;
-    }
-
-    // *************************************************************
-    // 二次降级操作限流相关配置
-    // *************************************************************
-    /**
-     * 二次降级限流令牌桶-每秒获得令牌数
-     */
-    public static Double getSwitchLimitTokenPerSecond(Properties cfg) {
-        if (switchLimitTokenPerSecond == null) {
-            switchLimitTokenPerSecond = PropertyUtils.getRemoteSyncLocalConfig("switchLimit.tokenPerSecond", Double.class, 1.0, cfg);
-        }
-        return switchLimitTokenPerSecond;
-    }
-
-    /**
-     * 二次降级限流令牌桶-初始预放置令牌时间
-     */
-    public static double getSwitchLimitInitBurstSeconds(Properties cfg) {
-        if (switchLimitInitBurstSeconds == null) {
-            switchLimitInitBurstSeconds = PropertyUtils.getRemoteSyncLocalConfig("switchLimit.initBurstSeconds", Double.class, 1.0, cfg);
-        }
-        return switchLimitInitBurstSeconds;
-    }
-
-    /**
-     * 二次降级熔断器打开状态持续最大时间(ms)，大于等级该时间将触发降级
-     */
-    public static long getSwitchOpenStatusDurationThreshold(Properties cfg) {
-        if (switchOpenStatusDurationThreshold == null) {
-            switchOpenStatusDurationThreshold = PropertyUtils.getRemoteSyncLocalConfig("switchLimit.switchOpenStatusDurationThreshold", Long.class, 30000L, cfg);
-        }
-        return switchOpenStatusDurationThreshold;
-    }
-
-    // *************************************************************
     // 性能熔断阈值相关配置
     // *************************************************************
 
@@ -189,15 +166,15 @@ public class RemoteConfigUtils {
     /**
      * 获取性能断路器失败率阈值
      */
-    public static Float getPerformanceBreakerFailureRate(Properties cfg) {
+    public static Double getPerformanceBreakerFailureRate(Properties cfg) {
         if (performanceBreakerFailureRate == null) {
             performanceBreakerFailureRate = PropertyUtils.getRemoteSyncLocalConfig("performanceLimit.performanceBreakerFailureRate",
-                    Float.class, 51F, cfg);
+                    Double.class, 51.0, cfg);
         }
         return performanceBreakerFailureRate;
     }
 
-    public static void setPerformanceBreakerFailureRate(Float performanceBreakerFailureRate) {
+    public static void setPerformanceBreakerFailureRate(Double performanceBreakerFailureRate) {
         RemoteConfigUtils.performanceBreakerFailureRate = performanceBreakerFailureRate;
     }
 
