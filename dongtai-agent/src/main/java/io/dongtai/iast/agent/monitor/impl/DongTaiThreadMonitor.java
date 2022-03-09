@@ -49,8 +49,10 @@ public class DongTaiThreadMonitor implements IMonitor {
     @Override
     public void run() {
         while (!MonitorDaemonThread.isExit) {
+            // 延迟2s启动DongTaiThreadMonitor，以防首次加载时其他Monitor未能启动的情形出现。
+            ThreadUtils.threadSleep(2);
             this.check();
-            ThreadUtils.threadSleep(60);
+            ThreadUtils.threadSleep(58);
         }
     }
 
