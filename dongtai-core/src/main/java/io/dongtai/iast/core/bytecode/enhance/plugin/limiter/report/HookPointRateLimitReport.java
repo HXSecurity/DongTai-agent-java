@@ -1,8 +1,10 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.limiter.report;
 
 import io.dongtai.iast.core.EngineManager;
-import io.dongtai.iast.core.handler.hookpoint.vulscan.ReportConstant;
-import org.json.JSONObject;
+import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.report.body.HookPointRateLimitReportBody;
+import io.dongtai.iast.core.utils.json.GsonUtils;
+
+import java.util.Date;
 
 
 /**
@@ -19,19 +21,17 @@ public class HookPointRateLimitReport extends AbstractLimitReport {
     }
 
     protected static String createReport(String className, String method, String methodSign, Integer hookType, Double rate) {
-        JSONObject report = new JSONObject();
-        JSONObject detail = new JSONObject();
-        report.put(ReportConstant.REPORT_KEY, ReportConstant.REPORT_LIMIT_HOOK_POINT_RATE);
-        report.put(ReportConstant.REPORT_VALUE_KEY, detail);
-
-        detail.put(ReportConstant.AGENT_ID, EngineManager.getAgentId());
-        detail.put(ReportConstant.LIMIT_HOOK_POINT_CLASS_NAME, className);
-        detail.put(ReportConstant.LIMIT_HOOK_POINT_METHOD, method);
-        detail.put(ReportConstant.LIMIT_HOOK_POINT_METHOD_SIGN, methodSign);
-        detail.put(ReportConstant.LIMIT_HOOK_POINT_TYPE, hookType);
-        detail.put(ReportConstant.LIMIT_HOOK_POINT_RATE, rate);
-
-        return report.toString();
+        final HookPointRateLimitReportBody reportBody = new HookPointRateLimitReportBody();
+        reportBody.setDetail(new HookPointRateLimitReportBody.HookPointRateLimitDetail()
+                .setAgentId(EngineManager.getAgentId())
+                .setLimitDate(new Date())
+                .setClassName(className)
+                .setMethod(method)
+                .setMethodSign(methodSign)
+                .setHookType(hookType)
+                .setLimitRate(rate)
+        );
+        return GsonUtils.toJson(reportBody);
     }
 
 }
