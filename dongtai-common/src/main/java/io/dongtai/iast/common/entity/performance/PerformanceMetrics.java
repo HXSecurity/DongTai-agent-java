@@ -1,5 +1,6 @@
 package io.dongtai.iast.common.entity.performance;
 
+import com.google.gson.annotations.SerializedName;
 import io.dongtai.iast.common.enums.MetricsKey;
 
 import java.io.Serializable;
@@ -16,6 +17,7 @@ public class PerformanceMetrics implements Serializable {
     /**
      * 指标枚举
      */
+    @SerializedName("metricsKey")
     private MetricsKey metricsKey;
 
     /**

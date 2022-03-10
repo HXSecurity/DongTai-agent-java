@@ -1,7 +1,7 @@
 package io.dongtai.iast.common.entity.performance.metrics;
 
 import java.io.Serializable;
-
+import com.google.gson.annotations.SerializedName;
 /**
  * CPU使用率指标
  *
@@ -14,6 +14,7 @@ public class CpuInfoMetrics implements Serializable {
     /**
      * cpu使用百分比
      */
+    @SerializedName("cpuUsagePercentage")
     private Double cpuUsagePercentage;
 
     public Double getCpuUsagePercentage() {
