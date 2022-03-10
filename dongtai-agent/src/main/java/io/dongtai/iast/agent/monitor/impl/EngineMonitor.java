@@ -106,7 +106,7 @@ public class EngineMonitor implements IMonitor {
     public void run() {
         while (!MonitorDaemonThread.isExit) {
             this.check();
-            ThreadUtils.threadSleep(60);
+            ThreadUtils.threadSleep(30);
         }
     }
 }

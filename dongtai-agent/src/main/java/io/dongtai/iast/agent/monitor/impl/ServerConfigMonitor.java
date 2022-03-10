@@ -7,7 +7,6 @@ import io.dongtai.iast.agent.monitor.MonitorDaemonThread;
 import io.dongtai.iast.agent.report.AgentRegisterReport;
 import io.dongtai.iast.agent.util.ThreadUtils;
 import io.dongtai.iast.agent.util.http.HttpClientUtils;
-import io.dongtai.iast.common.utils.serialize.SerializeUtils;
 import io.dongtai.log.DongTaiLog;
 import org.json.JSONObject;
 
@@ -23,7 +22,7 @@ public class ServerConfigMonitor implements IMonitor {
     public void check() {
         String serverConfig = getConfigFromRemote();
         // 前期无法从服务端获取config，返回的serverConfig为""，不进行下一步配置客户端。
-        if(!serverConfig.equals("")){
+        if(!"".equals(serverConfig)){
             //  获取的JSON字段不合法，抛异常，不进行下一步配置客户端
             try {
                 JSONObject tempJson = new JSONObject(serverConfig);
