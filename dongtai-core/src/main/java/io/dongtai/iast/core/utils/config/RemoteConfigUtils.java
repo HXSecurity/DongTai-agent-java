@@ -158,7 +158,7 @@ public class RemoteConfigUtils {
     // *************************************************************
 
     /**
-     * 获取性能断路器统计窗口大小
+     * 性能断路器-统计窗口大小
      */
     public static Integer getPerformanceBreakerWindowSize(Properties cfg) {
         if (performanceBreakerWindowSize == null) {
@@ -173,7 +173,7 @@ public class RemoteConfigUtils {
     }
 
     /**
-     * 获取性能断路器失败率阈值
+     * 性能断路器-失败率阈值
      */
     public static Double getPerformanceBreakerFailureRate(Properties cfg) {
         if (performanceBreakerFailureRate == null) {
@@ -188,7 +188,7 @@ public class RemoteConfigUtils {
     }
 
     /**
-     * 获取性能断路器自动转半开的等待时间(单位:秒)
+     * 性能断路器-自动转半开的等待时间(单位:秒)
      */
     public static Integer getPerformanceBreakerWaitDuration(Properties cfg) {
         if (performanceBreakerWaitDuration == null) {
@@ -203,7 +203,7 @@ public class RemoteConfigUtils {
     }
 
     /**
-     * 获取不允许超过风险阈值的指标数量(0为不限制，达到阈值数时熔断)
+     * 性能断路器-不允许超过风险阈值的指标数量(0为不限制，达到阈值数时熔断)
      */
     public static Integer getMaxRiskMetricsCount(Properties cfg) {
         if (maxRiskMetricsCount == null) {
@@ -217,7 +217,7 @@ public class RemoteConfigUtils {
     }
 
     /**
-     * 获取性能限制风险阈值
+     * 性能断路器-风险阈值配置
      */
     public static List<PerformanceMetrics> getPerformanceLimitRiskThreshold(Properties cfg) {
         if (performanceLimitRiskThreshold == null) {
@@ -227,7 +227,7 @@ public class RemoteConfigUtils {
     }
 
     /**
-     * 获取性能限制最大阈值
+     * 性能断路器-最大阈值配置
      */
     public static List<PerformanceMetrics> getPerformanceLimitMaxThreshold(Properties cfg) {
         if (performanceLimitMaxThreshold == null) {
