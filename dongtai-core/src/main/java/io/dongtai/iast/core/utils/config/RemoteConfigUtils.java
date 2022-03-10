@@ -3,9 +3,12 @@ package io.dongtai.iast.core.utils.config;
 import io.dongtai.iast.common.entity.performance.PerformanceMetrics;
 import io.dongtai.iast.common.enums.MetricsKey;
 import io.dongtai.iast.core.utils.PropertyUtils;
+import io.dongtai.iast.core.utils.config.entity.PerformanceLimitThreshold;
+import io.dongtai.iast.core.utils.config.entity.RemoteConfigEntity;
 import io.dongtai.iast.core.utils.json.GsonUtils;
 import io.dongtai.log.DongTaiLog;
 
+import java.lang.reflect.Field;
 import java.util.*;
 
 /**
@@ -91,16 +94,17 @@ public class RemoteConfigUtils {
      * @return {@link List}<{@link PerformanceMetrics}>
      */
     private static List<PerformanceMetrics> combineRemoteAndLocalMetricsThreshold(List<PerformanceMetrics> localThreshold,
-                                                                                  List<PerformanceMetrics> remoteThreshold) {
+                                                                                  PerformanceLimitThreshold remoteThreshold) {
         List<PerformanceMetrics> performanceMetricsList = new ArrayList<>();
         for (MetricsKey metricsKey : MetricsKey.values()) {
             //远端包含该指标配置
             if (remoteThreshold != null) {
-                PerformanceMetrics remoteMetrics = remoteThreshold.stream()
-                        .filter(each -> each.getMetricsKey() == metricsKey)
-                        .findFirst().orElse(null);
-                if (remoteMetrics != null) {
-                    performanceMetricsList.add(remoteMetrics);
+                Object metricsValue = getMetricsFromPerformanceLimitThreshold(remoteThreshold, metricsKey);
+                if (metricsValue != null) {
+                    PerformanceMetrics metrics = new PerformanceMetrics();
+                    metrics.setMetricsKey(metricsKey);
+                    metrics.setMetricsValue(metricsValue);
+                    performanceMetricsList.add(metrics);
                     continue;
                 }
             }
@@ -113,6 +117,23 @@ public class RemoteConfigUtils {
             }
         }
         return performanceMetricsList;
+    }
+
+    /**
+     * 获取性能限制阈值配置中，与指标名称相同的指标度量值
+     *
+     * @param threshold  阈值配置
+     * @param metricsKey 指标名称
+     * @return {@link Object}
+     */
+    private static Object getMetricsFromPerformanceLimitThreshold(PerformanceLimitThreshold threshold, MetricsKey metricsKey) {
+        try {
+            final Field field = threshold.getClass().getDeclaredField(metricsKey.getKey());
+            field.setAccessible(true);
+            return field.get(threshold);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     // *************************************************************
