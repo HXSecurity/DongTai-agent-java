@@ -47,6 +47,7 @@ public class PerformanceMonitor implements IMonitor {
     private final EngineManager engineManager;
     private final List<MetricsKey> needCollectMetrics = new ArrayList<MetricsKey>();
 
+    @Override
     public String getName() {
         return  Constant.THREAD_PREFIX + name;
     }
@@ -210,7 +211,7 @@ public class PerformanceMonitor implements IMonitor {
             if (performanceBreaker == null) {
                 return;
             }
-            performanceBreaker.getMethod("checkPerformance", String.class)
+            performanceBreaker.getMethod("breakCheck", String.class)
                     .invoke(null, SerializeUtils.serializeByList(performanceMetrics));
         } catch (Throwable t) {
             DongTaiLog.error("checkPerformanceMetrics failed, msg:{}, err:{}", t.getMessage(), t.getCause());
