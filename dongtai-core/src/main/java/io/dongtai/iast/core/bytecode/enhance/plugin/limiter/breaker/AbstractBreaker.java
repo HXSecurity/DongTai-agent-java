@@ -12,26 +12,30 @@ import java.util.Properties;
  */
 public abstract class AbstractBreaker {
 
+    public static AbstractBreaker newInstance(Properties cfg) {
+        DongTaiLog.info("No suitable breaker,skip create newInstance.");
+        return null;
+    }
+
     protected AbstractBreaker(Properties cfg) {
         initBreaker(cfg);
     }
 
     /**
-     * 性能检查(由agent监控线程触发)
+     * 断路检查(由agent监控线程触发)
      *
      * @param contextString 上下文字符串
      */
-    public static void checkPerformance(String contextString) {
-        DongTaiLog.info("No suitable Performance Breaker,skip check.");
+    public static void breakCheck(String contextString) {
+        DongTaiLog.info("No suitable breaker,skip check.");
     }
 
     /**
      * 强制开关断路器(由agent监控线程触发)
      */
     public static void forceSwitchBreaker(boolean turnOn) {
-        DongTaiLog.info("No suitable Performance Breaker,skip switch.");
+        DongTaiLog.info("No suitable breaker,skip switch.");
     }
-
 
     /**
      * 初始化断路器

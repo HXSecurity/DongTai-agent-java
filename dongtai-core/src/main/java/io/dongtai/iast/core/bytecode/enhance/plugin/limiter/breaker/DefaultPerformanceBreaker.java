@@ -51,7 +51,7 @@ public class DefaultPerformanceBreaker extends AbstractBreaker {
      *
      * @param contextString 上下文字符串
      */
-    public static void checkPerformance(String contextString) {
+    public static void breakCheck(String contextString) {
         if (breaker == null) {
             DongTaiLog.info("the breaker need to be init,skip check.");
             return;

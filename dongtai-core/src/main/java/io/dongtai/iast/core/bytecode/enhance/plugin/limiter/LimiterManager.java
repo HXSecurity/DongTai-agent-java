@@ -1,8 +1,10 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.limiter;
 
 
+import io.dongtai.iast.common.utils.version.JavaVersionUtils;
 import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.breaker.AbstractBreaker;
 import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.breaker.DefaultPerformanceBreaker;
+import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.breaker.NopPerformanceBreaker;
 import io.dongtai.iast.core.utils.threadlocal.RateLimiterThreadLocal;
 
 import java.util.Properties;
@@ -33,7 +35,11 @@ public class LimiterManager {
     }
 
     private LimiterManager(Properties cfg) {
-        this.performanceBreaker = DefaultPerformanceBreaker.newInstance(cfg);
+        if (JavaVersionUtils.isJava6() || JavaVersionUtils.isJava7()) {
+            this.performanceBreaker = NopPerformanceBreaker.newInstance(cfg);
+        } else {
+            this.performanceBreaker = DefaultPerformanceBreaker.newInstance(cfg);
+        }
         this.hookRateLimiter = new RateLimiterThreadLocal(cfg);
     }
 
