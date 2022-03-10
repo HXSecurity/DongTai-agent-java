@@ -1,7 +1,8 @@
-package io.dongtai.iast.core.utils;
+package io.dongtai.iast.core.utils.config;
 
 import io.dongtai.iast.common.entity.performance.PerformanceMetrics;
 import io.dongtai.iast.common.enums.MetricsKey;
+import io.dongtai.iast.core.utils.PropertyUtils;
 import io.dongtai.iast.core.utils.json.GsonUtils;
 import io.dongtai.log.DongTaiLog;
 import org.json.JSONObject;
