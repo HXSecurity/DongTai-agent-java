@@ -25,7 +25,6 @@ max	表示可用于内存管理的最大内存量（以字节为单位）。它�
  */
 package io.dongtai.iast.common.entity.performance.metrics;
 
-import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 import java.lang.management.MemoryUsage;
@@ -40,19 +39,25 @@ import java.lang.management.MemoryUsage;
 public class MemoryUsageMetrics implements Serializable {
     private static final long serialVersionUID = -809690992297671496L;
 
-    @SerializedName("init")
-    private Long init;
-    @SerializedName("used")
-    private Long used;
-    @SerializedName("committed")
-    private Long committed;
-    @SerializedName("max")
-    private Long max;
-
     /**
-     * 内存使用百分比
+     * 初始化内存
      */
-    @SerializedName("memUsagePercentage")
+    private Long init;
+    /**
+     * 已用内存
+     */
+    private Long used;
+    /**
+     * 已提交内存
+     */
+    private Long committed;
+    /**
+     * 最大内存(未限制时为-1)
+     */
+    private Long max;
+    /**
+     * 内存使用率百分比
+     */
     private Double memUsagePercentage;
 
     public MemoryUsageMetrics() {
