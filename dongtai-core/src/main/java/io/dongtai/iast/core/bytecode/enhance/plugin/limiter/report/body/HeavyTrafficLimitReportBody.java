@@ -47,7 +47,7 @@ public class HeavyTrafficLimitReportBody {
         /**
          * 限流发生时间
          */
-        @SerializedName(ReportConstant.LIMIT_TRAFFIC_LIMIT_DATE)
+        @SerializedName(ReportConstant.LIMIT_TRAFFIC_OCCUR_DATE)
         private Date limitDate;
         /**
          * 限流阈值

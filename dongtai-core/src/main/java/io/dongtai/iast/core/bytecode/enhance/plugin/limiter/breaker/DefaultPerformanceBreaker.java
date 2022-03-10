@@ -9,7 +9,7 @@ import io.dongtai.iast.common.enums.MetricsKey;
 import io.dongtai.iast.common.utils.serialize.SerializeUtils;
 import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.checker.IPerformanceChecker;
 import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.checker.MetricsBindCheckerEnum;
-import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.fallback.LimitFallbackSwitch;
+import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.fallback.SecondFallbackSwitch;
 import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.report.PerformanceLimitReport;
 import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.report.body.PerformanceBreakReportBody;
 import io.dongtai.iast.core.utils.RemoteConfigUtils;
@@ -95,9 +95,9 @@ public class DefaultPerformanceBreaker extends AbstractBreaker {
                     final CircuitBreaker.State toState = event.getStateTransition().getToState();
                     if (toState == CircuitBreaker.State.OPEN) {
                         PerformanceLimitReport.sendReport();
-                        LimitFallbackSwitch.setPerformanceFallback(true);
+                        SecondFallbackSwitch.setPerformanceFallback(true);
                     } else if (toState == CircuitBreaker.State.CLOSED) {
-                        LimitFallbackSwitch.setPerformanceFallback(false);
+                        SecondFallbackSwitch.setPerformanceFallback(false);
                     }
                 });
         DefaultPerformanceBreaker.breaker = breaker;

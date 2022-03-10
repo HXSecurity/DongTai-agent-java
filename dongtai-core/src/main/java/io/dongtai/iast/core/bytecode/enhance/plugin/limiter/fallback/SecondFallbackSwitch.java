@@ -1,6 +1,5 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.limiter.fallback;
 
-import io.dongtai.iast.common.utils.FixSizeLinkedList;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.report.SecondFallbackReport;
 import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.report.body.SecondFallbackReportBody;
@@ -9,17 +8,15 @@ import io.dongtai.iast.core.utils.threadlocal.BooleanThreadLocal;
 import io.dongtai.log.DongTaiLog;
 import org.apache.commons.lang3.time.StopWatch;
 
-import java.text.SimpleDateFormat;
-
 /**
- * 限制降级开关
+ * 二次降级开关
  *
  * @author chenyi
  * @date 2022/3/2
  */
-public class LimitFallbackSwitch {
+public class SecondFallbackSwitch {
 
-    private LimitFallbackSwitch() {
+    private SecondFallbackSwitch() {
         throw new IllegalStateException("Utility class");
     }
 
@@ -43,11 +40,6 @@ public class LimitFallbackSwitch {
      * 性能降级打开状态计时器
      */
     private static final StopWatch PERFORMANCE_STOPWATCH = new StopWatch();
-
-    /**
-     * 记录会触发二次降级的日志列表
-     */
-    private static final FixSizeLinkedList<SecondFallbackReportBody.AbstractSecondFallbackReportLog> FALLBACK_REPORT_LOGS = new FixSizeLinkedList<>(30);
 
     /**
      * 请求对当前请求降级
@@ -86,38 +78,25 @@ public class LimitFallbackSwitch {
 
     public static void setHeavyTrafficLimitFallback(boolean fallback) {
         HEAVY_TRAFFIC_LIMIT_FALLBACK = fallback;
-        logEngineStatus(fallback, "heavyTraffic");
-        acquireFromTokenBucket(fallback);
+        DongTaiLog.info("Engine heavyTraffic fallback is {}, Engine {} successfully", fallback ? "open" : "close", fallback ? "shut down" : "opened");
+        acquireTokenForOpenSwitch(fallback);
         handleStopWatch(HEAVY_TRAFFIC_STOPWATCH, fallback, SecondFallbackTypeEnum.HEAVY_TRAFFIC_SWITCHER_OPEN_DURATION_OVER_THRESHOLD);
     }
 
     public static void setPerformanceFallback(boolean fallback) {
         PERFORMANCE_FALLBACK = fallback;
-        logEngineStatus(fallback, "performance");
-        acquireFromTokenBucket(fallback);
+        DongTaiLog.info("Engine performance fallback is {}, Engine {} successfully", fallback ? "open" : "close", fallback ? "shut down" : "opened");
+        acquireTokenForOpenSwitch(fallback);
         handleStopWatch(PERFORMANCE_STOPWATCH, fallback, SecondFallbackTypeEnum.PERFORMANCE_SWITCHER_OPEN_DURATION_OVER_THRESHOLD);
-    }
-
-    /**
-     * 打印引擎状态变化日志
-     *
-     * @param fallback 降级状态
-     */
-    public static void logEngineStatus(boolean fallback, String switcher) {
-        String switchStatus = fallback ? "open" : "close";
-        String engineOperation = fallback ? "shut down" : "opened";
-        DongTaiLog.info("Engine {} fallback is {}, Engine {} successfully", switcher, switchStatus, engineOperation);
     }
 
     /**
      * 打开开关时获取令牌，获取不到令牌则记录下来
      */
-    private static void acquireFromTokenBucket(boolean fallback) {
+    private static void acquireTokenForOpenSwitch(boolean fallback) {
         if (fallback && !EngineManager.getLimiterManager().getSwitchRateLimiter().acquire()) {
             DongTaiLog.info("Frequency of SecondFallbackSwitch transformation excesses threshold.");
-            String occurTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis());
-            SecondFallbackReportBody.SwitchFrequencyOverThresholdLog body = new SecondFallbackReportBody.SwitchFrequencyOverThresholdLog(SecondFallbackTypeEnum.SWITCH_FALLBACK_FREQUENCY_OVER_RATE.getFallbackType(), occurTime);
-            FALLBACK_REPORT_LOGS.add(body);
+            SecondFallbackReport.addReportLog(new SecondFallbackReportBody.SwitchFrequencyOverThresholdLog(SecondFallbackTypeEnum.SWITCH_FALLBACK_FREQUENCY_OVER_RATE));
         }
     }
 
@@ -141,7 +120,7 @@ public class LimitFallbackSwitch {
             stopWatch.stop();
             // 计算持续时间超限则记录下来
             if (stopWatch.getTime() >= RemoteConfigUtils.getSwitchOpenStatusDurationThreshold(null)) {
-                FALLBACK_REPORT_LOGS.add(new SecondFallbackReportBody.SwitchOpenTimeOverThresholdReportLog(secondFallbackType, stopWatch));
+                SecondFallbackReport.addReportLog(new SecondFallbackReportBody.SwitchOpenTimeOverThresholdReportLog(secondFallbackType, stopWatch));
             }
             stopWatch.reset();
         }
@@ -154,20 +133,14 @@ public class LimitFallbackSwitch {
         // 1、判断此时流量熔断器开关是否处于打开状态并达到阈值
         long switchOpenStatusDurationThreshold = RemoteConfigUtils.getSwitchOpenStatusDurationThreshold(null);
         if (HEAVY_TRAFFIC_STOPWATCH.getTime() >= switchOpenStatusDurationThreshold) {
-            FALLBACK_REPORT_LOGS.add(new SecondFallbackReportBody.SwitchOpenTimeOverThresholdReportLog(SecondFallbackTypeEnum.HEAVY_TRAFFIC_SWITCHER_OPEN_DURATION_OVER_THRESHOLD, HEAVY_TRAFFIC_STOPWATCH));
+            SecondFallbackReport.addReportLog(new SecondFallbackReportBody.SwitchOpenTimeOverThresholdReportLog(SecondFallbackTypeEnum.HEAVY_TRAFFIC_SWITCHER_OPEN_DURATION_OVER_THRESHOLD, HEAVY_TRAFFIC_STOPWATCH));
         }
         // 2、判断此时性能熔断器开关是否处于打开状态并达到阈值
         if (PERFORMANCE_STOPWATCH.getTime() >= switchOpenStatusDurationThreshold) {
-            FALLBACK_REPORT_LOGS.add(new SecondFallbackReportBody.SwitchOpenTimeOverThresholdReportLog(SecondFallbackTypeEnum.PERFORMANCE_SWITCHER_OPEN_DURATION_OVER_THRESHOLD, PERFORMANCE_STOPWATCH));
+            SecondFallbackReport.addReportLog(new SecondFallbackReportBody.SwitchOpenTimeOverThresholdReportLog(SecondFallbackTypeEnum.PERFORMANCE_SWITCHER_OPEN_DURATION_OVER_THRESHOLD, PERFORMANCE_STOPWATCH));
         }
-        // 3、判断当前检查周期内是否存在过需要二次降级的情况
-        if (!FALLBACK_REPORT_LOGS.isEmpty()) {
-            SecondFallbackReport.sendReport(FALLBACK_REPORT_LOGS);
-            FALLBACK_REPORT_LOGS.clear();
-            return true;
-        }
-
-        return false;
+        // 3、检查报告，返回是否需要二次降级
+        return SecondFallbackReport.checkReport();
     }
 
     /**

@@ -4,8 +4,8 @@ package io.dongtai.iast.core.bytecode.enhance.plugin.limiter;
 import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.breaker.AbstractBreaker;
 import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.breaker.DefaultPerformanceBreaker;
 import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.breaker.HeavyTrafficBreaker;
-import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.bucket.HeavyTrafficRateLimiter;
-import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.bucket.SwitchRateLimiter;
+import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.impl.HeavyTrafficRateLimiter;
+import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.impl.SwitchRateLimiter;
 import io.dongtai.iast.core.utils.threadlocal.RateLimiterThreadLocal;
 
 import java.util.Properties;

@@ -89,9 +89,8 @@ public class ReportConstant {
     /**
      * 流量限流相关
      */
-    public static final String LIMIT_REQUEST_SWITCH_OPERATE = "switchOperate";
-    public static final String LIMIT_REQUEST_REAL_TIME_RATE = "realTimeRate";
-    public static final String LIMIT_REQUEST_RATE_THRESHOLD = "limitRateThreshold";
+    public static final String LIMIT_TRAFFIC_OCCUR_DATE = "limitDate";
+    public static final String LIMIT_TRAFFIC_RATE = "limitRate";
     /**
      * 异常熔断相关
      */

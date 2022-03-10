@@ -2,12 +2,14 @@ package io.dongtai.iast.core.bytecode.enhance.plugin.limiter.report.body;
 
 import com.google.gson.annotations.SerializedName;
 import io.dongtai.iast.core.EngineManager;
-import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.fallback.LimitFallbackSwitch;
+import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.fallback.SecondFallbackSwitch;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.ReportConstant;
 import io.dongtai.iast.core.utils.RemoteConfigUtils;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.time.StopWatch;
 
-import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.LinkedList;
 
 /**
@@ -16,6 +18,7 @@ import java.util.LinkedList;
  * @author liyuan40
  * @date 2022/3/10 00:39
  */
+@Data
 public class SecondFallbackReportBody {
     /**
      * type 字段
@@ -29,20 +32,33 @@ public class SecondFallbackReportBody {
     @SerializedName(ReportConstant.REPORT_VALUE_KEY)
     private SecondFallbackReportDetail detail;
 
-    public Integer getReportKey() {
-        return reportKey;
-    }
-
-    public SecondFallbackReportDetail getDetail() {
-        return detail;
-    }
-
-    public void setDetail(SecondFallbackReportDetail detail) {
-        this.detail = detail;
-    }
-
     public SecondFallbackReportBody(LinkedList<AbstractSecondFallbackReportLog> secondFallbackReportDetailLog) {
         detail = new SecondFallbackReportDetail(secondFallbackReportDetailLog);
+    }
+
+    /**
+     * 是否存在日志
+     *
+     * @return boolean
+     */
+    public boolean isEmpty() {
+        return detail.getSecondFallbackReportDetailLog().isEmpty();
+    }
+
+    /**
+     * 添加日志
+     *
+     * @param log 日志
+     */
+    public void addSecondFallbackReportLog(AbstractSecondFallbackReportLog log) {
+        detail.getSecondFallbackReportDetailLog().add(log);
+    }
+
+    /**
+     * 清理日志
+     */
+    public void clear() {
+        detail.getSecondFallbackReportDetailLog().clear();
     }
 
     /**
@@ -51,6 +67,7 @@ public class SecondFallbackReportBody {
      * @author liyuan
      * @date 2022/03/10
      */
+    @Data
     public static class SecondFallbackReportDetail {
         /**
          * IAST agent 编号
@@ -68,39 +85,18 @@ public class SecondFallbackReportBody {
             this.agentId = EngineManager.getAgentId();
             this.secondFallbackReportDetailLog = secondFallbackReportDetailLog;
         }
-
-        public Integer getAgentId() {
-            return agentId;
-        }
-
-        public void setAgentId(Integer agentId) {
-            this.agentId = agentId;
-        }
-
-        public void setSecondFallbackReportDetailLog(LinkedList<AbstractSecondFallbackReportLog> secondFallbackReportDetailLog) {
-            this.secondFallbackReportDetailLog = secondFallbackReportDetailLog;
-        }
-
-        public LinkedList<AbstractSecondFallbackReportLog> getSecondFallbackReportDetailLog() {
-            return secondFallbackReportDetailLog;
-        }
     }
 
+    @Data
+    @NoArgsConstructor
     public static abstract class AbstractSecondFallbackReportLog {
 
         private String fallbackType;
 
-        public AbstractSecondFallbackReportLog(String fallbackType) {
-            this.fallbackType = fallbackType;
+        public AbstractSecondFallbackReportLog(SecondFallbackSwitch.SecondFallbackTypeEnum fallbackType) {
+            this.fallbackType = fallbackType.getFallbackType();
         }
 
-        public String getFallbackType() {
-            return fallbackType;
-        }
-
-        public void setFallbackType(String fallbackType) {
-            this.fallbackType = fallbackType;
-        }
     }
 
     /**
@@ -109,23 +105,16 @@ public class SecondFallbackReportBody {
      * @author liyuan
      * @date 2022/03/10
      */
+    @Data
     public static class SwitchFrequencyOverThresholdLog extends AbstractSecondFallbackReportLog {
         /**
          * 发生时间
          */
-        private String occurTime;
+        private Date occurTime;
 
-        public SwitchFrequencyOverThresholdLog(String fallbackType, String occurTime) {
+        public SwitchFrequencyOverThresholdLog(SecondFallbackSwitch.SecondFallbackTypeEnum fallbackType) {
             super(fallbackType);
-            this.occurTime = occurTime;
-        }
-
-        public String getOccurTime() {
-            return occurTime;
-        }
-
-        public void setOccurTime(String occurTime) {
-            this.occurTime = occurTime;
+            this.occurTime = new Date();
         }
     }
 
@@ -135,12 +124,13 @@ public class SecondFallbackReportBody {
      * @author liyuan40
      * @date 2022/3/8 17:10
      */
+    @Data
     public static class SwitchOpenTimeOverThresholdReportLog extends AbstractSecondFallbackReportLog {
 
         /**
          * 开始时间
          */
-        private String startTime;
+        private Date startTime;
 
         /**
          * 持续时间
@@ -152,35 +142,11 @@ public class SecondFallbackReportBody {
          */
         private String threshold;
 
-        public SwitchOpenTimeOverThresholdReportLog(LimitFallbackSwitch.SecondFallbackTypeEnum secondFallbackType, StopWatch stopWatch) {
-            super(secondFallbackType.getFallbackType());
-            this.startTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(stopWatch.getStartTime());
+        public SwitchOpenTimeOverThresholdReportLog(SecondFallbackSwitch.SecondFallbackTypeEnum secondFallbackType, StopWatch stopWatch) {
+            super(secondFallbackType);
+            this.startTime = new Date(stopWatch.getStartTime());
             this.persistTime = stopWatch.getTime() / 1000 + "s";
             this.threshold = RemoteConfigUtils.getSwitchOpenStatusDurationThreshold(null) / 1000 + "s";
-        }
-
-        public String getStartTime() {
-            return startTime;
-        }
-
-        public void setStartTime(String startTime) {
-            this.startTime = startTime;
-        }
-
-        public String getPersistTime() {
-            return persistTime;
-        }
-
-        public void setPersistTime(String persistTime) {
-            this.persistTime = persistTime;
-        }
-
-        public String getThreshold() {
-            return threshold;
-        }
-
-        public void setThreshold(String threshold) {
-            this.threshold = threshold;
         }
     }
 }

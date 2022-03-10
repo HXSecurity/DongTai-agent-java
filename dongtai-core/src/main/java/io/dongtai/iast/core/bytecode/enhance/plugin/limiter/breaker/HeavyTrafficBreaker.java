@@ -1,7 +1,7 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.limiter.breaker;
 
 import io.dongtai.iast.core.EngineManager;
-import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.fallback.LimitFallbackSwitch;
+import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.fallback.SecondFallbackSwitch;
 import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.report.HeavyTrafficRateLimitReport;
 import io.dongtai.iast.core.utils.RemoteConfigUtils;
 import io.dongtai.log.DongTaiLog;
@@ -66,16 +66,16 @@ public class HeavyTrafficBreaker extends AbstractBreaker {
                     // 断路器转为打开时，打开请求降级开关
                     CircuitBreaker.State state = event.getStateTransition().getToState();
                     if (state == CircuitBreaker.State.OPEN) {
-                        LimitFallbackSwitch.setHeavyTrafficLimitFallback(true);
+                        SecondFallbackSwitch.setHeavyTrafficLimitFallback(true);
                         HeavyTrafficRateLimitReport.sendReport(trafficLimitRate);
                     }
-                    // 因为本断路器的样本来自 EngineManager.enterHttpEntry()，打开后再也无法获取样本，会导致在 HALF_OPEN 阶段无法恢复到 CLOSE
+                    // 因为本断路器的样本来自流量，打开后无法获取新样本，故需要在 HALF_OPEN 状态直接转到 CLOSE 状态
                     if (state == CircuitBreaker.State.HALF_OPEN) {
                         breaker.transitionToClosedState();
                     }
                     // 关闭或半开断路器则关闭请求降级开关
                     if (state == CircuitBreaker.State.CLOSED) {
-                        LimitFallbackSwitch.setHeavyTrafficLimitFallback(false);
+                        SecondFallbackSwitch.setHeavyTrafficLimitFallback(false);
                     }
                 });
         HeavyTrafficBreaker.breaker = breaker;

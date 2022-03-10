@@ -160,7 +160,7 @@ public class RemoteConfigUtils {
     /**
      * 高频流量限流-初始预放置令牌时间
      */
-    public static double getRequestLimitInitBurstSeconds(Properties cfg) {
+    public static double getHeavyTrafficLimitInitBurstSeconds(Properties cfg) {
         if (heavyTrafficLimitInitBurstSeconds == null) {
             heavyTrafficLimitInitBurstSeconds = PropertyUtils.getRemoteSyncLocalConfig("heavyTrafficLimit.initBurstSeconds", Double.class, 2.0, cfg);
         }
@@ -205,7 +205,7 @@ public class RemoteConfigUtils {
      */
     public static long getSwitchOpenStatusDurationThreshold(Properties cfg) {
         if (switchOpenStatusDurationThreshold == null) {
-            switchOpenStatusDurationThreshold = PropertyUtils.getRemoteSyncLocalConfig("switchLimit.switchOpenStatusDurationThreshold", Long.class, 30000L, cfg);
+            switchOpenStatusDurationThreshold = PropertyUtils.getRemoteSyncLocalConfig("switchLimit.switchOpenStatusDurationThreshold", Long.class, 120000L, cfg);
         }
         return switchOpenStatusDurationThreshold;
     }

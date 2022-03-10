@@ -3,7 +3,7 @@ package io.dongtai.iast.core;
 import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.LimiterManager;
 import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.breaker.HeavyTrafficBreaker;
 import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.report.HookPointRateLimitReport;
-import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.fallback.LimitFallbackSwitch;
+import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.fallback.SecondFallbackSwitch;
 import io.dongtai.iast.core.handler.context.ContextManager;
 import io.dongtai.iast.core.handler.hookpoint.IastServer;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
@@ -72,7 +72,7 @@ public class EngineManager {
      * hook点是否降级
      */
     public static boolean isHookPointFallback() {
-        return LimitFallbackSwitch.isRequestFallback();
+        return SecondFallbackSwitch.isRequestFallback();
     }
 
     /**
@@ -84,7 +84,7 @@ public class EngineManager {
         DongTaiLog.info("HookPoint rate limit! hookType: " + hookType + ", method:" + className + "." + method
                 + ", sign:" + methodSign + " ,rate:" + limitRate);
         HookPointRateLimitReport.sendReport(className, method, methodSign, hookType, limitRate);
-        LimitFallbackSwitch.setHeavyHookFallback(true);
+        SecondFallbackSwitch.setHeavyHookFallback(true);
     }
 
     public static EngineManager getInstance() {
@@ -125,7 +125,7 @@ public class EngineManager {
         EngineManager.TAINT_POOL.remove();
         EngineManager.TAINT_HASH_CODES.remove();
         EngineManager.SCOPE_TRACKER.remove();
-        LimitFallbackSwitch.clearHeavyHookFallback();
+        SecondFallbackSwitch.clearHeavyHookFallback();
         EngineManager.getLimiterManager().getHookRateLimiter().remove();
     }
 
@@ -162,7 +162,7 @@ public class EngineManager {
      * @return true - 引擎已启动；false - 引擎未启动
      */
     public static boolean isEngineRunning() {
-        return !LimitFallbackSwitch.isEngineFallback() && EngineManager.enableLingzhi == 1;
+        return !SecondFallbackSwitch.isEngineFallback() && EngineManager.enableLingzhi == 1;
     }
 
     public boolean supportLazyHook() {
