@@ -25,6 +25,13 @@ public abstract class AbstractBreaker {
         DongTaiLog.info("No suitable Performance Breaker,skip check.");
     }
 
+    /**
+     * 强制开关断路器(由agent监控线程触发)
+     */
+    public static void forceSwitchBreaker(boolean turnOn) {
+        DongTaiLog.info("No suitable Performance Breaker,skip switch.");
+    }
+
 
     /**
      * 初始化断路器

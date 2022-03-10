@@ -21,6 +21,10 @@ public enum ServerCommandEnum {
 
     CORE_UNINSTALL("coreUninstall","卸载引擎核心"),
 
+    CORE_PERFORMANCE_FORCE_OPEN("corePerformanceForceOpen", "强制开启引擎核心性能熔断"),
+
+    CORE_PERFORMANCE_FORCE_CLOSE("corePerformanceForceClose", "强制关闭引擎核心性能熔断"),
+
     ;
     /**
      * 指令名称
