@@ -1,7 +1,7 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.limiter.breaker;
 
 import io.dongtai.iast.core.EngineManager;
-import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.fallback.SecondFallbackSwitch;
+import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.fallback.LimitFallbackSwitch;
 import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.report.HeavyTrafficRateLimitReport;
 import io.dongtai.iast.core.utils.RemoteConfigUtils;
 import io.dongtai.log.DongTaiLog;
@@ -41,7 +41,7 @@ public class HeavyTrafficBreaker extends AbstractBreaker {
     @Override
     protected void initBreaker(Properties cfg) {
         HeavyTrafficBreaker.cfg = cfg;
-        final int breakerWaitDuration = RemoteConfigUtils.getRequestWaitDurationInOpenState(cfg);
+        final int breakerWaitDuration = RemoteConfigUtils.getHeavyTrafficBreakerWaitDuration(cfg);
         // 创建断路器自定义配置
         CircuitBreaker breaker = CircuitBreaker.of("iastHeavyTrafficBreaker", CircuitBreakerConfig.custom()
                 // 基于次数的滑动窗口
@@ -66,7 +66,7 @@ public class HeavyTrafficBreaker extends AbstractBreaker {
                     // 断路器转为打开时，打开请求降级开关
                     CircuitBreaker.State state = event.getStateTransition().getToState();
                     if (state == CircuitBreaker.State.OPEN) {
-                        SecondFallbackSwitch.setHeavyTrafficLimitFallback(true);
+                        LimitFallbackSwitch.setHeavyTrafficLimitFallback(true);
                         HeavyTrafficRateLimitReport.sendReport(trafficLimitRate);
                     }
                     // 因为本断路器的样本来自流量，打开后无法获取新样本，故需要在 HALF_OPEN 状态直接转到 CLOSE 状态
@@ -75,7 +75,7 @@ public class HeavyTrafficBreaker extends AbstractBreaker {
                     }
                     // 关闭或半开断路器则关闭请求降级开关
                     if (state == CircuitBreaker.State.CLOSED) {
-                        SecondFallbackSwitch.setHeavyTrafficLimitFallback(false);
+                        LimitFallbackSwitch.setHeavyTrafficLimitFallback(false);
                     }
                 });
         HeavyTrafficBreaker.breaker = breaker;
@@ -84,7 +84,7 @@ public class HeavyTrafficBreaker extends AbstractBreaker {
     /**
      * 检查流量速率
      */
-    public static void checkTrafficRate() {
+    public static void breakCheck(String contextString) {
         if (breaker == null) {
             DongTaiLog.info("the HeavyTrafficBreaker need to be init,skip check.");
             return;

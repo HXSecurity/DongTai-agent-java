@@ -4,10 +4,10 @@ package io.dongtai.iast.core.bytecode.enhance.plugin.limiter;
 import io.dongtai.iast.common.utils.version.JavaVersionUtils;
 import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.breaker.AbstractBreaker;
 import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.breaker.DefaultPerformanceBreaker;
-import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.breaker.NopPerformanceBreaker;
+import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.breaker.NopBreaker;
 import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.breaker.HeavyTrafficBreaker;
 import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.impl.HeavyTrafficRateLimiter;
-import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.impl.SwitchRateLimiter;
+import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.impl.FallbackSwitchFrequencyLimiter;
 import io.dongtai.iast.core.utils.threadlocal.RateLimiterThreadLocal;
 
 import java.util.Properties;
@@ -44,7 +44,7 @@ public class LimiterManager {
     /**
      * 降级开关限速器
      */
-    private final SwitchRateLimiter switchRateLimiter;
+    private final FallbackSwitchFrequencyLimiter fallbackSwitchFrequencyLimiter;
 
     public static LimiterManager newInstance(Properties cfg) {
         if (instance == null) {
@@ -55,14 +55,15 @@ public class LimiterManager {
 
     private LimiterManager(Properties cfg) {
         if (JavaVersionUtils.isJava6() || JavaVersionUtils.isJava7()) {
-            this.performanceBreaker = NopPerformanceBreaker.newInstance(cfg);
+            this.performanceBreaker = NopBreaker.newInstance(cfg);
+            this.heavyTrafficBreaker = NopBreaker.newInstance(cfg);
         } else {
             this.performanceBreaker = DefaultPerformanceBreaker.newInstance(cfg);
+            this.heavyTrafficBreaker = HeavyTrafficBreaker.newInstance(cfg);
         }
-        this.heavyTrafficBreaker = HeavyTrafficBreaker.newInstance(cfg);
         this.hookRateLimiter = new RateLimiterThreadLocal(cfg);
         this.heavyTrafficRateLimiter = new HeavyTrafficRateLimiter(cfg);
-        this.switchRateLimiter = new SwitchRateLimiter(cfg);
+        this.fallbackSwitchFrequencyLimiter = new FallbackSwitchFrequencyLimiter(cfg);
     }
 
     public AbstractBreaker getPerformanceBreaker() {
@@ -77,7 +78,7 @@ public class LimiterManager {
         return heavyTrafficRateLimiter;
     }
 
-    public SwitchRateLimiter getSwitchRateLimiter() {
-        return switchRateLimiter;
+    public FallbackSwitchFrequencyLimiter getSwitchRateLimiter() {
+        return fallbackSwitchFrequencyLimiter;
     }
 }

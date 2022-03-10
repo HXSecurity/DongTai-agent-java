@@ -49,9 +49,9 @@ public class RemoteConfigUtils {
     /**
      * 二次降级阈值相关配置
      */
-    private static Double switchLimitTokenPerSecond;
-    private static Double switchLimitInitBurstSeconds;
-    private static Long switchOpenStatusDurationThreshold;
+    private static Double secondFallbackFrequencyTokenPerSecond;
+    private static Double secondFallbackFrequencyInitBurstSeconds;
+    private static Long secondFallbackDuration;
 
 
     /**
@@ -152,7 +152,7 @@ public class RemoteConfigUtils {
      */
     public static Double getHeavyTrafficLimitTokenPerSecond(Properties cfg) {
         if (heavyTrafficLimitTokenPerSecond == null) {
-            heavyTrafficLimitTokenPerSecond = PropertyUtils.getRemoteSyncLocalConfig("heavyTrafficLimit.tokenPerSecond", Double.class, 100.0, cfg);
+            heavyTrafficLimitTokenPerSecond = PropertyUtils.getRemoteSyncLocalConfig("heavyTrafficLimit.tokenPerSecond", Double.class, 40.0, cfg);
         }
         return heavyTrafficLimitTokenPerSecond;
     }
@@ -170,44 +170,11 @@ public class RemoteConfigUtils {
     /**
      * 高频流量熔断器在 open 状态等待的时间，不能大于等于 switchOpenStatusDurationThreshold
      */
-    public static int getRequestWaitDurationInOpenState(Properties cfg) {
+    public static int getHeavyTrafficBreakerWaitDuration(Properties cfg) {
         if (heavyTrafficBreakerWaitDuration == null) {
-            heavyTrafficBreakerWaitDuration = PropertyUtils.getRemoteSyncLocalConfig("heavyTrafficLimit.heavyTrafficBreakerWaitDuration", Integer.class, 10, cfg);
+            heavyTrafficBreakerWaitDuration = PropertyUtils.getRemoteSyncLocalConfig("heavyTrafficLimit.heavyTrafficBreakerWaitDuration", Integer.class, 30, cfg);
         }
         return heavyTrafficBreakerWaitDuration;
-    }
-
-    // *************************************************************
-    // 二次降级操作限流相关配置
-    // *************************************************************
-    /**
-     * 二次降级限流令牌桶-每秒获得令牌数
-     */
-    public static Double getSwitchLimitTokenPerSecond(Properties cfg) {
-        if (switchLimitTokenPerSecond == null) {
-            switchLimitTokenPerSecond = PropertyUtils.getRemoteSyncLocalConfig("switchLimit.tokenPerSecond", Double.class, 0.01, cfg);
-        }
-        return switchLimitTokenPerSecond;
-    }
-
-    /**
-     * 二次降级限流令牌桶-初始预放置令牌时间
-     */
-    public static double getSwitchLimitInitBurstSeconds(Properties cfg) {
-        if (switchLimitInitBurstSeconds == null) {
-            switchLimitInitBurstSeconds = PropertyUtils.getRemoteSyncLocalConfig("switchLimit.initBurstSeconds", Double.class, 200.0, cfg);
-        }
-        return switchLimitInitBurstSeconds;
-    }
-
-    /**
-     * 二次降级熔断器打开状态持续最大时间(ms)，大于等级该时间将触发降级
-     */
-    public static long getSwitchOpenStatusDurationThreshold(Properties cfg) {
-        if (switchOpenStatusDurationThreshold == null) {
-            switchOpenStatusDurationThreshold = PropertyUtils.getRemoteSyncLocalConfig("switchLimit.switchOpenStatusDurationThreshold", Long.class, 120000L, cfg);
-        }
-        return switchOpenStatusDurationThreshold;
     }
 
 
@@ -292,6 +259,39 @@ public class RemoteConfigUtils {
             performanceLimitMaxThreshold = buildPerformanceMetrics("performanceLimit.maxThreshold", cfg);
         }
         return performanceLimitMaxThreshold;
+    }
+
+    // *************************************************************
+    // 二次降级操作限流相关配置
+    // *************************************************************
+    /**
+     * 二次降级限流令牌桶-每秒获得令牌数
+     */
+    public static Double getSwitchLimitTokenPerSecond(Properties cfg) {
+        if (secondFallbackFrequencyTokenPerSecond == null) {
+            secondFallbackFrequencyTokenPerSecond = PropertyUtils.getRemoteSyncLocalConfig("secondFallback.frequency.tokenPerSecond", Double.class, 0.01, cfg);
+        }
+        return secondFallbackFrequencyTokenPerSecond;
+    }
+
+    /**
+     * 二次降级限流令牌桶-初始预放置令牌时间
+     */
+    public static double getSwitchLimitInitBurstSeconds(Properties cfg) {
+        if (secondFallbackFrequencyInitBurstSeconds == null) {
+            secondFallbackFrequencyInitBurstSeconds = PropertyUtils.getRemoteSyncLocalConfig("secondFallback.frequency.initBurstSeconds", Double.class, 200.0, cfg);
+        }
+        return secondFallbackFrequencyInitBurstSeconds;
+    }
+
+    /**
+     * 二次降级熔断器打开状态持续最大时间(ms)，大于等级该时间将触发降级
+     */
+    public static long getSwitchOpenStatusDurationThreshold(Properties cfg) {
+        if (secondFallbackDuration == null) {
+            secondFallbackDuration = PropertyUtils.getRemoteSyncLocalConfig("secondFallback.duration", Long.class, 120000L, cfg);
+        }
+        return secondFallbackDuration;
     }
 
     /**

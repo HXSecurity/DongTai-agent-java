@@ -2,25 +2,23 @@ package io.dongtai.iast.core.bytecode.enhance.plugin.limiter.impl;
 
 import com.google.common.util.concurrent.RateLimiter;
 import com.google.common.util.concurrent.RateLimiterWithCapacity;
-import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.AbstractRateLimiter;
 import io.dongtai.iast.core.utils.RemoteConfigUtils;
-import io.dongtai.log.DongTaiLog;
 
 import java.util.Properties;
 
 /**
- * 熔断器开关限速器
+ * 降级开关触发频率限速器
  *
  * @author liyuan40
  * @date 2022/3/7 18:10
  */
-public class SwitchRateLimiter extends AbstractRateLimiter {
+public class FallbackSwitchFrequencyLimiter extends AbstractRateLimiter {
     /**
      * 默认每次尝试获取的许可数
      */
-    public static final int DEFAULT_PERMITS = 1;
+    private static final int DEFAULT_PERMITS = 1;
 
-    RateLimiter rateLimiter;
+    private final RateLimiter rateLimiter;
     /**
      * 每秒颁发令牌速率
      */
@@ -30,7 +28,7 @@ public class SwitchRateLimiter extends AbstractRateLimiter {
      */
     double initBurstSeconds;
 
-    public SwitchRateLimiter(Properties properties) {
+    public FallbackSwitchFrequencyLimiter(Properties properties) {
         tokenPerSecond = RemoteConfigUtils.getSwitchLimitTokenPerSecond(properties);
         initBurstSeconds = RemoteConfigUtils.getSwitchLimitInitBurstSeconds(properties);
         rateLimiter = RateLimiterWithCapacity.createSmoothBurstyLimiter(tokenPerSecond, initBurstSeconds);

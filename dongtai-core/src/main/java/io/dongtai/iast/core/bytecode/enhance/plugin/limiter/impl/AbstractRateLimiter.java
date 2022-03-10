@@ -1,4 +1,4 @@
-package io.dongtai.iast.core.bytecode.enhance.plugin.limiter;
+package io.dongtai.iast.core.bytecode.enhance.plugin.limiter.impl;
 
 /**
  * 限速器抽象类

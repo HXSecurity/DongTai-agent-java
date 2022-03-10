@@ -23,6 +23,7 @@ public class ReportConstant {
     public static final int REPORT_LIMIT_HEAVY_TRAFFIC_RATE = 0x42;
     public static final int REPORT_LIMIT_PERFORMANCE_FALLBACK = 0x43;
     public static final int REPORT_LIMIT_EXCEPTION_RATE = 0x44;
+    public static final int REPORT_ERROR_THREAD = 0x45;
     public static final int REPORT_SECOND_FALLBACK = 0x46;
     public static final int REPORT_ERROR_LOG = 0x51;
     public static final int REPORT_API = 0x61;

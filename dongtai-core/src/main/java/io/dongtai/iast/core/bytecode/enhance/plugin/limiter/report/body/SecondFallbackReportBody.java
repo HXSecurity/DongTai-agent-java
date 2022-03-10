@@ -1,11 +1,11 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.limiter.report.body;
 
 import com.google.gson.annotations.SerializedName;
-import io.dongtai.iast.core.EngineManager;
-import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.fallback.SecondFallbackSwitch;
+import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.fallback.LimitFallbackSwitch;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.ReportConstant;
 import io.dongtai.iast.core.utils.RemoteConfigUtils;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.time.StopWatch;
 
@@ -82,7 +82,6 @@ public class SecondFallbackReportBody {
         private LinkedList<AbstractSecondFallbackReportLog> secondFallbackReportDetailLog;
 
         public SecondFallbackReportDetail(LinkedList<AbstractSecondFallbackReportLog> secondFallbackReportDetailLog) {
-            this.agentId = EngineManager.getAgentId();
             this.secondFallbackReportDetailLog = secondFallbackReportDetailLog;
         }
     }
@@ -93,7 +92,7 @@ public class SecondFallbackReportBody {
 
         private String fallbackType;
 
-        public AbstractSecondFallbackReportLog(SecondFallbackSwitch.SecondFallbackTypeEnum fallbackType) {
+        public AbstractSecondFallbackReportLog(LimitFallbackSwitch.SecondFallbackReasonEnum fallbackType) {
             this.fallbackType = fallbackType.getFallbackType();
         }
 
@@ -105,14 +104,15 @@ public class SecondFallbackReportBody {
      * @author liyuan
      * @date 2022/03/10
      */
+    @EqualsAndHashCode(callSuper = true)
     @Data
-    public static class SwitchFrequencyOverThresholdLog extends AbstractSecondFallbackReportLog {
+    public static class FrequencyOverThresholdLog extends AbstractSecondFallbackReportLog {
         /**
          * 发生时间
          */
         private Date occurTime;
 
-        public SwitchFrequencyOverThresholdLog(SecondFallbackSwitch.SecondFallbackTypeEnum fallbackType) {
+        public FrequencyOverThresholdLog(LimitFallbackSwitch.SecondFallbackReasonEnum fallbackType) {
             super(fallbackType);
             this.occurTime = new Date();
         }
@@ -124,8 +124,9 @@ public class SecondFallbackReportBody {
      * @author liyuan40
      * @date 2022/3/8 17:10
      */
+    @EqualsAndHashCode(callSuper = true)
     @Data
-    public static class SwitchOpenTimeOverThresholdReportLog extends AbstractSecondFallbackReportLog {
+    public static class DurationOverThresholdLog extends AbstractSecondFallbackReportLog {
 
         /**
          * 开始时间
@@ -133,20 +134,20 @@ public class SecondFallbackReportBody {
         private Date startTime;
 
         /**
-         * 持续时间
+         * 持续时间(单位:ms)
          */
-        private String persistTime;
+        private Long persistTime;
 
         /**
-         * 阈值
+         * 阈值(单位:ms)
          */
-        private String threshold;
+        private Long threshold;
 
-        public SwitchOpenTimeOverThresholdReportLog(SecondFallbackSwitch.SecondFallbackTypeEnum secondFallbackType, StopWatch stopWatch) {
+        public DurationOverThresholdLog(LimitFallbackSwitch.SecondFallbackReasonEnum secondFallbackType, StopWatch stopWatch) {
             super(secondFallbackType);
             this.startTime = new Date(stopWatch.getStartTime());
-            this.persistTime = stopWatch.getTime() / 1000 + "s";
-            this.threshold = RemoteConfigUtils.getSwitchOpenStatusDurationThreshold(null) / 1000 + "s";
+            this.persistTime = stopWatch.getTime();
+            this.threshold = RemoteConfigUtils.getSwitchOpenStatusDurationThreshold(null);
         }
     }
 }

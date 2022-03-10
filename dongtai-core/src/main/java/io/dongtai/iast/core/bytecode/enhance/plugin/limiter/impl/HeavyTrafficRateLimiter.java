@@ -2,7 +2,6 @@ package io.dongtai.iast.core.bytecode.enhance.plugin.limiter.impl;
 
 import com.google.common.util.concurrent.RateLimiter;
 import com.google.common.util.concurrent.RateLimiterWithCapacity;
-import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.AbstractRateLimiter;
 import io.dongtai.iast.core.utils.RemoteConfigUtils;
 
 import java.util.Properties;
@@ -17,9 +16,9 @@ public class HeavyTrafficRateLimiter extends AbstractRateLimiter {
     /**
      * 默认每次尝试获取的许可数
      */
-    public static final int DEFAULT_PERMITS = 1;
+    private static final int DEFAULT_PERMITS = 1;
 
-    RateLimiter rateLimiter;
+    private final RateLimiter rateLimiter;
 
     public HeavyTrafficRateLimiter(Properties properties) {
         rateLimiter = RateLimiterWithCapacity.createSmoothBurstyLimiter(

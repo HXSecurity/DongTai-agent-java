@@ -23,8 +23,8 @@ public class MonitorDaemonThread implements Runnable {
         monitorTasks.add(new PerformanceMonitor(engineManager));
         monitorTasks.add(new EngineMonitor(engineManager));
         monitorTasks.add(new HeartBeatMonitor());
-        monitorTasks.add(new DongTaiThreadMonitor());
         monitorTasks.add(new LimitFallbackSwitchMonitor(engineManager));
+        monitorTasks.add(new DongTaiThreadMonitor());
         this.engineManager = engineManager;
         try {
             delayTime = Integer.parseInt(System.getProperty("iast.engine.delay.time", "0"));
