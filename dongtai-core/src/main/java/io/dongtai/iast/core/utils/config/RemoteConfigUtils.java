@@ -48,7 +48,6 @@ public class RemoteConfigUtils {
     private static Integer maxRiskMetricsCount;
     private static List<PerformanceMetrics> performanceLimitRiskThreshold;
     private static List<PerformanceMetrics> performanceLimitMaxThreshold;
-
     /**
      * 二次降级阈值相关配置
      */
@@ -76,6 +75,15 @@ public class RemoteConfigUtils {
                 if (remoteConfigEntity.getHookLimitInitBurstSeconds() != null) {
                     hookLimitInitBurstSeconds = remoteConfigEntity.getHookLimitInitBurstSeconds();
                 }
+                if (remoteConfigEntity.getHeavyTrafficLimitTokenPerSecond() != null) {
+                    heavyTrafficLimitTokenPerSecond = remoteConfigEntity.getHeavyTrafficLimitTokenPerSecond();
+                }
+                if (remoteConfigEntity.getHeavyTrafficLimitInitBurstSeconds() != null) {
+                    heavyTrafficLimitInitBurstSeconds = remoteConfigEntity.getHeavyTrafficLimitInitBurstSeconds();
+                }
+                if (remoteConfigEntity.getHeavyTrafficBreakerWaitDuration() != null) {
+                    heavyTrafficBreakerWaitDuration = remoteConfigEntity.getHeavyTrafficBreakerWaitDuration();
+                }
                 if (remoteConfigEntity.getPerformanceBreakerWindowSize() != null) {
                     performanceBreakerWindowSize = remoteConfigEntity.getPerformanceBreakerWindowSize();
                 }
@@ -92,6 +100,15 @@ public class RemoteConfigUtils {
                         remoteConfigEntity.getPerformanceLimitRiskThreshold());
                 performanceLimitMaxThreshold = combineRemoteAndLocalMetricsThreshold(performanceLimitMaxThreshold,
                         remoteConfigEntity.getPerformanceLimitMaxThreshold());
+                if (remoteConfigEntity.getSecondFallbackFrequencyTokenPerSecond() != null) {
+                    secondFallbackFrequencyTokenPerSecond = remoteConfigEntity.getSecondFallbackFrequencyTokenPerSecond();
+                }
+                if (remoteConfigEntity.getSecondFallbackFrequencyInitBurstSeconds() != null) {
+                    secondFallbackFrequencyInitBurstSeconds = remoteConfigEntity.getSecondFallbackFrequencyInitBurstSeconds();
+                }
+                if (remoteConfigEntity.getSecondFallbackDuration() != null) {
+                    secondFallbackDuration = remoteConfigEntity.getSecondFallbackDuration();
+                }
                 existsRemoteConfigMeta = remoteConfig;
                 DongTaiLog.info("Sync remote config successful.");
             }
@@ -151,7 +168,7 @@ public class RemoteConfigUtils {
     }
 
     // *************************************************************
-    // 全局配置
+    // 全局配置(本地)
     // *************************************************************
 
     /**
@@ -165,7 +182,7 @@ public class RemoteConfigUtils {
     }
 
     // *************************************************************
-    // 高频hook限流相关配置
+    // 高频hook限流相关配置(本地)
     // *************************************************************
 
     /**
@@ -189,7 +206,7 @@ public class RemoteConfigUtils {
     }
 
     // *************************************************************
-    // 高频流量限流相关配置
+    // 高频流量限流相关配置(本地)
     // *************************************************************
     /**
      * 高频流量限流-每秒获得令牌数
@@ -212,7 +229,7 @@ public class RemoteConfigUtils {
     }
 
     /**
-     * 高频流量熔断器在 open 状态等待的时间，不能大于等于 secondFallbackDuration
+     * 高频流量限流-断路状态等待时间(不能大于等于secondFallbackDuration)
      */
     public static int getHeavyTrafficBreakerWaitDuration(Properties cfg) {
         if (heavyTrafficBreakerWaitDuration == null) {
@@ -223,11 +240,11 @@ public class RemoteConfigUtils {
 
 
     // *************************************************************
-    // 性能熔断阈值相关配置
+    // 性能熔断阈值相关配置(本地)
     // *************************************************************
 
     /**
-     * 性能断路器-统计窗口大小
+     * 性能熔断-统计窗口大小
      */
     public static Integer getPerformanceBreakerWindowSize(Properties cfg) {
         if (performanceBreakerWindowSize == null) {
@@ -242,7 +259,7 @@ public class RemoteConfigUtils {
     }
 
     /**
-     * 性能断路器-失败率阈值
+     * 性能熔断-失败率阈值
      */
     public static Double getPerformanceBreakerFailureRate(Properties cfg) {
         if (performanceBreakerFailureRate == null) {
@@ -257,7 +274,7 @@ public class RemoteConfigUtils {
     }
 
     /**
-     * 性能断路器-自动转半开的等待时间(单位:秒)
+     * 性能熔断-自动转半开的等待时间(单位:秒)
      */
     public static Integer getPerformanceBreakerWaitDuration(Properties cfg) {
         if (performanceBreakerWaitDuration == null) {
@@ -272,7 +289,7 @@ public class RemoteConfigUtils {
     }
 
     /**
-     * 性能断路器-不允许超过风险阈值的指标数量(0为不限制，达到阈值数时熔断)
+     * 性能熔断-不允许超过风险阈值的指标数量(0为不限制，达到阈值数时熔断)
      */
     public static Integer getMaxRiskMetricsCount(Properties cfg) {
         if (maxRiskMetricsCount == null) {
@@ -286,7 +303,7 @@ public class RemoteConfigUtils {
     }
 
     /**
-     * 性能断路器-风险阈值配置
+     * 性能熔断-风险阈值配置
      */
     public static List<PerformanceMetrics> getPerformanceLimitRiskThreshold(Properties cfg) {
         if (performanceLimitRiskThreshold == null) {
@@ -296,7 +313,7 @@ public class RemoteConfigUtils {
     }
 
     /**
-     * 性能断路器-最大阈值配置
+     * 性能熔断-最大阈值配置
      */
     public static List<PerformanceMetrics> getPerformanceLimitMaxThreshold(Properties cfg) {
         if (performanceLimitMaxThreshold == null) {
@@ -306,10 +323,10 @@ public class RemoteConfigUtils {
     }
 
     // *************************************************************
-    // 二次降级操作限流相关配置
+    // 二次降级操作限流相关配置(本地)
     // *************************************************************
     /**
-     * 二次降级限流令牌桶-每秒获得令牌数
+     * 二次降级-降级开关打开频率限制-每秒获得令牌数
      */
     public static Double getSwitchLimitTokenPerSecond(Properties cfg) {
         if (secondFallbackFrequencyTokenPerSecond == null) {
@@ -319,7 +336,7 @@ public class RemoteConfigUtils {
     }
 
     /**
-     * 二次降级限流令牌桶-初始预放置令牌时间
+     * 二次降级-降级开关打开频率限制-初始预放置令牌时间
      */
     public static double getSwitchLimitInitBurstSeconds(Properties cfg) {
         if (secondFallbackFrequencyInitBurstSeconds == null) {
@@ -329,7 +346,7 @@ public class RemoteConfigUtils {
     }
 
     /**
-     * 二次降级熔断器打开状态持续最大时间(ms)，大于等级该时间将触发降级
+     * 二次降级-降级开关持续时间限制-降级开关打开状态持续最大时间(ms)
      */
     public static long getSwitchOpenStatusDurationThreshold(Properties cfg) {
         if (secondFallbackDuration == null) {
