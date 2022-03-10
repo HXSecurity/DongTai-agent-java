@@ -168,7 +168,7 @@ public class RemoteConfigUtils {
     }
 
     /**
-     * 高频流量熔断器在 open 状态等待的时间，不能大于等于 switchOpenStatusDurationThreshold
+     * 高频流量熔断器在 open 状态等待的时间，不能大于等于 secondFallbackDuration
      */
     public static int getHeavyTrafficBreakerWaitDuration(Properties cfg) {
         if (heavyTrafficBreakerWaitDuration == null) {

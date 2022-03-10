@@ -103,7 +103,7 @@ public class LimitFallbackSwitch {
      * 限制开关切换速率
      */
     private static void limitSwitchFrequency(boolean fallback) {
-        if (fallback && !EngineManager.getLimiterManager().getSwitchRateLimiter().acquire()) {
+        if (fallback && !EngineManager.getLimiterManager().getFallbackSwitchFrequencyLimiter().acquire()) {
             DongTaiLog.info("Switch frequency is over threshold.");
             SecondFallbackReport.appendLog(new SecondFallbackReportBody.FrequencyOverThresholdLog(SecondFallbackReasonEnum.FALLBACK_SWITCH_FREQUENCY));
         }
@@ -149,11 +149,11 @@ public class LimitFallbackSwitch {
                     SecondFallbackReasonEnum.PERFORMANCE_FALLBACK_DURATION, PERFORMANCE_STOPWATCH));
         }
         // 3、当二次降级报告日志不为空时，需要进行二次降级
-        final boolean isSecondFallbackLogEmpty = SecondFallbackReport.isSecondFallbackLogEmpty();
-        if (!isSecondFallbackLogEmpty) {
+        final boolean isNeedSecondFallback = !SecondFallbackReport.isSecondFallbackLogEmpty();
+        if (isNeedSecondFallback) {
             SecondFallbackReport.sendReport();
         }
-        return isSecondFallbackLogEmpty;
+        return isNeedSecondFallback;
     }
 
     /**

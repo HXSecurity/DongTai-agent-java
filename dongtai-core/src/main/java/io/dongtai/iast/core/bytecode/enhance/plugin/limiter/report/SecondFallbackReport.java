@@ -19,7 +19,7 @@ public class SecondFallbackReport extends AbstractLimitReport {
      * 二次降级日志是否为空
      */
     public static boolean isSecondFallbackLogEmpty() {
-        return !FALLBACK_REPORT_LOG.isEmpty();
+        return FALLBACK_REPORT_LOG.isEmpty();
     }
 
     /**

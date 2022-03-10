@@ -78,7 +78,7 @@ public class LimiterManager {
         return heavyTrafficRateLimiter;
     }
 
-    public FallbackSwitchFrequencyLimiter getSwitchRateLimiter() {
+    public FallbackSwitchFrequencyLimiter getFallbackSwitchFrequencyLimiter() {
         return fallbackSwitchFrequencyLimiter;
     }
 }
