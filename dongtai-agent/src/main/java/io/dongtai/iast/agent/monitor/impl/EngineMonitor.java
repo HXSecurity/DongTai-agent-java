@@ -54,7 +54,29 @@ public class EngineMonitor implements IMonitor {
             case CORE_UNINSTALL:
                 DongTaiLog.info("engine uninstall");
                 engineManager.uninstall();
+                break;
+            case CORE_PERFORMANCE_FORCE_OPEN:
+                DongTaiLog.info("force turn on performance breaker");
+                forceSwitchPerformanceBreaker(true);
+                break;
+            case CORE_PERFORMANCE_FORCE_CLOSE:
+                DongTaiLog.info("force turn off performance breaker");
+                forceSwitchPerformanceBreaker(false);
+                break;
             default:
+        }
+    }
+
+    private void forceSwitchPerformanceBreaker(boolean turnOn) {
+        try {
+            final Class<?> performanceBreaker = EngineManager.getPerformanceBreaker();
+            if (performanceBreaker == null) {
+                return;
+            }
+            performanceBreaker.getMethod("forceSwitchBreaker", boolean.class)
+                    .invoke(null, turnOn);
+        } catch (Throwable t) {
+            DongTaiLog.error("turnOnPerformanceBreak failed, msg:{}, err:{}", t.getMessage(), t.getCause());
         }
     }
 

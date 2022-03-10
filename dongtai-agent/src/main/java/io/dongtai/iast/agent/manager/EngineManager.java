@@ -4,7 +4,7 @@ import io.dongtai.iast.agent.IastClassLoader;
 import io.dongtai.iast.agent.IastProperties;
 import io.dongtai.iast.agent.report.AgentRegisterReport;
 import io.dongtai.iast.agent.util.FileUtils;
-import io.dongtai.iast.agent.util.JavaVersionUtils;
+import io.dongtai.iast.common.utils.version.JavaVersionUtils;
 import io.dongtai.iast.agent.util.http.HttpClientUtils;
 import io.dongtai.log.DongTaiLog;
 import org.json.JSONObject;

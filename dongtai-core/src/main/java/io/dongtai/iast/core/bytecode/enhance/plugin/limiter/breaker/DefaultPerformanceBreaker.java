@@ -51,7 +51,7 @@ public class DefaultPerformanceBreaker extends AbstractBreaker {
      *
      * @param contextString 上下文字符串
      */
-    public static void checkPerformance(String contextString) {
+    public static void breakCheck(String contextString) {
         if (breaker == null) {
             DongTaiLog.info("the breaker need to be init,skip check.");
             return;
@@ -61,9 +61,26 @@ public class DefaultPerformanceBreaker extends AbstractBreaker {
         }
         Try.ofSupplier(CircuitBreaker.decorateSupplier(breaker, () -> checkMetricsWithAutoFallback(contextString)))
                 .recover(throwable -> {
-                    DongTaiLog.info("performance is over threshold");
+                    DongTaiLog.info(throwable.getMessage());
                     return false;
                 }).get();
+    }
+
+    /**
+     * 强制开关断路器(由agent监控线程触发)
+     *
+     * @param turnOn 是否打开
+     */
+    public static void forceSwitchBreaker(boolean turnOn) {
+        if (breaker == null) {
+            DongTaiLog.info("the breaker need to be init,skip switch.");
+            return;
+        }
+        if (turnOn) {
+            breaker.transitionToOpenState();
+        } else {
+            breaker.transitionToClosedState();
+        }
     }
 
     @Override
@@ -118,7 +135,7 @@ public class DefaultPerformanceBreaker extends AbstractBreaker {
                 if (riskMetricsCount >= maxRiskMetricsCount) {
                     final PerformanceMetrics threshold = performanceChecker.getMatchRiskThreshold(metrics.getMetricsKey(), cfg);
                     appendToOverThresholdLog(true, metrics, threshold, riskMetricsCount);
-                    throw new IllegalStateException("performance risk num over limit!");
+                    throw new IllegalStateException("performance is over risk threshold! riskMetricsCount:" + riskMetricsCount);
                 }
             }
         }
@@ -128,7 +145,7 @@ public class DefaultPerformanceBreaker extends AbstractBreaker {
             if (performanceChecker != null && performanceChecker.isPerformanceOverLimit(metrics, cfg)) {
                 final PerformanceMetrics threshold = performanceChecker.getMatchMaxThreshold(metrics.getMetricsKey(), cfg);
                 appendToOverThresholdLog(false, metrics, threshold, 1);
-                throw new IllegalStateException("performance over limit!");
+                throw new IllegalStateException("performance is over max threshold! metrics:" + metrics.getMetricsKey().getKey());
             }
         }
         return true;
