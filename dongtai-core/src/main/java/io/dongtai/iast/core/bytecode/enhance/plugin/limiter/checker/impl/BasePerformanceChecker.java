@@ -3,7 +3,7 @@ package io.dongtai.iast.core.bytecode.enhance.plugin.limiter.checker.impl;
 import io.dongtai.iast.common.entity.performance.PerformanceMetrics;
 import io.dongtai.iast.common.enums.MetricsKey;
 import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.checker.IPerformanceChecker;
-import io.dongtai.iast.core.utils.RemoteConfigUtils;
+import io.dongtai.iast.core.utils.config.RemoteConfigUtils;
 
 import java.util.List;
 import java.util.Properties;

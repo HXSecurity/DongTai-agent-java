@@ -49,47 +49,36 @@ public class RemoteConfigUtils {
         // 和上次配置内容不一致时才重新更新配置文件
         try {
             if (!existsRemoteConfigMeta.equals(remoteConfig)) {
-                JSONObject configJson = new JSONObject(remoteConfig);
-                enableAutoFallback = configJson.getBoolean("enableAutoFallback");
-                hookLimitTokenPerSecond = configJson.getDouble("hookLimitTokenPerSecond");
-                hookLimitInitBurstSeconds = configJson.getDouble("hookLimitInitBurstSeconds");
-                performanceBreakerWindowSize = configJson.getInt("performanceBreakerWindowSize");
-                performanceBreakerFailureRate = configJson.getDouble("performanceBreakerFailureRate");
-                performanceBreakerWaitDuration = configJson.getInt("performanceBreakerWaitDuration");
-                maxRiskMetricsCount = configJson.getInt("maxRiskMetricsCount");
-                JSONObject perfLimMaxThresholdJson = configJson.getJSONObject("performanceLimitMaxThreshold");
-                performanceLimitMaxThreshold = buildPerformanceMetricsFromJson(perfLimMaxThresholdJson.toString());
-                JSONObject perfLimRiskThresholdJson = configJson.getJSONObject("performanceLimitRiskThreshold");
-                performanceLimitRiskThreshold = buildPerformanceMetricsFromJson(perfLimRiskThresholdJson.toString());
+                RemoteConfigObject remoteConfigObject = GsonUtils.toObject(remoteConfig, RemoteConfigObject.class);
+                if (remoteConfigObject.getEnableAutoFallback() != null){
+                    enableAutoFallback = remoteConfigObject.getEnableAutoFallback();
+                }
+                if (remoteConfigObject.getHookLimitTokenPerSecond() != null){
+                    hookLimitTokenPerSecond = remoteConfigObject.getHookLimitTokenPerSecond();
+                }
+                if (remoteConfigObject.getHookLimitInitBurstSeconds() != null){
+                    hookLimitInitBurstSeconds = remoteConfigObject.getHookLimitInitBurstSeconds();
+                }
+                if (remoteConfigObject.getPerformanceBreakerWindowSize() != null){
+                    performanceBreakerWindowSize =remoteConfigObject.getPerformanceBreakerWindowSize();
+                }
+                if (remoteConfigObject.getPerformanceBreakerFailureRate() !=null) {
+                    performanceBreakerFailureRate = remoteConfigObject.getPerformanceBreakerFailureRate();
+                }
+                if (remoteConfigObject.getPerformanceBreakerWaitDuration() != null){
+                    performanceBreakerWaitDuration = remoteConfigObject.getPerformanceBreakerWaitDuration();
+                }
+                if (remoteConfigObject.getMaxRiskMetricsCount() != null){
+                    maxRiskMetricsCount = remoteConfigObject.getMaxRiskMetricsCount();
+                }
+                performanceLimitRiskThreshold = remoteConfigObject.getPerformanceLimitRiskThreshold();
+                performanceLimitMaxThreshold = remoteConfigObject.getPerformanceLimitMaxThreshold();
                 existsRemoteConfigMeta = remoteConfig;
                 DongTaiLog.info("Sync remote config successful.");
             }
         } catch (Throwable t) {
             DongTaiLog.warn("Sync remote config failed, msg: {}, error: {}", t.getMessage(), t.getCause());
         }
-    }
-
-    /**
-     * 将json转化为List<PerformanceMetrics>类型
-     */
-    private static List<PerformanceMetrics> buildPerformanceMetricsFromJson(String json){
-        List<PerformanceMetrics> performanceMetricsList  = new ArrayList<>();
-        try {
-        JSONObject jsonObject = new JSONObject(json);
-        Set<String> keySet = jsonObject.keySet();
-            for (MetricsKey each : MetricsKey.values()) {
-                PerformanceMetrics metrics = new PerformanceMetrics();
-                if (keySet.contains(each.getKey())) {
-                    String metricsValueJson = jsonObject.get(each.getKey()).toString();
-                    metrics.setMetricsKey(each);
-                    metrics.setMetricsValue(GsonUtils.toObject(metricsValueJson, each.getValueType()));
-                    performanceMetricsList.add(metrics);
-                }
-            }
-        }catch (Throwable t){
-            DongTaiLog.warn("Build performance metrics from json failed, msg: {}, error: {}",t.getCause(),t.getMessage());
-        }
-        return performanceMetricsList;
     }
 
     // *************************************************************

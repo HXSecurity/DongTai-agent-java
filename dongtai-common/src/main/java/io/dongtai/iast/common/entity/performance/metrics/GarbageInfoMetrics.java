@@ -1,5 +1,7 @@
 package io.dongtai.iast.common.entity.performance.metrics;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,6 +21,7 @@ public class GarbageInfoMetrics implements Serializable {
     /**
      * 有效的内存管理器列表
      */
+    @SerializedName("collectionInfoList")
     private final List<CollectionInfo> collectionInfoList = new ArrayList<CollectionInfo>();
 
 
@@ -64,18 +67,22 @@ public class GarbageInfoMetrics implements Serializable {
         /**
          * 收集器名称
          */
+        @SerializedName("collectionName")
         public String collectionName;
         /**
          * 收集次数
          */
+        @SerializedName("collectionCount")
         public Long collectionCount;
         /**
          * 收集时间
          */
+        @SerializedName("collectionTime")
         public Long collectionTime;
         /**
          * 是否是老年代收集器
          */
+        @SerializedName("tenured")
         public Boolean tenured;
 
         public Long getCollectionCount() {

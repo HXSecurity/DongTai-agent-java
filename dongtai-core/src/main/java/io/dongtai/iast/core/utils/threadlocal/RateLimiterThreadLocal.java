@@ -3,7 +3,7 @@ package io.dongtai.iast.core.utils.threadlocal;
 
 import com.google.common.util.concurrent.RateLimiter;
 import com.google.common.util.concurrent.RateLimiterWithCapacity;
-import io.dongtai.iast.core.utils.RemoteConfigUtils;
+import io.dongtai.iast.core.utils.config.RemoteConfigUtils;
 
 import java.util.Properties;
 

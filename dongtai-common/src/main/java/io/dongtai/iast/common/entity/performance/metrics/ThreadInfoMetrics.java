@@ -1,5 +1,7 @@
 package io.dongtai.iast.common.entity.performance.metrics;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.io.Serializable;
 
 /**
@@ -14,19 +16,23 @@ public class ThreadInfoMetrics implements Serializable {
     /**
      * 当前线程数
      */
+    @SerializedName("threadCount")
     private Integer threadCount;
     /**
      * 峰值线程数
      */
+    @SerializedName("peakThreadCount")
     private Integer peakThreadCount;
     /**
      * 守护线程数
      */
+    @SerializedName("daemonThreadCount")
     private Integer daemonThreadCount;
 
     /**
      * DongTai线程数
      */
+    @SerializedName("dongTaiThreadCount")
     private Integer dongTaiThreadCount;
 
     public Integer getThreadCount() {
