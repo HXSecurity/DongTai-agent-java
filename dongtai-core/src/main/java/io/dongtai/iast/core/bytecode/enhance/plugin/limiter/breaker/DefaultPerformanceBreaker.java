@@ -124,15 +124,15 @@ public class DefaultPerformanceBreaker extends AbstractBreaker {
         List<PerformanceMetrics> performanceMetrics = convert2MetricsList(contextString);
         // 检查每个性能是否达到风险值
         int riskMetricsCount = 0;
-        final Integer maxRiskMetricsCount = RemoteConfigUtils.getMaxRiskMetricsCount(cfg);
-        if (maxRiskMetricsCount > 0) {
+        final Integer performanceLimitRiskMaxMetricsCount = RemoteConfigUtils.getPerformanceLimitRiskMaxMetricsCount(cfg);
+        if (performanceLimitRiskMaxMetricsCount > 0) {
             for (PerformanceMetrics metrics : performanceMetrics) {
                 final IPerformanceChecker performanceChecker = MetricsBindCheckerEnum.newCheckerInstance(metrics.getMetricsKey());
                 if (performanceChecker != null && performanceChecker.isPerformanceRisk(metrics, cfg)) {
                     riskMetricsCount++;
                 }
                 //达到性能风险的指标数量超过阈值
-                if (riskMetricsCount >= maxRiskMetricsCount) {
+                if (riskMetricsCount >= performanceLimitRiskMaxMetricsCount) {
                     final PerformanceMetrics threshold = performanceChecker.getMatchRiskThreshold(metrics.getMetricsKey(), cfg);
                     appendToOverThresholdLog(true, metrics, threshold, riskMetricsCount);
                     throw new IllegalStateException("performance is over risk threshold! riskMetricsCount:" + riskMetricsCount);

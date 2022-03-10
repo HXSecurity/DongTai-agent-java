@@ -45,7 +45,7 @@ public class RemoteConfigUtils {
     private static Integer performanceBreakerWindowSize;
     private static Double performanceBreakerFailureRate;
     private static Integer performanceBreakerWaitDuration;
-    private static Integer maxRiskMetricsCount;
+    private static Integer performanceLimitRiskMaxMetricsCount;
     private static List<PerformanceMetrics> performanceLimitRiskThreshold;
     private static List<PerformanceMetrics> performanceLimitMaxThreshold;
     /**
@@ -93,8 +93,8 @@ public class RemoteConfigUtils {
                 if (remoteConfigEntity.getPerformanceBreakerWaitDuration() != null) {
                     performanceBreakerWaitDuration = remoteConfigEntity.getPerformanceBreakerWaitDuration();
                 }
-                if (remoteConfigEntity.getMaxRiskMetricsCount() != null) {
-                    maxRiskMetricsCount = remoteConfigEntity.getMaxRiskMetricsCount();
+                if (remoteConfigEntity.getPerformanceLimitRiskMaxMetricsCount() != null) {
+                    performanceLimitRiskMaxMetricsCount = remoteConfigEntity.getPerformanceLimitRiskMaxMetricsCount();
                 }
                 performanceLimitRiskThreshold = combineRemoteAndLocalMetricsThreshold(performanceLimitRiskThreshold,
                         remoteConfigEntity.getPerformanceLimitRiskThreshold());
@@ -291,15 +291,15 @@ public class RemoteConfigUtils {
     /**
      * 性能熔断-不允许超过风险阈值的指标数量(0为不限制，达到阈值数时熔断)
      */
-    public static Integer getMaxRiskMetricsCount(Properties cfg) {
-        if (maxRiskMetricsCount == null) {
-            maxRiskMetricsCount = PropertyUtils.getRemoteSyncLocalConfig("performanceLimit.maxRiskMetricsCount", Integer.class, 3, cfg);
+    public static Integer getPerformanceLimitRiskMaxMetricsCount(Properties cfg) {
+        if (performanceLimitRiskMaxMetricsCount == null) {
+            performanceLimitRiskMaxMetricsCount = PropertyUtils.getRemoteSyncLocalConfig("performanceLimit.performanceLimitRiskMaxMetricsCount", Integer.class, 3, cfg);
         }
-        return maxRiskMetricsCount;
+        return performanceLimitRiskMaxMetricsCount;
     }
 
-    public static void setMaxRiskMetricsCount(Integer maxRiskMetricsCount) {
-        RemoteConfigUtils.maxRiskMetricsCount = maxRiskMetricsCount;
+    public static void setPerformanceLimitRiskMaxMetricsCount(Integer performanceLimitRiskMaxMetricsCount) {
+        RemoteConfigUtils.performanceLimitRiskMaxMetricsCount = performanceLimitRiskMaxMetricsCount;
     }
 
     /**

@@ -69,7 +69,7 @@ public class RemoteConfigEntity {
     /**
      * 性能熔断-不允许超过风险阈值的指标数量(0为不限制，达到阈值数时熔断)
      */
-    private Integer maxRiskMetricsCount;
+    private Integer performanceLimitRiskMaxMetricsCount;
     /**
      * 性能熔断-风险阈值配置
      */
