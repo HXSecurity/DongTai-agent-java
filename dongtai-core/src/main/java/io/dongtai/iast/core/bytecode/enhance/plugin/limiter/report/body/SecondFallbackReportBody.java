@@ -3,7 +3,6 @@ package io.dongtai.iast.core.bytecode.enhance.plugin.limiter.report.body;
 import com.google.gson.annotations.SerializedName;
 import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.fallback.LimitFallbackSwitch;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.ReportConstant;
-import io.dongtai.iast.core.utils.RemoteConfigUtils;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -143,11 +142,11 @@ public class SecondFallbackReportBody {
          */
         private Long threshold;
 
-        public DurationOverThresholdLog(LimitFallbackSwitch.SecondFallbackReasonEnum secondFallbackType, StopWatch stopWatch) {
+        public DurationOverThresholdLog(LimitFallbackSwitch.SecondFallbackReasonEnum secondFallbackType, StopWatch stopWatch, Long threshold) {
             super(secondFallbackType);
             this.startTime = new Date(stopWatch.getStartTime());
             this.persistTime = stopWatch.getTime();
-            this.threshold = RemoteConfigUtils.getSwitchOpenStatusDurationThreshold(null);
+            this.threshold = threshold;
         }
     }
 }

@@ -3,7 +3,7 @@ package io.dongtai.iast.core.bytecode.enhance.plugin.limiter.fallback;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.report.SecondFallbackReport;
 import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.report.body.SecondFallbackReportBody;
-import io.dongtai.iast.core.utils.RemoteConfigUtils;
+import io.dongtai.iast.core.utils.config.RemoteConfigUtils;
 import io.dongtai.iast.core.utils.threadlocal.BooleanThreadLocal;
 import io.dongtai.log.DongTaiLog;
 import lombok.Getter;
@@ -125,9 +125,10 @@ public class LimitFallbackSwitch {
             // 关闭开关时，计时器停止
             stopWatch.stop();
             // 计算持续时间超限则记录下来
-            if (stopWatch.getTime() >= RemoteConfigUtils.getSwitchOpenStatusDurationThreshold(null)) {
+            final long switchOpenStatusDurationThreshold = RemoteConfigUtils.getSwitchOpenStatusDurationThreshold(null);
+            if (stopWatch.getTime() >= switchOpenStatusDurationThreshold) {
                 SecondFallbackReport.appendLog(new SecondFallbackReportBody.DurationOverThresholdLog(
-                        secondFallbackType, stopWatch));
+                        secondFallbackType, stopWatch, switchOpenStatusDurationThreshold));
             }
             stopWatch.reset();
         }
@@ -141,12 +142,12 @@ public class LimitFallbackSwitch {
         long switchOpenStatusDurationThreshold = RemoteConfigUtils.getSwitchOpenStatusDurationThreshold(null);
         if (HEAVY_TRAFFIC_STOPWATCH.getTime() >= switchOpenStatusDurationThreshold) {
             SecondFallbackReport.appendLog(new SecondFallbackReportBody.DurationOverThresholdLog(
-                    SecondFallbackReasonEnum.TRAFFIC_FALLBACK_DURATION, HEAVY_TRAFFIC_STOPWATCH));
+                    SecondFallbackReasonEnum.TRAFFIC_FALLBACK_DURATION, HEAVY_TRAFFIC_STOPWATCH, switchOpenStatusDurationThreshold));
         }
         // 2、判断此时性能熔断器开关是否处于打开状态并达到阈值
         if (PERFORMANCE_STOPWATCH.getTime() >= switchOpenStatusDurationThreshold) {
             SecondFallbackReport.appendLog(new SecondFallbackReportBody.DurationOverThresholdLog(
-                    SecondFallbackReasonEnum.PERFORMANCE_FALLBACK_DURATION, PERFORMANCE_STOPWATCH));
+                    SecondFallbackReasonEnum.PERFORMANCE_FALLBACK_DURATION, PERFORMANCE_STOPWATCH, switchOpenStatusDurationThreshold));
         }
         // 3、当二次降级报告日志不为空时，需要进行二次降级
         final boolean isNeedSecondFallback = !SecondFallbackReport.isSecondFallbackLogEmpty();

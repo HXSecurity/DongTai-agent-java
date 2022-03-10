@@ -2,7 +2,7 @@ package io.dongtai.iast.core.bytecode.enhance.plugin.limiter.impl;
 
 import com.google.common.util.concurrent.RateLimiter;
 import com.google.common.util.concurrent.RateLimiterWithCapacity;
-import io.dongtai.iast.core.utils.RemoteConfigUtils;
+import io.dongtai.iast.core.utils.config.RemoteConfigUtils;
 
 import java.util.Properties;
 

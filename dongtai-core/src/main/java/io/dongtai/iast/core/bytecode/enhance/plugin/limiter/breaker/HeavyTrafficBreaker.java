@@ -3,7 +3,7 @@ package io.dongtai.iast.core.bytecode.enhance.plugin.limiter.breaker;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.fallback.LimitFallbackSwitch;
 import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.report.HeavyTrafficRateLimitReport;
-import io.dongtai.iast.core.utils.RemoteConfigUtils;
+import io.dongtai.iast.core.utils.config.RemoteConfigUtils;
 import io.dongtai.log.DongTaiLog;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
