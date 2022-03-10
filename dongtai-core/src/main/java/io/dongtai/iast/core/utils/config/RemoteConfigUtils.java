@@ -5,7 +5,6 @@ import io.dongtai.iast.common.enums.MetricsKey;
 import io.dongtai.iast.core.utils.PropertyUtils;
 import io.dongtai.iast.core.utils.json.GsonUtils;
 import io.dongtai.log.DongTaiLog;
-import org.json.JSONObject;
 
 import java.util.*;
 
@@ -50,36 +49,70 @@ public class RemoteConfigUtils {
         // 和上次配置内容不一致时才重新更新配置文件
         try {
             if (!existsRemoteConfigMeta.equals(remoteConfig)) {
-                RemoteConfigObject remoteConfigObject = GsonUtils.toObject(remoteConfig, RemoteConfigObject.class);
-                if (remoteConfigObject.getEnableAutoFallback() != null){
-                    enableAutoFallback = remoteConfigObject.getEnableAutoFallback();
+                RemoteConfigEntity remoteConfigEntity = GsonUtils.toObject(remoteConfig, RemoteConfigEntity.class);
+                if (remoteConfigEntity.getEnableAutoFallback() != null) {
+                    enableAutoFallback = remoteConfigEntity.getEnableAutoFallback();
                 }
-                if (remoteConfigObject.getHookLimitTokenPerSecond() != null){
-                    hookLimitTokenPerSecond = remoteConfigObject.getHookLimitTokenPerSecond();
+                if (remoteConfigEntity.getHookLimitTokenPerSecond() != null) {
+                    hookLimitTokenPerSecond = remoteConfigEntity.getHookLimitTokenPerSecond();
                 }
-                if (remoteConfigObject.getHookLimitInitBurstSeconds() != null){
-                    hookLimitInitBurstSeconds = remoteConfigObject.getHookLimitInitBurstSeconds();
+                if (remoteConfigEntity.getHookLimitInitBurstSeconds() != null) {
+                    hookLimitInitBurstSeconds = remoteConfigEntity.getHookLimitInitBurstSeconds();
                 }
-                if (remoteConfigObject.getPerformanceBreakerWindowSize() != null){
-                    performanceBreakerWindowSize =remoteConfigObject.getPerformanceBreakerWindowSize();
+                if (remoteConfigEntity.getPerformanceBreakerWindowSize() != null) {
+                    performanceBreakerWindowSize = remoteConfigEntity.getPerformanceBreakerWindowSize();
                 }
-                if (remoteConfigObject.getPerformanceBreakerFailureRate() !=null) {
-                    performanceBreakerFailureRate = remoteConfigObject.getPerformanceBreakerFailureRate();
+                if (remoteConfigEntity.getPerformanceBreakerFailureRate() != null) {
+                    performanceBreakerFailureRate = remoteConfigEntity.getPerformanceBreakerFailureRate();
                 }
-                if (remoteConfigObject.getPerformanceBreakerWaitDuration() != null){
-                    performanceBreakerWaitDuration = remoteConfigObject.getPerformanceBreakerWaitDuration();
+                if (remoteConfigEntity.getPerformanceBreakerWaitDuration() != null) {
+                    performanceBreakerWaitDuration = remoteConfigEntity.getPerformanceBreakerWaitDuration();
                 }
-                if (remoteConfigObject.getMaxRiskMetricsCount() != null){
-                    maxRiskMetricsCount = remoteConfigObject.getMaxRiskMetricsCount();
+                if (remoteConfigEntity.getMaxRiskMetricsCount() != null) {
+                    maxRiskMetricsCount = remoteConfigEntity.getMaxRiskMetricsCount();
                 }
-                performanceLimitRiskThreshold = remoteConfigObject.getPerformanceLimitRiskThreshold();
-                performanceLimitMaxThreshold = remoteConfigObject.getPerformanceLimitMaxThreshold();
+                performanceLimitRiskThreshold = combineRemoteAndLocalMetricsThreshold(performanceLimitRiskThreshold,
+                        remoteConfigEntity.getPerformanceLimitRiskThreshold());
+                performanceLimitMaxThreshold = combineRemoteAndLocalMetricsThreshold(performanceLimitMaxThreshold,
+                        remoteConfigEntity.getPerformanceLimitMaxThreshold());
                 existsRemoteConfigMeta = remoteConfig;
                 DongTaiLog.info("Sync remote config successful.");
             }
         } catch (Throwable t) {
             DongTaiLog.warn("Sync remote config failed, msg: {}, error: {}", t.getMessage(), t.getCause());
         }
+    }
+
+    /**
+     * 合并远端和本地的指标阈值配置
+     *
+     * @param localThreshold  本地阈值配置
+     * @param remoteThreshold 远端阈值配置
+     * @return {@link List}<{@link PerformanceMetrics}>
+     */
+    private static List<PerformanceMetrics> combineRemoteAndLocalMetricsThreshold(List<PerformanceMetrics> localThreshold,
+                                                                                  List<PerformanceMetrics> remoteThreshold) {
+        List<PerformanceMetrics> performanceMetricsList = new ArrayList<>();
+        for (MetricsKey metricsKey : MetricsKey.values()) {
+            //远端包含该指标配置
+            if (remoteThreshold != null) {
+                PerformanceMetrics remoteMetrics = remoteThreshold.stream()
+                        .filter(each -> each.getMetricsKey() == metricsKey)
+                        .findFirst().orElse(null);
+                if (remoteMetrics != null) {
+                    performanceMetricsList.add(remoteMetrics);
+                    continue;
+                }
+            }
+            //本地包含该指标配置
+            if (localThreshold != null) {
+                localThreshold.stream()
+                        .filter(each -> each.getMetricsKey() == metricsKey)
+                        .findFirst()
+                        .ifPresent(performanceMetricsList::add);
+            }
+        }
+        return performanceMetricsList;
     }
 
     // *************************************************************

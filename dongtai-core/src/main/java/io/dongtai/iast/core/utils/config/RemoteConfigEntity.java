@@ -9,8 +9,14 @@ import lombok.Data;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 远程配置实体
+ *
+ * @author me
+ * @date 2022/03/10
+ */
 @Data
-public class RemoteConfigObject {
+public class RemoteConfigEntity {
     @SerializedName("enableAutoFallback")
     private Boolean enableAutoFallback;
     /**
@@ -42,8 +48,6 @@ public class RemoteConfigObject {
 
     /**
      * Gson无法将转json转化为List<PerformanceMetrics>，需要特殊处理
-     * @param sourceList
-     * @return
      */
     private List<PerformanceMetrics> convert2PerformanceMetricsList(List<PerformanceMetrics> sourceList) {
         List<PerformanceMetrics> metricsList = new ArrayList<>();
