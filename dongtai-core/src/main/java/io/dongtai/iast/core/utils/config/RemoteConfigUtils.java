@@ -34,6 +34,12 @@ public class RemoteConfigUtils {
     private static Double hookLimitTokenPerSecond;
     private static Double hookLimitInitBurstSeconds;
     /**
+     * 高频流量限流相关配置
+     */
+    private static Double heavyTrafficLimitTokenPerSecond;
+    private static Double heavyTrafficLimitInitBurstSeconds;
+    private static Integer heavyTrafficBreakerWaitDuration;
+    /**
      * 性能熔断阈值相关配置
      */
     private static Integer performanceBreakerWindowSize;
@@ -42,6 +48,14 @@ public class RemoteConfigUtils {
     private static Integer maxRiskMetricsCount;
     private static List<PerformanceMetrics> performanceLimitRiskThreshold;
     private static List<PerformanceMetrics> performanceLimitMaxThreshold;
+
+    /**
+     * 二次降级阈值相关配置
+     */
+    private static Double secondFallbackFrequencyTokenPerSecond;
+    private static Double secondFallbackFrequencyInitBurstSeconds;
+    private static Long secondFallbackDuration;
+
 
     /**
      * 同步远程配置
@@ -175,6 +189,40 @@ public class RemoteConfigUtils {
     }
 
     // *************************************************************
+    // 高频流量限流相关配置
+    // *************************************************************
+    /**
+     * 高频流量限流-每秒获得令牌数
+     */
+    public static Double getHeavyTrafficLimitTokenPerSecond(Properties cfg) {
+        if (heavyTrafficLimitTokenPerSecond == null) {
+            heavyTrafficLimitTokenPerSecond = PropertyUtils.getRemoteSyncLocalConfig("heavyTrafficLimit.tokenPerSecond", Double.class, 40.0, cfg);
+        }
+        return heavyTrafficLimitTokenPerSecond;
+    }
+
+    /**
+     * 高频流量限流-初始预放置令牌时间
+     */
+    public static double getHeavyTrafficLimitInitBurstSeconds(Properties cfg) {
+        if (heavyTrafficLimitInitBurstSeconds == null) {
+            heavyTrafficLimitInitBurstSeconds = PropertyUtils.getRemoteSyncLocalConfig("heavyTrafficLimit.initBurstSeconds", Double.class, 2.0, cfg);
+        }
+        return heavyTrafficLimitInitBurstSeconds;
+    }
+
+    /**
+     * 高频流量熔断器在 open 状态等待的时间，不能大于等于 secondFallbackDuration
+     */
+    public static int getHeavyTrafficBreakerWaitDuration(Properties cfg) {
+        if (heavyTrafficBreakerWaitDuration == null) {
+            heavyTrafficBreakerWaitDuration = PropertyUtils.getRemoteSyncLocalConfig("heavyTrafficLimit.heavyTrafficBreakerWaitDuration", Integer.class, 30, cfg);
+        }
+        return heavyTrafficBreakerWaitDuration;
+    }
+
+
+    // *************************************************************
     // 性能熔断阈值相关配置
     // *************************************************************
 
@@ -255,6 +303,39 @@ public class RemoteConfigUtils {
             performanceLimitMaxThreshold = buildPerformanceMetrics("performanceLimit.maxThreshold", cfg);
         }
         return performanceLimitMaxThreshold;
+    }
+
+    // *************************************************************
+    // 二次降级操作限流相关配置
+    // *************************************************************
+    /**
+     * 二次降级限流令牌桶-每秒获得令牌数
+     */
+    public static Double getSwitchLimitTokenPerSecond(Properties cfg) {
+        if (secondFallbackFrequencyTokenPerSecond == null) {
+            secondFallbackFrequencyTokenPerSecond = PropertyUtils.getRemoteSyncLocalConfig("secondFallback.frequency.tokenPerSecond", Double.class, 0.01, cfg);
+        }
+        return secondFallbackFrequencyTokenPerSecond;
+    }
+
+    /**
+     * 二次降级限流令牌桶-初始预放置令牌时间
+     */
+    public static double getSwitchLimitInitBurstSeconds(Properties cfg) {
+        if (secondFallbackFrequencyInitBurstSeconds == null) {
+            secondFallbackFrequencyInitBurstSeconds = PropertyUtils.getRemoteSyncLocalConfig("secondFallback.frequency.initBurstSeconds", Double.class, 200.0, cfg);
+        }
+        return secondFallbackFrequencyInitBurstSeconds;
+    }
+
+    /**
+     * 二次降级熔断器打开状态持续最大时间(ms)，大于等级该时间将触发降级
+     */
+    public static long getSwitchOpenStatusDurationThreshold(Properties cfg) {
+        if (secondFallbackDuration == null) {
+            secondFallbackDuration = PropertyUtils.getRemoteSyncLocalConfig("secondFallback.duration", Long.class, 120000L, cfg);
+        }
+        return secondFallbackDuration;
     }
 
     /**

@@ -23,6 +23,7 @@ public class MonitorDaemonThread implements Runnable {
         monitorTasks.add(new PerformanceMonitor(engineManager));
         monitorTasks.add(new EngineMonitor(engineManager));
         monitorTasks.add(new HeartBeatMonitor());
+        monitorTasks.add(new LimitFallbackSwitchMonitor(engineManager));
         monitorTasks.add(new DongTaiThreadMonitor());
         this.engineManager = engineManager;
         try {

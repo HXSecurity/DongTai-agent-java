@@ -1,6 +1,7 @@
 package io.dongtai.iast.core;
 
 import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.LimiterManager;
+import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.breaker.HeavyTrafficBreaker;
 import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.report.HookPointRateLimitReport;
 import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.fallback.LimitFallbackSwitch;
 import io.dongtai.iast.core.handler.context.ContextManager;
@@ -42,6 +43,7 @@ public class EngineManager {
      * 限制器统一管理器
      */
     private final LimiterManager limiterManager;
+
     public static IastServer SERVER;
 
     private static boolean logined = false;
@@ -208,6 +210,11 @@ public class EngineManager {
     }
 
     public static void enterHttpEntry(Map<String, Object> requestMeta) {
+        // 尝试获取请求限速令牌，耗尽时调用断路器方法
+        if (!EngineManager.getLimiterManager().getHeavyTrafficRateLimiter().acquire()) {
+            HeavyTrafficBreaker.breakCheck(null);
+        }
+
         ServiceFactory.startService();
         if (null == SERVER) {
             // todo: read server addr and send to OpenAPI Service
@@ -237,6 +244,11 @@ public class EngineManager {
      * @since 1.2.0
      */
     public static void enterDubboEntry(String dubboService, Map<String, String> attachments) {
+        // 尝试获取请求限速令牌，耗尽时调用断路器方法
+        if (!EngineManager.getLimiterManager().getHeavyTrafficRateLimiter().acquire()) {
+            HeavyTrafficBreaker.breakCheck(null);
+        }
+
         if (attachments != null) {
             if (attachments.containsKey(ContextManager.getHeaderKey())) {
                 ContextManager.getOrCreateGlobalTraceId(attachments.get(ContextManager.getHeaderKey()),

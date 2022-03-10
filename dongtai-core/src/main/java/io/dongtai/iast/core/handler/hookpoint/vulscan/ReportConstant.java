@@ -20,7 +20,11 @@ public class ReportConstant {
     public static final int REPORT_AUTH_ADD = 0x31;
     public static final int REPORT_AUTH_UPDATE = 0x32;
     public static final int REPORT_LIMIT_HOOK_POINT_RATE = 0x41;
+    public static final int REPORT_LIMIT_HEAVY_TRAFFIC_RATE = 0x42;
     public static final int REPORT_LIMIT_PERFORMANCE_FALLBACK = 0x43;
+    public static final int REPORT_LIMIT_EXCEPTION_RATE = 0x44;
+    public static final int REPORT_ERROR_THREAD = 0x45;
+    public static final int REPORT_SECOND_FALLBACK = 0x46;
     public static final int REPORT_ERROR_LOG = 0x51;
     public static final int REPORT_API = 0x61;
 
@@ -83,6 +87,21 @@ public class ReportConstant {
     public static final String LIMIT_HOOK_POINT_METHOD_SIGN = "methodSign";
     public static final String LIMIT_HOOK_POINT_TYPE = "hookType";
     public static final String LIMIT_HOOK_POINT_RATE = "limitRate";
+    /**
+     * 流量限流相关
+     */
+    public static final String LIMIT_TRAFFIC_OCCUR_DATE = "limitDate";
+    public static final String LIMIT_TRAFFIC_RATE = "limitRate";
+    /**
+     * 异常熔断相关
+     */
+    public static final String LIMIT_EXCEPTION_SWITCH_OPERATE = "switchOperate";
+    public static final String LIMIT_EXCEPTION_REAL_TIME_RATE = "realTimeRate";
+    public static final String LIMIT_EXCEPTION_RATE_THRESHOLD = "limitRateThreshold";
+    /**
+     * 二次降级相关
+     */
+    public static final String SECOND_FALLBACK_OVER_THRESHOLD_LOG = "secondFallbackOverThresholdLog";
 
     /**
      * 性能降级报告相关
