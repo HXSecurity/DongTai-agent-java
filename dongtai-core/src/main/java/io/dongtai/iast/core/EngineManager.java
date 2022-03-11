@@ -81,7 +81,7 @@ public class EngineManager {
      */
     public static void openHookPointFallback(String className, String method, String methodSign, int hookType) {
         final double limitRate = EngineManager.getLimiterManager().getHookRateLimiter().getRate();
-        DongTaiLog.info("HookPoint rate limit! hookType: " + hookType + ", method:" + className + "." + method
+        DongTaiLog.debug("HookPoint rate limit! hookType: " + hookType + ", method:" + className + "." + method
                 + ", sign:" + methodSign + " ,rate:" + limitRate);
         HookPointRateLimitReport.sendReport(className, method, methodSign, hookType, limitRate);
         LimitFallbackSwitch.setHeavyHookFallback(true);
