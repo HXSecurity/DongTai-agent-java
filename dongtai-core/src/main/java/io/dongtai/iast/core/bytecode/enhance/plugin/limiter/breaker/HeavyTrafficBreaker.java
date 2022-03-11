@@ -81,15 +81,26 @@ public class HeavyTrafficBreaker extends AbstractBreaker {
         HeavyTrafficBreaker.breaker = breaker;
     }
 
-    /**
-     * 检查流量速率
-     */
-    public static void breakCheck(String contextString) {
+    @Override
+    public void breakCheck(String contextString) {
         if (breaker == null) {
             DongTaiLog.info("the HeavyTrafficBreaker need to be init,skip check.");
             return;
         }
         Try.ofSupplier(CircuitBreaker.decorateSupplier(breaker, () -> false)).recover(throwable -> false).get();
+    }
+
+    @Override
+    public void switchBreaker(boolean turnOn) {
+        if (breaker == null) {
+            DongTaiLog.info("the breaker need to be init,skip switch.");
+            return;
+        }
+        if (turnOn) {
+            breaker.transitionToOpenState();
+        } else {
+            breaker.transitionToClosedState();
+        }
     }
 
 }

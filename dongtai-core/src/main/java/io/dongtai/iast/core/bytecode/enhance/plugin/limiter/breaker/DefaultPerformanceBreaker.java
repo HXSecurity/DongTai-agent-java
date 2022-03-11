@@ -47,11 +47,31 @@ public class DefaultPerformanceBreaker extends AbstractBreaker {
     }
 
     /**
-     * 性能检查(由agent监控线程触发)
+     * 触发断路检查(由agent监控线程触发)
      *
      * @param contextString 上下文字符串
      */
-    public static void breakCheck(String contextString) {
+    public static void invokeBreakCheck(String contextString) {
+        if (instance == null) {
+            DongTaiLog.info("No suitable breaker,skip check.");
+            return;
+        }
+        instance.breakCheck(contextString);
+    }
+
+    /**
+     * 触发开关断路器(由agent监控线程触发)
+     */
+    public static void invokeSwitchBreaker(boolean turnOn) {
+        if (instance == null) {
+            DongTaiLog.info("No suitable breaker,skip switch.");
+            return;
+        }
+        instance.switchBreaker(turnOn);
+    }
+
+    @Override
+    public void breakCheck(String contextString) {
         if (breaker == null) {
             DongTaiLog.info("the breaker need to be init,skip check.");
             return;
@@ -66,12 +86,8 @@ public class DefaultPerformanceBreaker extends AbstractBreaker {
                 }).get();
     }
 
-    /**
-     * 强制开关断路器(由agent监控线程触发)
-     *
-     * @param turnOn 是否打开
-     */
-    public static void forceSwitchBreaker(boolean turnOn) {
+    @Override
+    public void switchBreaker(boolean turnOn) {
         if (breaker == null) {
             DongTaiLog.info("the breaker need to be init,skip switch.");
             return;

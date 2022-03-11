@@ -187,7 +187,7 @@ public class PerformanceMonitor implements IMonitor {
             if (performanceBreaker == null) {
                 return;
             }
-            performanceBreaker.getMethod("breakCheck", String.class)
+            performanceBreaker.getMethod("invokeBreakCheck", String.class)
                     .invoke(null, SerializeUtils.serializeByList(performanceMetrics));
         } catch (Throwable t) {
             DongTaiLog.error("checkPerformanceMetrics failed, msg:{}, err:{}", t.getMessage(), t.getCause());

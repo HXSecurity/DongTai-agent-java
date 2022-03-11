@@ -18,4 +18,12 @@ public class NopBreaker extends AbstractBreaker {
     @Override
     protected void initBreaker(Properties cfg) {
     }
+
+    @Override
+    public void breakCheck(String contextString) {
+    }
+
+    @Override
+    public void switchBreaker(boolean turnOn) {
+    }
 }

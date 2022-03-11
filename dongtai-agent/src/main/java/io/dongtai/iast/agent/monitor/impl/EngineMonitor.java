@@ -73,7 +73,7 @@ public class EngineMonitor implements IMonitor {
             if (performanceBreaker == null) {
                 return;
             }
-            performanceBreaker.getMethod("forceSwitchBreaker", boolean.class)
+            performanceBreaker.getMethod("invokeSwitchBreaker", boolean.class)
                     .invoke(null, turnOn);
         } catch (Throwable t) {
             DongTaiLog.error("turnOnPerformanceBreak failed, msg:{}, err:{}", t.getMessage(), t.getCause());

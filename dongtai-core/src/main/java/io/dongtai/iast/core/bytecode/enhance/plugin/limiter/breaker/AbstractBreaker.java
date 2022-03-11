@@ -22,18 +22,18 @@ public abstract class AbstractBreaker {
     }
 
     /**
-     * 断路检查(由agent监控线程触发)
+     * 触发断路检查(由agent监控线程触发)
      *
      * @param contextString 上下文字符串
      */
-    public static void breakCheck(String contextString) {
+    public static void invokeBreakCheck(String contextString) {
         DongTaiLog.info("No suitable breaker,skip check.");
     }
 
     /**
-     * 强制开关断路器(由agent监控线程触发)
+     * 触发开关断路器(由agent监控线程触发)
      */
-    public static void forceSwitchBreaker(boolean turnOn) {
+    public static void invokeSwitchBreaker(boolean turnOn) {
         DongTaiLog.info("No suitable breaker,skip switch.");
     }
 
@@ -43,5 +43,20 @@ public abstract class AbstractBreaker {
      * @param cfg 配置
      */
     protected abstract void initBreaker(Properties cfg);
+
+
+    /**
+     * 断路检查
+     *
+     * @param contextString 上下文字符串
+     */
+    public abstract void breakCheck(String contextString);
+
+    /**
+     * 开关断路器
+     *
+     * @param turnOn 打开/关闭断路器
+     */
+    public abstract void switchBreaker(boolean turnOn);
 
 }

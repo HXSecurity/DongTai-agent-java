@@ -54,6 +54,7 @@ public class LimiterManager {
     }
 
     private LimiterManager(Properties cfg) {
+        // 创建断路器实例
         if (JavaVersionUtils.isJava6() || JavaVersionUtils.isJava7()) {
             this.performanceBreaker = NopBreaker.newInstance(cfg);
             this.heavyTrafficBreaker = NopBreaker.newInstance(cfg);
@@ -61,6 +62,7 @@ public class LimiterManager {
             this.performanceBreaker = DefaultPerformanceBreaker.newInstance(cfg);
             this.heavyTrafficBreaker = HeavyTrafficBreaker.newInstance(cfg);
         }
+        // 创建限速器实例
         this.hookRateLimiter = new RateLimiterThreadLocal(cfg);
         this.heavyTrafficRateLimiter = new HeavyTrafficRateLimiter(cfg);
         this.fallbackSwitchFrequencyLimiter = new FallbackSwitchFrequencyLimiter(cfg);
@@ -76,6 +78,10 @@ public class LimiterManager {
 
     public HeavyTrafficRateLimiter getHeavyTrafficRateLimiter() {
         return heavyTrafficRateLimiter;
+    }
+
+    public AbstractBreaker getHeavyTrafficBreaker() {
+        return heavyTrafficBreaker;
     }
 
     public FallbackSwitchFrequencyLimiter getFallbackSwitchFrequencyLimiter() {
