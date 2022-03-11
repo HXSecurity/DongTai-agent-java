@@ -84,6 +84,12 @@ public class AgentLauncher {
                 if (argsMap.containsKey("appVersion")) {
                     System.setProperty("dongtai.app.version", argsMap.get("appVersion"));
                 }
+                if (argsMap.containsKey("clusterName")) {
+                    System.setProperty("dongtai.cluster.name", argsMap.get("clusterName"));
+                }
+                if (argsMap.containsKey("clusterVersion")) {
+                    System.setProperty("dongtai.cluster.version", argsMap.get("clusterVersion"));
+                }
                 if (argsMap.containsKey("dongtaiServer")) {
                     System.setProperty("dongtai.server.url", argsMap.get("dongtaiServer"));
                 }

@@ -24,6 +24,8 @@ public class Constant {
     public static final String KEY_HOSTNAME = "hostname";
     public static final String KEY_SERVER_ENV = "serverEnv";
     public static final String KEY_PROJECT_NAME = "projectName";
+    public static final String KEY_CLUSTER_NAME = "clusterName";
+    public static final String KEY_CLUSTER_VERSION = "clusterVersion";
     public static final String KEY_AUTO_CREATE_PROJECT = "autoCreateProject";
     public static final String KEY_PROJECT_VERSION = "projectVersion";
     public static final String KEY_LANGUAGE = "language";

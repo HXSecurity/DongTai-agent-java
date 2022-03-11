@@ -22,6 +22,8 @@ public class IastProperties {
     private String serverUrl;
     private String engineName;
     private String projectName;
+    private String clusterName;
+    private String clusterVersion;
     private String proxyEnableStatus;
     private String proxyHost;
     private int proxyPort = -1;
@@ -105,6 +107,20 @@ public class IastProperties {
             );
         }
         return projectName;
+    }
+
+    public String getClusterName() {
+        if (clusterName == null) {
+            clusterName = System.getProperty("dongtai.cluster.name", cfg.getProperty("dongtai.cluster.name", ""));
+        }
+        return clusterName;
+    }
+
+    public String getClusterVersion() {
+        if (clusterVersion == null) {
+            clusterVersion = System.getProperty("dongtai.cluster.version", cfg.getProperty("dongtai.cluster.version", ""));
+        }
+        return clusterVersion;
     }
 
     private String getProxyEnableStatus() {

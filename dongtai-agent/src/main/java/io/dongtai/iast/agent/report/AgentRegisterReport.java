@@ -37,6 +37,8 @@ public class AgentRegisterReport {
         object.put(Constant.KEY_AGENT_TOKEN, AgentRegisterReport.getAgentToken());
         object.put(Constant.KEY_AGENT_VERSION, Constant.AGENT_VERSION_VALUE);
         object.put(Constant.KEY_PROJECT_NAME, getProjectName());
+        object.put(Constant.KEY_CLUSTER_NAME, getClusterName());
+        object.put(Constant.KEY_CLUSTER_VERSION, getClusterVersion());
         object.put(Constant.KEY_PID, EngineManager.getPID());
         object.put(Constant.KEY_HOSTNAME, AgentRegisterReport.getInternalHostName());
         object.put(Constant.KEY_LANGUAGE, Constant.LANGUAGE);
@@ -143,6 +145,26 @@ public class AgentRegisterReport {
             projectName = cfg.getProjectName();
         }
         return projectName;
+    }
+
+    /**
+     * 获取集群名称,用于集群对应多个分布式实例的应用agent管理
+     *
+     * @return {@link String}
+     */
+    private String getClusterName() {
+        IastProperties cfg = IastProperties.getInstance();
+        return cfg.getClusterName();
+    }
+
+    /**
+     * 获取集群版本,用于集群对应多个分布式实例的应用agent管理
+     *
+     * @return {@link String}
+     */
+    private String getClusterVersion() {
+        IastProperties cfg = IastProperties.getInstance();
+        return cfg.getClusterVersion();
     }
 
     /**
