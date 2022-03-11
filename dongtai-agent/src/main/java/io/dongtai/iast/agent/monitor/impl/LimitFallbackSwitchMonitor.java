@@ -47,11 +47,11 @@ public class LimitFallbackSwitchMonitor implements IMonitor {
      */
     private Boolean checkIsNeedSecondFallback() {
         try {
-            final Class<?> limitFallbackSwitch = EngineManager.getLimitFallbackSwitch();
-            if (limitFallbackSwitch == null) {
+            final Class<?> fallbackManagerClass = EngineManager.getFallbackManagerClass();
+            if (fallbackManagerClass == null) {
                 return null;
             }
-            return (Boolean) limitFallbackSwitch.getMethod("isNeedSecondFallback").invoke(null);
+            return (Boolean) fallbackManagerClass.getMethod("isNeedSecondFallback").invoke(null);
         } catch (Throwable t) {
             DongTaiLog.error("checkIsNeedSecondFallback failed, msg:{}, err:{}", t.getMessage(), t.getCause());
             return false;

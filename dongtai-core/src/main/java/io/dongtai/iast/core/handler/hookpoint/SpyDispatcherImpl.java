@@ -326,7 +326,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
             return false;
         }
         // 尝试获取hook限速令牌,耗尽时降级
-        if (!EngineManager.getLimiterManager().getHookRateLimiter().acquire()) {
+        if (!EngineManager.getFallbackManager().getHookRateLimiter().acquire()) {
             EngineManager.openHookPointFallback(className, methodName, methodSign, hookType);
             return false;
         }

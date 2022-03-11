@@ -25,7 +25,6 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 负责监控jvm性能状态，如果达到停止阈值，则停止检测引擎；如果达到卸载阈值，则卸载引擎；
@@ -183,11 +182,11 @@ public class PerformanceMonitor implements IMonitor {
      */
     private void checkPerformanceMetrics(List<PerformanceMetrics> performanceMetrics) {
         try {
-            final Class<?> performanceBreaker = EngineManager.getPerformanceBreaker();
-            if (performanceBreaker == null) {
+            final Class<?> fallbackManagerClass = EngineManager.getFallbackManagerClass();
+            if (fallbackManagerClass == null) {
                 return;
             }
-            performanceBreaker.getMethod("invokeBreakCheck", String.class)
+            fallbackManagerClass.getMethod("invokePerformanceBreakerCheck", String.class)
                     .invoke(null, SerializeUtils.serializeByList(performanceMetrics));
         } catch (Throwable t) {
             DongTaiLog.error("checkPerformanceMetrics failed, msg:{}, err:{}", t.getMessage(), t.getCause());

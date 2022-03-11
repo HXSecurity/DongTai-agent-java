@@ -1,8 +1,8 @@
 package io.dongtai.iast.core;
 
-import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.LimiterManager;
-import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.report.HookPointRateLimitReport;
-import io.dongtai.iast.core.bytecode.enhance.plugin.limiter.fallback.LimitFallbackSwitch;
+import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.FallbackManager;
+import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.report.HookPointRateLimitReport;
+import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.FallbackSwitch;
 import io.dongtai.iast.core.handler.context.ContextManager;
 import io.dongtai.iast.core.handler.hookpoint.IastServer;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
@@ -41,7 +41,7 @@ public class EngineManager {
     /**
      * 限制器统一管理器
      */
-    private final LimiterManager limiterManager;
+    private final FallbackManager fallbackManager;
 
     public static IastServer SERVER;
 
@@ -71,7 +71,7 @@ public class EngineManager {
      * hook点是否降级
      */
     public static boolean isHookPointFallback() {
-        return LimitFallbackSwitch.isRequestFallback();
+        return FallbackSwitch.isRequestFallback();
     }
 
     /**
@@ -79,11 +79,11 @@ public class EngineManager {
      * 该开关打开后，在当前请求生命周期内，逻辑短路hook点
      */
     public static void openHookPointFallback(String className, String method, String methodSign, int hookType) {
-        final double limitRate = EngineManager.getLimiterManager().getHookRateLimiter().getRate();
+        final double limitRate = EngineManager.getFallbackManager().getHookRateLimiter().getRate();
         DongTaiLog.debug("HookPoint rate limit! hookType: " + hookType + ", method:" + className + "." + method
                 + ", sign:" + methodSign + " ,rate:" + limitRate);
         HookPointRateLimitReport.sendReport(className, method, methodSign, hookType, limitRate);
-        LimitFallbackSwitch.setHeavyHookFallback(true);
+        FallbackSwitch.setHeavyHookFallback(true);
     }
 
     public static EngineManager getInstance() {
@@ -106,11 +106,11 @@ public class EngineManager {
         this.supportLazyHook = cfg.isEnableAllHook();
         this.saveBytecode = cfg.isEnableDumpClass();
         this.agentId = agentId;
-        this.limiterManager = LimiterManager.newInstance(cfg.cfg);
+        this.fallbackManager = FallbackManager.newInstance(cfg.cfg);
     }
 
-    public static LimiterManager getLimiterManager() {
-        return instance.limiterManager;
+    public static FallbackManager getFallbackManager() {
+        return instance.fallbackManager;
     }
 
     /**
@@ -124,8 +124,8 @@ public class EngineManager {
         EngineManager.TAINT_POOL.remove();
         EngineManager.TAINT_HASH_CODES.remove();
         EngineManager.SCOPE_TRACKER.remove();
-        LimitFallbackSwitch.clearHeavyHookFallback();
-        EngineManager.getLimiterManager().getHookRateLimiter().remove();
+        FallbackSwitch.clearHeavyHookFallback();
+        EngineManager.getFallbackManager().getHookRateLimiter().remove();
     }
 
     public static void maintainRequestCount() {
@@ -161,7 +161,7 @@ public class EngineManager {
      * @return true - 引擎已启动；false - 引擎未启动
      */
     public static boolean isEngineRunning() {
-        return !LimitFallbackSwitch.isEngineFallback() && EngineManager.enableLingzhi == 1;
+        return !FallbackSwitch.isEngineFallback() && EngineManager.enableLingzhi == 1;
     }
 
     public boolean supportLazyHook() {
@@ -210,8 +210,8 @@ public class EngineManager {
 
     public static void enterHttpEntry(Map<String, Object> requestMeta) {
         // 尝试获取请求限速令牌，耗尽时调用断路器方法
-        if (!EngineManager.getLimiterManager().getHeavyTrafficRateLimiter().acquire()) {
-            EngineManager.getLimiterManager().getHeavyTrafficBreaker().breakCheck(null);
+        if (!EngineManager.getFallbackManager().getHeavyTrafficRateLimiter().acquire()) {
+            EngineManager.getFallbackManager().getHeavyTrafficBreaker().breakCheck(null);
         }
 
         ServiceFactory.startService();
@@ -244,8 +244,8 @@ public class EngineManager {
      */
     public static void enterDubboEntry(String dubboService, Map<String, String> attachments) {
         // 尝试获取请求限速令牌，耗尽时调用断路器方法
-        if (!EngineManager.getLimiterManager().getHeavyTrafficRateLimiter().acquire()) {
-            EngineManager.getLimiterManager().getHeavyTrafficBreaker().breakCheck(null);
+        if (!EngineManager.getFallbackManager().getHeavyTrafficRateLimiter().acquire()) {
+            EngineManager.getFallbackManager().getHeavyTrafficBreaker().breakCheck(null);
         }
 
         if (attachments != null) {

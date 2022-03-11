@@ -26,9 +26,7 @@ import java.util.jar.JarFile;
 public class EngineManager {
 
     private static final String ENGINE_ENTRYPOINT_CLASS = "com.secnium.iast.core.AgentEngine";
-    private static final String PERFORMANCE_BREAKER_DEFAULT = "io.dongtai.iast.core.bytecode.enhance.plugin.limiter.breaker.DefaultPerformanceBreaker";
-    private static final String PERFORMANCE_BREAKER_NOP = "io.dongtai.iast.core.bytecode.enhance.plugin.limiter.breaker.NopPerformanceBreaker";
-    private static final String LIMIT_FALLBACK_SWITCH = "io.dongtai.iast.core.bytecode.enhance.plugin.limiter.fallback.LimitFallbackSwitch";
+    private static final String FALLBACK_MANAGER_CLASS = "io.dongtai.iast.core.bytecode.enhance.plugin.fallback.FallbackManager";
     private static final String REMOTE_CONFIG_UTIL = "io.dongtai.iast.core.utils.config.RemoteConfigUtils";
     private static final String INJECT_PACKAGE_REMOTE_URI = "/api/v1/engine/download?engineName=dongtai-spy";
     private static final String ENGINE_PACKAGE_REMOTE_URI = "/api/v1/engine/download?engineName=dongtai-core";
@@ -77,44 +75,19 @@ public class EngineManager {
     }
 
     /**
-     * 在核心包中加载并获取限制降级开关类
-     *
-     * @return {@link Class}<{@link ?}>
-     * @throws ClassNotFoundException 未找到类异常
+     * 在核心包中加载并获取降级管理器
      */
-    public static Class<?> getLimitFallbackSwitch() throws ClassNotFoundException {
+    public static Class<?> getFallbackManagerClass() throws ClassNotFoundException {
         if (IAST_CLASS_LOADER == null) {
             return null;
         }
-        return IAST_CLASS_LOADER.loadClass(LIMIT_FALLBACK_SWITCH);
-    }
-
-    /**
-     * 在核心包中加载并获取性能断路器类
-     *
-     * @return {@link Class}<{@link ?}>
-     * @throws ClassNotFoundException 未找到类异常
-     */
-    public static Class<?> getPerformanceBreaker() throws ClassNotFoundException {
-        if (IAST_CLASS_LOADER == null) {
-            return null;
-        }
-        String clazz;
-        if (JavaVersionUtils.isJava6() || JavaVersionUtils.isJava7()) {
-            clazz = PERFORMANCE_BREAKER_NOP;
-        } else {
-            clazz = PERFORMANCE_BREAKER_DEFAULT;
-        }
-        return IAST_CLASS_LOADER.loadClass(clazz);
+        return IAST_CLASS_LOADER.loadClass(FALLBACK_MANAGER_CLASS);
     }
 
     /**
      * 在核心包中加载并获取远端配置工具类
-     *
-     * @return
-     * @throws ClassNotFoundException
      */
-    public static Class<?> getRemoteConfigUtils() throws ClassNotFoundException{
+    public static Class<?> getRemoteConfigUtils() throws ClassNotFoundException {
         if (IAST_CLASS_LOADER == null) {
             return null;
         }
