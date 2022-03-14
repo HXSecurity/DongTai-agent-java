@@ -3,14 +3,12 @@ package io.dongtai.iast.core.bytecode.enhance.plugin.fallback;
 
 import io.dongtai.iast.common.utils.version.JavaVersionUtils;
 import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.breaker.AbstractBreaker;
-import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.breaker.PerformanceBreaker;
-import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.breaker.NopBreaker;
-import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.breaker.HeavyTrafficBreaker;
 import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.limiter.HeavyTrafficRateLimiter;
 import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.limiter.FallbackSwitchFrequencyLimiter;
 import io.dongtai.iast.core.utils.threadlocal.RateLimiterThreadLocal;
 import io.dongtai.log.DongTaiLog;
 
+import java.lang.reflect.Method;
 import java.util.Properties;
 
 /**
@@ -21,6 +19,13 @@ import java.util.Properties;
  */
 public class FallbackManager {
 
+    private static final String BREAKER_NAMESPACE = "io.dongtai.iast.core.bytecode.enhance.plugin.fallback.breaker.";
+    private static final String NOP_BREAKER_CLASS = BREAKER_NAMESPACE + "NopBreaker";
+    private static final String PERFORMANCE_BREAKER_CLASS = BREAKER_NAMESPACE + "PerformanceBreaker";
+    private static final String HEAVY_TRAFFIC_BREAKER_CLASS = BREAKER_NAMESPACE + "HeavyTrafficBreaker";
+    /**
+     * 降级管理器实例
+     */
     private static FallbackManager instance;
     /**
      * 性能断路器
@@ -57,16 +62,30 @@ public class FallbackManager {
     private FallbackManager(Properties cfg) {
         // 创建断路器实例
         if (JavaVersionUtils.isJava6() || JavaVersionUtils.isJava7()) {
-            this.performanceBreaker = NopBreaker.newInstance(cfg);
-            this.heavyTrafficBreaker = NopBreaker.newInstance(cfg);
+            this.performanceBreaker = (AbstractBreaker) invoke2CreateNewInstance(NOP_BREAKER_CLASS, cfg);
+            this.heavyTrafficBreaker = (AbstractBreaker) invoke2CreateNewInstance(NOP_BREAKER_CLASS, cfg);
         } else {
-            this.performanceBreaker = PerformanceBreaker.newInstance(cfg);
-            this.heavyTrafficBreaker = HeavyTrafficBreaker.newInstance(cfg);
+            this.performanceBreaker = (AbstractBreaker) invoke2CreateNewInstance(PERFORMANCE_BREAKER_CLASS, cfg);
+            this.heavyTrafficBreaker = (AbstractBreaker) invoke2CreateNewInstance(HEAVY_TRAFFIC_BREAKER_CLASS, cfg);
         }
         // 创建限速器实例
         this.hookRateLimiter = new RateLimiterThreadLocal(cfg);
         this.heavyTrafficRateLimiter = new HeavyTrafficRateLimiter(cfg);
         this.fallbackSwitchFrequencyLimiter = new FallbackSwitchFrequencyLimiter(cfg);
+    }
+
+    /**
+     * 反射调用创建新实例
+     */
+    private Object invoke2CreateNewInstance(String clazzFullName, Properties cfg) {
+        try {
+            Class<?> clazz = Class.forName(clazzFullName);
+            Method method = clazz.getMethod("newInstance", Properties.class);
+            return method.invoke(null, cfg);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public AbstractBreaker getPerformanceBreaker() {
