@@ -32,6 +32,7 @@ public class SecondFallbackMonitor implements IMonitor {
         // 检查是否需要二次降级
         Boolean isNeedSecondFallback = (Boolean) fallbackManagerClass.getMethod("isNeedSecondFallback").invoke(null);
         if (isNeedSecondFallback) {
+            DongTaiLog.info("SecondFallbackCheck result is true, ready to execute second fallback operation.");
             engineManager.uninstall();
         }
     }
