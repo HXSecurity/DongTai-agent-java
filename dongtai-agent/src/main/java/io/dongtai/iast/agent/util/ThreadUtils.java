@@ -1,10 +1,12 @@
 package io.dongtai.iast.agent.util;
 
 import io.dongtai.iast.agent.Constant;
+import io.dongtai.iast.common.entity.performance.metrics.ThreadInfoMetrics;
 import io.dongtai.log.DongTaiLog;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.lang.management.ManagementFactory;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 线程工具类
@@ -17,23 +19,36 @@ public class ThreadUtils {
     /**
      * 获取所有名称中包含DongTai字样的线程
      */
-    public static Set<String> getDongTaiThreads() {
-        Set<String> threadSet = new HashSet<String>();
+    public static List<ThreadInfoMetrics.ThreadInfo> getDongTaiThreads() {
+        List<ThreadInfoMetrics.ThreadInfo> dongTaiThreadInfoList = new ArrayList<ThreadInfoMetrics.ThreadInfo>();
         try {
-            ThreadGroup currentGroup = Thread.currentThread().getThreadGroup();
+            final ThreadGroup currentGroup = Thread.currentThread().getThreadGroup();
             int threadNum = currentGroup.activeCount();
             Thread[] threads = new Thread[threadNum];
             currentGroup.enumerate(threads);
             for (int i = 0; i < threadNum; i++) {
                 // 匹配DongTai线程
                 if (threads[i].getName() != null && threads[i].getName().startsWith(Constant.THREAD_PREFIX)) {
-                    threadSet.add(threads[i].getName());
+                    ThreadInfoMetrics.ThreadInfo dongTaiThread = new ThreadInfoMetrics.ThreadInfo();
+                    dongTaiThread.setId(threads[i].getId());
+                    dongTaiThread.setName(threads[i].getName());
+                    dongTaiThread.setCpuTime(getThreadCpuTime(threads[i].getId()));
+                    dongTaiThreadInfoList.add(dongTaiThread);
                 }
+            }
+            // 停顿时间间隔,用于收集cpu使用率变化
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException ignored) {
+            }
+            // 收集洞态线程最新的cpu时间
+            for (ThreadInfoMetrics.ThreadInfo dongTaiThread : dongTaiThreadInfoList) {
+                dongTaiThread.setCpuTime(getThreadCpuTime(dongTaiThread.getId()));
             }
         } catch (Throwable t) {
             DongTaiLog.warn("Get DongTai thread failed, msg: {} , error: {}", t.getMessage(), t.getCause());
         }
-        return threadSet;
+        return dongTaiThreadInfoList;
     }
 
     public static void threadSleep(int seconds) {
@@ -45,4 +60,14 @@ public class ThreadUtils {
             throw new RuntimeException(e);
         }
     }
+
+    private static Long getThreadCpuTime(long threadId) {
+        try {
+            return ManagementFactory.getThreadMXBean().getThreadCpuTime(threadId);
+        } catch (Throwable ignored) {
+            return null;
+        }
+    }
+
+
 }

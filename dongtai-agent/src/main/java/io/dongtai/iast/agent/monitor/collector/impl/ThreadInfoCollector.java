@@ -1,6 +1,5 @@
 package io.dongtai.iast.agent.monitor.collector.impl;
 
-import io.dongtai.iast.agent.util.LogUtils;
 import io.dongtai.iast.agent.util.ThreadUtils;
 import io.dongtai.iast.common.entity.performance.PerformanceMetrics;
 import io.dongtai.iast.common.entity.performance.metrics.ThreadInfoMetrics;
@@ -25,7 +24,7 @@ public class ThreadInfoCollector extends AbstractPerformanceCollector {
         metricsValue.setThreadCount(threadMxBean.getThreadCount());
         metricsValue.setPeakThreadCount(threadMxBean.getPeakThreadCount());
         metricsValue.setDaemonThreadCount(threadMxBean.getDaemonThreadCount());
-        metricsValue.setDongTaiThreadCount(ThreadUtils.getDongTaiThreads().size());
+        metricsValue.setDongTaiThreadInfoList(ThreadUtils.getDongTaiThreads());
         return buildMetricsData(MetricsKey.THREAD_INFO, metricsValue);
     }
 }

@@ -154,7 +154,7 @@ public class PerformanceBreaker extends AbstractBreaker {
         try {
             final List<Class<?>> clazzWhiteList = Arrays.asList(PerformanceMetrics.class, MetricsKey.class,
                     CpuInfoMetrics.class, MemoryUsageMetrics.class, GarbageInfoMetrics.class, GarbageInfoMetrics.CollectionInfo.class,
-                    ThreadInfoMetrics.class);
+                    ThreadInfoMetrics.class, ThreadInfoMetrics.ThreadInfo.class);
             return SerializeUtils.deserialize2ArrayList(contextString, PerformanceMetrics.class, clazzWhiteList);
         } catch (Exception e) {
             DongTaiLog.warn("convert2MetricsList failed, err:{}", e.getMessage());
