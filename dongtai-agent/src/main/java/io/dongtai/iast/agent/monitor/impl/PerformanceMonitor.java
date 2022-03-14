@@ -124,7 +124,7 @@ public class PerformanceMonitor implements IMonitor {
      * 0 -> 1 -> 0
      */
     @Override
-    public void check() {
+    public void check() throws Exception {
         // 收集性能指标数据
         final List<PerformanceMetrics> performanceMetrics = collectPerformanceMetrics();
         // 更新本地性能指标记录(用于定期上报)
@@ -248,7 +248,11 @@ public class PerformanceMonitor implements IMonitor {
     @Override
     public void run() {
         while(!MonitorDaemonThread.isExit) {
-            this.check();
+            try {
+                this.check();
+            } catch (Throwable t) {
+                DongTaiLog.warn("Monitor thread checked error, monitor:{}, msg:{}, err:{}", getName(), t.getMessage(), t.getCause());
+            }
             ThreadUtils.threadSleep(30);
         }
     }

@@ -6,6 +6,7 @@ import io.dongtai.iast.agent.monitor.MonitorDaemonThread;
 import io.dongtai.iast.agent.report.HeartBeatReport;
 import io.dongtai.iast.agent.util.ThreadUtils;
 import io.dongtai.iast.agent.util.http.HttpClientUtils;
+import io.dongtai.log.DongTaiLog;
 
 public class HeartBeatMonitor implements IMonitor {
 
@@ -18,18 +19,18 @@ public class HeartBeatMonitor implements IMonitor {
 
 
     @Override
-    public void check() {
-        try {
-            HttpClientUtils.sendPost(Constant.API_REPORT_UPLOAD, HeartBeatReport.generateHeartBeatMsg());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public void check() throws Exception {
+        HttpClientUtils.sendPost(Constant.API_REPORT_UPLOAD, HeartBeatReport.generateHeartBeatMsg());
     }
 
     @Override
     public void run() {
         while (!MonitorDaemonThread.isExit) {
-            this.check();
+            try {
+                this.check();
+            } catch (Throwable t) {
+                DongTaiLog.warn("Monitor thread checked error, monitor:{}, msg:{}, err:{}", getName(), t.getMessage(), t.getCause());
+            }
             ThreadUtils.threadSleep(30);
         }
     }

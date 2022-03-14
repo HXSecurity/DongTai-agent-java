@@ -31,7 +31,7 @@ public class EngineMonitor implements IMonitor {
 
 
     @Override
-    public void check() {
+    public void check() throws Exception {
         String status = checkForStatus();
         ServerCommandEnum serviceCmdEnum = ServerCommandEnum.getEnum(status);
         if (serviceCmdEnum == null || serviceCmdEnum == ServerCommandEnum.NO_CMD) {
@@ -105,7 +105,11 @@ public class EngineMonitor implements IMonitor {
     @Override
     public void run() {
         while (!MonitorDaemonThread.isExit) {
-            this.check();
+            try {
+                this.check();
+            } catch (Throwable t) {
+                DongTaiLog.warn("Monitor thread checked error, monitor:{}, msg:{}, err:{}", getName(), t.getMessage(), t.getCause());
+            }
             ThreadUtils.threadSleep(30);
         }
     }

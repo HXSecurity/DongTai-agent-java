@@ -19,7 +19,7 @@ public class ServerConfigMonitor implements IMonitor {
     }
 
     @Override
-    public void check() {
+    public void check() throws Exception {
         String serverConfig = getConfigFromRemote();
         // 前期无法从服务端获取config，返回的serverConfig为""，不进行下一步配置客户端。
         if(!"".equals(serverConfig)){
@@ -36,7 +36,11 @@ public class ServerConfigMonitor implements IMonitor {
     @Override
     public void run() {
         while (!MonitorDaemonThread.isExit){
-            check();
+            try {
+                this.check();
+            } catch (Throwable t) {
+                DongTaiLog.warn("Monitor thread checked error, monitor:{}, msg:{}, err:{}", getName(), t.getMessage(), t.getCause());
+            }
             ThreadUtils.threadSleep(60);
         }
     }
@@ -61,15 +65,17 @@ public class ServerConfigMonitor implements IMonitor {
     /**
      * 寻找远端配置工具类 反射调用进行阈值配置
      */
-    public void setConfigToLocal(String serverConfig){
+    public void setConfigToLocal(String serverConfig) {
         try {
             final Class<?> remoteConfigUtil = EngineManager.getRemoteConfigUtils();
+            if (remoteConfigUtil == null) {
+                return;
+            }
             remoteConfigUtil.getMethod("syncRemoteConfig", String.class)
                     .invoke(null, serverConfig);
-        //    引擎卸载后，无法调用core包里的方法。
-        } catch (Throwable ignored) {
+        } catch (Throwable t) {
+            DongTaiLog.error("setConfigToLocal failed, msg:{}, err:{}", t.getMessage(), t.getCause());
         }
-
     }
 
 }

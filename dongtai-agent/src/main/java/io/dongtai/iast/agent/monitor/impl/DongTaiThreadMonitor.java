@@ -3,7 +3,6 @@ package io.dongtai.iast.agent.monitor.impl;
 import io.dongtai.iast.agent.Constant;
 import io.dongtai.iast.agent.monitor.IMonitor;
 import io.dongtai.iast.agent.monitor.MonitorDaemonThread;
-import io.dongtai.iast.agent.report.HeartBeatReport;
 import io.dongtai.iast.agent.util.ThreadUtils;
 import io.dongtai.iast.agent.util.http.HttpClientUtils;
 import io.dongtai.log.DongTaiLog;
@@ -22,8 +21,7 @@ public class DongTaiThreadMonitor implements IMonitor {
     }
 
     @Override
-    public void check() {
-        try {
+    public void check() throws Exception {
             JSONObject report = new JSONObject();
             JSONObject detail = new JSONObject();
             Set<String> dongTaiThreads = ThreadUtils.getDongTaiThreads();
@@ -40,9 +38,6 @@ public class DongTaiThreadMonitor implements IMonitor {
                 report.put(Constant.KEY_REPORT_VALUE, detail);
                 HttpClientUtils.sendPost(Constant.API_REPORT_UPLOAD,report.toString());
             }
-        }catch (Throwable t){
-            DongTaiLog.warn("Report error thread failed, msg:{}, err:{}",t.getMessage(),t.getCause());
-        }
     }
 
 
@@ -51,7 +46,11 @@ public class DongTaiThreadMonitor implements IMonitor {
         while (!MonitorDaemonThread.isExit) {
             // 延迟2s启动DongTaiThreadMonitor，以防首次加载时其他Monitor未能启动的情形出现。
             ThreadUtils.threadSleep(2);
-            this.check();
+            try {
+                this.check();
+            } catch (Throwable t) {
+                DongTaiLog.warn("Monitor thread checked error, monitor:{}, msg:{}, err:{}", getName(), t.getMessage(), t.getCause());
+            }
             ThreadUtils.threadSleep(58);
         }
     }

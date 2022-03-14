@@ -2,7 +2,6 @@ package io.dongtai.iast.agent.monitor;
 
 import io.dongtai.iast.agent.manager.EngineManager;
 import io.dongtai.iast.agent.monitor.impl.*;
-import io.dongtai.iast.agent.util.ThreadUtils;
 import io.dongtai.log.DongTaiLog;
 
 import java.util.ArrayList;
@@ -23,7 +22,7 @@ public class MonitorDaemonThread implements Runnable {
         monitorTasks.add(new PerformanceMonitor(engineManager));
         monitorTasks.add(new EngineMonitor(engineManager));
         monitorTasks.add(new HeartBeatMonitor());
-        monitorTasks.add(new LimitFallbackSwitchMonitor(engineManager));
+        monitorTasks.add(new SecondFallbackMonitor(engineManager));
         monitorTasks.add(new DongTaiThreadMonitor());
         this.engineManager = engineManager;
         try {

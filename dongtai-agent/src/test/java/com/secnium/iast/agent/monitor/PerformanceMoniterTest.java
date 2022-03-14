@@ -48,7 +48,7 @@ public class PerformanceMoniterTest {
     }
 
     @Test
-    public void check() {
+    public void check() throws Exception {
         RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
         PerformanceMonitor performanceMoniter = new PerformanceMonitor(EngineManager.getInstance(null, null, runtimeMXBean.getName().split("@")[0]));
         performanceMoniter.check();
