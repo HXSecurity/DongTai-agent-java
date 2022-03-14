@@ -30,6 +30,7 @@ public class PluginRegister {
         this.plugins.add(new DispatchCookie());
         this.plugins.add(new DispatchDubbo());
         //this.plugins.add(new DispatchKrpc());
+
         //PLUGINS.add(new DispatchSpringAutoBinding());
         this.plugins.add(new DispatchClassPlugin());
         //PLUGINS.add()

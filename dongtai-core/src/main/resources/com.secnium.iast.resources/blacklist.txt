@@ -24464,7 +24464,6 @@ java/sql/SQLTransientException
 java/sql/SQLWarning
 java/sql/SQLXML
 java/sql/Savepoint
-#java/sql/Statement
 java/sql/Time
 java/sql/Timestamp
 java/sql/Types
