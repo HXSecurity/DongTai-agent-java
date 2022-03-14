@@ -15,7 +15,7 @@ import io.dongtai.log.DongTaiLog;
  */
 public class SecondFallbackMonitor implements IMonitor {
 
-    private final String name = "LimitFallbackSwitchMonitor";
+    private final String name = "SecondFallbackMonitor";
 
     private final EngineManager engineManager;
 
