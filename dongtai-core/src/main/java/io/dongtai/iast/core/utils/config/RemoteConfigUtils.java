@@ -141,10 +141,12 @@ public class RemoteConfigUtils {
             }
             //本地包含该指标配置
             if (localThreshold != null) {
-                localThreshold.stream()
-                        .filter(each -> each.getMetricsKey() == metricsKey)
-                        .findFirst()
-                        .ifPresent(performanceMetricsList::add);
+                for (PerformanceMetrics each : localThreshold) {
+                    if (each.getMetricsKey() == metricsKey) {
+                        performanceMetricsList.add(each);
+                        break;
+                    }
+                }
             }
         }
         return performanceMetricsList;
