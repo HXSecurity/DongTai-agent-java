@@ -246,10 +246,6 @@ public class PropertyUtils {
         return debugFlag;
     }
 
-    public boolean isDebug() {
-        return "true".equalsIgnoreCase(getDebugFlag());
-    }
-
     public Integer getResponseLength() {
         if(responseLength == null){
             responseLength = Integer.parseInt(System.getProperty("dongtai.response.length", cfg.getProperty("dongtai.response.length","-1")));

@@ -22,6 +22,7 @@ public class ErrorLogReport {
     public static void sendErrorLog(String errorLog) {
         String report = createReport(errorLog);
         ThreadPools.sendReport(Constants.API_REPORT_UPLOAD, report);
+
     }
 
     public static void sendErrorLog(Throwable t) {

@@ -51,18 +51,16 @@ public class HttpClientUtils {
         }
     }
 
-    public static StringBuilder sendPost(String uri, String value) throws Exception {
+    public static StringBuilder sendPost(String uri, String value) {
         StringBuilder response;
         response = sendRequest(HttpMethods.POST, PROPERTIES.getBaseUrl(), uri, value, null, PROXY);
-        if (PROPERTIES.isDebug()) {
-            DongTaiLog.debug("cn.huoxian.iast url is {}, resp is {}", uri, response.toString());
-        }
+        DongTaiLog.debug("cn.huoxian.iast url is {}, resp is {}", uri, response.toString());
         return response;
     }
 
 
     private static StringBuilder sendRequest(HttpMethods method, String baseUrl, String urlStr, String data,
-            HashMap<String, String> headers, Proxy proxy) throws Exception {
+            HashMap<String, String> headers, Proxy proxy) {
         HttpURLConnection connection = null;
         StringBuilder response = new StringBuilder();
         try {
@@ -116,12 +114,13 @@ public class HttpClientUtils {
             rd.close();
             return response;
         } catch (Exception e) {
-            throw e;
+            DongTaiLog.debug(e);
         } finally {
             if (connection != null) {
                 connection.disconnect();
             }
         }
+        return response;
     }
 
     /**

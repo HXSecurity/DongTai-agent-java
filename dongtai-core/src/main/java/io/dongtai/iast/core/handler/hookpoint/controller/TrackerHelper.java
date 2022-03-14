@@ -15,6 +15,10 @@ public class TrackerHelper {
      * @since 1.2.0
      */
     private int dubboLevel = 0;
+    /**
+     * @since 1.3.2
+     */
+    private int krpcLevel = 0;
 
     public void enterTrack() {
         this.trackCounts++;
@@ -136,4 +140,19 @@ public class TrackerHelper {
         return false;
     }
 
+    public void enterKrpc() {
+        this.krpcLevel++;
+    }
+
+    public void leaveKrpc() {
+        this.krpcLevel--;
+    }
+
+    public boolean isExitedKrpc() {
+        return krpcLevel == 0;
+    }
+
+    public boolean isFirstLevelKrpc() {
+        return this.krpcLevel == 1;
+    }
 }

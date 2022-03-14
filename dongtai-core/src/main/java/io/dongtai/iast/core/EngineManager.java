@@ -16,7 +16,6 @@ import io.dongtai.iast.core.utils.PropertyUtils;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 存储全局信息
@@ -45,13 +44,13 @@ public class EngineManager {
 
     private static boolean logined = false;
     private static int reqCounts = 0;
-    private static int enableLingzhi = 0;
+    private static int enableDongTai = 0;
 
-    public static void turnOnLingzhi() {
+    public static void turnOnDongTai() {
         DONGTAI_STATE.set(true);
     }
 
-    public static void turnOffLingzhi() {
+    public static void turnOffDongTai() {
         DONGTAI_STATE.set(false);
     }
 
@@ -60,7 +59,7 @@ public class EngineManager {
      *
      * @return
      */
-    public static Boolean isLingzhiRunning() {
+    public static Boolean isDongTaiRunning() {
         Boolean status = DONGTAI_STATE.get();
         return status != null && status;
     }
@@ -118,14 +117,14 @@ public class EngineManager {
      * 打开检测引擎
      */
     public static void turnOnEngine() {
-        EngineManager.enableLingzhi = 1;
+        EngineManager.enableDongTai = 1;
     }
 
     /**
      * 关闭检测引擎
      */
     public static void turnOffEngine() {
-        EngineManager.enableLingzhi = 0;
+        EngineManager.enableDongTai = 0;
     }
 
     /**
@@ -134,7 +133,7 @@ public class EngineManager {
      * @return true - 引擎已启动；false - 引擎未启动
      */
     public static boolean isEngineRunning() {
-        return EngineManager.enableLingzhi == 1;
+        return EngineManager.enableDongTai == 1;
     }
 
     public boolean supportLazyHook() {
@@ -196,7 +195,9 @@ public class EngineManager {
             ContextManager.getOrCreateGlobalTraceId(headers.get("dt-traceid"), EngineManager.getAgentId());
         } else {
             String newTraceId = ContextManager.getOrCreateGlobalTraceId(null, EngineManager.getAgentId());
+            String spanId = ContextManager.getSpanId(newTraceId,EngineManager.getAgentId());
             headers.put("dt-traceid", newTraceId);
+            headers.put("dt-spandid",spanId);
         }
         ENTER_HTTP_ENTRYPOINT.enterEntry();
         REQUEST_CONTEXT.set(requestMeta);
@@ -256,6 +257,56 @@ public class EngineManager {
     }
 
     /**
+     * @param krpcService
+     * @param attachments
+     * @since 1.3.2
+     */
+    public static void enterKrpcEntry(String krpcService, Map<String, String> attachments) {
+        if (attachments != null) {
+            if (attachments.containsKey(ContextManager.getHeaderKey())) {
+                ContextManager.getOrCreateGlobalTraceId(attachments.get(ContextManager.getHeaderKey()),
+                        EngineManager.getAgentId());
+            } else {
+                attachments.put(ContextManager.getHeaderKey(), ContextManager.getSegmentId());
+            }
+        }
+        if (ENTER_HTTP_ENTRYPOINT.isEnterEntry()) {
+            return;
+        }
+
+        // todo: register server
+        if (attachments != null) {
+            Map<String, String> requestHeaders = new HashMap<String, String>(attachments.size());
+            for (Map.Entry<String, String> entry : attachments.entrySet()) {
+                requestHeaders.put(entry.getKey(), entry.getValue());
+            }
+            if (null == SERVER) {
+                // todo: read server addr and send to OpenAPI Service
+                SERVER = new IastServer(requestHeaders.get("krpc"), 0, true);
+            }
+            Map<String, Object> requestMeta = new HashMap<String, Object>(12);
+            requestMeta.put("protocol", "krpc/" + requestHeaders.get("krpc"));
+            requestMeta.put("scheme", "krpc");
+            requestMeta.put("method", "RPC");
+            requestMeta.put("secure", "true");
+            requestMeta.put("requestURL", krpcService.split("\\?")[0]);
+            requestMeta.put("requestURI", requestHeaders.get("path"));
+            requestMeta.put("remoteAddr", "");
+            requestMeta.put("queryString", "");
+            requestMeta.put("headers", requestHeaders);
+            requestMeta.put("body", "");
+            requestMeta.put("contextPath", "");
+            requestMeta.put("replay-request", false);
+
+            REQUEST_CONTEXT.set(requestMeta);
+        }
+
+        TRACK_MAP.set(new HashMap<Integer, MethodEvent>(1024));
+        TAINT_POOL.set(new HashSet<Object>());
+        TAINT_HASH_CODES.set(new HashSet<Integer>());
+    }
+
+    /**
      * @return
      * @since 1.2.0
      */
@@ -282,5 +333,18 @@ public class EngineManager {
      */
     public static boolean isFirstLevelDubbo() {
         return SCOPE_TRACKER.isFirstLevelDubbo();
+    }
+
+
+    public static void leaveKrpc() {
+        SCOPE_TRACKER.leaveKrpc();
+    }
+
+    public static boolean isExitedKrpc() {
+        return SCOPE_TRACKER.isExitedKrpc();
+    }
+
+    public static boolean isFirstLevelKrpc() {
+        return SCOPE_TRACKER.isFirstLevelKrpc();
     }
 }

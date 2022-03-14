@@ -1,4 +1,4 @@
-package io.dongtai.iast.core.bytecode.enhance.plugin.framework.dubbo;
+package io.dongtai.iast.core.bytecode.enhance.plugin.framework.krpc;
 
 import io.dongtai.iast.core.bytecode.enhance.IastContext;
 import io.dongtai.iast.core.bytecode.enhance.plugin.AbstractAdviceAdapter;
@@ -6,23 +6,20 @@ import io.dongtai.iast.core.handler.hookpoint.controller.HookType;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 
-/**
- * @author dongzhiyong@huoxian.cn
- */
-public class DubboAdviceAdapter extends AbstractAdviceAdapter {
+public class KrpcAdviceAdapter extends AbstractAdviceAdapter {
 
     private int athrowCounts = 0;
 
-    public DubboAdviceAdapter(MethodVisitor mv, int access, String name, String desc, String signCode,
-            IastContext context) {
-        super(mv, access, name, desc, context, "dubbo", signCode);
+    public KrpcAdviceAdapter(MethodVisitor mv, int access, String name, String desc, String signCode, IastContext context) {
+        super(mv, access, name, desc, context, "krpc", signCode);
     }
 
     @Override
     protected void onMethodEnter() {
         Label elseLabel = new Label();
-        enterDubbo();
-        isFirstLevelDubbo();
+
+        enterKrpc();
+        isFirstLevelKrpc();
         mv.visitJumpInsn(EQ, elseLabel);
         captureMethodState(-1, HookType.RPC.getValue(), false);
         mark(elseLabel);
@@ -33,12 +30,13 @@ public class DubboAdviceAdapter extends AbstractAdviceAdapter {
         if (opcode == ATHROW) {
             if (athrowCounts == 0) {
                 athrowCounts++;
-                leaveDubbo();
+                leaveKrpc();
             }
         } else {
-            leaveDubbo();
+            leaveKrpc();
         }
     }
+
 
     @Override
     protected void before() {
@@ -62,34 +60,32 @@ public class DubboAdviceAdapter extends AbstractAdviceAdapter {
     }
 
     /**
-     * mark for enter dubbo method
+     * mark for enter Krpc method
      * <p>
-     * since: 1.2.0
+     * since: 1.3.2
      */
-    private void enterDubbo() {
+    private void enterKrpc() {
         invokeStatic(ASM_TYPE_SPY_HANDLER, SPY_HANDLER$getDispatcher);
-        invokeInterface(ASM_TYPE_SPY_DISPATCHER, SPY$enterDubbo);
+        invokeInterface(ASM_TYPE_SPY_DISPATCHER, SPY$enterKrpc);
     }
 
     /**
-     * Determine whether it is the first layer of Dubbo method call
+     * Determine whether it is the first layer of Krpc method call
      * <p>
-     * since: 1.2.0
+     * since: 1.3.2
      */
-    private void isFirstLevelDubbo() {
+    private void isFirstLevelKrpc() {
         invokeStatic(ASM_TYPE_SPY_HANDLER, SPY_HANDLER$getDispatcher);
-        invokeInterface(ASM_TYPE_SPY_DISPATCHER, SPY$isFirstLevelDubbo);
+        invokeInterface(ASM_TYPE_SPY_DISPATCHER, SPY$isFirstLevelKrpc);
     }
 
     /**
-     * mark for leave dubbo method
+     * mark for leave Krpc method
      * <p>
-     * since: 1.2.0
+     * since: 1.3.2
      */
-    private void leaveDubbo() {
+    private void leaveKrpc() {
         invokeStatic(ASM_TYPE_SPY_HANDLER, SPY_HANDLER$getDispatcher);
-        invokeInterface(ASM_TYPE_SPY_DISPATCHER, SPY$leaveDubbo);
+        invokeInterface(ASM_TYPE_SPY_DISPATCHER, SPY$leaveKrpc);
     }
-
-
 }

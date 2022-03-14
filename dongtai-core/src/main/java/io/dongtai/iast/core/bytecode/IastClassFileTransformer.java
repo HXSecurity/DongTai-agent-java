@@ -122,9 +122,9 @@ public class IastClassFileTransformer implements ClassFileTransformer {
             return null;
         }
         matchClock.resume();
-        boolean isRunning = EngineManager.isLingzhiRunning();
+        boolean isRunning = EngineManager.isDongTaiRunning();
         if (isRunning) {
-            EngineManager.turnOffLingzhi();
+            EngineManager.turnOffDongTai();
         }
 
         try {
@@ -171,7 +171,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                 Throwable ignore) {
         } finally {
             if (isRunning) {
-                EngineManager.turnOnLingzhi();
+                EngineManager.turnOnDongTai();
             }
             matchClock.suspend();
         }

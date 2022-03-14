@@ -90,7 +90,7 @@ public class HttpRequestReplay implements Runnable {
      * @param headers http请求的header头
      * @throws Exception http请求中抛出的异常
      */
-    private static void sendRequest(String method, String fullUrl, String data, HashMap<String, String> headers) throws Exception {
+    private static void sendRequest(String method, String fullUrl, String data, HashMap<String, String> headers) {
         HttpURLConnection connection = null;
         try {
             HttpClientUtils.trustAllHosts();
@@ -130,7 +130,7 @@ public class HttpRequestReplay implements Runnable {
             }
             rd.close();
         } catch (Exception e) {
-            throw e;
+            DongTaiLog.debug(e);
         } finally {
             if (connection != null) {
                 connection.disconnect();

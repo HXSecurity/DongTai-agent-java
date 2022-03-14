@@ -67,6 +67,18 @@ public interface AsmMethods {
             SpyDispatcher.class,
             "isFirstLevelDubbo"
     );
+    Method SPY$enterKrpc = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "enterKrpc"
+    );
+    Method SPY$leaveKrpc = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "leaveKrpc"
+    );
+    Method SPY$isFirstLevelKrpc = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "isFirstLevelKrpc"
+    );
     Method SPY$enterSource = InnerHelper.getAsmMethod(
             SpyDispatcher.class,
             "enterSource"

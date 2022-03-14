@@ -3,11 +3,7 @@ package io.dongtai.iast.core.handler.hookpoint;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.bytecode.enhance.plugin.spring.SpringApplicationImpl;
 import io.dongtai.iast.core.handler.hookpoint.controller.HookType;
-import io.dongtai.iast.core.handler.hookpoint.controller.impl.DubboImpl;
-import io.dongtai.iast.core.handler.hookpoint.controller.impl.HttpImpl;
-import io.dongtai.iast.core.handler.hookpoint.controller.impl.PropagatorImpl;
-import io.dongtai.iast.core.handler.hookpoint.controller.impl.SinkImpl;
-import io.dongtai.iast.core.handler.hookpoint.controller.impl.SourceImpl;
+import io.dongtai.iast.core.handler.hookpoint.controller.impl.*;
 import io.dongtai.iast.core.handler.hookpoint.graphy.GraphBuilder;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.service.ErrorLogReport;
@@ -45,8 +41,8 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public void leaveHttp(Object request, Object response) {
         try {
-            if (EngineManager.isLingzhiRunning()) {
-                EngineManager.turnOffLingzhi();
+            if (EngineManager.isDongTaiRunning()) {
+                EngineManager.turnOffDongTai();
 
                 EngineManager.SCOPE_TRACKER.leaveHttp();
                 if (EngineManager.SCOPE_TRACKER.isExitedHttp() && EngineManager.isEnterHttp()) {
@@ -55,7 +51,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                     EngineManager.cleanThreadState();
                 }
 
-                EngineManager.turnOnLingzhi();
+                EngineManager.turnOnDongTai();
             }
 
         } catch (Exception e) {
@@ -129,8 +125,8 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public void leaveDubbo() {
         try {
-            if (EngineManager.isLingzhiRunning()) {
-                EngineManager.turnOffLingzhi();
+            if (EngineManager.isDongTaiRunning()) {
+                EngineManager.turnOffDongTai();
 
                 EngineManager.leaveDubbo();
                 if (EngineManager.isExitedDubbo() && !EngineManager.isEnterHttp()) {
@@ -139,7 +135,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                     EngineManager.cleanThreadState();
                 }
 
-                EngineManager.turnOnLingzhi();
+                EngineManager.turnOnDongTai();
             }
         } catch (Exception e) {
             ErrorLogReport.sendErrorLog(e);
@@ -164,6 +160,62 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     }
 
     /**
+     * mark for enter Krpc Entry Point
+     *
+     * @since 1.3.1
+     */
+    @Override
+    public void enterKrpc() {
+        try {
+            EngineManager.SCOPE_TRACKER.enterKrpc();
+        } catch (Exception e) {
+            ErrorLogReport.sendErrorLog(e);
+        }
+    }
+
+    /**
+     * mark for leave Krpc Entry Point
+     *
+     * @since 1.3.1
+     */
+    @Override
+    public void leaveKrpc() {
+        try {
+            if (EngineManager.isDongTaiRunning()) {
+                EngineManager.turnOffDongTai();
+
+                EngineManager.leaveKrpc();
+                if (EngineManager.isExitedKrpc() && !EngineManager.isEnterHttp()) {
+                    EngineManager.maintainRequestCount();
+                    GraphBuilder.buildAndReport(null, null);
+                    EngineManager.cleanThreadState();
+                }
+
+                EngineManager.turnOnDongTai();
+            }
+        } catch (Exception e) {
+            ErrorLogReport.sendErrorLog(e);
+            EngineManager.cleanThreadState();
+        }
+    }
+
+    /**
+     * Determines whether it is a layer 1 Krpc entry
+     *
+     * @return true if is a layer 1 Krpc entry; else false
+     * @since 1.3.1
+     */
+    @Override
+    public boolean isFirstLevelKrpc() {
+        try {
+            return EngineManager.isEngineRunning() && EngineManager.isFirstLevelKrpc();
+        } catch (Exception e) {
+            ErrorLogReport.sendErrorLog(e);
+        }
+        return false;
+    }
+
+    /**
      * mark for enter Source Entry Point
      *
      * @since 1.3.1
@@ -171,7 +223,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public void enterSource() {
         try {
-            if (EngineManager.isLingzhiRunning()) {
+            if (EngineManager.isDongTaiRunning()) {
                 EngineManager.SCOPE_TRACKER.enterSource();
             }
         } catch (Exception e) {
@@ -187,7 +239,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public void leaveSource() {
         try {
-            if (EngineManager.isLingzhiRunning()) {
+            if (EngineManager.isDongTaiRunning()) {
                 EngineManager.SCOPE_TRACKER.leaveSource();
             }
         } catch (Exception e) {
@@ -204,7 +256,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public boolean isFirstLevelSource() {
         try {
-            return EngineManager.isLingzhiRunning() && EngineManager.isEngineRunning() && EngineManager.SCOPE_TRACKER
+            return EngineManager.isDongTaiRunning() && EngineManager.isEngineRunning() && EngineManager.SCOPE_TRACKER
                     .isFirstLevelSource();
         } catch (Exception e) {
             return false;
@@ -219,7 +271,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public void enterPropagator() {
         try {
-            if (EngineManager.isLingzhiRunning()) {
+            if (EngineManager.isDongTaiRunning()) {
                 EngineManager.SCOPE_TRACKER.enterPropagation();
             }
         } catch (Exception e) {
@@ -235,7 +287,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public void leavePropagator() {
         try {
-            if (EngineManager.isLingzhiRunning()) {
+            if (EngineManager.isDongTaiRunning()) {
                 EngineManager.SCOPE_TRACKER.leavePropagation();
             }
         } catch (Exception e) {
@@ -252,7 +304,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public boolean isFirstLevelPropagator() {
         try {
-            return EngineManager.isLingzhiRunning() && EngineManager.isEngineRunning() && EngineManager.SCOPE_TRACKER.isFirstLevelPropagator();
+            return EngineManager.isDongTaiRunning() && EngineManager.isEngineRunning() && EngineManager.SCOPE_TRACKER.isFirstLevelPropagator();
         } catch (Exception e) {
             return false;
         }
@@ -266,7 +318,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public void enterSink() {
         try {
-            if (EngineManager.isLingzhiRunning()) {
+            if (EngineManager.isDongTaiRunning()) {
                 EngineManager.SCOPE_TRACKER.enterSink();
             }
         } catch (Exception e) {
@@ -282,7 +334,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public void leaveSink() {
         try {
-            if (EngineManager.isLingzhiRunning()) {
+            if (EngineManager.isDongTaiRunning()) {
                 EngineManager.SCOPE_TRACKER.leaveSink();
             }
         } catch (Exception e) {
@@ -299,7 +351,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public boolean isFirstLevelSink() {
         try {
-            return EngineManager.isLingzhiRunning() && EngineManager.isEngineRunning() && EngineManager.isTopLevelSink();
+            return EngineManager.isDongTaiRunning() && EngineManager.isEngineRunning() && EngineManager.isTopLevelSink();
         } catch (Exception e) {
             return false;
         }
@@ -325,13 +377,13 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     public boolean collectMethodPool(Object instance, Object[] argumentArray, Object retValue, String framework,
                                      String className, String matchClassName, String methodName, String methodSign, boolean isStatic,
                                      int hookType) {
-        if (!EngineManager.isLingzhiRunning() && (HookType.HTTP.equals(hookType) || HookType.DUBBO.equals(hookType))) {
-            EngineManager.turnOnLingzhi();
+        if (!EngineManager.isDongTaiRunning() && (HookType.HTTP.equals(hookType) || HookType.RPC.equals(hookType))) {
+            EngineManager.turnOnDongTai();
         }
 
-        if (EngineManager.isLingzhiRunning()) {
+        if (EngineManager.isDongTaiRunning()) {
             try {
-                EngineManager.turnOffLingzhi();
+                EngineManager.turnOffDongTai();
 
                 if (HookType.SPRINGAPPLICATION.equals(hookType)) {
                     MethodEvent event = new MethodEvent(0, -1, className, matchClassName, methodName,
@@ -339,14 +391,14 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                     SpringApplicationImpl.getWebApplicationContext(event);
                 } else {
                     boolean isEnterEntryPoint = EngineManager.isEnterHttp() || EngineManager.isFirstLevelDubbo();
-                    boolean isEntryPointMethod = HookType.HTTP.equals(hookType) || HookType.DUBBO.equals(hookType);
+                    boolean isEntryPointMethod = HookType.HTTP.equals(hookType) || HookType.RPC.equals(hookType);
                     if (isEnterEntryPoint || isEntryPointMethod) {
                         MethodEvent event = new MethodEvent(0, -1, className, matchClassName, methodName,
                                 methodSign, methodSign, instance, argumentArray, retValue, framework, isStatic, null);
                         if (HookType.HTTP.equals(hookType)) {
                             HttpImpl.solveHttp(event);
-                        } else if (HookType.DUBBO.equals(hookType)) {
-                            DubboImpl.solveDubbo(event, INVOKE_ID_SEQUENCER);
+                        } else if (HookType.RPC.equals(hookType)) {
+                            solveRPC(framework,event);
                         } else if (HookType.PROPAGATOR.equals(hookType) && !EngineManager.TAINT_POOL.get().isEmpty()) {
                             PropagatorImpl.solvePropagator(event, INVOKE_ID_SEQUENCER);
                         } else if (HookType.SOURCE.equals(hookType)) {
@@ -359,9 +411,20 @@ public class SpyDispatcherImpl implements SpyDispatcher {
             } catch (Exception e) {
                 ErrorLogReport.sendErrorLog(e);
             } finally {
-                EngineManager.turnOnLingzhi();
+                EngineManager.turnOnDongTai();
             }
         }
         return false;
+    }
+
+    private void solveRPC(String framework, MethodEvent event) {
+        switch (framework){
+            case "dubbo" :
+                DubboImpl.solveDubbo(event, SpyDispatcherImpl.INVOKE_ID_SEQUENCER);
+                break;
+            case "krpc" :
+                KrpcImpl.solveKrpc(event, SpyDispatcherImpl.INVOKE_ID_SEQUENCER);
+                break;
+        }
     }
 }

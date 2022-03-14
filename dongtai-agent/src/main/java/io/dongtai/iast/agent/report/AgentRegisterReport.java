@@ -199,13 +199,8 @@ public class AgentRegisterReport {
             if (!isRegistered()) {
                 setAgentData(responseRaw);
             }
-        } catch (SocketTimeoutException e) {
-            DongTaiLog.error("Agent registration to {} failed 10 seconds later, Reason: {}, token: {}",
-                    IastProperties.getInstance().getBaseUrl(), IastProperties.getInstance().getIastServerToken());
         } catch (NullPointerException e) {
             DongTaiLog.error("Agent registration to {} failed, Token: {}, Reason: {}", IastProperties.getInstance().getBaseUrl(), IastProperties.getInstance().getIastServerToken(), e.getMessage());
-        } catch (ConnectException e) {
-            DongTaiLog.error("Agent registration failed, Reason: Failed to connect to {}, please check with `curl -v {}`", IastProperties.getInstance().getBaseUrl(), IastProperties.getInstance().getBaseUrl());
         } catch (Exception e) {
             DongTaiLog.debug(e);
             DongTaiLog.error("Agent registration to {} failed 10 seconds later, cause: {}, token: {}",
