@@ -17,7 +17,7 @@ import org.json.JSONObject;
 public class EngineMonitor implements IMonitor {
     private final EngineManager engineManager;
     public static Boolean isCoreRegisterStart = false;
-    private final String name = "EngineMonitor";
+    private static final String NAME = "EngineMonitor";
 
 
     public EngineMonitor(EngineManager engineManager) {
@@ -26,7 +26,7 @@ public class EngineMonitor implements IMonitor {
 
     @Override
     public String getName() {
-        return  Constant.THREAD_PREFIX + name;
+        return  Constant.THREAD_PREFIX + NAME;
     }
 
 
@@ -107,10 +107,10 @@ public class EngineMonitor implements IMonitor {
         while (!MonitorDaemonThread.isExit) {
             try {
                 this.check();
+                ThreadUtils.threadSleep(30);
             } catch (Throwable t) {
                 DongTaiLog.warn("Monitor thread checked error, monitor:{}, msg:{}, err:{}", getName(), t.getMessage(), t.getCause());
             }
-            ThreadUtils.threadSleep(30);
         }
     }
 }

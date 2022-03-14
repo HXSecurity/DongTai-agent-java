@@ -10,11 +10,11 @@ import io.dongtai.log.DongTaiLog;
 
 public class HeartBeatMonitor implements IMonitor {
 
-    public final String name = "HearBeatMonitor";
+    private static final String NAME = "HearBeatMonitor";
 
     @Override
     public String getName() {
-        return  Constant.THREAD_PREFIX + name;
+        return  Constant.THREAD_PREFIX + NAME;
     }
 
 
@@ -28,10 +28,10 @@ public class HeartBeatMonitor implements IMonitor {
         while (!MonitorDaemonThread.isExit) {
             try {
                 this.check();
+                ThreadUtils.threadSleep(30);
             } catch (Throwable t) {
                 DongTaiLog.warn("Monitor thread checked error, monitor:{}, msg:{}, err:{}", getName(), t.getMessage(), t.getCause());
             }
-            ThreadUtils.threadSleep(30);
         }
     }
 }

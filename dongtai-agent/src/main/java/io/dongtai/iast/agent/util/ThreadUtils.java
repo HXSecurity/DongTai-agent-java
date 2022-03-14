@@ -22,17 +22,14 @@ public class ThreadUtils {
     public static List<ThreadInfoMetrics.ThreadInfo> getDongTaiThreads() {
         List<ThreadInfoMetrics.ThreadInfo> dongTaiThreadInfoList = new ArrayList<ThreadInfoMetrics.ThreadInfo>();
         try {
-            final ThreadGroup currentGroup = Thread.currentThread().getThreadGroup();
-            int threadNum = currentGroup.activeCount();
-            Thread[] threads = new Thread[threadNum];
-            currentGroup.enumerate(threads);
-            for (int i = 0; i < threadNum; i++) {
+            Thread[] threads = getCurrentActiveThreads();
+            for (Thread thread : threads) {
                 // 匹配DongTai线程
-                if (threads[i].getName() != null && threads[i].getName().startsWith(Constant.THREAD_PREFIX)) {
+                if (thread.getName() != null && thread.getName().startsWith(Constant.THREAD_PREFIX)) {
                     ThreadInfoMetrics.ThreadInfo dongTaiThread = new ThreadInfoMetrics.ThreadInfo();
-                    dongTaiThread.setId(threads[i].getId());
-                    dongTaiThread.setName(threads[i].getName());
-                    dongTaiThread.setCpuTime(getThreadCpuTime(threads[i].getId()));
+                    dongTaiThread.setId(thread.getId());
+                    dongTaiThread.setName(thread.getName());
+                    dongTaiThread.setCpuTime(getThreadCpuTime(thread.getId()));
                     dongTaiThreadInfoList.add(dongTaiThread);
                 }
             }
@@ -46,9 +43,34 @@ public class ThreadUtils {
                 dongTaiThread.setCpuTime(getThreadCpuTime(dongTaiThread.getId()));
             }
         } catch (Throwable t) {
-            DongTaiLog.warn("Get DongTai thread failed, msg: {} , error: {}", t.getMessage(), t.getCause());
+            DongTaiLog.warn("get DongTai thread failed, msg: {} , error: {}", t.getMessage(), t.getCause());
         }
         return dongTaiThreadInfoList;
+    }
+
+    /**
+     * 杀死指定的洞态线程
+     *
+     * @param threadId 线程id
+     * @return boolean
+     */
+    public static boolean killDongTaiThread(Long threadId) {
+        try {
+            if (threadId == null || threadId <= 0) {
+                return false;
+            }
+            final Thread[] threads = getCurrentActiveThreads();
+            for (Thread thread : threads) {
+                if (thread.getId() == threadId && thread.getName() != null
+                        && thread.getName().startsWith(Constant.THREAD_PREFIX)) {
+                    thread.interrupt();
+                    return true;
+                }
+            }
+        } catch (Throwable t) {
+            DongTaiLog.warn("kill DongTai thread failed, msg: {} , error: {}", t.getMessage(), t.getCause());
+        }
+        return false;
     }
 
     public static void threadSleep(int seconds) {
@@ -59,6 +81,19 @@ public class ThreadUtils {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * 获取当前活动线程
+     *
+     * @return {@link Thread[]}
+     */
+    private static Thread[] getCurrentActiveThreads() {
+        final ThreadGroup currentGroup = Thread.currentThread().getThreadGroup();
+        int threadNum = currentGroup.activeCount();
+        Thread[] threads = new Thread[threadNum];
+        currentGroup.enumerate(threads);
+        return threads;
     }
 
     private static Long getThreadCpuTime(long threadId) {

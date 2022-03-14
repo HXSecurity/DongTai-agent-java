@@ -40,13 +40,13 @@ public class PerformanceMonitor implements IMonitor {
     private static Integer CPU_USAGE = 0;
     private static List<PerformanceMetrics> PERFORMANCE_METRICS = new ArrayList<PerformanceMetrics>();
 
-    private final static String name = "PerformanceMonitor";
+    private static final String NAME = "PerformanceMonitor";
     private final EngineManager engineManager;
     private final List<MetricsKey> needCollectMetrics = new ArrayList<MetricsKey>();
 
     @Override
     public String getName() {
-        return  Constant.THREAD_PREFIX + name;
+        return  Constant.THREAD_PREFIX + NAME;
     }
 
 
@@ -250,10 +250,10 @@ public class PerformanceMonitor implements IMonitor {
         while(!MonitorDaemonThread.isExit) {
             try {
                 this.check();
+                ThreadUtils.threadSleep(30);
             } catch (Throwable t) {
                 DongTaiLog.warn("Monitor thread checked error, monitor:{}, msg:{}, err:{}", getName(), t.getMessage(), t.getCause());
             }
-            ThreadUtils.threadSleep(30);
         }
     }
 }

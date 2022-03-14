@@ -11,11 +11,11 @@ import io.dongtai.log.DongTaiLog;
 import org.json.JSONObject;
 
 public class ServerConfigMonitor implements IMonitor {
-    private final String name = "ServerConfigMonitor";
+    private static final String NAME = "ServerConfigMonitor";
 
     @Override
     public String getName() {
-        return Constant.THREAD_PREFIX + name;
+        return Constant.THREAD_PREFIX + NAME;
     }
 
     @Override
@@ -38,10 +38,10 @@ public class ServerConfigMonitor implements IMonitor {
         while (!MonitorDaemonThread.isExit){
             try {
                 this.check();
+                ThreadUtils.threadSleep(60);
             } catch (Throwable t) {
                 DongTaiLog.warn("Monitor thread checked error, monitor:{}, msg:{}, err:{}", getName(), t.getMessage(), t.getCause());
             }
-            ThreadUtils.threadSleep(60);
         }
     }
 
