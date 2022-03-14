@@ -6,6 +6,7 @@ import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.FallbackSwitch;
 import io.dongtai.iast.core.handler.context.ContextManager;
 import io.dongtai.iast.core.handler.hookpoint.IastServer;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
+import io.dongtai.iast.core.utils.config.RemoteConfigUtils;
 import io.dongtai.iast.core.utils.threadlocal.*;
 import io.dongtai.iast.core.service.ServiceFactory;
 import io.dongtai.iast.core.utils.PropertyUtils;
@@ -106,6 +107,7 @@ public class EngineManager {
         this.supportLazyHook = cfg.isEnableAllHook();
         this.saveBytecode = cfg.isEnableDumpClass();
         this.agentId = agentId;
+        RemoteConfigUtils.syncRemoteConfig(agentId);
         this.fallbackManager = FallbackManager.newInstance(cfg.cfg);
     }
 

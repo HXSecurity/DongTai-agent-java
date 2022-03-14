@@ -2,11 +2,14 @@ package io.dongtai.iast.core.utils.config;
 
 import io.dongtai.iast.common.entity.performance.PerformanceMetrics;
 import io.dongtai.iast.common.enums.MetricsKey;
+import io.dongtai.iast.core.utils.Constants;
+import io.dongtai.iast.core.utils.HttpClientUtils;
 import io.dongtai.iast.core.utils.PropertyUtils;
 import io.dongtai.iast.core.utils.config.entity.PerformanceLimitThreshold;
 import io.dongtai.iast.core.utils.config.entity.RemoteConfigEntity;
 import io.dongtai.iast.core.utils.json.GsonUtils;
 import io.dongtai.log.DongTaiLog;
+import org.json.JSONObject;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -18,6 +21,8 @@ import java.util.*;
  * @date 2022/3/3
  */
 public class RemoteConfigUtils {
+
+    private static final String KEY_AGENT_ID = "agentId";
 
     private RemoteConfigUtils() {
         throw new IllegalStateException("Utility class");
@@ -59,9 +64,10 @@ public class RemoteConfigUtils {
     /**
      * 同步远程配置
      *
-     * @param remoteConfig 远程配置内容字符串
+     * @param agentId agent的唯一标识
      */
-    public static void syncRemoteConfig(String remoteConfig) {
+    public static void syncRemoteConfig(int agentId) {
+        String remoteConfig = getConfigFromRemote(agentId);
         // 和上次配置内容不一致时才重新更新配置文件
         try {
             if (!existsRemoteConfigMeta.equals(remoteConfig)) {
@@ -115,6 +121,23 @@ public class RemoteConfigUtils {
         } catch (Throwable t) {
             DongTaiLog.warn("Sync remote config failed, msg: {}, error: {}", t.getMessage(), t.getCause());
         }
+    }
+
+    /**
+     * 根据agentID获取服务端对Agent的配置
+     */
+    public static String getConfigFromRemote(int agentId){
+        JSONObject report = new JSONObject();
+        StringBuilder response = new StringBuilder();
+        report.put(KEY_AGENT_ID,agentId);
+        try {
+            response = HttpClientUtils.sendPost(Constants.API_SERVER_CONFIG,report.toString());
+
+        } catch (Throwable t) {
+            // todo 现在无法获取服务端配置，不需要打印日志。等服务端上线后取消注释下面的代码
+            //DongTaiLog.warn("Get server config failed, msg:{}, err:{}",t.getMessage(),t.getCause());
+        }
+        return response.toString();
     }
 
     /**

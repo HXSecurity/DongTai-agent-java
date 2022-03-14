@@ -20,16 +20,10 @@ public class ServerConfigMonitor implements IMonitor {
 
     @Override
     public void check() throws Exception {
-        String serverConfig = getConfigFromRemote();
-        // 前期无法从服务端获取config，返回的serverConfig为""，不进行下一步配置客户端。
-        if(!"".equals(serverConfig)){
-            //  获取的JSON字段不合法，抛异常，不进行下一步配置客户端
-            try {
-                JSONObject tempJson = new JSONObject(serverConfig);
-                setConfigToLocal(tempJson.toString());
-            }catch(Throwable t){
-                DongTaiLog.warn("Set server config to local failed, msg: {}, error: {}",t.getMessage(),t.getCause());
-            }
+        try {
+            setConfigToLocal(AgentRegisterReport.getAgentFlag());
+        }catch(Throwable t){
+            DongTaiLog.warn("Set server config to local failed, msg: {}, error: {}",t.getMessage(),t.getCause());
         }
     }
 
@@ -37,8 +31,9 @@ public class ServerConfigMonitor implements IMonitor {
     public void run() {
         while (!MonitorDaemonThread.isExit){
             try {
-                this.check();
+                // EngineManger初始化时会请求配置一次，所以ServerConfigMonitor首次不用运行
                 ThreadUtils.threadSleep(60);
+                this.check();
             } catch (Throwable t) {
                 DongTaiLog.warn("Monitor thread checked error, monitor:{}, msg:{}, err:{}", getName(), t.getMessage(), t.getCause());
             }
@@ -46,33 +41,16 @@ public class ServerConfigMonitor implements IMonitor {
     }
 
     /**
-     * 根据agentID获取服务端对Agent的配置
-     */
-    public String getConfigFromRemote(){
-        JSONObject report = new JSONObject();
-        StringBuilder response = new StringBuilder();
-        report.put(Constant.KEY_AGENT_ID, AgentRegisterReport.getAgentFlag());
-        try {
-            response = HttpClientUtils.sendPost(Constant.API_Server_Config,report.toString());
-
-        } catch (Throwable t) {
-            // todo 现在无法获取服务端配置，不需要打印日志。等服务端上线后取消注释下面的代码
-            // DongTaiLog.warn("Get server config failed, msg:{}, err:{}",t.getMessage(),t.getCause());
-        }
-        return response.toString();
-    }
-
-    /**
      * 寻找远端配置工具类 反射调用进行阈值配置
      */
-    public void setConfigToLocal(String serverConfig) {
+    public void setConfigToLocal(int agentId) {
         try {
             final Class<?> remoteConfigUtil = EngineManager.getRemoteConfigUtils();
             if (remoteConfigUtil == null) {
                 return;
             }
-            remoteConfigUtil.getMethod("syncRemoteConfig", String.class)
-                    .invoke(null, serverConfig);
+            remoteConfigUtil.getMethod("syncRemoteConfig",int.class)
+                    .invoke(null, agentId);
         } catch (Throwable t) {
             DongTaiLog.error("setConfigToLocal failed, msg:{}, err:{}", t.getMessage(), t.getCause());
         }
