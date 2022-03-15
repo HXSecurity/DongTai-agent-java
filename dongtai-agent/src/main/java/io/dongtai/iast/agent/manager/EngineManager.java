@@ -200,9 +200,13 @@ public class EngineManager {
      */
     public boolean downloadPackageFromServer() {
         String baseUrl = properties.getBaseUrl();
-        return downloadJarPackageToCacheFromUrl(baseUrl + INJECT_PACKAGE_REMOTE_URI, getInjectPackageCachePath()) &&
-                downloadJarPackageToCacheFromUrl(baseUrl + ENGINE_PACKAGE_REMOTE_URI, getEnginePackageCachePath()) &&
-                downloadJarPackageToCacheFromUrl(baseUrl + API_PACKAGE_REMOTE_URI, getApiPackagePath());
+        // 自定义jar下载地址
+        String spyJarUrl = "".equals(properties.getCustomSpyJarUrl()) ? baseUrl + INJECT_PACKAGE_REMOTE_URI : properties.getCustomSpyJarUrl();
+        String coreJarUrl = "".equals(properties.getCustomCoreJarUrl()) ? baseUrl + ENGINE_PACKAGE_REMOTE_URI : properties.getCustomCoreJarUrl();
+        String apiJarUrl = "".equals(properties.getCustomApiJarUrl()) ? baseUrl + API_PACKAGE_REMOTE_URI : properties.getCustomApiJarUrl();
+        return downloadJarPackageToCacheFromUrl(spyJarUrl, getInjectPackageCachePath()) &&
+                downloadJarPackageToCacheFromUrl(coreJarUrl, getEnginePackageCachePath()) &&
+                downloadJarPackageToCacheFromUrl(apiJarUrl, getApiPackagePath());
     }
 
     /**

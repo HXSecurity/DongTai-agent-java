@@ -32,6 +32,10 @@ public class IastProperties {
 
     private String propertiesFilePath;
 
+    private String customCoreJarUrl;
+    private String customSpyJarUrl;
+    private String customApiJarUrl;
+
     public static IastProperties getInstance() {
         if (null == instance) {
             instance = new IastProperties();
@@ -176,6 +180,28 @@ public class IastProperties {
                 )
         );
     }
+
+    public String getCustomSpyJarUrl() {
+        if (null == customSpyJarUrl) {
+            customSpyJarUrl = System.getProperty("iast.jar.spy.url", cfg.getProperty("iast.jar.spy.url", ""));
+        }
+        return customSpyJarUrl;
+    }
+
+    public String getCustomCoreJarUrl() {
+        if (null == customCoreJarUrl) {
+            customCoreJarUrl = System.getProperty("iast.jar.core.url", cfg.getProperty("iast.jar.core.url", ""));
+        }
+        return customCoreJarUrl;
+    }
+
+    public String getCustomApiJarUrl() {
+        if (null == customApiJarUrl) {
+            customApiJarUrl = System.getProperty("iast.jar.api.url", cfg.getProperty("iast.jar.api.url", ""));
+        }
+        return customApiJarUrl;
+    }
+
 
     private String getDebugFlag() {
         if (debugFlag == null) {
