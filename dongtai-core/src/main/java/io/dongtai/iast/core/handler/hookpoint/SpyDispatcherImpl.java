@@ -4,6 +4,7 @@ import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.bytecode.enhance.plugin.spring.SpringApplicationImpl;
 import io.dongtai.iast.core.handler.hookpoint.controller.HookType;
 import io.dongtai.iast.core.handler.hookpoint.controller.impl.*;
+import io.dongtai.iast.core.handler.hookpoint.framework.grpc.GrpcHandler;
 import io.dongtai.iast.core.handler.hookpoint.graphy.GraphBuilder;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.service.ErrorLogReport;
@@ -357,6 +358,16 @@ public class SpyDispatcherImpl implements SpyDispatcher {
         }
     }
 
+    @Override
+    public Object clientInterceptor(Object channel) {
+        return GrpcHandler.interceptChannel(channel);
+    }
+
+    @Override
+    public Object serverInterceptor(Object serverServiceDefinition) {
+        return GrpcHandler.interceptService(serverServiceDefinition);
+    }
+
     /**
      * mark for enter Source Entry Point
      *
@@ -398,7 +409,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                         if (HookType.HTTP.equals(hookType)) {
                             HttpImpl.solveHttp(event);
                         } else if (HookType.RPC.equals(hookType)) {
-                            solveRPC(framework,event);
+                            solveRPC(framework, event);
                         } else if (HookType.PROPAGATOR.equals(hookType) && !EngineManager.TAINT_POOL.get().isEmpty()) {
                             PropagatorImpl.solvePropagator(event, INVOKE_ID_SEQUENCER);
                         } else if (HookType.SOURCE.equals(hookType)) {
@@ -418,13 +429,15 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     }
 
     private void solveRPC(String framework, MethodEvent event) {
-        switch (framework){
-            case "dubbo" :
+        switch (framework) {
+            case "dubbo":
                 DubboImpl.solveDubbo(event, SpyDispatcherImpl.INVOKE_ID_SEQUENCER);
                 break;
-            case "krpc" :
+            case "krpc":
                 KrpcImpl.solveKrpc(event, SpyDispatcherImpl.INVOKE_ID_SEQUENCER);
                 break;
         }
     }
+
+
 }

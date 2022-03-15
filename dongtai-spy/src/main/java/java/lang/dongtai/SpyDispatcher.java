@@ -155,6 +155,12 @@ public interface SpyDispatcher {
      */
     boolean isFirstLevelSink();
 
+    /**
+     * @since 1.4.1
+     */
+    Object clientInterceptor(Object channel);
+
+    Object serverInterceptor(Object serverServiceDefinition);
 
 
     /**

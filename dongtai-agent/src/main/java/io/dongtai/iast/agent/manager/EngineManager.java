@@ -114,6 +114,10 @@ public class EngineManager {
         return System.getProperty("java.io.tmpdir") + File.separator + "iast" + File.separator + "dongtai-api.jar";
     }
 
+    private static String getGrpcPackagePath() {
+        return System.getProperty("java.io.tmpdir") + File.separator + "iast" + File.separator + "dongtai-grpc.jar";
+    }
+
 
     /**
      * 从远程URI下载jar包到指定的本地文件
@@ -179,7 +183,8 @@ public class EngineManager {
         String baseUrl = properties.getBaseUrl();
         return downloadJarPackageToCacheFromUrl(baseUrl + INJECT_PACKAGE_REMOTE_URI, getInjectPackageCachePath()) &&
                 downloadJarPackageToCacheFromUrl(baseUrl + ENGINE_PACKAGE_REMOTE_URI, getEnginePackageCachePath()) &&
-                downloadJarPackageToCacheFromUrl(baseUrl + API_PACKAGE_REMOTE_URI, getApiPackagePath());
+                downloadJarPackageToCacheFromUrl(baseUrl + API_PACKAGE_REMOTE_URI, getApiPackagePath()) &&
+                downloadJarPackageToCacheFromUrl(baseUrl + "/api/v1/engine/download?engineName=dongtai-grpc", getGrpcPackagePath());
     }
 
     /**
@@ -192,7 +197,8 @@ public class EngineManager {
         try {
             return FileUtils.getResourceToFile("bin/dongtai-spy.jar", getInjectPackageCachePath()) &&
                     FileUtils.getResourceToFile("bin/dongtai-core.jar", getEnginePackageCachePath()) &&
-                    FileUtils.getResourceToFile("bin/dongtai-api.jar", getApiPackagePath());
+                    FileUtils.getResourceToFile("bin/dongtai-api.jar", getApiPackagePath()) &&
+                    FileUtils.getResourceToFile("bin/dongtai-grpc.jar", getGrpcPackagePath());
         } catch (IOException e) {
             DongTaiLog.error(e);
         }
@@ -233,7 +239,7 @@ public class EngineManager {
                     .invoke(null, launchMode, this.properties.getPropertiesFilePath(),
                             AgentRegisterReport.getAgentFlag(), inst, agentPath);
             File iastDir = new File(System.getProperty("java.io.tmpdir") + File.separator + "iast");
-            deleteCache(iastDir);
+            //deleteCache(iastDir);
             return true;
         } catch (IOException e) {
             DongTaiLog.error("DongTai engine start failed, Reason: dongtai-spy.jar or dongtai-core.jar open failed. path: \n\tdongtai-core.jar: " + corePackage + "\n\tdongtai-spy.jar: " + spyPackage);

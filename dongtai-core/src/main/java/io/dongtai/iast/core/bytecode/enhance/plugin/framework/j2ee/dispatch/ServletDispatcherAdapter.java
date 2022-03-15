@@ -32,11 +32,6 @@ public class ServletDispatcherAdapter extends AbstractClassVisitor {
     }
 
     @Override
-    public boolean hasTransformed() {
-        return transformed;
-    }
-
-    @Override
     public MethodVisitor visitMethod(final int access, final String name, final String desc, final String signature, final String[] exceptions) {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
         Type[] typeOfArgs = Type.getArgumentTypes(desc);
@@ -50,9 +45,9 @@ public class ServletDispatcherAdapter extends AbstractClassVisitor {
             }
 
             mv = new ServletDispatcherAdviceAdapter(mv, access, name, desc, signCode, context, isJakarta);
-            transformed = true;
+            setTransformed();
         }
-        if (transformed) {
+        if (isTransformed()) {
             if (DongTaiLog.isDebugEnabled()) {
                 DongTaiLog.debug("rewrite method {}.{} for listener[match={}]", context.getClassName(), name, context.getMatchClassName());
             }

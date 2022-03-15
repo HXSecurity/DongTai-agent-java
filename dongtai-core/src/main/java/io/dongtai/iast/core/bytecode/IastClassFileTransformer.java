@@ -167,8 +167,8 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                     }
                 }
             }
-        } catch (
-                Throwable ignore) {
+        } catch (Throwable ignore) {
+            ignore.printStackTrace();
         } finally {
             if (isRunning) {
                 EngineManager.turnOnDongTai();

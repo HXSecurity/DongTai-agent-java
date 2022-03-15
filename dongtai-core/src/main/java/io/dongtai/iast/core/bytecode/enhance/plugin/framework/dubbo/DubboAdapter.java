@@ -17,11 +17,6 @@ public class DubboAdapter extends AbstractClassVisitor {
     }
 
     @Override
-    public boolean hasTransformed() {
-        return transformed;
-    }
-
-    @Override
     public MethodVisitor visitMethod(final int access, final String name, final String desc, final String signature, final String[] exceptions) {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
         String signCode = AsmUtils.buildSignature(context.getClassName(), name, desc);
@@ -31,7 +26,7 @@ public class DubboAdapter extends AbstractClassVisitor {
             }
 
             mv = new DubboAdviceAdapter(mv, access, name, desc, signCode, context);
-            transformed = true;
+            setTransformed();
             if (DongTaiLog.isDebugEnabled()) {
                 DongTaiLog.debug("rewrite method {}.{} for listener[match={}]", context.getClassName(), name, context.getMatchClassName());
             }

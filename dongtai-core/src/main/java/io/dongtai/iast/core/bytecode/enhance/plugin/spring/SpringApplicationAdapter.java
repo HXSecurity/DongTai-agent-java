@@ -12,11 +12,6 @@ public class SpringApplicationAdapter extends AbstractClassVisitor {
     }
 
     @Override
-    public boolean hasTransformed() {
-        return transformed;
-    }
-
-    @Override
     public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
 
         MethodVisitor methodVisitor = super.visitMethod(access,
@@ -34,7 +29,7 @@ public class SpringApplicationAdapter extends AbstractClassVisitor {
                     "SPRINGAPPLICATION_FOR_API",
                     "SPRINGAPPLICATION_FOR_API"
             );
-            transformed = true;
+            setTransformed();
         }
         return methodVisitor;
 
