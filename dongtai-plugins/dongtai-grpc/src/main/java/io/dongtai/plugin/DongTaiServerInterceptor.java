@@ -8,11 +8,15 @@ public class DongTaiServerInterceptor implements ServerInterceptor {
 
     @Override
     public <ReqT, RespT> ServerCall.Listener<ReqT> interceptCall(ServerCall<ReqT, RespT> serverCall, Metadata metadata, ServerCallHandler<ReqT, RespT> serverCallHandler) {
-        //输出客户端传递过来的header
         Set<String> keys = metadata.keys();
         for (String key : keys) {
-            System.out.println(key);
-            GrpcProxy.addMetaItem(key, metadata.get(Metadata.Key.of(key, Metadata.ASCII_STRING_MARSHALLER)));
+            Metadata.Key<?> metaItemKey;
+            if (key.endsWith("-bin")) {
+                metaItemKey = Metadata.Key.of(key, Metadata.BINARY_BYTE_MARSHALLER);
+            } else {
+                metaItemKey = Metadata.Key.of(key, Metadata.ASCII_STRING_MARSHALLER);
+            }
+            GrpcProxy.addMetaItem(key, metadata.get(metaItemKey));
         }
         return new DongTaiServerCallListener<ReqT>(serverCallHandler.startCall(new ForwardingServerCall.SimpleForwardingServerCall<ReqT, RespT>(serverCall) {
             @Override

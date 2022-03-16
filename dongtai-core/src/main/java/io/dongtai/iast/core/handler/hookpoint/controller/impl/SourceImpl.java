@@ -3,6 +3,7 @@ package io.dongtai.iast.core.handler.hookpoint.controller.impl;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.utils.StackUtils;
+
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +44,11 @@ public class SourceImpl {
         }
     }
 
+    /**
+     * todo: 处理过程和结果需要细化
+     *
+     * @param event
+     */
     public static void handlerCustomModel(MethodEvent event) {
         try {
             Class<?> sourceClass = event.returnValue.getClass();

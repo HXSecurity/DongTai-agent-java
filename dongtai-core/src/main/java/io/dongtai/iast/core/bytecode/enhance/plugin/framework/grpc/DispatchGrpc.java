@@ -8,6 +8,11 @@ public class DispatchGrpc implements DispatchPlugin {
     private final String classOfAbstractStub = "io.grpc.stub.AbstractStub";
     private final String classOfAbstractServerImplBuilder = "io.grpc.internal.AbstractServerImplBuilder";
     private final String classOfClientCalls = "io.grpc.stub.ClientCalls";
+    private final String classOfServerTransportListenerImpl = "io.grpc.internal.ServerImpl$ServerTransportListenerImpl";
+    private final String classOfMethodDescriptor = "io.grpc.MethodDescriptor";
+    private final String classOfServerStreamListenerImpl = "io.grpc.internal.ServerCallImpl$ServerStreamListenerImpl";
+    //io.grpc.internal.ServerCallImpl.ServerStreamListenerImpl.closed
+    // io.grpc.MethodDescriptor.parseRequest
 
     @Override
     public ClassVisitor dispatch(ClassVisitor classVisitor, IastContext context) {
@@ -24,6 +29,15 @@ public class DispatchGrpc implements DispatchPlugin {
                 context.setMatchClassName(className);
                 classVisitor = new AbstractServerImplBuilderAdapter(classVisitor, null);
                 break;
+            case classOfServerTransportListenerImpl:
+                classVisitor = new ServerTransportListenerImplAdapter(classVisitor, null);
+                break;
+            case classOfServerStreamListenerImpl:
+                classVisitor = new ServerStreamListenerImplAdapter(classVisitor, null);
+                break;
+//            case classOfMethodDescriptor:
+//                classVisitor = new MethodDescriptorAdapter(classVisitor, null);
+//                break;
         }
         return classVisitor;
     }

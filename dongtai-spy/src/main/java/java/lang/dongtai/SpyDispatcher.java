@@ -162,6 +162,9 @@ public interface SpyDispatcher {
 
     Object serverInterceptor(Object serverServiceDefinition);
 
+    void startGrpcCall();
+
+    void closeGrpcCall();
 
     /**
      * mark for enter Source Entry Point

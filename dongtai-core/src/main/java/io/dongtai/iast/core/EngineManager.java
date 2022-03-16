@@ -195,9 +195,9 @@ public class EngineManager {
             ContextManager.getOrCreateGlobalTraceId(headers.get("dt-traceid"), EngineManager.getAgentId());
         } else {
             String newTraceId = ContextManager.getOrCreateGlobalTraceId(null, EngineManager.getAgentId());
-            String spanId = ContextManager.getSpanId(newTraceId,EngineManager.getAgentId());
+            String spanId = ContextManager.getSpanId(newTraceId, EngineManager.getAgentId());
             headers.put("dt-traceid", newTraceId);
-            headers.put("dt-spandid",spanId);
+            headers.put("dt-spandid", spanId);
         }
         ENTER_HTTP_ENTRYPOINT.enterEntry();
         REQUEST_CONTEXT.set(requestMeta);
@@ -346,5 +346,11 @@ public class EngineManager {
 
     public static boolean isFirstLevelKrpc() {
         return SCOPE_TRACKER.isFirstLevelKrpc();
+    }
+
+    public static boolean isEnterEntry() {
+        return EngineManager.isEnterHttp()
+                || SCOPE_TRACKER.isFirstLevelDubbo()
+                || SCOPE_TRACKER.get().isFirstLevelGrpc();
     }
 }

@@ -228,6 +228,7 @@ public class EngineManager {
             File coreFile = new File(corePackage);
             JarFile spyJarFile = new JarFile(spyFile);
             inst.appendToBootstrapClassLoaderSearch(spyJarFile);
+            inst.appendToBootstrapClassLoaderSearch(new JarFile(coreFile));
             spyJarFile.close();
             if (IAST_CLASS_LOADER == null) {
                 IAST_CLASS_LOADER = new IastClassLoader(corePackage);

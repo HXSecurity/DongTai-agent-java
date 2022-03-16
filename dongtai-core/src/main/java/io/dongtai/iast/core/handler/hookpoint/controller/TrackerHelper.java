@@ -20,6 +20,8 @@ public class TrackerHelper {
      */
     private int krpcLevel = 0;
 
+    private int grpcLevel = 0;
+
     public void enterTrack() {
         this.trackCounts++;
     }
@@ -126,7 +128,7 @@ public class TrackerHelper {
     }
 
     private boolean isEnterEntry() {
-        return enterHttp > 0 || dubboLevel > 0;
+        return enterHttp > 0 || dubboLevel > 0 || grpcLevel > 0;
     }
 
     private boolean isFirstLevel(int targetLevel) {
@@ -154,5 +156,21 @@ public class TrackerHelper {
 
     public boolean isFirstLevelKrpc() {
         return this.krpcLevel == 1;
+    }
+
+    public void enterGrpc() {
+        grpcLevel++;
+    }
+
+    public void leaveGrpc() {
+        grpcLevel--;
+    }
+
+    public boolean isExitGrpc() {
+        return grpcLevel == 0;
+    }
+
+    public boolean isFirstLevelGrpc() {
+        return grpcLevel == 1;
     }
 }

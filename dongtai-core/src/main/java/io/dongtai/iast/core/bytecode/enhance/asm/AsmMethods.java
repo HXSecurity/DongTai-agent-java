@@ -140,4 +140,12 @@ public interface AsmMethods {
             "serverInterceptor",
             Object.class
     );
+    Method SPY$startGrpcCall = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "startGrpcCall"
+    );
+    Method SPY$closeGrpcCall = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "closeGrpcCall"
+    );
 }
