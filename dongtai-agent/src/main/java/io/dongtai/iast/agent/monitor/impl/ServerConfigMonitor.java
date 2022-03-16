@@ -6,9 +6,7 @@ import io.dongtai.iast.agent.monitor.IMonitor;
 import io.dongtai.iast.agent.monitor.MonitorDaemonThread;
 import io.dongtai.iast.agent.report.AgentRegisterReport;
 import io.dongtai.iast.agent.util.ThreadUtils;
-import io.dongtai.iast.agent.util.http.HttpClientUtils;
 import io.dongtai.log.DongTaiLog;
-import org.json.JSONObject;
 
 public class ServerConfigMonitor implements IMonitor {
     private static final String NAME = "ServerConfigMonitor";
@@ -22,14 +20,14 @@ public class ServerConfigMonitor implements IMonitor {
     public void check() throws Exception {
         try {
             setConfigToLocal(AgentRegisterReport.getAgentFlag());
-        }catch(Throwable t){
-            DongTaiLog.warn("Set server config to local failed, msg: {}, error: {}",t.getMessage(),t.getCause());
+        } catch (Throwable t) {
+            DongTaiLog.warn("ServerConfigMonitor check failed, msg: {}, error: {}", t.getMessage(), t.getCause());
         }
     }
 
     @Override
     public void run() {
-        while (!MonitorDaemonThread.isExit){
+        while (!MonitorDaemonThread.isExit) {
             try {
                 // EngineManger初始化时会请求配置一次，所以ServerConfigMonitor首次不用运行
                 ThreadUtils.threadSleep(60);
@@ -49,7 +47,7 @@ public class ServerConfigMonitor implements IMonitor {
             if (remoteConfigUtil == null) {
                 return;
             }
-            remoteConfigUtil.getMethod("syncRemoteConfig",int.class)
+            remoteConfigUtil.getMethod("syncRemoteConfig", int.class)
                     .invoke(null, agentId);
         } catch (Throwable t) {
             DongTaiLog.error("setConfigToLocal failed, msg:{}, err:{}", t.getMessage(), t.getCause());

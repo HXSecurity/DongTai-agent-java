@@ -1,5 +1,6 @@
 package io.dongtai.iast.core.utils.config;
 
+import com.google.common.reflect.TypeToken;
 import io.dongtai.iast.common.entity.performance.PerformanceMetrics;
 import io.dongtai.iast.common.enums.MetricsKey;
 import io.dongtai.iast.core.utils.Constants;
@@ -7,11 +8,13 @@ import io.dongtai.iast.core.utils.HttpClientUtils;
 import io.dongtai.iast.core.utils.PropertyUtils;
 import io.dongtai.iast.core.utils.config.entity.PerformanceLimitThreshold;
 import io.dongtai.iast.core.utils.config.entity.RemoteConfigEntity;
+import io.dongtai.iast.core.utils.config.entity.ServerResponseEntity;
 import io.dongtai.iast.core.utils.json.GsonUtils;
 import io.dongtai.log.DongTaiLog;
 import org.json.JSONObject;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 import java.util.*;
 
 /**
@@ -67,11 +70,11 @@ public class RemoteConfigUtils {
      * @param agentId agent的唯一标识
      */
     public static void syncRemoteConfig(int agentId) {
-        String remoteConfig = getConfigFromRemote(agentId);
-        // 和上次配置内容不一致时才重新更新配置文件
+        String remoteResponse = getConfigFromRemote(agentId);
+        RemoteConfigEntity remoteConfigEntity = extractConfigEntity(remoteResponse);
+        // 远端有配置且和上次配置内容不一致时，重新更新配置文件
         try {
-            if (!existsRemoteConfigMeta.equals(remoteConfig)) {
-                RemoteConfigEntity remoteConfigEntity = GsonUtils.toObject(remoteConfig, RemoteConfigEntity.class);
+            if (null != remoteConfigEntity && !remoteResponse.equals(existsRemoteConfigMeta)) {
                 if (remoteConfigEntity.getEnableAutoFallback() != null) {
                     enableAutoFallback = remoteConfigEntity.getEnableAutoFallback();
                 }
@@ -115,7 +118,7 @@ public class RemoteConfigUtils {
                 if (remoteConfigEntity.getSecondFallbackDuration() != null) {
                     secondFallbackDuration = remoteConfigEntity.getSecondFallbackDuration();
                 }
-                existsRemoteConfigMeta = remoteConfig;
+                existsRemoteConfigMeta = remoteResponse;
                 DongTaiLog.info("Sync remote config successful.");
             }
         } catch (Throwable t) {
@@ -126,19 +129,34 @@ public class RemoteConfigUtils {
     /**
      * 根据agentID获取服务端对Agent的配置
      */
-    public static String getConfigFromRemote(int agentId){
+    private static String getConfigFromRemote(int agentId) {
         JSONObject report = new JSONObject();
-        StringBuilder response = new StringBuilder();
-        report.put(KEY_AGENT_ID,agentId);
+        report.put(KEY_AGENT_ID, agentId);
         try {
-            response = HttpClientUtils.sendPost(Constants.API_SERVER_CONFIG,report.toString());
-
+            StringBuilder response = HttpClientUtils.sendPost(Constants.API_SERVER_CONFIG, report.toString());
+            return response.toString();
         } catch (Throwable t) {
             // todo 现在无法获取服务端配置，不需要打印日志。等服务端上线后取消注释下面的代码
-            //DongTaiLog.warn("Get server config failed, msg:{}, err:{}",t.getMessage(),t.getCause());
+            // DongTaiLog.warn("Get server config failed, msg:{}, err:{}",t.getMessage(),t.getCause());
         }
-        return response.toString();
+        return "{}";
     }
+
+    private static RemoteConfigEntity extractConfigEntity(String remoteResponse) {
+        RemoteConfigEntity configEntity = null;
+        Type type = new TypeToken<ServerResponseEntity<RemoteConfigEntity>>() {
+        }.getType();
+        ServerResponseEntity<RemoteConfigEntity> responseEntity = GsonUtils.toObject(remoteResponse, type);
+        // 状态码为201时，从请求中获取实体
+        if (201 == responseEntity.getStatus()) {
+            configEntity = responseEntity.getData();
+        } else {
+            // todo 现在无法获取服务端配置，不需要打印日志。等服务端上线后取消注释下面的代码
+            // DongTaiLog.warn("Remote status error: status: {},msg: {}", responseEntity.getStatus(), responseEntity.getMsg());
+        }
+        return configEntity;
+    }
+
 
     /**
      * 合并远端和本地的指标阈值配置
@@ -233,6 +251,7 @@ public class RemoteConfigUtils {
     // *************************************************************
     // 高频流量限流相关配置(本地)
     // *************************************************************
+
     /**
      * 高频流量限流-每秒获得令牌数
      */
@@ -350,6 +369,7 @@ public class RemoteConfigUtils {
     // *************************************************************
     // 二次降级操作限流相关配置(本地)
     // *************************************************************
+
     /**
      * 二次降级-降级开关打开频率限制-每秒获得令牌数
      */

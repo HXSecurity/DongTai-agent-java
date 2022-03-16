@@ -38,6 +38,10 @@ public class GsonUtils {
         return GSON.fromJson(json, clazz);
     }
 
+    public static <T> T toObject(String json, Type typeOfT) {
+        return GSON.fromJson(json, typeOfT);
+    }
+
     public static <T> Collection<T> toList(String json, Class<T> clazz) {
         Type collectionType = new TypeToken<Collection<T>>() {
         }.getType();
