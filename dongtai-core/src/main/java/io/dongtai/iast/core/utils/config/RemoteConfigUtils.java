@@ -144,15 +144,19 @@ public class RemoteConfigUtils {
 
     private static RemoteConfigEntity extractConfigEntity(String remoteResponse) {
         RemoteConfigEntity configEntity = null;
-        Type type = new TypeToken<ServerResponseEntity<RemoteConfigEntity>>() {
-        }.getType();
-        ServerResponseEntity<RemoteConfigEntity> responseEntity = GsonUtils.toObject(remoteResponse, type);
-        // 状态码为201时，从请求中获取实体
-        if (201 == responseEntity.getStatus()) {
-            configEntity = responseEntity.getData();
-        } else {
-            // todo 现在无法获取服务端配置，不需要打印日志。等服务端上线后取消注释下面的代码
-            // DongTaiLog.warn("Remote status error: status: {},msg: {}", responseEntity.getStatus(), responseEntity.getMsg());
+        try {
+            Type type = new TypeToken<ServerResponseEntity<RemoteConfigEntity>>() {
+            }.getType();
+            ServerResponseEntity<RemoteConfigEntity> responseEntity = GsonUtils.toObject(remoteResponse, type);
+            // 状态码为201时，从请求中获取实体
+            if (201 == responseEntity.getStatus()) {
+                configEntity = responseEntity.getData();
+            } else {
+                // todo 现在无法获取服务端配置，不需要打印日志。等服务端上线后取消注释下面的代码
+                // DongTaiLog.warn("Remote status error: status: {},msg: {}", responseEntity.getStatus(), responseEntity.getMsg());
+            }
+        } catch (Throwable t) {
+            DongTaiLog.warn("extractConfigEntity filed: msg:{}, err:{}",t.getMessage(),t.getCause());
         }
         return configEntity;
     }
