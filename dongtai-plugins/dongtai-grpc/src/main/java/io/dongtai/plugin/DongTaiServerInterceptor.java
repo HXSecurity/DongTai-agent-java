@@ -18,6 +18,8 @@ public class DongTaiServerInterceptor implements ServerInterceptor {
             }
             GrpcProxy.addMetaItem(key, metadata.get(metaItemKey));
         }
+        GrpcProxy.addMetaItem("requestURI", serverCall.getMethodDescriptor().getFullMethodName());
+        GrpcProxy.addMetaItem("serverAddr", serverCall.getAuthority());
         return new DongTaiServerCallListener<ReqT>(serverCallHandler.startCall(new ForwardingServerCall.SimpleForwardingServerCall<ReqT, RespT>(serverCall) {
             @Override
             public void close(Status status, Metadata trailers) {
