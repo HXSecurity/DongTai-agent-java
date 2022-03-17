@@ -386,6 +386,13 @@ public class SpyDispatcherImpl implements SpyDispatcher {
         GrpcHandler.closeGrpcCall();
     }
 
+    @Override
+    public void blockingUnaryCall(Object req, Object res) {
+        EngineManager.turnOffDongTai();
+        GrpcHandler.blockingUnaryCall(req, res);
+        EngineManager.turnOnDongTai();
+    }
+
 
     /**
      * mark for enter Source Entry Point

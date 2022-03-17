@@ -148,4 +148,10 @@ public interface AsmMethods {
             SpyDispatcher.class,
             "closeGrpcCall"
     );
+    Method SPY$blockingUnaryCall = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "blockingUnaryCall",
+            Object.class,
+            Object.class
+    );
 }

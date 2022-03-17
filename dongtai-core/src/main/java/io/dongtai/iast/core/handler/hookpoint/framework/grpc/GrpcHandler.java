@@ -3,10 +3,14 @@ package io.dongtai.iast.core.handler.hookpoint.framework.grpc;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.context.ContextManager;
 import io.dongtai.iast.core.handler.hookpoint.IastClassLoader;
+import io.dongtai.iast.core.handler.hookpoint.SpyDispatcherImpl;
+import io.dongtai.iast.core.handler.hookpoint.controller.impl.SourceImpl;
 import io.dongtai.iast.core.handler.hookpoint.graphy.GraphBuilder;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.service.ErrorLogReport;
 import io.dongtai.iast.core.utils.HttpClientUtils;
+import io.dongtai.iast.core.utils.StackUtils;
+import io.dongtai.iast.core.utils.TaintPoolUtils;
 import io.dongtai.log.DongTaiLog;
 
 import java.io.File;
@@ -16,6 +20,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class GrpcHandler {
     private static IastClassLoader gRpcClassLoader;
@@ -139,4 +144,44 @@ public class GrpcHandler {
         }
     }
 
+    public static void blockingUnaryCall(Object req, Object res) {
+        // todo: 判断 req 的相关自定义对象是否与污点有关
+        if (!EngineManager.TAINT_POOL.get().isEmpty()) {
+            MethodEvent event = new MethodEvent(
+                    0,
+                    0,
+                    "io.grpc.stub.ClientCalls",
+                    "io.grpc.stub.ClientCalls",
+                    "blockingUnaryCall",
+                    "io.grpc.stub.ClientCalls.blockingUnaryCall(io.grpc.Channel, io.grpc.MethodDescriptor<ReqT,RespT>, io.grpc.CallOptions, ReqT)",
+                    "io.grpc.stub.ClientCalls.blockingUnaryCall(io.grpc.Channel, io.grpc.MethodDescriptor<ReqT,RespT>, io.grpc.CallOptions, ReqT)",
+                    null,
+                    new Object[]{req},
+                    res,
+                    "GRPC",
+                    false,
+                    null
+            );
+            Set<Object> modelItems = SourceImpl.parseCustomModel(req);
+            boolean isHitTaints = false;
+            for (Object item : modelItems) {
+                isHitTaints = isHitTaints || TaintPoolUtils.poolContains(item, event, false);
+            }
+            if (isHitTaints) {
+                // todo: 处理返回值，将返回值加入 taint pool
+                int invokeId = SpyDispatcherImpl.INVOKE_ID_SEQUENCER.getAndIncrement();
+                event.setInvokeId(invokeId);
+                event.setCallStack(StackUtils.getLatestStack(5));
+                EngineManager.TRACK_MAP.addTrackMethod(invokeId, event);
+                Set<Object> resModelItems = SourceImpl.parseCustomModel(res);
+                for (Object obj : resModelItems) {
+                    // fixme: 暂时只跟踪字符串相关内容
+                    if (obj instanceof String) {
+                        EngineManager.TAINT_POOL.addTaintToPool(obj, event, false);
+                    }
+                }
+            }
+        }
+
+    }
 }

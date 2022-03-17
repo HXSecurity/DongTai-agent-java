@@ -166,6 +166,8 @@ public interface SpyDispatcher {
 
     void closeGrpcCall();
 
+    void blockingUnaryCall(Object req, Object res);
+
     /**
      * mark for enter Source Entry Point
      *
