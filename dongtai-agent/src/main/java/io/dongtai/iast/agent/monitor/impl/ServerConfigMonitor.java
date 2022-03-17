@@ -18,11 +18,7 @@ public class ServerConfigMonitor implements IMonitor {
 
     @Override
     public void check() throws Exception {
-        try {
-            setConfigToLocal(AgentRegisterReport.getAgentFlag());
-        } catch (Throwable t) {
-            DongTaiLog.warn("ServerConfigMonitor check failed, msg: {}, error: {}", t.getMessage(), t.getCause());
-        }
+        setConfigToLocal(AgentRegisterReport.getAgentFlag());
     }
 
     @Override
@@ -50,7 +46,7 @@ public class ServerConfigMonitor implements IMonitor {
             remoteConfigUtil.getMethod("syncRemoteConfig", int.class)
                     .invoke(null, agentId);
         } catch (Throwable t) {
-            DongTaiLog.error("setConfigToLocal failed, msg:{}, err:{}", t.getMessage(), t.getCause());
+            DongTaiLog.warn("setConfigToLocal failed, msg:{}, err:{}", t.getMessage(), t.getCause());
         }
     }
 

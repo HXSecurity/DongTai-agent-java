@@ -1,20 +1,19 @@
 package io.dongtai.iast.core.utils.config;
 
-import com.google.common.reflect.TypeToken;
+import com.google.gson.reflect.TypeToken;
 import io.dongtai.iast.common.entity.performance.PerformanceMetrics;
+import io.dongtai.iast.common.entity.response.PlainResult;
 import io.dongtai.iast.common.enums.MetricsKey;
 import io.dongtai.iast.core.utils.Constants;
 import io.dongtai.iast.core.utils.HttpClientUtils;
 import io.dongtai.iast.core.utils.PropertyUtils;
 import io.dongtai.iast.core.utils.config.entity.PerformanceLimitThreshold;
 import io.dongtai.iast.core.utils.config.entity.RemoteConfigEntity;
-import io.dongtai.iast.core.utils.config.entity.ServerResponseEntity;
 import io.dongtai.iast.core.utils.json.GsonUtils;
 import io.dongtai.log.DongTaiLog;
 import org.json.JSONObject;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Type;
 import java.util.*;
 
 /**
@@ -26,6 +25,7 @@ import java.util.*;
 public class RemoteConfigUtils {
 
     private static final String KEY_AGENT_ID = "agentId";
+    private static final String REMOTE_CONFIG_DEFAULT_META = "{}";
 
     private RemoteConfigUtils() {
         throw new IllegalStateException("Utility class");
@@ -71,7 +71,7 @@ public class RemoteConfigUtils {
      */
     public static void syncRemoteConfig(int agentId) {
         String remoteResponse = getConfigFromRemote(agentId);
-        RemoteConfigEntity remoteConfigEntity = extractConfigEntity(remoteResponse);
+        RemoteConfigEntity remoteConfigEntity = parseRemoteConfigResponse(remoteResponse);
         // 远端有配置且和上次配置内容不一致时，重新更新配置文件
         try {
             if (null != remoteConfigEntity && !remoteResponse.equals(existsRemoteConfigMeta)) {
@@ -138,27 +138,33 @@ public class RemoteConfigUtils {
         } catch (Throwable t) {
             // todo 现在无法获取服务端配置，不需要打印日志。等服务端上线后取消注释下面的代码
             // DongTaiLog.warn("Get server config failed, msg:{}, err:{}",t.getMessage(),t.getCause());
+            return REMOTE_CONFIG_DEFAULT_META;
         }
-        return "{}";
     }
 
-    private static RemoteConfigEntity extractConfigEntity(String remoteResponse) {
-        RemoteConfigEntity configEntity = null;
+    /**
+     * 解析远程配置响应
+     */
+    private static RemoteConfigEntity parseRemoteConfigResponse(String remoteResponse) {
         try {
-            Type type = new TypeToken<ServerResponseEntity<RemoteConfigEntity>>() {
-            }.getType();
-            ServerResponseEntity<RemoteConfigEntity> responseEntity = GsonUtils.toObject(remoteResponse, type);
-            // 状态码为201时，从请求中获取实体
-            if (201 == responseEntity.getStatus()) {
-                configEntity = responseEntity.getData();
+            // 默认响应标识调用失败
+            if (REMOTE_CONFIG_DEFAULT_META.equals(remoteResponse)) {
+                return null;
+            }
+            PlainResult<RemoteConfigEntity> result = GsonUtils.toObject(remoteResponse, new TypeToken<PlainResult<RemoteConfigEntity>>() {
+            }.getType());
+            // 服务端响应成功状态码
+            if (result.isSuccess()) {
+                return result.getData();
             } else {
-                // todo 现在无法获取服务端配置，不需要打印日志。等服务端上线后取消注释下面的代码
-                // DongTaiLog.warn("Remote status error: status: {},msg: {}", responseEntity.getStatus(), responseEntity.getMsg());
+                DongTaiLog.warn("remoteConfig request not success, status:{}, msg:{},response:{}", result.getStatus(), result.getMsg(),
+                        remoteResponse);
+                return null;
             }
         } catch (Throwable t) {
-            DongTaiLog.warn("extractConfigEntity filed: msg:{}, err:{}",t.getMessage(),t.getCause());
+            DongTaiLog.warn("remoteConfig parse failed: msg:{}, err:{}, response:{}", t.getMessage(), t.getCause(), remoteResponse);
+            return null;
         }
-        return configEntity;
     }
 
 
