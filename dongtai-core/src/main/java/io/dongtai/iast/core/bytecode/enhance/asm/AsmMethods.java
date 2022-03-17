@@ -154,4 +154,9 @@ public interface AsmMethods {
             Object.class,
             Object.class
     );
+    Method SPY$sendMessage = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "sendMessage",
+            Object.class
+    );
 }

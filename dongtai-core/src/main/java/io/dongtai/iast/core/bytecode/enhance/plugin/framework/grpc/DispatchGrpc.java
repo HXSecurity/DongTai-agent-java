@@ -10,6 +10,7 @@ public class DispatchGrpc implements DispatchPlugin {
     private final String classOfClientCalls = "io.grpc.stub.ClientCalls";
     private final String classOfServerTransportListenerImpl = "io.grpc.internal.ServerImpl$ServerTransportListenerImpl";
     private final String classOfServerStreamListenerImpl = "io.grpc.internal.ServerCallImpl$ServerStreamListenerImpl";
+    private final String classOfServerCallImpl = "io.grpc.internal.ServerCallImpl";
 
     @Override
     public ClassVisitor dispatch(ClassVisitor classVisitor, IastContext context) {
@@ -29,6 +30,9 @@ public class DispatchGrpc implements DispatchPlugin {
                 break;
             case classOfServerStreamListenerImpl:
                 classVisitor = new ServerStreamListenerImplAdapter(classVisitor, null);
+                break;
+            case classOfServerCallImpl:
+                classVisitor = new ServerCallImplAdapter(classVisitor, null);
                 break;
         }
         return classVisitor;

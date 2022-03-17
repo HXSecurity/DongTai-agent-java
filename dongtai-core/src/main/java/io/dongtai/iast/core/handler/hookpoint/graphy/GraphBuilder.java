@@ -58,7 +58,13 @@ public class GraphBuilder {
                             event.getSourceHashes(),
                             event.getTargetHashes(),
                             properties.isLocal() ? event.obj2String(event.inValue) : "",
-                            properties.isLocal() ? event.obj2String(event.outValue) : ""
+                            properties.isLocal() ? event.obj2String(event.outValue) : "",
+                            event.getSourceHashForRpc(),
+                            event.getTargetHashForRpc(),
+                            event.getTraceId(),
+                            event.getServiceName(),
+                            event.getPlugin(),
+                            event.getProjectPropagatorClose()
                     )
             );
         }

@@ -3,6 +3,7 @@ package io.dongtai.iast.core.utils.threadlocal;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.utils.PropertyUtils;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
+
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -41,6 +42,7 @@ public class IastTaintPool extends ThreadLocal<HashSet<Object>> {
                     subHashCode = System.identityHashCode(tempObj);
                     EngineManager.TAINT_HASH_CODES.get().add(subHashCode);
                     event.addTargetHash(subHashCode);
+                    event.addTargetHashForRpc(tempObj.hashCode());
                 }
             } else {
                 for (String tempObj : tempObjs) {
@@ -77,6 +79,7 @@ public class IastTaintPool extends ThreadLocal<HashSet<Object>> {
                 subHashCode = obj.hashCode();
             }
             event.addTargetHash(subHashCode);
+            event.addTargetHashForRpc(obj.hashCode());
 
         }
     }

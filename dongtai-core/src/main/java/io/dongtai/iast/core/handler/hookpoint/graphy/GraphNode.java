@@ -1,9 +1,9 @@
 package io.dongtai.iast.core.handler.hookpoint.graphy;
 
+import javafx.scene.chart.ValueAxis;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -87,11 +87,30 @@ public class GraphNode {
     /**
      * 来源污点hash
      */
-    private final List<Integer> sourceHash;
+    private final Set<Integer> sourceHash;
     /**
      * 输出污点hash
      */
-    private final List<Integer> targetHash;
+    private final Set<Integer> targetHash;
+
+    /**
+     * 增加一组hashcode，用于处理rpc请求中，污点断链的情况
+     *
+     * @issue: http://
+     */
+    private final Set<Integer> sourceHashForRpc;
+
+    /**
+     * 增加一组hashcode，用于处理rpc请求中，污点断链的情况
+     *
+     * @issue: http://
+     */
+    private final Set<Integer> targetHashForRpc;
+
+    private final String traceId;
+    private final String serviceName;
+    private final String plugin;
+    private final Boolean projectPropagatorClose;
 
     public GraphNode(boolean isSource,
                      int invokeId,
@@ -105,10 +124,16 @@ public class GraphNode {
                      String signature,
                      String args,
                      String retClassName,
-                     List<Integer> sourceHash,
-                     List<Integer> targetHash,
+                     Set<Integer> sourceHash,
+                     Set<Integer> targetHash,
                      String sourceValues,
-                     String targetValues
+                     String targetValues,
+                     Set<Integer> sourceHashForRpc,
+                     Set<Integer> targetHashForRpc,
+                     String traceId,
+                     String serviceName,
+                     String plugin,
+                     Boolean projectPropagatorClose
     ) {
         this.isSource = isSource;
         this.invokeId = invokeId;
@@ -126,6 +151,12 @@ public class GraphNode {
         this.targetHash = targetHash;
         this.sourceValues = sourceValues;
         this.targetValues = targetValues;
+        this.sourceHashForRpc = sourceHashForRpc;
+        this.targetHashForRpc = targetHashForRpc;
+        this.traceId = traceId;
+        this.serviceName = serviceName;
+        this.plugin = plugin;
+        this.projectPropagatorClose = projectPropagatorClose;
     }
 
     public JSONObject toJson() {
@@ -133,6 +164,8 @@ public class GraphNode {
         JSONArray interfaceArray = new JSONArray();
         JSONArray sourceHashArray = new JSONArray();
         JSONArray targetHashArray = new JSONArray();
+        JSONArray sourceHashForRpcArray = new JSONArray();
+        JSONArray targetHashForRpcArray = new JSONArray();
 
         value.put("source", isSource);
         value.put("invokeId", invokeId);
@@ -150,6 +183,13 @@ public class GraphNode {
         value.put("sourceValues", sourceValues);
         value.put("targetHash", targetHashArray);
         value.put("targetValues", targetValues);
+        value.put("sourceHashForRpc", sourceHashForRpcArray);
+        value.put("targetHashForRpc", targetHashForRpcArray);
+        value.put("traceId", traceId);
+        value.put("serviceName", serviceName);
+        value.put("plugin", plugin);
+        value.put("projectPropagatorClose", projectPropagatorClose);
+
 
         if (interfaceNames != null) {
             for (String interfaceName : interfaceNames) {
@@ -163,6 +203,14 @@ public class GraphNode {
 
         for (Integer hash : targetHash) {
             targetHashArray.put(hash);
+        }
+
+        for (Integer hash : this.sourceHashForRpc) {
+            sourceHashForRpcArray.put(hash);
+        }
+
+        for (Integer hash : this.targetHashForRpc) {
+            targetHashForRpcArray.put(hash);
         }
 
         return value;

@@ -393,6 +393,13 @@ public class SpyDispatcherImpl implements SpyDispatcher {
         EngineManager.turnOnDongTai();
     }
 
+    @Override
+    public void sendMessage(Object message) {
+        EngineManager.turnOffDongTai();
+        GrpcHandler.sendMessage(message);
+        EngineManager.turnOnDongTai();
+    }
+
 
     /**
      * mark for enter Source Entry Point

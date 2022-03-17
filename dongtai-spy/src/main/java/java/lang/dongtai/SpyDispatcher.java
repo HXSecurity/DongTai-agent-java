@@ -168,6 +168,8 @@ public interface SpyDispatcher {
 
     void blockingUnaryCall(Object req, Object res);
 
+    void sendMessage(Object message);
+
     /**
      * mark for enter Source Entry Point
      *

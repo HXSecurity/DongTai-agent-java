@@ -28,6 +28,7 @@ public class GrpcHandler {
     private static Method methodOfInterceptChannel;
     private static Method methodOfInterceptService;
     private static Method methodOfGetRequestMetadata;
+    private static ThreadLocal<String> sharedTraceId = new ThreadLocal<String>();
 
     static {
         grpcPluginPath = new File(System.getProperty("java.io.tmpdir") + File.separator + "iast" + File.separator + "dongtai-grpc.jar");
@@ -74,7 +75,10 @@ public class GrpcHandler {
             createClassLoader(channel);
         }
         try {
-            return methodOfInterceptChannel.invoke(null, channel, ContextManager.getHeaderKey(), ContextManager.getSegmentId());
+            // todo: 考虑测试并发场景
+            String traceId = ContextManager.getSegmentId();
+            sharedTraceId.set(traceId);
+            return methodOfInterceptChannel.invoke(null, channel, ContextManager.getHeaderKey(), traceId);
         } catch (Exception e) {
             DongTaiLog.error(e);
         }
@@ -111,9 +115,7 @@ public class GrpcHandler {
                 ContextManager.getOrCreateGlobalTraceId((String) metadata.get("dt-traceid"), EngineManager.getAgentId());
             } else {
                 String newTraceId = ContextManager.getOrCreateGlobalTraceId(null, EngineManager.getAgentId());
-                String spanId = ContextManager.getSpanId(newTraceId, EngineManager.getAgentId());
                 metadata.put("dt-traceid", newTraceId);
-                metadata.put("dt-spandid", spanId);
             }
             EngineManager.REQUEST_CONTEXT.set(metadata);
             EngineManager.TRACK_MAP.set(new HashMap<Integer, MethodEvent>(1024));
@@ -168,9 +170,13 @@ public class GrpcHandler {
                 isHitTaints = isHitTaints || TaintPoolUtils.poolContains(item, event, false);
             }
             if (isHitTaints) {
-                // todo: 处理返回值，将返回值加入 taint pool
                 int invokeId = SpyDispatcherImpl.INVOKE_ID_SEQUENCER.getAndIncrement();
                 event.setInvokeId(invokeId);
+                event.setPlugin("GRPC");
+                // todo: 获取 service name
+                event.setServiceName("");
+                // todo: 获取 traceId
+                event.setTraceId(sharedTraceId.get());
                 event.setCallStack(StackUtils.getLatestStack(5));
                 EngineManager.TRACK_MAP.addTrackMethod(invokeId, event);
                 Set<Object> resModelItems = SourceImpl.parseCustomModel(res);
@@ -183,5 +189,39 @@ public class GrpcHandler {
             }
         }
 
+    }
+
+    public static void sendMessage(Object message) {
+        if (!EngineManager.TAINT_POOL.get().isEmpty()) {
+            MethodEvent event = new MethodEvent(
+                    0,
+                    0,
+                    "io.grpc.stub.ClientCalls",
+                    "io.grpc.stub.ClientCalls",
+                    "blockingUnaryCall",
+                    "io.grpc.stub.ClientCalls.blockingUnaryCall(io.grpc.Channel, io.grpc.MethodDescriptor<ReqT,RespT>, io.grpc.CallOptions, ReqT)",
+                    "io.grpc.stub.ClientCalls.blockingUnaryCall(io.grpc.Channel, io.grpc.MethodDescriptor<ReqT,RespT>, io.grpc.CallOptions, ReqT)",
+                    null,
+                    new Object[]{message},
+                    null,
+                    "GRPC",
+                    false,
+                    null
+            );
+            Set<Object> modelItems = SourceImpl.parseCustomModel(message);
+            boolean isHitTaints = false;
+            for (Object item : modelItems) {
+                isHitTaints = isHitTaints || TaintPoolUtils.poolContains(item, event, false);
+            }
+            if (isHitTaints) {
+                int invokeId = SpyDispatcherImpl.INVOKE_ID_SEQUENCER.getAndIncrement();
+                event.setInvokeId(invokeId);
+                event.setPlugin("GRPC");
+                event.setServiceName("");
+                event.setProjectPropagatorClose(true);
+                event.setCallStack(StackUtils.getLatestStack(5));
+                EngineManager.TRACK_MAP.addTrackMethod(invokeId, event);
+            }
+        }
     }
 }

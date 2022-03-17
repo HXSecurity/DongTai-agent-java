@@ -1,11 +1,11 @@
 package io.dongtai.iast.core.handler.hookpoint.models;
 
-import io.dongtai.iast.core.service.ErrorLogReport;
-import org.json.JSONObject;
+import io.dongtai.log.DongTaiLog;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 方法事件
@@ -83,24 +83,45 @@ public class MethodEvent {
      */
     public Object inValue;
 
-    public List<Integer> getSourceHashes() {
+    public Set<Integer> getSourceHashes() {
         return sourceHashes;
     }
 
-    private final List<Integer> sourceHashes = new ArrayList<Integer>();
+    private final Set<Integer> sourceHashes = new HashSet<Integer>();
 
-    public List<Integer> getTargetHashes() {
+
+    public Set<Integer> getSourceHashForRpc() {
+        return sourceHashForRpc;
+    }
+
+    private final Set<Integer> sourceHashForRpc = new HashSet<Integer>();
+
+    public Set<Integer> getTargetHashes() {
         return targetHashes;
     }
 
-    private final List<Integer> targetHashes = new ArrayList<Integer>();
+    private final Set<Integer> targetHashes = new HashSet<Integer>();
+
+    public Set<Integer> getTargetHashForRpc() {
+        return targetHashForRpc;
+    }
+
+    private final Set<Integer> targetHashForRpc = new HashSet<Integer>();
 
     public void addSourceHash(int hashcode) {
         this.sourceHashes.add(hashcode);
     }
 
+    public void addSourceHashForRpc(int hash) {
+        this.sourceHashForRpc.add(hash);
+    }
+
     public void addTargetHash(int hashCode) {
         this.targetHashes.add(hashCode);
+    }
+
+    public void addTargetHashForRpc(int hash) {
+        this.targetHashForRpc.add(hash);
     }
 
     /**
@@ -168,6 +189,16 @@ public class MethodEvent {
      * 当前服务使用的rpc框架
      */
     public String plugin;
+
+    public Boolean getProjectPropagatorClose() {
+        return projectPropagatorClose;
+    }
+
+    public void setProjectPropagatorClose(Boolean projectPropagatorClose) {
+        this.projectPropagatorClose = projectPropagatorClose;
+    }
+
+    public Boolean projectPropagatorClose = false;
 
     /**
      * 构造调用事件
@@ -243,38 +274,32 @@ public class MethodEvent {
 
     public String obj2String(Object value) {
         StringBuilder sb = new StringBuilder();
-        try {
-            sb.append(value.toString());
-        } catch (Exception e) {
-            sb.append("CustomObjectValue");
+        if (null == value) {
+            return "";
         }
-        return sb.toString();
-//        if (null == value) {
-//            return "";
-//        }
-//        try {
-//            // 判断是否是基本类型的数组，基本类型的数组无法类型转换为Object[]，导致java.lang.ClassCastException异常
-//            if (value.getClass().isArray() && !value.getClass().getComponentType().isPrimitive()) {
-//                Object[] taints = (Object[]) value;
-//                for (Object taint : taints) {
-//                    if (taint != null) {
-//                        if (taint.getClass().isArray() && !taint.getClass().getComponentType().isPrimitive()) {
-//                            Object[] subTaints = (Object[]) taint;
-//                            for (Object subTaint : subTaints) {
-//                                sb.append(subTaint.toString()).append(" ");
-//                            }
-//                        } else {
-//                            sb.append(taint.toString()).append(" ");
-//                        }
-//                    }
-//                }
-//            } else {
-//                sb.append(value.toString());
-//            }
-//        } catch (Exception e) {
-//            ErrorLogReport.sendErrorLog(e);
-//        }
-//        return sb.toString().trim();
+        try {
+            // 判断是否是基本类型的数组，基本类型的数组无法类型转换为Object[]，导致java.lang.ClassCastException异常
+            if (value.getClass().isArray() && !value.getClass().getComponentType().isPrimitive()) {
+                Object[] taints = (Object[]) value;
+                for (Object taint : taints) {
+                    if (taint != null) {
+                        if (taint.getClass().isArray() && !taint.getClass().getComponentType().isPrimitive()) {
+                            Object[] subTaints = (Object[]) taint;
+                            for (Object subTaint : subTaints) {
+                                sb.append(subTaint.toString()).append(" ");
+                            }
+                        } else {
+                            sb.append(taint.toString()).append(" ");
+                        }
+                    }
+                }
+            } else {
+                sb.append(value.toString());
+            }
+        } catch (Exception e) {
+            DongTaiLog.error(e);
+        }
+        return sb.toString().trim();
     }
 
     @Override
