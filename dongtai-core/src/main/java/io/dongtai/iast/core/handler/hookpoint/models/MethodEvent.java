@@ -155,6 +155,21 @@ public class MethodEvent {
     public String framework;
 
     /**
+     * 当前服务的 traceId
+     */
+    public String traceId;
+
+    /**
+     * 当前服务的名称
+     */
+    public String serviceName;
+
+    /**
+     * 当前服务使用的rpc框架
+     */
+    public String plugin;
+
+    /**
      * 构造调用事件
      *
      * @param processId      调用者ID
@@ -303,4 +318,27 @@ public class MethodEvent {
         this.callStack = callStack;
     }
 
+    public String getTraceId() {
+        return traceId;
+    }
+
+    public void setTraceId(String traceId) {
+        this.traceId = traceId;
+    }
+
+    public String getServiceName() {
+        return serviceName;
+    }
+
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
+    }
+
+    public String getPlugin() {
+        return plugin;
+    }
+
+    public void setPlugin(String plugin) {
+        this.plugin = plugin;
+    }
 }
