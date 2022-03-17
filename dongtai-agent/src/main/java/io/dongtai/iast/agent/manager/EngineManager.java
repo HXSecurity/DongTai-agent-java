@@ -4,7 +4,6 @@ import io.dongtai.iast.agent.IastClassLoader;
 import io.dongtai.iast.agent.IastProperties;
 import io.dongtai.iast.agent.report.AgentRegisterReport;
 import io.dongtai.iast.agent.util.FileUtils;
-import io.dongtai.iast.common.utils.version.JavaVersionUtils;
 import io.dongtai.iast.agent.util.http.HttpClientUtils;
 import io.dongtai.log.DongTaiLog;
 import org.json.JSONObject;
@@ -27,7 +26,8 @@ public class EngineManager {
 
     private static final String ENGINE_ENTRYPOINT_CLASS = "com.secnium.iast.core.AgentEngine";
     private static final String FALLBACK_MANAGER_CLASS = "io.dongtai.iast.core.bytecode.enhance.plugin.fallback.FallbackManager";
-    private static final String REMOTE_CONFIG_UTIL = "io.dongtai.iast.core.utils.config.RemoteConfigUtils";
+    private static final String REMOTE_CONFIG_UTILS_CLASS = "io.dongtai.iast.core.utils.config.RemoteConfigUtils";
+    private static final String ENGINE_MANAGER_CLASS = "io.dongtai.iast.core.EngineManager";
     private static final String INJECT_PACKAGE_REMOTE_URI = "/api/v1/engine/download?engineName=dongtai-spy";
     private static final String ENGINE_PACKAGE_REMOTE_URI = "/api/v1/engine/download?engineName=dongtai-core";
     private static final String API_PACKAGE_REMOTE_URI = "/api/v1/engine/download?engineName=dongtai-api";
@@ -85,13 +85,43 @@ public class EngineManager {
     }
 
     /**
+     * 检查核心是否已安装
+     *
+     * @return boolean 核心是否已安装
+     */
+    public static boolean checkCoreIsInstalled() {
+        return IAST_CLASS_LOADER != null;
+    }
+
+    /**
+     * 检查核心是否在运行中
+     * 当引擎被关闭/降级/卸载及其他反射调用失败的情况时，isCoreRunning也返回false
+     *
+     * @return boolean 核心是否在运行中
+     */
+    public static boolean checkCoreIsRunning() {
+        if (IAST_CLASS_LOADER == null) {
+            return false;
+        }
+        try {
+            final Class<?> engineManagerClass = IAST_CLASS_LOADER.loadClass(ENGINE_MANAGER_CLASS);
+            if (engineManagerClass == null) {
+                return false;
+            }
+            return (Boolean) engineManagerClass.getMethod("isEngineRunning").invoke(null);
+        } catch (Throwable e) {
+            return false;
+        }
+    }
+
+    /**
      * 在核心包中加载并获取远端配置工具类
      */
     public static Class<?> getRemoteConfigUtils() throws ClassNotFoundException {
         if (IAST_CLASS_LOADER == null) {
             return null;
         }
-        return IAST_CLASS_LOADER.loadClass(REMOTE_CONFIG_UTIL);
+        return IAST_CLASS_LOADER.loadClass(REMOTE_CONFIG_UTILS_CLASS);
     }
 
     /**
