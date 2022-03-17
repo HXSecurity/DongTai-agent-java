@@ -51,10 +51,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                     GraphBuilder.buildAndReport(request, response);
                     EngineManager.cleanThreadState();
                 }
-
-                EngineManager.turnOnDongTai();
             }
-
         } catch (Exception e) {
             ErrorLogReport.sendErrorLog(e);
             EngineManager.cleanThreadState();
@@ -224,7 +221,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public void enterSource() {
         try {
-            if (EngineManager.isEnterEntry()) {
+            if (EngineManager.isEngineRunning()) {
                 EngineManager.SCOPE_TRACKER.enterSource();
             }
         } catch (Exception e) {
@@ -240,7 +237,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public void leaveSource() {
         try {
-            if (EngineManager.isEnterEntry()) {
+            if (EngineManager.isEngineRunning()) {
                 EngineManager.SCOPE_TRACKER.leaveSource();
             }
         } catch (Exception e) {
@@ -257,7 +254,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public boolean isFirstLevelSource() {
         try {
-            return EngineManager.isEngineRunning() && EngineManager.isEnterEntry() && EngineManager.SCOPE_TRACKER
+            return EngineManager.isEngineRunning() && EngineManager.isDongTaiRunning() && EngineManager.SCOPE_TRACKER
                     .isFirstLevelSource();
         } catch (Exception e) {
             return false;
@@ -272,10 +269,10 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public void enterPropagator() {
         try {
-            if (EngineManager.isEnterEntry()) {
-                EngineManager.turnOnDongTai();
-                EngineManager.SCOPE_TRACKER.enterPropagation();
+            if (EngineManager.isEngineRunning() && EngineManager.isDongTaiRunning()) {
                 EngineManager.turnOffDongTai();
+                EngineManager.SCOPE_TRACKER.enterPropagation();
+                EngineManager.turnOnDongTai();
             }
         } catch (Exception e) {
             ErrorLogReport.sendErrorLog(e);
@@ -290,10 +287,10 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public void leavePropagator() {
         try {
-            if (EngineManager.isEnterEntry()) {
+            if (EngineManager.isEngineRunning() && EngineManager.isDongTaiRunning()) {
                 EngineManager.turnOffDongTai();
                 EngineManager.SCOPE_TRACKER.leavePropagation();
-                EngineManager.turnOffDongTai();
+                EngineManager.turnOnDongTai();
             }
         } catch (Exception e) {
             ErrorLogReport.sendErrorLog(e);
@@ -309,7 +306,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public boolean isFirstLevelPropagator() {
         try {
-            return EngineManager.isEngineRunning() && EngineManager.isEnterEntry() && EngineManager.SCOPE_TRACKER.isFirstLevelPropagator();
+            return EngineManager.isEngineRunning() && EngineManager.isDongTaiRunning() && EngineManager.SCOPE_TRACKER.isFirstLevelPropagator();
         } catch (Exception e) {
             return false;
         }
@@ -323,10 +320,10 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public void enterSink() {
         try {
-            if (EngineManager.isEnterEntry()) {
-                EngineManager.turnOnDongTai();
-                EngineManager.SCOPE_TRACKER.enterSink();
+            if (EngineManager.isEngineRunning() && EngineManager.isDongTaiRunning()) {
                 EngineManager.turnOffDongTai();
+                EngineManager.SCOPE_TRACKER.enterSink();
+                EngineManager.turnOnDongTai();
             }
         } catch (Exception e) {
             ErrorLogReport.sendErrorLog(e);
@@ -341,10 +338,10 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public void leaveSink() {
         try {
-            if (EngineManager.isEnterEntry()) {
-                EngineManager.turnOnDongTai();
-                EngineManager.SCOPE_TRACKER.leaveSink();
+            if (EngineManager.isEngineRunning() && EngineManager.isDongTaiRunning()) {
                 EngineManager.turnOffDongTai();
+                EngineManager.SCOPE_TRACKER.leaveSink();
+                EngineManager.turnOnDongTai();
             }
         } catch (Exception e) {
             ErrorLogReport.sendErrorLog(e);
@@ -388,16 +385,29 @@ public class SpyDispatcherImpl implements SpyDispatcher {
 
     @Override
     public void blockingUnaryCall(Object req, Object res) {
-        EngineManager.turnOffDongTai();
-        GrpcHandler.blockingUnaryCall(req, res);
-        EngineManager.turnOnDongTai();
+        if (EngineManager.isEngineRunning() && EngineManager.isDongTaiRunning()) {
+            EngineManager.turnOffDongTai();
+            GrpcHandler.blockingUnaryCall(req, res);
+            EngineManager.turnOnDongTai();
+        }
     }
 
     @Override
     public void sendMessage(Object message) {
-        EngineManager.turnOffDongTai();
-        GrpcHandler.sendMessage(message);
-        EngineManager.turnOnDongTai();
+        if (EngineManager.isEngineRunning() && EngineManager.isDongTaiRunning()) {
+            EngineManager.turnOffDongTai();
+            GrpcHandler.sendMessage(message);
+            EngineManager.turnOnDongTai();
+        }
+    }
+
+    @Override
+    public void toStringUtf8(Object value) {
+        if (EngineManager.isEngineRunning() && EngineManager.isDongTaiRunning()) {
+            EngineManager.turnOffDongTai();
+            GrpcHandler.toStringUtf8(value);
+            EngineManager.turnOnDongTai();
+        }
     }
 
 
@@ -421,7 +431,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     public boolean collectMethodPool(Object instance, Object[] argumentArray, Object retValue, String framework,
                                      String className, String matchClassName, String methodName, String methodSign, boolean isStatic,
                                      int hookType) {
-        if (EngineManager.isEnterEntry() || HookType.HTTP.equals(hookType) || HookType.RPC.equals(hookType)) {
+        if (!EngineManager.isDongTaiRunning() && (EngineManager.isEnterEntry() || HookType.HTTP.equals(hookType) || HookType.RPC.equals(hookType))) {
             EngineManager.turnOnDongTai();
         }
 

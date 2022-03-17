@@ -159,4 +159,9 @@ public interface AsmMethods {
             "sendMessage",
             Object.class
     );
+    Method SPY$toStringUtf8 = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "toStringUtf8",
+            Object.class
+    );
 }

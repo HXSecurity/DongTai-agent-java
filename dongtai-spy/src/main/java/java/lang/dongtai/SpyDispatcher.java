@@ -170,6 +170,8 @@ public interface SpyDispatcher {
 
     void sendMessage(Object message);
 
+    void toStringUtf8(Object value);
+
     /**
      * mark for enter Source Entry Point
      *

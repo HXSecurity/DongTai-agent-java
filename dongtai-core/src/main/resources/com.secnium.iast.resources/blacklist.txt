@@ -16,7 +16,7 @@ uri_3a_classloader_3a_/*
 org/asciidoctor/*
 com/sun/jmx/remote/*
 # apple package
-apple/*
+apple/* g
 # octo
 com/octo/captcha/*
 # apache shaded
@@ -33,7 +33,7 @@ groovy/*sun/rmi/transport/DGCAckHandler$1
 # https://github.com/AutoGeneral/cors-filter
 com/thetransactioncompany/*
 # protobuf
-com/google/protobuf/*
+#com/google/protobuf/*
 #Spring Cloud Sleuth
 com/github/benmanes/caffeine/*
 # spring

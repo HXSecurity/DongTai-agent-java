@@ -98,6 +98,7 @@ public class EngineManager {
         EngineManager.TAINT_POOL.remove();
         EngineManager.TAINT_HASH_CODES.remove();
         EngineManager.SCOPE_TRACKER.remove();
+        EngineManager.DONGTAI_STATE.remove();
     }
 
     public static void maintainRequestCount() {

@@ -29,6 +29,8 @@ public class GrpcHandler {
     private static Method methodOfInterceptService;
     private static Method methodOfGetRequestMetadata;
     private static ThreadLocal<String> sharedTraceId = new ThreadLocal<String>();
+    public static ThreadLocal<Boolean> addCustomResp = new ThreadLocal<Boolean>();
+    private static ThreadLocal<Set<Object>> sharedRespData = new ThreadLocal<Set<Object>>();
 
     static {
         grpcPluginPath = new File(System.getProperty("java.io.tmpdir") + File.separator + "iast" + File.separator + "dongtai-grpc.jar");
@@ -140,7 +142,6 @@ public class GrpcHandler {
                 EngineManager.maintainRequestCount();
                 GraphBuilder.buildAndReport(null, null);
                 EngineManager.cleanThreadState();
-                EngineManager.turnOnDongTai();
             }
         } catch (Exception e) {
             ErrorLogReport.sendErrorLog(e);
@@ -182,12 +183,22 @@ public class GrpcHandler {
                 event.setCallStack(StackUtils.getLatestStack(5));
                 EngineManager.TRACK_MAP.addTrackMethod(invokeId, event);
                 Set<Object> resModelItems = SourceImpl.parseCustomModel(res);
+                sharedRespData.remove();
+                Set<Object> taintPool = EngineManager.TAINT_POOL.get();
+                Set<Object> resModelSet = new HashSet<Object>();
                 for (Object obj : resModelItems) {
                     // fixme: 暂时只跟踪字符串相关内容
                     if (obj instanceof String) {
-                        EngineManager.TAINT_POOL.addTaintToPool(obj, event, false);
+                        resModelSet.add(obj);
+                        addCustomResp.set(true);
+                        taintPool.add(obj);
+                        int identityHashCode = System.identityHashCode(obj);
+                        event.addTargetHash(identityHashCode);
+                        event.addTargetHashForRpc(obj.hashCode());
+                        EngineManager.TAINT_HASH_CODES.get().add(identityHashCode);
                     }
                 }
+                sharedRespData.set(resModelSet);
             }
         }
 
@@ -223,6 +234,15 @@ public class GrpcHandler {
                 event.setProjectPropagatorClose(true);
                 event.setCallStack(StackUtils.getLatestStack(5));
                 EngineManager.TRACK_MAP.addTrackMethod(invokeId, event);
+            }
+        }
+    }
+
+    public static void toStringUtf8(Object value) {
+        Boolean added = addCustomResp.get();
+        if (added != null && added) {
+            if (sharedRespData.get().contains(value)) {
+                EngineManager.TAINT_POOL.get().add(value);
             }
         }
     }

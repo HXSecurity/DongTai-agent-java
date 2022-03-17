@@ -11,6 +11,7 @@ public class DispatchGrpc implements DispatchPlugin {
     private final String classOfServerTransportListenerImpl = "io.grpc.internal.ServerImpl$ServerTransportListenerImpl";
     private final String classOfServerStreamListenerImpl = "io.grpc.internal.ServerCallImpl$ServerStreamListenerImpl";
     private final String classOfServerCallImpl = "io.grpc.internal.ServerCallImpl";
+    private static final String classOfByteString = "com.google.protobuf.ByteString";
 
     @Override
     public ClassVisitor dispatch(ClassVisitor classVisitor, IastContext context) {
@@ -33,6 +34,9 @@ public class DispatchGrpc implements DispatchPlugin {
                 break;
             case classOfServerCallImpl:
                 classVisitor = new ServerCallImplAdapter(classVisitor, null);
+                break;
+            case classOfByteString:
+                classVisitor = new ByteStringAdapter(classVisitor, null);
                 break;
         }
         return classVisitor;
