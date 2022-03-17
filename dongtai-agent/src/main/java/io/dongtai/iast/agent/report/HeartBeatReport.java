@@ -1,6 +1,7 @@
 package io.dongtai.iast.agent.report;
 
 import io.dongtai.iast.agent.Constant;
+import io.dongtai.iast.agent.manager.EngineManager;
 import io.dongtai.iast.agent.monitor.impl.PerformanceMonitor;
 import io.dongtai.iast.agent.util.ByteUtils;
 import io.dongtai.iast.common.entity.performance.PerformanceMetrics;
@@ -31,6 +32,8 @@ public class HeartBeatReport {
         detail.put(Constant.KEY_CPU, readCpuInfo());
         detail.put(Constant.KEY_DISK,getDiskInfo());
         detail.put(Constant.KEY_PERFORMANCE, readRecentlyPerformanceMetrics());
+        detail.put(Constant.KEY_CORE_INSTALLED, EngineManager.checkCoreIsInstalled() ? 1 : 0);
+        detail.put(Constant.KEY_CORE_RUNNING, EngineManager.checkCoreIsRunning() ? 1 : 0);
         detail.put(Constant.KEY_RETURN_QUEUE, 0);
 
         return report.toString();
@@ -85,5 +88,7 @@ public class HeartBeatReport {
     public static String getDiskInfo() {
         return "{}";
     }
+
+
 
 }

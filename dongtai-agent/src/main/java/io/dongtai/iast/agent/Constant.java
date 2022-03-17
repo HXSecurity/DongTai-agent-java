@@ -37,6 +37,8 @@ public class Constant {
     public static final String KEY_CPU = "cpu";
     public static final String KEY_DISK = "disk";
     public static final String KEY_PERFORMANCE = "performance";
+    public static final String KEY_CORE_INSTALLED = "isCoreInstalled";
+    public static final String KEY_CORE_RUNNING = "isCoreRunning";
     public static final String KEY_RETURN_QUEUE = "returnQueue";
 
     // 线程异常上报
