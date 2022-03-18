@@ -81,13 +81,13 @@ public class DongTaiThreadMonitor implements IMonitor {
     public void run() {
         while (!MonitorDaemonThread.isExit) {
             // 延迟启动DongTaiThreadMonitor，以防首次加载时其他Monitor未能启动的情形出现。
+            ThreadUtils.threadSleep(10);
             try {
-                ThreadUtils.threadSleep(10);
                 this.check();
-                ThreadUtils.threadSleep(50);
             } catch (Throwable t) {
                 DongTaiLog.warn("Monitor thread checked error, monitor:{}, msg:{}, err:{}", getName(), t.getMessage(), t.getCause());
             }
+            ThreadUtils.threadSleep(50);
         }
     }
 

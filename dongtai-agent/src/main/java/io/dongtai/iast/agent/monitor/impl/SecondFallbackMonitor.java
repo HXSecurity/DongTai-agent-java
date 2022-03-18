@@ -47,10 +47,10 @@ public class SecondFallbackMonitor implements IMonitor {
         while (!MonitorDaemonThread.isExit) {
             try {
                 this.check();
-                ThreadUtils.threadSleep(60);
             } catch (Throwable t) {
                 DongTaiLog.warn("Monitor thread checked error, monitor:{}, msg:{}, err:{}", getName(), t.getMessage(), t.getCause());
             }
+            ThreadUtils.threadSleep(60);
         }
     }
 }

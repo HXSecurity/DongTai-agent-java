@@ -110,6 +110,7 @@ public class EngineManager {
             }
             return (Boolean) engineManagerClass.getMethod("isEngineRunning").invoke(null);
         } catch (Throwable e) {
+            DongTaiLog.info("checkCoreIsRunning failed, msg:{}, cause:{}", e.getMessage(), e.getCause());
             return false;
         }
     }
