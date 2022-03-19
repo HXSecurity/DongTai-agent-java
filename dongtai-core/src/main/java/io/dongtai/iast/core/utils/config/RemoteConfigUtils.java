@@ -71,9 +71,9 @@ public class RemoteConfigUtils {
      */
     public static void syncRemoteConfig(int agentId) {
         String remoteResponse = getConfigFromRemote(agentId);
-        RemoteConfigEntity remoteConfigEntity = parseRemoteConfigResponse(remoteResponse);
-        // 远端有配置且和上次配置内容不一致时，重新更新配置文件
         try {
+            // 远端有配置且和上次配置内容不一致时，重新更新配置文件
+            RemoteConfigEntity remoteConfigEntity = parseRemoteConfigResponse(remoteResponse);
             if (null != remoteConfigEntity && !remoteResponse.equals(existsRemoteConfigMeta)) {
                 if (remoteConfigEntity.getEnableAutoFallback() != null) {
                     enableAutoFallback = remoteConfigEntity.getEnableAutoFallback();
@@ -162,7 +162,7 @@ public class RemoteConfigUtils {
                 return null;
             }
         } catch (Throwable t) {
-            DongTaiLog.warn("remoteConfig parse failed: msg:{}, err:{}, response:{}", t.getMessage(), t.getCause(), remoteResponse);
+            DongTaiLog.warn("remoteConfig parse failed: msg:{}, err:{}, response:{}", t.getMessage(), t.getCause(), GsonUtils.toJson(remoteResponse));
             return null;
         }
     }
