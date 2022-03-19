@@ -1,22 +1,20 @@
 package io.dongtai.iast.core;
 
+import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.FallbackManager;
+import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.report.HookPointRateLimitReport;
+import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.FallbackSwitch;
 import io.dongtai.iast.core.handler.context.ContextManager;
 import io.dongtai.iast.core.handler.hookpoint.IastServer;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
-import io.dongtai.iast.core.utils.threadlocal.BooleanThreadLocal;
-import io.dongtai.iast.core.utils.threadlocal.IastScopeTracker;
-import io.dongtai.iast.core.utils.threadlocal.IastServerPort;
-import io.dongtai.iast.core.utils.threadlocal.IastTaintHashCodes;
-import io.dongtai.iast.core.utils.threadlocal.IastTaintPool;
-import io.dongtai.iast.core.utils.threadlocal.IastTrackMap;
-import io.dongtai.iast.core.utils.threadlocal.RequestContext;
+import io.dongtai.iast.core.utils.config.RemoteConfigUtils;
+import io.dongtai.iast.core.utils.threadlocal.*;
 import io.dongtai.iast.core.service.ServiceFactory;
 import io.dongtai.iast.core.utils.PropertyUtils;
+import io.dongtai.log.DongTaiLog;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 存储全局信息
@@ -41,6 +39,11 @@ public class EngineManager {
      * 标记是否位于 IAST 的代码中，如果该值为 true 表示 iast 在运行中；如果 该值为 false 表示当前位置在iast的代码中，所有iast逻辑都bypass，直接退出
      */
     private static final BooleanThreadLocal DONGTAI_STATE = new BooleanThreadLocal(false);
+    /**
+     * 限制器统一管理器
+     */
+    private final FallbackManager fallbackManager;
+
     public static IastServer SERVER;
 
     private static boolean logined = false;
@@ -65,6 +68,25 @@ public class EngineManager {
         return status != null && status;
     }
 
+    /**
+     * hook点是否降级
+     */
+    public static boolean isHookPointFallback() {
+        return FallbackSwitch.isRequestFallback();
+    }
+
+    /**
+     * 打开hook点降级开关
+     * 该开关打开后，在当前请求生命周期内，逻辑短路hook点
+     */
+    public static void openHookPointFallback(String className, String method, String methodSign, int hookType) {
+        final double limitRate = EngineManager.getFallbackManager().getHookRateLimiter().getRate();
+        DongTaiLog.debug("HookPoint rate limit! hookType: " + hookType + ", method:" + className + "." + method
+                + ", sign:" + methodSign + " ,rate:" + limitRate);
+        HookPointRateLimitReport.sendReport(className, method, methodSign, hookType, limitRate);
+        FallbackSwitch.setHeavyHookFallback(true);
+    }
+
     public static EngineManager getInstance() {
         return instance;
     }
@@ -85,7 +107,12 @@ public class EngineManager {
         this.supportLazyHook = cfg.isEnableAllHook();
         this.saveBytecode = cfg.isEnableDumpClass();
         this.agentId = agentId;
+        RemoteConfigUtils.syncRemoteConfig(agentId);
+        this.fallbackManager = FallbackManager.newInstance(cfg.cfg);
+    }
 
+    public static FallbackManager getFallbackManager() {
+        return instance.fallbackManager;
     }
 
     /**
@@ -99,6 +126,8 @@ public class EngineManager {
         EngineManager.TAINT_POOL.remove();
         EngineManager.TAINT_HASH_CODES.remove();
         EngineManager.SCOPE_TRACKER.remove();
+        FallbackSwitch.clearHeavyHookFallback();
+        EngineManager.getFallbackManager().getHookRateLimiter().remove();
     }
 
     public static void maintainRequestCount() {
@@ -134,7 +163,7 @@ public class EngineManager {
      * @return true - 引擎已启动；false - 引擎未启动
      */
     public static boolean isEngineRunning() {
-        return EngineManager.enableLingzhi == 1;
+        return !FallbackSwitch.isEngineFallback() && EngineManager.enableLingzhi == 1;
     }
 
     public boolean supportLazyHook() {
@@ -182,6 +211,11 @@ public class EngineManager {
     }
 
     public static void enterHttpEntry(Map<String, Object> requestMeta) {
+        // 尝试获取请求限速令牌，耗尽时调用断路器方法
+        if (!EngineManager.getFallbackManager().getHeavyTrafficRateLimiter().acquire()) {
+            EngineManager.getFallbackManager().getHeavyTrafficBreaker().breakCheck(null);
+        }
+
         ServiceFactory.startService();
         if (null == SERVER) {
             // todo: read server addr and send to OpenAPI Service
@@ -211,6 +245,11 @@ public class EngineManager {
      * @since 1.2.0
      */
     public static void enterDubboEntry(String dubboService, Map<String, String> attachments) {
+        // 尝试获取请求限速令牌，耗尽时调用断路器方法
+        if (!EngineManager.getFallbackManager().getHeavyTrafficRateLimiter().acquire()) {
+            EngineManager.getFallbackManager().getHeavyTrafficBreaker().breakCheck(null);
+        }
+
         if (attachments != null) {
             if (attachments.containsKey(ContextManager.getHeaderKey())) {
                 ContextManager.getOrCreateGlobalTraceId(attachments.get(ContextManager.getHeaderKey()),

@@ -1,7 +1,7 @@
 package com.secnium.iast.agent.monitor;
 
 import io.dongtai.iast.agent.manager.EngineManager;
-import io.dongtai.iast.agent.monitor.PerformanceMonitor;
+import io.dongtai.iast.agent.monitor.impl.PerformanceMonitor;
 import org.junit.Test;
 
 import java.lang.management.ManagementFactory;
@@ -48,7 +48,7 @@ public class PerformanceMoniterTest {
     }
 
     @Test
-    public void check() {
+    public void check() throws Exception {
         RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
         PerformanceMonitor performanceMoniter = new PerformanceMonitor(EngineManager.getInstance(null, null, runtimeMXBean.getName().split("@")[0]));
         performanceMoniter.check();

@@ -30,6 +30,8 @@ public class Agent {
         attachOptions.addOption(build("app_name", "app_name", "optional: DongTai Application Name, default: ExampleApplication"));
         attachOptions.addOption(build("app_create", "app_create", "optional: DongTai Application Auto Create, default: false"));
         attachOptions.addOption(build("app_version", "app_version", "optional: DongTai Application Version, default: v1.0"));
+        attachOptions.addOption(build("cluster_name", "cluster_name", "optional: Application Cluster Name"));
+        attachOptions.addOption(build("cluster_version", "cluster_version", "optional: Application Cluster Version"));
         attachOptions.addOption(build("dongtai_server", "dongtai_server", "optional: DongTai server url"));
         attachOptions.addOption(build("dongtai_token", "dongtai_token", "optional: DongTai server token"));
 
@@ -60,6 +62,12 @@ public class Agent {
             }
             if (result.hasOption("app_version")) {
                 attachArgs.append("&appVersion=").append(result.getOptionValue("app_version"));
+            }
+            if (result.hasOption("cluster_name")) {
+                attachArgs.append("&clusterName=").append(result.getOptionValue("cluster_name"));
+            }
+            if (result.hasOption("cluster_version")) {
+                attachArgs.append("&clusterVersion=").append(result.getOptionValue("cluster_version"));
             }
             if (result.hasOption("dongtai_server")) {
                 attachArgs.append("&dongtaiServer=").append(result.getOptionValue("dongtai_server"));

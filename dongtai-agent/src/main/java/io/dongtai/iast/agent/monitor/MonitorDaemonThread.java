@@ -1,6 +1,7 @@
 package io.dongtai.iast.agent.monitor;
 
 import io.dongtai.iast.agent.manager.EngineManager;
+import io.dongtai.iast.agent.monitor.impl.*;
 import io.dongtai.log.DongTaiLog;
 
 import java.util.ArrayList;
@@ -10,16 +11,19 @@ import java.util.ArrayList;
  */
 public class MonitorDaemonThread implements Runnable {
 
-    public ArrayList<IMonitor> monitorTasks;
+    public static ArrayList<IMonitor> monitorTasks;
     public static boolean isExit = false;
     private final EngineManager engineManager;
     public static int delayTime = 0;
 
     public MonitorDaemonThread(EngineManager engineManager) {
-        this.monitorTasks = new ArrayList<IMonitor>();
-        this.monitorTasks.add(new PerformanceMonitor(engineManager));
-        this.monitorTasks.add(new EngineMonitor(engineManager));
-        this.monitorTasks.add(new HeartBeatMonitor());
+        monitorTasks = new ArrayList<IMonitor>();
+        monitorTasks.add(new ServerConfigMonitor());
+        monitorTasks.add(new PerformanceMonitor(engineManager));
+        monitorTasks.add(new EngineMonitor(engineManager));
+        monitorTasks.add(new HeartBeatMonitor());
+        monitorTasks.add(new SecondFallbackMonitor(engineManager));
+        monitorTasks.add(new DongTaiThreadMonitor());
         this.engineManager = engineManager;
         try {
             delayTime = Integer.parseInt(System.getProperty("iast.engine.delay.time", "0"));
@@ -43,24 +47,17 @@ public class MonitorDaemonThread implements Runnable {
                 startEngine();
             }
         }
-        while (!isExit) {
-            // check for webapi
-            for (IMonitor monitor : this.monitorTasks) {
-                monitor.check();
-            }
-            threadSleep();
+        // 启动子线程执行monitor任务.
+        for (IMonitor monitor : monitorTasks) {
+            Thread monitorThread = new Thread(monitor, monitor.getName());
+            monitorThread.setDaemon(true);
+            monitorThread.setPriority(1);
+            monitorThread.start();
         }
     }
 
-    private void threadSleep() {
-        try {
-            long milliseconds = 60 * 1000L;
-            Thread.sleep(milliseconds);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException(e);
-        }
-    }
+    //todo: 检测所有线程信息。
+
 
     public void startEngine() {
         // todo: 下载功能优先走本地缓存

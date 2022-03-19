@@ -1,4 +1,4 @@
-package io.dongtai.iast.agent.util;
+package io.dongtai.iast.common.utils.version;
 
 import java.util.Properties;
 

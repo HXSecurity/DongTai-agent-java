@@ -25,6 +25,9 @@ import java.util.jar.JarFile;
 public class EngineManager {
 
     private static final String ENGINE_ENTRYPOINT_CLASS = "com.secnium.iast.core.AgentEngine";
+    private static final String FALLBACK_MANAGER_CLASS = "io.dongtai.iast.core.bytecode.enhance.plugin.fallback.FallbackManager";
+    private static final String REMOTE_CONFIG_UTILS_CLASS = "io.dongtai.iast.core.utils.config.RemoteConfigUtils";
+    private static final String ENGINE_MANAGER_CLASS = "io.dongtai.iast.core.EngineManager";
     private static final String INJECT_PACKAGE_REMOTE_URI = "/api/v1/engine/download?engineName=dongtai-spy";
     private static final String ENGINE_PACKAGE_REMOTE_URI = "/api/v1/engine/download?engineName=dongtai-core";
     private static final String API_PACKAGE_REMOTE_URI = "/api/v1/engine/download?engineName=dongtai-api";
@@ -69,6 +72,57 @@ public class EngineManager {
             INSTANCE = new EngineManager(inst, launchMode, ppid);
         }
         return INSTANCE;
+    }
+
+    /**
+     * 在核心包中加载并获取降级管理器
+     */
+    public static Class<?> getFallbackManagerClass() throws ClassNotFoundException {
+        if (IAST_CLASS_LOADER == null) {
+            return null;
+        }
+        return IAST_CLASS_LOADER.loadClass(FALLBACK_MANAGER_CLASS);
+    }
+
+    /**
+     * 检查核心是否已安装
+     *
+     * @return boolean 核心是否已安装
+     */
+    public static boolean checkCoreIsInstalled() {
+        return IAST_CLASS_LOADER != null;
+    }
+
+    /**
+     * 检查核心是否在运行中
+     * 当引擎被关闭/降级/卸载及其他反射调用失败的情况时，isCoreRunning也返回false
+     *
+     * @return boolean 核心是否在运行中
+     */
+    public static boolean checkCoreIsRunning() {
+        if (IAST_CLASS_LOADER == null) {
+            return false;
+        }
+        try {
+            final Class<?> engineManagerClass = IAST_CLASS_LOADER.loadClass(ENGINE_MANAGER_CLASS);
+            if (engineManagerClass == null) {
+                return false;
+            }
+            return (Boolean) engineManagerClass.getMethod("isEngineRunning").invoke(null);
+        } catch (Throwable e) {
+            DongTaiLog.info("checkCoreIsRunning failed, msg:{}, cause:{}", e.getMessage(), e.getCause());
+            return false;
+        }
+    }
+
+    /**
+     * 在核心包中加载并获取远端配置工具类
+     */
+    public static Class<?> getRemoteConfigUtils() throws ClassNotFoundException {
+        if (IAST_CLASS_LOADER == null) {
+            return null;
+        }
+        return IAST_CLASS_LOADER.loadClass(REMOTE_CONFIG_UTILS_CLASS);
     }
 
     /**
@@ -177,9 +231,13 @@ public class EngineManager {
      */
     public boolean downloadPackageFromServer() {
         String baseUrl = properties.getBaseUrl();
-        return downloadJarPackageToCacheFromUrl(baseUrl + INJECT_PACKAGE_REMOTE_URI, getInjectPackageCachePath()) &&
-                downloadJarPackageToCacheFromUrl(baseUrl + ENGINE_PACKAGE_REMOTE_URI, getEnginePackageCachePath()) &&
-                downloadJarPackageToCacheFromUrl(baseUrl + API_PACKAGE_REMOTE_URI, getApiPackagePath());
+        // 自定义jar下载地址
+        String spyJarUrl = "".equals(properties.getCustomSpyJarUrl()) ? baseUrl + INJECT_PACKAGE_REMOTE_URI : properties.getCustomSpyJarUrl();
+        String coreJarUrl = "".equals(properties.getCustomCoreJarUrl()) ? baseUrl + ENGINE_PACKAGE_REMOTE_URI : properties.getCustomCoreJarUrl();
+        String apiJarUrl = "".equals(properties.getCustomApiJarUrl()) ? baseUrl + API_PACKAGE_REMOTE_URI : properties.getCustomApiJarUrl();
+        return downloadJarPackageToCacheFromUrl(spyJarUrl, getInjectPackageCachePath()) &&
+                downloadJarPackageToCacheFromUrl(coreJarUrl, getEnginePackageCachePath()) &&
+                downloadJarPackageToCacheFromUrl(apiJarUrl, getApiPackagePath());
     }
 
     /**

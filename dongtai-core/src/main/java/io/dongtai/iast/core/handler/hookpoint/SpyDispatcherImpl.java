@@ -3,11 +3,7 @@ package io.dongtai.iast.core.handler.hookpoint;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.bytecode.enhance.plugin.spring.SpringApplicationImpl;
 import io.dongtai.iast.core.handler.hookpoint.controller.HookType;
-import io.dongtai.iast.core.handler.hookpoint.controller.impl.DubboImpl;
-import io.dongtai.iast.core.handler.hookpoint.controller.impl.HttpImpl;
-import io.dongtai.iast.core.handler.hookpoint.controller.impl.PropagatorImpl;
-import io.dongtai.iast.core.handler.hookpoint.controller.impl.SinkImpl;
-import io.dongtai.iast.core.handler.hookpoint.controller.impl.SourceImpl;
+import io.dongtai.iast.core.handler.hookpoint.controller.impl.*;
 import io.dongtai.iast.core.handler.hookpoint.graphy.GraphBuilder;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.service.ErrorLogReport;
@@ -325,6 +321,15 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     public boolean collectMethodPool(Object instance, Object[] argumentArray, Object retValue, String framework,
                                      String className, String matchClassName, String methodName, String methodSign, boolean isStatic,
                                      int hookType) {
+        // hook点降级判断
+        if (EngineManager.isHookPointFallback()) {
+            return false;
+        }
+        // 尝试获取hook限速令牌,耗尽时降级
+        if (!EngineManager.getFallbackManager().getHookRateLimiter().acquire()) {
+            EngineManager.openHookPointFallback(className, methodName, methodSign, hookType);
+            return false;
+        }
         if (!EngineManager.isLingzhiRunning() && (HookType.HTTP.equals(hookType) || HookType.DUBBO.equals(hookType))) {
             EngineManager.turnOnLingzhi();
         }

@@ -22,6 +22,8 @@ public class IastProperties {
     private String serverUrl;
     private String engineName;
     private String projectName;
+    private String clusterName;
+    private String clusterVersion;
     private String proxyEnableStatus;
     private String proxyHost;
     private int proxyPort = -1;
@@ -29,6 +31,10 @@ public class IastProperties {
     private String debugFlag = null;
 
     private String propertiesFilePath;
+
+    private String customCoreJarUrl;
+    private String customSpyJarUrl;
+    private String customApiJarUrl;
 
     public static IastProperties getInstance() {
         if (null == instance) {
@@ -107,6 +113,20 @@ public class IastProperties {
         return projectName;
     }
 
+    public String getClusterName() {
+        if (clusterName == null) {
+            clusterName = System.getProperty("dongtai.cluster.name", cfg.getProperty("dongtai.cluster.name", ""));
+        }
+        return clusterName;
+    }
+
+    public String getClusterVersion() {
+        if (clusterVersion == null) {
+            clusterVersion = System.getProperty("dongtai.cluster.version", cfg.getProperty("dongtai.cluster.version", ""));
+        }
+        return clusterVersion;
+    }
+
     private String getProxyEnableStatus() {
         if (null == proxyEnableStatus) {
             proxyEnableStatus = System.getProperty("iast.proxy.enable", cfg.getProperty("iast.proxy.enable", "false"));
@@ -160,6 +180,28 @@ public class IastProperties {
                 )
         );
     }
+
+    public String getCustomSpyJarUrl() {
+        if (null == customSpyJarUrl) {
+            customSpyJarUrl = System.getProperty("iast.jar.spy.url", cfg.getProperty("iast.jar.spy.url", ""));
+        }
+        return customSpyJarUrl;
+    }
+
+    public String getCustomCoreJarUrl() {
+        if (null == customCoreJarUrl) {
+            customCoreJarUrl = System.getProperty("iast.jar.core.url", cfg.getProperty("iast.jar.core.url", ""));
+        }
+        return customCoreJarUrl;
+    }
+
+    public String getCustomApiJarUrl() {
+        if (null == customApiJarUrl) {
+            customApiJarUrl = System.getProperty("iast.jar.api.url", cfg.getProperty("iast.jar.api.url", ""));
+        }
+        return customApiJarUrl;
+    }
+
 
     private String getDebugFlag() {
         if (debugFlag == null) {

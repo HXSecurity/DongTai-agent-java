@@ -1,13 +1,20 @@
-package io.dongtai.iast.agent.monitor;
+package io.dongtai.iast.agent.monitor.impl;
 
+import io.dongtai.iast.agent.Constant;
 import io.dongtai.iast.agent.IastProperties;
 import io.dongtai.iast.agent.manager.EngineManager;
+import io.dongtai.iast.agent.monitor.IMonitor;
+import io.dongtai.iast.agent.monitor.MonitorDaemonThread;
+import io.dongtai.iast.agent.monitor.collector.*;
 import io.dongtai.iast.agent.report.AgentRegisterReport;
+import io.dongtai.iast.agent.util.ThreadUtils;
+import io.dongtai.iast.common.entity.performance.PerformanceMetrics;
+import io.dongtai.iast.common.entity.performance.metrics.CpuInfoMetrics;
+import io.dongtai.iast.common.enums.MetricsKey;
+import io.dongtai.iast.common.utils.serialize.SerializeUtils;
 import io.dongtai.log.DongTaiLog;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import oshi.SystemInfo;
-import oshi.hardware.CentralProcessor;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,7 +23,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.concurrent.TimeUnit;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 负责监控jvm性能状态，如果达到停止阈值，则停止检测引擎；如果达到卸载阈值，则卸载引擎；
@@ -30,11 +38,32 @@ public class PerformanceMonitor implements IMonitor {
     private final static String AGENT_TOKEN = URLEncoder.encode(AgentRegisterReport.getAgentToken());
     private static Integer AGENT_THRESHOLD_VALUE;
     private static Integer CPU_USAGE = 0;
+    private static List<PerformanceMetrics> PERFORMANCE_METRICS = new ArrayList<PerformanceMetrics>();
 
+    private static final String NAME = "PerformanceMonitor";
     private final EngineManager engineManager;
+    private final List<MetricsKey> needCollectMetrics = new ArrayList<MetricsKey>();
+
+    @Override
+    public String getName() {
+        return  Constant.THREAD_PREFIX + NAME;
+    }
+
 
     public PerformanceMonitor(EngineManager engineManager) {
         this.engineManager = engineManager;
+        configCollectMetrics();
+    }
+
+    /**
+     * 配置需要收集的指标(todo:通过配置文件初始化)
+     */
+    private void configCollectMetrics() {
+        needCollectMetrics.add(MetricsKey.CPU_USAGE);
+        needCollectMetrics.add(MetricsKey.MEM_USAGE);
+        needCollectMetrics.add(MetricsKey.MEM_NO_HEAP_USAGE);
+        needCollectMetrics.add(MetricsKey.GARBAGE_INFO);
+        needCollectMetrics.add(MetricsKey.THREAD_INFO);
     }
 
     public double memUsedRate() {
@@ -47,26 +76,8 @@ public class PerformanceMonitor implements IMonitor {
         return CPU_USAGE;
     }
 
-    public Integer cpuUsedRate() {
-        SystemInfo systemInfo = new SystemInfo();
-        CentralProcessor processor = systemInfo.getHardware().getProcessor();
-        long[] prevTicks = processor.getSystemCpuLoadTicks();
-        try {
-            TimeUnit.SECONDS.sleep(1);
-        } catch (InterruptedException ignored) {
-        }
-        long[] ticks = processor.getSystemCpuLoadTicks();
-        long nice = ticks[CentralProcessor.TickType.NICE.getIndex()] - prevTicks[CentralProcessor.TickType.NICE.getIndex()];
-        long irq = ticks[CentralProcessor.TickType.IRQ.getIndex()] - prevTicks[CentralProcessor.TickType.IRQ.getIndex()];
-        long softirq = ticks[CentralProcessor.TickType.SOFTIRQ.getIndex()] - prevTicks[CentralProcessor.TickType.SOFTIRQ.getIndex()];
-        long steal = ticks[CentralProcessor.TickType.STEAL.getIndex()] - prevTicks[CentralProcessor.TickType.STEAL.getIndex()];
-        long cSys = ticks[CentralProcessor.TickType.SYSTEM.getIndex()] - prevTicks[CentralProcessor.TickType.SYSTEM.getIndex()];
-        long user = ticks[CentralProcessor.TickType.USER.getIndex()] - prevTicks[CentralProcessor.TickType.USER.getIndex()];
-        long iowait = ticks[CentralProcessor.TickType.IOWAIT.getIndex()] - prevTicks[CentralProcessor.TickType.IOWAIT.getIndex()];
-        long idle = ticks[CentralProcessor.TickType.IDLE.getIndex()] - prevTicks[CentralProcessor.TickType.IDLE.getIndex()];
-        long totalCpu = user + nice + cSys + idle + iowait + irq + softirq + steal;
-        CPU_USAGE = (int) ((1.0 - (idle * 1.0 / totalCpu)) * 100);
-        return CPU_USAGE;
+    public static List<PerformanceMetrics> getPerformanceMetrics() {
+        return PERFORMANCE_METRICS;
     }
 
     public static Integer checkThresholdValue() {
@@ -113,9 +124,15 @@ public class PerformanceMonitor implements IMonitor {
      * 0 -> 1 -> 0
      */
     @Override
-    public void check() {
+    public void check() throws Exception {
+        // 收集性能指标数据
+        final List<PerformanceMetrics> performanceMetrics = collectPerformanceMetrics();
+        // 更新本地性能指标记录(用于定期上报)
+        updatePerformanceMetrics(performanceMetrics);
+        // 检查性能指标(用于熔断降级)
+        checkPerformanceMetrics(performanceMetrics);
+        int UsedRate = CPU_USAGE;
         PerformanceMonitor.AGENT_THRESHOLD_VALUE = PerformanceMonitor.checkThresholdValue();
-        int UsedRate = cpuUsedRate();
         int preStatus = this.engineManager.getRunningStatus();
         if (isStart(UsedRate, preStatus)) {
             this.engineManager.start();
@@ -125,6 +142,54 @@ public class PerformanceMonitor implements IMonitor {
             this.engineManager.stop();
             this.engineManager.setRunningStatus(1);
             DongTaiLog.info("The current CPU usage is " + UsedRate + "%, higher than the threshold " + AGENT_THRESHOLD_VALUE + "%，and the detection engine is stopping");
+        }
+    }
+
+    private void updatePerformanceMetrics(List<PerformanceMetrics> performanceMetrics) {
+        for (PerformanceMetrics metrics : performanceMetrics) {
+            if (metrics.getMetricsKey() == MetricsKey.CPU_USAGE) {
+                final CpuInfoMetrics cpuInfoMetrics = metrics.getMetricsValue(CpuInfoMetrics.class);
+                CPU_USAGE = cpuInfoMetrics.getCpuUsagePercentage().intValue();
+            }
+        }
+        PERFORMANCE_METRICS = performanceMetrics;
+    }
+
+
+    /**
+     * 收集性能指标
+     *
+     * @return {@link List}<{@link PerformanceMetrics}>
+     */
+    private List<PerformanceMetrics> collectPerformanceMetrics() {
+        final List<PerformanceMetrics> metricsList = new ArrayList<PerformanceMetrics>();
+        for (MetricsKey metricsKey : needCollectMetrics) {
+            final MetricsBindCollectorEnum collectorEnum = MetricsBindCollectorEnum.getEnum(metricsKey);
+            if (collectorEnum != null) {
+                try {
+                    IPerformanceCollector collector = collectorEnum.getCollector().newInstance();
+                    metricsList.add(collector.getMetrics());
+                } catch (Throwable t) {
+                    DongTaiLog.error("getPerformanceMetrics failed, collector:{}, err:{}", collectorEnum, t.getMessage());
+                }
+            }
+        }
+        return metricsList;
+    }
+
+    /**
+     * 寻找性能监控熔断器类,反射调用进行性能熔断检查
+     */
+    private void checkPerformanceMetrics(List<PerformanceMetrics> performanceMetrics) {
+        try {
+            final Class<?> fallbackManagerClass = EngineManager.getFallbackManagerClass();
+            if (fallbackManagerClass == null) {
+                return;
+            }
+            fallbackManagerClass.getMethod("invokePerformanceBreakerCheck", String.class)
+                    .invoke(null, SerializeUtils.serializeByList(performanceMetrics));
+        } catch (Throwable t) {
+            DongTaiLog.error("checkPerformanceMetrics failed, msg:{}, err:{}", t.getMessage(), t.getCause());
         }
     }
 
@@ -178,5 +243,17 @@ public class PerformanceMonitor implements IMonitor {
 
     static {
         AGENT_THRESHOLD_VALUE = 100;
+    }
+
+    @Override
+    public void run() {
+        while(!MonitorDaemonThread.isExit) {
+            try {
+                this.check();
+            } catch (Throwable t) {
+                DongTaiLog.warn("Monitor thread checked error, monitor:{}, msg:{}, err:{}", getName(), t.getMessage(), t.getCause());
+            }
+            ThreadUtils.threadSleep(30);
+        }
     }
 }

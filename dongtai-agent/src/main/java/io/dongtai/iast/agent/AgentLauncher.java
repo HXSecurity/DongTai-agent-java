@@ -1,7 +1,7 @@
 package io.dongtai.iast.agent;
 
 import io.dongtai.iast.agent.manager.EngineManager;
-import io.dongtai.iast.agent.monitor.EngineMonitor;
+import io.dongtai.iast.agent.monitor.impl.EngineMonitor;
 import io.dongtai.iast.agent.monitor.MonitorDaemonThread;
 import io.dongtai.iast.agent.report.AgentRegisterReport;
 import io.dongtai.log.DongTaiLog;
@@ -64,7 +64,7 @@ public class AgentLauncher {
             }
             DongTaiLog.info("Engine is about to be uninstalled");
             uninstall();
-            System.setProperty("protect.by.dongtai", null);
+            System.clearProperty("protect.by.dongtai");
         } else {
             if (System.getProperty("protect.by.dongtai", null) != null) {
                 DongTaiLog.info("DongTai already installed.");
@@ -83,6 +83,12 @@ public class AgentLauncher {
                 }
                 if (argsMap.containsKey("appVersion")) {
                     System.setProperty("dongtai.app.version", argsMap.get("appVersion"));
+                }
+                if (argsMap.containsKey("clusterName")) {
+                    System.setProperty("dongtai.cluster.name", argsMap.get("clusterName"));
+                }
+                if (argsMap.containsKey("clusterVersion")) {
+                    System.setProperty("dongtai.cluster.version", argsMap.get("clusterVersion"));
                 }
                 if (argsMap.containsKey("dongtaiServer")) {
                     System.setProperty("dongtai.server.url", argsMap.get("dongtaiServer"));
@@ -143,7 +149,7 @@ public class AgentLauncher {
 
         agentMonitorDaemonThread.setDaemon(true);
         agentMonitorDaemonThread.setPriority(1);
-        agentMonitorDaemonThread.setName(Constant.THREAD_PREFIX + "-monitor");
+        agentMonitorDaemonThread.setName(Constant.THREAD_PREFIX + "MonitorDaemon");
         agentMonitorDaemonThread.start();
     }
 
