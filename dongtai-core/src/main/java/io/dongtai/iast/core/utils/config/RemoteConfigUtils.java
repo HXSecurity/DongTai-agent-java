@@ -158,7 +158,7 @@ public class RemoteConfigUtils {
                 return result.getData();
             } else {
                 DongTaiLog.warn("remoteConfig request not success, status:{}, msg:{},response:{}", result.getStatus(), result.getMsg(),
-                        remoteResponse);
+                        GsonUtils.toJson(remoteResponse));
                 return null;
             }
         } catch (Throwable t) {
