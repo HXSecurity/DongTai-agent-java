@@ -22,10 +22,14 @@ public class ContextManager {
         return context.getTraceId();
     }
 
-    public static String getSpanId(String traceId, int agentId) {
+    public static String getSpanId() {
         TracingContext context = getOrCreate();
-        context.parseOrCreateTraceId(traceId, agentId);
         return String.valueOf(context.getSpanId());
+    }
+
+    public static void addSpanId() {
+        TracingContext context = getOrCreate();
+        context.setSpanId(context.getSpanId()+1);
     }
 
     public static String getSegmentId() {
@@ -33,7 +37,8 @@ public class ContextManager {
         return context.createSegmentId();
     }
 
-    public static String getHeaderKey() {
-        return TracingContext.getHeaderKey();
+    public static String getHeaderKeyTraceId() {
+        return TracingContext.getHeaderKeyTraceId();
     }
+
 }

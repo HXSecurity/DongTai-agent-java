@@ -256,7 +256,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public boolean isFirstLevelSource() {
         try {
-            return EngineManager.isDongTaiRunning() && EngineManager.isEngineRunning() && EngineManager.SCOPE_TRACKER
+            return EngineManager.isEngineRunning() && EngineManager.isDongTaiRunning() && EngineManager.SCOPE_TRACKER
                     .isFirstLevelSource();
         } catch (Exception e) {
             return false;
@@ -304,7 +304,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public boolean isFirstLevelPropagator() {
         try {
-            return EngineManager.isDongTaiRunning() && EngineManager.isEngineRunning() && EngineManager.SCOPE_TRACKER.isFirstLevelPropagator();
+            return EngineManager.isEngineRunning() && EngineManager.isDongTaiRunning() && EngineManager.SCOPE_TRACKER.isFirstLevelPropagator();
         } catch (Exception e) {
             return false;
         }
@@ -351,7 +351,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public boolean isFirstLevelSink() {
         try {
-            return EngineManager.isDongTaiRunning() && EngineManager.isEngineRunning() && EngineManager.isTopLevelSink();
+            return EngineManager.isEngineRunning() && EngineManager.isDongTaiRunning() && EngineManager.isTopLevelSink();
         } catch (Exception e) {
             return false;
         }
@@ -390,7 +390,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                             methodSign, methodSign, instance, argumentArray, retValue, framework, isStatic, null);
                     SpringApplicationImpl.getWebApplicationContext(event);
                 } else {
-                    boolean isEnterEntryPoint = EngineManager.isEnterHttp() || EngineManager.isFirstLevelDubbo();
+                    boolean isEnterEntryPoint = EngineManager.isEnterHttp() || EngineManager.isFirstLevelDubbo() || EngineManager.isFirstLevelKrpc();
                     boolean isEntryPointMethod = HookType.HTTP.equals(hookType) || HookType.RPC.equals(hookType);
                     if (isEnterEntryPoint || isEntryPointMethod) {
                         MethodEvent event = new MethodEvent(0, -1, className, matchClassName, methodName,

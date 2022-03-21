@@ -6,8 +6,7 @@ import org.objectweb.asm.ClassVisitor;
 
 public class DispatchKrpc implements DispatchPlugin {
 
-    // todo:krpc hook
-    static final String CLASS_OF_KRPC = " ".substring(1);
+    static final String CLASS_OF_KRPC = " krpc.rpc.impl.RpcCallableBase".substring(1);
 
     /**
      * 分发类访问器

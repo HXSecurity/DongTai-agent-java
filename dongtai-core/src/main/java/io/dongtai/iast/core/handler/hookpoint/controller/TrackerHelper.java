@@ -126,7 +126,7 @@ public class TrackerHelper {
     }
 
     private boolean isEnterEntry() {
-        return enterHttp > 0 || dubboLevel > 0;
+        return enterHttp > 0 || dubboLevel > 0 || krpcLevel > 0;
     }
 
     private boolean isFirstLevel(int targetLevel) {
@@ -135,6 +135,9 @@ public class TrackerHelper {
                     && targetLevel == 1;
         }
         if (this.dubboLevel > 0) {
+            return targetLevel == 1;
+        }
+        if (this.krpcLevel > 0) {
             return targetLevel == 1;
         }
         return false;

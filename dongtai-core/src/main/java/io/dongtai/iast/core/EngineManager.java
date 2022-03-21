@@ -195,9 +195,7 @@ public class EngineManager {
             ContextManager.getOrCreateGlobalTraceId(headers.get("dt-traceid"), EngineManager.getAgentId());
         } else {
             String newTraceId = ContextManager.getOrCreateGlobalTraceId(null, EngineManager.getAgentId());
-            String spanId = ContextManager.getSpanId(newTraceId,EngineManager.getAgentId());
             headers.put("dt-traceid", newTraceId);
-            headers.put("dt-spandid",spanId);
         }
         ENTER_HTTP_ENTRYPOINT.enterEntry();
         REQUEST_CONTEXT.set(requestMeta);
@@ -213,11 +211,12 @@ public class EngineManager {
      */
     public static void enterDubboEntry(String dubboService, Map<String, String> attachments) {
         if (attachments != null) {
-            if (attachments.containsKey(ContextManager.getHeaderKey())) {
-                ContextManager.getOrCreateGlobalTraceId(attachments.get(ContextManager.getHeaderKey()),
+            if (attachments.containsKey(ContextManager.getHeaderKeyTraceId())) {
+                ContextManager.getOrCreateGlobalTraceId(attachments.get(ContextManager.getHeaderKeyTraceId()),
                         EngineManager.getAgentId());
+                ContextManager.addSpanId();
             } else {
-                attachments.put(ContextManager.getHeaderKey(), ContextManager.getSegmentId());
+                attachments.put(ContextManager.getHeaderKeyTraceId(), ContextManager.getSegmentId());
             }
         }
         if (ENTER_HTTP_ENTRYPOINT.isEnterEntry()) {
@@ -263,11 +262,11 @@ public class EngineManager {
      */
     public static void enterKrpcEntry(String krpcService, Map<String, String> attachments) {
         if (attachments != null) {
-            if (attachments.containsKey(ContextManager.getHeaderKey())) {
-                ContextManager.getOrCreateGlobalTraceId(attachments.get(ContextManager.getHeaderKey()),
+            if (attachments.containsKey(ContextManager.getHeaderKeyTraceId())) {
+                ContextManager.getOrCreateGlobalTraceId(attachments.get(ContextManager.getHeaderKeyTraceId()),
                         EngineManager.getAgentId());
             } else {
-                attachments.put(ContextManager.getHeaderKey(), ContextManager.getSegmentId());
+                attachments.put(ContextManager.getHeaderKeyTraceId(), ContextManager.getOrCreateGlobalTraceId(null,EngineManager.getAgentId()));
             }
         }
         if (ENTER_HTTP_ENTRYPOINT.isEnterEntry()) {
@@ -285,12 +284,12 @@ public class EngineManager {
                 SERVER = new IastServer(requestHeaders.get("krpc"), 0, true);
             }
             Map<String, Object> requestMeta = new HashMap<String, Object>(12);
-            requestMeta.put("protocol", "krpc/" + requestHeaders.get("krpc"));
+            requestMeta.put("protocol", "krpc/");
             requestMeta.put("scheme", "krpc");
             requestMeta.put("method", "RPC");
             requestMeta.put("secure", "true");
-            requestMeta.put("requestURL", krpcService.split("\\?")[0]);
-            requestMeta.put("requestURI", requestHeaders.get("path"));
+            requestMeta.put("requestURL", krpcService);
+            requestMeta.put("requestURI", "");
             requestMeta.put("remoteAddr", "");
             requestMeta.put("queryString", "");
             requestMeta.put("headers", requestHeaders);

@@ -38,8 +38,12 @@ public class TracingContext {
                 + getNextSpanId();
     }
 
-    public static String getHeaderKey() {
+    public static String getHeaderKeyTraceId() {
         return "dt-traceid";
+    }
+
+    public static String getHeaderKeySpanId() {
+        return "dt-spanid";
     }
 
     public void parseOrCreateTraceId(String traceId, int agentId) {

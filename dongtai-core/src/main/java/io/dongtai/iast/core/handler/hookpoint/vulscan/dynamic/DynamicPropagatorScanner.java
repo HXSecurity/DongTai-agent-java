@@ -39,7 +39,7 @@ public class DynamicPropagatorScanner implements IVulScan {
             Object obj = event.argumentArray[1];
             try {
                 Method method = obj.getClass().getMethod("addHeader", String.class, Object.class);
-                method.invoke(obj, ContextManager.getHeaderKey(), ContextManager.getSegmentId());
+                method.invoke(obj, ContextManager.getHeaderKeyTraceId(), ContextManager.getSegmentId());
             } catch (Exception e) {
                 // fixme: solve exception
                 DongTaiLog.error(e);
@@ -48,7 +48,7 @@ public class DynamicPropagatorScanner implements IVulScan {
             Object obj = event.argumentArray[1];
             try {
                 Method method = obj.getClass().getMethod("setRequestHeader", String.class, String.class);
-                method.invoke(obj, ContextManager.getHeaderKey(), ContextManager.getSegmentId());
+                method.invoke(obj, ContextManager.getHeaderKeyTraceId(), ContextManager.getSegmentId());
             } catch (Exception e) {
                 // fixme: solve exception
                 DongTaiLog.error(e);

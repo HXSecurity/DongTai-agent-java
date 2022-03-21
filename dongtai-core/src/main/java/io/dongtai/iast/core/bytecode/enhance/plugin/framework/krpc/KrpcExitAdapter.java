@@ -7,8 +7,9 @@ import io.dongtai.log.DongTaiLog;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 
-public class KrpcAdapter extends AbstractClassVisitor {
-    public KrpcAdapter(ClassVisitor classVisitor, IastContext context) {
+public class KrpcExitAdapter extends AbstractClassVisitor {
+
+    public KrpcExitAdapter(ClassVisitor classVisitor, IastContext context) {
         super(classVisitor, context);
     }
 
@@ -21,23 +22,12 @@ public class KrpcAdapter extends AbstractClassVisitor {
     public MethodVisitor visitMethod(final int access, final String name, final String desc, final String signature, final String[] exceptions) {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
         String signCode = AsmUtils.buildSignature(context.getClassName(), name, desc);
-/*        if ("sendCall".equals(name)) {
+        if ("".equals(name)) {
             if (DongTaiLog.isDebugEnabled()) {
                 DongTaiLog.debug("Adding Krpc Source tracking for type {}", context.getClassName());
             }
 
-            mv = new KrpcAdviceAdapter(mv, access, name, desc, signCode, context);
-            transformed = true;
-            if (DongTaiLog.isDebugEnabled()) {
-                DongTaiLog.debug("rewrite method {}.{} for listener[match={}]", context.getClassName(), name, context.getMatchClassName());
-            }
-        }*/
-        if ("callService".equals(name)) {
-            if (DongTaiLog.isDebugEnabled()) {
-                DongTaiLog.debug("Adding Krpc Source tracking for type {}", context.getClassName());
-            }
-
-            mv = new KrpcAdviceAdapter(mv, access, name, desc, signCode, context);
+            mv = new KrpcExitAdviceAdapter(mv, access, name, desc, signCode, context);
             transformed = true;
             if (DongTaiLog.isDebugEnabled()) {
                 DongTaiLog.debug("rewrite method {}.{} for listener[match={}]", context.getClassName(), name, context.getMatchClassName());
