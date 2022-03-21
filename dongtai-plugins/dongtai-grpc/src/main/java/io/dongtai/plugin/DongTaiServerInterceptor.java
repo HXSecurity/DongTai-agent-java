@@ -12,10 +12,9 @@ public class DongTaiServerInterceptor implements ServerInterceptor {
         for (String key : keys) {
             Metadata.Key<?> metaItemKey;
             if (key.endsWith("-bin")) {
-                metaItemKey = Metadata.Key.of(key, Metadata.BINARY_BYTE_MARSHALLER);
-            } else {
-                metaItemKey = Metadata.Key.of(key, Metadata.ASCII_STRING_MARSHALLER);
+                continue;
             }
+            metaItemKey = Metadata.Key.of(key, Metadata.ASCII_STRING_MARSHALLER);
             GrpcProxy.addMetaItem(key, metadata.get(metaItemKey));
         }
         GrpcProxy.addMetaItem("requestURI", serverCall.getMethodDescriptor().getFullMethodName());

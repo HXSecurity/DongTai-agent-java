@@ -69,7 +69,7 @@ public class TrackerHelper {
     public void leaveSource() {
         if (isEnterEntry()) {
             this.sourceLevel--;
-            if (enterHttp > 0 && leaveSource == 0) {
+            if (leaveSource == 0) {
                 leaveSource = 1;
             }
         }
@@ -132,7 +132,7 @@ public class TrackerHelper {
     }
 
     private boolean isFirstLevel(int targetLevel) {
-        if (this.enterHttp > 0) {
+        if (this.enterHttp > 0 || this.grpcLevel > 0) {
             return this.sourceLevel == 0 && this.leaveSource == 1
                     && targetLevel == 1;
         }

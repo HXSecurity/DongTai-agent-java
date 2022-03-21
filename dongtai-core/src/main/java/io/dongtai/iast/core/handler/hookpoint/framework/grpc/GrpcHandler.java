@@ -119,13 +119,17 @@ public class GrpcHandler {
                 String newTraceId = ContextManager.getOrCreateGlobalTraceId(null, EngineManager.getAgentId());
                 metadata.put("dt-traceid", newTraceId);
             }
-            metadata.put("protocol", "ProtoBuf");
-            metadata.put("requestURL", metadata.get("serverAddr") + "/" + metadata.get("requestURI"));
-            EngineManager.REQUEST_CONTEXT.set(metadata);
+            Map<String, Object> requestMeta = new HashMap<String, Object>();
+            requestMeta.put("protocol", "ProtoBuf");
+            requestMeta.put("requestURL", metadata.get("serverAddr") + "/" + metadata.get("requestURI"));
+            requestMeta.put("requestURI", metadata.get("requestURI"));
+            requestMeta.put("headers", metadata);
+            EngineManager.REQUEST_CONTEXT.set(requestMeta);
             EngineManager.TRACK_MAP.set(new HashMap<Integer, MethodEvent>(1024));
             EngineManager.TAINT_POOL.set(new HashSet<Object>());
             EngineManager.TAINT_HASH_CODES.set(new HashSet<Integer>());
             EngineManager.SCOPE_TRACKER.get().enterGrpc();
+            EngineManager.turnOnDongTai();
         } catch (Exception e) {
             DongTaiLog.error(e);
         }
