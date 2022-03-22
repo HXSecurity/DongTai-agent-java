@@ -2,6 +2,7 @@ package io.dongtai.iast.core.bytecode.enhance.asm;
 
 import java.lang.dongtai.SpyDispatcher;
 import java.lang.dongtai.SpyDispatcherHandler;
+
 import org.objectweb.asm.commons.Method;
 
 /**
@@ -18,8 +19,8 @@ public interface AsmMethods {
         }
 
         static Method getAsmMethod(final Class<?> clazz,
-                final String methodName,
-                final Class<?>... parameterClassArray) {
+                                   final String methodName,
+                                   final Class<?>... parameterClassArray) {
             return Method.getMethod(
                     SandboxReflectUtils.unCaughtGetClassDeclaredJavaMethod(clazz, methodName, parameterClassArray));
         }
@@ -128,5 +129,10 @@ public interface AsmMethods {
             String.class,
             boolean.class,
             int.class
+    );
+    Method SPY$toStringUtf8 = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "toStringUtf8",
+            Object.class
     );
 }

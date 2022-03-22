@@ -2,14 +2,17 @@ package io.dongtai.iast.core.bytecode.enhance.plugin;
 
 import io.dongtai.iast.core.bytecode.enhance.IastContext;
 import io.dongtai.iast.core.bytecode.enhance.plugin.framework.krpc.DispatchKrpc;
+import io.dongtai.iast.core.bytecode.enhance.plugin.framework.protobuf.DispatchProtobuf;
 import io.dongtai.iast.core.bytecode.enhance.plugin.spring.DispatchSpringApplication;
 import io.dongtai.iast.core.bytecode.enhance.plugin.cookie.DispatchCookie;
 import io.dongtai.iast.core.bytecode.enhance.plugin.core.DispatchClassPlugin;
 import io.dongtai.iast.core.bytecode.enhance.plugin.framework.dubbo.DispatchDubbo;
 import io.dongtai.iast.core.bytecode.enhance.plugin.framework.j2ee.dispatch.DispatchJ2ee;
 import io.dongtai.iast.core.bytecode.enhance.plugin.hardcoded.DispatchHardcodedPlugin;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import org.objectweb.asm.ClassVisitor;
 
 /**
@@ -33,7 +36,7 @@ public class PluginRegister {
 
         //PLUGINS.add(new DispatchSpringAutoBinding());
         this.plugins.add(new DispatchClassPlugin());
-        //PLUGINS.add()
+        this.plugins.add(new DispatchProtobuf());
     }
 
     public ClassVisitor initial(ClassVisitor classVisitor, IastContext context) {

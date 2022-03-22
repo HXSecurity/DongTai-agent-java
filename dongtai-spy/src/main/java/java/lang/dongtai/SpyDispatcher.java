@@ -155,6 +155,7 @@ public interface SpyDispatcher {
      */
     boolean isFirstLevelSink();
 
+    void toStringUtf8(Object ref);
 
 
     /**

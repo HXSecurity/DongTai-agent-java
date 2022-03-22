@@ -398,7 +398,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                         if (HookType.HTTP.equals(hookType)) {
                             HttpImpl.solveHttp(event);
                         } else if (HookType.RPC.equals(hookType)) {
-                            solveRPC(framework,event);
+                            solveRPC(framework, event);
                         } else if (HookType.PROPAGATOR.equals(hookType) && !EngineManager.TAINT_POOL.get().isEmpty()) {
                             PropagatorImpl.solvePropagator(event, INVOKE_ID_SEQUENCER);
                         } else if (HookType.SOURCE.equals(hookType)) {
@@ -418,13 +418,19 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     }
 
     private void solveRPC(String framework, MethodEvent event) {
-        switch (framework){
-            case "dubbo" :
+        switch (framework) {
+            case "dubbo":
                 DubboImpl.solveDubbo(event, SpyDispatcherImpl.INVOKE_ID_SEQUENCER);
                 break;
-            case "krpc" :
+            case "krpc":
                 KrpcImpl.solveKrpc(event, SpyDispatcherImpl.INVOKE_ID_SEQUENCER);
                 break;
         }
+    }
+
+    @Override
+    public void toStringUtf8(Object ref) {
+        System.out.println(ref);
+        System.out.println(System.identityHashCode(ref));
     }
 }
