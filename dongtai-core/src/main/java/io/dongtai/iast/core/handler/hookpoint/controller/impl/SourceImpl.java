@@ -89,6 +89,16 @@ public class SourceImpl {
                     || methodName.equals("getInitializationErrorString")
                     || methodName.equals("getUnknownFields")
                     || methodName.equals("getDetailOrBuilderList")
+                    || methodName.equals("getAllFieldsMutable")
+                    || methodName.equals("getAllFieldsRaw")
+                    || methodName.equals("getOneofFieldDescriptor")
+                    || methodName.equals("getField")
+                    || methodName.equals("getFieldRaw")
+                    || methodName.equals("getRepeatedFieldCount")
+                    || methodName.equals("getRepeatedField")
+                    || methodName.equals("getSerializedSize")
+                    || methodName.equals("getMethodOrDie")
+                    || methodName.endsWith("Bytes")
                     || method.getParameterCount() != 0) {
                 continue;
             }
