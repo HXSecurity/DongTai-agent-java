@@ -89,6 +89,12 @@ public interface SpyDispatcher {
      */
     boolean isFirstLevelKrpc();
 
+    void enterKrpcHttp();
+
+    void leaveKrpcHttp();
+
+    boolean isFirstLevelKrpcHttp();
+
     /**
      * mark for enter Source Entry Point
      *

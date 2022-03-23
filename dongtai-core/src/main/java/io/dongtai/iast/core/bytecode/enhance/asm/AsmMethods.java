@@ -80,6 +80,18 @@ public interface AsmMethods {
             SpyDispatcher.class,
             "isFirstLevelKrpc"
     );
+    Method SPY$enterKrpcHttp = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "enterKrpcHttp"
+    );
+    Method SPY$leaveKrpcHttp = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "leaveKrpcHttp"
+    );
+    Method SPY$isFirstLevelKrpcHttp = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "isFirstLevelKrpcHttp"
+    );
     Method SPY$enterSource = InnerHelper.getAsmMethod(
             SpyDispatcher.class,
             "enterSource"

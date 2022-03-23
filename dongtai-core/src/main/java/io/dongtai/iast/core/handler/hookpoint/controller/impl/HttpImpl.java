@@ -130,8 +130,8 @@ public class HttpImpl {
             return (Map<String, Object>) methodOfRequestMeta.invoke(response);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             DongTaiLog.debug(e);
+            return (Map<String, Object>) response;
         }
-        return null;
     }
 
     /**

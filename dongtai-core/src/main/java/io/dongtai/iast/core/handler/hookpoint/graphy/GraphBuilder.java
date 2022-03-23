@@ -111,7 +111,13 @@ public class GraphBuilder {
 
     private static byte[] getResponseBody(Map<String, Object> responseMeta) {
         Integer responseLength = PropertyUtils.getInstance().getResponseLength();
-        byte[] responseBody = (byte[]) responseMeta.get("body");
+        Object objOfRespones = responseMeta.get("body");
+        byte[] responseBody;
+        if (objOfRespones instanceof String){
+            responseBody = objOfRespones.toString().getBytes();
+        }else {
+            responseBody = (byte[]) responseMeta.get("body");
+        }
         if (responseLength > 0) {
             byte[] newResponseBody = new byte[responseLength];
             newResponseBody = Arrays.copyOfRange(responseBody, 0, responseLength);

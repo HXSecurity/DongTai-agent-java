@@ -3,13 +3,12 @@ package io.dongtai.iast.core.bytecode.enhance.plugin.framework.krpc;
 import io.dongtai.iast.core.bytecode.enhance.IastContext;
 import io.dongtai.iast.core.bytecode.enhance.plugin.AbstractClassVisitor;
 import io.dongtai.iast.core.utils.AsmUtils;
-import io.dongtai.log.DongTaiLog;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 
-public class KrpcExitAdapter extends AbstractClassVisitor {
+public class KrpcHttpAdapter extends AbstractClassVisitor {
 
-    public KrpcExitAdapter(ClassVisitor classVisitor, IastContext context) {
+    public KrpcHttpAdapter(ClassVisitor classVisitor, IastContext context) {
         super(classVisitor, context);
     }
 
@@ -22,16 +21,13 @@ public class KrpcExitAdapter extends AbstractClassVisitor {
     public MethodVisitor visitMethod(final int access, final String name, final String desc, final String signature, final String[] exceptions) {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
         String signCode = AsmUtils.buildSignature(context.getClassName(), name, desc);
-        if ("".equals(name)) {
-            if (DongTaiLog.isDebugEnabled()) {
-                DongTaiLog.debug("Adding Krpc Source tracking for type {}", context.getClassName());
-            }
-
-            mv = new KrpcExitAdviceAdapter(mv, access, name, desc, signCode, context);
+        if ("callService".equals(name)){
+            mv = new KrpcHttpAdviceAdapter(mv, access, name, desc, signCode, context);
             transformed = true;
-            if (DongTaiLog.isDebugEnabled()) {
-                DongTaiLog.debug("rewrite method {}.{} for listener[match={}]", context.getClassName(), name, context.getMatchClassName());
-            }
+        }
+        if ("startRender".equals(name)) {
+            mv = new KrpcHttpExitAdviceAdapter(mv, access, name, desc, signCode, context);
+            transformed = true;
         }
         return mv;
     }

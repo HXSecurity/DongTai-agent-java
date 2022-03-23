@@ -7,6 +7,7 @@ import io.dongtai.iast.core.handler.hookpoint.controller.impl.*;
 import io.dongtai.iast.core.handler.hookpoint.graphy.GraphBuilder;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.service.ErrorLogReport;
+import io.dongtai.log.DongTaiLog;
 
 import java.lang.dongtai.SpyDispatcher;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -216,6 +217,62 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     }
 
     /**
+     * mark for enter Krpc Entry Point
+     *
+     * @since 1.3.1
+     */
+    @Override
+    public void enterKrpcHttp() {
+        try {
+            EngineManager.SCOPE_TRACKER.enterKrpc();
+        } catch (Exception e) {
+            ErrorLogReport.sendErrorLog(e);
+        }
+    }
+
+    /**
+     * mark for leave Krpc Entry Point
+     *
+     * @since 1.3.1
+     */
+    @Override
+    public void leaveKrpcHttp() {
+        try {
+            if (EngineManager.isDongTaiRunning()) {
+                EngineManager.turnOffDongTai();
+
+                EngineManager.leaveKrpc();
+                if (EngineManager.isExitedKrpc() && !EngineManager.isEnterHttp()) {
+                    EngineManager.maintainRequestCount();
+                    GraphBuilder.buildAndReport(EngineManager.REQUEST_CONTEXT.get(), EngineManager.RESPONSE_CONTEXT.get());
+                    EngineManager.cleanThreadState();
+                }
+
+                EngineManager.turnOnDongTai();
+            }
+        } catch (Exception e) {
+            ErrorLogReport.sendErrorLog(e);
+            EngineManager.cleanThreadState();
+        }
+    }
+
+    /**
+     * Determines whether it is a layer 1 Krpc entry
+     *
+     * @return true if is a layer 1 Krpc entry; else false
+     * @since 1.3.1
+     */
+    @Override
+    public boolean isFirstLevelKrpcHttp() {
+        try {
+            return EngineManager.isEngineRunning() && EngineManager.isFirstLevelKrpc();
+        } catch (Exception e) {
+            ErrorLogReport.sendErrorLog(e);
+        }
+        return false;
+    }
+
+    /**
      * mark for enter Source Entry Point
      *
      * @since 1.3.1
@@ -409,7 +466,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                     }
                 }
             } catch (Exception e) {
-                ErrorLogReport.sendErrorLog(e);
+                DongTaiLog.debug(e);
             } finally {
                 EngineManager.turnOnDongTai();
             }
@@ -419,11 +476,17 @@ public class SpyDispatcherImpl implements SpyDispatcher {
 
     private void solveRPC(String framework, MethodEvent event) {
         switch (framework) {
-            case "dubbo":
-                DubboImpl.solveDubbo(event, SpyDispatcherImpl.INVOKE_ID_SEQUENCER);
-                break;
             case "krpc":
                 KrpcImpl.solveKrpc(event, SpyDispatcherImpl.INVOKE_ID_SEQUENCER);
+                break;
+            case "krpc_api" :
+                KrpcImpl.solveKrpcApi(event, SpyDispatcherImpl.INVOKE_ID_SEQUENCER);
+                break;
+            case "krpc_http" :
+                KrpcImpl.solveKrpcHttpEnter(event, SpyDispatcherImpl.INVOKE_ID_SEQUENCER);
+                break;
+            case "krpc_http_exit" :
+                KrpcImpl.solveKrpcHttpExit(event, SpyDispatcherImpl.INVOKE_ID_SEQUENCER);
                 break;
         }
     }
