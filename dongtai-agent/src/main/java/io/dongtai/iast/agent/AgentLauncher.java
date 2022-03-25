@@ -122,7 +122,6 @@ public class AgentLauncher {
      */
     private static void install(final Instrumentation inst) {
         IastProperties iastProperties = IastProperties.getInstance();
-        DongTaiLog.info("DongTai Agent Version: {}, DongTai Server: {}", Constant.AGENT_VERSION_VALUE, iastProperties.getBaseUrl());
         Boolean send = AgentRegisterReport.send();
         if (send) {
             DongTaiLog.info("Agent registered successfully.");

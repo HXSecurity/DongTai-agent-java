@@ -114,9 +114,9 @@ public class IastClassFileTransformer implements ClassFileTransformer {
         if (internalClassName == null || internalClassName.startsWith("io/dongtai/") || internalClassName.startsWith("com/secnium/iast/") || internalClassName.startsWith("java/lang/iast/") || internalClassName.startsWith("cn/huoxian/iast/")) {
             return null;
         }
-        boolean isRunning = EngineManager.isLingzhiRunning();
+        boolean isRunning = EngineManager.isDongTaiRunning();
         if (isRunning) {
-            EngineManager.turnOffLingzhi();
+            EngineManager.turnOffDongTai();
         }
 
         try {
@@ -163,7 +163,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                 Throwable ignore) {
         } finally {
             if (isRunning) {
-                EngineManager.turnOnLingzhi();
+                EngineManager.turnOnDongTai();
             }
         }
 
@@ -302,7 +302,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         Class<?>[] waitingReTransformClasses = findForRetransform();
-        DongTaiLog.info("find {} classes to reTransform, time: {}", waitingReTransformClasses.length, stopWatch.getTime());
+        DongTaiLog.debug("find {} classes to reTransform, time: {}", waitingReTransformClasses.length, stopWatch.getTime());
         // fixme: Performance Loss Calculation, 6752 * 50ms = 337600ms, 337s, 6-7min
         for (Class<?> clazz : waitingReTransformClasses) {
             try {
@@ -314,7 +314,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
             }
         }
         stopWatch.stop();
-        DongTaiLog.info("finish reTransform, class count: {}, time: {}", getTransformCount(), stopWatch.getTime());
+        DongTaiLog.debug("finish reTransform, class count: {}, time: {}", getTransformCount(), stopWatch.getTime());
     }
 
 }
