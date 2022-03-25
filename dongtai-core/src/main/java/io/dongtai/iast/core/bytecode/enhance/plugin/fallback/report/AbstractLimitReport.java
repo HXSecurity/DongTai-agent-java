@@ -1,8 +1,8 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.fallback.report;
 
-import io.dongtai.iast.core.service.ErrorLogReport;
 import io.dongtai.iast.core.service.ThreadPools;
 import io.dongtai.iast.core.utils.Constants;
+import io.dongtai.log.DongTaiLog;
 
 
 /**
@@ -17,7 +17,7 @@ public abstract class AbstractLimitReport {
         try {
             ThreadPools.sendLimitReport(Constants.API_REPORT_UPLOAD, report);
         } catch (Exception e) {
-            ErrorLogReport.sendErrorLog(e);
+            DongTaiLog.error(e);
         }
     }
 

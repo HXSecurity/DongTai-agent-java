@@ -41,7 +41,7 @@ public class MonitorDaemonThread implements Runnable {
             try {
                 Thread.sleep(delayTime);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                DongTaiLog.error(e);
             }
             if (EngineMonitor.isCoreRegisterStart) {
                 startEngine();

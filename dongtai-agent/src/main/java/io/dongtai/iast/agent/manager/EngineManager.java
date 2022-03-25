@@ -147,7 +147,7 @@ public class EngineManager {
      * @return engine包的本地保存路径
      */
     private static String getEnginePackageCachePath() {
-        return System.getProperty("java.io.tmpdir") + File.separator + "iast" + File.separator + "dongtai-core.jar";
+        return System.getProperty("java.io.tmpdir.dongtai") + File.separator + "iast" + File.separator + "dongtai-core.jar";
     }
 
     /**
@@ -156,7 +156,7 @@ public class EngineManager {
      * @return inject包的本地路径
      */
     private static String getInjectPackageCachePath() {
-        return System.getProperty("java.io.tmpdir") + File.separator + "iast" + File.separator + "dongtai-spy.jar";
+        return System.getProperty("java.io.tmpdir.dongtai") + File.separator + "iast" + File.separator + "dongtai-spy.jar";
     }
 
     /**
@@ -165,7 +165,7 @@ public class EngineManager {
      * @return inject包的本地路径
      */
     private static String getApiPackagePath() {
-        return System.getProperty("java.io.tmpdir") + File.separator + "iast" + File.separator + "dongtai-api.jar";
+        return System.getProperty("java.io.tmpdir.dongtai") + File.separator + "iast" + File.separator + "dongtai-api.jar";
     }
 
 
@@ -252,7 +252,7 @@ public class EngineManager {
                     FileUtils.getResourceToFile("bin/dongtai-core.jar", getEnginePackageCachePath()) &&
                     FileUtils.getResourceToFile("bin/dongtai-api.jar", getApiPackagePath());
         } catch (IOException e) {
-            e.printStackTrace();
+            DongTaiLog.error(e);
         }
         return false;
     }
@@ -264,7 +264,7 @@ public class EngineManager {
         String enginePackage = getEnginePackageCachePath();
         String apiPackage = getApiPackagePath();
         if (properties.isDebug()) {
-            DongTaiLog.info("current mode: debug, try to read package from directory {}", System.getProperty("java.io.tmpdir"));
+            DongTaiLog.info("current mode: debug, try to read package from directory {}", System.getProperty("java.io.tmpdir.dongtai"));
             if ((new File(spyPackage)).exists() && (new File(enginePackage)).exists() && (new File(apiPackage)).exists()) {
                 return true;
             }
@@ -292,11 +292,12 @@ public class EngineManager {
         } catch (IOException e) {
             DongTaiLog.error("DongTai engine start failed, Reason: dongtai-spy.jar or dongtai-core.jar open failed. path: \n\tdongtai-core.jar: " + corePackage + "\n\tdongtai-spy.jar: " + spyPackage);
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            DongTaiLog.error(e);
             DongTaiLog.error("ClassNotFoundException: DongTai engine start failed, please contact staff for help.");
         } catch (Throwable throwable) {
             DongTaiLog.error("Throwable: DongTai engine start failed, please contact staff for help.");
-            throwable.printStackTrace();
+            DongTaiLog.error(throwable);
+
         }
         return false;
     }
@@ -314,17 +315,17 @@ public class EngineManager {
             }
             return false;
         } catch (InvocationTargetException e) {
-            e.printStackTrace();
+            DongTaiLog.error(e);
             DongTaiLog.error("DongTai engine start failed, please contact staff for help.");
         } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+            DongTaiLog.error(e);
             DongTaiLog.error("DongTai engine start failed, please contact staff for help.");
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            DongTaiLog.error(e);
             DongTaiLog.error("DongTai engine start failed, please contact staff for help.");
         } catch (Throwable throwable) {
             DongTaiLog.error("DongTai engine start failed, please contact staff for help.");
-            throwable.printStackTrace();
+            DongTaiLog.error(throwable);
         }
         return false;
     }
@@ -353,10 +354,10 @@ public class EngineManager {
             DongTaiLog.error("DongTai engine stop failed, please contact staff for help.");
         } catch (IllegalAccessException e) {
             DongTaiLog.error("DongTai engine stop failed, please contact staff for help.");
-            e.printStackTrace();
+            DongTaiLog.error(e);
         } catch (Throwable throwable) {
             DongTaiLog.error("DongTai engine stop failed, please contact staff for help.");
-            throwable.printStackTrace();
+            DongTaiLog.error(throwable);
         }
         return false;
     }
@@ -377,11 +378,11 @@ public class EngineManager {
                         .invoke(null, launchMode, this.properties.getPropertiesFilePath(), inst);
             }
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            DongTaiLog.error(e);
         } catch (InvocationTargetException e) {
-            e.printStackTrace();
+            DongTaiLog.error(e);
         } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+            DongTaiLog.error(e);
         }
 
         // 关闭SandboxClassLoader

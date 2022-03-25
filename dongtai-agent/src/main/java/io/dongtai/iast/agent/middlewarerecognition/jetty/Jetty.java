@@ -2,6 +2,7 @@ package io.dongtai.iast.agent.middlewarerecognition.jetty;
 
 
 import io.dongtai.iast.agent.middlewarerecognition.IServer;
+import io.dongtai.log.DongTaiLog;
 
 import java.io.*;
 import java.lang.management.RuntimeMXBean;
@@ -47,9 +48,9 @@ public class Jetty implements IServer {
             reader.close();
             fileReader.close();
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            DongTaiLog.error(e);
         } catch (IOException e) {
-            e.printStackTrace();
+            DongTaiLog.error(e);
         }
         return version;
     }

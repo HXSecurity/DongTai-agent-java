@@ -52,7 +52,7 @@ public class IastProperties {
 
     public void init() throws ClassNotFoundException {
         try {
-            propertiesFilePath = System.getProperty("java.io.tmpdir") + File.separator + "iast" + File.separator + "iast.properties";
+            propertiesFilePath = System.getProperty("java.io.tmpdir.dongtai") + File.separator + "iast" + File.separator + "iast.properties";
             FileUtils.getResourceToFile("iast.properties", propertiesFilePath);
 
             InputStream is = IastProperties.class.getClassLoader().getResourceAsStream("iast.properties");
@@ -60,7 +60,7 @@ public class IastProperties {
 
             DongTaiLog.info("DongTai Config: " + propertiesFilePath);
         } catch (IOException e) {
-            e.printStackTrace();
+            DongTaiLog.error(e);
         }
     }
 

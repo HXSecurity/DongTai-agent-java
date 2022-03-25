@@ -18,6 +18,7 @@ public class DongTaiLog {
     static boolean enableWriteToFile;
     static String filePath;
     static boolean enableColor;
+    static boolean isCreateLog = false;
     public static java.util.logging.Level LEVEL = java.util.logging.Level.CONFIG;
 
     private static final String RESET = "\033[0m";
@@ -239,7 +240,7 @@ public class DongTaiLog {
             o.flush();
             o.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            DongTaiLog.error(e);
         }
     }
 
@@ -250,17 +251,18 @@ public class DongTaiLog {
             enableWriteToFile = false;
         }
         filePath = IastProperties.getLogPath();
-        if (enableWriteToFile) {
+        if (enableWriteToFile && !isCreateLog) {
             File f = new File(filePath);
             if (!f.exists()) {
                 f.mkdirs();
             }
-            File file = new File(filePath, "/dongtai.log");
+            File file = new File(filePath, "/javaAgent.log");
             if (!file.exists()) {
                 try {
                     file.createNewFile();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                } catch (IOException ignore) {
+                }finally {
+                    isCreateLog = true;
                 }
             }
         }

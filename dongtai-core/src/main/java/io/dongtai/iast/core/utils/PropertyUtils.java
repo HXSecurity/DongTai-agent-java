@@ -65,9 +65,9 @@ public class PropertyUtils {
                 fis.close();
             }
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            DongTaiLog.error(e);
         } catch (IOException e) {
-            e.printStackTrace();
+            DongTaiLog.error(e);
         }
     }
 

@@ -6,7 +6,7 @@ import io.dongtai.iast.core.handler.hookpoint.controller.HookType;
 import io.dongtai.iast.core.handler.hookpoint.controller.impl.*;
 import io.dongtai.iast.core.handler.hookpoint.graphy.GraphBuilder;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
-import io.dongtai.iast.core.service.ErrorLogReport;
+import io.dongtai.log.DongTaiLog;
 
 import java.lang.dongtai.SpyDispatcher;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -28,7 +28,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
         try {
             EngineManager.SCOPE_TRACKER.enterHttp();
         } catch (Exception e) {
-            ErrorLogReport.sendErrorLog(e);
+            DongTaiLog.error(e);
         }
     }
 
@@ -55,7 +55,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
             }
 
         } catch (Exception e) {
-            ErrorLogReport.sendErrorLog(e);
+            DongTaiLog.error(e);
             EngineManager.cleanThreadState();
         }
     }
@@ -72,7 +72,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
             return EngineManager.isEngineRunning() && EngineManager.SCOPE_TRACKER
                     .isFirstLevelHttp();
         } catch (Exception e) {
-            ErrorLogReport.sendErrorLog(e);
+            DongTaiLog.error(e);
         }
         return false;
     }
@@ -113,7 +113,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
         try {
             EngineManager.SCOPE_TRACKER.enterDubbo();
         } catch (Exception e) {
-            ErrorLogReport.sendErrorLog(e);
+            DongTaiLog.error(e);
         }
     }
 
@@ -138,7 +138,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                 EngineManager.turnOnLingzhi();
             }
         } catch (Exception e) {
-            ErrorLogReport.sendErrorLog(e);
+            DongTaiLog.error(e);
             EngineManager.cleanThreadState();
         }
     }
@@ -154,7 +154,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
         try {
             return EngineManager.isEngineRunning() && EngineManager.isFirstLevelDubbo();
         } catch (Exception e) {
-            ErrorLogReport.sendErrorLog(e);
+            DongTaiLog.error(e);
         }
         return false;
     }
@@ -171,7 +171,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                 EngineManager.SCOPE_TRACKER.enterSource();
             }
         } catch (Exception e) {
-            ErrorLogReport.sendErrorLog(e);
+            DongTaiLog.error(e);
         }
     }
 
@@ -187,7 +187,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                 EngineManager.SCOPE_TRACKER.leaveSource();
             }
         } catch (Exception e) {
-            ErrorLogReport.sendErrorLog(e);
+            DongTaiLog.error(e);
         }
     }
 
@@ -219,7 +219,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                 EngineManager.SCOPE_TRACKER.enterPropagation();
             }
         } catch (Exception e) {
-            ErrorLogReport.sendErrorLog(e);
+            DongTaiLog.error(e);
         }
     }
 
@@ -235,7 +235,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                 EngineManager.SCOPE_TRACKER.leavePropagation();
             }
         } catch (Exception e) {
-            ErrorLogReport.sendErrorLog(e);
+            DongTaiLog.error(e);
         }
     }
 
@@ -266,7 +266,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                 EngineManager.SCOPE_TRACKER.enterSink();
             }
         } catch (Exception e) {
-            ErrorLogReport.sendErrorLog(e);
+            DongTaiLog.error(e);
         }
     }
 
@@ -282,7 +282,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                 EngineManager.SCOPE_TRACKER.leaveSink();
             }
         } catch (Exception e) {
-            ErrorLogReport.sendErrorLog(e);
+            DongTaiLog.error(e);
         }
     }
 
@@ -362,7 +362,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                     }
                 }
             } catch (Exception e) {
-                ErrorLogReport.sendErrorLog(e);
+                DongTaiLog.error(e);
             } finally {
                 EngineManager.turnOnLingzhi();
             }

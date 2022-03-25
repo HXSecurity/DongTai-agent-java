@@ -1,8 +1,5 @@
 package io.dongtai.iast.core.handler.hookpoint.models;
 
-import io.dongtai.iast.core.service.ErrorLogReport;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -257,7 +254,7 @@ public class MethodEvent {
 //                sb.append(value.toString());
 //            }
 //        } catch (Exception e) {
-//            ErrorLogReport.sendErrorLog(e);
+//            DongTaiLog.error(e);
 //        }
 //        return sb.toString().trim();
     }

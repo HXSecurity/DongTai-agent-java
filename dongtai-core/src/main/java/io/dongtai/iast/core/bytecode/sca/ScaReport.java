@@ -1,10 +1,10 @@
 package io.dongtai.iast.core.bytecode.sca;
 
-import io.dongtai.iast.core.service.ErrorLogReport;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.ReportConstant;
 import io.dongtai.iast.core.utils.Constants;
 import io.dongtai.iast.core.utils.HttpClientUtils;
+import io.dongtai.log.DongTaiLog;
 import org.json.JSONObject;
 
 
@@ -24,7 +24,7 @@ public class ScaReport {
         try {
             HttpClientUtils.sendPost(Constants.API_REPORT_UPLOAD, report);
         } catch (Exception e) {
-            ErrorLogReport.sendErrorLog(e);
+            DongTaiLog.error(e);
         }
     }
 

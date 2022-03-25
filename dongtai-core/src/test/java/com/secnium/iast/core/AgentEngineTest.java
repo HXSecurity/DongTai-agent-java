@@ -1,5 +1,7 @@
 package com.secnium.iast.core;
 
+import io.dongtai.log.DongTaiLog;
+
 import java.util.concurrent.TimeUnit;
 
 public class AgentEngineTest {
@@ -18,7 +20,7 @@ public class AgentEngineTest {
             TimeUnit.SECONDS.sleep(10);
             System.out.println("a");
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            DongTaiLog.error(e);
         }
     }
 
