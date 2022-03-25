@@ -29,7 +29,7 @@ public class TransformEngine implements IEngine {
             DongTaiLog.info("Install data acquisition and analysis sub-modules");
             inst.addTransformer(classFileTransformer, true);
             classFileTransformer.reTransform();
-            DongTaiLog.info("The sub-module of data acquisition and analysis is successfully installed");
+            DongTaiLog.debug("The sub-module of data acquisition and analysis is successfully installed");
         } catch (Throwable cause) {
             DongTaiLog.error("Failed to install the sub-module of data collection and analysis");
             ErrorLogReport.sendErrorLog(cause);

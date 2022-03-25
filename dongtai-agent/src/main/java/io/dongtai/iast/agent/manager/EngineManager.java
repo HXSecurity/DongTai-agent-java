@@ -147,7 +147,7 @@ public class EngineManager {
      * @return engine包的本地保存路径
      */
     private static String getEnginePackageCachePath() {
-        return System.getProperty("java.io.tmpdir.dongtai") + File.separator + "iast" + File.separator + "dongtai-core.jar";
+        return System.getProperty("java.io.tmpdir.dongtai") + "iast" + File.separator + "dongtai-core.jar";
     }
 
     /**
@@ -156,7 +156,7 @@ public class EngineManager {
      * @return inject包的本地路径
      */
     private static String getInjectPackageCachePath() {
-        return System.getProperty("java.io.tmpdir.dongtai") + File.separator + "iast" + File.separator + "dongtai-spy.jar";
+        return System.getProperty("java.io.tmpdir.dongtai") + "iast" + File.separator + "dongtai-spy.jar";
     }
 
     /**
@@ -165,7 +165,7 @@ public class EngineManager {
      * @return inject包的本地路径
      */
     private static String getApiPackagePath() {
-        return System.getProperty("java.io.tmpdir.dongtai") + File.separator + "iast" + File.separator + "dongtai-api.jar";
+        return System.getProperty("java.io.tmpdir.dongtai") + "iast" + File.separator + "dongtai-api.jar";
     }
 
 
@@ -269,7 +269,11 @@ public class EngineManager {
                 return true;
             }
         }
-        return extractPackageFromAgent() || downloadPackageFromServer();
+        if(properties.getIsDownloadPackage().equals("true")){
+            return downloadPackageFromServer();
+        }else {
+            return extractPackageFromAgent();
+        }
     }
 
     public boolean install() {

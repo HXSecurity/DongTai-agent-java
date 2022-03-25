@@ -302,7 +302,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         Class<?>[] waitingReTransformClasses = findForRetransform();
-        DongTaiLog.info("find {} classes to reTransform, time: {}", waitingReTransformClasses.length, stopWatch.getTime());
+        DongTaiLog.debug("find {} classes to reTransform, time: {}", waitingReTransformClasses.length, stopWatch.getTime());
         // fixme: Performance Loss Calculation, 6752 * 50ms = 337600ms, 337s, 6-7min
         for (Class<?> clazz : waitingReTransformClasses) {
             try {
@@ -314,7 +314,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
             }
         }
         stopWatch.stop();
-        DongTaiLog.info("finish reTransform, class count: {}, time: {}", getTransformCount(), stopWatch.getTime());
+        DongTaiLog.debug("finish reTransform, class count: {}, time: {}", getTransformCount(), stopWatch.getTime());
     }
 
 }

@@ -29,6 +29,7 @@ public class IastProperties {
     private int proxyPort = -1;
     private Integer isAutoCreateProject;
     private String debugFlag = null;
+    private String isDownloadPackage;
 
     private String propertiesFilePath;
 
@@ -52,7 +53,7 @@ public class IastProperties {
 
     public void init() throws ClassNotFoundException {
         try {
-            propertiesFilePath = System.getProperty("java.io.tmpdir.dongtai") + File.separator + "iast" + File.separator + "iast.properties";
+            propertiesFilePath = System.getProperty("java.io.tmpdir.dongtai") + "iast" + File.separator + "iast.properties";
             FileUtils.getResourceToFile("iast.properties", propertiesFilePath);
 
             InputStream is = IastProperties.class.getClassLoader().getResourceAsStream("iast.properties");
@@ -202,6 +203,12 @@ public class IastProperties {
         return customApiJarUrl;
     }
 
+    public String getIsDownloadPackage() {
+        if (null == isDownloadPackage) {
+            isDownloadPackage = System.getProperty("dongtai.server.package", cfg.getProperty("dongtai.server.package", "true"));
+        }
+        return isDownloadPackage;
+    }
 
     private String getDebugFlag() {
         if (debugFlag == null) {
