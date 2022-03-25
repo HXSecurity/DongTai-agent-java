@@ -16,6 +16,7 @@ import io.dongtai.log.DongTaiLog;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 存储全局信息
@@ -48,7 +49,7 @@ public class EngineManager {
     public static IastServer SERVER;
 
     private static boolean logined = false;
-    private static int reqCounts = 0;
+    private static final AtomicInteger reqCounts = new AtomicInteger(0);
     private static int enableLingzhi = 0;
 
     public static void turnOnLingzhi() {
@@ -132,7 +133,7 @@ public class EngineManager {
     }
 
     public static void maintainRequestCount() {
-        EngineManager.reqCounts++;
+        EngineManager.reqCounts.getAndIncrement();
     }
 
     /**
@@ -141,7 +142,7 @@ public class EngineManager {
      * @return 产生的请求数量
      */
     public static int getRequestCount() {
-        return EngineManager.reqCounts;
+        return EngineManager.reqCounts.get();
     }
 
     /**
