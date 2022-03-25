@@ -87,7 +87,12 @@ public class DubboAdviceAdapter extends AbstractAdviceAdapter {
      * since: 1.2.0
      */
     private void leaveDubbo() {
+        newLocal(ASM_TYPE_OBJECT);
+        dup();
+        storeLocal(nextLocal - 1);
         invokeStatic(ASM_TYPE_SPY_HANDLER, SPY_HANDLER$getDispatcher);
+        loadArg(1);
+        loadLocal(nextLocal - 1);
         invokeInterface(ASM_TYPE_SPY_DISPATCHER, SPY$leaveDubbo);
     }
 

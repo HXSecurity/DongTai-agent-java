@@ -208,56 +208,6 @@ public class EngineManager {
     }
 
     /**
-     * @param dubboService
-     * @param attachments
-     * @since 1.2.0
-     */
-    public static void enterDubboEntry(String dubboService, Map<String, String> attachments) {
-        if (attachments != null) {
-            if (attachments.containsKey(ContextManager.getHeaderKey())) {
-                ContextManager.getOrCreateGlobalTraceId(attachments.get(ContextManager.getHeaderKey()),
-                        EngineManager.getAgentId());
-            } else {
-                attachments.put(ContextManager.getHeaderKey(), ContextManager.getSegmentId());
-            }
-        }
-        if (ENTER_HTTP_ENTRYPOINT.isEnterEntry()) {
-            return;
-        }
-
-        // todo: register server
-        if (attachments != null) {
-            Map<String, String> requestHeaders = new HashMap<String, String>(attachments.size());
-            for (Map.Entry<String, String> entry : attachments.entrySet()) {
-                requestHeaders.put(entry.getKey(), entry.getValue());
-            }
-            if (null == SERVER) {
-                // todo: read server addr and send to OpenAPI Service
-                SERVER = new IastServer(requestHeaders.get("dubbo"), 0, true);
-            }
-            Map<String, Object> requestMeta = new HashMap<String, Object>(12);
-            requestMeta.put("protocol", "dubbo/" + requestHeaders.get("dubbo"));
-            requestMeta.put("scheme", "dubbo");
-            requestMeta.put("method", "RPC");
-            requestMeta.put("secure", "true");
-            requestMeta.put("requestURL", dubboService.split("\\?")[0]);
-            requestMeta.put("requestURI", requestHeaders.get("path"));
-            requestMeta.put("remoteAddr", "");
-            requestMeta.put("queryString", "");
-            requestMeta.put("headers", requestHeaders);
-            requestMeta.put("body", "");
-            requestMeta.put("contextPath", "");
-            requestMeta.put("replay-request", false);
-
-            REQUEST_CONTEXT.set(requestMeta);
-        }
-
-        TRACK_MAP.set(new HashMap<Integer, MethodEvent>(1024));
-        TAINT_POOL.set(new HashSet<Object>());
-        TAINT_HASH_CODES.set(new HashSet<Integer>());
-    }
-
-    /**
      * @param krpcService
      * @param attachments
      * @since 1.3.2
@@ -349,7 +299,12 @@ public class EngineManager {
         return SCOPE_TRACKER.isFirstLevelKrpc();
     }
 
-    public static boolean isEnterEntry() {
+    public static boolean isEnterEntry(String currentFramework) {
+        if (currentFramework != null) {
+            if (currentFramework.equals("DUBBO")) {
+                return EngineManager.isEnterHttp() || SCOPE_TRACKER.get().isFirstLevelGrpc();
+            }
+        }
         return EngineManager.isEnterHttp()
                 || SCOPE_TRACKER.isFirstLevelDubbo()
                 || SCOPE_TRACKER.get().isFirstLevelGrpc();

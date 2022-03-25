@@ -140,7 +140,7 @@ public class GrpcHandler {
      */
     public static void closeGrpcCall() {
         try {
-            if (EngineManager.isEnterEntry()) {
+            if (EngineManager.isEnterEntry(null)) {
                 EngineManager.turnOffDongTai();
                 EngineManager.SCOPE_TRACKER.get().leaveGrpc();
                 EngineManager.maintainRequestCount();

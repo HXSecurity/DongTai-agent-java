@@ -57,7 +57,7 @@ public interface SpyDispatcher {
      *
      * @since 1.3.1
      */
-    void leaveDubbo();
+    void leaveDubbo(Object invocation, Object rpcResult);
 
     /**
      * Determines whether it is a layer 1 Dubbo entry

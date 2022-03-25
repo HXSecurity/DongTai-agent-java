@@ -62,7 +62,9 @@ public interface AsmMethods {
     );
     Method SPY$leaveDubbo = InnerHelper.getAsmMethod(
             SpyDispatcher.class,
-            "leaveDubbo"
+            "leaveDubbo",
+            Object.class,
+            Object.class
     );
     Method SPY$isFirstLevelDubbo = InnerHelper.getAsmMethod(
             SpyDispatcher.class,

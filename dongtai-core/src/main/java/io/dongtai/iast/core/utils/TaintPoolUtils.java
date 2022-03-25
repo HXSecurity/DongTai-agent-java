@@ -5,6 +5,8 @@ import io.dongtai.iast.core.utils.PropertyUtils;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -15,6 +17,16 @@ import java.util.Set;
  * @author dongzhiyong@huoxian.cn
  */
 public class TaintPoolUtils {
+
+    /**
+     * 判断 obj 对象是否为 java 的内置数据类型，包括：string、array、list、map、enum 等
+     *
+     * @param obj
+     * @return
+     */
+    public static boolean isJdkType(Object obj) {
+        return obj instanceof String || obj instanceof Map || obj instanceof List;
+    }
 
     public static boolean poolContains(Object obj, MethodEvent event, boolean isNormal) {
         if (obj == null) {

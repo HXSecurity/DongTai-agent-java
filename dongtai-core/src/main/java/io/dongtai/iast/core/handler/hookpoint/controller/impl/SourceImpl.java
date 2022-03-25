@@ -74,7 +74,7 @@ public class SourceImpl {
         ) {
             return modelValues;
         }
-        Method[] methods = sourceClass.getDeclaredMethods();
+        Method[] methods = sourceClass.getMethods();
         Object itemValue = null;
         for (Method method : methods) {
             String methodName = method.getName();
