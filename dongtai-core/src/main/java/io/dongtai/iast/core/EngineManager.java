@@ -50,13 +50,13 @@ public class EngineManager {
 
     private static boolean logined = false;
     private static final AtomicInteger reqCounts = new AtomicInteger(0);
-    private static int enableLingzhi = 0;
+    private static int enableDongTai = 0;
 
-    public static void turnOnLingzhi() {
+    public static void turnOnDongTai() {
         DONGTAI_STATE.set(true);
     }
 
-    public static void turnOffLingzhi() {
+    public static void turnOffDongTai() {
         DONGTAI_STATE.set(false);
     }
 
@@ -65,7 +65,7 @@ public class EngineManager {
      *
      * @return
      */
-    public static Boolean isLingzhiRunning() {
+    public static Boolean isDongTaiRunning() {
         Boolean status = DONGTAI_STATE.get();
         return status != null && status;
     }
@@ -149,14 +149,14 @@ public class EngineManager {
      * 打开检测引擎
      */
     public static void turnOnEngine() {
-        EngineManager.enableLingzhi = 1;
+        EngineManager.enableDongTai = 1;
     }
 
     /**
      * 关闭检测引擎
      */
     public static void turnOffEngine() {
-        EngineManager.enableLingzhi = 0;
+        EngineManager.enableDongTai = 0;
     }
 
     /**
@@ -165,7 +165,7 @@ public class EngineManager {
      * @return true - 引擎已启动；false - 引擎未启动
      */
     public static boolean isEngineRunning() {
-        return !FallbackSwitch.isEngineFallback() && EngineManager.enableLingzhi == 1;
+        return !FallbackSwitch.isEngineFallback() && EngineManager.enableDongTai == 1;
     }
 
     public boolean supportLazyHook() {

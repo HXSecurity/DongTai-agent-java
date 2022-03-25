@@ -114,9 +114,9 @@ public class IastClassFileTransformer implements ClassFileTransformer {
         if (internalClassName == null || internalClassName.startsWith("io/dongtai/") || internalClassName.startsWith("com/secnium/iast/") || internalClassName.startsWith("java/lang/iast/") || internalClassName.startsWith("cn/huoxian/iast/")) {
             return null;
         }
-        boolean isRunning = EngineManager.isLingzhiRunning();
+        boolean isRunning = EngineManager.isDongTaiRunning();
         if (isRunning) {
-            EngineManager.turnOffLingzhi();
+            EngineManager.turnOffDongTai();
         }
 
         try {
@@ -163,7 +163,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                 Throwable ignore) {
         } finally {
             if (isRunning) {
-                EngineManager.turnOnLingzhi();
+                EngineManager.turnOnDongTai();
             }
         }
 
