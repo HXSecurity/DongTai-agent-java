@@ -1,6 +1,5 @@
 package io.dongtai.iast.core.utils;
 
-import io.dongtai.iast.core.service.ErrorLogReport;
 import io.dongtai.log.DongTaiLog;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -188,7 +187,7 @@ public class HttpClientUtils {
             sc.init(null, trustAllCerts, new java.security.SecureRandom());
             HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
         } catch (Exception e) {
-            ErrorLogReport.sendErrorLog(e);
+            DongTaiLog.error(e);
         }
     }
 

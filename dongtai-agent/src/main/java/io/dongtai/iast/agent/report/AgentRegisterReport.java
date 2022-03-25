@@ -229,7 +229,7 @@ public class AgentRegisterReport {
         } catch (ConnectException e) {
             DongTaiLog.error("Agent registration failed, Reason: Failed to connect to {}, please check with `curl -v {}`", IastProperties.getInstance().getBaseUrl(), IastProperties.getInstance().getBaseUrl());
         } catch (Exception e) {
-            e.printStackTrace();
+            DongTaiLog.error(e);
             DongTaiLog.error("Agent registration to {} failed 10 seconds later, cause: {}, token: {}",
                     IastProperties.getInstance().getBaseUrl(), e.getMessage(), IastProperties.getInstance().getIastServerToken());
         }

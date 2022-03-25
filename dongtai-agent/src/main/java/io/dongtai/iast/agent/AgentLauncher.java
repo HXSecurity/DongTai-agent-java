@@ -9,6 +9,7 @@ import io.dongtai.log.DongTaiLog;
 import java.lang.instrument.Instrumentation;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -28,6 +29,7 @@ public class AgentLauncher {
          * fix bug: java.lang.ClassCastException: weblogic.net.http.SOAPHttpsURLConnection cannot be cast to javax.net.ssl.HttpsURLConnection
          */
         System.setProperty("UseSunHttpHandler", "true");
+        System.setProperty("java.io.tmpdir.dongtai", System.getProperty("java.io.tmpdir")+ UUID.randomUUID().toString().replaceAll("-","")+"/");
     }
 
     /**
@@ -44,7 +46,7 @@ public class AgentLauncher {
         try {
             install(inst);
         } catch (Exception e) {
-            e.printStackTrace();
+            DongTaiLog.error(e);
         }
     }
 
@@ -98,7 +100,7 @@ public class AgentLauncher {
                 }
                 install(inst);
             } catch (Exception e) {
-                e.printStackTrace();
+                DongTaiLog.error(e);
             }
         }
     }

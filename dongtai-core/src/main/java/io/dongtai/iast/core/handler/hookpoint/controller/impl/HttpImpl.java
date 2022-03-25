@@ -29,7 +29,7 @@ public class HttpImpl {
     public static File IAST_REQUEST_JAR_PACKAGE;
 
     static {
-        IAST_REQUEST_JAR_PACKAGE = new File(System.getProperty("java.io.tmpdir") + File.separator + "iast" + File.separator + "dongtai-api.jar");
+        IAST_REQUEST_JAR_PACKAGE = new File(System.getProperty("java.io.tmpdir.dongtai") + File.separator + "iast" + File.separator + "dongtai-api.jar");
         if (!IAST_REQUEST_JAR_PACKAGE.exists()) {
             HttpClientUtils.downloadRemoteJar("/api/v1/engine/download?engineName=dongtai-api", IAST_REQUEST_JAR_PACKAGE.getAbsolutePath());
         }
@@ -56,9 +56,9 @@ public class HttpImpl {
                         .getDeclaredMethod("cloneResponse", Object.class, boolean.class);
             }
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            DongTaiLog.error(e);
         } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+            DongTaiLog.error(e);
         }
     }
 
@@ -71,7 +71,7 @@ public class HttpImpl {
                 cloneResponseMethod = CLASS_OF_SERVLET_PROXY
                         .getDeclaredMethod("cloneResponse", Object.class, boolean.class);
             } catch (NoSuchMethodException e) {
-                e.printStackTrace();
+                DongTaiLog.error(e);
             }
         }
     }
@@ -177,4 +177,7 @@ public class HttpImpl {
         }
     }
 
+    public static IastClassLoader getClassLoader() {
+        return iastClassLoader;
+    }
 }

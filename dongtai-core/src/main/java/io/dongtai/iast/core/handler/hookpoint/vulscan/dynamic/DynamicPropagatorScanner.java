@@ -42,7 +42,7 @@ public class DynamicPropagatorScanner implements IVulScan {
                 method.invoke(obj, ContextManager.getHeaderKey(), ContextManager.getSegmentId());
             } catch (Exception e) {
                 // fixme: solve exception
-                e.printStackTrace();
+                DongTaiLog.error(e);
             }
         } else if (sink.getSignature().equals(HTTP_CLIENT_4)) {
             Object obj = event.argumentArray[1];
@@ -51,7 +51,7 @@ public class DynamicPropagatorScanner implements IVulScan {
                 method.invoke(obj, ContextManager.getHeaderKey(), ContextManager.getSegmentId());
             } catch (Exception e) {
                 // fixme: solve exception
-                e.printStackTrace();
+                DongTaiLog.error(e);
             }
         }
 

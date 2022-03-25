@@ -48,7 +48,7 @@ public class ConfigUtils {
             }
         } catch (IOException e) {
             DongTaiLog.error("读取配置文件：{} 失败，错误信息：{}", filename, e);
-            ErrorLogReport.sendErrorLog(e);
+            DongTaiLog.error(e);
         }
         return new HashSet[]{container, startWith, endWith};
     }
@@ -65,7 +65,7 @@ public class ConfigUtils {
             }
         } catch (IOException e) {
             DongTaiLog.error("读取后缀配置文件：{} 失败，错误信息：{}", filename, e);
-            ErrorLogReport.sendErrorLog(e);
+            DongTaiLog.error(e);
         }
         return extStringArray;
     }
@@ -82,8 +82,7 @@ public class ConfigUtils {
             }
         } catch (IOException e) {
             DongTaiLog.error("读取配置文件：{} 失败，错误信息：{}", filename, e);
-            ErrorLogReport.sendErrorLog(ThrowableUtils.getStackTrace(e));
-        }
+            DongTaiLog.error(e);        }
         return container;
     }
 

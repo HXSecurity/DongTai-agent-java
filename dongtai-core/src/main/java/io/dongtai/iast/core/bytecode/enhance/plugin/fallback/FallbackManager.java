@@ -83,7 +83,7 @@ public class FallbackManager {
             Method method = clazz.getMethod("newInstance", Properties.class);
             return method.invoke(null, cfg);
         } catch (Exception e) {
-            e.printStackTrace();
+            DongTaiLog.error(e);
             return null;
         }
     }

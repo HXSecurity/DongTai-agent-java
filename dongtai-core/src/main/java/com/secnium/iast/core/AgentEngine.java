@@ -48,7 +48,7 @@ public class AgentEngine {
             @Override
             public void uncaughtException(Thread t, Throwable e) {
                 System.out.println("DongTai UncaughtExceptionHandler");
-                e.printStackTrace();
+                DongTaiLog.error(e);
             }
         });
         DongTaiLog.info("DongTai Engine is about to be installed, the installation mode is {}", mode);
@@ -63,8 +63,8 @@ public class AgentEngine {
         stopWatch.stop();
         StartUpTimeReport.sendReport(EngineManager.getAgentId(), (int) stopWatch.getTime());
         IastClassFileTransformer transformer = IastClassFileTransformer.getInstance(inst);
-        DongTaiLog.info("DongTai Engine is successfully installed to the JVM, and it takes {} s, transform takes {} ms",
-                stopWatch.getTime() / 1000, transformer.getTransformTime());
+        DongTaiLog.info("DongTai Engine is successfully installed to the JVM, and it takes {} s",
+                stopWatch.getTime() / 1000);
     }
 
     public static void start() {

@@ -100,9 +100,9 @@ public class Agent {
                 DongTaiLog.error("attach failure, please try again with command: {}", Arrays.toString(execution));
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            DongTaiLog.error(e);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            DongTaiLog.error(e);
         }
     }
 
@@ -120,13 +120,13 @@ public class Agent {
 
     private static void extractJattach() throws IOException {
         if (isWindows()) {
-            JATTACH_FILE = System.getProperty("java.io.tmpdir") + File.separator + "iast" + File.separator + "jattach.exe";
+            JATTACH_FILE = System.getProperty("java.io.tmpdir.dongtai") + File.separator + "iast" + File.separator + "jattach.exe";
             FileUtils.getResourceToFile("bin/jattach.exe", JATTACH_FILE);
         } else if (isMacOs()) {
-            JATTACH_FILE = System.getProperty("java.io.tmpdir") + File.separator + "iast" + File.separator + "jattach-mac";
+            JATTACH_FILE = System.getProperty("java.io.tmpdir.dongtai") + File.separator + "iast" + File.separator + "jattach-mac";
             FileUtils.getResourceToFile("bin/jattach-mac", JATTACH_FILE);
         } else {
-            JATTACH_FILE = System.getProperty("java.io.tmpdir") + File.separator + "iast" + File.separator + "jattach-linux";
+            JATTACH_FILE = System.getProperty("java.io.tmpdir.dongtai") + File.separator + "iast" + File.separator + "jattach-linux";
             FileUtils.getResourceToFile("bin/jattach-linux", JATTACH_FILE);
         }
         if ((new File(JATTACH_FILE)).setExecutable(true)) {
@@ -151,9 +151,9 @@ public class Agent {
                 doAttach(agentArgs[0], agentArgs[1]);
             }
         } catch (ParseException e) {
-            e.printStackTrace();
+            DongTaiLog.error(e);
         } catch (IOException e) {
-            e.printStackTrace();
+            DongTaiLog.error(e);
         }
     }
 

@@ -22,25 +22,15 @@ public class SpringApplicationImpl {
     public static void getWebApplicationContext(MethodEvent event) {
         if (!isSend) {
             Object applicationContext = event.returnValue;
-            createClassLoader(applicationContext);
+            createClassLoader();
             loadApplicationContext();
             GetApiThread getApiThread = new GetApiThread(applicationContext);
             getApiThread.start();
         }
     }
 
-    private static void createClassLoader(Object applicationContext) {
-        try {
-            if (iastClassLoader == null) {
-                if (HttpImpl.IAST_REQUEST_JAR_PACKAGE.exists()) {
-                    Class<?> applicationContextClass = applicationContext.getClass();
-                    URL[] adapterJar = new URL[]{HttpImpl.IAST_REQUEST_JAR_PACKAGE.toURI().toURL()};
-                    iastClassLoader = new IastClassLoader(applicationContextClass.getClassLoader(), adapterJar);
-                }
-            }
-        } catch (MalformedURLException e) {
-            DongTaiLog.error(e.getMessage());
-        }
+    private static void createClassLoader() {
+        iastClassLoader = HttpImpl.getClassLoader();
     }
 
     private static void loadApplicationContext() {

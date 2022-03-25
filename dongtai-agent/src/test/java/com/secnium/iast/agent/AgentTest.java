@@ -4,6 +4,7 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.util.Arrays;
 
+import io.dongtai.log.DongTaiLog;
 import org.junit.Test;
 
 public class AgentTest {
@@ -15,8 +16,12 @@ public class AgentTest {
         try {
             pid = "94008";
         } catch (Throwable e) {
-            e.printStackTrace();
+            DongTaiLog.error(e);
             System.exit(-1);
         }
+    }
+
+    public static void main(String[] args) {
+        System.out.println(System.getProperty("java.io.tmpdir"));
     }
 }

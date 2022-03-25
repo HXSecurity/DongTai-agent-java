@@ -6,6 +6,7 @@ import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.FallbackSwitch;
 import io.dongtai.iast.core.handler.context.ContextManager;
 import io.dongtai.iast.core.handler.hookpoint.IastServer;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
+import io.dongtai.iast.core.service.ServerAddressReport;
 import io.dongtai.iast.core.utils.config.RemoteConfigUtils;
 import io.dongtai.iast.core.utils.threadlocal.*;
 import io.dongtai.iast.core.service.ServiceFactory;
@@ -224,6 +225,8 @@ public class EngineManager {
                     (Integer) requestMeta.get("serverPort"),
                     true
             );
+            ServerAddressReport serverAddressReport = new ServerAddressReport(EngineManager.SERVER.getServerAddr(),EngineManager.SERVER.getServerPort());
+            serverAddressReport.run();
         }
         Map<String, String> headers = (Map<String, String>) requestMeta.get("headers");
         if (headers.containsKey("dt-traceid")) {
@@ -271,6 +274,9 @@ public class EngineManager {
             if (null == SERVER) {
                 // todo: read server addr and send to OpenAPI Service
                 SERVER = new IastServer(requestHeaders.get("dubbo"), 0, true);
+                String serverAddr = EngineManager.SERVER.getServerAddr();
+                ServerAddressReport serverAddressReport = new ServerAddressReport(serverAddr,0);
+                serverAddressReport.run();
             }
             Map<String, Object> requestMeta = new HashMap<String, Object>(12);
             requestMeta.put("protocol", "dubbo/" + requestHeaders.get("dubbo"));

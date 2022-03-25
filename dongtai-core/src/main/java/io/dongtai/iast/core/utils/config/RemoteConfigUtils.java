@@ -229,7 +229,7 @@ public class RemoteConfigUtils {
      */
     public static Boolean enableAutoFallback() {
         if (enableAutoFallback == null) {
-            enableAutoFallback = PropertyUtils.getRemoteSyncLocalConfig("global.autoFallback", Boolean.class, true);
+            enableAutoFallback = PropertyUtils.getRemoteSyncLocalConfig("global.autoFallback", Boolean.class, false);
         }
         return enableAutoFallback;
     }
