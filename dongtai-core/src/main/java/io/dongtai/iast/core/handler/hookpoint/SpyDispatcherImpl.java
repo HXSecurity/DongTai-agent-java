@@ -200,7 +200,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public boolean isFirstLevelSource() {
         try {
-            return EngineManager.isEngineRunning() && EngineManager.isDongTaiRunning() && EngineManager.SCOPE_TRACKER
+            return EngineManager.isDongTaiRunning() && EngineManager.isEngineRunning() && EngineManager.SCOPE_TRACKER
                     .isFirstLevelSource();
         } catch (Exception e) {
             return false;
@@ -248,7 +248,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public boolean isFirstLevelPropagator() {
         try {
-            return EngineManager.isEngineRunning() && EngineManager.isDongTaiRunning() && EngineManager.SCOPE_TRACKER.isFirstLevelPropagator();
+            return EngineManager.isDongTaiRunning() && EngineManager.isEngineRunning() && EngineManager.SCOPE_TRACKER.isFirstLevelPropagator();
         } catch (Exception e) {
             return false;
         }
@@ -295,7 +295,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public boolean isFirstLevelSink() {
         try {
-            return EngineManager.isEngineRunning() && EngineManager.isDongTaiRunning() && EngineManager.isTopLevelSink();
+            return EngineManager.isDongTaiRunning() && EngineManager.isEngineRunning() && EngineManager.isTopLevelSink();
         } catch (Exception e) {
             return false;
         }
