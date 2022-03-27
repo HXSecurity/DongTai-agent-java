@@ -6,6 +6,7 @@ import io.dongtai.iast.agent.monitor.MonitorDaemonThread;
 import io.dongtai.iast.agent.report.AgentRegisterReport;
 import io.dongtai.log.DongTaiLog;
 
+import java.io.File;
 import java.lang.instrument.Instrumentation;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,7 +30,7 @@ public class AgentLauncher {
          * fix bug: java.lang.ClassCastException: weblogic.net.http.SOAPHttpsURLConnection cannot be cast to javax.net.ssl.HttpsURLConnection
          */
         System.setProperty("UseSunHttpHandler", "true");
-        System.setProperty("java.io.tmpdir.dongtai", System.getProperty("java.io.tmpdir")+ UUID.randomUUID().toString().replaceAll("-","")+"/");
+        System.setProperty("java.io.tmpdir.dongtai", System.getProperty("java.io.tmpdir")+ File.separator +UUID.randomUUID().toString().replaceAll("-","")+"/");
     }
 
     /**
