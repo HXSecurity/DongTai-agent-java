@@ -45,6 +45,8 @@ public class AgentEngine {
         }
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
+        DongTaiLog.info("DongTai Engine is about to be installed, the installation mode is {}", mode);
+        PropertyUtils cfg = PropertyUtils.getInstance(propertiesFilePath);
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             @Override
             public void uncaughtException(Thread t, Throwable e) {
@@ -52,8 +54,6 @@ public class AgentEngine {
                 DongTaiLog.error(e);
             }
         });
-        DongTaiLog.info("DongTai Engine is about to be installed, the installation mode is {}", mode);
-        PropertyUtils cfg = PropertyUtils.getInstance(propertiesFilePath);
         EngineManager.getInstance(agentId);
         AgentEngine agentEngine = AgentEngine.getInstance();
         agentEngine.init(mode, cfg, inst);
