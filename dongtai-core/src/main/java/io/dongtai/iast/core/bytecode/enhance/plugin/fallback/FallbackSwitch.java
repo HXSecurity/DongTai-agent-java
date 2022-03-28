@@ -140,7 +140,7 @@ public class FallbackSwitch {
      * 判断是否需要二次降级
      */
     protected static boolean isNeedSecondFallback() {
-        // 1、判断此时流量熔断器开关是否处于打开状态并达到阈值，switchOpenStatusDurationThreshold 不允许为 0，为 0 时会在 stopwatch 未开始状态下触发报错
+        // 1、判断此时流量熔断器开关是否处于打开状态并达到阈值，之所以限制 switchOpenStatusDurationThreshold > 0，是因为秒表停止状态下 getTime 的值为 0，如果 switchOpenStatusDurationThreshold < 0 则永远都不会触发二次降级
         long switchOpenStatusDurationThreshold = RemoteConfigUtils.getSwitchOpenStatusDurationThreshold(null);
         if (StopwatchUtils.getTime(HEAVY_TRAFFIC_STOPWATCH) >= switchOpenStatusDurationThreshold && switchOpenStatusDurationThreshold > 0) {
             SecondFallbackReport.appendLog(new SecondFallbackReportBody.DurationOverThresholdLog(
