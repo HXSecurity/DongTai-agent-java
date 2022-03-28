@@ -3,6 +3,7 @@ package io.dongtai.iast.core.bytecode.enhance.plugin.fallback.report.body;
 import com.google.gson.annotations.SerializedName;
 import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.FallbackSwitch;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.ReportConstant;
+import io.dongtai.iast.core.utils.StopwatchUtils;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -144,8 +145,9 @@ public class SecondFallbackReportBody {
 
         public DurationOverThresholdLog(FallbackSwitch.SecondFallbackReasonEnum secondFallbackType, StopWatch stopWatch, Long threshold) {
             super(secondFallbackType);
-            this.startTime = new Date(stopWatch.getStartTime());
-            this.persistTime = stopWatch.getTime();
+            Long startTime = StopwatchUtils.getStartTime(stopWatch);
+            this.startTime = startTime == null ? null : new Date(startTime);
+            this.persistTime = StopwatchUtils.getTime(stopWatch);
             this.threshold = threshold;
         }
     }
