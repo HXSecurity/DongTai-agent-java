@@ -3,6 +3,7 @@ package io.dongtai.iast.core.bytecode.enhance.plugin.fallback;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.report.SecondFallbackReport;
 import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.report.body.SecondFallbackReportBody;
+import io.dongtai.iast.core.utils.StopwatchUtils;
 import io.dongtai.iast.core.utils.config.RemoteConfigUtils;
 import io.dongtai.iast.core.utils.threadlocal.BooleanThreadLocal;
 import io.dongtai.log.DongTaiLog;
@@ -117,17 +118,17 @@ public class FallbackSwitch {
         if (fallback) {
             // 打开开关时，计时器开始计时
             if (stopWatch.isStopped()) {
-                stopWatch.start();
+                StopwatchUtils.start(stopWatch);
             }
         } else {
             if (!stopWatch.isStarted()) {
                 return;
             }
             // 关闭开关时，计时器停止
-            stopWatch.stop();
+            StopwatchUtils.stop(stopWatch);
             // 计算持续时间超限则记录下来
             final long switchOpenStatusDurationThreshold = RemoteConfigUtils.getSwitchOpenStatusDurationThreshold(null);
-            if (stopWatch.getTime() >= switchOpenStatusDurationThreshold) {
+            if (StopwatchUtils.getTime(stopWatch) >= switchOpenStatusDurationThreshold && switchOpenStatusDurationThreshold > 0) {
                 SecondFallbackReport.appendLog(new SecondFallbackReportBody.DurationOverThresholdLog(
                         secondFallbackType, stopWatch, switchOpenStatusDurationThreshold));
             }
@@ -141,12 +142,12 @@ public class FallbackSwitch {
     protected static boolean isNeedSecondFallback() {
         // 1、判断此时流量熔断器开关是否处于打开状态并达到阈值，switchOpenStatusDurationThreshold 不允许为 0，为 0 时会在 stopwatch 未开始状态下触发报错
         long switchOpenStatusDurationThreshold = RemoteConfigUtils.getSwitchOpenStatusDurationThreshold(null);
-        if (HEAVY_TRAFFIC_STOPWATCH.getTime() >= switchOpenStatusDurationThreshold && switchOpenStatusDurationThreshold > 0) {
+        if (StopwatchUtils.getTime(HEAVY_TRAFFIC_STOPWATCH) >= switchOpenStatusDurationThreshold && switchOpenStatusDurationThreshold > 0) {
             SecondFallbackReport.appendLog(new SecondFallbackReportBody.DurationOverThresholdLog(
                     SecondFallbackReasonEnum.TRAFFIC_FALLBACK_DURATION, HEAVY_TRAFFIC_STOPWATCH, switchOpenStatusDurationThreshold));
         }
         // 2、判断此时性能熔断器开关是否处于打开状态并达到阈值
-        if (PERFORMANCE_STOPWATCH.getTime() >= switchOpenStatusDurationThreshold) {
+        if (StopwatchUtils.getTime(PERFORMANCE_STOPWATCH) >= switchOpenStatusDurationThreshold && switchOpenStatusDurationThreshold > 0) {
             SecondFallbackReport.appendLog(new SecondFallbackReportBody.DurationOverThresholdLog(
                     SecondFallbackReasonEnum.PERFORMANCE_FALLBACK_DURATION, PERFORMANCE_STOPWATCH, switchOpenStatusDurationThreshold));
         }
