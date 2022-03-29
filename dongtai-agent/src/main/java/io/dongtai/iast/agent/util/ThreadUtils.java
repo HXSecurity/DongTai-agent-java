@@ -73,6 +73,16 @@ public class ThreadUtils {
         return false;
     }
 
+    /**
+     * 杀死所有的洞态线程
+     */
+    public static void killAllDongTaiThreads() {
+        List<ThreadInfoMetrics.ThreadInfo> dongTaiThreads = ThreadUtils.getDongTaiThreads();
+        for (ThreadInfoMetrics.ThreadInfo each : dongTaiThreads) {
+            ThreadUtils.killDongTaiThread(each.getId());
+        }
+    }
+
     public static void threadSleep(int seconds) {
         try {
             long milliseconds = seconds * 1000L;
