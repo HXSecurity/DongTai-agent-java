@@ -23,14 +23,18 @@ public class ServerConfigMonitor implements IMonitor {
 
     @Override
     public void run() {
-        while (!MonitorDaemonThread.isExit) {
-            ThreadUtils.threadSleep(60);
-            try {
-                // EngineManger初始化时会请求配置一次，所以ServerConfigMonitor首次不用运行
-                this.check();
-            } catch (Throwable t) {
-                DongTaiLog.warn("Monitor thread checked error, monitor:{}, msg:{}, err:{}", getName(), t.getMessage(), t.getCause());
+        try {
+            while (!MonitorDaemonThread.isExit) {
+                ThreadUtils.threadSleep(60);
+                try {
+                    // EngineManger初始化时会请求配置一次，所以ServerConfigMonitor首次不用运行
+                    this.check();
+                } catch (Throwable t) {
+                    DongTaiLog.warn("Monitor thread checked error, monitor:{}, msg:{}, err:{}", getName(), t.getMessage(), t.getCause());
+                }
             }
+        } catch (Throwable t) {
+            DongTaiLog.info("ServerConfigMonitor interrupted, msg:{}", t.getMessage());
         }
     }
 

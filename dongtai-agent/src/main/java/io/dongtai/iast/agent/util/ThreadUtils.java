@@ -88,8 +88,8 @@ public class ThreadUtils {
             long milliseconds = seconds * 1000L;
             Thread.sleep(milliseconds);
         } catch (InterruptedException e) {
-            DongTaiLog.warn("DongTai thread threadSleep failed, msg: {} , error: {}", e.getMessage(), e.getCause());
             Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
         }
     }
 

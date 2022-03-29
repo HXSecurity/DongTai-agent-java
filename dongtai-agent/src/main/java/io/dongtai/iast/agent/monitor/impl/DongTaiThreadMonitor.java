@@ -79,15 +79,19 @@ public class DongTaiThreadMonitor implements IMonitor {
 
     @Override
     public void run() {
-        while (!MonitorDaemonThread.isExit) {
-            // 延迟启动DongTaiThreadMonitor，以防首次加载时其他Monitor未能启动的情形出现。
-            ThreadUtils.threadSleep(10);
-            try {
-                this.check();
-            } catch (Throwable t) {
-                DongTaiLog.warn("Monitor thread checked error, monitor:{}, msg:{}, err:{}", getName(), t.getMessage(), t.getCause());
+        try {
+            while (!MonitorDaemonThread.isExit) {
+                // 延迟启动DongTaiThreadMonitor，以防首次加载时其他Monitor未能启动的情形出现。
+                ThreadUtils.threadSleep(10);
+                try {
+                    this.check();
+                } catch (Throwable t) {
+                    DongTaiLog.warn("Monitor thread checked error, monitor:{}, msg:{}, err:{}", getName(), t.getMessage(), t.getCause());
+                }
+                ThreadUtils.threadSleep(50);
             }
-            ThreadUtils.threadSleep(50);
+        } catch (Throwable t) {
+            DongTaiLog.info("DongTaiThreadMonitor interrupted, msg:{}", t.getMessage());
         }
     }
 
