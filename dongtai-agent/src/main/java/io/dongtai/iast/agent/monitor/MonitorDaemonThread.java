@@ -2,6 +2,7 @@ package io.dongtai.iast.agent.monitor;
 
 import io.dongtai.iast.agent.manager.EngineManager;
 import io.dongtai.iast.agent.monitor.impl.*;
+import io.dongtai.iast.common.utils.version.JavaVersionUtils;
 import io.dongtai.log.DongTaiLog;
 
 import java.util.ArrayList;
@@ -60,6 +61,12 @@ public class MonitorDaemonThread implements Runnable {
 
 
     public void startEngine() {
+        // 低版本jdk暂不支持安装引擎core包
+        if (JavaVersionUtils.isJava6() || JavaVersionUtils.isJava7()) {
+            DongTaiLog.info("DongTai Engine core couldn't install because of low JDK version:" + JavaVersionUtils.javaVersionStr());
+            DongTaiLog.info("DongTai IAST started failure");
+            return;
+        }
         // todo: 下载功能优先走本地缓存
         boolean status = engineManager.extractPackage();
         status = status && engineManager.install();
