@@ -17,11 +17,3 @@ DongTai Java Agent 会收集应用的所有接口信息，包括接口访问路�
 ## 主动验证
 
 当 DongTai Engine 检测出 Java 应用某接口有安全漏洞后，会向 DongTai Java Agent 发送重放请求，这个重放请求会携带特定的 payload ，去验证该漏洞是否真实存在。
-
- 
-
-
-
-# Usage Scenarios
-
-Dongtai-agent-java is DongTai Iast's data acquisition tool for Java applications. In a Java application with the iast agent added, the required data is collected by rewriting class bytecode, and then the data is sent to dongtai-OpenAPI service, and then the cloud engine processes the data to determine whether there are security holes.

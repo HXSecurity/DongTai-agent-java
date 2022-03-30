@@ -5,11 +5,11 @@
 
 3. 使用 Remote JVM Debug 功能
 
-   ![springtest_config](/Users/erzhuangniu/Documents/png/springtest_config.png)
+   ![springtest_config](./assets/remote_config.png)
 
 4. 进行配置
 
-   ![remote_debug](/Users/erzhuangniu/Documents/png/remote_debug.png)
+   ![remote_debug](./assets/remote_debug.png)
 
    参数：
 

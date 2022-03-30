@@ -2,7 +2,7 @@
 
 DongTai Java Agent 工作流：
 
-![DongTai Java Agent](/Users/erzhuangniu/Downloads/DongTai Java Agent.png)
+![DongTai Java Agent](./assets/dongtai_Java_Agent.png)
 
 DongTai Java Agent 由 dongTai-agent、dongtai-api、dongTai-core、dongtai-log、dongtai-spring-api、dongtai-spy 组成。
 
