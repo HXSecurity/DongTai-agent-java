@@ -4,6 +4,7 @@ import io.dongtai.iast.agent.manager.EngineManager;
 import io.dongtai.iast.agent.monitor.impl.EngineMonitor;
 import io.dongtai.iast.agent.monitor.MonitorDaemonThread;
 import io.dongtai.iast.agent.report.AgentRegisterReport;
+import io.dongtai.iast.agent.util.ThreadUtils;
 import io.dongtai.log.DongTaiLog;
 
 import java.io.File;
@@ -67,6 +68,8 @@ public class AgentLauncher {
             }
             DongTaiLog.info("Engine is about to be uninstalled");
             uninstall();
+            // attach手动卸载后停止守护线程
+            ThreadUtils.killAllDongTaiThreads();
             System.clearProperty("protect.by.dongtai");
         } else {
             if (System.getProperty("protect.by.dongtai", null) != null) {
