@@ -1,8 +1,8 @@
 package io.dongtai.iast.core.handler.hookpoint.models;
 
 import io.dongtai.iast.core.handler.hookpoint.controller.HookType;
-import io.dongtai.iast.core.service.ErrorLogReport;
 import io.dongtai.iast.core.utils.*;
+import io.dongtai.log.DongTaiLog;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -333,11 +333,12 @@ public class IastHookRuleModel {
                                 break;
                         }
                     } catch (Exception e) {
-                        errorLogReport = new JSONObject();
+/*                        errorLogReport = new JSONObject();
                         errorLogReport.put("type", "rule");
                         errorLogReport.put("rule", details.toString());
                         errorLogReport.put("msg", ThrowableUtils.getStackTrace(e));
-                        ErrorLogReport.sendErrorLog(errorLogReport.toString());
+                        ErrorLogReport.sendErrorLog(errorLogReport.toString());*/
+                        DongTaiLog.error(e);
                     }
                 }
             }

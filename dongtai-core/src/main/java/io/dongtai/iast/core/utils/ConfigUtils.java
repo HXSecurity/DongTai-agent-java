@@ -1,7 +1,5 @@
 package io.dongtai.iast.core.utils;
 
-import io.dongtai.iast.core.service.ErrorLogReport;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;

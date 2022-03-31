@@ -1,10 +1,6 @@
 package io.dongtai.iast.core.bytecode.enhance;
 
-import io.dongtai.iast.core.service.ErrorLogReport;
-import io.dongtai.iast.core.utils.ThrowableUtils;
-
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,7 +11,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.json.JSONObject;
+import io.dongtai.log.DongTaiLog;
 import org.objectweb.asm.ClassReader;
 
 /**
@@ -176,11 +172,7 @@ public class IastClassDiagram {
                     }
                 }
             } catch (Exception e) {
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("type", "scan class for family");
-                jsonObject.put("className", currentClass);
-                jsonObject.put("msg", ThrowableUtils.getStackTrace(e));
-                ErrorLogReport.sendErrorLog(jsonObject.toString());
+                DongTaiLog.error(e);
             }
         }
     }

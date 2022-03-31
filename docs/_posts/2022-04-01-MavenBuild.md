@@ -1,3 +1,7 @@
+---
+layout: post
+title: 构建部署
+---
 # 构建部署
 
 1. 确保你的计算机安装了 JDK8 和 maven
