@@ -1,14 +1,11 @@
 package io.dongtai.iast.core.utils.matcher;
 
-import io.dongtai.iast.core.service.ErrorLogReport;
 import io.dongtai.iast.core.utils.ConfigUtils;
 import io.dongtai.iast.core.utils.PropertyUtils;
-import io.dongtai.iast.core.utils.ThrowableUtils;
 import io.dongtai.log.DongTaiLog;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.instrument.Instrumentation;
-import java.security.MessageDigest;
 import java.util.Map;
 import java.util.Set;
 
@@ -100,7 +97,7 @@ public class ConfigMatcher {
             }
         } catch (Exception e) {
             DongTaiLog.info("dongtai getBalckurl error");
-            ErrorLogReport.sendErrorLog(ThrowableUtils.getStackTrace(e));
+            DongTaiLog.error(e);
         }
         return false;
     }

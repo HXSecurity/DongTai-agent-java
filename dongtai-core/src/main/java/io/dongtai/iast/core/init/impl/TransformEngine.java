@@ -3,9 +3,7 @@ package io.dongtai.iast.core.init.impl;
 import io.dongtai.iast.core.utils.PropertyUtils;
 import io.dongtai.iast.core.init.IEngine;
 import io.dongtai.iast.core.bytecode.IastClassFileTransformer;
-import io.dongtai.iast.core.service.ErrorLogReport;
 import io.dongtai.log.DongTaiLog;
-import org.apache.commons.lang3.time.StopWatch;
 
 import java.lang.instrument.Instrumentation;
 
@@ -32,7 +30,7 @@ public class TransformEngine implements IEngine {
             DongTaiLog.debug("The sub-module of data acquisition and analysis is successfully installed");
         } catch (Throwable cause) {
             DongTaiLog.error("Failed to install the sub-module of data collection and analysis");
-            ErrorLogReport.sendErrorLog(cause);
+            DongTaiLog.error(cause);
         }
     }
 

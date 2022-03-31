@@ -1,3 +1,7 @@
+---
+layout: post
+title: Agent 架构
+---
 # Agent 架构
 
 DongTai Java Agent 工作流：

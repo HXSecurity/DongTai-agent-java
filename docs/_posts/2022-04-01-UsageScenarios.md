@@ -1,3 +1,7 @@
+---
+layout: post
+title: Agent 功能
+---
 # Agent 功能
 
 Dongtai Java Agent 是洞态 Iast 为 Java 应用提供的数据采集工具，在添加了 Dongtai Java Agent 的 Java 应用程序中，Agent 会收集数据向 DongTai OpenAPI 服务上报。
