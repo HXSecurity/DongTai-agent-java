@@ -1,4 +1,4 @@
-package io.dongtai.iast.core.bytecode.enhance.plugin.framework.kafka;
+package io.dongtai.iast.core.bytecode.enhance.plugin.service.kafka;
 
 import io.dongtai.iast.core.bytecode.enhance.asm.AsmMethods;
 import io.dongtai.iast.core.bytecode.enhance.asm.AsmTypes;

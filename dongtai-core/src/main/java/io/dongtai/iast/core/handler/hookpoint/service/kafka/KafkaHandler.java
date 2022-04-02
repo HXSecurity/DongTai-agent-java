@@ -1,4 +1,4 @@
-package io.dongtai.iast.core.handler.hookpoint.framework.kafka;
+package io.dongtai.iast.core.handler.hookpoint.service.kafka;
 
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.context.ContextManager;

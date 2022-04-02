@@ -6,9 +6,9 @@ import io.dongtai.iast.core.handler.hookpoint.controller.HookType;
 import io.dongtai.iast.core.handler.hookpoint.controller.impl.*;
 import io.dongtai.iast.core.handler.hookpoint.framework.dubbo.DubboHandler;
 import io.dongtai.iast.core.handler.hookpoint.framework.grpc.GrpcHandler;
-import io.dongtai.iast.core.handler.hookpoint.framework.kafka.KafkaHandler;
 import io.dongtai.iast.core.handler.hookpoint.graphy.GraphBuilder;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
+import io.dongtai.iast.core.handler.hookpoint.service.kafka.KafkaHandler;
 import io.dongtai.iast.core.service.ErrorLogReport;
 
 import java.lang.dongtai.SpyDispatcher;
