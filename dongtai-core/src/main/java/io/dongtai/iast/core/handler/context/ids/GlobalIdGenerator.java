@@ -32,6 +32,8 @@ public class GlobalIdGenerator {
                 + "."
                 + Thread.currentThread().getId()
                 + "."
+                + 0
+                + "."
                 + 0;
     }
 }

@@ -67,6 +67,16 @@ public interface SpyDispatcher {
      */
     boolean isFirstLevelDubbo();
 
+    void enterKafka(Object record);
+
+    Object kafkaBeforeSend(Object record);
+
+    void kafkaAfterSend(Object record, Object ret);
+
+    void kafkaAfterPoll(Object record);
+
+    void leaveKafka();
+
     /**
      * mark for enter Krpc Entry Point
      *

@@ -1,9 +1,9 @@
 package io.dongtai.iast.core.bytecode.enhance.asm;
 
+import org.objectweb.asm.commons.Method;
+
 import java.lang.dongtai.SpyDispatcher;
 import java.lang.dongtai.SpyDispatcherHandler;
-
-import org.objectweb.asm.commons.Method;
 
 /**
  * 常用的ASM method 集合 省得我到处声明
@@ -81,6 +81,31 @@ public interface AsmMethods {
     Method SPY$isFirstLevelKrpc = InnerHelper.getAsmMethod(
             SpyDispatcher.class,
             "isFirstLevelKrpc"
+    );
+    Method SPY$enterKafka = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "enterKafka",
+            Object.class
+    );
+    Method SPY$kafkaBeforeSend = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "kafkaBeforeSend",
+            Object.class
+    );
+    Method SPY$kafkaAfterSend = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "kafkaAfterSend",
+            Object.class,
+            Object.class
+    );
+    Method SPY$kafkaAfterPoll = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "kafkaAfterPoll",
+            Object.class
+    );
+    Method SPY$leaveKafka = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "leaveKafka"
     );
     Method SPY$enterSource = InnerHelper.getAsmMethod(
             SpyDispatcher.class,

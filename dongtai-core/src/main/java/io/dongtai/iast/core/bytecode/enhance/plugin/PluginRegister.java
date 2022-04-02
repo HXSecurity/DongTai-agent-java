@@ -2,6 +2,7 @@ package io.dongtai.iast.core.bytecode.enhance.plugin;
 
 import io.dongtai.iast.core.bytecode.enhance.IastContext;
 import io.dongtai.iast.core.bytecode.enhance.plugin.framework.grpc.DispatchGrpc;
+import io.dongtai.iast.core.bytecode.enhance.plugin.framework.kafka.DispatchKafka;
 import io.dongtai.iast.core.bytecode.enhance.plugin.framework.krpc.DispatchKrpc;
 import io.dongtai.iast.core.bytecode.enhance.plugin.spring.DispatchSpringApplication;
 import io.dongtai.iast.core.bytecode.enhance.plugin.cookie.DispatchCookie;
@@ -10,6 +11,7 @@ import io.dongtai.iast.core.bytecode.enhance.plugin.framework.dubbo.DispatchDubb
 import io.dongtai.iast.core.bytecode.enhance.plugin.framework.j2ee.dispatch.DispatchJ2ee;
 import io.dongtai.iast.core.bytecode.enhance.plugin.hardcoded.DispatchHardcodedPlugin;
 
+import io.dongtai.log.DongTaiLog;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +35,7 @@ public class PluginRegister {
         this.plugins.add(new DispatchCookie());
         this.plugins.add(new DispatchDubbo());
         //this.plugins.add(new DispatchKrpc());
+        this.plugins.add(new DispatchKafka());
 
         //PLUGINS.add(new DispatchSpringAutoBinding());
         this.plugins.add(new DispatchClassPlugin());
