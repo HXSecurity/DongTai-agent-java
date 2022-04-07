@@ -9,6 +9,8 @@ public class DispatchJdbc implements DispatchPlugin {
     private final String classOfMysqlJdbcDriver = " com.mysql.jdbc.NonRegisteringDriver".substring(1);
     // mysql 8.x
     private final String classOfMysqlHostInfo = " com.mysql.cj.conf.HostInfo".substring(1);
+    // postgresql
+    private final String classOfPostgresqlDriver = " org.postgresql.Driver".substring(1);
 
     @Override
     public ClassVisitor dispatch(ClassVisitor classVisitor, IastContext context) {
@@ -18,6 +20,8 @@ public class DispatchJdbc implements DispatchPlugin {
             classVisitor = new MysqlJdbcDriverAdapter(classVisitor, context);
         } else if (classOfMysqlHostInfo.equals(className)) {
             classVisitor = new MysqlHostInfoAdapter(classVisitor, context);
+        } else if (classOfPostgresqlDriver.equals(className)) {
+            classVisitor = new PostgresqlDriverAdapter(classVisitor, context);
         }
 
         return classVisitor;
