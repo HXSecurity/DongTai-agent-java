@@ -182,6 +182,8 @@ public interface SpyDispatcher {
 
     void toStringUtf8(Object value);
 
+    void reportService(String category, String type, String host, String port, ServiceUrlHandler handler);
+
     /**
      * mark for enter Source Entry Point
      *

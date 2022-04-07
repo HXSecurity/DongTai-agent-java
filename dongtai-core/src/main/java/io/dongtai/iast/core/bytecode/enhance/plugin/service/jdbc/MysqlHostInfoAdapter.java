@@ -1,4 +1,4 @@
-package io.dongtai.iast.core.bytecode.enhance.plugin.service.kafka;
+package io.dongtai.iast.core.bytecode.enhance.plugin.service.jdbc;
 
 import io.dongtai.iast.core.bytecode.enhance.IastContext;
 import io.dongtai.iast.core.bytecode.enhance.plugin.AbstractClassVisitor;
@@ -6,8 +6,8 @@ import io.dongtai.log.DongTaiLog;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 
-public class SpringKafkaMessageListenerContainerAdapter extends AbstractClassVisitor {
-    public SpringKafkaMessageListenerContainerAdapter(ClassVisitor classVisitor, IastContext context) {
+public class MysqlHostInfoAdapter extends AbstractClassVisitor {
+    public MysqlHostInfoAdapter(ClassVisitor classVisitor, IastContext context) {
         super(classVisitor, context);
     }
 
@@ -15,15 +15,12 @@ public class SpringKafkaMessageListenerContainerAdapter extends AbstractClassVis
     public MethodVisitor visitMethod(final int access, final String name, final String desc, final String signature, final String[] exceptions) {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
 
-        // >=1.3 argCount=2
-        // >=2.0 argCount=3
-        // >=2.5 argCount=2
-        if ("doInvokeRecordListener".equals(name)) {
+        if ("exposeAsProperties".equals(name)) {
             if (DongTaiLog.isDebugEnabled()) {
-                DongTaiLog.debug("Adding spring kafka tracking for type {}.{}", context.getClassName(), name);
+                DongTaiLog.debug("Adding MySQL jdbc tracking for type {}.{}", context.getClassName(), name);
             }
 
-            mv = new SpringKafkaMessageListenerContainerAdviceAdapter(mv, access, name, desc);
+            mv = new MysqlHostInfoPropertiesAdviceAdapter(mv, access, name, desc);
             setTransformed();
         }
         return mv;

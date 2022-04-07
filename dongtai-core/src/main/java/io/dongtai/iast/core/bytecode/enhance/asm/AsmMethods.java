@@ -2,8 +2,7 @@ package io.dongtai.iast.core.bytecode.enhance.asm;
 
 import org.objectweb.asm.commons.Method;
 
-import java.lang.dongtai.SpyDispatcher;
-import java.lang.dongtai.SpyDispatcherHandler;
+import java.lang.dongtai.*;
 
 /**
  * 常用的ASM method 集合 省得我到处声明
@@ -190,5 +189,14 @@ public interface AsmMethods {
             SpyDispatcher.class,
             "toStringUtf8",
             Object.class
+    );
+    Method SPY$reportService = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "reportService",
+            String.class,
+            String.class,
+            String.class,
+            String.class,
+            ServiceUrlHandler.class
     );
 }

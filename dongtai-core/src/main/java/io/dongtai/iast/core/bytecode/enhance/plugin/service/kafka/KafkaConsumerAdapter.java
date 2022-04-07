@@ -17,9 +17,16 @@ public class KafkaConsumerAdapter extends AbstractClassVisitor {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
         int argCount = Type.getArgumentTypes(desc).length;
 
-        if ("poll".equals(name) && argCount == 2) {
+        if ("<init>".equals(name) && "(Ljava/util/Map;Lorg/apache/kafka/common/serialization/Deserializer;Lorg/apache/kafka/common/serialization/Deserializer;)V".equals(desc)) {
             if (DongTaiLog.isDebugEnabled()) {
-                DongTaiLog.debug("Adding kafka tracking for type {}", context.getClassName());
+                DongTaiLog.debug("Adding kafka tracking for type {}.{}", context.getClassName(), name);
+            }
+
+            mv = new KafkaConsumerAdviceAdapter(mv, access, name, desc);
+            setTransformed();
+        } else if ("poll".equals(name) && argCount == 2) {
+            if (DongTaiLog.isDebugEnabled()) {
+                DongTaiLog.debug("Adding kafka tracking for type {}.{}", context.getClassName(), name);
             }
 
             mv = new KafkaConsumerPollAdviceAdapter(mv, access, name, desc);
