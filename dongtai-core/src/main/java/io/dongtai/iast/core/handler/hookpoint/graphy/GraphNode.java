@@ -1,6 +1,5 @@
 package io.dongtai.iast.core.handler.hookpoint.graphy;
 
-import javafx.scene.chart.ValueAxis;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
