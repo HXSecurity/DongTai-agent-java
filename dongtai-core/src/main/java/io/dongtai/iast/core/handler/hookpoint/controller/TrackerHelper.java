@@ -18,6 +18,8 @@ public class TrackerHelper {
     /**
      * @since 1.3.2
      */
+    private int kafkaLevel = 0;
+    private int krpcLevel = 0;
 
     private int grpcLevel = 0;
 
@@ -126,8 +128,20 @@ public class TrackerHelper {
         return dubboLevel == 0;
     }
 
+    public void enterKafka() {
+        this.kafkaLevel++;
+    }
+
+    public void leaveKafka() {
+        this.kafkaLevel--;
+    }
+
+    public boolean isExitedKafka() {
+        return kafkaLevel == 0;
+    }
+
     private boolean isEnterEntry() {
-        return enterHttp > 0 || dubboLevel > 0 || grpcLevel > 0;
+        return enterHttp > 0 || dubboLevel > 0 || grpcLevel > 0 || kafkaLevel > 0;
     }
 
     private boolean isFirstLevel(int targetLevel) {

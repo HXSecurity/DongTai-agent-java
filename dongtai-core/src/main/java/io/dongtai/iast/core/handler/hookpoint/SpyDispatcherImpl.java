@@ -10,7 +10,11 @@ import io.dongtai.iast.core.handler.hookpoint.controller.impl.*;
 import io.dongtai.iast.core.handler.hookpoint.graphy.GraphBuilder;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.log.DongTaiLog;
+import io.dongtai.iast.core.handler.hookpoint.service.ServiceHandler;
+import io.dongtai.iast.core.handler.hookpoint.service.kafka.KafkaHandler;
+import io.dongtai.iast.core.service.ErrorLogReport;
 
+import java.lang.dongtai.ServiceUrlHandler;
 import java.lang.dongtai.SpyDispatcher;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -160,6 +164,113 @@ public class SpyDispatcherImpl implements SpyDispatcher {
             return EngineManager.isEngineRunning() && EngineManager.isFirstLevelDubbo();
         } catch (Exception e) {
             DongTaiLog.error(e);
+            ErrorLogReport.sendErrorLog(e);
+        }
+        return false;
+    }
+
+    @Override
+    public void enterKafka(Object record) {
+        try {
+            EngineManager.SCOPE_TRACKER.enterKafka();
+        } catch (Exception e) {
+            ErrorLogReport.sendErrorLog(e);
+        }
+    }
+
+    @Override
+    public Object kafkaBeforeSend(Object record) {
+        return KafkaHandler.beforeSend(record);
+    }
+
+    @Override
+    public void kafkaAfterSend(Object record, Object ret) {
+        EngineManager.turnOffDongTai();
+        KafkaHandler.afterSend(record, ret);
+        EngineManager.turnOnDongTai();
+    }
+
+    @Override
+    public void kafkaAfterPoll(Object record) {
+        EngineManager.turnOffDongTai();
+        KafkaHandler.afterPoll(record);
+
+        EngineManager.turnOnDongTai();
+    }
+
+    @Override
+    public void leaveKafka() {
+        try {
+            if (EngineManager.isEnterEntry(null)) {
+                EngineManager.turnOffDongTai();
+
+                EngineManager.leaveKafka();
+                if (EngineManager.isExitedKafka() && !EngineManager.isEnterHttp()) {
+                    EngineManager.maintainRequestCount();
+                    GraphBuilder.buildAndReport(null, null);
+                    EngineManager.cleanThreadState();
+                }
+
+                EngineManager.turnOnDongTai();
+            }
+        } catch (Exception e) {
+            ErrorLogReport.sendErrorLog(e);
+            EngineManager.cleanThreadState();
+        }
+    }
+
+    /**
+     * mark for enter Krpc Entry Point
+     *
+     * @since 1.3.1
+     */
+    @Override
+    public void enterKrpc() {
+        try {
+            EngineManager.SCOPE_TRACKER.enterKrpc();
+        } catch (Exception e) {
+            ErrorLogReport.sendErrorLog(e);
+        }
+    }
+
+    /**
+     * mark for leave Krpc Entry Point
+     *
+     * @since 1.3.1
+     */
+    @Override
+    public void leaveKrpc() {
+        try {
+            if (EngineManager.isEnterEntry(null)) {
+                EngineManager.turnOffDongTai();
+
+                EngineManager.leaveKrpc();
+                if (EngineManager.isExitedKrpc() && !EngineManager.isEnterHttp()) {
+                    EngineManager.maintainRequestCount();
+                    GraphBuilder.buildAndReport(null, null);
+                    EngineManager.cleanThreadState();
+                }
+
+                EngineManager.turnOnDongTai();
+            }
+        } catch (Exception e) {
+            ErrorLogReport.sendErrorLog(e);
+            EngineManager.cleanThreadState();
+        }
+    }
+
+    /**
+     * Determines whether it is a layer 1 Krpc entry
+     *
+     * @return true if is a layer 1 Krpc entry; else false
+     * @since 1.3.1
+     */
+    @Override
+    public boolean isFirstLevelKrpc() {
+        try {
+            return EngineManager.isEngineRunning() && EngineManager.isFirstLevelKrpc();
+        } catch (Exception e) {
+            ErrorLogReport.sendErrorLog(e);
         }
         return false;
     }
@@ -357,6 +468,18 @@ public class SpyDispatcherImpl implements SpyDispatcher {
         }
     }
 
+    @Override
+    public void reportService(String category, String type, String host, String port, ServiceUrlHandler handler) {
+        if (EngineManager.isEngineRunning()) {
+            if (EngineManager.isDongTaiRunning()) {
+                EngineManager.turnOffDongTai();
+                ServiceHandler.reportService(category, type, host, port, handler);
+                EngineManager.turnOnDongTai();
+            } else {
+                ServiceHandler.reportService(category, type, host, port, handler);
+            }
+        }
+    }
 
     /**
      * mark for enter Source Entry Point
@@ -433,6 +556,4 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                 break;
         }
     }
-
-
 }
