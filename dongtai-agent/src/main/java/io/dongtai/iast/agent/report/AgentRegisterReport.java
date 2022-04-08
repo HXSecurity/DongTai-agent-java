@@ -248,6 +248,8 @@ public class AgentRegisterReport {
             JSONObject data = (JSONObject) responseObj.get("data");
             agentId = (Integer) data.get("id");
             coreRegisterStart = (Integer) data.get("coreAutoStart");
+        }else {
+            DongTaiLog.error("Register msg: "+ responseRaw);
         }
     }
 
