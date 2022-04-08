@@ -3,3 +3,4 @@
 isTest 2
 /internalHeartBeat/_health 1
 /internalHeartBeat/_check 1
+/actuator/health 1

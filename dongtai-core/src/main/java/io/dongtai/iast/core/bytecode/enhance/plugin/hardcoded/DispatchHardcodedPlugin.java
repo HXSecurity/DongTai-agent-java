@@ -112,11 +112,6 @@ public class DispatchHardcodedPlugin implements DispatchPlugin {
         private final String[] notPrefixes = {"date", "forgot", "form", "encode", "pattern", "prefix", "prop", "suffix",
                 "url"};
 
-        @Override
-        public boolean hasTransformed() {
-            return false;
-        }
-
         private void sendVulReport(String fileName, String className, boolean isJDKClass, String fieldName,
                                    String value) {
             JSONObject report = new JSONObject();

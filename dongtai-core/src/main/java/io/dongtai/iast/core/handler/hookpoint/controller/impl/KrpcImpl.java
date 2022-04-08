@@ -1,9 +1,10 @@
 package io.dongtai.iast.core.handler.hookpoint.controller.impl;
 
-
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.utils.StackUtils;
+import io.dongtai.log.DongTaiLog;
+
 import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.List;
@@ -11,19 +12,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * @author owefsad
- * @since 1.2.0
- */
-public class DubboImpl {
+public class KrpcImpl {
 
-    public static void solveDubbo(MethodEvent event, AtomicInteger invokeIdSequencer) {
+    public static void solveKrpc(MethodEvent event, AtomicInteger invokeIdSequencer) {
         // todo handler traceId
         Object invoker = event.argumentArray[0];
         Object invocation = event.argumentArray[1];
-        String dubboService = getUrl(invoker);
+        String krpcService = getUrl(invoker);
         Map<String, String> attachments = getAttachments(invocation);
-        EngineManager.enterDubboEntry(dubboService, attachments);
+        EngineManager.enterKrpcEntry(krpcService, attachments);
 
         if (EngineManager.isEnterHttp()) {
             return;
@@ -65,7 +62,8 @@ public class DubboImpl {
             Method methodOfGetUrl = invokerClass.getMethod("getUrl");
             methodOfGetUrl.setAccessible(true);
             return methodOfGetUrl.invoke(invoker).toString();
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            DongTaiLog.debug(e);
             return null;
         }
     }
@@ -133,4 +131,5 @@ public class DubboImpl {
         }
         return true;
     }
+
 }

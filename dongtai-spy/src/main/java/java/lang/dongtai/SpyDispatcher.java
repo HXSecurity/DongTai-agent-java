@@ -57,7 +57,7 @@ public interface SpyDispatcher {
      *
      * @since 1.3.1
      */
-    void leaveDubbo();
+    void leaveDubbo(Object invocation, Object rpcResult);
 
     /**
      * Determines whether it is a layer 1 Dubbo entry
@@ -66,6 +66,28 @@ public interface SpyDispatcher {
      * @since 1.3.1
      */
     boolean isFirstLevelDubbo();
+
+    /**
+     * mark for enter Krpc Entry Point
+     *
+     * @since 1.3.1
+     */
+    void enterKrpc();
+
+    /**
+     * mark for leave Krpc Entry Point
+     *
+     * @since 1.3.1
+     */
+    void leaveKrpc();
+
+    /**
+     * Determines whether it is a layer 1 Krpc entry
+     *
+     * @return true if is a layer 1 Krpc entry; else false
+     * @since 1.3.1
+     */
+    boolean isFirstLevelKrpc();
 
     /**
      * mark for enter Source Entry Point
@@ -132,6 +154,23 @@ public interface SpyDispatcher {
      * @since 1.3.1
      */
     boolean isFirstLevelSink();
+
+    /**
+     * @since 1.4.1
+     */
+    Object clientInterceptor(Object channel);
+
+    Object serverInterceptor(Object serverServiceDefinition);
+
+    void startGrpcCall();
+
+    void closeGrpcCall();
+
+    void blockingUnaryCall(Object req, Object res);
+
+    void sendMessage(Object message);
+
+    void toStringUtf8(Object value);
 
     /**
      * mark for enter Source Entry Point

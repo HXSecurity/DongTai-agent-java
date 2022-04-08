@@ -3,11 +3,10 @@ package io.dongtai.iast.core.handler.hookpoint.controller.impl;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.utils.StackUtils;
+
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -43,50 +42,103 @@ public class SourceImpl {
         }
     }
 
+    /**
+     * todo: 处理过程和结果需要细化
+     *
+     * @param event
+     */
     public static void handlerCustomModel(MethodEvent event) {
-        try {
-            Class<?> sourceClass = event.returnValue.getClass();
-            if (sourceClass.getClassLoader() == null) {
-                return;
+        Set<Object> modelValues = parseCustomModel(event.returnValue);
+        for (Object modelValue : modelValues) {
+            EngineManager.TAINT_POOL.addTaintToPool(modelValue, event, true);
+        }
+    }
+
+    /**
+     * fixme: 解析自定义对象中的可疑数据，当前只解析第一层，可能导致部分变异数据无法跟踪到，不考虑性能的情况下，可疑逐级遍历
+     *
+     * @param model
+     * @return
+     */
+    public static Set<Object> parseCustomModel(Object model) {
+        Set<Object> modelValues = new HashSet<Object>();
+        Class<?> sourceClass = model.getClass();
+        if (sourceClass.getClassLoader() == null) {
+            return modelValues;
+        }
+        String className = sourceClass.getName();
+        if (className.startsWith("cn.huoxian.iast.api.") ||
+                className.startsWith("io.dongtai.api.") ||
+                VALUES_ENUMERATOR.equals(className) ||
+                className.startsWith(SPRING_OBJECT)
+        ) {
+            return modelValues;
+        }
+        Method[] methods = sourceClass.getMethods();
+        Object itemValue = null;
+        for (Method method : methods) {
+            String methodName = method.getName();
+            if (!methodName.startsWith("get")
+                    || methodName.equals("getClass")
+                    || methodName.equals("getParserForType")
+                    || methodName.equals("getDefaultInstance")
+                    || methodName.equals("getDefaultInstanceForType")
+                    || methodName.equals("getDescriptor")
+                    || methodName.equals("getDescriptorForType")
+                    || methodName.equals("getAllFields")
+                    || methodName.equals("getInitializationErrorString")
+                    || methodName.equals("getUnknownFields")
+                    || methodName.equals("getDetailOrBuilderList")
+                    || methodName.equals("getAllFieldsMutable")
+                    || methodName.equals("getAllFieldsRaw")
+                    || methodName.equals("getOneofFieldDescriptor")
+                    || methodName.equals("getField")
+                    || methodName.equals("getFieldRaw")
+                    || methodName.equals("getRepeatedFieldCount")
+                    || methodName.equals("getRepeatedField")
+                    || methodName.equals("getSerializedSize")
+                    || methodName.equals("getMethodOrDie")
+                    || methodName.endsWith("Bytes")
+                    || method.getParameterCount() != 0) {
+                continue;
             }
-            String className = sourceClass.getName();
-            if (className.startsWith("cn.huoxian.iast.api.") ||
-                    className.startsWith("io.dongtai.api.") ||
-                    VALUES_ENUMERATOR.equals(className) ||
-                    className.startsWith(SPRING_OBJECT)
+
+            Class<?> returnType = method.getReturnType();
+            if (returnType == Integer.class ||
+                    returnType == Boolean.class ||
+                    returnType == Long.class ||
+                    returnType == Character.class ||
+                    returnType == Double.class ||
+                    returnType == Float.class ||
+                    returnType == Enum.class ||
+                    returnType == Byte.class ||
+                    returnType == int.class ||
+                    returnType == boolean.class ||
+                    returnType == long.class ||
+                    returnType == char.class ||
+                    returnType == double.class ||
+                    returnType == float.class ||
+                    returnType == byte.class
             ) {
-                return;
+                continue;
             }
-            Method[] methods = sourceClass.getDeclaredMethods();
-            Object itemValue = null;
-            for (Method method : methods) {
-                if (!method.getName().startsWith("get")) {
-                    continue;
-                }
 
-                Class<?> returnType = method.getReturnType();
-                if (returnType == Integer.class ||
-                        returnType == Boolean.class ||
-                        returnType == Long.class ||
-                        returnType == Character.class ||
-                        returnType == Double.class ||
-                        returnType == Float.class ||
-                        returnType == Enum.class ||
-                        returnType == Byte.class
-                ) {
-                    continue;
-                }
-
-                itemValue = method.invoke(event.returnValue);
+            try {
+                itemValue = method.invoke(model);
                 if (!isNotEmpty(itemValue)) {
                     continue;
                 }
-                EngineManager.TAINT_POOL.addTaintToPool(itemValue, event, true);
+                modelValues.add(itemValue);
+                if (itemValue instanceof List) {
+                    List<?> itemValueList = (List<?>) itemValue;
+                    for (Object listValue : itemValueList) {
+                        modelValues.addAll(parseCustomModel(listValue));
+                    }
+                }
+            } catch (Exception ignored) {
             }
-
-        } catch (Throwable t) {
-
         }
+        return modelValues;
     }
 
     /**

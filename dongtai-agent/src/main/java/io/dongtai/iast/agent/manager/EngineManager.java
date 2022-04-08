@@ -168,6 +168,10 @@ public class EngineManager {
         return System.getProperty("java.io.tmpdir.dongtai") + "iast" + File.separator + "dongtai-api.jar";
     }
 
+    private static String getGrpcPackagePath() {
+        return System.getProperty("java.io.tmpdir") + File.separator + "iast" + File.separator + "dongtai-grpc.jar";
+    }
+
 
     /**
      * 从远程URI下载jar包到指定的本地文件
@@ -237,7 +241,8 @@ public class EngineManager {
         String apiJarUrl = "".equals(properties.getCustomApiJarUrl()) ? baseUrl + API_PACKAGE_REMOTE_URI : properties.getCustomApiJarUrl();
         return downloadJarPackageToCacheFromUrl(spyJarUrl, getInjectPackageCachePath()) &&
                 downloadJarPackageToCacheFromUrl(coreJarUrl, getEnginePackageCachePath()) &&
-                downloadJarPackageToCacheFromUrl(apiJarUrl, getApiPackagePath());
+                downloadJarPackageToCacheFromUrl(apiJarUrl, getApiPackagePath()) &&
+                downloadJarPackageToCacheFromUrl(baseUrl + "/api/v1/engine/download?engineName=dongtai-grpc", getGrpcPackagePath());
     }
 
     /**
@@ -250,7 +255,8 @@ public class EngineManager {
         try {
             return FileUtils.getResourceToFile("bin/dongtai-spy.jar", getInjectPackageCachePath()) &&
                     FileUtils.getResourceToFile("bin/dongtai-core.jar", getEnginePackageCachePath()) &&
-                    FileUtils.getResourceToFile("bin/dongtai-api.jar", getApiPackagePath());
+                    FileUtils.getResourceToFile("bin/dongtai-api.jar", getApiPackagePath()) &&
+                    FileUtils.getResourceToFile("bin/dongtai-grpc.jar", getGrpcPackagePath());
         } catch (IOException e) {
             DongTaiLog.error(e);
         }

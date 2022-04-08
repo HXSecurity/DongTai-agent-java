@@ -14,11 +14,11 @@ public class FileUtils {
         if (!targetFile.exists()) {
             if (!targetFile.getParentFile().exists()) {
                 if (!targetFile.getParentFile().mkdirs()) {
-                    throw new NullPointerException("文件创建失败");
+                    throw new NullPointerException("用户权限不足，文件创建失败");
                 }
             }
             if (!targetFile.createNewFile()) {
-                throw new NullPointerException("文件创建失败");
+                throw new NullPointerException("用户权限不足，文件创建失败");
             }
         }
         if (AgentLauncher.LAUNCH_MODE_AGENT.equals("agent")) {
