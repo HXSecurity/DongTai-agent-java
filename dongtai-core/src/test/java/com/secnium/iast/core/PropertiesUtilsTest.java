@@ -3,12 +3,19 @@ package com.secnium.iast.core;
 import io.dongtai.iast.core.utils.PropertyUtils;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class PropertiesUtilsTest {
-    @Test
-    public void getInstance() {
-        System.out.println("[+] test init properties class");
-        String propertiesFilePath = "～/Documents/workspace/BugPlatflam/IAST/IastDocker/SecniumIAST/release/config/iast.properties";
-        PropertyUtils propertiesUtils = PropertyUtils.getInstance(propertiesFilePath);
-        assert null != propertiesUtils;
+
+    public static void main(String[] args) {
+        List<String> list = new ArrayList<>();
+        list.add("a");
+        list.add("b");
+        list.add("c");
+        for (String a : list){
+            System.out.println(a);
+        }
     }
+
 }
