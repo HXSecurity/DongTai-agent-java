@@ -14741,7 +14741,7 @@ com/mysql/jdbc/Connection
 com/mysql/jdbc/ConnectionImpl$3
 com/mysql/jdbc/Driver
 com/mysql/jdbc/JDBC4MySQLConnection
-com/mysql/jdbc/NonRegisteringDriver
+#com/mysql/jdbc/NonRegisteringDriver
 com/mysql/jdbc/Statement
 com/mysql/jdbc/StringUtils
 com/mysql/jdbc/util/LRUCache

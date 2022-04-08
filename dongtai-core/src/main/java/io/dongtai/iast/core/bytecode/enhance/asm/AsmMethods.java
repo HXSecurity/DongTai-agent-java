@@ -1,5 +1,6 @@
 package io.dongtai.iast.core.bytecode.enhance.asm;
 
+import java.lang.dongtai.ServiceUrlHandler;
 import java.lang.dongtai.SpyDispatcher;
 import java.lang.dongtai.SpyDispatcherHandler;
 
@@ -69,6 +70,31 @@ public interface AsmMethods {
     Method SPY$isFirstLevelDubbo = InnerHelper.getAsmMethod(
             SpyDispatcher.class,
             "isFirstLevelDubbo"
+    );
+    Method SPY$enterKafka = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "enterKafka",
+            Object.class
+    );
+    Method SPY$kafkaBeforeSend = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "kafkaBeforeSend",
+            Object.class
+    );
+    Method SPY$kafkaAfterSend = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "kafkaAfterSend",
+            Object.class,
+            Object.class
+    );
+    Method SPY$kafkaAfterPoll = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "kafkaAfterPoll",
+            Object.class
+    );
+    Method SPY$leaveKafka = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "leaveKafka"
     );
     Method SPY$enterSource = InnerHelper.getAsmMethod(
             SpyDispatcher.class,
@@ -153,5 +179,14 @@ public interface AsmMethods {
             SpyDispatcher.class,
             "toStringUtf8",
             Object.class
+    );
+    Method SPY$reportService = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "reportService",
+            String.class,
+            String.class,
+            String.class,
+            String.class,
+            ServiceUrlHandler.class
     );
 }

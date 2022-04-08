@@ -67,6 +67,16 @@ public interface SpyDispatcher {
      */
     boolean isFirstLevelDubbo();
 
+    void enterKafka(Object record);
+
+    Object kafkaBeforeSend(Object record);
+
+    void kafkaAfterSend(Object record, Object ret);
+
+    void kafkaAfterPoll(Object record);
+
+    void leaveKafka();
+
     /**
      * mark for enter Source Entry Point
      *
@@ -149,6 +159,8 @@ public interface SpyDispatcher {
     void sendMessage(Object message);
 
     void toStringUtf8(Object value);
+
+    void reportService(String category, String type, String host, String port, ServiceUrlHandler handler);
 
     /**
      * mark for enter Source Entry Point

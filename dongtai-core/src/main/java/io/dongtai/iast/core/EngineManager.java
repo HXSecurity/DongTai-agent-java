@@ -12,11 +12,13 @@ import io.dongtai.iast.core.utils.threadlocal.*;
 import io.dongtai.iast.core.service.ServiceFactory;
 import io.dongtai.iast.core.utils.PropertyUtils;
 import io.dongtai.log.DongTaiLog;
+import io.dongtai.iast.core.utils.threadlocal.*;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.*;
 
 /**
  * 存储全局信息
@@ -332,6 +334,14 @@ public class EngineManager {
         return SCOPE_TRACKER.isFirstLevelDubbo();
     }
 
+    public static void leaveKafka() {
+        SCOPE_TRACKER.leaveKafka();
+    }
+
+    public static boolean isExitedKafka() {
+        return SCOPE_TRACKER.isExitedKafka();
+    }
+
     public static boolean isEnterEntry(String currentFramework) {
         if (currentFramework != null) {
             if (currentFramework.equals("DUBBO")) {
@@ -340,6 +350,7 @@ public class EngineManager {
         }
         return EngineManager.isEnterHttp()
                 || SCOPE_TRACKER.isFirstLevelDubbo()
-                || SCOPE_TRACKER.get().isFirstLevelGrpc();
+                || SCOPE_TRACKER.get().isFirstLevelGrpc()
+                || !SCOPE_TRACKER.get().isExitedKafka();
     }
 }

@@ -96,4 +96,16 @@ public class IastScopeTracker extends ThreadLocal<TrackerHelper> {
     public boolean isExitedDubbo() {
         return this.get().isExitedDubbo();
     }
+
+    public void enterKafka() {
+        this.get().enterKafka();
+    }
+
+    public void leaveKafka() {
+        this.get().leaveKafka();
+    }
+
+    public boolean isExitedKafka() {
+        return this.get().isExitedKafka();
+    }
 }
