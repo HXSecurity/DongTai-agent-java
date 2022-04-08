@@ -169,7 +169,7 @@ public class EngineManager {
     }
 
     private static String getGrpcPackagePath() {
-        return System.getProperty("java.io.tmpdir") + File.separator + "iast" + File.separator + "dongtai-grpc.jar";
+        return System.getProperty("java.io.tmpdir.dongtai") + File.separator + "iast" + File.separator + "dongtai-grpc.jar";
     }
 
 

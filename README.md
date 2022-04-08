@@ -68,7 +68,7 @@ Please refer to the [Quick Start](https://doc.dongtai.io).
 5. Copy `dongtai-core.jar`、`dongtai-spy.jar`、`dongtai-servlet.jar` to the system temporary directory. Get the system temporary directory to run the following Java code:
 
    ```
-   System.getProperty("java.io.tmpdir");
+   System.getProperty("java.io.tmpdir.dongtai");
    ```
 
 6. Run the application and test the code (for example, SpringBoot) : `java -javaagent:/path/to/dongtai-agent.jar -Ddongtai.debug=true -jar app.jar`

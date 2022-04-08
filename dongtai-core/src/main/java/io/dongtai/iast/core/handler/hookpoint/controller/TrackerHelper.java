@@ -18,7 +18,6 @@ public class TrackerHelper {
     /**
      * @since 1.3.2
      */
-    private int krpcLevel = 0;
 
     private int grpcLevel = 0;
 
@@ -140,22 +139,6 @@ public class TrackerHelper {
             return targetLevel == 1;
         }
         return false;
-    }
-
-    public void enterKrpc() {
-        this.krpcLevel++;
-    }
-
-    public void leaveKrpc() {
-        this.krpcLevel--;
-    }
-
-    public boolean isExitedKrpc() {
-        return krpcLevel == 0;
-    }
-
-    public boolean isFirstLevelKrpc() {
-        return this.krpcLevel == 1;
     }
 
     public void enterGrpc() {
