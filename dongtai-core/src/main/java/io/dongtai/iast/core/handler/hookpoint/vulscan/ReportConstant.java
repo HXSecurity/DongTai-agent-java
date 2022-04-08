@@ -27,6 +27,7 @@ public class ReportConstant {
     public static final int REPORT_SECOND_FALLBACK = 0x46;
     public static final int REPORT_ERROR_LOG = 0x51;
     public static final int REPORT_API = 0x61;
+    public static final int REPORT_SERVICE_DIR = 0x82;
 
     public static final String REPORT_VALUE_KEY = "detail";
 
@@ -77,6 +78,9 @@ public class ReportConstant {
     public static final String KEY_RETURN_QUEUE = "returnQueue";
 
     public static final String STARTUP_TIME = "startupTime";
+
+    public static final String SERVICE_DIR = "serviceDir";
+    public static final String SERVICE_TYPE = "serviceType";
 
     /**
      * 高频hook降级报告相关

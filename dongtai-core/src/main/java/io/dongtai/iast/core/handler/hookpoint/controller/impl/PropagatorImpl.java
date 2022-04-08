@@ -156,6 +156,7 @@ public class PropagatorImpl {
             pools.add(event.outValue);
             if (event.outValue instanceof String) {
                 event.addTargetHash(System.identityHashCode(event.outValue));
+                event.addTargetHashForRpc(event.outValue.hashCode());
             } else {
                 event.addTargetHash(event.outValue.hashCode());
             }

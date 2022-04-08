@@ -5,7 +5,7 @@
     <parent>
         <artifactId>iast</artifactId>
         <groupId>io.dongtai.iast</groupId>
-        <version>1.4.0</version>
+        <version>1.4.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -39,12 +39,12 @@
         <dependency>
             <groupId>cn.huoxian.iast</groupId>
             <artifactId>dongtai-spring-api</artifactId>
-            <version>1.4.0</version>
+            <version>1.4.1</version>
         </dependency>
         <dependency>
             <groupId>io.dongtai.iast</groupId>
             <artifactId>dongtai-log</artifactId>
-            <version>1.4.0</version>
+            <version>1.4.1</version>
         </dependency>
     </dependencies>
 

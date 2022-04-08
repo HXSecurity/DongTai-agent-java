@@ -41,7 +41,7 @@
 
     <groupId>io.dongtai.iast</groupId>
     <artifactId>iast</artifactId>
-    <version>1.4.0</version>
+    <version>1.4.1</version>
     <packaging>pom</packaging>
 
     <name>dongtai-agent-java</name>
@@ -104,6 +104,7 @@
         <module>dongtai-api</module>
         <module>dongtai-agent</module>
         <module>dongtai-common</module>
+        <module>dongtai-plugins</module>
     </modules>
 
     <dependencyManagement>
@@ -117,12 +118,12 @@
             <dependency>
                 <groupId>io.dongtai.iast</groupId>
                 <artifactId>dongtai-spy</artifactId>
-                <version>1.4.0</version>
+                <version>1.4.1</version>
             </dependency>
             <dependency>
                 <groupId>io.dongtai.iast</groupId>
                 <artifactId>dongtai-core</artifactId>
-                <version>1.4.0</version>
+                <version>1.4.1</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>

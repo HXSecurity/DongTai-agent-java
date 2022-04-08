@@ -15,7 +15,7 @@ public class ServletDispatcherAdviceAdapter extends AbstractAdviceAdapter {
     boolean isJakarta;
 
     public ServletDispatcherAdviceAdapter(MethodVisitor mv, int access, String name, String desc, String signature,
-            IastContext context, boolean isJakarta) {
+                                          IastContext context, boolean isJakarta) {
         super(mv, access, name, desc, context, "j2ee", signature);
         this.isJakarta = isJakarta;
     }
@@ -70,6 +70,7 @@ public class ServletDispatcherAdviceAdapter extends AbstractAdviceAdapter {
         loadArg(0);
         push(isJakarta);
         invokeInterface(ASM_TYPE_SPY_DISPATCHER, SPY$cloneRequest);
+        // todo: 增加类型转换
         storeArg(0);
     }
 
@@ -82,6 +83,7 @@ public class ServletDispatcherAdviceAdapter extends AbstractAdviceAdapter {
         loadArg(1);
         push(isJakarta);
         invokeInterface(ASM_TYPE_SPY_DISPATCHER, SPY$cloneResponse);
+        // todo: 增加类型转换
         storeArg(1);
     }
 

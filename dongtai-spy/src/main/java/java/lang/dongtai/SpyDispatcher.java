@@ -57,7 +57,7 @@ public interface SpyDispatcher {
      *
      * @since 1.3.1
      */
-    void leaveDubbo();
+    void leaveDubbo(Object invocation, Object rpcResult);
 
     /**
      * Determines whether it is a layer 1 Dubbo entry
@@ -132,6 +132,23 @@ public interface SpyDispatcher {
      * @since 1.3.1
      */
     boolean isFirstLevelSink();
+
+    /**
+     * @since 1.4.0
+     */
+    Object clientInterceptor(Object channel);
+
+    Object serverInterceptor(Object serverServiceDefinition);
+
+    void startGrpcCall();
+
+    void closeGrpcCall();
+
+    void blockingUnaryCall(Object req, Object res);
+
+    void sendMessage(Object message);
+
+    void toStringUtf8(Object value);
 
     /**
      * mark for enter Source Entry Point
