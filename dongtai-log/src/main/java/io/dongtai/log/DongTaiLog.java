@@ -233,7 +233,7 @@ public class DongTaiLog {
     private static void writeLogToFile(String msg) {
         FileOutputStream o = null;
         try {
-            File file = new File(filePath + "/dongtai.log");
+            File file = new File(filePath + "/dongtai_javaagent.log");
             o = new FileOutputStream(file, true);
             o.write(msg.getBytes());
             o.write(System.getProperty("line.separator").getBytes());
@@ -256,7 +256,7 @@ public class DongTaiLog {
             if (!f.exists()) {
                 f.mkdirs();
             }
-            File file = new File(filePath, "/javaAgent.log");
+            File file = new File(filePath, "/dongtai_javaagent.log");
             if (!file.exists()) {
                 try {
                     file.createNewFile();
