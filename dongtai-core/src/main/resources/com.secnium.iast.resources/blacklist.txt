@@ -16,7 +16,7 @@ uri_3a_classloader_3a_/*
 org/asciidoctor/*
 com/sun/jmx/remote/*
 # apple package
-apple/*
+apple/* g
 # octo
 com/octo/captcha/*
 # apache shaded
@@ -33,7 +33,7 @@ groovy/*sun/rmi/transport/DGCAckHandler$1
 # https://github.com/AutoGeneral/cors-filter
 com/thetransactioncompany/*
 # protobuf
-com/google/protobuf/*
+#com/google/protobuf/*
 #Spring Cloud Sleuth
 com/github/benmanes/caffeine/*
 # spring
@@ -14741,7 +14741,7 @@ com/mysql/jdbc/Connection
 com/mysql/jdbc/ConnectionImpl$3
 com/mysql/jdbc/Driver
 com/mysql/jdbc/JDBC4MySQLConnection
-com/mysql/jdbc/NonRegisteringDriver
+#com/mysql/jdbc/NonRegisteringDriver
 com/mysql/jdbc/Statement
 com/mysql/jdbc/StringUtils
 com/mysql/jdbc/util/LRUCache
@@ -24462,7 +24462,6 @@ java/sql/SQLTransientException
 java/sql/SQLWarning
 java/sql/SQLXML
 java/sql/Savepoint
-#java/sql/Statement
 java/sql/Time
 java/sql/Timestamp
 java/sql/Types

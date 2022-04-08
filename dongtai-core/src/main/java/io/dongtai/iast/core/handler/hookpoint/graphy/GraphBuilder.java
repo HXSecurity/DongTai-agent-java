@@ -11,10 +11,7 @@ import io.dongtai.iast.core.service.ThreadPools;
 import io.dongtai.iast.core.utils.Constants;
 import io.dongtai.iast.core.utils.base64.Base64Encoder;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -61,7 +58,13 @@ public class GraphBuilder {
                             event.getSourceHashes(),
                             event.getTargetHashes(),
                             properties.isLocal() ? event.obj2String(event.inValue) : "",
-                            properties.isLocal() ? event.obj2String(event.outValue) : ""
+                            properties.isLocal() ? event.obj2String(event.outValue) : "",
+                            event.getSourceHashForRpc(),
+                            event.getTargetHashForRpc(),
+                            event.getTraceId(),
+                            event.getServiceName(),
+                            event.getPlugin(),
+                            event.getProjectPropagatorClose()
                     )
             );
         }
@@ -80,25 +83,25 @@ public class GraphBuilder {
         report.put(ReportConstant.REPORT_VALUE_KEY, detail);
 
         detail.put(ReportConstant.AGENT_ID, EngineManager.getAgentId());
-        detail.put(ReportConstant.PROTOCOL, requestMeta.get("protocol"));
-        detail.put(ReportConstant.SCHEME, requestMeta.get("scheme"));
-        detail.put(ReportConstant.METHOD, requestMeta.get("method"));
-        detail.put(ReportConstant.SECURE, requestMeta.get("secure"));
-        detail.put(ReportConstant.URL, requestMeta.get("requestURL").toString());
-        detail.put(ReportConstant.URI, requestMeta.get("requestURI"));
-        detail.put(ReportConstant.CLIENT_IP, requestMeta.get("remoteAddr"));
-        detail.put(ReportConstant.QUERY_STRING, requestMeta.get("queryString"));
+        detail.put(ReportConstant.PROTOCOL, requestMeta.getOrDefault("protocol", "unknown"));
+        detail.put(ReportConstant.SCHEME, requestMeta.getOrDefault("scheme", ""));
+        detail.put(ReportConstant.METHOD, requestMeta.getOrDefault("method", ""));
+        detail.put(ReportConstant.SECURE, requestMeta.getOrDefault("secure", ""));
+        detail.put(ReportConstant.URL, requestMeta.getOrDefault("requestURL", "").toString());
+        detail.put(ReportConstant.URI, requestMeta.getOrDefault("requestURI", ""));
+        detail.put(ReportConstant.CLIENT_IP, requestMeta.getOrDefault("remoteAddr", ""));
+        detail.put(ReportConstant.QUERY_STRING, requestMeta.getOrDefault("queryString", ""));
         detail.put(ReportConstant.REQ_HEADER,
-                AbstractNormalVulScan.getEncodedHeader((Map<String, String>) requestMeta.get("headers")));
+                AbstractNormalVulScan.getEncodedHeader((Map<String, String>) requestMeta.getOrDefault("headers", new HashMap<String, String>())));
         // 设置请求体
         detail.put(ReportConstant.REQ_BODY, request == null ? "" : HttpImpl.getPostBody(request));
         detail.put(ReportConstant.RES_HEADER, responseMeta == null ? ""
-                : Base64Encoder.encodeBase64String(responseMeta.get("headers").toString().getBytes())
+                : Base64Encoder.encodeBase64String(responseMeta.getOrDefault("headers", "").toString().getBytes())
                 .replaceAll("\n", ""));
         detail.put(ReportConstant.RES_BODY, responseMeta == null ? "" : Base64Encoder.encodeBase64String(
                 getResponseBody(responseMeta)));
-        detail.put(ReportConstant.CONTEXT_PATH, requestMeta.get("contextPath"));
-        detail.put(ReportConstant.REPLAY_REQUEST, requestMeta.get("replay-request"));
+        detail.put(ReportConstant.CONTEXT_PATH, requestMeta.getOrDefault("contextPath", ""));
+        detail.put(ReportConstant.REPLAY_REQUEST, requestMeta.getOrDefault("replay-request", false));
 
         detail.put(ReportConstant.SAAS_METHOD_POOL, methodPool);
 
@@ -111,7 +114,7 @@ public class GraphBuilder {
 
     private static byte[] getResponseBody(Map<String, Object> responseMeta) {
         Integer responseLength = PropertyUtils.getInstance().getResponseLength();
-        byte[] responseBody = (byte[]) responseMeta.get("body");
+        byte[] responseBody = (byte[]) responseMeta.getOrDefault("body", "");
         if (responseLength > 0) {
             byte[] newResponseBody = new byte[responseLength];
             newResponseBody = Arrays.copyOfRange(responseBody, 0, responseLength);

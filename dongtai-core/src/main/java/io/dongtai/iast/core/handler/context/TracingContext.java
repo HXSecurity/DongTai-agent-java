@@ -19,6 +19,10 @@ public class TracingContext {
 
     @Setter
     @Getter
+    private int level;
+
+    @Setter
+    @Getter
     private int spanId;
 
     @Setter
@@ -35,7 +39,7 @@ public class TracingContext {
 
     public String createSegmentId() {
         return getApplicationId() + "." + getCurrentAgent() + "." + Thread.currentThread().getId() + "."
-                + getNextSpanId();
+                + getLevel() + "." + getNextSpanId();
     }
 
     public static String getHeaderKey() {
@@ -45,14 +49,16 @@ public class TracingContext {
     public void parseOrCreateTraceId(String traceId, int agentId) {
         this.setTraceId(traceId);
         String[] traceItem = traceId != null ? traceId.split("\\.") : null;
-        if (traceItem == null || traceItem.length != 4) {
+        if (traceItem == null || traceItem.length != 5) {
             String newTraceId = GlobalIdGenerator.generate(agentId);
             traceItem = newTraceId.split("\\.");
             this.setTraceId(newTraceId);
         }
         this.setApplicationId(traceItem[0]);
         this.setParentAgent(Integer.parseInt(traceItem[1]));
-        this.setSpanId(Integer.parseInt(traceItem[3]));
+        int currentLevel = Integer.parseInt(traceItem[3]);
+        this.setLevel(currentLevel+1);
+        this.setSpanId(Integer.parseInt(traceItem[4]));
         this.setCurrentAgent(agentId);
     }
 
@@ -60,6 +66,7 @@ public class TracingContext {
     public String toString() {
         return "TracingContext{" +
                 "traceId='" + traceId + '\'' +
+                ", level=" + level +
                 ", spanId=" + spanId +
                 ", parentAgent=" + parentAgent +
                 ", currentAgent=" + currentAgent +

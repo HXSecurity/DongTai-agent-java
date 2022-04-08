@@ -27,6 +27,7 @@ public class ReportConstant {
     public static final int REPORT_SECOND_FALLBACK = 0x46;
     public static final int REPORT_ERROR_LOG = 0x51;
     public static final int REPORT_API = 0x61;
+    public static final int REPORT_SERVICE = 0x81;
     public static final int REPORT_SERVICE_DIR = 0x82;
 
     public static final String REPORT_VALUE_KEY = "detail";
@@ -48,6 +49,11 @@ public class ReportConstant {
     public static final String SCA_PACKAGE_NAME = "packageName";
     public static final String SCA_PACKAGE_SIGNATURE = "packageSignature";
     public static final String SCA_PACKAGE_ALGORITHM = "packageAlgorithm";
+
+    public static final String KEY_SERVICE_DATA = "serviceData";
+    public static final String KEY_SERVICE_TYPE = "serviceType";
+    public static final String KEY_SERVICE_ADDRESS = "address";
+    public static final String KEY_SERVICE_PORT = "port";
 
     public static final String PROTOCOL = "protocol";
     public static final String SCHEME = "scheme";

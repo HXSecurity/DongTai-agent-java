@@ -14,7 +14,7 @@ public enum HookType {
     /**
      * HTTP方法hook
      */
-    DUBBO("dubbo", 15),
+    RPC("rpc", 15),
     HTTP("http", 10),
     SOURCE("source", 11),
     PROPAGATOR("propagator", 12),

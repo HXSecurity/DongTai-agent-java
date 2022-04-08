@@ -81,11 +81,6 @@ public class DispatchClassPlugin implements DispatchPlugin {
         }
 
         @Override
-        public boolean hasTransformed() {
-            return transformed;
-        }
-
-        @Override
         public MethodVisitor visitMethod(final int access, final String name, final String desc, final String signature,
                 final String[] exceptions) {
             MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
@@ -98,11 +93,11 @@ public class DispatchClassPlugin implements DispatchPlugin {
                         framework == null ? "none" : framework, iastMethodSignature)
                         : (framework == null ? mv : lazyAop(mv, access, name, desc, framework, iastMethodSignature));
 
-                if (transformed && this.classVersion < 50) {
+                if (isTransformed() && this.classVersion < 50) {
                     mv = new JSRInlinerAdapter(mv, access, name, desc, signature, exceptions);
                 }
 
-                if (transformed && DongTaiLog.isDebugEnabled() && null != framework) {
+                if (isTransformed() && DongTaiLog.isDebugEnabled() && null != framework) {
                     DongTaiLog.debug("rewrite method {} for listener[framework={},class={}]", iastMethodSignature,
                             framework, context.getClassName());
                 }
@@ -135,7 +130,7 @@ public class DispatchClassPlugin implements DispatchPlugin {
             } else if (isAppClass && Method.hook(access, name, desc, signature)) {
                 mv = new PropagateAdviceAdapter(mv, access, name, desc, context, null, signature);
             }
-            transformed = true;
+            setTransformed();
             return mv;
         }
 
@@ -155,20 +150,20 @@ public class DispatchClassPlugin implements DispatchPlugin {
             int hookValue = IastHookRuleModel.getRuleTypeValueByFramework(framework);
             if (HookType.PROPAGATOR.equals(hookValue)) {
                 mv = new PropagateAdviceAdapter(mv, access, name, desc, context, framework, signature);
-                transformed = true;
+                setTransformed();
             } else if (HookType.SINK.equals(hookValue)) {
                 // fixme 针对越权类，overpower为true，否则为false
                 IastSinkModel sinkModel = IastHookRuleModel.getSinkByMethodSignature(signature);
                 if (sinkModel != null) {
                     boolean isOverPower = VulnType.SQL_OVER_POWER.equals(sinkModel.getType());
                     mv = new SinkAdviceAdapter(mv, access, name, desc, context, framework, signature, isOverPower);
-                    transformed = true;
+                    setTransformed();
                 } else {
                     DongTaiLog.error("framework[{}], method[{}] doesn't find sink model", framework, name);
                 }
             } else if (HookType.SOURCE.equals(hookValue)) {
                 mv = new SourceAdviceAdapter(mv, access, name, desc, context, framework, signature);
-                transformed = true;
+                setTransformed();
             }
             return mv;
         }

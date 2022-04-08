@@ -108,10 +108,5 @@ final public class DispatchTechnologyPlugin implements DispatchPlugin {
             }
             return mv;
         }
-
-        @Override
-        public boolean hasTransformed() {
-            return transformed;
-        }
     }
 }

@@ -1,7 +1,9 @@
 package io.dongtai.iast.core.bytecode.enhance.asm;
 
+import java.lang.dongtai.ServiceUrlHandler;
 import java.lang.dongtai.SpyDispatcher;
 import java.lang.dongtai.SpyDispatcherHandler;
+
 import org.objectweb.asm.commons.Method;
 
 /**
@@ -18,8 +20,8 @@ public interface AsmMethods {
         }
 
         static Method getAsmMethod(final Class<?> clazz,
-                final String methodName,
-                final Class<?>... parameterClassArray) {
+                                   final String methodName,
+                                   final Class<?>... parameterClassArray) {
             return Method.getMethod(
                     SandboxReflectUtils.unCaughtGetClassDeclaredJavaMethod(clazz, methodName, parameterClassArray));
         }
@@ -61,11 +63,38 @@ public interface AsmMethods {
     );
     Method SPY$leaveDubbo = InnerHelper.getAsmMethod(
             SpyDispatcher.class,
-            "leaveDubbo"
+            "leaveDubbo",
+            Object.class,
+            Object.class
     );
     Method SPY$isFirstLevelDubbo = InnerHelper.getAsmMethod(
             SpyDispatcher.class,
             "isFirstLevelDubbo"
+    );
+    Method SPY$enterKafka = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "enterKafka",
+            Object.class
+    );
+    Method SPY$kafkaBeforeSend = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "kafkaBeforeSend",
+            Object.class
+    );
+    Method SPY$kafkaAfterSend = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "kafkaAfterSend",
+            Object.class,
+            Object.class
+    );
+    Method SPY$kafkaAfterPoll = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "kafkaAfterPoll",
+            Object.class
+    );
+    Method SPY$leaveKafka = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "leaveKafka"
     );
     Method SPY$enterSource = InnerHelper.getAsmMethod(
             SpyDispatcher.class,
@@ -116,5 +145,48 @@ public interface AsmMethods {
             String.class,
             boolean.class,
             int.class
+    );
+    Method SPY$clientInterceptor = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "clientInterceptor",
+            Object.class
+    );
+    Method SPY$serverInterceptor = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "serverInterceptor",
+            Object.class
+    );
+    Method SPY$startGrpcCall = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "startGrpcCall"
+    );
+    Method SPY$closeGrpcCall = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "closeGrpcCall"
+    );
+    Method SPY$blockingUnaryCall = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "blockingUnaryCall",
+            Object.class,
+            Object.class
+    );
+    Method SPY$sendMessage = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "sendMessage",
+            Object.class
+    );
+    Method SPY$toStringUtf8 = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "toStringUtf8",
+            Object.class
+    );
+    Method SPY$reportService = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "reportService",
+            String.class,
+            String.class,
+            String.class,
+            String.class,
+            ServiceUrlHandler.class
     );
 }

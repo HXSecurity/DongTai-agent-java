@@ -72,7 +72,7 @@ DongTai-agent-java 由`agent.jar`、`dongtai-core.jar `、`dongtai-inject.jar`�
 5. 拷贝`dongtai-core.jar`、`dongtai-inject.jar`、`dongtai-servlet.jar`到系统临时目录。获取系统临时目录可运行以下 Java 代码：
 
    ```java
-   System.getProperty("java.io.tmpdir");
+   System.getProperty("java.io.tmpdir.dongtai");
    ```
 
 6. 运行应用，测试代码（以SpringBoot应用为例）：`java -javaagent:/path/to/dongtai-agent.jar -Ddongtai.debug=true -jar app.jar`

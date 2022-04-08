@@ -36,8 +36,6 @@ public class AgentQueueReport implements Runnable {
         try {
             StringBuilder replayRequestRaw = HttpClientUtils.sendPost(Constants.API_REPORT_UPLOAD, generateHeartBeatMsg());
             ThreadPools.submitReplayTask(replayRequestRaw);
-        } catch (IOException e) {
-            DongTaiLog.debug("send agent status failure, reason: {}", e);
         } catch (Exception e) {
             DongTaiLog.debug("send API Queue to {} error, reason: {}", Constants.API_REPORT_UPLOAD, e);
         }

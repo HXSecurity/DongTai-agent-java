@@ -104,13 +104,17 @@ public class EngineMonitor implements IMonitor {
 
     @Override
     public void run() {
-        while (!MonitorDaemonThread.isExit) {
-            try {
-                this.check();
-            } catch (Throwable t) {
-                DongTaiLog.warn("Monitor thread checked error, monitor:{}, msg:{}, err:{}", getName(), t.getMessage(), t.getCause());
+        try {
+            while (!MonitorDaemonThread.isExit) {
+                try {
+                    this.check();
+                } catch (Throwable t) {
+                    DongTaiLog.warn("Monitor thread checked error, monitor:{}, msg:{}, err:{}", getName(), t.getMessage(), t.getCause());
+                }
+                ThreadUtils.threadSleep(30);
             }
-            ThreadUtils.threadSleep(30);
+        } catch (Throwable t) {
+            DongTaiLog.info("EngineMonitor interrupted, msg:{}", t.getMessage());
         }
     }
 }

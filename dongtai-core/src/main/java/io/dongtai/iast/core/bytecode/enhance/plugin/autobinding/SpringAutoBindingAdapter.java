@@ -25,13 +25,8 @@ public class SpringAutoBindingAdapter extends AbstractClassVisitor {
     }
 
     @Override
-    public boolean hasTransformed() {
-        return transformed;
-    }
-
-    @Override
     public MethodVisitor visitMethod(int access, String name, String descriptor, String signature,
-            String[] exceptions) {
+                                     String[] exceptions) {
         SpringAutoBindingAdviceAdapter methodVisitor = (SpringAutoBindingAdviceAdapter) super.visitMethod(access,
                 name,
                 descriptor,
@@ -43,7 +38,7 @@ public class SpringAutoBindingAdapter extends AbstractClassVisitor {
                     access,
                     name,
                     descriptor);
-            transformed = true;
+            setTransformed();
         }
         return methodVisitor;
     }
@@ -51,9 +46,9 @@ public class SpringAutoBindingAdapter extends AbstractClassVisitor {
     private static class SpringAutoBindingAdviceAdapter extends AdviceAdapter {
 
         SpringAutoBindingAdviceAdapter(MethodVisitor methodVisitor,
-                int access,
-                String name,
-                String descriptor) {
+                                       int access,
+                                       String name,
+                                       String descriptor) {
             super(AsmUtils.api, methodVisitor, access, name, descriptor);
         }
 
