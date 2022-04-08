@@ -34,7 +34,6 @@ public class PluginRegister {
         //PLUGINS.add(new DispatchJsp());
         this.plugins.add(new DispatchCookie());
         this.plugins.add(new DispatchDubbo());
-        //this.plugins.add(new DispatchKrpc());
         this.plugins.add(new DispatchKafka());
         this.plugins.add(new DispatchJdbc());
 

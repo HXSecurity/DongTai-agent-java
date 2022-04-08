@@ -19,7 +19,6 @@ public class TrackerHelper {
      * @since 1.3.2
      */
     private int kafkaLevel = 0;
-    private int krpcLevel = 0;
 
     private int grpcLevel = 0;
 

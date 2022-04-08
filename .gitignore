@@ -35,3 +35,4 @@ logs
 dongtai-api.jar
 dongtai-core.jar
 dongtai-spy.jar
+dongtai-grpc.jar

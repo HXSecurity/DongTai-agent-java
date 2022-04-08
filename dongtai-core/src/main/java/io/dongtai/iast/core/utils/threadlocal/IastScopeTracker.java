@@ -108,20 +108,4 @@ public class IastScopeTracker extends ThreadLocal<TrackerHelper> {
     public boolean isExitedKafka() {
         return this.get().isExitedKafka();
     }
-
-    public void enterKrpc() {
-        this.get().enterKrpc();
-    }
-
-    public void leaveKrpc() {
-        this.get().leaveKrpc();
-    }
-
-    public boolean isExitedKrpc() {
-        return this.get().isExitedKrpc();
-    }
-
-    public boolean isFirstLevelKrpc() {
-        return this.get().isFirstLevelKrpc();
-    }
 }

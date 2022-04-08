@@ -342,18 +342,6 @@ public class EngineManager {
         return SCOPE_TRACKER.isExitedKafka();
     }
 
-    public static void leaveKrpc() {
-        SCOPE_TRACKER.leaveKrpc();
-    }
-
-    public static boolean isExitedKrpc() {
-        return SCOPE_TRACKER.isExitedKrpc();
-    }
-
-    public static boolean isFirstLevelKrpc() {
-        return SCOPE_TRACKER.isFirstLevelKrpc();
-    }
-
     public static boolean isEnterEntry(String currentFramework) {
         if (currentFramework != null) {
             if (currentFramework.equals("DUBBO")) {

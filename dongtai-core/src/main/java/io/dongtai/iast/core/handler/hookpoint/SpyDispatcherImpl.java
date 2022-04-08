@@ -6,7 +6,6 @@ import io.dongtai.iast.core.handler.hookpoint.controller.HookType;
 import io.dongtai.iast.core.handler.hookpoint.controller.impl.*;
 import io.dongtai.iast.core.handler.hookpoint.framework.dubbo.DubboHandler;
 import io.dongtai.iast.core.handler.hookpoint.framework.grpc.GrpcHandler;
-import io.dongtai.iast.core.handler.hookpoint.controller.impl.*;
 import io.dongtai.iast.core.handler.hookpoint.graphy.GraphBuilder;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.log.DongTaiLog;
@@ -217,62 +216,6 @@ public class SpyDispatcherImpl implements SpyDispatcher {
             ErrorLogReport.sendErrorLog(e);
             EngineManager.cleanThreadState();
         }
-    }
-
-    /**
-     * mark for enter Krpc Entry Point
-     *
-     * @since 1.3.1
-     */
-    @Override
-    public void enterKrpc() {
-        try {
-            EngineManager.SCOPE_TRACKER.enterKrpc();
-        } catch (Exception e) {
-            ErrorLogReport.sendErrorLog(e);
-        }
-    }
-
-    /**
-     * mark for leave Krpc Entry Point
-     *
-     * @since 1.3.1
-     */
-    @Override
-    public void leaveKrpc() {
-        try {
-            if (EngineManager.isEnterEntry(null)) {
-                EngineManager.turnOffDongTai();
-
-                EngineManager.leaveKrpc();
-                if (EngineManager.isExitedKrpc() && !EngineManager.isEnterHttp()) {
-                    EngineManager.maintainRequestCount();
-                    GraphBuilder.buildAndReport(null, null);
-                    EngineManager.cleanThreadState();
-                }
-
-                EngineManager.turnOnDongTai();
-            }
-        } catch (Exception e) {
-            ErrorLogReport.sendErrorLog(e);
-            EngineManager.cleanThreadState();
-        }
-    }
-
-    /**
-     * Determines whether it is a layer 1 Krpc entry
-     *
-     * @return true if is a layer 1 Krpc entry; else false
-     * @since 1.3.1
-     */
-    @Override
-    public boolean isFirstLevelKrpc() {
-        try {
-            return EngineManager.isEngineRunning() && EngineManager.isFirstLevelKrpc();
-        } catch (Exception e) {
-            ErrorLogReport.sendErrorLog(e);
-        }
-        return false;
     }
 
     /**
