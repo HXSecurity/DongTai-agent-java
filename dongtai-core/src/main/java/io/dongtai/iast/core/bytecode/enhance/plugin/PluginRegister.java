@@ -1,19 +1,19 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin;
 
 import io.dongtai.iast.core.bytecode.enhance.IastContext;
-import io.dongtai.iast.core.bytecode.enhance.plugin.framework.grpc.DispatchGrpc;
-import io.dongtai.iast.core.bytecode.enhance.plugin.framework.krpc.DispatchKrpc;
-import io.dongtai.iast.core.bytecode.enhance.plugin.spring.DispatchSpringApplication;
 import io.dongtai.iast.core.bytecode.enhance.plugin.cookie.DispatchCookie;
 import io.dongtai.iast.core.bytecode.enhance.plugin.core.DispatchClassPlugin;
 import io.dongtai.iast.core.bytecode.enhance.plugin.framework.dubbo.DispatchDubbo;
+import io.dongtai.iast.core.bytecode.enhance.plugin.framework.grpc.DispatchGrpc;
 import io.dongtai.iast.core.bytecode.enhance.plugin.framework.j2ee.dispatch.DispatchJ2ee;
 import io.dongtai.iast.core.bytecode.enhance.plugin.hardcoded.DispatchHardcodedPlugin;
+import io.dongtai.iast.core.bytecode.enhance.plugin.service.jdbc.DispatchJdbc;
+import io.dongtai.iast.core.bytecode.enhance.plugin.service.kafka.DispatchKafka;
+import io.dongtai.iast.core.bytecode.enhance.plugin.spring.DispatchSpringApplication;
+import org.objectweb.asm.ClassVisitor;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.objectweb.asm.ClassVisitor;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -33,6 +33,8 @@ public class PluginRegister {
         this.plugins.add(new DispatchCookie());
         this.plugins.add(new DispatchDubbo());
         //this.plugins.add(new DispatchKrpc());
+        this.plugins.add(new DispatchKafka());
+        this.plugins.add(new DispatchJdbc());
 
         //PLUGINS.add(new DispatchSpringAutoBinding());
         this.plugins.add(new DispatchClassPlugin());

@@ -3,19 +3,11 @@ package io.dongtai.iast.core;
 import io.dongtai.iast.core.handler.context.ContextManager;
 import io.dongtai.iast.core.handler.hookpoint.IastServer;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
-import io.dongtai.iast.core.utils.threadlocal.BooleanThreadLocal;
-import io.dongtai.iast.core.utils.threadlocal.IastScopeTracker;
-import io.dongtai.iast.core.utils.threadlocal.IastServerPort;
-import io.dongtai.iast.core.utils.threadlocal.IastTaintHashCodes;
-import io.dongtai.iast.core.utils.threadlocal.IastTaintPool;
-import io.dongtai.iast.core.utils.threadlocal.IastTrackMap;
-import io.dongtai.iast.core.utils.threadlocal.RequestContext;
 import io.dongtai.iast.core.service.ServiceFactory;
 import io.dongtai.iast.core.utils.PropertyUtils;
+import io.dongtai.iast.core.utils.threadlocal.*;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 存储全局信息
@@ -286,6 +278,13 @@ public class EngineManager {
         return SCOPE_TRACKER.isFirstLevelDubbo();
     }
 
+    public static void leaveKafka() {
+        SCOPE_TRACKER.leaveKafka();
+    }
+
+    public static boolean isExitedKafka() {
+        return SCOPE_TRACKER.isExitedKafka();
+    }
 
     public static void leaveKrpc() {
         SCOPE_TRACKER.leaveKrpc();
@@ -307,6 +306,7 @@ public class EngineManager {
         }
         return EngineManager.isEnterHttp()
                 || SCOPE_TRACKER.isFirstLevelDubbo()
-                || SCOPE_TRACKER.get().isFirstLevelGrpc();
+                || SCOPE_TRACKER.get().isFirstLevelGrpc()
+                || !SCOPE_TRACKER.get().isExitedKafka();
     }
 }
