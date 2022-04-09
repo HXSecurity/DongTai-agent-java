@@ -47,7 +47,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public void leaveHttp(Object request, Object response) {
         try {
-            if (EngineManager.isDongTaiRunning() && EngineManager.isEnterEntry(null)) {
+            if (EngineManager.isDongTaiRunning()) {
                 EngineManager.turnOffDongTai();
 
                 EngineManager.SCOPE_TRACKER.leaveHttp();
