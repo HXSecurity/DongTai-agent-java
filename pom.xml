@@ -104,6 +104,7 @@
         <module>dongtai-api</module>
         <module>dongtai-agent</module>
         <module>dongtai-common</module>
+        <module>dongtai-plugins</module>
     </modules>
 
     <dependencyManagement>
