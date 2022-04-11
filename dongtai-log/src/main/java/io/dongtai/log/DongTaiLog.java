@@ -115,9 +115,10 @@ public class DongTaiLog {
     }
 
     public static void debug(Throwable t) {
-        if (canLog(Level.FINER)) {
+/*        if (canLog(Level.FINER)) {
             t.printStackTrace(System.out);
-        }
+        }*/
+        t.printStackTrace(System.out);
     }
 
     public static void info(String msg) {
