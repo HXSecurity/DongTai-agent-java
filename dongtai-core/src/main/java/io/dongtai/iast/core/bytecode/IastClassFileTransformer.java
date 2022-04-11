@@ -8,7 +8,6 @@ import io.dongtai.iast.core.bytecode.enhance.plugin.PluginRegister;
 import io.dongtai.iast.core.bytecode.sca.ScaScanner;
 import io.dongtai.iast.core.handler.hookpoint.SpyDispatcherImpl;
 import io.dongtai.iast.core.handler.hookpoint.models.IastHookRuleModel;
-import io.dongtai.iast.core.service.ErrorLogReport;
 import io.dongtai.iast.core.utils.AsmUtils;
 import io.dongtai.iast.core.utils.PropertyUtils;
 import io.dongtai.iast.core.utils.matcher.ConfigMatcher;
@@ -47,7 +46,6 @@ public class IastClassFileTransformer implements ClassFileTransformer {
     private final PluginRegister plugins;
     private static IastClassFileTransformer INSTANCE;
     private final IastHookRuleModel hookRuleModel;
-    private final StopWatch matchClock = new StopWatch();
 
     /**
      * Gets a singleton object
@@ -64,7 +62,6 @@ public class IastClassFileTransformer implements ClassFileTransformer {
     }
 
     IastClassFileTransformer(Instrumentation inst) {
-        matchClock.start();
         this.inst = inst;
         this.isDumpClass = EngineManager.getInstance().isEnableDumpClass();
         this.properties = PropertyUtils.getInstance();
@@ -75,11 +72,6 @@ public class IastClassFileTransformer implements ClassFileTransformer {
         this.hookRuleModel = IastHookRuleModel.getInstance();
 
         SpyDispatcherHandler.setDispatcher(new SpyDispatcherImpl());
-        matchClock.suspend();
-    }
-
-    public Long getTransformTime() {
-        return matchClock.getTime();
     }
 
     public int getTransformCount() {
@@ -122,10 +114,9 @@ public class IastClassFileTransformer implements ClassFileTransformer {
         if (internalClassName == null || internalClassName.startsWith("io/dongtai/") || internalClassName.startsWith("com/secnium/iast/") || internalClassName.startsWith("java/lang/iast/") || internalClassName.startsWith("cn/huoxian/iast/")) {
             return null;
         }
-        matchClock.resume();
-        boolean isRunning = EngineManager.isLingzhiRunning();
+        boolean isRunning = EngineManager.isDongTaiRunning();
         if (isRunning) {
-            EngineManager.turnOffLingzhi();
+            EngineManager.turnOffDongTai();
         }
 
         try {
@@ -169,13 +160,11 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                 }
             }
         } catch (
-                Throwable cause) {
-            ErrorLogReport.sendErrorLog(cause);
+                Throwable ignore) {
         } finally {
             if (isRunning) {
-                EngineManager.turnOnLingzhi();
+                EngineManager.turnOnDongTai();
             }
-            matchClock.suspend();
         }
 
         return null;
@@ -313,7 +302,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         Class<?>[] waitingReTransformClasses = findForRetransform();
-        DongTaiLog.info("find {} classes to reTransform, time: {}", waitingReTransformClasses.length, stopWatch.getTime());
+        DongTaiLog.debug("find {} classes to reTransform, time: {}", waitingReTransformClasses.length, stopWatch.getTime());
         // fixme: Performance Loss Calculation, 6752 * 50ms = 337600ms, 337s, 6-7min
         for (Class<?> clazz : waitingReTransformClasses) {
             try {
@@ -321,11 +310,12 @@ public class IastClassFileTransformer implements ClassFileTransformer {
             } catch (InternalError ignored) {
             } catch (Exception e) {
                 DongTaiLog.error("transform class failure, class: {}, reason: {}", clazz.getCanonicalName(), e.getMessage());
-                e.printStackTrace();
+                DongTaiLog.error(e);
             }
         }
         stopWatch.stop();
-        DongTaiLog.info("finish reTransform, class count: {}, time: {}, transform time: {}", getTransformCount(), stopWatch.getTime(), getTransformTime());
+        DongTaiLog.debug("finish reTransform, class count: {}, time: {}", getTransformCount(), stopWatch.getTime());
     }
 
 }
+

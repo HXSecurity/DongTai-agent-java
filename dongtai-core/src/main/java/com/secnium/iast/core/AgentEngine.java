@@ -4,7 +4,9 @@ import io.dongtai.iast.core.bytecode.IastClassFileTransformer;
 import io.dongtai.iast.core.init.IEngine;
 import io.dongtai.iast.core.init.impl.ConfigEngine;
 import io.dongtai.iast.core.init.impl.TransformEngine;
+import io.dongtai.iast.core.service.ServiceDirReport;
 import io.dongtai.iast.core.service.StartUpTimeReport;
+import io.dongtai.iast.core.utils.Constants;
 import io.dongtai.log.DongTaiLog;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.utils.PropertyUtils;
@@ -44,15 +46,15 @@ public class AgentEngine {
         }
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
+        DongTaiLog.info("DongTai Engine is about to be installed, the installation mode is {}", mode);
+        PropertyUtils cfg = PropertyUtils.getInstance(propertiesFilePath);
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             @Override
             public void uncaughtException(Thread t, Throwable e) {
                 System.out.println("DongTai UncaughtExceptionHandler");
-                e.printStackTrace();
+                DongTaiLog.error(e);
             }
         });
-        DongTaiLog.info("DongTai Engine is about to be installed, the installation mode is {}", mode);
-        PropertyUtils cfg = PropertyUtils.getInstance(propertiesFilePath);
         EngineManager.getInstance(agentId);
         AgentEngine agentEngine = AgentEngine.getInstance();
         agentEngine.init(mode, cfg, inst);
@@ -63,8 +65,10 @@ public class AgentEngine {
         stopWatch.stop();
         StartUpTimeReport.sendReport(EngineManager.getAgentId(), (int) stopWatch.getTime());
         IastClassFileTransformer transformer = IastClassFileTransformer.getInstance(inst);
-        DongTaiLog.info("DongTai Engine is successfully installed to the JVM, and it takes {} s, transform takes {} ms",
-                stopWatch.getTime() / 1000, transformer.getTransformTime());
+        DongTaiLog.info("DongTai Engine is successfully installed to the JVM, and it takes {} s",
+                stopWatch.getTime() / 1000);
+        DongTaiLog.info("DongTai Agent Version: {}, DongTai Server: {}", Constants.AGENT_VERSION_VALUE, cfg.getBaseUrl());
+        new ServiceDirReport().send();
     }
 
     public static void start() {
@@ -84,6 +88,7 @@ public class AgentEngine {
         AgentEngine agentEngine = AgentEngine.getInstance();
         assert agentEngine != null;
         agentEngine.destroy();
+        System.clearProperty("DongTai.IAST.Status");
         DongTaiLog.info("Engine uninstallation succeeded");
     }
 

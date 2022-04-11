@@ -1,5 +1,6 @@
 package io.dongtai.iast.core.handler.hookpoint.controller.impl;
 
+import io.dongtai.log.DongTaiLog;
 import org.junit.Test;
 
 import java.io.*;
@@ -25,9 +26,9 @@ public class HttpImplTest {
             inputStream.close();
             outputStream.close();
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            DongTaiLog.error(e);
         } catch (IOException e) {
-            e.printStackTrace();
+            DongTaiLog.error(e);
         }
     }
 
@@ -49,9 +50,9 @@ public class HttpImplTest {
             System.out.println("try open sub jar");
             JarFile jarFile = new JarFile(IAST_REQUEST_JAR_PACKAGE);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            DongTaiLog.error(e);
         } catch (IOException e) {
-            e.printStackTrace();
+            DongTaiLog.error(e);
         }
     }
 

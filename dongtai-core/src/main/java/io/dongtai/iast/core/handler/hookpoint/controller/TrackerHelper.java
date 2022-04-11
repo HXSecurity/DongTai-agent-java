@@ -15,6 +15,12 @@ public class TrackerHelper {
      * @since 1.2.0
      */
     private int dubboLevel = 0;
+    /**
+     * @since 1.3.2
+     */
+    private int kafkaLevel = 0;
+
+    private int grpcLevel = 0;
 
     public void enterTrack() {
         this.trackCounts++;
@@ -63,7 +69,7 @@ public class TrackerHelper {
     public void leaveSource() {
         if (isEnterEntry()) {
             this.sourceLevel--;
-            if (enterHttp > 0 && leaveSource == 0) {
+            if (leaveSource == 0) {
                 leaveSource = 1;
             }
         }
@@ -121,12 +127,24 @@ public class TrackerHelper {
         return dubboLevel == 0;
     }
 
+    public void enterKafka() {
+        this.kafkaLevel++;
+    }
+
+    public void leaveKafka() {
+        this.kafkaLevel--;
+    }
+
+    public boolean isExitedKafka() {
+        return kafkaLevel == 0;
+    }
+
     private boolean isEnterEntry() {
-        return enterHttp > 0 || dubboLevel > 0;
+        return enterHttp > 0 || dubboLevel > 0 || grpcLevel > 0 || kafkaLevel > 0;
     }
 
     private boolean isFirstLevel(int targetLevel) {
-        if (this.enterHttp > 0) {
+        if (this.enterHttp > 0 || this.grpcLevel > 0) {
             return this.sourceLevel == 0 && this.leaveSource == 1
                     && targetLevel == 1;
         }
@@ -136,4 +154,19 @@ public class TrackerHelper {
         return false;
     }
 
+    public void enterGrpc() {
+        grpcLevel++;
+    }
+
+    public void leaveGrpc() {
+        grpcLevel--;
+    }
+
+    public boolean isExitGrpc() {
+        return grpcLevel == 0;
+    }
+
+    public boolean isFirstLevelGrpc() {
+        return grpcLevel == 1;
+    }
 }

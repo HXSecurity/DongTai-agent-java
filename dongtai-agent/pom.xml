@@ -7,21 +7,12 @@
     <parent>
         <groupId>io.dongtai.iast</groupId>
         <artifactId>iast</artifactId>
-        <version>1.3.0</version>
+        <version>1.5.0</version>
     </parent>
     <artifactId>dongtai-agent</artifactId>
     <name>dongtai-agent</name>
 
     <dependencies>
-        <!-- for com.sun.tools.attach.VirtualMachine api -->
-        <dependency>
-            <groupId>com.github.olivergondza</groupId>
-            <artifactId>maven-jdk-tools-wrapper</artifactId>
-            <version>0.1</version>
-            <scope>provided</scope>
-            <optional>true</optional>
-        </dependency>
-
         <!-- https://mvnrepository.com/artifact/commons-cli/commons-cli -->
         <dependency>
             <groupId>commons-cli</groupId>
@@ -57,7 +48,12 @@
         <dependency>
             <groupId>io.dongtai.iast</groupId>
             <artifactId>dongtai-log</artifactId>
-            <version>1.3.0</version>
+            <version>1.5.0</version>
+        </dependency>
+        <dependency>
+            <groupId>io.dongtai.iast</groupId>
+            <artifactId>dongtai-common</artifactId>
+            <version>${project.parent.version}</version>
         </dependency>
 
         <dependency>
@@ -75,9 +71,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-deploy-plugin</artifactId>
                 <version>2.4</version>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
             </plugin>
 
             <plugin>
@@ -92,9 +85,9 @@
                 <configuration>
                     <archive>
                         <manifestEntries>
-                            <Premain-Class>com.secnium.iast.agent.AgentLauncher</Premain-Class>
-                            <Agent-Class>com.secnium.iast.agent.AgentLauncher</Agent-Class>
-                            <Main-Class>com.secnium.iast.agent.Agent</Main-Class>
+                            <Premain-Class>io.dongtai.iast.agent.AgentLauncher</Premain-Class>
+                            <Agent-Class>io.dongtai.iast.agent.AgentLauncher</Agent-Class>
+                            <Main-Class>io.dongtai.iast.agent.Agent</Main-Class>
                             <Can-Redefine-Classes>true</Can-Redefine-Classes>
                             <Can-Retransform-Classes>true</Can-Retransform-Classes>
                             <Built-By>DongTai</Built-By>
@@ -142,28 +135,6 @@
                                 </relocation>
                             </relocations>
                         </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-lib-src-webapps</id>
-                        <phase>package</phase>
-                        <configuration>
-                            <tasks>
-                                <copy todir="./../release">
-                                    <fileset dir="target/">
-                                        <include name="dongtai-agent.jar"/>
-                                    </fileset>
-                                </copy>
-                            </tasks>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
                     </execution>
                 </executions>
             </plugin>

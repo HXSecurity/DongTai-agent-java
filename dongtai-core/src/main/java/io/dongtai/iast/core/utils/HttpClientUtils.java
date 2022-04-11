@@ -1,25 +1,14 @@
 package io.dongtai.iast.core.utils;
 
-import io.dongtai.iast.core.service.ErrorLogReport;
 import io.dongtai.log.DongTaiLog;
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.InetSocketAddress;
-import java.net.Proxy;
-import java.net.URL;
+
+import javax.net.ssl.*;
+import java.io.*;
+import java.net.*;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.GZIPOutputStream;
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -51,18 +40,16 @@ public class HttpClientUtils {
         }
     }
 
-    public static StringBuilder sendPost(String uri, String value) throws Exception {
+    public static StringBuilder sendPost(String uri, String value) {
         StringBuilder response;
         response = sendRequest(HttpMethods.POST, PROPERTIES.getBaseUrl(), uri, value, null, PROXY);
-        if (PROPERTIES.isDebug()) {
-            DongTaiLog.debug("cn.huoxian.iast url is {}, resp is {}", uri, response.toString());
-        }
+        DongTaiLog.debug("cn.huoxian.iast url is {}, resp is {}", uri, response.toString());
         return response;
     }
 
 
     private static StringBuilder sendRequest(HttpMethods method, String baseUrl, String urlStr, String data,
-            HashMap<String, String> headers, Proxy proxy) throws Exception {
+            HashMap<String, String> headers, Proxy proxy) {
         HttpURLConnection connection = null;
         StringBuilder response = new StringBuilder();
         try {
@@ -116,12 +103,13 @@ public class HttpClientUtils {
             rd.close();
             return response;
         } catch (Exception e) {
-            throw e;
+            DongTaiLog.debug(e);
         } finally {
             if (connection != null) {
                 connection.disconnect();
             }
         }
+        return response;
     }
 
     /**
@@ -175,8 +163,8 @@ public class HttpClientUtils {
                 ));
                 return proxy;
             }
-        } catch (Throwable ignored) {
-
+        } catch (Throwable e) {
+            DongTaiLog.debug(e);
         }
         return null;
     }
@@ -188,7 +176,7 @@ public class HttpClientUtils {
             sc.init(null, trustAllCerts, new java.security.SecureRandom());
             HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
         } catch (Exception e) {
-            ErrorLogReport.sendErrorLog(e);
+            DongTaiLog.error(e);
         }
     }
 

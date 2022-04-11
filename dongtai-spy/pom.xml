@@ -5,14 +5,14 @@
     <parent>
         <artifactId>iast</artifactId>
         <groupId>io.dongtai.iast</groupId>
-        <version>1.3.0</version>
+        <version>1.5.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>dongtai-spy</artifactId>
 
     <name>dongtai-spy</name>
-    
+
     <build>
         <finalName>dongtai-spy</finalName>
         <plugins>
@@ -54,7 +54,7 @@
                         <phase>package</phase>
                         <configuration>
                             <tasks>
-                                <copy todir="./../release/lib">
+                                <copy todir="./../dongtai-agent/src/main/resources/bin">
                                     <fileset dir="target/">
                                         <include name="dongtai-spy.jar"/>
                                     </fileset>

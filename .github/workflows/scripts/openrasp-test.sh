@@ -6,8 +6,8 @@ wget https://github.com/exexute/github_action_samples/releases/download/1.0.0/ap
 unzip apache-tomcat-8.5.40.zip 1>/dev/null
 
 echo "copy dongtai agent java to tomcat..."
-cp DongTai-agent-java/release/dongtai-agent.jar apache-tomcat-8.5.40/iast/agent.jar
-cp DongTai-agent-java/release/lib/*.jar apache-tomcat-8.5.40/temp/
+cp DongTai-agent-java/dongtai-agent/target/dongtai-agent.jar apache-tomcat-8.5.40/iast/agent.jar
+cp DongTai-agent-java/dongtai-agent/src/main/resources/bin/*.jar apache-tomcat-8.5.40/temp/
 cd apache-tomcat-8.5.40
 
 echo "init mysql"

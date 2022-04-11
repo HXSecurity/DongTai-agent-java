@@ -7,6 +7,7 @@ import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.dynamic.TrackUtils;
 import io.dongtai.iast.core.utils.StackUtils;
 import io.dongtai.iast.core.utils.TaintPoolUtils;
+import io.dongtai.log.DongTaiLog;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -156,6 +157,7 @@ public class PropagatorImpl {
             pools.add(event.outValue);
             if (event.outValue instanceof String) {
                 event.addTargetHash(System.identityHashCode(event.outValue));
+                event.addTargetHashForRpc(event.outValue.hashCode());
             } else {
                 event.addTargetHash(event.outValue.hashCode());
             }

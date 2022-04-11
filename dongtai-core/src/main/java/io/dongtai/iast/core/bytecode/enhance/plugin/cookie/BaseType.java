@@ -32,7 +32,7 @@ public class BaseType extends AbstractClassVisitor {
             String iastMethodSignature = AsmUtils.buildSignature(context.getMatchClassName(), name, desc);
             String framework = "refType";
             mv = new PropagateAdviceAdapter(mv, access, name, desc, context, framework, iastMethodSignature);
-            transformed = true;
+            setTransformed();
             if (DongTaiLog.isDebugEnabled()) {
                 DongTaiLog.debug("rewrite method {} for listener[match={},class={}]", iastMethodSignature, context.getMatchClassName(), context.getClassName());
             }
@@ -42,10 +42,5 @@ public class BaseType extends AbstractClassVisitor {
 
     protected boolean match(String name, String classname) {
         return hookMethods.contains(name);
-    }
-
-    @Override
-    public boolean hasTransformed() {
-        return transformed;
     }
 }

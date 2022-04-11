@@ -1,15 +1,12 @@
 package io.dongtai.iast.core.handler.hookpoint.models;
 
 import io.dongtai.iast.core.handler.hookpoint.controller.HookType;
-import io.dongtai.iast.core.service.ErrorLogReport;
 import io.dongtai.iast.core.utils.*;
+import io.dongtai.log.DongTaiLog;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -333,11 +330,12 @@ public class IastHookRuleModel {
                                 break;
                         }
                     } catch (Exception e) {
-                        errorLogReport = new JSONObject();
+/*                        errorLogReport = new JSONObject();
                         errorLogReport.put("type", "rule");
                         errorLogReport.put("rule", details.toString());
                         errorLogReport.put("msg", ThrowableUtils.getStackTrace(e));
-                        ErrorLogReport.sendErrorLog(errorLogReport.toString());
+                        ErrorLogReport.sendErrorLog(errorLogReport.toString());*/
+                        DongTaiLog.error(e);
                     }
                 }
             }

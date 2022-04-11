@@ -2,6 +2,7 @@ package io.dongtai.api.jakarta;
 
 
 import io.dongtai.api.DongTaiResponse;
+import io.dongtai.log.DongTaiLog;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpServletResponseWrapper;
@@ -22,7 +23,7 @@ public class JakartaResponseWrapper extends HttpServletResponseWrapper implement
 
     public JakartaResponseWrapper(HttpServletResponse response) {
         super(response);
-        response.addHeader("DongTai", "v1.3.0");
+        response.addHeader("DongTai", "v1.5.0");
     }
 
     @Override
@@ -76,7 +77,7 @@ public class JakartaResponseWrapper extends HttpServletResponseWrapper implement
                 return copier.getCopy();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            DongTaiLog.error(e);
         }
         return new byte[0];
     }

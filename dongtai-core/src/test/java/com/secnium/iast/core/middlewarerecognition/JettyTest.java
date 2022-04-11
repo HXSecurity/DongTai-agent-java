@@ -1,5 +1,6 @@
 package com.secnium.iast.core.middlewarerecognition;
 
+import io.dongtai.log.DongTaiLog;
 import org.junit.Test;
 
 import java.io.*;
@@ -19,10 +20,8 @@ public class JettyTest {
             version = temp.split(" ")[0];
             reader.close();
             fileReader.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();
+            DongTaiLog.error(e);
         }
         System.out.println("version = " + version);
     }

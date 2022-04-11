@@ -1,5 +1,6 @@
 package com.secnium.iast.core;
 
+import io.dongtai.log.DongTaiLog;
 import org.junit.Test;
 
 import java.lang.reflect.Method;
@@ -13,7 +14,7 @@ public class JDKVersionIdentifyTest {
             Method m = Locale.class.getMethod("forLanguageTag", String.class);
             System.out.println("m = " + m);
         } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+            DongTaiLog.error(e);
         }
     }
 }

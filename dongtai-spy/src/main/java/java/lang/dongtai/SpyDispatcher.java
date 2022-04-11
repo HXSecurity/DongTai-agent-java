@@ -57,7 +57,7 @@ public interface SpyDispatcher {
      *
      * @since 1.3.1
      */
-    void leaveDubbo();
+    void leaveDubbo(Object invocation, Object rpcResult);
 
     /**
      * Determines whether it is a layer 1 Dubbo entry
@@ -66,6 +66,16 @@ public interface SpyDispatcher {
      * @since 1.3.1
      */
     boolean isFirstLevelDubbo();
+
+    void enterKafka(Object record);
+
+    Object kafkaBeforeSend(Object record);
+
+    void kafkaAfterSend(Object record, Object ret);
+
+    void kafkaAfterPoll(Object record);
+
+    void leaveKafka();
 
     /**
      * mark for enter Source Entry Point
@@ -132,6 +142,25 @@ public interface SpyDispatcher {
      * @since 1.3.1
      */
     boolean isFirstLevelSink();
+
+    /**
+     * @since 1.4.0
+     */
+    Object clientInterceptor(Object channel);
+
+    Object serverInterceptor(Object serverServiceDefinition);
+
+    void startGrpcCall();
+
+    void closeGrpcCall();
+
+    void blockingUnaryCall(Object req, Object res);
+
+    void sendMessage(Object message);
+
+    void toStringUtf8(Object value);
+
+    void reportService(String category, String type, String host, String port, ServiceUrlHandler handler);
 
     /**
      * mark for enter Source Entry Point

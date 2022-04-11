@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>iast</artifactId>
         <groupId>io.dongtai.iast</groupId>
-        <version>1.3.0</version>
+        <version>1.5.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -39,7 +39,12 @@
         <dependency>
             <groupId>cn.huoxian.iast</groupId>
             <artifactId>dongtai-spring-api</artifactId>
-            <version>1.3.0</version>
+            <version>1.5.0</version>
+        </dependency>
+        <dependency>
+            <groupId>io.dongtai.iast</groupId>
+            <artifactId>dongtai-log</artifactId>
+            <version>1.5.0</version>
         </dependency>
     </dependencies>
 
@@ -68,7 +73,7 @@
                         <phase>package</phase>
                         <configuration>
                             <tasks>
-                                <copy todir="./../release/lib">
+                                <copy todir="./../dongtai-agent/src/main/resources/bin">
                                     <fileset dir="target/">
                                         <include name="dongtai-api.jar"/>
                                     </fileset>

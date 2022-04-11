@@ -10,7 +10,7 @@ import org.objectweb.asm.ClassVisitor;
 public abstract class AbstractClassVisitor extends ClassVisitor {
 
     protected IastContext context;
-    protected boolean transformed;
+    private boolean transformed;
 
     public AbstractClassVisitor(ClassVisitor classVisitor, IastContext context) {
         super(AsmUtils.api, classVisitor);
@@ -18,5 +18,15 @@ public abstract class AbstractClassVisitor extends ClassVisitor {
         this.transformed = false;
     }
 
-    public abstract boolean hasTransformed();
+    public void setTransformed() {
+        transformed = true;
+    }
+
+    public boolean isTransformed() {
+        return transformed;
+    }
+
+    public boolean hasTransformed() {
+        return transformed;
+    }
 }

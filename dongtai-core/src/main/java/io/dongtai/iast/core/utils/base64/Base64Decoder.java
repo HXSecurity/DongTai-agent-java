@@ -1,6 +1,8 @@
 package io.dongtai.iast.core.utils.base64;
 
 
+import io.dongtai.log.DongTaiLog;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PushbackInputStream;
@@ -24,7 +26,7 @@ public class Base64Decoder extends CharacterDecoder {
         try {
             return instance.decodeBuffer(data);
         } catch (IOException e) {
-            e.printStackTrace();
+            DongTaiLog.error(e);
         }
         return null;
     }

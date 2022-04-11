@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
+import io.dongtai.log.IastProperties;
 
 /**
  * @author niuerzhuang@huoxian.cn
@@ -17,7 +18,7 @@ public class DongTaiLog {
     static boolean enableWriteToFile;
     static String filePath;
     static boolean enableColor;
-    private static final IastProperties iastProperties;
+    static boolean isCreateLog = false;
     public static java.util.logging.Level LEVEL = java.util.logging.Level.CONFIG;
 
     private static final String RESET = "\033[0m";
@@ -215,7 +216,7 @@ public class DongTaiLog {
     }
 
     public static boolean isDebugEnabled() {
-        if ("debug".equals(iastProperties.getLogLevel())) {
+        if ("debug".equals(IastProperties.getLogLevel())) {
             level(Level.ALL);
             return true;
         } else {
@@ -232,36 +233,36 @@ public class DongTaiLog {
     private static void writeLogToFile(String msg) {
         FileOutputStream o = null;
         try {
-            File file = new File(filePath + "/dongtai.log");
+            File file = new File(filePath + "/dongtai_javaagent.log");
             o = new FileOutputStream(file, true);
             o.write(msg.getBytes());
             o.write(System.getProperty("line.separator").getBytes());
             o.flush();
             o.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            DongTaiLog.error(e);
         }
     }
 
     static {
-        iastProperties = IastProperties.getInstance();
-        if ("true".equals(iastProperties.enableLogFile())) {
+        if ("true".equals(IastProperties.enableLogFile())) {
             enableWriteToFile = true;
-        } else if ("false".equals(iastProperties.enableLogFile())) {
+        } else if ("false".equals(IastProperties.enableLogFile())) {
             enableWriteToFile = false;
         }
-        filePath = iastProperties.getLogPath();
-        if (enableWriteToFile) {
+        filePath = IastProperties.getLogPath();
+        if (enableWriteToFile && !isCreateLog) {
             File f = new File(filePath);
             if (!f.exists()) {
                 f.mkdirs();
             }
-            File file = new File(filePath, "/dongtai.log");
+            File file = new File(filePath, "/dongtai_javaagent.log");
             if (!file.exists()) {
                 try {
                     file.createNewFile();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                } catch (IOException ignore) {
+                }finally {
+                    isCreateLog = true;
                 }
             }
         }

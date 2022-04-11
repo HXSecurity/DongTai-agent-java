@@ -22,7 +22,7 @@ DongTai-agent-java 由`agent.jar`、`dongtai-core.jar `、`dongtai-inject.jar`�
 
 - `agent.jar`用来管理 agent 的生命周期和配置。agent 的生命周期包括下载、安装、启动、停止、重启、卸载。agent 的配置包括配置应用启动模式、漏洞检验模式、是否开启代理等。
 - `dongtai-core.jar`是核心 jar 包，其主要功能是：字节码插桩、数据采集、数据预处理、数据上报、第三方组件管理等。
-- `dongtai-inject.jar`是间谍 jar 包，用于注入至`BootStrap ClassLoader`，后续在目标应用中调用`dongtai-core.jar`中的数据采集方法
+- `dongtai-inject.jar`是间谍 jar 包，用于注入至`BootStrap ClassLoader`，后续在目标应用中调用`dongtai-core.jar`中的数据采集方法。
 - `dongtai-servlet.jar`用于获取应用发送的请求以及收到的响应，用于数据展示以及请求重放功能。
 
 ## 应用场景
@@ -72,7 +72,7 @@ DongTai-agent-java 由`agent.jar`、`dongtai-core.jar `、`dongtai-inject.jar`�
 5. 拷贝`dongtai-core.jar`、`dongtai-inject.jar`、`dongtai-servlet.jar`到系统临时目录。获取系统临时目录可运行以下 Java 代码：
 
    ```java
-   System.getProperty("java.io.tmpdir");
+   System.getProperty("java.io.tmpdir.dongtai");
    ```
 
 6. 运行应用，测试代码（以SpringBoot应用为例）：`java -javaagent:/path/to/dongtai-agent.jar -Ddongtai.debug=true -jar app.jar`

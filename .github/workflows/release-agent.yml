@@ -37,7 +37,7 @@ jobs:
 
       - name: Generate version file
         run: |
-          cd ${{ github.workspace }}/release/lib/ && \
+          cd ${{ github.workspace }}/dongtai-agent/src/main/resources/bin/ && \
           echo "${{ github.event.repository.name }},version,${{ steps.release.outputs.VERSION }}" >> version.txt && \
           echo "${{ github.event.repository.name }},commit_hash,${GITHUB_SHA}" >> version.txt && \
           files=('dongtai-core.jar') && \
@@ -50,12 +50,12 @@ jobs:
           access-key-secret: ${{ secrets.OSS_KEY_SECRET }}
 
       - run: |
-          cd ${{ github.workspace }}/release/lib/ && \
+          cd ${{ github.workspace }}/dongtai-agent/src/main/resources/bin/ && \
           ossutil cp version.txt oss://huoqi-public/iast/release-version/${{ github.event.repository.name }}/${{ steps.release.outputs.VERSION }}/version.txt
 
       - run: |
-          ossutil cp -rf release/dongtai-agent.jar oss://dongtai/agent/java/${{ steps.release.outputs.VERSION }}/dongtai-agent.jar --meta x-oss-object-acl:public-read
-          ossutil cp -rf release/lib/ oss://dongtai/agent/java/${{ steps.release.outputs.VERSION }}/ --meta x-oss-object-acl:public-read
+          ossutil cp -rf dongtai-agent/target/dongtai-agent.jar oss://dongtai/agent/java/${{ steps.release.outputs.VERSION }}/dongtai-agent.jar --meta x-oss-object-acl:public-read
+          ossutil cp -rf dongtai-agent/src/main/resources/bin/ oss://dongtai/agent/java/${{ steps.release.outputs.VERSION }}/ --meta x-oss-object-acl:public-read
 
-          ossutil cp -rf release/dongtai-agent.jar oss://dongtai/agent/java/latest/dongtai-agent.jar --meta x-oss-object-acl:public-read
-          ossutil cp -rf release/lib/ oss://dongtai/agent/java/latest/ --meta x-oss-object-acl:public-read
+          ossutil cp -rf dongtai-agent/target/dongtai-agent.jar oss://dongtai/agent/java/latest/dongtai-agent.jar --meta x-oss-object-acl:public-read
+          ossutil cp -rf dongtai-agent/src/main/resources/bin/ oss://dongtai/agent/java/latest/ --meta x-oss-object-acl:public-read

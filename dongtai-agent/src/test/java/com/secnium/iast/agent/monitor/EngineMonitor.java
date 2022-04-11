@@ -1,9 +1,10 @@
 package com.secnium.iast.agent.monitor;
 
-import com.secnium.iast.agent.*;
-import com.secnium.iast.agent.manager.EngineManager;
-import com.secnium.iast.agent.report.AgentRegisterReport;
-import com.secnium.iast.agent.util.http.HttpClientUtils;
+import io.dongtai.iast.agent.manager.EngineManager;
+import io.dongtai.iast.agent.monitor.IMonitor;
+import io.dongtai.iast.agent.report.AgentRegisterReport;
+import io.dongtai.iast.agent.util.http.HttpClientUtils;
+import io.dongtai.iast.agent.Constant;
 import io.dongtai.log.DongTaiLog;
 import org.json.JSONObject;
 
@@ -12,11 +13,18 @@ import org.json.JSONObject;
  */
 public class EngineMonitor implements IMonitor {
     private String currentStatus = null;
+    private final String  name = "EngineMonitor";
     private final EngineManager engineManager;
 
     public EngineMonitor(EngineManager engineManager) {
         this.engineManager = engineManager;
     }
+
+    @Override
+    public String getName() {
+        return Constant.THREAD_PREFIX + name;
+    }
+
 
     @Override
     public void check() {
@@ -53,4 +61,15 @@ public class EngineMonitor implements IMonitor {
         }
         return "other";
     }
+
+    @Override
+    public void run() {
+        this.check();
+        try{
+            Thread.sleep(60 * 1000L);
+        } catch (Throwable t) {
+            DongTaiLog.info("Start engine monitor failed, msg : {}, error : {}",t.getMessage(),t.getCause());
+        }
+    }
+
 }

@@ -1,6 +1,7 @@
 package com.secnium.iast.core.report;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import io.dongtai.log.DongTaiLog;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -37,7 +38,7 @@ public class ReportService {
         try {
             Thread.sleep(30 * 1000);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            DongTaiLog.error(e);
         }
 
         service.shutdown();

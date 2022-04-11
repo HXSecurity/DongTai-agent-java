@@ -16,7 +16,7 @@ uri_3a_classloader_3a_/*
 org/asciidoctor/*
 com/sun/jmx/remote/*
 # apple package
-apple/*
+apple/* g
 # octo
 com/octo/captcha/*
 # apache shaded
@@ -33,7 +33,7 @@ groovy/*sun/rmi/transport/DGCAckHandler$1
 # https://github.com/AutoGeneral/cors-filter
 com/thetransactioncompany/*
 # protobuf
-com/google/protobuf/*
+#com/google/protobuf/*
 #Spring Cloud Sleuth
 com/github/benmanes/caffeine/*
 # spring
@@ -4448,8 +4448,6 @@ com/ctc/wstx/sr/ReaderCreator
 com/ctc/wstx/sr/StreamReaderImpl
 com/ctc/wstx/sr/StreamScanner
 com/ctc/wstx/sr/TypedStreamReader
-com/ctc/wstx/stax/WstxInputFactory
-com/ctc/wstx/stax/WstxOutputFactory
 com/ctc/wstx/sw/AsciiXmlWriter
 com/ctc/wstx/sw/BufferingXmlWriter
 com/ctc/wstx/sw/EncodingXmlWriter
@@ -14743,7 +14741,7 @@ com/mysql/jdbc/Connection
 com/mysql/jdbc/ConnectionImpl$3
 com/mysql/jdbc/Driver
 com/mysql/jdbc/JDBC4MySQLConnection
-com/mysql/jdbc/NonRegisteringDriver
+#com/mysql/jdbc/NonRegisteringDriver
 com/mysql/jdbc/Statement
 com/mysql/jdbc/StringUtils
 com/mysql/jdbc/util/LRUCache
@@ -24464,7 +24462,6 @@ java/sql/SQLTransientException
 java/sql/SQLWarning
 java/sql/SQLXML
 java/sql/Savepoint
-#java/sql/Statement
 java/sql/Time
 java/sql/Timestamp
 java/sql/Types
@@ -24587,8 +24584,8 @@ java/time/temporal/ValueRange
 java/util/AbstractCollection
 java/util/AbstractList
 java/util/AbstractList$FullListIterator
-java/util/AbstractList$Itr
-java/util/AbstractList$ListItr
+# java/util/AbstractList$Itr
+# java/util/AbstractList$ListItr
 java/util/AbstractList$SimpleListIterator
 java/util/AbstractList$SubAbstractList
 java/util/AbstractList$SubAbstractList$SubAbstractListIterator
@@ -24605,8 +24602,8 @@ java/util/AbstractSequentialList
 java/util/AbstractSet
 java/util/ArrayDeque
 java/util/ArrayList$1
-java/util/ArrayList$Itr
-java/util/ArrayList$ListItr
+# java/util/ArrayList$Itr
+# java/util/ArrayList$ListItr
 java/util/ArrayList$SubList
 java/util/ArrayList$SubList$1
 #java/util/Arrays*
@@ -24769,7 +24766,7 @@ java/util/LinkedList$DescendingIterator
 java/util/LinkedList$Entry
 java/util/LinkedList$Link
 java/util/LinkedList$LinkIterator
-java/util/LinkedList$ListItr
+# java/util/LinkedList$ListItr
 java/util/LinkedList$Node
 java/util/ListResourceBundle
 java/util/Locale
@@ -31258,7 +31255,7 @@ org/apache/commons/fileupload/FileItemIterator
 org/apache/commons/fileupload/FileItemStream
 org/apache/commons/fileupload/FileItemStream$ItemSkippedException
 org/apache/commons/fileupload/FileUpload
-org/apache/commons/fileupload/FileUploadBase
+# org/apache/commons/fileupload/FileUploadBase
 org/apache/commons/fileupload/FileUploadBase$FileItemIteratorImpl
 org/apache/commons/fileupload/FileUploadBase$FileItemIteratorImpl$1
 org/apache/commons/fileupload/FileUploadBase$FileItemIteratorImpl$FileItemStreamImpl
@@ -31284,7 +31281,7 @@ org/apache/commons/fileupload/portlet/PortletFileUpload
 org/apache/commons/fileupload/portlet/PortletRequestContext
 org/apache/commons/fileupload/servlet/FileCleanerCleanup
 org/apache/commons/fileupload/servlet/ServletFileUpload
-org/apache/commons/fileupload/servlet/ServletRequestContext
+# org/apache/commons/fileupload/servlet/ServletRequestContext
 org/apache/commons/fileupload/util/Closeable
 org/apache/commons/fileupload/util/FileItemHeadersImpl
 org/apache/commons/fileupload/util/Streams

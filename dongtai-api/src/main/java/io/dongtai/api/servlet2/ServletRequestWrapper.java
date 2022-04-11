@@ -1,6 +1,8 @@
 package io.dongtai.api.servlet2;
 
 import io.dongtai.api.DongTaiRequest;
+import io.dongtai.log.DongTaiLog;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -53,7 +55,7 @@ public class ServletRequestWrapper extends HttpServletRequestWrapper implements 
                     bufferedReader.close();
                 } catch (IOException e) {
                     // fixme: add logger for solve exception
-                    e.printStackTrace();
+                    DongTaiLog.error(e);
                 }
                 body = stringBuilder.toString();
                 isCachedBody = true;
@@ -165,7 +167,7 @@ public class ServletRequestWrapper extends HttpServletRequestWrapper implements 
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            DongTaiLog.error(e);
         }
         return postBody.toString();
     }

@@ -3,15 +3,17 @@ package io.dongtai.iast.core.handler.hookpoint;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.bytecode.enhance.plugin.spring.SpringApplicationImpl;
 import io.dongtai.iast.core.handler.hookpoint.controller.HookType;
-import io.dongtai.iast.core.handler.hookpoint.controller.impl.DubboImpl;
-import io.dongtai.iast.core.handler.hookpoint.controller.impl.HttpImpl;
-import io.dongtai.iast.core.handler.hookpoint.controller.impl.PropagatorImpl;
-import io.dongtai.iast.core.handler.hookpoint.controller.impl.SinkImpl;
-import io.dongtai.iast.core.handler.hookpoint.controller.impl.SourceImpl;
+import io.dongtai.iast.core.handler.hookpoint.controller.impl.*;
+import io.dongtai.iast.core.handler.hookpoint.framework.dubbo.DubboHandler;
+import io.dongtai.iast.core.handler.hookpoint.framework.grpc.GrpcHandler;
 import io.dongtai.iast.core.handler.hookpoint.graphy.GraphBuilder;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
+import io.dongtai.log.DongTaiLog;
+import io.dongtai.iast.core.handler.hookpoint.service.ServiceHandler;
+import io.dongtai.iast.core.handler.hookpoint.service.kafka.KafkaHandler;
 import io.dongtai.iast.core.service.ErrorLogReport;
 
+import java.lang.dongtai.ServiceUrlHandler;
 import java.lang.dongtai.SpyDispatcher;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -32,7 +34,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
         try {
             EngineManager.SCOPE_TRACKER.enterHttp();
         } catch (Exception e) {
-            ErrorLogReport.sendErrorLog(e);
+            DongTaiLog.error(e);
         }
     }
 
@@ -45,14 +47,20 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public void leaveHttp(Object request, Object response) {
         try {
-            EngineManager.SCOPE_TRACKER.leaveHttp();
-            if (EngineManager.SCOPE_TRACKER.isExitedHttp() && EngineManager.isEnterHttp()) {
-                EngineManager.maintainRequestCount();
-                GraphBuilder.buildAndReport(request, response);
-                EngineManager.cleanThreadState();
+            if (EngineManager.isDongTaiRunning()) {
+                EngineManager.turnOffDongTai();
+
+                EngineManager.SCOPE_TRACKER.leaveHttp();
+                if (EngineManager.SCOPE_TRACKER.isExitedHttp() && EngineManager.isEnterHttp()) {
+                    EngineManager.maintainRequestCount();
+                    GraphBuilder.buildAndReport(request, response);
+                    EngineManager.cleanThreadState();
+                }
+
+                EngineManager.turnOnDongTai();
             }
         } catch (Exception e) {
-            ErrorLogReport.sendErrorLog(e);
+            DongTaiLog.error(e);
             EngineManager.cleanThreadState();
         }
     }
@@ -69,7 +77,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
             return EngineManager.isEngineRunning() && EngineManager.SCOPE_TRACKER
                     .isFirstLevelHttp();
         } catch (Exception e) {
-            ErrorLogReport.sendErrorLog(e);
+            DongTaiLog.error(e);
         }
         return false;
     }
@@ -110,7 +118,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
         try {
             EngineManager.SCOPE_TRACKER.enterDubbo();
         } catch (Exception e) {
-            ErrorLogReport.sendErrorLog(e);
+            DongTaiLog.error(e);
         }
     }
 
@@ -120,16 +128,25 @@ public class SpyDispatcherImpl implements SpyDispatcher {
      * @since 1.3.1
      */
     @Override
-    public void leaveDubbo() {
+    public void leaveDubbo(Object invocation, Object rpcResult) {
         try {
-            EngineManager.leaveDubbo();
-            if (EngineManager.isExitedDubbo() && !EngineManager.isEnterHttp()) {
-                EngineManager.maintainRequestCount();
-                GraphBuilder.buildAndReport(null, null);
-                EngineManager.cleanThreadState();
+            if (EngineManager.isDongTaiRunning() && EngineManager.isEnterEntry(null)) {
+                EngineManager.turnOffDongTai();
+
+                EngineManager.leaveDubbo();
+                if (EngineManager.isEnterEntry(null)) {
+                    DubboHandler.solveClientExit(invocation, rpcResult);
+                } else if (EngineManager.isExitedDubbo()) {
+                    DubboHandler.solveServiceExit(invocation, rpcResult);
+                    EngineManager.maintainRequestCount();
+                    GraphBuilder.buildAndReport(null, null);
+                    EngineManager.cleanThreadState();
+                }
+
+                EngineManager.turnOnDongTai();
             }
         } catch (Exception e) {
-            ErrorLogReport.sendErrorLog(e);
+            DongTaiLog.error(e);
             EngineManager.cleanThreadState();
         }
     }
@@ -145,9 +162,60 @@ public class SpyDispatcherImpl implements SpyDispatcher {
         try {
             return EngineManager.isEngineRunning() && EngineManager.isFirstLevelDubbo();
         } catch (Exception e) {
+            DongTaiLog.error(e);
             ErrorLogReport.sendErrorLog(e);
         }
         return false;
+    }
+
+    @Override
+    public void enterKafka(Object record) {
+        try {
+            EngineManager.SCOPE_TRACKER.enterKafka();
+        } catch (Exception e) {
+            ErrorLogReport.sendErrorLog(e);
+        }
+    }
+
+    @Override
+    public Object kafkaBeforeSend(Object record) {
+        return KafkaHandler.beforeSend(record);
+    }
+
+    @Override
+    public void kafkaAfterSend(Object record, Object ret) {
+        EngineManager.turnOffDongTai();
+        KafkaHandler.afterSend(record, ret);
+        EngineManager.turnOnDongTai();
+    }
+
+    @Override
+    public void kafkaAfterPoll(Object record) {
+        EngineManager.turnOffDongTai();
+        KafkaHandler.afterPoll(record);
+
+        EngineManager.turnOnDongTai();
+    }
+
+    @Override
+    public void leaveKafka() {
+        try {
+            if (EngineManager.isEnterEntry(null)) {
+                EngineManager.turnOffDongTai();
+
+                EngineManager.leaveKafka();
+                if (EngineManager.isExitedKafka() && !EngineManager.isEnterHttp()) {
+                    EngineManager.maintainRequestCount();
+                    GraphBuilder.buildAndReport(null, null);
+                    EngineManager.cleanThreadState();
+                }
+
+                EngineManager.turnOnDongTai();
+            }
+        } catch (Exception e) {
+            ErrorLogReport.sendErrorLog(e);
+            EngineManager.cleanThreadState();
+        }
     }
 
     /**
@@ -158,11 +226,11 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public void enterSource() {
         try {
-            if (EngineManager.isLingzhiRunning()) {
+            if (EngineManager.isDongTaiRunning()) {
                 EngineManager.SCOPE_TRACKER.enterSource();
             }
         } catch (Exception e) {
-            ErrorLogReport.sendErrorLog(e);
+            DongTaiLog.error(e);
         }
     }
 
@@ -174,11 +242,11 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public void leaveSource() {
         try {
-            if (EngineManager.isLingzhiRunning()) {
+            if (EngineManager.isDongTaiRunning()) {
                 EngineManager.SCOPE_TRACKER.leaveSource();
             }
         } catch (Exception e) {
-            ErrorLogReport.sendErrorLog(e);
+            DongTaiLog.error(e);
         }
     }
 
@@ -191,7 +259,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public boolean isFirstLevelSource() {
         try {
-            return EngineManager.isLingzhiRunning() && EngineManager.isEngineRunning() && EngineManager.SCOPE_TRACKER
+            return EngineManager.isDongTaiRunning() && EngineManager.isEngineRunning() && EngineManager.SCOPE_TRACKER
                     .isFirstLevelSource();
         } catch (Exception e) {
             return false;
@@ -206,11 +274,13 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public void enterPropagator() {
         try {
-            if (EngineManager.isLingzhiRunning()) {
+            if (EngineManager.isDongTaiRunning() && EngineManager.isEngineRunning()) {
+                EngineManager.turnOffDongTai();
                 EngineManager.SCOPE_TRACKER.enterPropagation();
+                EngineManager.turnOnDongTai();
             }
         } catch (Exception e) {
-            ErrorLogReport.sendErrorLog(e);
+            DongTaiLog.error(e);
         }
     }
 
@@ -222,11 +292,13 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public void leavePropagator() {
         try {
-            if (EngineManager.isLingzhiRunning()) {
+            if (EngineManager.isDongTaiRunning() && EngineManager.isEngineRunning()) {
+                EngineManager.turnOffDongTai();
                 EngineManager.SCOPE_TRACKER.leavePropagation();
+                EngineManager.turnOnDongTai();
             }
         } catch (Exception e) {
-            ErrorLogReport.sendErrorLog(e);
+            DongTaiLog.error(e);
         }
     }
 
@@ -239,7 +311,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public boolean isFirstLevelPropagator() {
         try {
-            return EngineManager.isLingzhiRunning() && EngineManager.isEngineRunning() && EngineManager.SCOPE_TRACKER.isFirstLevelPropagator();
+            return EngineManager.isDongTaiRunning() && EngineManager.isEngineRunning() && EngineManager.SCOPE_TRACKER.isFirstLevelPropagator();
         } catch (Exception e) {
             return false;
         }
@@ -253,11 +325,11 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public void enterSink() {
         try {
-            if (EngineManager.isLingzhiRunning()) {
+            if (EngineManager.isDongTaiRunning()) {
                 EngineManager.SCOPE_TRACKER.enterSink();
             }
         } catch (Exception e) {
-            ErrorLogReport.sendErrorLog(e);
+            DongTaiLog.error(e);
         }
     }
 
@@ -269,11 +341,11 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public void leaveSink() {
         try {
-            if (EngineManager.isLingzhiRunning()) {
+            if (EngineManager.isDongTaiRunning()) {
                 EngineManager.SCOPE_TRACKER.leaveSink();
             }
         } catch (Exception e) {
-            ErrorLogReport.sendErrorLog(e);
+            DongTaiLog.error(e);
         }
     }
 
@@ -286,9 +358,69 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public boolean isFirstLevelSink() {
         try {
-            return EngineManager.isLingzhiRunning() && EngineManager.isEngineRunning() && EngineManager.isTopLevelSink();
+            return EngineManager.isDongTaiRunning() && EngineManager.isEngineRunning() && EngineManager.isTopLevelSink();
         } catch (Exception e) {
             return false;
+        }
+    }
+
+    @Override
+    public Object clientInterceptor(Object channel) {
+        return GrpcHandler.interceptChannel(channel);
+    }
+
+    @Override
+    public Object serverInterceptor(Object serverServiceDefinition) {
+        return GrpcHandler.interceptService(serverServiceDefinition);
+    }
+
+    @Override
+    public void startGrpcCall() {
+        GrpcHandler.startTrace();
+    }
+
+    @Override
+    public void closeGrpcCall() {
+        GrpcHandler.closeGrpcCall();
+    }
+
+    @Override
+    public void blockingUnaryCall(Object req, Object res) {
+        if (EngineManager.isDongTaiRunning() && EngineManager.isEngineRunning()) {
+            EngineManager.turnOffDongTai();
+            GrpcHandler.blockingUnaryCall(req, res);
+            EngineManager.turnOnDongTai();
+        }
+    }
+
+    @Override
+    public void sendMessage(Object message) {
+        if (EngineManager.isDongTaiRunning() && EngineManager.isEngineRunning()) {
+            EngineManager.turnOffDongTai();
+            GrpcHandler.sendMessage(message);
+            EngineManager.turnOnDongTai();
+        }
+    }
+
+    @Override
+    public void toStringUtf8(Object value) {
+        if (EngineManager.isDongTaiRunning() && EngineManager.isEngineRunning()) {
+            EngineManager.turnOffDongTai();
+            GrpcHandler.toStringUtf8(value);
+            EngineManager.turnOnDongTai();
+        }
+    }
+
+    @Override
+    public void reportService(String category, String type, String host, String port, ServiceUrlHandler handler) {
+        if (EngineManager.isEngineRunning()) {
+            if (EngineManager.isDongTaiRunning()) {
+                EngineManager.turnOffDongTai();
+                ServiceHandler.reportService(category, type, host, port, handler);
+                EngineManager.turnOnDongTai();
+            } else {
+                ServiceHandler.reportService(category, type, host, port, handler);
+            }
         }
     }
 
@@ -312,28 +444,36 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     public boolean collectMethodPool(Object instance, Object[] argumentArray, Object retValue, String framework,
                                      String className, String matchClassName, String methodName, String methodSign, boolean isStatic,
                                      int hookType) {
-        if (!EngineManager.isLingzhiRunning() && (HookType.HTTP.equals(hookType) || HookType.DUBBO.equals(hookType))) {
-            EngineManager.turnOnLingzhi();
+        // hook点降级判断
+        if (EngineManager.isHookPointFallback()) {
+            return false;
+        }
+        // 尝试获取hook限速令牌,耗尽时降级
+        if (!EngineManager.getFallbackManager().getHookRateLimiter().acquire()) {
+            EngineManager.openHookPointFallback(className, methodName, methodSign, hookType);
+            return false;
+        }
+        if (!EngineManager.isDongTaiRunning() && (EngineManager.isEnterEntry(null) || HookType.HTTP.equals(hookType) || HookType.RPC.equals(hookType))) {
+            EngineManager.turnOnDongTai();
         }
 
-        if (EngineManager.isLingzhiRunning()) {
+        if (EngineManager.isDongTaiRunning()) {
             try {
-                EngineManager.turnOffLingzhi();
+                EngineManager.turnOffDongTai();
 
                 if (HookType.SPRINGAPPLICATION.equals(hookType)) {
                     MethodEvent event = new MethodEvent(0, -1, className, matchClassName, methodName,
                             methodSign, methodSign, instance, argumentArray, retValue, framework, isStatic, null);
                     SpringApplicationImpl.getWebApplicationContext(event);
                 } else {
-                    boolean isEnterEntryPoint = EngineManager.isEnterHttp() || EngineManager.isFirstLevelDubbo();
-                    boolean isEntryPointMethod = HookType.HTTP.equals(hookType) || HookType.DUBBO.equals(hookType);
-                    if (isEnterEntryPoint || isEntryPointMethod) {
+                    boolean isEntryPointMethod = HookType.HTTP.equals(hookType) || HookType.RPC.equals(hookType);
+                    if (EngineManager.isEnterEntry(null) || isEntryPointMethod) {
                         MethodEvent event = new MethodEvent(0, -1, className, matchClassName, methodName,
                                 methodSign, methodSign, instance, argumentArray, retValue, framework, isStatic, null);
                         if (HookType.HTTP.equals(hookType)) {
                             HttpImpl.solveHttp(event);
-                        } else if (HookType.DUBBO.equals(hookType)) {
-                            DubboImpl.solveDubbo(event, INVOKE_ID_SEQUENCER);
+                        } else if (HookType.RPC.equals(hookType)) {
+                            solveRPC(framework, event);
                         } else if (HookType.PROPAGATOR.equals(hookType) && !EngineManager.TAINT_POOL.get().isEmpty()) {
                             PropagatorImpl.solvePropagator(event, INVOKE_ID_SEQUENCER);
                         } else if (HookType.SOURCE.equals(hookType)) {
@@ -344,11 +484,19 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                     }
                 }
             } catch (Exception e) {
-                ErrorLogReport.sendErrorLog(e);
+                DongTaiLog.error(e);
             } finally {
-                EngineManager.turnOnLingzhi();
+                EngineManager.turnOnDongTai();
             }
         }
         return false;
+    }
+
+    private void solveRPC(String framework, MethodEvent event) {
+        switch (framework) {
+            case "dubbo":
+                DubboHandler.solveDubbo(event, SpyDispatcherImpl.INVOKE_ID_SEQUENCER);
+                break;
+        }
     }
 }
