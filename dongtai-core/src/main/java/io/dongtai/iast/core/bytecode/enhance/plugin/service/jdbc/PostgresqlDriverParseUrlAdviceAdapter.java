@@ -27,10 +27,10 @@ public class PostgresqlDriverParseUrlAdviceAdapter extends AdviceAdapter impleme
             push(ServiceType.POSTGRESQL.getType());
             loadLocal(nextLocal - 1);
             push("PGHOST");
-            mv.visitMethodInsn(INVOKESPECIAL, "java/util/Properties", "getProperty", "(Ljava/lang/String;)Ljava/lang/String;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/util/Properties", "getProperty", "(Ljava/lang/String;)Ljava/lang/String;", false);
             loadLocal(nextLocal - 1);
             push("PGPORT");
-            mv.visitMethodInsn(INVOKESPECIAL, "java/util/Properties", "getProperty", "(Ljava/lang/String;)Ljava/lang/String;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/util/Properties", "getProperty", "(Ljava/lang/String;)Ljava/lang/String;", false);
             mv.visitInsn(ACONST_NULL);
             invokeInterface(ASM_TYPE_SPY_DISPATCHER, SPY$reportService);
             mark(nonNullLabel);
