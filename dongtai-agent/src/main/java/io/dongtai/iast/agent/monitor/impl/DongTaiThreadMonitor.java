@@ -17,6 +17,7 @@ import java.util.Set;
 
 public class DongTaiThreadMonitor implements IMonitor {
     private static final String NAME = "DongTaiThreadMonitor";
+    private static String NOT_ALIVE_THREAD = "[]";
 
     /**
      * 高cpu百分比
@@ -33,7 +34,7 @@ public class DongTaiThreadMonitor implements IMonitor {
         JSONObject report = new JSONObject();
         JSONObject detail = new JSONObject();
         List<ThreadInfoMetrics.ThreadInfo> dongTaiThreads = ThreadUtils.getDongTaiThreads();
-        Set<String> notExistThreads = new HashSet<String>();
+        Set<String> notAliveThreads = new HashSet<String>();
         List<ThreadInfoMetrics.ThreadInfo> highCpuDaemonThreads = new ArrayList<ThreadInfoMetrics.ThreadInfo>();
         for (IMonitor monitor : MonitorDaemonThread.monitorTasks) {
             boolean isMonitorAlive = false;
@@ -48,12 +49,16 @@ public class DongTaiThreadMonitor implements IMonitor {
                 }
             }
             if (!isMonitorAlive) {
-                notExistThreads.add(monitor.getName());
+                notAliveThreads.add(monitor.getName());
             }
         }
         // 生成报告
-        if (notExistThreads.size() > 0) {
-            detail.put(Constant.KEY_NOT_EXIST_THREADS, notExistThreads.toString());
+        // 两次生成的notAliveThread不一致时，再上报.
+        Boolean notAliveThreadReportFlag = false;
+        if (!notAliveThreads.toString().equals(NOT_ALIVE_THREAD)) {
+            detail.put(Constant.KEY_NOT_EXIST_THREADS, notAliveThreads.toString());
+            NOT_ALIVE_THREAD = notAliveThreads.toString();
+            notAliveThreadReportFlag = true;
         }
         if (highCpuDaemonThreads.size() > 0) {
             final JSONArray highCpuThreadJsonList = new JSONArray();
@@ -69,7 +74,7 @@ public class DongTaiThreadMonitor implements IMonitor {
             }
             detail.put(Constant.KEY_HIGH_CPU_THREADS, highCpuThreadJsonList);
         }
-        if (notExistThreads.size() > 0 || highCpuDaemonThreads.size() > 0) {
+        if (notAliveThreadReportFlag || highCpuDaemonThreads.size() > 0) {
             report.put(Constant.KEY_UPDATE_REPORT, Constant.REPORT_ERROR_THREAD);
             report.put(Constant.KEY_REPORT_VALUE, detail);
             HttpClientUtils.sendPost(Constant.API_REPORT_UPLOAD, report.toString());
