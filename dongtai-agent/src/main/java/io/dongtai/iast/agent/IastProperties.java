@@ -45,7 +45,7 @@ public class IastProperties {
         try {
             init();
         } catch (ClassNotFoundException e) {
-            DongTaiLog.debug(e);
+            DongTaiLog.error(e);
         }
     }
 

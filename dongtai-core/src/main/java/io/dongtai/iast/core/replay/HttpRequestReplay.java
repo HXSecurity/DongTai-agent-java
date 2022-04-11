@@ -130,7 +130,7 @@ public class HttpRequestReplay implements Runnable {
             }
             rd.close();
         } catch (Exception e) {
-            DongTaiLog.debug(e);
+            DongTaiLog.error(e);
         } finally {
             if (connection != null) {
                 connection.disconnect();
