@@ -81,7 +81,7 @@ DongTai-agent-java 由`agent.jar`、`dongtai-core.jar `、`dongtai-inject.jar`�
 
 #### 支持的Java版本及中间件
 
-- Java 1.6+
+- Java 1.8+
 - Tomcat、Jetty、WebLogic、WebSphere、SpringBoot等主流软件和中间件
 
 **notice:** `jdk 1.6`开发的Agent需要使用`Maven 3.2.5`进行构建
