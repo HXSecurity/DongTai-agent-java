@@ -27,10 +27,10 @@ public class MysqlJdbcDriverParseUrlAdviceAdapter extends AdviceAdapter implemen
             push(ServiceType.MYSQL.getType());
             loadLocal(nextLocal - 1);
             push("HOST");
-            mv.visitMethodInsn(INVOKESPECIAL, "java/util/Properties", "getProperty", "(Ljava/lang/String;)Ljava/lang/String;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/util/Properties", "getProperty", "(Ljava/lang/String;)Ljava/lang/String;", false);
             loadLocal(nextLocal - 1);
             push("PORT");
-            mv.visitMethodInsn(INVOKESPECIAL, "java/util/Properties", "getProperty", "(Ljava/lang/String;)Ljava/lang/String;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/util/Properties", "getProperty", "(Ljava/lang/String;)Ljava/lang/String;", false);
             mv.visitInsn(ACONST_NULL);
             invokeInterface(ASM_TYPE_SPY_DISPATCHER, SPY$reportService);
             mark(nonNullLabel);
