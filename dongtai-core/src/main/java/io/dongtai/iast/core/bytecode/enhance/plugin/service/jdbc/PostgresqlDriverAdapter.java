@@ -16,9 +16,7 @@ public class PostgresqlDriverAdapter extends AbstractClassVisitor {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
 
         if ("parseURL".equals(name)) {
-            if (DongTaiLog.isDebugEnabled()) {
-                DongTaiLog.debug("Adding PostgreSQL jdbc tracking for type {}.{}", context.getClassName(), name);
-            }
+            DongTaiLog.debug("Adding PostgreSQL jdbc tracking for type {}.{}", context.getClassName(), name);
 
             mv = new PostgresqlDriverParseUrlAdviceAdapter(mv, access, name, desc);
             setTransformed();

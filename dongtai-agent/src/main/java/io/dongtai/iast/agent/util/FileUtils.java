@@ -1,6 +1,7 @@
 package io.dongtai.iast.agent.util;
 
 import io.dongtai.iast.agent.AgentLauncher;
+import io.dongtai.log.DongTaiLog;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -14,11 +15,11 @@ public class FileUtils {
         if (!targetFile.exists()) {
             if (!targetFile.getParentFile().exists()) {
                 if (!targetFile.getParentFile().mkdirs()) {
-                    throw new NullPointerException("用户权限不足，文件创建失败");
+                    DongTaiLog.error("用户权限不足，文件创建失败");
                 }
             }
             if (!targetFile.createNewFile()) {
-                throw new NullPointerException("用户权限不足，文件创建失败");
+                DongTaiLog.error("用户权限不足，文件创建失败");
             }
         }
         if (AgentLauncher.LAUNCH_MODE_AGENT.equals("agent")) {

@@ -25,9 +25,7 @@ public class DispatchJsp implements DispatchPlugin {
 
         String matchClassname = isMatch();
         if (null != matchClassname) {
-            if (DongTaiLog.isDebugEnabled()) {
-                DongTaiLog.debug("JspPage match class for {} from {}", context.getClassName(), matchClassname);
-            }
+            DongTaiLog.debug("JspPage match class for {} from {}", context.getClassName(), matchClassname);
             context.setMatchClassName(matchClassname);
             // JspPageAdapter
             classVisitor = new JspPageAdapter(classVisitor, context);

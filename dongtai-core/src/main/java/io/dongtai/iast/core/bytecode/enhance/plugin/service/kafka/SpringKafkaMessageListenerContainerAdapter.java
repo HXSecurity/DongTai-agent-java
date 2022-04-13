@@ -19,10 +19,7 @@ public class SpringKafkaMessageListenerContainerAdapter extends AbstractClassVis
         // >=2.0 argCount=3
         // >=2.5 argCount=2
         if ("doInvokeRecordListener".equals(name)) {
-            if (DongTaiLog.isDebugEnabled()) {
-                DongTaiLog.debug("Adding spring kafka tracking for type {}.{}", context.getClassName(), name);
-            }
-
+            DongTaiLog.debug("Adding spring kafka tracking for type {}.{}", context.getClassName(), name);
             mv = new SpringKafkaMessageListenerContainerAdviceAdapter(mv, access, name, desc);
             setTransformed();
         }

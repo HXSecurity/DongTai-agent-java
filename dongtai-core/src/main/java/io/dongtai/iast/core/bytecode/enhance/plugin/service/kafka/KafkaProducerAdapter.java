@@ -16,17 +16,11 @@ public class KafkaProducerAdapter extends AbstractClassVisitor {
         int argCount = Type.getArgumentTypes(desc).length;
 
         if ("<init>".equals(name) && argCount == 7) {
-            if (DongTaiLog.isDebugEnabled()) {
-                DongTaiLog.debug("Adding kafka tracking for type {}.{}", context.getClassName(), name);
-            }
-
+            DongTaiLog.debug("Adding kafka tracking for type {}.{}", context.getClassName(), name);
             mv = new KafkaProducerAdviceAdapter(mv, access, name, desc);
             setTransformed();
         } else if ("send".equals(name) && argCount == 2) {
-            if (DongTaiLog.isDebugEnabled()) {
-                DongTaiLog.debug("Adding kafka tracking for type {}.{}", context.getClassName(), name);
-            }
-
+            DongTaiLog.debug("Adding kafka tracking for type {}.{}", context.getClassName(), name);
             mv = new KafkaProducerSendAdviceAdapter(mv, access, name, desc);
             setTransformed();
         }

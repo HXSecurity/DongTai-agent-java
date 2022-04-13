@@ -14,9 +14,11 @@ import io.dongtai.iast.core.handler.hookpoint.vulscan.VulnType;
 import io.dongtai.iast.core.utils.AsmUtils;
 import io.dongtai.iast.core.utils.matcher.Method;
 import io.dongtai.log.DongTaiLog;
+
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Set;
+
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.commons.JSRInlinerAdapter;
@@ -42,10 +44,8 @@ public class DispatchClassPlugin implements DispatchPlugin {
         String matchClassName = isMatch();
 
         if (null != matchClassName) {
-            if (DongTaiLog.isDebugEnabled()) {
-                DongTaiLog.debug("class {} hit rule {}, class diagrams: {}", className, matchClassName,
-                        Arrays.toString(ancestors.toArray()));
-            }
+            DongTaiLog.debug("class {} hit rule {}, class diagrams: {}", className, matchClassName,
+                    Arrays.toString(ancestors.toArray()));
             context.setMatchClassName(matchClassName);
             modifiedClassVisitor = new ClassVisit(classVisitor, context);
         } else if (enableAllHook && !context.isBootstrapClassLoader()) {
@@ -82,7 +82,7 @@ public class DispatchClassPlugin implements DispatchPlugin {
 
         @Override
         public MethodVisitor visitMethod(final int access, final String name, final String desc, final String signature,
-                final String[] exceptions) {
+                                         final String[] exceptions) {
             MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
 
             if (!Modifier.isInterface(access) && !Modifier.isAbstract(access) && !"<clinit>".equals(name)) {
@@ -97,7 +97,7 @@ public class DispatchClassPlugin implements DispatchPlugin {
                     mv = new JSRInlinerAdapter(mv, access, name, desc, signature, exceptions);
                 }
 
-                if (isTransformed() && DongTaiLog.isDebugEnabled() && null != framework) {
+                if (isTransformed() && null != framework) {
                     DongTaiLog.debug("rewrite method {} for listener[framework={},class={}]", iastMethodSignature,
                             framework, context.getClassName());
                 }
@@ -107,7 +107,7 @@ public class DispatchClassPlugin implements DispatchPlugin {
 
         @Override
         public void visit(int version, int access, String name, String signature, String superName,
-                String[] interfaces) {
+                          String[] interfaces) {
             this.classVersion = version;
             super.visit(version, access, name, signature, superName, interfaces);
         }
@@ -124,7 +124,7 @@ public class DispatchClassPlugin implements DispatchPlugin {
          * @return 修改后的方法访问器
          */
         private MethodVisitor greedyAop(MethodVisitor mv, int access, String name, String desc, String framework,
-                String signature) {
+                                        String signature) {
             if (null != framework) {
                 mv = new PropagateAdviceAdapter(mv, access, name, desc, context, framework, signature);
             } else if (isAppClass && Method.hook(access, name, desc, signature)) {
@@ -146,7 +146,7 @@ public class DispatchClassPlugin implements DispatchPlugin {
          * @return 修改后的方法访问器
          */
         private MethodVisitor lazyAop(MethodVisitor mv, int access, String name, String desc, String framework,
-                String signature) {
+                                      String signature) {
             int hookValue = IastHookRuleModel.getRuleTypeValueByFramework(framework);
             if (HookType.PROPAGATOR.equals(hookValue)) {
                 mv = new PropagateAdviceAdapter(mv, access, name, desc, context, framework, signature);

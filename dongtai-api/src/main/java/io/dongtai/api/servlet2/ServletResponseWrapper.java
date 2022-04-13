@@ -31,7 +31,7 @@ public class ServletResponseWrapper extends HttpServletResponseWrapper implement
     @Override
     public ServletOutputStream getOutputStream() throws IOException {
         if (writer != null) {
-            throw new IllegalStateException("getOutputStream() has already been called over once");
+            DongTaiLog.error("getOutputStream() has already been called over once");
         }
         if (outputStream == null) {
             outputStream = getResponse().getOutputStream();
@@ -43,7 +43,7 @@ public class ServletResponseWrapper extends HttpServletResponseWrapper implement
     @Override
     public PrintWriter getWriter() throws IOException {
         if (outputStream != null) {
-            throw new IllegalStateException("getWriter() has already been called over once");
+            DongTaiLog.error("getWriter() has already been called over once");
         }
         if (writer == null) {
             copier = new ServletWrapperOutputStreamCopier(getResponse().getOutputStream());

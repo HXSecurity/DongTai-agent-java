@@ -40,9 +40,7 @@ public class JspPageAdapter extends AbstractClassVisitor {
         @Override
         public void visitMethodInsn(int opc, String owner, String name, String desc, boolean isInterface) {
             if (owner.endsWith("JspRuntimeLibrary") && "include".equals(name)) {
-                if (DongTaiLog.isDebugEnabled()) {
-                    DongTaiLog.debug("[com.secnium.iast] enter include method" + owner + "." + name);
-                }
+                DongTaiLog.debug("[com.secnium.iast] enter include method" + owner + "." + name);
 
                 int j = newLocal(Type.getType(Object.class));
                 int k = newLocal(Type.getType(Object.class));

@@ -19,7 +19,7 @@ public class DongTaiLog {
     static String filePath;
     static boolean enableColor;
     static boolean isCreateLog = false;
-    public static java.util.logging.Level LEVEL = java.util.logging.Level.CONFIG;
+    public static java.util.logging.Level LEVEL;
 
     private static final String RESET = "\033[0m";
     private static final int RED = 31;
@@ -48,6 +48,18 @@ public class DongTaiLog {
     static {
         if (System.console() != null && !System.getProperty("os.name").toLowerCase().contains("windows")) {
             enableColor = true;
+        }
+        String logLevel = IastProperties.getLogLevel();
+        if ("info".equals(logLevel)) {
+            LEVEL = Level.CONFIG;
+        }else if ("debug".equals(logLevel)){
+            LEVEL = Level.FINER;
+        }else if ("warn".equals(logLevel)){
+            LEVEL = Level.WARNING;
+        }else if ("error".equals(logLevel)){
+            LEVEL = Level.SEVERE;
+        }else if ("trace".equals(logLevel)){
+            LEVEL = Level.FINEST;
         }
     }
 
@@ -213,15 +225,6 @@ public class DongTaiLog {
 
     private static boolean canLog(Level level) {
         return level.intValue() >= LEVEL.intValue();
-    }
-
-    public static boolean isDebugEnabled() {
-        if ("debug".equals(IastProperties.getLogLevel())) {
-            level(Level.ALL);
-            return true;
-        } else {
-            return false;
-        }
     }
 
     private static String getTime() {

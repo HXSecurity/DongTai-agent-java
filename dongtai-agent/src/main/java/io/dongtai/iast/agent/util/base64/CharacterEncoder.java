@@ -1,5 +1,7 @@
 package io.dongtai.iast.agent.util.base64;
 
+import io.dongtai.log.DongTaiLog;
+
 import java.io.*;
 import java.nio.ByteBuffer;
 
@@ -90,7 +92,8 @@ public abstract class CharacterEncoder {
             var4 = var2.toString("8859_1");
             return var4;
         } catch (Exception var6) {
-            throw new Error("CharacterEncoder.encode internal error");
+            DongTaiLog.error("CharacterEncoder.encode internal error.");
+            return "";
         }
     }
 
@@ -161,7 +164,7 @@ public abstract class CharacterEncoder {
         try {
             this.encodeBuffer((InputStream) var3, var2);
         } catch (Exception var5) {
-            throw new Error("CharacterEncoder.encodeBuffer internal error");
+            DongTaiLog.error("CharacterEncoder.encodeBuffer internal error");
         }
 
         return var2.toString();

@@ -104,7 +104,7 @@ public class HttpClientUtils {
                 wr.close();
             }
             if (connection.getResponseCode() != 200) {
-                throw new NullPointerException(connection.getResponseCode() + " " + connection.getResponseMessage());
+                DongTaiLog.error(connection.getResponseCode() + " " + connection.getResponseMessage());
             }
             InputStream is = connection.getInputStream();
             BufferedReader rd = new BufferedReader(new InputStreamReader(is));
