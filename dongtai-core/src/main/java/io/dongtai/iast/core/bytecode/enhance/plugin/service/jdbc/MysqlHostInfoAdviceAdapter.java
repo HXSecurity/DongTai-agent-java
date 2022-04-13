@@ -7,26 +7,20 @@ import io.dongtai.iast.core.utils.AsmUtils;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.commons.AdviceAdapter;
 
-public class MysqlHostInfoPropertiesAdviceAdapter extends AdviceAdapter implements AsmTypes, AsmMethods {
-    protected MysqlHostInfoPropertiesAdviceAdapter(MethodVisitor mv, int access, String name, String desc) {
+public class MysqlHostInfoAdviceAdapter extends AdviceAdapter implements AsmTypes, AsmMethods {
+    protected MysqlHostInfoAdviceAdapter(MethodVisitor mv, int access, String name, String desc) {
         super(AsmUtils.api, mv, access, name, desc);
     }
 
     @Override
     protected void onMethodExit(int opcode) {
         if (opcode != ATHROW) {
-            newLocal(ASM_TYPE_OBJECT);
-            dup();
-            storeLocal(nextLocal - 1);
             invokeStatic(ASM_TYPE_SPY_HANDLER, SPY_HANDLER$getDispatcher);
             push(ServiceType.MYSQL.getCategory());
             push(ServiceType.MYSQL.getType());
-            loadLocal(nextLocal - 1);
-            push("host");
-            mv.visitMethodInsn(INVOKESPECIAL, "java/util/Properties", "getProperty", "(Ljava/lang/String;)Ljava/lang/String;", false);
-            loadLocal(nextLocal - 1);
-            push("port");
-            mv.visitMethodInsn(INVOKESPECIAL, "java/util/Properties", "getProperty", "(Ljava/lang/String;)Ljava/lang/String;", false);
+            loadArg(1);
+            loadArg(2);
+            mv.visitMethodInsn(INVOKESTATIC, "java/lang/String", "valueOf", "(I)Ljava/lang/String;", false);
             mv.visitInsn(ACONST_NULL);
             invokeInterface(ASM_TYPE_SPY_DISPATCHER, SPY$reportService);
         }
