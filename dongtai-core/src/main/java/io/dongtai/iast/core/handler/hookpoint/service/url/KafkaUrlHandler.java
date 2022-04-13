@@ -1,7 +1,5 @@
 package io.dongtai.iast.core.handler.hookpoint.service.url;
 
-import java.lang.dongtai.ServiceUrl;
-import java.lang.dongtai.ServiceUrlHandler;
 import java.util.ArrayList;
 import java.util.List;
 
