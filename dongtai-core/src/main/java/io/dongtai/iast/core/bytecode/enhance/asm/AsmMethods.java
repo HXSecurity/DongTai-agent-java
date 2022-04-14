@@ -1,10 +1,9 @@
 package io.dongtai.iast.core.bytecode.enhance.asm;
 
-import java.lang.dongtai.ServiceUrlHandler;
+import org.objectweb.asm.commons.Method;
+
 import java.lang.dongtai.SpyDispatcher;
 import java.lang.dongtai.SpyDispatcherHandler;
-
-import org.objectweb.asm.commons.Method;
 
 /**
  * 常用的ASM method 集合 省得我到处声明
@@ -79,12 +78,6 @@ public interface AsmMethods {
     Method SPY$kafkaBeforeSend = InnerHelper.getAsmMethod(
             SpyDispatcher.class,
             "kafkaBeforeSend",
-            Object.class
-    );
-    Method SPY$kafkaAfterSend = InnerHelper.getAsmMethod(
-            SpyDispatcher.class,
-            "kafkaAfterSend",
-            Object.class,
             Object.class
     );
     Method SPY$kafkaAfterPoll = InnerHelper.getAsmMethod(
@@ -187,6 +180,6 @@ public interface AsmMethods {
             String.class,
             String.class,
             String.class,
-            ServiceUrlHandler.class
+            String.class
     );
 }

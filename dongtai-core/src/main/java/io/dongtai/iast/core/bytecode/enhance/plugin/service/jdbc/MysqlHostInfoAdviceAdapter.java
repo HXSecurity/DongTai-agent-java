@@ -21,7 +21,7 @@ public class MysqlHostInfoAdviceAdapter extends AdviceAdapter implements AsmType
             loadArg(1);
             loadArg(2);
             mv.visitMethodInsn(INVOKESTATIC, "java/lang/String", "valueOf", "(I)Ljava/lang/String;", false);
-            mv.visitInsn(ACONST_NULL);
+            push("");
             invokeInterface(ASM_TYPE_SPY_DISPATCHER, SPY$reportService);
         }
     }
