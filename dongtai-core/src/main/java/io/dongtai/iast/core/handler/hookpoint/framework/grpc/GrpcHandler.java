@@ -8,19 +8,15 @@ import io.dongtai.iast.core.handler.hookpoint.controller.impl.SourceImpl;
 import io.dongtai.iast.core.handler.hookpoint.graphy.GraphBuilder;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.service.ErrorLogReport;
-import io.dongtai.iast.core.utils.HttpClientUtils;
-import io.dongtai.iast.core.utils.StackUtils;
-import io.dongtai.iast.core.utils.TaintPoolUtils;
+import io.dongtai.iast.core.utils.*;
 import io.dongtai.log.DongTaiLog;
 
 import java.io.File;
+import java.lang.dongtai.TraceIdHandler;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class GrpcHandler {
     private static IastClassLoader gRpcClassLoader;
@@ -56,7 +52,7 @@ public class GrpcHandler {
 
             Class<?> classOfGrpcProxy = gRpcClassLoader.loadClass("io.dongtai.plugin.GrpcProxy");
             methodOfInterceptChannel = classOfGrpcProxy
-                    .getDeclaredMethod("interceptChannel", Object.class, String.class, String.class);
+                    .getDeclaredMethod("interceptChannel", Object.class, TraceIdHandler.class);
             methodOfInterceptService = classOfGrpcProxy
                     .getDeclaredMethod("interceptService", Object.class);
             methodOfGetRequestMetadata = classOfGrpcProxy.getDeclaredMethod("getServerMeta");
@@ -64,6 +60,10 @@ public class GrpcHandler {
         } catch (MalformedURLException | NoSuchMethodException e) {
             DongTaiLog.error(e);
         }
+    }
+
+    public static void setSharedTraceId(String traceId) {
+        sharedTraceId.set(traceId);
     }
 
     /**
@@ -77,10 +77,7 @@ public class GrpcHandler {
             createClassLoader(channel);
         }
         try {
-            // todo: 考虑测试并发场景
-            String traceId = ContextManager.getSegmentId();
-            sharedTraceId.set(traceId);
-            return methodOfInterceptChannel.invoke(null, channel, ContextManager.getHeaderKey(), traceId);
+            return methodOfInterceptChannel.invoke(null, channel, new GrpcTraceManager());
         } catch (Exception e) {
             DongTaiLog.error(e);
         }
@@ -213,11 +210,11 @@ public class GrpcHandler {
             MethodEvent event = new MethodEvent(
                     0,
                     0,
-                    "io.grpc.stub.ClientCalls",
-                    "io.grpc.stub.ClientCalls",
-                    "blockingUnaryCall",
-                    "io.grpc.stub.ClientCalls.blockingUnaryCall(io.grpc.Channel, io.grpc.MethodDescriptor<ReqT,RespT>, io.grpc.CallOptions, ReqT)",
-                    "io.grpc.stub.ClientCalls.blockingUnaryCall(io.grpc.Channel, io.grpc.MethodDescriptor<ReqT,RespT>, io.grpc.CallOptions, ReqT)",
+                    "io.grpc.internal.ServerCallImpl",
+                    "io.grpc.internal.ServerCallImpl",
+                    "sendMessage",
+                    "io.grpc.internal.ServerCallImpl.sendMessage(RespT)",
+                    "io.grpc.internal.ServerCallImpl.sendMessage(RespT)",
                     null,
                     new Object[]{message},
                     null,

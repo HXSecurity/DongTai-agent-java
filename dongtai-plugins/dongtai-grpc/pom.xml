@@ -25,6 +25,10 @@
             <version>${grpc-all.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>io.dongtai.iast</groupId>
+            <artifactId>dongtai-spy</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

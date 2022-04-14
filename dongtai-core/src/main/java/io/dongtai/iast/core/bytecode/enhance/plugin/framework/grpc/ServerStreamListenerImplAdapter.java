@@ -14,8 +14,11 @@ public class ServerStreamListenerImplAdapter extends AbstractClassVisitor {
     @Override
     public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
         MethodVisitor mv = super.visitMethod(access, name, descriptor, signature, exceptions);
-        if (name.equals("closed")) {
-            mv = new ServerStreamListenerImplAdviceAdapter(mv, access, name, descriptor);
+        if ("messagesAvailable".equals(name)) {
+            mv = new ServerStreamListenerImplStartAdviceAdapter(mv, access, name, descriptor);
+            setTransformed();
+        } else if ("closed".equals(name)) {
+            mv = new ServerStreamListenerImplClosedAdviceAdapter(mv, access, name, descriptor);
             setTransformed();
         }
         return mv;
