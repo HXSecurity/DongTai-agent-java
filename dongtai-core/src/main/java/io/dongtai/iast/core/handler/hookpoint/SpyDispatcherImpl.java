@@ -8,12 +8,11 @@ import io.dongtai.iast.core.handler.hookpoint.framework.dubbo.DubboHandler;
 import io.dongtai.iast.core.handler.hookpoint.framework.grpc.GrpcHandler;
 import io.dongtai.iast.core.handler.hookpoint.graphy.GraphBuilder;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
-import io.dongtai.log.DongTaiLog;
 import io.dongtai.iast.core.handler.hookpoint.service.ServiceHandler;
 import io.dongtai.iast.core.handler.hookpoint.service.kafka.KafkaHandler;
 import io.dongtai.iast.core.service.ErrorLogReport;
+import io.dongtai.log.DongTaiLog;
 
-import java.lang.dongtai.ServiceUrlHandler;
 import java.lang.dongtai.SpyDispatcher;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -178,15 +177,8 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     }
 
     @Override
-    public Object kafkaBeforeSend(Object record) {
-        return KafkaHandler.beforeSend(record);
-    }
-
-    @Override
-    public void kafkaAfterSend(Object record, Object ret) {
-        EngineManager.turnOffDongTai();
-        KafkaHandler.afterSend(record, ret);
-        EngineManager.turnOnDongTai();
+    public void kafkaBeforeSend(Object record) {
+        KafkaHandler.beforeSend(record);
     }
 
     @Override
@@ -412,7 +404,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     }
 
     @Override
-    public void reportService(String category, String type, String host, String port, ServiceUrlHandler handler) {
+    public void reportService(String category, String type, String host, String port, String handler) {
         if (EngineManager.isEngineRunning()) {
             if (EngineManager.isDongTaiRunning()) {
                 EngineManager.turnOffDongTai();

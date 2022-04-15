@@ -3,43 +3,32 @@ package io.dongtai.iast.core.handler.hookpoint.service.kafka;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.context.ContextManager;
 import io.dongtai.iast.core.handler.hookpoint.SpyDispatcherImpl;
-import io.dongtai.iast.core.handler.hookpoint.controller.impl.SourceImpl;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.service.ErrorLogReport;
 import io.dongtai.iast.core.utils.StackUtils;
 import io.dongtai.iast.core.utils.TaintPoolUtils;
 
-import java.lang.reflect.Constructor;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class KafkaHandler {
     private static ThreadLocal<String> sharedTraceId = new ThreadLocal<String>();
 
-    public static Object beforeSend(Object record) {
+    public static void beforeSend(Object record) {
         try {
-            Class<?> c = Class.forName(" org.apache.kafka.clients.producer.ProducerRecord".substring(1));
-            Constructor<?> con = c.getConstructor(String.class, Integer.class, Long.class, Object.class, Object.class, Iterable.class);
-            Object rd = con.newInstance((String) record.getClass().getMethod("topic").invoke(record),
-                    (Integer) record.getClass().getMethod("partition").invoke(record),
-                    (Long) record.getClass().getMethod("timestamp").invoke(record),
-                    record.getClass().getMethod("key").invoke(record),
-                    record.getClass().getMethod("value").invoke(record),
-                    (Iterable<?>) record.getClass().getMethod("headers").invoke(record));
-
             String traceId = ContextManager.getSegmentId();
             sharedTraceId.set(traceId);
-            Object headers = rd.getClass().getMethod("headers").invoke(rd);
+            KafkaHandler.trackSend(record);
+
+            Object headers = record.getClass().getMethod("headers").invoke(record);
             headers.getClass().getMethod("add", String.class, byte[].class).
                     invoke(headers, ContextManager.getHeaderKey(), traceId.getBytes(StandardCharsets.UTF_8));
-            return rd;
         } catch (Exception e) {
             ErrorLogReport.sendErrorLog(e);
         }
-        return record;
     }
 
-    public static void afterSend(Object record, Object ret) {
+    public static void trackSend(Object record) {
         if (EngineManager.TAINT_POOL.get().isEmpty()) {
             return;
         }
@@ -54,7 +43,7 @@ public class KafkaHandler {
                 " org.apache.kafka.clients.producer.KafkaProducer.send(org.apache.kafka.clients.producer.ProducerRecord<K,V>,org.apache.kafka.clients.producer.Callback)".substring(1),
                 null,
                 new Object[]{record},
-                ret,
+                null,
                 "KAFKA",
                 false,
                 null
@@ -69,16 +58,6 @@ public class KafkaHandler {
             event.setTraceId(sharedTraceId.get());
             event.setCallStack(StackUtils.getLatestStack(5));
             EngineManager.TRACK_MAP.addTrackMethod(invokeId, event);
-            Set<Object> resModelItems = SourceImpl.parseCustomModel(ret);
-            Set<Object> resModelSet = new HashSet<Object>();
-            for (Object obj : resModelItems) {
-                resModelSet.add(obj);
-                int identityHashCode = System.identityHashCode(obj);
-                event.addTargetHash(identityHashCode);
-                event.addTargetHashForRpc(obj.hashCode());
-                EngineManager.TAINT_HASH_CODES.get().add(identityHashCode);
-            }
-            event.outValue = resModelSet;
         }
     }
 

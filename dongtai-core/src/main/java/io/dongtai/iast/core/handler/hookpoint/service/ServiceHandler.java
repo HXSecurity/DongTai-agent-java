@@ -1,28 +1,32 @@
 package io.dongtai.iast.core.handler.hookpoint.service;
 
 import io.dongtai.iast.core.EngineManager;
-import io.dongtai.iast.core.handler.hookpoint.service.url.SimpleUrlHandler;
+import io.dongtai.iast.core.handler.hookpoint.service.url.*;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.ReportConstant;
 import io.dongtai.iast.core.service.ErrorLogReport;
 import io.dongtai.iast.core.service.ThreadPools;
 import io.dongtai.iast.core.utils.Constants;
 import org.json.JSONObject;
 
-import java.lang.dongtai.ServiceUrl;
-import java.lang.dongtai.ServiceUrlHandler;
 import java.util.*;
 
 public class ServiceHandler {
     private static Map<String, Boolean> uniqMap = new HashMap<String, Boolean>();
 
-    public static void reportService(String category, String type, String host, String port, ServiceUrlHandler handler) {
+    public static void reportService(String category, String type, String host, String port, String handler) {
         try {
             ServiceUrlHandler h;
-            if (handler == null) {
-                handler = new SimpleUrlHandler();
+            switch (handler) {
+                case "KafkaUrlHandler":
+                    h = new KafkaUrlHandler();
+                    break;
+                case "SimpleUrlHandler":
+                default:
+                    h = new SimpleUrlHandler();
+                    break;
             }
 
-            List<ServiceUrl> srvList = handler.processUrl(host, port);
+            List<ServiceUrl> srvList = h.processUrl(host, port);
             for (ServiceUrl srv : srvList) {
                 reportSingleService(category, type, srv.getHost(), srv.getPort());
             }

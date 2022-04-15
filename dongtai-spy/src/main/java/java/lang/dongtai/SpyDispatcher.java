@@ -69,9 +69,7 @@ public interface SpyDispatcher {
 
     void enterKafka(Object record);
 
-    Object kafkaBeforeSend(Object record);
-
-    void kafkaAfterSend(Object record, Object ret);
+    void kafkaBeforeSend(Object record);
 
     void kafkaAfterPoll(Object record);
 
@@ -160,7 +158,7 @@ public interface SpyDispatcher {
 
     void toStringUtf8(Object value);
 
-    void reportService(String category, String type, String host, String port, ServiceUrlHandler handler);
+    void reportService(String category, String type, String host, String port, String handler);
 
     /**
      * mark for enter Source Entry Point
