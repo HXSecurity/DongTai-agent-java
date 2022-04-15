@@ -214,7 +214,7 @@ public class AgentRegisterReport {
                 DongTaiLog.warn("Can't Recognize Web Service");
                 return;
             } else {
-                DongTaiLog.info("DongTai will install for {} Service", server.getName());
+                DongTaiLog.debug("DongTai will install for {} Service", server.getName());
             }
             String msg = generateAgentRegisterMsg();
             StringBuilder responseRaw = HttpClientUtils.sendPost(Constant.API_AGENT_REGISTER, msg);
@@ -242,14 +242,18 @@ public class AgentRegisterReport {
      * @param responseRaw
      */
     private void setAgentData(StringBuilder responseRaw) {
-        JSONObject responseObj = new JSONObject(responseRaw.toString());
-        Integer status = (Integer) responseObj.get("status");
-        if (status == 201) {
-            JSONObject data = (JSONObject) responseObj.get("data");
-            agentId = (Integer) data.get("id");
-            coreRegisterStart = (Integer) data.get("coreAutoStart");
-        }else {
-            DongTaiLog.error("Register msg: "+ responseRaw);
+        try {
+            JSONObject responseObj = new JSONObject(responseRaw.toString());
+            Integer status = (Integer) responseObj.get("status");
+            if (status == 201) {
+                JSONObject data = (JSONObject) responseObj.get("data");
+                agentId = (Integer) data.get("id");
+                coreRegisterStart = (Integer) data.get("coreAutoStart");
+            }else {
+                DongTaiLog.error("Register msg: "+ responseRaw);
+            }
+        }catch (Exception e){
+            DongTaiLog.error("DongTai server no response.");
         }
     }
 

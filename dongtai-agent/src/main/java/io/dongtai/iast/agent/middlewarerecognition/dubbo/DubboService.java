@@ -12,13 +12,13 @@ public class DubboService implements IServer {
             loader.loadClass("org.apache.dubbo.monitor.support.MonitorFilter");
             return true;
         } catch (Exception e) {
-            DongTaiLog.debug(e);
+            DongTaiLog.error(e);
         }
         try {
             loader.loadClass("com.alibaba.dubbo.monitor.support.MonitorFilter");
             return true;
         } catch (Exception e) {
-            DongTaiLog.debug(e);
+            DongTaiLog.error(e);
         }
         return false;
     }

@@ -103,7 +103,7 @@ public class HttpClientUtils {
             rd.close();
             return response;
         } catch (Exception e) {
-            DongTaiLog.debug(e);
+            DongTaiLog.error(e);
         } finally {
             if (connection != null) {
                 connection.disconnect();
@@ -164,7 +164,7 @@ public class HttpClientUtils {
                 return proxy;
             }
         } catch (Throwable e) {
-            DongTaiLog.debug(e);
+            DongTaiLog.error(e);
         }
         return null;
     }

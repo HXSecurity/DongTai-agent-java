@@ -16,9 +16,7 @@ public class MysqlHostInfoAdapter extends AbstractClassVisitor {
         int argCount = Type.getArgumentTypes(desc).length;
 
         if ("<init>".equals(name) && argCount == 7) {
-            if (DongTaiLog.isDebugEnabled()) {
-                DongTaiLog.debug("Adding MySQL jdbc tracking for type {}.{}", context.getClassName(), name);
-            }
+            DongTaiLog.debug("Adding MySQL jdbc tracking for type {}.{}", context.getClassName(), name);
 
             mv = new MysqlHostInfoAdviceAdapter(mv, access, name, desc);
             setTransformed();

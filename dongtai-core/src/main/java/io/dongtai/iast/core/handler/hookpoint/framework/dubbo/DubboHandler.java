@@ -122,7 +122,7 @@ public class DubboHandler {
             methodOfGetUrl.setAccessible(true);
             return methodOfGetUrl.invoke(invoker).toString();
         } catch (Exception e) {
-            DongTaiLog.debug(e);
+            DongTaiLog.error(e);
             return null;
         }
     }

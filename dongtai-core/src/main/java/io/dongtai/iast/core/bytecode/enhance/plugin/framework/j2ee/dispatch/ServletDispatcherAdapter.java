@@ -40,17 +40,12 @@ public class ServletDispatcherAdapter extends AbstractClassVisitor {
                 (this.isJakarta && isJakartaArgs(typeOfArgs)) ||
                 (this.isFaces && isFacesArgs(typeOfArgs))
         ) {
-            if (DongTaiLog.isDebugEnabled()) {
-                DongTaiLog.debug("Adding HTTP tracking for type {}", context.getClassName());
-            }
-
+            DongTaiLog.debug("Adding HTTP tracking for type {}", context.getClassName());
             mv = new ServletDispatcherAdviceAdapter(mv, access, name, desc, signCode, context, isJakarta);
             setTransformed();
         }
         if (isTransformed()) {
-            if (DongTaiLog.isDebugEnabled()) {
-                DongTaiLog.debug("rewrite method {}.{} for listener[match={}]", context.getClassName(), name, context.getMatchClassName());
-            }
+            DongTaiLog.debug("rewrite method {}.{} for listener[match={}]", context.getClassName(), name, context.getMatchClassName());
         }
 
         return mv;

@@ -37,6 +37,7 @@ public class EngineManager {
 
     private final Instrumentation inst;
     private int runningStatus;
+    private static boolean isCoreStop;
     private final IastProperties properties;
     private final String launchMode;
     private Class<?> classOfEngine;
@@ -298,6 +299,8 @@ public class EngineManager {
                     String.class)
                     .invoke(null, launchMode, this.properties.getPropertiesFilePath(),
                             AgentRegisterReport.getAgentFlag(), inst, agentPath);
+            setRunningStatus(0);
+            setCoreStop(false);
             return true;
         } catch (IOException e) {
             DongTaiLog.error("DongTai engine start failed, Reason: dongtai-spy.jar or dongtai-core.jar open failed. path: \n\tdongtai-core.jar: " + corePackage + "\n\tdongtai-spy.jar: " + spyPackage);
@@ -321,6 +324,8 @@ public class EngineManager {
             if (classOfEngine != null) {
                 classOfEngine.getMethod("start").invoke(null);
                 DongTaiLog.info("DongTai engine start successfully.");
+                setRunningStatus(0);
+                setCoreStop(false);
                 return true;
             }
             return false;
@@ -351,6 +356,8 @@ public class EngineManager {
             if (classOfEngine != null) {
                 classOfEngine.getMethod("stop").invoke(null);
                 DongTaiLog.info("DongTai engine stop successfully.");
+                setRunningStatus(1);
+                setCoreStop(true);
                 return true;
             }
             return false;
@@ -379,6 +386,8 @@ public class EngineManager {
      */
     public synchronized boolean uninstall() {
         if (null == IAST_CLASS_LOADER) {
+            setRunningStatus(1);
+            setCoreStop(true);
             return true;
         }
 
@@ -399,6 +408,8 @@ public class EngineManager {
         classOfEngine = null;
         IAST_CLASS_LOADER.closeIfPossible();
         IAST_CLASS_LOADER = null;
+        setRunningStatus(1);
+        setCoreStop(true);
         return true;
     }
 
@@ -408,5 +419,13 @@ public class EngineManager {
             PID = ManagementFactory.getRuntimeMXBean().getName().split("@")[0];
         }
         return PID;
+    }
+
+    public static boolean isCoreStop() {
+        return isCoreStop;
+    }
+
+    public static void setCoreStop(boolean coreStop) {
+        isCoreStop = coreStop;
     }
 }

@@ -129,9 +129,8 @@ public class HttpImpl {
         try {
             Method methodOfRequestMeta = request.getClass().getDeclaredMethod("getPostBody");
             return (String) methodOfRequestMeta.invoke(request);
-        } catch (NoSuchMethodException ignored) {
-        } catch (IllegalAccessException ignored) {
-        } catch (InvocationTargetException ignored) {
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            DongTaiLog.error(e);
         }
         return null;
     }
@@ -141,9 +140,8 @@ public class HttpImpl {
         try {
             methodOfRequestMeta = response.getClass().getDeclaredMethod("getResponseMeta");
             return (Map<String, Object>) methodOfRequestMeta.invoke(response);
-        } catch (NoSuchMethodException ignored) {
-        } catch (IllegalAccessException ignored) {
-        } catch (InvocationTargetException ignored) {
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            DongTaiLog.error(e);
         }
         return null;
     }
@@ -155,10 +153,7 @@ public class HttpImpl {
      */
     public static void solveHttp(MethodEvent event)
             throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        if (DongTaiLog.isDebugEnabled()) {
-            DongTaiLog.debug(EngineManager.SCOPE_TRACKER.get().toString());
-        }
-
+        DongTaiLog.debug(EngineManager.SCOPE_TRACKER.get().toString());
         Map<String, Object> requestMeta = getRequestMeta(event.argumentArray[0]);
         // todo Consider increasing the capture of html request responses
         if (ConfigMatcher.getInstance().disableExtension((String) requestMeta.get("requestURI"))) {
@@ -170,11 +165,8 @@ public class HttpImpl {
 
         // todo: add custom header escape
         EngineManager.enterHttpEntry(requestMeta);
-
-        if (DongTaiLog.isDebugEnabled()) {
-            DongTaiLog.debug("HTTP Request:{} {} from: {}", requestMeta.get("method"), requestMeta.get("requestURI"),
-                    event.signature);
-        }
+        DongTaiLog.debug("HTTP Request:{} {} from: {}", requestMeta.get("method"), requestMeta.get("requestURI"),
+                event.signature);
     }
 
     public static IastClassLoader getClassLoader() {

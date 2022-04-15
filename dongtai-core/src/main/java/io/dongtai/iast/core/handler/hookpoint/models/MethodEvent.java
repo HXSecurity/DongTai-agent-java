@@ -297,7 +297,7 @@ public class MethodEvent {
                 sb.append(value.toString());
             }
         } catch (Exception e) {
-            DongTaiLog.error(e);
+            sb.append("CustomObjectValue");
         }
         return sb.toString().trim();
     }

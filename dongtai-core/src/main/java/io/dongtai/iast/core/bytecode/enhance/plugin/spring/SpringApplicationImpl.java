@@ -21,6 +21,7 @@ public class SpringApplicationImpl {
 
     public static void getWebApplicationContext(MethodEvent event) {
         if (!isSend) {
+            SpringApplicationImpl.isSend = true;
             Object applicationContext = event.returnValue;
             createClassLoader();
             loadApplicationContext();
@@ -40,7 +41,7 @@ public class SpringApplicationImpl {
                 proxyClass = iastClassLoader.loadClass("cn.huoxian.iast.spring.SpringApplicationContext");
                 getAPI = proxyClass.getDeclaredMethod("getAPI", Object.class);
             } catch (NoSuchMethodException e) {
-                DongTaiLog.error(e.getMessage());
+                DongTaiLog.error(e);
             }
         }
     }

@@ -14,6 +14,7 @@ public class WebLogic implements IServer {
     public boolean isMatch(RuntimeMXBean paramRuntimeMXBean, ClassLoader loader) {
         File runFile = new File(".", "bin/startWebLogic.sh");
         File configFile = new File(".", "init-info/domain-info.xml");
+        System.setProperty("UseSunHttpHandler", "true");
         return runFile.exists() && configFile.exists();
     }
 

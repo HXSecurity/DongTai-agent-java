@@ -21,15 +21,10 @@ public class DubboAdapter extends AbstractClassVisitor {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
         String signCode = AsmUtils.buildSignature(context.getClassName(), name, desc);
         if ("invoke".equals(name)) {
-            if (DongTaiLog.isDebugEnabled()) {
-                DongTaiLog.debug("Adding Dubbo Source tracking for type {}", context.getClassName());
-            }
-
+            DongTaiLog.debug("Adding Dubbo Source tracking for type {}", context.getClassName());
             mv = new DubboAdviceAdapter(mv, access, name, desc, signCode, context);
             setTransformed();
-            if (DongTaiLog.isDebugEnabled()) {
-                DongTaiLog.debug("rewrite method {}.{} for listener[match={}]", context.getClassName(), name, context.getMatchClassName());
-            }
+            DongTaiLog.debug("rewrite method {}.{} for listener[match={}]", context.getClassName(), name, context.getMatchClassName());
         }
         return mv;
     }

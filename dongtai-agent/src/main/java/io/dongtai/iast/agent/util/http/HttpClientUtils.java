@@ -104,7 +104,7 @@ public class HttpClientUtils {
                 wr.close();
             }
             if (connection.getResponseCode() != 200) {
-                throw new NullPointerException(connection.getResponseCode() + " " + connection.getResponseMessage());
+                DongTaiLog.error(connection.getResponseCode() + " " + connection.getResponseMessage());
             }
             InputStream is = connection.getInputStream();
             BufferedReader rd = new BufferedReader(new InputStreamReader(is));
@@ -116,7 +116,7 @@ public class HttpClientUtils {
             rd.close();
             return response;
         } catch (Exception e){
-            DongTaiLog.debug(e);
+            DongTaiLog.error(e);
         }
         finally {
             if (connection != null) {
@@ -140,7 +140,7 @@ public class HttpClientUtils {
                 return proxy;
             }
         } catch (Throwable e) {
-            DongTaiLog.debug(e);
+            DongTaiLog.error(e);
         }
         return null;
     }
@@ -152,7 +152,7 @@ public class HttpClientUtils {
             sc.init(null, trustAllCerts, new java.security.SecureRandom());
             HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
         } catch (Exception e) {
-            DongTaiLog.debug(e);
+            DongTaiLog.error(e);
         }
     }
 

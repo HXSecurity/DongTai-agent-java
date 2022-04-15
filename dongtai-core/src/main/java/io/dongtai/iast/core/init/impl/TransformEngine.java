@@ -24,7 +24,7 @@ public class TransformEngine implements IEngine {
     @Override
     public void start() {
         try {
-            DongTaiLog.info("Install data acquisition and analysis sub-modules");
+            DongTaiLog.debug("Install data acquisition and analysis sub-modules");
             inst.addTransformer(classFileTransformer, true);
             classFileTransformer.reTransform();
             DongTaiLog.debug("The sub-module of data acquisition and analysis is successfully installed");

@@ -3,6 +3,7 @@ package io.dongtai.iast.core.handler.hookpoint.controller.impl;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.utils.StackUtils;
+import io.dongtai.log.DongTaiLog;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -69,6 +70,7 @@ public class SourceImpl {
         String className = sourceClass.getName();
         if (className.startsWith("cn.huoxian.iast.api.") ||
                 className.startsWith("io.dongtai.api.") ||
+                className.startsWith(" org.apache.shiro.web.servlet".substring(1)) ||
                 VALUES_ENUMERATOR.equals(className) ||
                 className.startsWith(SPRING_OBJECT)
         ) {
@@ -135,7 +137,8 @@ public class SourceImpl {
                         modelValues.addAll(parseCustomModel(listValue));
                     }
                 }
-            } catch (Exception ignored) {
+            } catch (Exception e) {
+                DongTaiLog.error(e);
             }
         }
         return modelValues;

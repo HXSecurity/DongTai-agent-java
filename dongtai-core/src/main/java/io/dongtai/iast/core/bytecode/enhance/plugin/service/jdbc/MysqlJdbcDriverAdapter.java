@@ -16,9 +16,7 @@ public class MysqlJdbcDriverAdapter extends AbstractClassVisitor {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
 
         if ("parseURL".equals(name)) {
-            if (DongTaiLog.isDebugEnabled()) {
-                DongTaiLog.debug("Adding MySQL jdbc tracking for type {}.{}", context.getClassName(), name);
-            }
+            DongTaiLog.debug("Adding MySQL jdbc tracking for type {}.{}", context.getClassName(), name);
 
             mv = new MysqlJdbcDriverParseUrlAdviceAdapter(mv, access, name, desc);
             setTransformed();

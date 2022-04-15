@@ -30,4 +30,9 @@ release
 # for jenv
 .java-version
 
+dongtai-api.jar
+dongtai-core.jar
+dongtai-grpc.jar
+dongtai-spy.jar
+
 logs

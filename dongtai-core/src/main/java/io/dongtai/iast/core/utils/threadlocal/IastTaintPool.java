@@ -85,7 +85,7 @@ public class IastTaintPool extends ThreadLocal<HashSet<Object>> {
 
             }
         }catch (Exception e){
-            DongTaiLog.debug(e);
+            DongTaiLog.error(e);
         }
     }
 

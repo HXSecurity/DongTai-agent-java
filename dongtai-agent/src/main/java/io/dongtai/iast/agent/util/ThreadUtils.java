@@ -36,7 +36,8 @@ public class ThreadUtils {
             // 停顿时间间隔,用于收集cpu使用率变化
             try {
                 Thread.sleep(200);
-            } catch (InterruptedException ignored) {
+            } catch (InterruptedException e) {
+                DongTaiLog.error(e);
             }
             // 收集洞态线程最新的cpu时间
             for (ThreadInfoMetrics.ThreadInfo dongTaiThread : dongTaiThreadInfoList) {

@@ -48,7 +48,7 @@ public class Base64Decoder extends CharacterDecoder {
         byte var7 = -1;
         byte var8 = -1;
         if (var3 < 2) {
-            throw new IOException("BASE64Decoder: Not enough bytes for an atom.");
+            DongTaiLog.error("BASE64Decoder: Not enough bytes for an atom.");
         } else {
             int var4;
             do {

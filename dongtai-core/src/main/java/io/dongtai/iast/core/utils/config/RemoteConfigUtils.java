@@ -119,7 +119,7 @@ public class RemoteConfigUtils {
                     secondFallbackDuration = remoteConfigEntity.getSecondFallbackDuration();
                 }
                 existsRemoteConfigMeta = remoteResponse;
-                DongTaiLog.info("Sync remote config successful.");
+                DongTaiLog.debug("Sync remote config successful.");
             }
         } catch (Throwable t) {
             DongTaiLog.warn("Sync remote config failed, msg: {}, error: {}", t.getMessage(), t.getCause());

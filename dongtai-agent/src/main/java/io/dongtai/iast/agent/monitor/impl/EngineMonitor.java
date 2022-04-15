@@ -26,7 +26,7 @@ public class EngineMonitor implements IMonitor {
 
     @Override
     public String getName() {
-        return  Constant.THREAD_PREFIX + NAME;
+        return Constant.THREAD_PREFIX + NAME;
     }
 
 

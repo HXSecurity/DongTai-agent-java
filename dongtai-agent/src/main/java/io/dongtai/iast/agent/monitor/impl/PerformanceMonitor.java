@@ -125,23 +125,23 @@ public class PerformanceMonitor implements IMonitor {
      */
     @Override
     public void check() throws Exception {
-        // 收集性能指标数据
-        final List<PerformanceMetrics> performanceMetrics = collectPerformanceMetrics();
-        // 更新本地性能指标记录(用于定期上报)
-        updatePerformanceMetrics(performanceMetrics);
-        // 检查性能指标(用于熔断降级)
-        checkPerformanceMetrics(performanceMetrics);
-        int UsedRate = CPU_USAGE;
-        PerformanceMonitor.AGENT_THRESHOLD_VALUE = PerformanceMonitor.checkThresholdValue();
-        int preStatus = this.engineManager.getRunningStatus();
-        if (isStart(UsedRate, preStatus)) {
-            this.engineManager.start();
-            this.engineManager.setRunningStatus(0);
-            DongTaiLog.info("The current CPU usage is " + UsedRate + "%, lower than the threshold " + AGENT_THRESHOLD_VALUE + "%，and the detection engine is starting");
-        } else if (isStop(UsedRate, preStatus)) {
-            this.engineManager.stop();
-            this.engineManager.setRunningStatus(1);
-            DongTaiLog.info("The current CPU usage is " + UsedRate + "%, higher than the threshold " + AGENT_THRESHOLD_VALUE + "%，and the detection engine is stopping");
+        if (!EngineManager.isCoreStop()){
+            // 收集性能指标数据
+            final List<PerformanceMetrics> performanceMetrics = collectPerformanceMetrics();
+            // 更新本地性能指标记录(用于定期上报)
+            updatePerformanceMetrics(performanceMetrics);
+            // 检查性能指标(用于熔断降级)
+            checkPerformanceMetrics(performanceMetrics);
+            int UsedRate = CPU_USAGE;
+            PerformanceMonitor.AGENT_THRESHOLD_VALUE = PerformanceMonitor.checkThresholdValue();
+            int preStatus = this.engineManager.getRunningStatus();
+            if (isStart(UsedRate, preStatus)) {
+                this.engineManager.start();
+                DongTaiLog.info("The current CPU usage is " + UsedRate + "%, lower than the threshold " + AGENT_THRESHOLD_VALUE + "%，and the detection engine is starting");
+            } else if (isStop(UsedRate, preStatus)) {
+                this.engineManager.stop();
+                DongTaiLog.info("The current CPU usage is " + UsedRate + "%, higher than the threshold " + AGENT_THRESHOLD_VALUE + "%，and the detection engine is stopping");
+            }
         }
     }
 

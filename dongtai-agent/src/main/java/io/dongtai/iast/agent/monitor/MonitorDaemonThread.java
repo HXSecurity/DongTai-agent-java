@@ -32,7 +32,7 @@ public class MonitorDaemonThread implements Runnable {
         this.engineManager = engineManager;
         try {
             delayTime = Integer.parseInt(System.getProperty("iast.engine.delay.time", "0"));
-            DongTaiLog.info("engine delay time is " + delayTime + " s");
+            DongTaiLog.info("dongtai engine delay time is " + delayTime + " s");
             delayTime = delayTime * 1000;
         } catch (Exception e) {
             DongTaiLog.error("engine delay time must be int,eg: 10、20");
