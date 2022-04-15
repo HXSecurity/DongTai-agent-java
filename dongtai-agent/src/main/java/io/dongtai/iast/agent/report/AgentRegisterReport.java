@@ -242,14 +242,18 @@ public class AgentRegisterReport {
      * @param responseRaw
      */
     private void setAgentData(StringBuilder responseRaw) {
-        JSONObject responseObj = new JSONObject(responseRaw.toString());
-        Integer status = (Integer) responseObj.get("status");
-        if (status == 201) {
-            JSONObject data = (JSONObject) responseObj.get("data");
-            agentId = (Integer) data.get("id");
-            coreRegisterStart = (Integer) data.get("coreAutoStart");
-        }else {
-            DongTaiLog.error("Register msg: "+ responseRaw);
+        try {
+            JSONObject responseObj = new JSONObject(responseRaw.toString());
+            Integer status = (Integer) responseObj.get("status");
+            if (status == 201) {
+                JSONObject data = (JSONObject) responseObj.get("data");
+                agentId = (Integer) data.get("id");
+                coreRegisterStart = (Integer) data.get("coreAutoStart");
+            }else {
+                DongTaiLog.error("Register msg: "+ responseRaw);
+            }
+        }catch (Exception e){
+            DongTaiLog.error("DongTai server no response.");
         }
     }
 

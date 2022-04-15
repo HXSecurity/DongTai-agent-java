@@ -274,13 +274,6 @@ public class MethodEvent {
 
     public String obj2String(Object value) {
         StringBuilder sb = new StringBuilder();
-        try {
-            sb.append(value.toString());
-        } catch (Exception e) {
-            sb.append("CustomObjectValue");
-        }
-        return sb.toString().trim();
-/*        StringBuilder sb = new StringBuilder();
         if (null == value) {
             return "";
         }
@@ -304,9 +297,10 @@ public class MethodEvent {
                 sb.append(value.toString());
             }
         } catch (Exception e) {
+            sb.append("CustomObjectValue");
             DongTaiLog.error(e);
         }
-        return sb.toString().trim();*/
+        return sb.toString().trim();
     }
 
     @Override

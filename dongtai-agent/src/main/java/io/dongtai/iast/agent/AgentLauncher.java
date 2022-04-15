@@ -31,7 +31,13 @@ public class AgentLauncher {
          * fix bug: java.lang.ClassCastException: weblogic.net.http.SOAPHttpsURLConnection cannot be cast to javax.net.ssl.HttpsURLConnection
          */
         System.setProperty("UseSunHttpHandler", "true");
-        System.setProperty("java.io.tmpdir.dongtai", System.getProperty("java.io.tmpdir")+ File.separator +UUID.randomUUID().toString().replaceAll("-","")+"/");
+        if (System.getProperty("java.io.tmpdir.dongtai") == null){
+            String tmpdir = System.getProperty("java.io.tmpdir");
+            if(tmpdir == null){
+                tmpdir = File.separator+"tmp";
+            }
+            System.setProperty("java.io.tmpdir.dongtai", tmpdir+ File.separator +UUID.randomUUID().toString().replaceAll("-","")+"/");
+        }
     }
 
     /**
