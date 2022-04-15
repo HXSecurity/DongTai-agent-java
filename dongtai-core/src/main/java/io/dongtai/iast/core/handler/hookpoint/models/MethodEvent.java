@@ -298,7 +298,6 @@ public class MethodEvent {
             }
         } catch (Exception e) {
             sb.append("CustomObjectValue");
-            DongTaiLog.error(e);
         }
         return sb.toString().trim();
     }

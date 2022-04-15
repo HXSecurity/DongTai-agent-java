@@ -1,8 +1,6 @@
 package io.dongtai.log;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
@@ -102,7 +100,19 @@ public class DongTaiLog {
 
     public static void trace(Throwable t) {
         if (canLog(Level.FINEST)) {
-            t.printStackTrace(System.out);
+            String msg = t.getMessage();
+            if (enableColor) {
+                System.out.println(getTime() + TITTLE_COLOR_PREFIX + TRACE_COLOR_PREFIX + msg);
+            } else {
+                System.out.println(getTime() + TITTLE + TRACE_PREFIX + msg);
+            }
+            msg = getTime() + TITTLE + TRACE_PREFIX + msg;
+            if (enableWriteToFile) {
+                StringWriter stringWriter = new StringWriter();
+                t.printStackTrace(new PrintWriter(stringWriter));
+                msg = msg + stringWriter;
+                writeLogToFile(msg);
+            }
         }
     }
 
@@ -128,7 +138,19 @@ public class DongTaiLog {
 
     public static void debug(Throwable t) {
         if (canLog(Level.FINER)) {
-            t.printStackTrace(System.out);
+            String msg = t.getMessage();
+            if (enableColor) {
+                System.out.println(getTime() + TITTLE_COLOR_PREFIX + DEBUG_COLOR_PREFIX + msg);
+            } else {
+                System.out.println(getTime() + TITTLE + DEBUG_PREFIX + msg);
+            }
+            msg = getTime() + TITTLE + DEBUG_PREFIX + msg;
+            if (enableWriteToFile) {
+                StringWriter stringWriter = new StringWriter();
+                t.printStackTrace(new PrintWriter(stringWriter));
+                msg = msg + stringWriter;
+                writeLogToFile(msg);
+            }
         }
     }
 
@@ -154,7 +176,19 @@ public class DongTaiLog {
 
     public static void info(Throwable t) {
         if (canLog(Level.CONFIG)) {
-            t.printStackTrace(System.out);
+            String msg = t.getMessage();
+            if (enableColor) {
+                System.out.println(getTime() + TITTLE_COLOR_PREFIX + INFO_COLOR_PREFIX + msg);
+            } else {
+                System.out.println(getTime() + TITTLE + INFO_PREFIX + msg);
+            }
+            msg = getTime() + TITTLE + INFO_PREFIX + msg;
+            if (enableWriteToFile) {
+                StringWriter stringWriter = new StringWriter();
+                t.printStackTrace(new PrintWriter(stringWriter));
+                msg = msg + stringWriter;
+                writeLogToFile(msg);
+            }
         }
     }
 
@@ -180,7 +214,19 @@ public class DongTaiLog {
 
     public static void warn(Throwable t) {
         if (canLog(Level.WARNING)) {
-            t.printStackTrace(System.out);
+            String msg = t.getMessage();
+            if (enableColor) {
+                System.out.println(getTime() + TITTLE_COLOR_PREFIX + WARN_COLOR_PREFIX + msg);
+            } else {
+                System.out.println(getTime() + TITTLE + WARN_PREFIX + msg);
+            }
+            msg = getTime() + TITTLE + WARN_PREFIX + msg;
+            if (enableWriteToFile) {
+                StringWriter stringWriter = new StringWriter();
+                t.printStackTrace(new PrintWriter(stringWriter));
+                msg = msg + stringWriter;
+                writeLogToFile(msg);
+            }
         }
     }
 
@@ -206,7 +252,19 @@ public class DongTaiLog {
 
     public static void error(Throwable t) {
         if (canLog(Level.FINER)) {
-            t.printStackTrace(System.out);
+            String msg = t.getMessage();
+            if (enableColor) {
+                System.out.println(getTime() + TITTLE_COLOR_PREFIX + ERROR_COLOR_PREFIX + msg);
+            } else {
+                System.out.println(getTime() + TITTLE + ERROR_PREFIX + msg);
+            }
+            msg = getTime() + TITTLE + ERROR_PREFIX + msg;
+            if (enableWriteToFile) {
+                StringWriter stringWriter = new StringWriter();
+                t.printStackTrace(new PrintWriter(stringWriter));
+                msg = msg + stringWriter;
+                writeLogToFile(msg);
+            }
         }
     }
 
