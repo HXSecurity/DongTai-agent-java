@@ -18,9 +18,10 @@ public class ServletDispatcherAdapter extends AbstractClassVisitor {
     private final String SERVLET_REQUEST = " javax.servlet.ServletRequest".substring(1);
     private final String SERVLET_RESPONSE = " javax.servlet.ServletResponse".substring(1);
     private final String FILTER_CHAIN = " javax.servlet.FilterChain".substring(1);
-    private final String JAKARTA_SERVLET_REQUEST = " jakarta.servlet.http.HttpServletRequest".substring(1);
-    private final String JAKARTA_SERVLET_RESPONSE = " jakarta.servlet.http.HttpServletResponse".substring(1);
-
+    private final String JAKARTA_SERVLET_REQUEST_HTTP = " jakarta.servlet.http.HttpServletRequest".substring(1);
+    private final String JAKARTA_SERVLET_REQUEST = " jakarta.servlet.ServletRequest".substring(1);
+    private final String JAKARTA_SERVLET_RESPONSE_HTTP = " jakarta.servlet.http.HttpServletResponse".substring(1);
+    private final String JAKARTA_SERVLET_RESPONSE = " jakarta.servlet.ServletResponse".substring(1);
 
     private final boolean isFaces;
     private final boolean isJakarta;
@@ -75,9 +76,7 @@ public class ServletDispatcherAdapter extends AbstractClassVisitor {
     }
 
     private boolean isJakartaArgs(Type[] typeOfArgs) {
-        return typeOfArgs.length == 2 &&
-                JAKARTA_SERVLET_REQUEST.equals(typeOfArgs[0].getClassName()) &&
-                JAKARTA_SERVLET_RESPONSE.equals(typeOfArgs[1].getClassName());
+        return typeOfArgs.length == 2 && ((JAKARTA_SERVLET_REQUEST_HTTP.equals(typeOfArgs[0].getClassName()) && JAKARTA_SERVLET_RESPONSE_HTTP.equals(typeOfArgs[1].getClassName())) || (JAKARTA_SERVLET_REQUEST.equals(typeOfArgs[0].getClassName()) && JAKARTA_SERVLET_RESPONSE.equals(typeOfArgs[1].getClassName())));
     }
 
     private boolean isFacesArgs(Type[] typeOfArgs) {

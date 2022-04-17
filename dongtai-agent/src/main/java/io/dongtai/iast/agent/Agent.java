@@ -29,6 +29,9 @@ public class Agent {
         attachOptions.addOption(build("cluster_version", "cluster_version", "optional: Application Cluster Version"));
         attachOptions.addOption(build("dongtai_server", "dongtai_server", "optional: DongTai server url"));
         attachOptions.addOption(build("dongtai_token", "dongtai_token", "optional: DongTai server token"));
+        attachOptions.addOption(build("server_package", "server_package", "optional: DongTai core package download way."));
+        attachOptions.addOption(build("log_level", "log_level", "optional: DongTai agent log print level."));
+        attachOptions.addOption(build("log_path", "log_path", "optional: DongTai agent log print path."));
 
         CommandLineParser parser = new DefaultParser();
         HelpFormatter formatter = new HelpFormatter();
@@ -69,6 +72,15 @@ public class Agent {
             }
             if (result.hasOption("dongtai_token")) {
                 attachArgs.append("&dongtaiToken=").append(result.getOptionValue("dongtai_token"));
+            }
+            if (result.hasOption("server_package")) {
+                attachArgs.append("&serverPackage=").append(result.getOptionValue("server_package"));
+            }
+            if (result.hasOption("log_level")) {
+                attachArgs.append("&logLevel=").append(result.getOptionValue("log_level"));
+            }
+            if (result.hasOption("log_path")) {
+                attachArgs.append("&logPath=").append(result.getOptionValue("log_path"));
             }
             return new String[]{pid, attachArgs.toString()};
         } else {

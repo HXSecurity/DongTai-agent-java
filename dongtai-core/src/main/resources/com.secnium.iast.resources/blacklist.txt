@@ -40,7 +40,7 @@ com/github/benmanes/caffeine/*
 org/springframework/cloud/sleuth/*
 io/netty/handler/codec/*
 # fastjson
-com/alibaba/fastjson/*
+# com/alibaba/fastjson/*
 # old rule
 EDU/oswego/cs/dl/util/concurrent/BoundedChannel
 EDU/oswego/cs/dl/util/concurrent/BoundedLinkedQueue
@@ -33759,14 +33759,14 @@ org/apache/jasper/runtime/VariableMapperImpl
 org/apache/jasper/runtime/VariableResolverImpl
 org/apache/jasper/security/SecurityClassLoad
 org/apache/jasper/security/SecurityUtil
-org/apache/jasper/servlet/JasperInitializer
-org/apache/jasper/servlet/JasperLoader
-org/apache/jasper/servlet/JasperLoader$PrivilegedLoadClass
-org/apache/jasper/servlet/JspServlet
-org/apache/jasper/servlet/JspCServletContext
-org/apache/jasper/servlet/JspServletWrapper
-org/apache/jasper/servlet/TldScanner
-org/apache/jasper/servlet/TldScanner$TldScannerCallback
+# org/apache/jasper/servlet/JasperInitializer
+# org/apache/jasper/servlet/JasperLoader
+# org/apache/jasper/servlet/JasperLoader$PrivilegedLoadClass
+# org/apache/jasper/servlet/JspServlet
+# org/apache/jasper/servlet/JspCServletContext
+# org/apache/jasper/servlet/JspServletWrapper
+# org/apache/jasper/servlet/TldScanner
+# org/apache/jasper/servlet/TldScanner$TldScannerCallback
 org/apache/jasper/TrimSpacesOption
 org/apache/jasper/util/SimplePool
 org/apache/jasper/util/SystemLogHandler

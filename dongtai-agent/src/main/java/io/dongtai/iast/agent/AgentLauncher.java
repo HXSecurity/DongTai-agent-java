@@ -12,6 +12,7 @@ import java.lang.instrument.Instrumentation;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -55,6 +56,11 @@ public class AgentLauncher {
      * @param inst inst
      */
     public static void premain(String args, Instrumentation inst) {
+        try {
+            TimeUnit.SECONDS.sleep(5);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         if (System.getProperty("protect.by.dongtai", null) != null) {
             return;
         }
@@ -115,6 +121,15 @@ public class AgentLauncher {
                 }
                 if (argsMap.containsKey("dongtaiToken")) {
                     System.setProperty("dongtai.server.token", argsMap.get("dongtaiToken"));
+                }
+                if (argsMap.containsKey("serverPackage")) {
+                    System.setProperty("dongtai.server.package", argsMap.get("serverPackage"));
+                }
+                if (argsMap.containsKey("logLevel")) {
+                    System.setProperty("dongtai.log.level", argsMap.get("logLevel"));
+                }
+                if (argsMap.containsKey("logPath")) {
+                    System.setProperty("dongtai.log.path", argsMap.get("logPath"));
                 }
                 install(inst);
             } catch (Exception e) {
