@@ -56,11 +56,6 @@ public class AgentLauncher {
      * @param inst inst
      */
     public static void premain(String args, Instrumentation inst) {
-        try {
-            TimeUnit.SECONDS.sleep(5);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         if (System.getProperty("protect.by.dongtai", null) != null) {
             return;
         }
