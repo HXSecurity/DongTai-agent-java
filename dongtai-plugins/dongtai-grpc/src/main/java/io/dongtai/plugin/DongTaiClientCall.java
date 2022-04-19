@@ -1,8 +1,8 @@
 package io.dongtai.plugin;
 
-import io.grpc.ClientCall;
-import io.grpc.ForwardingClientCall;
-import io.grpc.Metadata;
+import io.grpc.*;
+
+import java.lang.dongtai.TraceIdHandler;
 
 public class DongTaiClientCall<REQUEST, RESPONSE> extends ForwardingClientCall.SimpleForwardingClientCall<REQUEST, RESPONSE> {
     String serviceName;
@@ -12,14 +12,14 @@ public class DongTaiClientCall<REQUEST, RESPONSE> extends ForwardingClientCall.S
     String traceKey;
     String traceId;
 
-    protected DongTaiClientCall(ClientCall<REQUEST, RESPONSE> delegate, String serviceName, String serviceType, String targetService, String traceKey, String traceId) {
+    protected DongTaiClientCall(ClientCall<REQUEST, RESPONSE> delegate, String serviceName, String serviceType, String targetService, TraceIdHandler traceIdHandler) {
         super(delegate);
         this.serviceName = serviceName;
         this.serviceType = serviceType;
         this.targetService = targetService;
         this.pluginName = "GRPC";
-        this.traceKey = traceKey;
-        this.traceId = traceId;
+        this.traceKey = traceIdHandler.getTraceKey();
+        this.traceId = traceIdHandler.getTraceId();
     }
 
     @Override

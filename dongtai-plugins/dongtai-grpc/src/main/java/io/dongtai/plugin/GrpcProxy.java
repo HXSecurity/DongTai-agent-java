@@ -1,20 +1,18 @@
 package io.dongtai.plugin;
 
-import io.grpc.Channel;
-import io.grpc.ClientInterceptors;
-import io.grpc.ServerInterceptors;
-import io.grpc.ServerServiceDefinition;
+import io.grpc.*;
 
+import java.lang.dongtai.TraceIdHandler;
 import java.util.HashMap;
 import java.util.Map;
 
 public class GrpcProxy {
     private static Map<String, Object> metadata;
 
-    public static Object interceptChannel(Object channel, String traceKey, String traceId) {
+    public static Object interceptChannel(Object channel, TraceIdHandler traceIdHandler) {
         try {
             Channel interceptedChannel = (Channel) channel;
-            return ClientInterceptors.intercept(interceptedChannel, new DongTaiClientInterceptor(traceKey, traceId));
+            return ClientInterceptors.intercept(interceptedChannel, new DongTaiClientInterceptor(traceIdHandler));
         } catch (Exception e) {
             // fixme: remove throw exception
             e.printStackTrace();
