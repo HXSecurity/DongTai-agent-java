@@ -13,6 +13,7 @@ import io.dongtai.iast.core.utils.base64.Base64Encoder;
 
 import java.util.*;
 
+import io.dongtai.log.DongTaiLog;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -39,34 +40,38 @@ public class GraphBuilder {
 
         MethodEvent event = null;
         for (Map.Entry<Integer, MethodEvent> entry : taintMethodPool.entrySet()) {
-            event = entry.getValue();
-            nodeList.add(
-                    new GraphNode(
-                            event.isSource(),
-                            event.getInvokeId(),
-                            event.getCallerClass(),
-                            event.getCallerMethod(),
-                            event.getCallerLine(),
-                            event.object != null ? IastClassDiagram
-                                    .getFamilyFromClass(event.object.getClass().getName().replace("\\.", "/")) : null,
-                            event.getMatchClassName(),
-                            event.getOriginClassName(),
-                            event.getMethodName(),
-                            event.getMethodDesc(),
-                            "",
-                            "",
-                            event.getSourceHashes(),
-                            event.getTargetHashes(),
-                            properties.isLocal() ? event.obj2String(event.inValue) : "",
-                            properties.isLocal() ? event.obj2String(event.outValue) : "",
-                            event.getSourceHashForRpc(),
-                            event.getTargetHashForRpc(),
-                            event.getTraceId(),
-                            event.getServiceName(),
-                            event.getPlugin(),
-                            event.getProjectPropagatorClose()
-                    )
-            );
+            try {
+                event = entry.getValue();
+                nodeList.add(
+                        new GraphNode(
+                                event.isSource(),
+                                event.getInvokeId(),
+                                event.getCallerClass(),
+                                event.getCallerMethod(),
+                                event.getCallerLine(),
+                                event.object != null ? IastClassDiagram
+                                        .getFamilyFromClass(event.object.getClass().getName().replace("\\.", "/")) : null,
+                                event.getMatchClassName(),
+                                event.getOriginClassName(),
+                                event.getMethodName(),
+                                event.getMethodDesc(),
+                                "",
+                                "",
+                                event.getSourceHashes(),
+                                event.getTargetHashes(),
+                                properties.isLocal() ? event.obj2String(event.inValue) : "",
+                                properties.isLocal() ? event.obj2String(event.outValue) : "",
+                                event.getSourceHashForRpc(),
+                                event.getTargetHashForRpc(),
+                                event.getTraceId(),
+                                event.getServiceName(),
+                                event.getPlugin(),
+                                event.getProjectPropagatorClose()
+                        )
+                );
+            }catch (Exception e){
+                DongTaiLog.debug(e);
+            }
         }
         return nodeList;
     }
