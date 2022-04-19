@@ -2,13 +2,13 @@ package io.dongtai.plugin;
 
 import io.grpc.*;
 
-public class DongTaiClientInterceptor implements ClientInterceptor {
-    private String traceId;
-    private String traceKey;
+import java.lang.dongtai.TraceIdHandler;
 
-    public DongTaiClientInterceptor(String traceKey, String traceId) {
-        this.traceId = traceId;
-        this.traceKey = traceKey;
+public class DongTaiClientInterceptor implements ClientInterceptor {
+    private TraceIdHandler traceIdHandler;
+
+    public DongTaiClientInterceptor(TraceIdHandler traceIdHandler) {
+        this.traceIdHandler = traceIdHandler;
     }
 
     @Override
@@ -16,6 +16,6 @@ public class DongTaiClientInterceptor implements ClientInterceptor {
         String methodName = method.getFullMethodName();
         String methodType = method.getType().toString();
         String target = channel.toString();
-        return new DongTaiClientCall<ReqT, RespT>(channel.newCall(method, callOptions), methodName, methodType, target, traceKey, traceId);
+        return new DongTaiClientCall<ReqT, RespT>(channel.newCall(method, callOptions), methodName, methodType, target, traceIdHandler);
     }
 }

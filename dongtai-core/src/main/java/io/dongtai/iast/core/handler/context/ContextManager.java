@@ -1,5 +1,7 @@
 package io.dongtai.iast.core.handler.context;
 
+import io.dongtai.iast.core.EngineManager;
+
 /**
  * @author owefsad
  */
@@ -30,7 +32,10 @@ public class ContextManager {
 
     public static String getSegmentId() {
         TracingContext context = CONTEXT.get();
-        return context.createSegmentId();
+        if (context != null) {
+            return context.createSegmentId();
+        }
+        return getOrCreateGlobalTraceId(null, EngineManager.getAgentId());
     }
 
     public static String getHeaderKey() {

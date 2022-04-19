@@ -38,6 +38,8 @@ public class DispatchGrpc implements DispatchPlugin {
             case classOfByteString:
                 classVisitor = new ByteStringAdapter(classVisitor, null);
                 break;
+            default:
+                break;
         }
         return classVisitor;
     }
