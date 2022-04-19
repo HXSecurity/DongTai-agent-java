@@ -4643,9 +4643,9 @@ com/fasterxml/jackson/databind/MappingIterator
 com/fasterxml/jackson/databind/MappingJsonFactory
 com/fasterxml/jackson/databind/Module
 com/fasterxml/jackson/databind/Module$SetupContext
-com/fasterxml/jackson/databind/ObjectMapper
-com/fasterxml/jackson/databind/ObjectMapper$1
-com/fasterxml/jackson/databind/ObjectMapper$DefaultTyping
+# com/fasterxml/jackson/databind/ObjectMapper
+# com/fasterxml/jackson/databind/ObjectMapper$1
+# com/fasterxml/jackson/databind/ObjectMapper$DefaultTyping
 com/fasterxml/jackson/databind/ObjectReader
 com/fasterxml/jackson/databind/ObjectWriter
 com/fasterxml/jackson/databind/ObjectWriter$GeneratorSettings
