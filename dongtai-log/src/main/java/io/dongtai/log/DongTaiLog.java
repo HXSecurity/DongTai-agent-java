@@ -85,6 +85,7 @@ public class DongTaiLog {
                 System.out.println(getTime() + TITTLE + TRACE_PREFIX + msg);
             }
             msg = getTime() + TITTLE + TRACE_PREFIX + msg;
+            writeLogToFile(msg);
         }
     }
 
