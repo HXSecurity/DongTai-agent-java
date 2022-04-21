@@ -149,14 +149,14 @@ public class AgentLauncher {
      * @param inst inst
      */
     private static void install(final Instrumentation inst) {
-        IastProperties iastProperties = IastProperties.getInstance();
+        IastProperties.getInstance();
         Boolean send = AgentRegisterReport.send();
         if (send) {
             DongTaiLog.info("Agent registered successfully.");
             Boolean agentStat = AgentRegisterReport.agentStat();
             if (!agentStat) {
                 EngineMonitor.isCoreRegisterStart = false;
-                DongTaiLog.info("Agent wait for confirm.");
+                DongTaiLog.info("Detection engine not started, agent waiting to be audited.");
             } else {
                 EngineMonitor.isCoreRegisterStart = true;
             }
