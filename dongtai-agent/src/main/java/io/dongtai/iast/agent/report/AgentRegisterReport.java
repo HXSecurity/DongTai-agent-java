@@ -12,6 +12,7 @@ import io.dongtai.log.DongTaiLog;
 import java.net.*;
 import java.util.Enumeration;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
@@ -174,9 +175,8 @@ public class AgentRegisterReport {
      */
     private String readIpInfo() {
         try {
-            StringBuilder sb = new StringBuilder();
-            boolean first = true;
             Enumeration<?> interfaces = NetworkInterface.getNetworkInterfaces();
+            JSONArray network = new JSONArray();
             while (interfaces.hasMoreElements()) {
                 NetworkInterface networkInterface = (NetworkInterface) interfaces.nextElement();
                 if (networkInterface.isLoopback() || !networkInterface.isUp()) {
@@ -188,21 +188,20 @@ public class AgentRegisterReport {
                     if (inetAddress instanceof Inet6Address) {
                         continue;
                     }
-                    if (first) {
-                        sb.append("{\"name\"").append(":").append("\"").append(networkInterface.getDisplayName())
-                                .append("\"");
-                        sb.append(",\"ip\"").append(":").append("\"").append(inetAddress.getHostAddress())
-                                .append("\"}");
-                        first = false;
-                    } else {
-                        sb.append(",{\"name\"").append(":").append("\"").append(networkInterface.getDisplayName())
-                                .append("\"");
-                        sb.append(",\"ip\"").append(":").append("\"").append(inetAddress.getHostAddress())
-                                .append("\"}");
+                    JSONObject jsonObject = new JSONObject();
+                    String displayName = networkInterface.getDisplayName();
+                    String hostAddress = inetAddress.getHostAddress();
+                    jsonObject.put("name",displayName);
+                    jsonObject.put("ip",hostAddress);
+                    if (displayName.startsWith("en")){
+                        jsonObject.put("isAddress","1");
+                    }else {
+                        jsonObject.put("isAddress","0");
                     }
+                    network.put(jsonObject);
                 }
             }
-            return sb.toString();
+            return network.toString();
         } catch (SocketException e) {
             return "{}";
         }
