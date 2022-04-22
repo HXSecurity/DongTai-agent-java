@@ -35,7 +35,9 @@ public class AgentQueueReport implements Runnable {
     public void run() {
         try {
             StringBuilder replayRequestRaw = HttpClientUtils.sendPost(Constants.API_REPORT_UPLOAD, generateHeartBeatMsg());
-            ThreadPools.submitReplayTask(replayRequestRaw);
+            if (EngineManager.isEngineRunning()){
+                ThreadPools.submitReplayTask(replayRequestRaw);
+            }
         } catch (Exception e) {
             DongTaiLog.debug("send API Queue to {} error, reason: {}", Constants.API_REPORT_UPLOAD, e);
         }

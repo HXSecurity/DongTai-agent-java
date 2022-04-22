@@ -33,7 +33,7 @@ public class BaseType extends AbstractClassVisitor {
             String framework = "refType";
             mv = new PropagateAdviceAdapter(mv, access, name, desc, context, framework, iastMethodSignature);
             setTransformed();
-            DongTaiLog.debug("rewrite method {} for listener[match={},class={}]", iastMethodSignature, context.getMatchClassName(), context.getClassName());
+            DongTaiLog.trace("rewrite method {} for listener[match={},class={}]", iastMethodSignature, context.getMatchClassName(), context.getClassName());
         }
         return mv;
     }

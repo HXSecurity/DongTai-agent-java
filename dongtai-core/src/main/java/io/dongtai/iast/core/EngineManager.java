@@ -54,6 +54,8 @@ public class EngineManager {
     private static final AtomicInteger reqCounts = new AtomicInteger(0);
     private static int enableDongTai = 0;
 
+    public static BooleanThreadLocal ENTER_REPLAY_ENTRYPOINT = new BooleanThreadLocal(false);
+
     public static void turnOnDongTai() {
         DONGTAI_STATE.set(true);
     }
@@ -130,6 +132,7 @@ public class EngineManager {
         EngineManager.TAINT_POOL.remove();
         EngineManager.TAINT_HASH_CODES.remove();
         EngineManager.SCOPE_TRACKER.remove();
+//        EngineManager.ENTER_REPLAY_ENTRYPOINT.remove();
         FallbackSwitch.clearHeavyHookFallback();
         EngineManager.getFallbackManager().getHookRateLimiter().remove();
     }
@@ -223,12 +226,26 @@ public class EngineManager {
         ServiceFactory.startService();
         if (null == SERVER) {
             // todo: read server addr and send to OpenAPI Service
+            String url = null;
+            String protocol = null;
+            if (null != requestMeta.get("serverName")){
+                url = (String) requestMeta.get("serverName");
+            }else {
+                url = "";
+            }
+            if(null != requestMeta.get("protocol")){
+                protocol = (String) requestMeta.get("protocol");
+            }else {
+                protocol = "";
+            }
+
             SERVER = new IastServer(
-                    (String) requestMeta.get("serverName"),
+                    url,
                     (Integer) requestMeta.get("serverPort"),
+                    protocol,
                     true
             );
-            ServerAddressReport serverAddressReport = new ServerAddressReport(EngineManager.SERVER.getServerAddr(),EngineManager.SERVER.getServerPort());
+            ServerAddressReport serverAddressReport = new ServerAddressReport(EngineManager.SERVER.getServerAddr(),EngineManager.SERVER.getServerPort(),EngineManager.SERVER.getProtocol());
             serverAddressReport.run();
         }
         Map<String, String> headers = (Map<String, String>) requestMeta.get("headers");
@@ -278,9 +295,9 @@ public class EngineManager {
             }
             if (null == SERVER) {
                 // todo: read server addr and send to OpenAPI Service
-                SERVER = new IastServer(requestHeaders.get("dubbo"), 0, true);
+                SERVER = new IastServer(requestHeaders.get("dubbo"), 0, "TCP",true);
                 String serverAddr = EngineManager.SERVER.getServerAddr();
-                ServerAddressReport serverAddressReport = new ServerAddressReport(serverAddr,0);
+                ServerAddressReport serverAddressReport = new ServerAddressReport(serverAddr,0, SERVER.getProtocol());
                 serverAddressReport.run();
             }
             Map<String, Object> requestMeta = new HashMap<String, Object>(12);

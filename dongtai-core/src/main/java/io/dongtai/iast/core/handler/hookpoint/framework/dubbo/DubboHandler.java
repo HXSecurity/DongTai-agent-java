@@ -50,7 +50,7 @@ public class DubboHandler {
             }
             if (null == EngineManager.SERVER) {
                 // todo: read server addr and send to OpenAPI Service
-                EngineManager.SERVER = new IastServer(requestHeaders.get("dubbo"), 0, true);
+                EngineManager.SERVER = new IastServer(requestHeaders.get("dubbo"), 0, "TCP",true);
             }
             Map<String, Object> requestMeta = new HashMap<String, Object>(12);
             requestMeta.put("protocol", "dubbo/" + requestHeaders.get("dubbo"));
@@ -192,7 +192,6 @@ public class DubboHandler {
     }
 
     public static void solveClientExit(Object invocation, Object rpcResult) {
-        System.out.println("");
         if (EngineManager.TAINT_POOL.get().isEmpty()) {
             return;
         }

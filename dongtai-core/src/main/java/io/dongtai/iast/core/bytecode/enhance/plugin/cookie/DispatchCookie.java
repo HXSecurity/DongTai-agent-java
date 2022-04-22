@@ -26,7 +26,7 @@ public class DispatchCookie implements DispatchPlugin {
         classname = context.getClassName();
         String matchClassname = isMatch();
         if (null != matchClassname) {
-            DongTaiLog.debug("Cookie match class for {} from {}", classname, matchClassname);
+            DongTaiLog.trace("Cookie match class for {} from {}", classname, matchClassname);
             context.setMatchClassName(matchClassname);
             classVisitor = new CookieAdapter(classVisitor, context);
         }

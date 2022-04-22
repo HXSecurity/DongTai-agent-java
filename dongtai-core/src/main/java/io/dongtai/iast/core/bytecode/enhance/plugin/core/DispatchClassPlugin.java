@@ -44,7 +44,7 @@ public class DispatchClassPlugin implements DispatchPlugin {
         String matchClassName = isMatch();
 
         if (null != matchClassName) {
-            DongTaiLog.debug("class {} hit rule {}, class diagrams: {}", className, matchClassName,
+            DongTaiLog.trace("class {} hit rule {}, class diagrams: {}", className, matchClassName,
                     Arrays.toString(ancestors.toArray()));
             context.setMatchClassName(matchClassName);
             modifiedClassVisitor = new ClassVisit(classVisitor, context);
@@ -98,7 +98,7 @@ public class DispatchClassPlugin implements DispatchPlugin {
                 }
 
                 if (isTransformed() && null != framework) {
-                    DongTaiLog.debug("rewrite method {} for listener[framework={},class={}]", iastMethodSignature,
+                    DongTaiLog.trace("rewrite method {} for listener[framework={},class={}]", iastMethodSignature,
                             framework, context.getClassName());
                 }
             }
