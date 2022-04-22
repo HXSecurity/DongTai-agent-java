@@ -46,7 +46,7 @@ public class ServletDispatcherAdapter extends AbstractClassVisitor {
             setTransformed();
         }
         if (isTransformed()) {
-            DongTaiLog.debug("rewrite method {}.{} for listener[match={}]", context.getClassName(), name, context.getMatchClassName());
+            DongTaiLog.trace("rewrite method {}.{} for listener[match={}]", context.getClassName(), name, context.getMatchClassName());
         }
 
         return mv;

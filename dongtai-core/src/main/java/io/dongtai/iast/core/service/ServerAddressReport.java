@@ -18,9 +18,11 @@ public class ServerAddressReport implements Runnable {
 
     private String serverAddr;
     private Integer serverPort;
-    public ServerAddressReport(String serverAddr,Integer serverPort) {
+    private String protocol;
+    public ServerAddressReport(String serverAddr,Integer serverPort,String protocol) {
         this.serverAddr = serverAddr;
         this.serverPort = serverPort;
+        this.protocol = protocol;
     }
 
     public String getServereAddressMsg() {
@@ -28,6 +30,7 @@ public class ServerAddressReport implements Runnable {
         report.put(ReportConstant.AGENT_ID, EngineManager.getAgentId());
         report.put(ReportConstant.SERVER_ADDR, this.serverAddr);
         report.put(ReportConstant.SERVER_PORT, this.serverPort);
+        report.put(ReportConstant.SERVER_PROTOCOL, this.protocol);
         return report.toString();
     }
 

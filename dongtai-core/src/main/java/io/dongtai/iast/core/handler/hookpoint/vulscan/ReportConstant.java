@@ -44,6 +44,7 @@ public class ReportConstant {
     public static final String SERVER_PATH = "serverPath";
     public static final String SERVER_ADDR = "serverAddr";
     public static final String SERVER_PORT = "serverPort";
+    public static final String SERVER_PROTOCOL = "protocol";
 
     public static final String SCA_PACKAGE_PATH = "packagePath";
     public static final String SCA_PACKAGE_NAME = "packageName";

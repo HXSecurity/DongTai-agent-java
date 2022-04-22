@@ -50,7 +50,7 @@ public class DubboHandler {
             }
             if (null == EngineManager.SERVER) {
                 // todo: read server addr and send to OpenAPI Service
-                EngineManager.SERVER = new IastServer(requestHeaders.get("dubbo"), 0, true);
+                EngineManager.SERVER = new IastServer(requestHeaders.get("dubbo"), 0, "TCP",true);
             }
             Map<String, Object> requestMeta = new HashMap<String, Object>(12);
             requestMeta.put("protocol", "dubbo/" + requestHeaders.get("dubbo"));
@@ -192,7 +192,6 @@ public class DubboHandler {
     }
 
     public static void solveClientExit(Object invocation, Object rpcResult) {
-        System.out.println("");
         if (EngineManager.TAINT_POOL.get().isEmpty()) {
             return;
         }
@@ -259,36 +258,41 @@ public class DubboHandler {
     }
 
     public static void solveServiceExit(Object invocation, Object rpcResult) {
-        if (!EngineManager.TAINT_POOL.get().isEmpty()) {
-            MethodEvent event = new MethodEvent(
-                    0,
-                    0,
-                    "*.dubbo.monitor.support.MonitorFilter",
-                    "*.dubbo.monitor.support.MonitorFilter",
-                    "invoke",
-                    "com.alibaba.dubbo.monitor.support.MonitorFilter#invoke",
-                    "com.alibaba.dubbo.monitor.support.MonitorFilter#invoke",
-                    null,
-                    new Object[]{rpcResult},
-                    null,
-                    "DUBBO",
-                    false,
-                    null
-            );
-            Set<Object> modelItems = SourceImpl.parseCustomModel(rpcResult);
-            boolean isHitTaints = false;
-            for (Object item : modelItems) {
-                isHitTaints = isHitTaints || TaintPoolUtils.poolContains(item, event, false);
+        try {
+            if (null != EngineManager.TAINT_POOL.get() && !EngineManager.TAINT_POOL.get().isEmpty()) {
+                MethodEvent event = new MethodEvent(
+                        0,
+                        0,
+                        "*.dubbo.monitor.support.MonitorFilter",
+                        "*.dubbo.monitor.support.MonitorFilter",
+                        "invoke",
+                        "com.alibaba.dubbo.monitor.support.MonitorFilter#invoke",
+                        "com.alibaba.dubbo.monitor.support.MonitorFilter#invoke",
+                        null,
+                        new Object[]{rpcResult},
+                        null,
+                        "DUBBO",
+                        false,
+                        null
+                );
+                Set<Object> modelItems = SourceImpl.parseCustomModel(rpcResult);
+                boolean isHitTaints = false;
+                for (Object item : modelItems) {
+                    isHitTaints = isHitTaints || TaintPoolUtils.poolContains(item, event, false);
+                }
+                if (isHitTaints) {
+                    int invokeId = SpyDispatcherImpl.INVOKE_ID_SEQUENCER.getAndIncrement();
+                    event.setInvokeId(invokeId);
+                    event.setPlugin("DUBBO");
+                    event.setServiceName("");
+                    event.setProjectPropagatorClose(true);
+                    event.setCallStack(StackUtils.getLatestStack(5));
+                    EngineManager.TRACK_MAP.addTrackMethod(invokeId, event);
+                }
             }
-            if (isHitTaints) {
-                int invokeId = SpyDispatcherImpl.INVOKE_ID_SEQUENCER.getAndIncrement();
-                event.setInvokeId(invokeId);
-                event.setPlugin("DUBBO");
-                event.setServiceName("");
-                event.setProjectPropagatorClose(true);
-                event.setCallStack(StackUtils.getLatestStack(5));
-                EngineManager.TRACK_MAP.addTrackMethod(invokeId, event);
-            }
+        }catch (Exception e){
+            DongTaiLog.debug(e);
         }
+
     }
 }

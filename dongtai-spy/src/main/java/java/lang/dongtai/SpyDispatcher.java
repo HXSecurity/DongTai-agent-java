@@ -160,6 +160,8 @@ public interface SpyDispatcher {
 
     void reportService(String category, String type, String host, String port, String handler);
 
+    boolean isReplayRequest();
+
     /**
      * mark for enter Source Entry Point
      *

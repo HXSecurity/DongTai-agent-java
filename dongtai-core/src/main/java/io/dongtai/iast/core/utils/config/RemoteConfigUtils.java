@@ -4,6 +4,7 @@ import com.google.gson.reflect.TypeToken;
 import io.dongtai.iast.common.entity.performance.PerformanceMetrics;
 import io.dongtai.iast.common.entity.response.PlainResult;
 import io.dongtai.iast.common.enums.MetricsKey;
+import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.FallbackSwitch;
 import io.dongtai.iast.core.utils.Constants;
 import io.dongtai.iast.core.utils.HttpClientUtils;
 import io.dongtai.iast.core.utils.PropertyUtils;
@@ -149,6 +150,10 @@ public class RemoteConfigUtils {
         try {
             // 默认响应标识调用失败
             if (REMOTE_CONFIG_DEFAULT_META.equals(remoteResponse)) {
+                return null;
+            }
+            if (REMOTE_CONFIG_DEFAULT_META.equals(new JSONObject(remoteResponse).get("data"))){
+                FallbackSwitch.setPerformanceFallback(false);
                 return null;
             }
             PlainResult<RemoteConfigEntity> result = GsonUtils.toObject(remoteResponse, new TypeToken<PlainResult<RemoteConfigEntity>>() {
