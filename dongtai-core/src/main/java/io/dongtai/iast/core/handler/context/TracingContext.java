@@ -23,7 +23,7 @@ public class TracingContext {
 
     @Setter
     @Getter
-    private int spanId;
+    private long spanId;
 
     @Setter
     @Getter
@@ -33,7 +33,7 @@ public class TracingContext {
     @Getter
     private int currentAgent;
 
-    private int getNextSpanId() {
+    private long getNextSpanId() {
         return this.spanId + 1;
     }
 
@@ -57,8 +57,8 @@ public class TracingContext {
         this.setApplicationId(traceItem[0]);
         this.setParentAgent(Integer.parseInt(traceItem[1]));
         int currentLevel = Integer.parseInt(traceItem[3]);
-        this.setLevel(currentLevel+1);
-        this.setSpanId(Integer.parseInt(traceItem[4]));
+        this.setLevel(currentLevel + 1);
+        this.setSpanId(Long.parseLong(traceItem[4]));
         this.setCurrentAgent(agentId);
     }
 
