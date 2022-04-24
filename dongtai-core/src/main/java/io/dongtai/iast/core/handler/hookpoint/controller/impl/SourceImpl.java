@@ -5,7 +5,6 @@ import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.utils.StackUtils;
 import io.dongtai.log.DongTaiLog;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -72,7 +71,10 @@ public class SourceImpl {
                 className.startsWith("io.dongtai.api.") ||
                 className.startsWith(" org.apache.shiro.web.servlet".substring(1)) ||
                 VALUES_ENUMERATOR.equals(className) ||
-                className.startsWith(SPRING_OBJECT)
+                className.startsWith(SPRING_OBJECT) ||
+                className.endsWith("RequestWrapper") ||
+                className.endsWith("ResponseWrapper")
+
         ) {
             return modelValues;
         }
