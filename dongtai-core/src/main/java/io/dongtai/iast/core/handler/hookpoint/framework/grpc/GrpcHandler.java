@@ -12,7 +12,6 @@ import io.dongtai.iast.core.utils.*;
 import io.dongtai.log.DongTaiLog;
 
 import java.io.File;
-import java.lang.dongtai.TraceIdHandler;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -52,7 +51,7 @@ public class GrpcHandler {
 
             Class<?> classOfGrpcProxy = gRpcClassLoader.loadClass("io.dongtai.plugin.GrpcProxy");
             methodOfInterceptChannel = classOfGrpcProxy
-                    .getDeclaredMethod("interceptChannel", Object.class, TraceIdHandler.class);
+                    .getDeclaredMethod("interceptChannel", Object.class, Object.class);
             methodOfInterceptService = classOfGrpcProxy
                     .getDeclaredMethod("interceptService", Object.class);
             methodOfGetRequestMetadata = classOfGrpcProxy.getDeclaredMethod("getServerMeta");
@@ -111,13 +110,15 @@ public class GrpcHandler {
         try {
             Map<String, Object> metadata = (Map<String, Object>) methodOfGetRequestMetadata.invoke(null);
             if (metadata.containsKey("dt-traceid")) {
-                ContextManager.getOrCreateGlobalTraceId((String) metadata.get("dt-traceid"), EngineManager.getAgentId());
+                ContextManager.getOrCreateGlobalTraceId(String.valueOf(metadata.get("dt-traceid")), EngineManager.getAgentId());
             } else {
                 String newTraceId = ContextManager.getOrCreateGlobalTraceId(null, EngineManager.getAgentId());
                 metadata.put("dt-traceid", newTraceId);
             }
             Map<String, Object> requestMeta = new HashMap<String, Object>();
+            requestMeta.put("method", "RPC");
             requestMeta.put("protocol", "ProtoBuf");
+            requestMeta.put("scheme", "grpc");
             requestMeta.put("requestURL", metadata.get("serverAddr") + "/" + metadata.get("requestURI"));
             requestMeta.put("requestURI", metadata.get("requestURI"));
             requestMeta.put("headers", metadata);
