@@ -35,7 +35,7 @@ public class ShiroAdapter extends AbstractClassVisitor {
         methodVisitor.visitLineNumber(169, label0);
         methodVisitor.visitVarInsn(ALOAD, 0);
         methodVisitor.visitVarInsn(ALOAD, 1);
-        methodVisitor.visitMethodInsn(INVOKEVIRTUAL, "org/apache/shiro/session/mgt/eis/AbstractSessionDAO", "doReadSession", "(Ljava/io/Serializable;)Lorg/apache/shiro/session/Session;", false);
+        methodVisitor.visitMethodInsn(INVOKEVIRTUAL, " org/apache/shiro/session/mgt/eis/AbstractSessionDAO".substring(1), "doReadSession", "(Ljava/io/Serializable;)Lorg/apache/shiro/session/Session;", false);
         methodVisitor.visitVarInsn(ASTORE, 2);
         Label label1 = new Label();
         methodVisitor.visitLabel(label1);
@@ -46,9 +46,7 @@ public class ShiroAdapter extends AbstractClassVisitor {
         Label label3 = new Label();
         methodVisitor.visitLabel(label3);
         methodVisitor.visitLineNumber(171, label3);
-        methodVisitor.visitFieldInsn(GETSTATIC, "io/dongtai/iast/core/EngineManager", "ENTER_REPLAY_ENTRYPOINT", "Lio/dongtai/iast/core/utils/threadlocal/BooleanThreadLocal;");
-        methodVisitor.visitMethodInsn(INVOKEVIRTUAL, "io/dongtai/iast/core/utils/threadlocal/BooleanThreadLocal", "get", "()Ljava/lang/Object;", false);
-        methodVisitor.visitTypeInsn(CHECKCAST, "java/lang/Boolean");
+        methodVisitor.visitFieldInsn(GETSTATIC, "io/dongtai/iast/core/EngineManager", "ENTER_REPLAY_ENTRYPOINT", "Ljava/lang/Boolean;");
         methodVisitor.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Boolean", "booleanValue", "()Z", false);
         Label label4 = new Label();
         methodVisitor.visitJumpInsn(IFEQ, label4);
@@ -57,13 +55,13 @@ public class ShiroAdapter extends AbstractClassVisitor {
         methodVisitor.visitLineNumber(172, label5);
         methodVisitor.visitVarInsn(ALOAD, 0);
         methodVisitor.visitVarInsn(ALOAD, 0);
-        methodVisitor.visitMethodInsn(INVOKEVIRTUAL, "org/apache/shiro/session/mgt/eis/AbstractSessionDAO", "getActiveSessions", "()Ljava/util/Collection;", false);
+        methodVisitor.visitMethodInsn(INVOKEVIRTUAL, " org/apache/shiro/session/mgt/eis/AbstractSessionDAO".substring(1), "getActiveSessions", "()Ljava/util/Collection;", false);
         methodVisitor.visitMethodInsn(INVOKEINTERFACE, "java/util/Collection", "stream", "()Ljava/util/stream/Stream;", true);
         methodVisitor.visitMethodInsn(INVOKEINTERFACE, "java/util/stream/Stream", "findFirst", "()Ljava/util/Optional;", true);
         methodVisitor.visitMethodInsn(INVOKEVIRTUAL, "java/util/Optional", "get", "()Ljava/lang/Object;", false);
-        methodVisitor.visitTypeInsn(CHECKCAST, "org/apache/shiro/session/Session");
-        methodVisitor.visitMethodInsn(INVOKEINTERFACE, "org/apache/shiro/session/Session", "getId", "()Ljava/io/Serializable;", true);
-        methodVisitor.visitMethodInsn(INVOKEVIRTUAL, "org/apache/shiro/session/mgt/eis/AbstractSessionDAO", "doReadSession", "(Ljava/io/Serializable;)Lorg/apache/shiro/session/Session;", false);
+        methodVisitor.visitTypeInsn(CHECKCAST, " org/apache/shiro/session/Session".substring(1));
+        methodVisitor.visitMethodInsn(INVOKEINTERFACE, " org/apache/shiro/session/Session".substring(1), "getId", "()Ljava/io/Serializable;", true);
+        methodVisitor.visitMethodInsn(INVOKEVIRTUAL, " org/apache/shiro/session/mgt/eis/AbstractSessionDAO".substring(1), "doReadSession", "(Ljava/io/Serializable;)Lorg/apache/shiro/session/Session;", false);
         methodVisitor.visitVarInsn(ASTORE, 2);
         Label label6 = new Label();
         methodVisitor.visitLabel(label6);
@@ -72,8 +70,8 @@ public class ShiroAdapter extends AbstractClassVisitor {
         methodVisitor.visitInsn(ARETURN);
         methodVisitor.visitLabel(label4);
         methodVisitor.visitLineNumber(175, label4);
-        methodVisitor.visitFrame(Opcodes.F_APPEND, 1, new Object[]{"org/apache/shiro/session/Session"}, 0, null);
-        methodVisitor.visitTypeInsn(NEW, "org/apache/shiro/session/UnknownSessionException");
+        methodVisitor.visitFrame(Opcodes.F_APPEND, 1, new Object[]{" org/apache/shiro/session/Session".substring(1)}, 0, null);
+        methodVisitor.visitTypeInsn(NEW, " org/apache/shiro/session/UnknownSessionException".substring(1));
         methodVisitor.visitInsn(DUP);
         methodVisitor.visitTypeInsn(NEW, "java/lang/StringBuilder");
         methodVisitor.visitInsn(DUP);
@@ -85,7 +83,7 @@ public class ShiroAdapter extends AbstractClassVisitor {
         methodVisitor.visitLdcInsn("]");
         methodVisitor.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;", false);
         methodVisitor.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;", false);
-        methodVisitor.visitMethodInsn(INVOKESPECIAL, "org/apache/shiro/session/UnknownSessionException", "<init>", "(Ljava/lang/String;)V", false);
+        methodVisitor.visitMethodInsn(INVOKESPECIAL, " org/apache/shiro/session/UnknownSessionException".substring(1), "<init>", "(Ljava/lang/String;)V", false);
         methodVisitor.visitInsn(ATHROW);
         methodVisitor.visitLabel(label2);
         methodVisitor.visitLineNumber(177, label2);

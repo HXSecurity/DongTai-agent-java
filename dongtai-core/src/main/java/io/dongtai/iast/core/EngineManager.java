@@ -12,13 +12,11 @@ import io.dongtai.iast.core.utils.threadlocal.*;
 import io.dongtai.iast.core.service.ServiceFactory;
 import io.dongtai.iast.core.utils.PropertyUtils;
 import io.dongtai.log.DongTaiLog;
-import io.dongtai.iast.core.utils.threadlocal.*;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.*;
 
 /**
  * 存储全局信息
@@ -54,7 +52,7 @@ public class EngineManager {
     private static final AtomicInteger reqCounts = new AtomicInteger(0);
     private static int enableDongTai = 0;
 
-    public static BooleanThreadLocal ENTER_REPLAY_ENTRYPOINT = new BooleanThreadLocal(false);
+    public static Boolean ENTER_REPLAY_ENTRYPOINT = false;
 
     public static void turnOnDongTai() {
         DONGTAI_STATE.set(true);
@@ -132,7 +130,6 @@ public class EngineManager {
         EngineManager.TAINT_POOL.remove();
         EngineManager.TAINT_HASH_CODES.remove();
         EngineManager.SCOPE_TRACKER.remove();
-//        EngineManager.ENTER_REPLAY_ENTRYPOINT.remove();
         FallbackSwitch.clearHeavyHookFallback();
         EngineManager.getFallbackManager().getHookRateLimiter().remove();
     }

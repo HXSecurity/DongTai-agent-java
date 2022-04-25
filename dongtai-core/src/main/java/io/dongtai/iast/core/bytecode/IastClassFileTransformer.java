@@ -211,7 +211,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
         if (javaClassName.lastIndexOf('.') == -1) {
             filename = javaClassName;
         } else {
-            path = path + javaClassName.substring(0, javaClassName.lastIndexOf('.')) + "/";
+            path = path + javaClassName.substring(0, javaClassName.lastIndexOf('.')) + File.separator;
             filename = javaClassName.substring(javaClassName.lastIndexOf('.') + 1);
         }
         try {

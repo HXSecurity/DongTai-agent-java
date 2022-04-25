@@ -22,7 +22,7 @@ public class IastProperties {
 
     public static String getLogPath() {
         if (dongtaiLogPath == null) {
-            dongtaiLogPath = System.getProperty("dongtai.log.path", System.getProperty("java.io.tmpdir.dongtai")+"/dongtaiJavaAgentLogs");
+            dongtaiLogPath = System.getProperty("dongtai.log.path", System.getProperty("java.io.tmpdir.dongtai")+File.separator+"dongtaiJavaAgentLogs");
         }
         return dongtaiLogPath;
     }

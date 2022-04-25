@@ -296,7 +296,7 @@ public class DongTaiLog {
             if (!f.exists()) {
                 f.mkdirs();
             }
-            File file = new File(filePath, "/dongtai_javaagent.log");
+            File file = new File(filePath, File.separator+"dongtai_javaagent.log");
             if (!file.exists()) {
                 try {
                     file.createNewFile();

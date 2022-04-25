@@ -29,7 +29,7 @@ public class GrpcHandler {
     private static ThreadLocal<Set<Object>> sharedRespData = new ThreadLocal<Set<Object>>();
 
     static {
-        grpcPluginPath = new File(System.getProperty("java.io.tmpdir.dongtai") + File.separator + "iast" + File.separator + "dongtai-grpc.jar");
+        grpcPluginPath = new File(System.getProperty("java.io.tmpdir.dongtai") + "iast" + File.separator + "dongtai-grpc.jar");
         if (!grpcPluginPath.exists()) {
             HttpClientUtils.downloadRemoteJar("/api/v1/engine/download?engineName=dongtai-grpc", grpcPluginPath.getAbsolutePath());
         }

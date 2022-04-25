@@ -29,7 +29,7 @@ public class HttpImpl {
     public static File IAST_REQUEST_JAR_PACKAGE;
 
     static {
-        IAST_REQUEST_JAR_PACKAGE = new File(System.getProperty("java.io.tmpdir.dongtai") + File.separator + "iast" + File.separator + "dongtai-api.jar");
+        IAST_REQUEST_JAR_PACKAGE = new File(System.getProperty("java.io.tmpdir.dongtai") + "iast" + File.separator + "dongtai-api.jar");
         if (!IAST_REQUEST_JAR_PACKAGE.exists()) {
             HttpClientUtils.downloadRemoteJar("/api/v1/engine/download?engineName=dongtai-api", IAST_REQUEST_JAR_PACKAGE.getAbsolutePath());
         }
@@ -157,7 +157,7 @@ public class HttpImpl {
         Map<String, Object> requestMeta = getRequestMeta(event.argumentArray[0]);
 /*        Boolean isReplay = (Boolean) requestMeta.get("replay-request");
         if (isReplay){
-            EngineManager.ENTER_REPLAY_ENTRYPOINT.set(true);
+            EngineManager.ENTER_REPLAY_ENTRYPOINT=true;
         }*/
         // todo Consider increasing the capture of html request responses
         if (ConfigMatcher.getInstance().disableExtension((String) requestMeta.get("requestURI"))) {

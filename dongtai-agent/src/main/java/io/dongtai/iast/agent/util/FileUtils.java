@@ -1,12 +1,11 @@
 package io.dongtai.iast.agent.util;
 
 import io.dongtai.iast.agent.AgentLauncher;
+import io.dongtai.iast.agent.IastProperties;
+import io.dongtai.iast.agent.report.AgentRegisterReport;
 import io.dongtai.log.DongTaiLog;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 
 public class FileUtils {
     public static boolean getResourceToFile(String resourceName, String fileName) throws IOException {
@@ -37,5 +36,48 @@ public class FileUtils {
             return true;
         }
         return false;
+    }
+
+    public static void confReplace(String path) {
+        String temp = "";
+
+        try {
+            File file = new File(path);
+            FileInputStream fis = new FileInputStream(file);
+            InputStreamReader isr = new InputStreamReader(fis);
+            BufferedReader br = new BufferedReader(isr);
+            StringBuffer buf = new StringBuffer();
+            // 保存该行前面的内容
+            while ((temp = br.readLine()) != null) {
+                if (temp.contains("${HOSTNAME_AGENT_ID}")){
+                    temp = temp.replace("${HOSTNAME_AGENT_ID}", AgentRegisterReport.getInternalHostName()+"-"+AgentRegisterReport.getAgentFlag().toString());
+                }else if (temp.contains("${HOSTNAME}")){
+                    temp = temp.replace("${HOSTNAME}",AgentRegisterReport.getInternalHostName());
+                }else if (temp.contains("${AGENT_ID}")){
+                    temp = temp.replace("${AGENT_ID}",AgentRegisterReport.getAgentFlag().toString());
+                }else if (temp.contains("${OPENAPI}")){
+                    String s = IastProperties.getInstance().getBaseUrl();
+                    s = s.substring(s.indexOf("://") + 3, s.indexOf("/openapi"));
+                    if(s.contains(":")){
+                        s = s.substring(0,s.indexOf(":"));
+                    }
+                    temp = temp.replace("${OPENAPI}", s);
+                }else if (temp.contains("${LOG_PORT}")){
+                    temp = temp.replace("${LOG_PORT}",IastProperties.getInstance().getLogPort());
+                }else if (temp.contains("${LOG_PATH}")){
+                    temp = temp.replace("${LOG_PATH}", System.getProperty("java.io.tmpdir.dongtai")+File.separator+"dongtaiJavaAgentLogs"+File.separator+"dongtai_javaagent.log");
+                }
+                buf = buf.append(temp);
+                buf = buf.append(System.getProperty("line.separator"));
+            }
+            br.close();
+            FileOutputStream fos = new FileOutputStream(file);
+            PrintWriter pw = new PrintWriter(fos);
+            pw.write(buf.toString().toCharArray());
+            pw.flush();
+            pw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
