@@ -9,10 +9,11 @@ import java.util.Map;
 public class GrpcProxy {
     private static Map<String, Object> metadata;
 
-    public static Object interceptChannel(Object channel, TraceIdHandler traceIdHandler) {
+    public static Object interceptChannel(Object channel, Object traceIdHandler) {
         try {
             Channel interceptedChannel = (Channel) channel;
-            return ClientInterceptors.intercept(interceptedChannel, new DongTaiClientInterceptor(traceIdHandler));
+            TraceIdHandler h = (TraceIdHandler) traceIdHandler;
+            return ClientInterceptors.intercept(interceptedChannel, new DongTaiClientInterceptor(h));
         } catch (Exception e) {
             // fixme: remove throw exception
             e.printStackTrace();
