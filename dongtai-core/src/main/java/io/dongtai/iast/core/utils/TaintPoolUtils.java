@@ -49,6 +49,8 @@ public class TaintPoolUtils {
                 Object[] objArray = (Object[]) obj;
                 for (Object objItem : objArray) {
                     if (poolContains(objItem, event)) {
+                        EngineManager.TAINT_POOL.addToPool(obj);
+                        event.addSourceHash(obj.hashCode());
                         return true;
                     }
                 }
