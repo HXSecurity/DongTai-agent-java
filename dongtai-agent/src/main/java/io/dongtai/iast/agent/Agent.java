@@ -117,23 +117,23 @@ public class Agent {
         return OS_NAME.indexOf("linux") >= 0;
     }
 
-    private static boolean isWindows() {
+    public static boolean isWindows() {
         return OS_NAME.indexOf("windows") >= 0;
     }
 
-    private static boolean isMacOs() {
+    public static boolean isMacOs() {
         return OS_NAME.indexOf("mac") >= 0 && OS_NAME.indexOf("os") > 0;
     }
 
     private static void extractJattach() throws IOException {
         if (isWindows()) {
-            JATTACH_FILE = System.getProperty("java.io.tmpdir.dongtai") + File.separator + "iast" + File.separator + "jattach.exe";
+            JATTACH_FILE = System.getProperty("java.io.tmpdir.dongtai") + "iast" + File.separator + "jattach.exe";
             FileUtils.getResourceToFile("bin/jattach.exe", JATTACH_FILE);
         } else if (isMacOs()) {
-            JATTACH_FILE = System.getProperty("java.io.tmpdir.dongtai") + File.separator + "iast" + File.separator + "jattach-mac";
+            JATTACH_FILE = System.getProperty("java.io.tmpdir.dongtai") + "iast" + File.separator + "jattach-mac";
             FileUtils.getResourceToFile("bin/jattach-mac", JATTACH_FILE);
         } else {
-            JATTACH_FILE = System.getProperty("java.io.tmpdir.dongtai") + File.separator + "iast" + File.separator + "jattach-linux";
+            JATTACH_FILE = System.getProperty("java.io.tmpdir.dongtai") + "iast" + File.separator + "jattach-linux";
             FileUtils.getResourceToFile("bin/jattach-linux", JATTACH_FILE);
         }
         if ((new File(JATTACH_FILE)).setExecutable(true)) {

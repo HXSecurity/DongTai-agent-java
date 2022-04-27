@@ -27,6 +27,7 @@ public class IastProperties {
     private Integer isAutoCreateProject;
     private String debugFlag = null;
     private String isDownloadPackage;
+    private String logPort;
 
     private String propertiesFilePath;
 
@@ -213,6 +214,13 @@ public class IastProperties {
             debugFlag = System.getProperty("dongtai.debug", "false");
         }
         return debugFlag;
+    }
+
+    public String getLogPort() {
+        if (logPort == null) {
+            logPort = System.getProperty("dongtai.log.port", "30909");
+        }
+        return logPort;
     }
 
     public boolean isDebug() {

@@ -1,5 +1,6 @@
 package io.dongtai.iast.core.replay;
 
+import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.hookpoint.models.IastReplayModel;
 import io.dongtai.iast.core.utils.HttpClientHostnameVerifier;
 import io.dongtai.iast.core.utils.HttpClientUtils;
@@ -48,6 +49,7 @@ public class HttpRequestReplay implements Runnable {
      */
     private static void doReplay(IastReplayModel replayModel) {
         try {
+            EngineManager.ENTER_REPLAY_ENTRYPOINT = true;
             HashMap<String, String> headers = splitHeaderStringToHashmap(replayModel.getRequestHeader());
             headers.put("dongtai-replay-id", String.valueOf(replayModel.getReplayId()));
             headers.put("dongtai-relation-id", String.valueOf(replayModel.getRelationId()));
@@ -59,6 +61,8 @@ public class HttpRequestReplay implements Runnable {
             }
         } catch (Exception e) {
             DongTaiLog.error(e);
+        } finally {
+            EngineManager.ENTER_REPLAY_ENTRYPOINT = false;
         }
     }
 
@@ -91,6 +95,7 @@ public class HttpRequestReplay implements Runnable {
      * @throws Exception http请求中抛出的异常
      */
     private static void sendRequest(String method, String fullUrl, String data, HashMap<String, String> headers) {
+        DongTaiLog.info("Do request replay: method={},url={},data={},header={}",method,fullUrl,data,headers.toString());
         HttpURLConnection connection = null;
         try {
             HttpClientUtils.trustAllHosts();
@@ -129,6 +134,7 @@ public class HttpRequestReplay implements Runnable {
                 response.append('\r');
             }
             rd.close();
+            DongTaiLog.info("Request replay response: {}",response);
         } catch (Exception e) {
             DongTaiLog.error(e);
         } finally {

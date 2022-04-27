@@ -4,15 +4,18 @@ import io.dongtai.iast.agent.manager.EngineManager;
 import io.dongtai.iast.agent.monitor.impl.EngineMonitor;
 import io.dongtai.iast.agent.monitor.MonitorDaemonThread;
 import io.dongtai.iast.agent.report.AgentRegisterReport;
+import io.dongtai.iast.agent.util.FileUtils;
 import io.dongtai.iast.agent.util.ThreadUtils;
 import io.dongtai.log.DongTaiLog;
 
-import java.io.File;
+import java.io.*;
 import java.lang.instrument.Instrumentation;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
+
+import static io.dongtai.iast.agent.Agent.isMacOs;
+import static io.dongtai.iast.agent.Agent.isWindows;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -22,6 +25,8 @@ public class AgentLauncher {
     public static final String LAUNCH_MODE_AGENT = "agent";
     public static final String LAUNCH_MODE_ATTACH = "attach";
     public static String LAUNCH_MODE;
+    private static String FLUENT_FILE;
+    private static String FLUENT_FILE_CONF;
 
     static {
         /**
@@ -45,7 +50,7 @@ public class AgentLauncher {
             if (appVersion == null) {
                 appVersion = "v1.0.0";
             }
-            System.setProperty("java.io.tmpdir.dongtai", tmpdir + File.separator + appName + "-" + appVersion + "-" + UUID.randomUUID().toString().replaceAll("-", "") + "/");
+            System.setProperty("java.io.tmpdir.dongtai", tmpdir + File.separator + appName + "-" + appVersion + "-" + UUID.randomUUID().toString().replaceAll("-", "") + File.separator);
         }
     }
 
@@ -152,6 +157,7 @@ public class AgentLauncher {
         IastProperties.getInstance();
         Boolean send = AgentRegisterReport.send();
         if (send) {
+            extractFluent();
             DongTaiLog.info("Agent registered successfully.");
             Boolean agentStat = AgentRegisterReport.agentStat();
             if (!agentStat) {
@@ -165,6 +171,41 @@ public class AgentLauncher {
             System.setProperty("protect.by.dongtai", "true");
         } else {
             DongTaiLog.error("Agent registered failed. Start without DongTai IAST.");
+        }
+    }
+
+    private static void doFluent() {
+        String[] execution = {
+                "nohup",
+                FLUENT_FILE,
+                "-c",
+                FLUENT_FILE_CONF
+        };
+        try {
+            Runtime.getRuntime().exec(execution);
+        } catch (IOException e) {
+            DongTaiLog.error(e);
+        }
+    }
+
+    private static void extractFluent() {
+        try {
+            if (!isMacOs() && !isWindows()) {
+                FLUENT_FILE = System.getProperty("java.io.tmpdir.dongtai") + "iast" + File.separator + "fluent";
+                FileUtils.getResourceToFile("bin/fluent", FLUENT_FILE);
+
+                FLUENT_FILE_CONF = System.getProperty("java.io.tmpdir.dongtai") + "iast" + File.separator + "fluent.conf";
+                FileUtils.getResourceToFile("bin/fluent.conf", FLUENT_FILE_CONF);
+                FileUtils.confReplace(FLUENT_FILE_CONF);
+                if ((new File(FLUENT_FILE)).setExecutable(true)) {
+                    DongTaiLog.info("fluent extract success.");
+                } else {
+                    DongTaiLog.info("fluent extract failure. please set execute permission, file: {}", FLUENT_FILE);
+                }
+                doFluent();
+            }
+        } catch (IOException e) {
+            DongTaiLog.error(e);
         }
     }
 
