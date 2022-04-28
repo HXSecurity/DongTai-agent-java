@@ -43,7 +43,7 @@ public class HttpClientUtils {
     public static StringBuilder sendPost(String uri, String value) {
         StringBuilder response;
         response = sendRequest(HttpMethods.POST, PROPERTIES.getBaseUrl(), uri, value, null, PROXY);
-        DongTaiLog.debug("cn.huoxian.iast url is {}, resp is {}", uri, response.toString());
+        DongTaiLog.debug("dongtai upload url is {}, resp is {}", uri, response.toString());
         return response;
     }
 
