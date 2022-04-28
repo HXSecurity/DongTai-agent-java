@@ -26,6 +26,8 @@ public class AgentQueueReport implements Runnable {
         detail.put(ReportConstant.REPORT_QUEUE, 0);
         detail.put(ReportConstant.METHOD_QUEUE, 0);
         detail.put(ReportConstant.REPLAY_QUEUE, 0);
+        detail.put(ReportConstant.KEY_CORE_INSTALLED, 1);
+        detail.put(ReportConstant.KEY_CORE_RUNNING, EngineManager.isEngineRunning() ? 1 : 0);
         detail.put(ReportConstant.KEY_RETURN_QUEUE, 1);
 
         return report.toString();

@@ -11,14 +11,12 @@ public class ServletService implements IServer {
         try {
             loader.loadClass("javax.servlet.ServletRequest");
             return true;
-        } catch (Exception e) {
-            DongTaiLog.error(e);
+        } catch (Exception ignore) {
         }
         try {
             loader.loadClass("jakarta.servlet.ServletRequest");
             return true;
-        } catch (Exception e) {
-            DongTaiLog.error(e);
+        } catch (Exception ignore) {
         }
         return false;
     }

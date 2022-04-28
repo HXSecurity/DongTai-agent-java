@@ -120,4 +120,6 @@ public class ReportConstant {
     public static final String LIMIT_PERFORMANCE_BREAK_DATE = "breakDate";
     public static final String LIMIT_PERFORMANCE_OVER_THRESHOLD_LOG = "performanceOverThresholdLog";
 
+    public static final String KEY_CORE_INSTALLED = "isCoreInstalled";
+    public static final String KEY_CORE_RUNNING = "isCoreRunning";
 }

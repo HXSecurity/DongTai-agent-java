@@ -9,16 +9,14 @@ public class DubboService implements IServer {
     @Override
     public boolean isMatch(RuntimeMXBean paramRuntimeMXBean, ClassLoader loader) {
         try {
-            loader.loadClass("org.apache.dubbo.monitor.support.MonitorFilter");
+            loader.loadClass(" org.apache.dubbo.monitor.support.MonitorFilter".substring(1));
             return true;
-        } catch (Exception e) {
-            DongTaiLog.error(e);
+        } catch (Exception ignored) {
         }
         try {
             loader.loadClass("com.alibaba.dubbo.monitor.support.MonitorFilter");
             return true;
-        } catch (Exception e) {
-            DongTaiLog.error(e);
+        } catch (Exception ignored) {
         }
         return false;
     }
