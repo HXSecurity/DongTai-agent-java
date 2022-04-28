@@ -150,6 +150,7 @@ public class RemoteConfigUtils {
         try {
             // 默认响应标识调用失败
             if (REMOTE_CONFIG_DEFAULT_META.equals(remoteResponse)) {
+                FallbackSwitch.setPerformanceFallback(false);
                 return null;
             }
             if (REMOTE_CONFIG_DEFAULT_META.equals(new JSONObject(remoteResponse).get("data"))){
