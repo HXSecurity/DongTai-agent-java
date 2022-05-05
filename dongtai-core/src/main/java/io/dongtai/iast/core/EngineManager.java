@@ -52,7 +52,7 @@ public class EngineManager {
     private static final AtomicInteger reqCounts = new AtomicInteger(0);
     private static int enableDongTai = 0;
 
-    public static Boolean ENTER_REPLAY_ENTRYPOINT = false;
+    public static final BooleanThreadLocal ENTER_REPLAY_ENTRYPOINT = new BooleanThreadLocal(false);
 
     public static void turnOnDongTai() {
         DONGTAI_STATE.set(true);

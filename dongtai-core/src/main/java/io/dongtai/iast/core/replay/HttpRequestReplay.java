@@ -49,7 +49,6 @@ public class HttpRequestReplay implements Runnable {
      */
     private static void doReplay(IastReplayModel replayModel) {
         try {
-            EngineManager.ENTER_REPLAY_ENTRYPOINT = true;
             HashMap<String, String> headers = splitHeaderStringToHashmap(replayModel.getRequestHeader());
             headers.put("dongtai-replay-id", String.valueOf(replayModel.getReplayId()));
             headers.put("dongtai-relation-id", String.valueOf(replayModel.getRelationId()));
@@ -61,8 +60,6 @@ public class HttpRequestReplay implements Runnable {
             }
         } catch (Exception e) {
             DongTaiLog.error(e);
-        } finally {
-            EngineManager.ENTER_REPLAY_ENTRYPOINT = false;
         }
     }
 

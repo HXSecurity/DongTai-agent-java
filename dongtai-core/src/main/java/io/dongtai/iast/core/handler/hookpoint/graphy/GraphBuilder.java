@@ -26,6 +26,7 @@ public class GraphBuilder {
         List<GraphNode> nodeList = build();
         String report = convertToReport(nodeList, request, response);
         ThreadPools.sendPriorityReport(Constants.API_REPORT_UPLOAD, report);
+        EngineManager.ENTER_REPLAY_ENTRYPOINT.remove();
     }
 
     /**
