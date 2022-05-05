@@ -35,7 +35,7 @@ public class ShiroAdapter extends AbstractClassVisitor {
         methodVisitor.visitLineNumber(169, label0);
         methodVisitor.visitVarInsn(ALOAD, 0);
         methodVisitor.visitVarInsn(ALOAD, 1);
-        methodVisitor.visitMethodInsn(INVOKEVIRTUAL, " org/apache/shiro/session/mgt/eis/AbstractSessionDAO".substring(1), "doReadSession", "(Ljava/io/Serializable;)Lorg/apache/shiro/session/Session;", false);
+        methodVisitor.visitMethodInsn(INVOKEVIRTUAL, " org/apache/shiro/session/mgt/eis/AbstractSessionDAO".substring(1), "doReadSession", " (Ljava/io/Serializable;)Lorg/apache/shiro/session/Session;".substring(1), false);
         methodVisitor.visitVarInsn(ASTORE, 2);
         Label label1 = new Label();
         methodVisitor.visitLabel(label1);
@@ -46,8 +46,8 @@ public class ShiroAdapter extends AbstractClassVisitor {
         Label label3 = new Label();
         methodVisitor.visitLabel(label3);
         methodVisitor.visitLineNumber(171, label3);
-        methodVisitor.visitFieldInsn(GETSTATIC, "io/dongtai/iast/core/EngineManager", "ENTER_REPLAY_ENTRYPOINT", "Ljava/lang/Boolean;");
-        methodVisitor.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Boolean", "booleanValue", "()Z", false);
+        methodVisitor.visitMethodInsn(INVOKESTATIC, "java/lang/dongtai/SpyDispatcherHandler", "getDispatcher", "()Ljava/lang/dongtai/SpyDispatcher;", false);
+        methodVisitor.visitMethodInsn(INVOKEINTERFACE, "java/lang/dongtai/SpyDispatcher", "isReplayRequest", "()Z", true);
         Label label4 = new Label();
         methodVisitor.visitJumpInsn(IFEQ, label4);
         Label label5 = new Label();
@@ -61,7 +61,7 @@ public class ShiroAdapter extends AbstractClassVisitor {
         methodVisitor.visitMethodInsn(INVOKEVIRTUAL, "java/util/Optional", "get", "()Ljava/lang/Object;", false);
         methodVisitor.visitTypeInsn(CHECKCAST, " org/apache/shiro/session/Session".substring(1));
         methodVisitor.visitMethodInsn(INVOKEINTERFACE, " org/apache/shiro/session/Session".substring(1), "getId", "()Ljava/io/Serializable;", true);
-        methodVisitor.visitMethodInsn(INVOKEVIRTUAL, " org/apache/shiro/session/mgt/eis/AbstractSessionDAO".substring(1), "doReadSession", "(Ljava/io/Serializable;)Lorg/apache/shiro/session/Session;", false);
+        methodVisitor.visitMethodInsn(INVOKEVIRTUAL, " org/apache/shiro/session/mgt/eis/AbstractSessionDAO".substring(1), "doReadSession", " (Ljava/io/Serializable;)Lorg/apache/shiro/session/Session;".substring(1), false);
         methodVisitor.visitVarInsn(ASTORE, 2);
         Label label6 = new Label();
         methodVisitor.visitLabel(label6);
@@ -94,7 +94,7 @@ public class ShiroAdapter extends AbstractClassVisitor {
         methodVisitor.visitLabel(label7);
         methodVisitor.visitLocalVariable("this", "Lorg/apache/shiro/session/mgt/eis/AbstractSessionDAO;", null, label0, label7, 0);
         methodVisitor.visitLocalVariable("sessionId", "Ljava/io/Serializable;", null, label0, label7, 1);
-        methodVisitor.visitLocalVariable("s", "Lorg/apache/shiro/session/Session;", null, label1, label7, 2);
+        methodVisitor.visitLocalVariable("s", " Lorg/apache/shiro/session/Session;".substring(1), null, label1, label7, 2);
         methodVisitor.visitMaxs(4, 3);
         methodVisitor.visitEnd();
         setTransformed();

@@ -418,7 +418,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
 
     @Override
     public boolean isReplayRequest() {
-        return EngineManager.ENTER_REPLAY_ENTRYPOINT;
+        return EngineManager.ENTER_REPLAY_ENTRYPOINT.get();
     }
 
     /**

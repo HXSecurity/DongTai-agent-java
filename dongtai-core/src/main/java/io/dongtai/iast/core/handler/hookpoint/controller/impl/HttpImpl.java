@@ -155,10 +155,10 @@ public class HttpImpl {
             throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         DongTaiLog.debug(EngineManager.SCOPE_TRACKER.get().toString());
         Map<String, Object> requestMeta = getRequestMeta(event.argumentArray[0]);
-/*        Boolean isReplay = (Boolean) requestMeta.get("replay-request");
+        Boolean isReplay = (Boolean) requestMeta.get("replay-request");
         if (isReplay){
-            EngineManager.ENTER_REPLAY_ENTRYPOINT=true;
-        }*/
+            EngineManager.ENTER_REPLAY_ENTRYPOINT.enterEntry();
+        }
         // todo Consider increasing the capture of html request responses
         if (ConfigMatcher.getInstance().disableExtension((String) requestMeta.get("requestURI"))) {
             return;
