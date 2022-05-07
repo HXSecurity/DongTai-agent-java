@@ -144,7 +144,7 @@ public class TrackerHelper {
     }
 
     private boolean isFirstLevel(int targetLevel) {
-        if (this.enterHttp > 0 || this.grpcLevel > 0) {
+        if (this.enterHttp > 0 || this.grpcLevel > 0 || this.kafkaLevel > 0) {
             return this.sourceLevel == 0 && this.leaveSource == 1
                     && targetLevel == 1;
         }
