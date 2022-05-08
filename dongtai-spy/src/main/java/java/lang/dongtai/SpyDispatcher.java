@@ -162,6 +162,8 @@ public interface SpyDispatcher {
 
     boolean isReplayRequest();
 
+    boolean isNotReplayRequest();
+
     /**
      * mark for enter Source Entry Point
      *

@@ -1,6 +1,7 @@
 package io.dongtai.iast.agent.monitor.impl;
 
 import io.dongtai.iast.agent.Constant;
+import io.dongtai.iast.agent.IastProperties;
 import io.dongtai.iast.agent.manager.EngineManager;
 import io.dongtai.iast.agent.monitor.IMonitor;
 import io.dongtai.iast.agent.monitor.MonitorDaemonThread;
@@ -18,7 +19,11 @@ public class ServerConfigMonitor implements IMonitor {
 
     @Override
     public void check() throws Exception {
-        setConfigToLocal(AgentRegisterReport.getAgentFlag());
+        if (IastProperties.getInstance().getFallbackVersion().equals("v1")){
+            setConfigToLocal(AgentRegisterReport.getAgentFlag());
+        }else {
+            setConfigToLocalV2(AgentRegisterReport.getAgentFlag());
+        }
     }
 
     @Override
@@ -54,4 +59,19 @@ public class ServerConfigMonitor implements IMonitor {
         }
     }
 
+    /**
+     * 寻找远端配置工具类 反射调用进行阈值配置
+     */
+    public void setConfigToLocalV2(int agentId) {
+        try {
+            final Class<?> remoteConfigUtil = EngineManager.getRemoteConfigUtils();
+            if (remoteConfigUtil == null) {
+                return;
+            }
+            remoteConfigUtil.getMethod("syncRemoteConfigV2", int.class)
+                    .invoke(null, agentId);
+        } catch (Throwable t) {
+            DongTaiLog.warn("setConfigToLocal failed, msg:{}, err:{}", t.getMessage(), t.getCause());
+        }
+    }
 }

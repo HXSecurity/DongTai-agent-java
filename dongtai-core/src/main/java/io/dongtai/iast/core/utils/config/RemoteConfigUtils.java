@@ -2,12 +2,17 @@ package io.dongtai.iast.core.utils.config;
 
 import com.google.gson.reflect.TypeToken;
 import io.dongtai.iast.common.entity.performance.PerformanceMetrics;
+import io.dongtai.iast.common.entity.performance.metrics.CpuInfoMetrics;
+import io.dongtai.iast.common.entity.performance.metrics.MemoryUsageMetrics;
+import io.dongtai.iast.common.entity.performance.metrics.ThreadInfoMetrics;
 import io.dongtai.iast.common.entity.response.PlainResult;
 import io.dongtai.iast.common.enums.MetricsKey;
 import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.FallbackSwitch;
 import io.dongtai.iast.core.utils.Constants;
 import io.dongtai.iast.core.utils.HttpClientUtils;
 import io.dongtai.iast.core.utils.PropertyUtils;
+import io.dongtai.iast.core.utils.config.entity.RemoteConfigEntityV2;
+import io.dongtai.iast.core.utils.config.entity.PerformanceEntity;
 import io.dongtai.iast.core.utils.config.entity.PerformanceLimitThreshold;
 import io.dongtai.iast.core.utils.config.entity.RemoteConfigEntity;
 import io.dongtai.iast.core.utils.json.GsonUtils;
@@ -64,6 +69,9 @@ public class RemoteConfigUtils {
     private static Double secondFallbackFrequencyInitBurstSeconds;
     private static Long secondFallbackDuration;
 
+    private static Boolean systemIsUninstall;
+    private static Boolean jvmIsUninstall;
+    private static Boolean applicationIsUninstall;
 
     /**
      * 同步远程配置
@@ -128,6 +136,118 @@ public class RemoteConfigUtils {
     }
 
     /**
+     * 同步远程配置
+     *
+     * @param agentId agent的唯一标识
+     */
+    public static void syncRemoteConfigV2(int agentId) {
+        String remoteResponse = getConfigFromRemoteV2(agentId);
+        try {
+            // 远端有配置且和上次配置内容不一致时，重新更新配置文件
+//            String remoteResponse = REMOTE_CONFIG_NEW_META;
+            RemoteConfigEntityV2 remoteConfigEntity = parseRemoteConfigResponseV2(remoteResponse);
+            if (null != remoteConfigEntity && !remoteResponse.equals(existsRemoteConfigMeta)) {
+                List<PerformanceEntity> application = remoteConfigEntity.getApplication();
+                List<PerformanceEntity> jvm = remoteConfigEntity.getJvm();
+                List<PerformanceEntity> system = remoteConfigEntity.getSystem();
+                PerformanceLimitThreshold performanceLimitThreshold = new PerformanceLimitThreshold();
+                MemoryUsageMetrics memoryUsage = new MemoryUsageMetrics();
+                ThreadInfoMetrics threadInfoMetrics = new ThreadInfoMetrics();
+                CpuInfoMetrics cpuInfoMetrics = new CpuInfoMetrics();
+                MemoryUsageMetrics memoryNoHeapUsage = new MemoryUsageMetrics();
+                if (remoteConfigEntity.getEnableAutoFallback() != null) {
+                    enableAutoFallback = remoteConfigEntity.getEnableAutoFallback();
+                }
+                if (null != remoteConfigEntity.getSystemIsUninstall()){
+                    systemIsUninstall = remoteConfigEntity.getSystemIsUninstall();
+                }
+                if (null != remoteConfigEntity.getApplicationIsUninstall()){
+                    applicationIsUninstall = remoteConfigEntity.getApplicationIsUninstall();
+                }
+                if (null != remoteConfigEntity.getJvmIsUninstall()){
+                    jvmIsUninstall = remoteConfigEntity.getJvmIsUninstall();
+                }
+                if (null != remoteConfigEntity.getPerformanceLimitRiskMaxMetricsCount()) {
+                    Integer performanceLimitRiskMaxMetricsCount = remoteConfigEntity.getPerformanceLimitRiskMaxMetricsCount();
+                    performanceBreakerWaitDuration =performanceLimitRiskMaxMetricsCount;
+                    if (getApplicationIsUninstall() || getJvmIsUninstall() || getSystemIsUninstall()){
+                        secondFallbackDuration = (long) (performanceLimitRiskMaxMetricsCount * 1000);
+                    }
+                }
+                if (null != remoteConfigEntity.getApplication()) {
+                    for (PerformanceEntity performanceEntity:application){
+                        switch (performanceEntity.getFallbackName()){
+                            case "hookLimitTokenPerSecond":
+                                hookLimitTokenPerSecond = performanceEntity.getValue();
+                                break;
+                            case "heavyTrafficLimitTokenPerSecond":
+                                heavyTrafficLimitTokenPerSecond = performanceEntity.getValue();
+                                break;
+                        }
+                    }
+                }
+                if (remoteConfigEntity.getJvm() != null) {
+                    for (PerformanceEntity performanceEntity:jvm){
+                        switch (performanceEntity.getFallbackName()){
+                            case "jvmMemUsagePercentage":{
+                                memoryUsage.setMemUsagePercentage(performanceEntity.getValue());
+                                break;
+                            }
+                            case "jvmMemUsageUsed":{
+                                memoryUsage.setUsed(performanceEntity.getValue().longValue());
+                                break;
+                            }
+                            case "threadCount":{
+                                threadInfoMetrics.setThreadCount(performanceEntity.getValue().intValue());
+                                break;
+                            }
+                            case "daemonThreadCount":{
+                                threadInfoMetrics.setDaemonThreadCount(performanceEntity.getValue().intValue());
+                                break;
+                            }
+                            case "dongTaiThreadCount":{
+                                threadInfoMetrics.setDongTaiThreadCount(performanceEntity.getValue().intValue());
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (remoteConfigEntity.getSystem() != null) {
+                    for (PerformanceEntity performanceEntity:system){
+                        switch (performanceEntity.getFallbackName()){
+                            case "cpuUsagePercentage":{
+                                cpuInfoMetrics.setCpuUsagePercentage(performanceEntity.getValue());
+                                break;
+                            }
+                            case "sysMemUsagePercentage":{
+                                memoryNoHeapUsage.setMemUsagePercentage(performanceEntity.getValue());
+                                break;
+                            }
+                            case "sysMemUsageUsed":{
+                                memoryNoHeapUsage.setUsed(performanceEntity.getValue().longValue());
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                threadInfoMetrics.setPeakThreadCount(1000000000);
+                memoryUsage.setMax(1000000000000L);
+                memoryNoHeapUsage.setMax(1000000000000L);
+                performanceLimitThreshold.setThreadInfo(threadInfoMetrics);
+                performanceLimitThreshold.setMemoryUsage(memoryUsage);
+                performanceLimitThreshold.setMemoryNoHeapUsage(memoryNoHeapUsage);
+                performanceLimitThreshold.setCpuUsage(cpuInfoMetrics);
+                performanceLimitMaxThreshold = combineRemoteAndLocalMetricsThreshold(performanceLimitMaxThreshold,performanceLimitThreshold);
+                existsRemoteConfigMeta = remoteResponse;
+                DongTaiLog.debug("Sync remote config successful.");
+            }
+        } catch (Throwable t) {
+            DongTaiLog.warn("Sync remote config failed, msg: {}, error: {}", t.getMessage(), t.getCause());
+        }
+    }
+
+    /**
      * 根据agentID获取服务端对Agent的配置
      */
     private static String getConfigFromRemote(int agentId) {
@@ -135,6 +255,22 @@ public class RemoteConfigUtils {
         report.put(KEY_AGENT_ID, agentId);
         try {
             StringBuilder response = HttpClientUtils.sendPost(Constants.API_SERVER_CONFIG, report.toString());
+            return response.toString();
+        } catch (Throwable t) {
+            // todo 现在无法获取服务端配置，不需要打印日志。等服务端上线后取消注释下面的代码
+            // DongTaiLog.warn("Get server config failed, msg:{}, err:{}",t.getMessage(),t.getCause());
+            return REMOTE_CONFIG_DEFAULT_META;
+        }
+    }
+
+    /**
+     * 根据agentID获取服务端对Agent的配置
+     */
+    private static String getConfigFromRemoteV2(int agentId) {
+        JSONObject report = new JSONObject();
+        report.put(KEY_AGENT_ID, agentId);
+        try {
+            StringBuilder response = HttpClientUtils.sendPost(Constants.API_SERVER_CONFIG_V2, report.toString());
             return response.toString();
         } catch (Throwable t) {
             // todo 现在无法获取服务端配置，不需要打印日志。等服务端上线后取消注释下面的代码
@@ -153,11 +289,44 @@ public class RemoteConfigUtils {
                 FallbackSwitch.setPerformanceFallback(false);
                 return null;
             }
-            if (REMOTE_CONFIG_DEFAULT_META.equals(new JSONObject(remoteResponse).get("data"))){
+            if (REMOTE_CONFIG_DEFAULT_META.equals(new JSONObject(remoteResponse).get("data").toString())){
                 FallbackSwitch.setPerformanceFallback(false);
                 return null;
             }
             PlainResult<RemoteConfigEntity> result = GsonUtils.toObject(remoteResponse, new TypeToken<PlainResult<RemoteConfigEntity>>() {
+            }.getType());
+            // 服务端响应成功状态码
+            if (result.isSuccess()) {
+                return result.getData();
+            } else {
+                DongTaiLog.warn("remoteConfig request not success, status:{}, msg:{},response:{}", result.getStatus(), result.getMsg(),
+                        GsonUtils.toJson(remoteResponse));
+                return null;
+            }
+        } catch (Throwable t) {
+            DongTaiLog.warn("remoteConfig parse failed: msg:{}, err:{}, response:{}", t.getMessage(), t.getCause(), GsonUtils.toJson(remoteResponse));
+            return null;
+        }
+    }
+
+    private static RemoteConfigEntityV2 parseRemoteConfigResponseV2(String remoteResponse) {
+        try {
+            // 默认响应标识调用失败
+            if (REMOTE_CONFIG_DEFAULT_META.equals(remoteResponse)) {
+                RemoteConfigUtils.enableAutoFallback = false;
+                if (FallbackSwitch.isEngineFallback()){
+                    FallbackSwitch.setPerformanceFallback(false);
+                }
+                return null;
+            }
+            if (REMOTE_CONFIG_DEFAULT_META.equals(new JSONObject(remoteResponse).get("data").toString())){
+                RemoteConfigUtils.enableAutoFallback = false;
+                if (FallbackSwitch.isEngineFallback()){
+                    FallbackSwitch.setPerformanceFallback(false);
+                }
+                return null;
+            }
+            PlainResult<RemoteConfigEntityV2> result = GsonUtils.toObject(remoteResponse, new TypeToken<PlainResult<RemoteConfigEntityV2>>() {
             }.getType());
             // 服务端响应成功状态码
             if (result.isSuccess()) {
@@ -259,7 +428,7 @@ public class RemoteConfigUtils {
      */
     public static double getHookLimitInitBurstSeconds(Properties cfg) {
         if (hookLimitInitBurstSeconds == null) {
-            hookLimitInitBurstSeconds = PropertyUtils.getRemoteSyncLocalConfig("hookLimit.initBurstSeconds", Double.class, 10.0, cfg);
+            hookLimitInitBurstSeconds = PropertyUtils.getRemoteSyncLocalConfig("hookLimit.initBurstSeconds", Double.class, 1.0, cfg);
         }
         return hookLimitInitBurstSeconds;
     }
@@ -283,7 +452,7 @@ public class RemoteConfigUtils {
      */
     public static double getHeavyTrafficLimitInitBurstSeconds(Properties cfg) {
         if (heavyTrafficLimitInitBurstSeconds == null) {
-            heavyTrafficLimitInitBurstSeconds = PropertyUtils.getRemoteSyncLocalConfig("heavyTrafficLimit.initBurstSeconds", Double.class, 2.0, cfg);
+            heavyTrafficLimitInitBurstSeconds = PropertyUtils.getRemoteSyncLocalConfig("heavyTrafficLimit.initBurstSeconds", Double.class, 1.0, cfg);
         }
         return heavyTrafficLimitInitBurstSeconds;
     }
@@ -391,7 +560,7 @@ public class RemoteConfigUtils {
      */
     public static Double getSwitchLimitTokenPerSecond(Properties cfg) {
         if (secondFallbackFrequencyTokenPerSecond == null) {
-            secondFallbackFrequencyTokenPerSecond = PropertyUtils.getRemoteSyncLocalConfig("secondFallback.frequency.tokenPerSecond", Double.class, 0.01, cfg);
+            secondFallbackFrequencyTokenPerSecond = PropertyUtils.getRemoteSyncLocalConfig("secondFallback.frequency.tokenPerSecond", Double.class, 1000000000000.0, cfg);
         }
         return secondFallbackFrequencyTokenPerSecond;
     }
@@ -401,7 +570,7 @@ public class RemoteConfigUtils {
      */
     public static double getSwitchLimitInitBurstSeconds(Properties cfg) {
         if (secondFallbackFrequencyInitBurstSeconds == null) {
-            secondFallbackFrequencyInitBurstSeconds = PropertyUtils.getRemoteSyncLocalConfig("secondFallback.frequency.initBurstSeconds", Double.class, 200.0, cfg);
+            secondFallbackFrequencyInitBurstSeconds = PropertyUtils.getRemoteSyncLocalConfig("secondFallback.frequency.initBurstSeconds", Double.class, 10000000000000.0, cfg);
         }
         return secondFallbackFrequencyInitBurstSeconds;
     }
@@ -411,7 +580,7 @@ public class RemoteConfigUtils {
      */
     public static long getSwitchOpenStatusDurationThreshold(Properties cfg) {
         if (secondFallbackDuration == null) {
-            secondFallbackDuration = PropertyUtils.getRemoteSyncLocalConfig("secondFallback.duration", Long.class, 120000L, cfg);
+            secondFallbackDuration = PropertyUtils.getRemoteSyncLocalConfig("secondFallback.duration", Long.class, 10000000000000L, cfg);
         }
         return secondFallbackDuration;
     }
@@ -443,5 +612,26 @@ public class RemoteConfigUtils {
             }
         }
         return performanceMetricsList;
+    }
+
+    public static Boolean getSystemIsUninstall() {
+        if (null == systemIsUninstall){
+            systemIsUninstall=false;
+        }
+        return systemIsUninstall;
+    }
+
+    public static Boolean getJvmIsUninstall() {
+        if (null == jvmIsUninstall){
+            jvmIsUninstall=false;
+        }
+        return jvmIsUninstall;
+    }
+
+    public static Boolean getApplicationIsUninstall() {
+        if (null == applicationIsUninstall){
+            applicationIsUninstall=false;
+        }
+        return applicationIsUninstall;
     }
 }

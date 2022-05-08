@@ -186,4 +186,8 @@ public interface AsmMethods {
             SpyDispatcher.class,
             "isReplayRequest"
     );
+    Method SPY$isNotReplayRequest = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "isNotReplayRequest"
+    );
 }

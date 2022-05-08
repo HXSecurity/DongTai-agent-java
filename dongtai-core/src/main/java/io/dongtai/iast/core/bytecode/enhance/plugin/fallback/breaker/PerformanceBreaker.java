@@ -7,6 +7,7 @@ import io.dongtai.iast.common.entity.performance.metrics.MemoryUsageMetrics;
 import io.dongtai.iast.common.entity.performance.metrics.ThreadInfoMetrics;
 import io.dongtai.iast.common.enums.MetricsKey;
 import io.dongtai.iast.common.utils.serialize.SerializeUtils;
+import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.checker.IPerformanceChecker;
 import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.checker.MetricsBindCheckerEnum;
 import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.FallbackSwitch;
@@ -56,11 +57,13 @@ public class PerformanceBreaker extends AbstractBreaker {
         if (!RemoteConfigUtils.enableAutoFallback()) {
             return;
         }
-        Try.ofSupplier(CircuitBreaker.decorateSupplier(breaker, () -> checkMetricsWithAutoFallback(contextString)))
-                .recover(throwable -> {
-                    DongTaiLog.info(throwable.getMessage());
-                    return false;
-                }).get();
+        if(EngineManager.enableDongTai != 0){
+            Try.ofSupplier(CircuitBreaker.decorateSupplier(breaker, () -> checkMetricsWithAutoFallback(contextString)))
+                    .recover(throwable -> {
+                        DongTaiLog.info(throwable.getMessage());
+                        return false;
+                    }).get();
+        }
     }
 
     @Override
@@ -102,12 +105,14 @@ public class PerformanceBreaker extends AbstractBreaker {
         // 断路器事件监听
         breaker.getEventPublisher()
                 .onStateTransition(event -> {
-                    final CircuitBreaker.State toState = event.getStateTransition().getToState();
-                    if (toState == CircuitBreaker.State.OPEN) {
-                        PerformanceLimitReport.sendReport();
-                        FallbackSwitch.setPerformanceFallback(true);
-                    } else if (toState == CircuitBreaker.State.CLOSED) {
-                        FallbackSwitch.setPerformanceFallback(false);
+                    if (EngineManager.enableDongTai != 0){
+                        final CircuitBreaker.State toState = event.getStateTransition().getToState();
+                        if (toState == CircuitBreaker.State.OPEN) {
+                            PerformanceLimitReport.sendReport();
+                            FallbackSwitch.setPerformanceFallback(true);
+                        } else if (toState == CircuitBreaker.State.CLOSED) {
+                            FallbackSwitch.setPerformanceFallback(false);
+                        }
                     }
                 });
         PerformanceBreaker.breaker = breaker;

@@ -9,5 +9,6 @@ public class Constants {
     public final static String SERVER_ADDRESS = "/api/v1/agent/update";
     public final static String API_HOOK_PROFILE = "/api/v1/profiles";
     public final static String API_SERVER_CONFIG = "/api/v1/agent/threshold";
+    public final static String API_SERVER_CONFIG_V2 = "/api/v1/agent/thresholdv2";
     public final static String THREAD_NAME_PREFIX = "DongTai-IAST-";
 }

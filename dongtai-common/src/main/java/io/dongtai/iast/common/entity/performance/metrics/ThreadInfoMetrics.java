@@ -58,6 +58,10 @@ public class ThreadInfoMetrics implements Serializable {
         this.daemonThreadCount = daemonThreadCount;
     }
 
+    public void setDongTaiThreadCount(Integer dongTaiThreadCount) {
+        this.dongTaiThreadCount = dongTaiThreadCount;
+    }
+
     public Integer getDongTaiThreadCount() {
         return dongTaiThreadCount;
     }
