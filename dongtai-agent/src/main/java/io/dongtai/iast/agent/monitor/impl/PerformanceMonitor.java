@@ -46,7 +46,7 @@ public class PerformanceMonitor implements IMonitor {
 
     @Override
     public String getName() {
-        return  Constant.THREAD_PREFIX + NAME;
+        return Constant.THREAD_PREFIX + NAME;
     }
 
 
@@ -81,7 +81,7 @@ public class PerformanceMonitor implements IMonitor {
     }
 
     public static Integer checkThresholdValue() {
-        int thresholdValue = 100;
+/*        int thresholdValue = 100;
         try {
             String respRaw = getThresholdValue();
             if (respRaw != null && !respRaw.isEmpty()) {
@@ -91,8 +91,8 @@ public class PerformanceMonitor implements IMonitor {
                 thresholdValue = Integer.parseInt(cpuLimit.get("value").toString());
             }
         } catch (Exception ignored) {
-        }
-        return thresholdValue;
+        }*/
+        return 100;
     }
 
     /**
@@ -125,24 +125,22 @@ public class PerformanceMonitor implements IMonitor {
      */
     @Override
     public void check() throws Exception {
-        if (!EngineManager.isCoreStop()){
-            // 收集性能指标数据
-            final List<PerformanceMetrics> performanceMetrics = collectPerformanceMetrics();
-            // 更新本地性能指标记录(用于定期上报)
-            updatePerformanceMetrics(performanceMetrics);
-            // 检查性能指标(用于熔断降级)
-            checkPerformanceMetrics(performanceMetrics);
-            int UsedRate = CPU_USAGE;
-            PerformanceMonitor.AGENT_THRESHOLD_VALUE = PerformanceMonitor.checkThresholdValue();
-            int preStatus = this.engineManager.getRunningStatus();
-            if (isStart(UsedRate, preStatus)) {
-                this.engineManager.start();
-                DongTaiLog.info("The current CPU usage is " + UsedRate + "%, lower than the threshold " + AGENT_THRESHOLD_VALUE + "%，and the detection engine is starting");
-            } else if (isStop(UsedRate, preStatus)) {
-                this.engineManager.stop();
-                DongTaiLog.info("The current CPU usage is " + UsedRate + "%, higher than the threshold " + AGENT_THRESHOLD_VALUE + "%，and the detection engine is stopping");
-            }
-        }
+        // 收集性能指标数据
+        final List<PerformanceMetrics> performanceMetrics = collectPerformanceMetrics();
+        // 更新本地性能指标记录(用于定期上报)
+        updatePerformanceMetrics(performanceMetrics);
+        // 检查性能指标(用于熔断降级)
+        checkPerformanceMetrics(performanceMetrics);
+        int UsedRate = CPU_USAGE;
+        PerformanceMonitor.AGENT_THRESHOLD_VALUE = PerformanceMonitor.checkThresholdValue();
+        int preStatus = this.engineManager.getRunningStatus();
+/*        if (isStart(UsedRate, preStatus)) {
+            this.engineManager.start();
+            DongTaiLog.info("The current CPU usage is " + UsedRate + "%, lower than the threshold " + AGENT_THRESHOLD_VALUE + "%，and the detection engine is starting");
+        } else if (isStop(UsedRate, preStatus)) {
+            this.engineManager.stop();
+            DongTaiLog.info("The current CPU usage is " + UsedRate + "%, higher than the threshold " + AGENT_THRESHOLD_VALUE + "%，and the detection engine is stopping");
+        }*/
     }
 
     private void updatePerformanceMetrics(List<PerformanceMetrics> performanceMetrics) {

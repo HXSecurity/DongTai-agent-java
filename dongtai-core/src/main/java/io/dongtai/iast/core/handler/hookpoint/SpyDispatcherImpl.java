@@ -421,6 +421,11 @@ public class SpyDispatcherImpl implements SpyDispatcher {
         return EngineManager.ENTER_REPLAY_ENTRYPOINT.get();
     }
 
+    @Override
+    public boolean isNotReplayRequest() {
+        return !EngineManager.ENTER_REPLAY_ENTRYPOINT.get();
+    }
+
     /**
      * mark for enter Source Entry Point
      *

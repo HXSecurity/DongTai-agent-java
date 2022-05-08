@@ -15,7 +15,7 @@ public class SinkAdviceAdapter extends AbstractAdviceAdapter {
     private static final boolean ENABLE_ALL_HOOK = PropertyUtils.getInstance().isEnableAllHook();
 
     public SinkAdviceAdapter(MethodVisitor mv, int access, String name, String desc, IastContext context,
-            String framework, String signCode, boolean overpower) {
+                             String framework, String signCode, boolean overpower) {
         super(mv, access, name, desc, context, framework, signCode);
     }
 
@@ -29,6 +29,33 @@ public class SinkAdviceAdapter extends AbstractAdviceAdapter {
             mv.visitJumpInsn(EQ, elseLabel);
         }
         captureMethodState(-1, HookType.SINK.getValue(), false);
+/*        Label elseLabel2 = new Label();
+        isRequestReplay();
+        mv.visitJumpInsn(EQ, elseLabel2);
+        Label returnLabel = new Label();
+        mv.visitTypeInsn(NEW, "java/lang/NullPointerException");
+        mv.visitInsn(DUP);
+        mv.visitLdcInsn("DongTai agent request replay, please ignore");
+        mv.visitMethodInsn(INVOKESPECIAL, "java/lang/NullPointerException", "<init>", "(Ljava/lang/String;)V", false);
+        mv.visitInsn(ATHROW);
+        mark(returnLabel);*/
+/*        Label label1 = new Label();
+        mv.visitTryCatchBlock(tryLabel, label1, label1, "java/lang/RuntimeException");
+        mv.visitTypeInsn(NEW, "java/lang/IllegalStateException");
+        mv.visitInsn(DUP);
+        mv.visitLdcInsn("asaaaaa");
+        mv.visitMethodInsn(INVOKESPECIAL, "java/lang/IllegalStateException", "<init>", "(Ljava/lang/String;)V", false);
+        mv.visitInsn(ATHROW);
+        mv.visitLabel(label1);
+        mv.visitFrame(Opcodes.F_SAME1, 0, null, 1, new Object[]{"java/lang/RuntimeException"});
+        mv.visitVarInsn(ASTORE, 1);
+        Label label4 = new Label();
+        mv.visitLabel(label4);
+        mv.visitLdcInsn("DongTai agent request replay, please ignore");
+        mv.visitFieldInsn(GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
+        mv.visitLdcInsn("DongTai agent request replay, please ignore");
+        mv.visitMethodInsn(INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V", false);*/
+//        mark(elseLabel2);
         mark(elseLabel);
     }
 
@@ -38,6 +65,29 @@ public class SinkAdviceAdapter extends AbstractAdviceAdapter {
             leaveSink();
         }
     }
+
+/*    *//**
+     * 方法结束前，如何判断是否需要throw、return，解决堆栈未对齐
+     *
+     * @param maxStack
+     * @param maxLocals
+     *//*
+    @Override
+    public void visitMaxs(int maxStack, int maxLocals) {
+        mark(catchLabel);
+        visitTryCatchBlock(tryLabel, catchLabel, mark(), ASM_TYPE_THROWABLE.getInternalName());
+        Label elseLabel2 = new Label();
+        isNotRequestReplay();
+        mv.visitJumpInsn(EQ, elseLabel2);
+        Label returnLabel = new Label();
+        throwException();
+        mark(returnLabel);
+        mark(elseLabel2);
+        after(ATHROW);
+        if (mv != null) {
+            mv.visitMaxs(maxStack, maxLocals);
+        }
+    }*/
 
     /**
      * 进入sink方法的字节码
@@ -53,6 +103,16 @@ public class SinkAdviceAdapter extends AbstractAdviceAdapter {
     private void isTopLevelSink() {
         invokeStatic(ASM_TYPE_SPY_HANDLER, SPY_HANDLER$getDispatcher);
         invokeInterface(ASM_TYPE_SPY_DISPATCHER, SPY$isFirstLevelSink);
+    }
+
+    private void isNotRequestReplay() {
+        invokeStatic(ASM_TYPE_SPY_HANDLER, SPY_HANDLER$getDispatcher);
+        invokeInterface(ASM_TYPE_SPY_DISPATCHER, SPY$isNotReplayRequest);
+    }
+
+    private void isRequestReplay() {
+        invokeStatic(ASM_TYPE_SPY_HANDLER, SPY_HANDLER$getDispatcher);
+        invokeInterface(ASM_TYPE_SPY_DISPATCHER, SPY$isReplayRequest);
     }
 
     /**

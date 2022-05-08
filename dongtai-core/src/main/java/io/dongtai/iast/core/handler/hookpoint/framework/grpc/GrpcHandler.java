@@ -148,6 +148,8 @@ public class GrpcHandler {
         } catch (Exception e) {
             ErrorLogReport.sendErrorLog(e);
             EngineManager.cleanThreadState();
+        } finally {
+            EngineManager.turnOnDongTai();
         }
     }
 

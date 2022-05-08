@@ -92,7 +92,7 @@ public class HttpRequestReplay implements Runnable {
      * @throws Exception http请求中抛出的异常
      */
     private static void sendRequest(String method, String fullUrl, String data, HashMap<String, String> headers) {
-        DongTaiLog.info("Do request replay: method={},url={},data={},header={}",method,fullUrl,data,headers.toString());
+        DongTaiLog.debug("Do request replay: method={},url={},data={},header={}",method,fullUrl,data,headers.toString());
         HttpURLConnection connection = null;
         try {
             HttpClientUtils.trustAllHosts();
@@ -131,7 +131,7 @@ public class HttpRequestReplay implements Runnable {
                 response.append('\r');
             }
             rd.close();
-            DongTaiLog.info("Request replay response: {}",response);
+            DongTaiLog.debug("Request replay response: {}",response);
         } catch (Exception e) {
             DongTaiLog.error(e);
         } finally {

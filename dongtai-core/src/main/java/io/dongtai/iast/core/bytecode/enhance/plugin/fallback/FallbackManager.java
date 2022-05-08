@@ -2,9 +2,11 @@ package io.dongtai.iast.core.bytecode.enhance.plugin.fallback;
 
 
 import io.dongtai.iast.common.utils.version.JavaVersionUtils;
+import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.breaker.AbstractBreaker;
 import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.limiter.HeavyTrafficRateLimiter;
 import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.limiter.FallbackSwitchFrequencyLimiter;
+import io.dongtai.iast.core.utils.config.RemoteConfigUtils;
 import io.dongtai.iast.core.utils.threadlocal.RateLimiterThreadLocal;
 import io.dongtai.log.DongTaiLog;
 
@@ -140,6 +142,9 @@ public class FallbackManager {
      * @return boolean
      */
     public static boolean isNeedSecondFallback() {
+        if (EngineManager.enableDongTai == 0 || !RemoteConfigUtils.enableAutoFallback()){
+            return false;
+        }
         return FallbackSwitch.isNeedSecondFallback();
     }
 }

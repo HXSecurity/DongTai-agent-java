@@ -50,7 +50,7 @@ public class EngineManager {
 
     private static boolean logined = false;
     private static final AtomicInteger reqCounts = new AtomicInteger(0);
-    private static int enableDongTai = 0;
+    public static int enableDongTai = 0;
 
     public static final BooleanThreadLocal ENTER_REPLAY_ENTRYPOINT = new BooleanThreadLocal(false);
 
@@ -111,7 +111,8 @@ public class EngineManager {
         this.supportLazyHook = cfg.isEnableAllHook();
         this.saveBytecode = cfg.isEnableDumpClass();
         this.agentId = agentId;
-        RemoteConfigUtils.syncRemoteConfig(agentId);
+//        RemoteConfigUtils.syncRemoteConfig(agentId);
+        RemoteConfigUtils.syncRemoteConfigV2(agentId);
         this.fallbackManager = FallbackManager.newInstance(cfg.cfg);
     }
 
