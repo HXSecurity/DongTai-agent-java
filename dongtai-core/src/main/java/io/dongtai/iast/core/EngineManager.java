@@ -153,6 +153,8 @@ public class EngineManager {
      */
     public static void turnOnEngine() {
         EngineManager.enableDongTai = 1;
+        FallbackSwitch.setPERFORMANCE_FALLBACK(false);
+        FallbackSwitch.setHEAVY_TRAFFIC_LIMIT_FALLBACK(false);
     }
 
     /**
