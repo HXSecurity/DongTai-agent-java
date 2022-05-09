@@ -169,7 +169,11 @@ public class RemoteConfigUtils {
                 }
                 if (null != remoteConfigEntity.getPerformanceLimitRiskMaxMetricsCount()) {
                     Integer performanceLimitRiskMaxMetricsCount = remoteConfigEntity.getPerformanceLimitRiskMaxMetricsCount();
-                    performanceBreakerWaitDuration =performanceLimitRiskMaxMetricsCount;
+                    if (performanceLimitRiskMaxMetricsCount == 0){
+                        performanceBreakerWaitDuration = null;
+                    }else {
+                        performanceBreakerWaitDuration =performanceLimitRiskMaxMetricsCount;
+                    }
                     if (getApplicationIsUninstall() || getJvmIsUninstall() || getSystemIsUninstall()){
                         secondFallbackDuration = (long) (performanceLimitRiskMaxMetricsCount * 1000);
                     }
