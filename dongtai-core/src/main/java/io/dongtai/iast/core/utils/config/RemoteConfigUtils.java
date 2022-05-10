@@ -175,7 +175,11 @@ public class RemoteConfigUtils {
                         performanceBreakerWaitDuration =performanceLimitRiskMaxMetricsCount;
                     }
                     if (getApplicationIsUninstall() || getJvmIsUninstall() || getSystemIsUninstall()){
-                        secondFallbackDuration = (long) (performanceLimitRiskMaxMetricsCount * 1000);
+                        if (performanceLimitRiskMaxMetricsCount == 0){
+                            secondFallbackDuration = (long) (30 * 1000);
+                        }else {
+                            secondFallbackDuration = (long) (performanceLimitRiskMaxMetricsCount * 1000);
+                        }
                     }
                 }
                 if (null != remoteConfigEntity.getApplication()) {
