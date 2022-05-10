@@ -76,13 +76,13 @@ public class KafkaHandler {
                 Object rd = it.next();
                 String topic = (String) rd.getClass().getMethod("topic").invoke(rd);
                 String partition = String.valueOf(rd.getClass().getMethod("partition").invoke(rd));
+                String traceId;
                 headerMap = getHeaderMapFromRecord(rd);
                 if (headerMap.get(ContextManager.getHeaderKey()) != null) {
-                    ContextManager.getOrCreateGlobalTraceId(headerMap.get(ContextManager.getHeaderKey()),
+                    traceId = ContextManager.getOrCreateGlobalTraceId(headerMap.get(ContextManager.getHeaderKey()),
                             EngineManager.getAgentId());
                 } else {
-                    String traceId = ContextManager.getSegmentId();
-                    sharedTraceId.set(traceId);
+                    traceId = ContextManager.getSegmentId();
                 }
 
                 Map<String, Object> requestMeta = new HashMap<String, Object>(12);
@@ -125,7 +125,7 @@ public class KafkaHandler {
                 event.setInvokeId(invokeId);
                 event.setPlugin("KAFKA");
                 event.setServiceName("MESSAGE_QUEUE");
-                event.setTraceId(sharedTraceId.get());
+                event.setTraceId(traceId);
                 event.setCallStack(StackUtils.getLatestStack(5));
 
                 Set<Object> resModelSet = new HashSet<Object>();
