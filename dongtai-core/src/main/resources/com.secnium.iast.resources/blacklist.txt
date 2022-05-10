@@ -30171,7 +30171,7 @@ org/apache/catalina/session/BaseSessionLocker
 org/apache/catalina/session/ManagerBase
 org/apache/catalina/session/ManagerBase$SessionTiming
 org/apache/catalina/session/PersistentManagerBase
-org/apache/catalina/session/StandardSession
+# org/apache/catalina/session/StandardSession
 org/apache/catalina/session/SessionLock
 org/apache/catalina/session/StandardSessionFacade
 org/apache/catalina/session/StandardManager
