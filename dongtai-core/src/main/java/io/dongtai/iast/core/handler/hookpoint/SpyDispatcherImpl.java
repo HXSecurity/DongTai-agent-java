@@ -1,6 +1,7 @@
 package io.dongtai.iast.core.handler.hookpoint;
 
 import io.dongtai.iast.core.EngineManager;
+import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.FallbackSwitch;
 import io.dongtai.iast.core.bytecode.enhance.plugin.spring.SpringApplicationImpl;
 import io.dongtai.iast.core.handler.hookpoint.controller.HookType;
 import io.dongtai.iast.core.handler.hookpoint.controller.impl.*;
@@ -61,6 +62,8 @@ public class SpyDispatcherImpl implements SpyDispatcher {
         } catch (Exception e) {
             DongTaiLog.error(e);
             EngineManager.cleanThreadState();
+        } finally {
+            FallbackSwitch.clearHeavyHookFallback();
         }
     }
 

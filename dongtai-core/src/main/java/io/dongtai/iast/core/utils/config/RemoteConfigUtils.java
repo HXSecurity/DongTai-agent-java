@@ -7,6 +7,7 @@ import io.dongtai.iast.common.entity.performance.metrics.MemoryUsageMetrics;
 import io.dongtai.iast.common.entity.performance.metrics.ThreadInfoMetrics;
 import io.dongtai.iast.common.entity.response.PlainResult;
 import io.dongtai.iast.common.enums.MetricsKey;
+import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.FallbackSwitch;
 import io.dongtai.iast.core.utils.Constants;
 import io.dongtai.iast.core.utils.HttpClientUtils;
@@ -144,7 +145,6 @@ public class RemoteConfigUtils {
         String remoteResponse = getConfigFromRemoteV2(agentId);
         try {
             // 远端有配置且和上次配置内容不一致时，重新更新配置文件
-//            String remoteResponse = REMOTE_CONFIG_NEW_META;
             RemoteConfigEntityV2 remoteConfigEntity = parseRemoteConfigResponseV2(remoteResponse);
             if (null != remoteConfigEntity && !remoteResponse.equals(existsRemoteConfigMeta)) {
                 List<PerformanceEntity> application = remoteConfigEntity.getApplication();
@@ -247,6 +247,9 @@ public class RemoteConfigUtils {
                 performanceLimitThreshold.setMemoryNoHeapUsage(memoryNoHeapUsage);
                 performanceLimitThreshold.setCpuUsage(cpuInfoMetrics);
                 performanceLimitMaxThreshold = combineRemoteAndLocalMetricsThreshold(performanceLimitMaxThreshold,performanceLimitThreshold);
+                if (!"{}".equals(existsRemoteConfigMeta)){
+                    EngineManager.setFallbackManager();
+                }
                 existsRemoteConfigMeta = remoteResponse;
                 DongTaiLog.debug("Sync remote config successful.");
             }
@@ -426,7 +429,7 @@ public class RemoteConfigUtils {
      */
     public static Double getHookLimitTokenPerSecond(Properties cfg) {
         if (hookLimitTokenPerSecond == null) {
-            hookLimitTokenPerSecond = PropertyUtils.getRemoteSyncLocalConfig("hookLimit.tokenPerSecond", Double.class, 5000.0, cfg);
+            hookLimitTokenPerSecond = PropertyUtils.getRemoteSyncLocalConfig("hookLimit.tokenPerSecond", Double.class, 10000000000000.0, cfg);
         }
         return hookLimitTokenPerSecond;
     }
@@ -436,7 +439,7 @@ public class RemoteConfigUtils {
      */
     public static double getHookLimitInitBurstSeconds(Properties cfg) {
         if (hookLimitInitBurstSeconds == null) {
-            hookLimitInitBurstSeconds = PropertyUtils.getRemoteSyncLocalConfig("hookLimit.initBurstSeconds", Double.class, 1.0, cfg);
+            hookLimitInitBurstSeconds = PropertyUtils.getRemoteSyncLocalConfig("hookLimit.initBurstSeconds", Double.class, 2.0, cfg);
         }
         return hookLimitInitBurstSeconds;
     }
@@ -450,7 +453,7 @@ public class RemoteConfigUtils {
      */
     public static Double getHeavyTrafficLimitTokenPerSecond(Properties cfg) {
         if (heavyTrafficLimitTokenPerSecond == null) {
-            heavyTrafficLimitTokenPerSecond = PropertyUtils.getRemoteSyncLocalConfig("heavyTrafficLimit.tokenPerSecond", Double.class, 40.0, cfg);
+            heavyTrafficLimitTokenPerSecond = PropertyUtils.getRemoteSyncLocalConfig("heavyTrafficLimit.tokenPerSecond", Double.class, 1000000000000.0, cfg);
         }
         return heavyTrafficLimitTokenPerSecond;
     }
@@ -460,7 +463,7 @@ public class RemoteConfigUtils {
      */
     public static double getHeavyTrafficLimitInitBurstSeconds(Properties cfg) {
         if (heavyTrafficLimitInitBurstSeconds == null) {
-            heavyTrafficLimitInitBurstSeconds = PropertyUtils.getRemoteSyncLocalConfig("heavyTrafficLimit.initBurstSeconds", Double.class, 1.0, cfg);
+            heavyTrafficLimitInitBurstSeconds = PropertyUtils.getRemoteSyncLocalConfig("heavyTrafficLimit.initBurstSeconds", Double.class, 2.0, cfg);
         }
         return heavyTrafficLimitInitBurstSeconds;
     }

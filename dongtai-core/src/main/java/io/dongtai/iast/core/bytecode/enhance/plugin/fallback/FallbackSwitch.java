@@ -89,14 +89,14 @@ public class FallbackSwitch {
 
     public static void setHeavyTrafficLimitFallback(boolean fallback) {
         HEAVY_TRAFFIC_LIMIT_FALLBACK = fallback;
-        DongTaiLog.info("Engine heavyTraffic fallback is {}, Engine {} successfully", fallback ? "open" : "close", fallback ? "shut down" : "opened");
+        DongTaiLog.info("Engine heavyTraffic fallback is {}, Fallback engine {} successfully", fallback ? "open" : "close", fallback ? "shut down" : "opened");
         limitSwitchFrequency(fallback);
         calculateFallbackDuration(HEAVY_TRAFFIC_STOPWATCH, fallback, SecondFallbackReasonEnum.TRAFFIC_FALLBACK_DURATION);
     }
 
     public static void setPerformanceFallback(boolean fallback) {
         PERFORMANCE_FALLBACK = fallback;
-        DongTaiLog.info("Engine performance fallback is {}, Engine {} successfully", fallback ? "open" : "close", fallback ? "shut down" : "opened");
+        DongTaiLog.info("Engine performance fallback is {}, Fallback engine {} successfully", fallback ? "open" : "close", fallback ? "shut down" : "opened");
         limitSwitchFrequency(fallback);
         calculateFallbackDuration(PERFORMANCE_STOPWATCH, fallback, SecondFallbackReasonEnum.PERFORMANCE_FALLBACK_DURATION);
     }
