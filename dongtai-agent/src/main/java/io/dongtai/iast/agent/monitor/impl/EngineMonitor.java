@@ -45,7 +45,11 @@ public class EngineMonitor implements IMonitor {
                 break;
             case CORE_START:
                 DongTaiLog.info("engine start");
-                engineManager.start();
+                if(EngineManager.checkCoreIsInstalled()){
+                    engineManager.start();
+                }else {
+                    startEngine();
+                }
                 break;
             case CORE_STOP:
                 DongTaiLog.info("engine stop");
