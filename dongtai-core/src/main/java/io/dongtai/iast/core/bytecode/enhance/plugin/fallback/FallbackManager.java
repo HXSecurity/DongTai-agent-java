@@ -61,6 +61,11 @@ public class FallbackManager {
         return instance;
     }
 
+    public static FallbackManager updateInstance(Properties cfg) {
+        instance = new FallbackManager(cfg);
+        return instance;
+    }
+
     private FallbackManager(Properties cfg) {
         // 创建断路器实例
         if (JavaVersionUtils.isJava6() || JavaVersionUtils.isJava7()) {

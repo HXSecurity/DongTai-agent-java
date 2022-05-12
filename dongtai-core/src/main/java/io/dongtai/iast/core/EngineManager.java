@@ -44,7 +44,7 @@ public class EngineManager {
     /**
      * 限制器统一管理器
      */
-    private final FallbackManager fallbackManager;
+    private FallbackManager fallbackManager;
 
     public static IastServer SERVER;
 
@@ -111,13 +111,21 @@ public class EngineManager {
         this.supportLazyHook = cfg.isEnableAllHook();
         this.saveBytecode = cfg.isEnableDumpClass();
         this.agentId = agentId;
-//        RemoteConfigUtils.syncRemoteConfig(agentId);
-        RemoteConfigUtils.syncRemoteConfigV2(agentId);
+        String fallbackVersion = System.getProperty("dongtai.fallback.version", "v2");
+        if ("v2".equals(fallbackVersion)){
+            RemoteConfigUtils.syncRemoteConfigV2(agentId);
+        }else {
+            RemoteConfigUtils.syncRemoteConfig(agentId);
+        }
         this.fallbackManager = FallbackManager.newInstance(cfg.cfg);
     }
 
     public static FallbackManager getFallbackManager() {
         return instance.fallbackManager;
+    }
+
+    public static void setFallbackManager() {
+        instance.fallbackManager = FallbackManager.updateInstance(PropertyUtils.getInstance().cfg);
     }
 
     /**

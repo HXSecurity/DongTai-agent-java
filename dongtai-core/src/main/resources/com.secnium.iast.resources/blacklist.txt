@@ -57503,6 +57503,7 @@ org/springframework/boot/BeanDefinitionLoader$ClassExcludeFilter
 org/springframework/boot/CommandLineRunner
 org/springframework/boot/DefaultApplicationArguments
 org/springframework/boot/DefaultApplicationArguments$Source
+org/springframework/boot/devtools/*
 org/springframework/boot/devtools/restart/classloader/RestartClassLoader$CompoundEnumeration
 org/springframework/boot/ExitCodeEvent
 org/springframework/boot/ExitCodeGenerator
