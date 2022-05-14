@@ -26,7 +26,7 @@ public class Base64Decoder extends CharacterDecoder {
         try {
             return instance.decodeBuffer(data);
         } catch (IOException e) {
-            DongTaiLog.error(e);
+            DongTaiLog.error("io.dongtai.iast.agent.util.base64.Base64Decoder.decodeBase64FromString(java.lang.String)",e);
         }
         return null;
     }

@@ -55,10 +55,8 @@ public class HttpImpl {
                 cloneResponseMethod = CLASS_OF_SERVLET_PROXY
                         .getDeclaredMethod("cloneResponse", Object.class, boolean.class);
             }
-        } catch (MalformedURLException e) {
-            DongTaiLog.error(e);
-        } catch (NoSuchMethodException e) {
-            DongTaiLog.error(e);
+        } catch (MalformedURLException | NoSuchMethodException e) {
+            DongTaiLog.error("io.dongtai.iast.core.handler.hookpoint.controller.impl.HttpImpl.createClassLoader(java.lang.Object)",e);
         }
     }
 

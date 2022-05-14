@@ -23,8 +23,8 @@ public class PerformanceLimitReport extends AbstractLimitReport {
     public static void sendReport() {
         PERFORMANCE_BREAK_REPORT_BODY.getDetail().setAgentId(EngineManager.getAgentId());
         PERFORMANCE_BREAK_REPORT_BODY.getDetail().setBreakDate(new Date());
-        String report = GsonUtils.toJson(PERFORMANCE_BREAK_REPORT_BODY);
-        sendReport(report);
+/*        String report = GsonUtils.toJson(PERFORMANCE_BREAK_REPORT_BODY);
+        sendReport(report);*/
         PERFORMANCE_BREAK_REPORT_BODY.clearAllPerformanceBreakLog();
     }
 

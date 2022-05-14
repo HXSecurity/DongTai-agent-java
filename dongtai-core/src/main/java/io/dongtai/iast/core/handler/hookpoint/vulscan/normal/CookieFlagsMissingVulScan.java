@@ -25,7 +25,7 @@ public class CookieFlagsMissingVulScan extends AbstractNormalVulScan {
                 sendReport(getLatestStack(), sink.getType());
                 break;
             } catch (Exception e) {
-                DongTaiLog.error(e);
+                DongTaiLog.error("io.dongtai.iast.core.handler.hookpoint.vulscan.normal.CookieFlagsMissingVulScan.scan(io.dongtai.iast.core.handler.hookpoint.models.IastSinkModel,io.dongtai.iast.core.handler.hookpoint.models.MethodEvent)",e);
             }
         }
     }

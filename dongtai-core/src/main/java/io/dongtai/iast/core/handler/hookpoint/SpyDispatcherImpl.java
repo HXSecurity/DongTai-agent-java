@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class SpyDispatcherImpl implements SpyDispatcher {
 
     public static final AtomicInteger INVOKE_ID_SEQUENCER = new AtomicInteger(1);
+    private static final ThreadLocal<Long> responseTime = new ThreadLocal<>();
 
     /**
      * mark for enter Http Entry Point
@@ -55,6 +56,8 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                     EngineManager.maintainRequestCount();
                     GraphBuilder.buildAndReport(request, response);
                     EngineManager.cleanThreadState();
+                    long responseTimeEnd = System.currentTimeMillis()-responseTime.get()+8;
+                    DongTaiLog.debug(GraphBuilder.getURL() + " response time: "+responseTimeEnd+"ms");
                 }
 
                 EngineManager.turnOnDongTai();
@@ -76,6 +79,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public boolean isFirstLevelHttp() {
         try {
+            responseTime.set(System.currentTimeMillis());
             return EngineManager.isEngineRunning() && EngineManager.SCOPE_TRACKER
                     .isFirstLevelHttp();
         } catch (Exception e) {

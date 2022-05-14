@@ -55,7 +55,7 @@ public class ServletRequestWrapper extends HttpServletRequestWrapper implements 
                     bufferedReader.close();
                 } catch (IOException e) {
                     // fixme: add logger for solve exception
-                    DongTaiLog.error(e);
+                    DongTaiLog.error("io.dongtai.api.servlet2.ServletRequestWrapper.getInputStream()",e);
                 }
                 body = stringBuilder.toString();
                 isCachedBody = true;

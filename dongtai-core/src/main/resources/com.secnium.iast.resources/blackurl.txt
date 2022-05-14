@@ -6,3 +6,5 @@ isTest 2
 /actuator/health 1
 /service/lessonmenu.mvc 1
 /service/lessonoverview.mvc 1
+.map 1
+.lesson 1

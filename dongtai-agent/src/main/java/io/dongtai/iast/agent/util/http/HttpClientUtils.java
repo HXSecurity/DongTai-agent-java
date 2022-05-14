@@ -114,6 +114,7 @@ public class HttpClientUtils {
                 response.append('\r');
             }
             rd.close();
+            DongTaiLog.debug("dongtai upload url is {}, request is {} ,response is {}", urlStr, data, response.toString());
             return response;
         } catch (Exception e){
             DongTaiLog.error(e);

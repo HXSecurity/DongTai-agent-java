@@ -47,7 +47,7 @@ public class IastProperties {
         try {
             init();
         } catch (ClassNotFoundException e) {
-            DongTaiLog.error(e);
+            DongTaiLog.error("io.dongtai.iast.agent.IastProperties.<init>()",e);
         }
     }
 

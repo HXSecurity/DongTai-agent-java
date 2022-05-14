@@ -1,5 +1,6 @@
 package io.dongtai.iast.core.utils.matcher;
 
+import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.FallbackSwitch;
 import io.dongtai.iast.core.utils.ConfigUtils;
 import io.dongtai.iast.core.utils.PropertyUtils;
 import io.dongtai.log.DongTaiLog;
@@ -29,7 +30,7 @@ public class ConfigMatcher {
     private final AbstractMatcher SERVER_CLASS = new ServerClass();
     private Instrumentation inst;
 
-    private final Set<String> BLACK_URL;
+    public final Set<String> BLACK_URL;
 
     public static ConfigMatcher getInstance() {
         if (null == INSTANCE) {
@@ -89,6 +90,10 @@ public class ConfigMatcher {
                         }
                     case 2:
                         if (null != headers.get(strings[0].toLowerCase())) {
+                            return true;
+                        }
+                    case 3:
+                        if (FallbackSwitch.URL_FALLBACK && uri.contains(strings[0])){
                             return true;
                         }
                     default:

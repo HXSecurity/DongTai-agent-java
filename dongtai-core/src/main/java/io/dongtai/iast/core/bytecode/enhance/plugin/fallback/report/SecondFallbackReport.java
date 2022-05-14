@@ -27,7 +27,7 @@ public class SecondFallbackReport extends AbstractLimitReport {
      */
     public static void sendReport(){
         FALLBACK_REPORT_LOG.getDetail().setAgentId(EngineManager.getAgentId());
-        sendReport(GsonUtils.toJson(FALLBACK_REPORT_LOG));
+//        sendReport(GsonUtils.toJson(FALLBACK_REPORT_LOG));
         FALLBACK_REPORT_LOG.clear();
     }
 

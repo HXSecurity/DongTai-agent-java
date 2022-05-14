@@ -107,9 +107,9 @@ public class Agent {
                 DongTaiLog.error("attach failure, please try again with command: {}", Arrays.toString(execution));
             }
         } catch (IOException e) {
-            DongTaiLog.error(e);
+            DongTaiLog.error("io.dongtai.iast.agent.Agent.doAttach(java.lang.String,java.lang.String)",e);
         } catch (InterruptedException e) {
-            DongTaiLog.error(e);
+            DongTaiLog.error("io.dongtai.iast.agent.Agent.doAttach(java.lang.String,java.lang.String)",e);
         }
     }
 

@@ -247,6 +247,22 @@ public class DongTaiLog {
         }
     }
 
+    public static void error(String des, Throwable t) {
+        if (canLog(Level.FINER) && enablePrintLog) {
+            String msg = des+"\n"+t.getMessage();
+            if (enableColor) {
+                System.out.println(getTime() + TITTLE_COLOR_PREFIX + ERROR_COLOR_PREFIX + msg);
+            } else {
+                System.out.println(getTime() + TITTLE + ERROR_PREFIX + msg);
+            }
+            msg = getTime() + TITTLE + ERROR_PREFIX + msg;
+            StringWriter stringWriter = new StringWriter();
+            t.printStackTrace(new PrintWriter(stringWriter));
+            msg = msg + stringWriter;
+            writeLogToFile(msg);
+        }
+    }
+
     private static String format(String from, Object... arguments) {
         if (from != null) {
             String computed = from;

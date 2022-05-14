@@ -46,7 +46,7 @@ public class ConfigUtils {
             }
         } catch (IOException e) {
             DongTaiLog.error("读取配置文件：{} 失败，错误信息：{}", filename, e);
-            DongTaiLog.error(e);
+            DongTaiLog.error("io.dongtai.iast.core.utils.ConfigUtils.loadConfigFromFile(java.lang.String)",e);
         }
         return new HashSet[]{container, startWith, endWith};
     }
