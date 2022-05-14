@@ -59,7 +59,7 @@ public class HttpRequestReplay implements Runnable {
                 sendRequest(replayModel.getRequestMethod(), url, replayModel.getRequestBody(), headers);
             }
         } catch (Exception e) {
-            DongTaiLog.error(e);
+            DongTaiLog.error("io.dongtai.iast.core.replay.HttpRequestReplay.doReplay(io.dongtai.iast.core.handler.hookpoint.models.IastReplayModel)",e);
         }
     }
 
@@ -133,7 +133,7 @@ public class HttpRequestReplay implements Runnable {
             rd.close();
             DongTaiLog.debug("Request replay response: {}",response);
         } catch (Exception e) {
-            DongTaiLog.error(e);
+            DongTaiLog.error("io.dongtai.iast.core.replay.HttpRequestReplay.sendRequest(java.lang.String,java.lang.String,java.lang.String,java.util.HashMap<java.lang.String,java.lang.String>)",e);
         } finally {
             if (connection != null) {
                 connection.disconnect();

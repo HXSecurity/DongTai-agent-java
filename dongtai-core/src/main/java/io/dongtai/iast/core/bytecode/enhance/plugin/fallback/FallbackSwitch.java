@@ -46,6 +46,13 @@ public class FallbackSwitch {
     @Setter
     private static boolean PERFORMANCE_FALLBACK = false;
 
+    /**
+     * URL 限流开关
+     */
+    @Getter
+    @Setter
+    public static boolean URL_FALLBACK = false;
+
     // *************************************************************
     // 二次降级配置
     // *************************************************************

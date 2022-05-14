@@ -64,10 +64,8 @@ public class PropertyUtils {
                 cfg.load(fis);
                 fis.close();
             }
-        } catch (FileNotFoundException e) {
-            DongTaiLog.error(e);
         } catch (IOException e) {
-            DongTaiLog.error(e);
+            DongTaiLog.error("io.dongtai.iast.core.utils.PropertyUtils.init()",e);
         }
     }
 

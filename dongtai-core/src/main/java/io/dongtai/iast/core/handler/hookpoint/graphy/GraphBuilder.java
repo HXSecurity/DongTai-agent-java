@@ -22,6 +22,8 @@ import org.json.JSONObject;
  */
 public class GraphBuilder {
 
+    private static String URL;
+
     public static void buildAndReport(Object request, Object response) {
         List<GraphNode> nodeList = build();
         String report = convertToReport(nodeList, request, response);
@@ -93,8 +95,11 @@ public class GraphBuilder {
         detail.put(ReportConstant.SCHEME, requestMeta.getOrDefault("scheme", ""));
         detail.put(ReportConstant.METHOD, requestMeta.getOrDefault("method", ""));
         detail.put(ReportConstant.SECURE, requestMeta.getOrDefault("secure", ""));
-        detail.put(ReportConstant.URL, requestMeta.getOrDefault("requestURL", "").toString());
-        detail.put(ReportConstant.URI, requestMeta.getOrDefault("requestURI", ""));
+        String requestURL = requestMeta.getOrDefault("requestURL", "").toString();
+        detail.put(ReportConstant.URL, requestURL);
+        String requestURI = requestMeta.getOrDefault("requestURI", "").toString();
+        detail.put(ReportConstant.URI, requestURI);
+        setURL(requestURL);
         detail.put(ReportConstant.CLIENT_IP, requestMeta.getOrDefault("remoteAddr", ""));
         detail.put(ReportConstant.QUERY_STRING, requestMeta.getOrDefault("queryString", ""));
         detail.put(ReportConstant.REQ_HEADER,
@@ -130,5 +135,13 @@ public class GraphBuilder {
         } else {
             return responseBody;
         }
+    }
+
+    public static String getURL() {
+        return URL;
+    }
+
+    public static void setURL(String URL) {
+        GraphBuilder.URL = URL;
     }
 }
