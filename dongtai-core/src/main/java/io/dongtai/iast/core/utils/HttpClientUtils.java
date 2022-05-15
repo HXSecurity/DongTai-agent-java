@@ -103,7 +103,7 @@ public class HttpClientUtils {
             DongTaiLog.debug("dongtai upload url is {}, request is {} ,response is {}", urlStr, data, response.toString());
             return response;
         } catch (Exception e) {
-            DongTaiLog.error(e);
+            DongTaiLog.error("io.dongtai.iast.core.utils.HttpClientUtils.sendRequest(io.dongtai.iast.core.utils.HttpMethods,java.lang.String,java.lang.String,java.lang.String,java.util.HashMap<java.lang.String,java.lang.String>,java.net.Proxy)",e);
         } finally {
             if (connection != null) {
                 connection.disconnect();
