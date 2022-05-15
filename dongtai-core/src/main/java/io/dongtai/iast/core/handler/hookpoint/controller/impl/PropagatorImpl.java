@@ -143,7 +143,7 @@ public class PropagatorImpl {
             }
         }
         if (isNotEmpty(event.outValue)) {
-            handlerCustomModel(event);
+//            handlerCustomModel(event);
             EngineManager.TAINT_POOL.addTaintToPool(event.outValue, event, false);
         }
     }
@@ -269,8 +269,7 @@ public class PropagatorImpl {
                         modelValues.addAll(parseCustomModel(listValue));
                     }
                 }
-            } catch (Exception e) {
-                DongTaiLog.error(e);
+            } catch (Exception ignored) {
             }
         }
         return modelValues;
