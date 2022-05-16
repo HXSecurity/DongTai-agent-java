@@ -3,6 +3,7 @@ package io.dongtai.iast.core.bytecode.enhance.plugin.cookie;
 import io.dongtai.iast.core.bytecode.enhance.IastContext;
 import io.dongtai.iast.core.bytecode.enhance.plugin.AbstractClassVisitor;
 import io.dongtai.iast.core.bytecode.enhance.plugin.core.adapter.PropagateAdviceAdapter;
+import io.dongtai.iast.core.bytecode.enhance.plugin.core.adapter.SinkAdviceAdapter;
 import io.dongtai.iast.core.utils.AsmUtils;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
@@ -31,7 +32,11 @@ public class BaseType extends AbstractClassVisitor {
         if (match(name, context.getMatchClassName())) {
             String iastMethodSignature = AsmUtils.buildSignature(context.getMatchClassName(), name, desc);
             String framework = "refType";
-            mv = new PropagateAdviceAdapter(mv, access, name, desc, context, framework, iastMethodSignature);
+            if (iastMethodSignature.contains("setSecure") || iastMethodSignature.contains("<init>")){
+                mv = new SinkAdviceAdapter(mv, access, name, desc, context, framework, iastMethodSignature,false);
+            }else {
+                mv = new PropagateAdviceAdapter(mv, access, name, desc, context, framework, iastMethodSignature);
+            }
             setTransformed();
             DongTaiLog.trace("rewrite method {} for listener[match={},class={}]", iastMethodSignature, context.getMatchClassName(), context.getClassName());
         }
