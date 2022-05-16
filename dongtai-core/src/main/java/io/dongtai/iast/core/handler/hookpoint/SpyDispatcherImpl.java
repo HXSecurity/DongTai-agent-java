@@ -487,7 +487,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                             PropagatorImpl.solvePropagator(event, INVOKE_ID_SEQUENCER);
                         } else if (HookType.SOURCE.equals(hookType)) {
                             SourceImpl.solveSource(event, INVOKE_ID_SEQUENCER);
-                        } else if (HookType.SINK.equals(hookType) && !EngineManager.TAINT_POOL.get().isEmpty()) {
+                        } else if (HookType.SINK.equals(hookType)) {
                             SinkImpl.solveSink(event);
                         }
                     }
