@@ -46994,7 +46994,7 @@ org/hsqldb/jdbc/jdbcColumnMetaData
 org/hsqldb/jdbc/jdbcDataSource
 org/hsqldb/jdbc/jdbcDataSourceFactory
 org/hsqldb/jdbc/JDBCDatabaseMetaData
-org/hsqldb/jdbc/JDBCPreparedStatement
+# org/hsqldb/jdbc/JDBCPreparedStatement
 org/hsqldb/jdbc/jdbcParameterMetaData
 org/hsqldb/jdbc/JDBCResultSet*
 org/hsqldb/jdbc/jdbcSavepoint

@@ -56,12 +56,17 @@ public class FileUtils {
                 }else if (temp.contains("${AGENT_ID}")){
                     temp = temp.replace("${AGENT_ID}",AgentRegisterReport.getAgentFlag().toString());
                 }else if (temp.contains("${OPENAPI}")){
-                    String s = IastProperties.getInstance().getBaseUrl();
-                    s = s.substring(s.indexOf("://") + 3, s.indexOf("/openapi"));
-                    if(s.contains(":")){
-                        s = s.substring(0,s.indexOf(":"));
+                    String logAddress = IastProperties.getInstance().getLogAddress();
+                    if (null == logAddress){
+                        String s = IastProperties.getInstance().getBaseUrl();
+                        s = s.substring(s.indexOf("://") + 3, s.indexOf("/openapi"));
+                        if(s.contains(":")){
+                            s = s.substring(0,s.indexOf(":"));
+                        }
+                        temp = temp.replace("${OPENAPI}", s);
+                    }else {
+                        temp = logAddress;
                     }
-                    temp = temp.replace("${OPENAPI}", s);
                 }else if (temp.contains("${LOG_PORT}")){
                     temp = temp.replace("${LOG_PORT}",IastProperties.getInstance().getLogPort());
                 }else if (temp.contains("${LOG_PATH}")){

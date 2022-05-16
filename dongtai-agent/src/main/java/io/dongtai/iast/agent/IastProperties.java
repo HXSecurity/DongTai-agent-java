@@ -28,6 +28,7 @@ public class IastProperties {
     private String debugFlag = null;
     private String isDownloadPackage;
     private String logPort;
+    private String logAddress;
     private String fallbackVersion;
 
     private String propertiesFilePath;
@@ -222,6 +223,13 @@ public class IastProperties {
             logPort = System.getProperty("dongtai.log.port", "30909");
         }
         return logPort;
+    }
+
+    public String getLogAddress() {
+        if (logAddress == null) {
+            logAddress = System.getProperty("dongtai.log.address");
+        }
+        return logAddress;
     }
 
     public String getFallbackVersion() {
