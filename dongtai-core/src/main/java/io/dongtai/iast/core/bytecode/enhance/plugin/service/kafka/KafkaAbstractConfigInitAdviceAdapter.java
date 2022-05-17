@@ -8,23 +8,22 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.AdviceAdapter;
 
-import java.util.ArrayList;
+import java.util.List;
 
-public class KafkaProducerAdviceAdapter extends AdviceAdapter implements AsmTypes, AsmMethods {
+public class KafkaAbstractConfigInitAdviceAdapter extends AdviceAdapter implements AsmTypes, AsmMethods {
     private int localServers;
     private int localServersString;
-    protected KafkaProducerAdviceAdapter(MethodVisitor mv, int access, String name, String desc) {
+    protected KafkaAbstractConfigInitAdviceAdapter(MethodVisitor mv, int access, String name, String desc) {
         super(AsmUtils.api, mv, access, name, desc);
     }
 
     @Override
     protected void onMethodExit(int opcode) {
         if (opcode != ATHROW) {
-            localServers = newLocal(Type.getType(ArrayList.class));
-            loadArg(0);
+            localServers = newLocal(Type.getType(List.class));
+            loadThis();
             push("bootstrap.servers");
-            mv.visitMethodInsn(INVOKEINTERFACE, "java/util/Map", "get", "(Ljava/lang/Object;)Ljava/lang/Object;", true);
-            mv.visitTypeInsn(CHECKCAST, "java/util/ArrayList");
+            mv.visitMethodInsn(INVOKEVIRTUAL, " org/apache/kafka/common/config/AbstractConfig".substring(1), "getList", "(Ljava/lang/String;)Ljava/util/List;", false);
             storeLocal(localServers);
 
             localServersString = newLocal(Type.getType(String.class));
