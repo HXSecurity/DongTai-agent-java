@@ -65,7 +65,7 @@ public class FileUtils {
                         }
                         temp = temp.replace("${OPENAPI}", s);
                     }else {
-                        temp = logAddress;
+                        temp = temp.replace("${OPENAPI}", logAddress);
                     }
                 }else if (temp.contains("${LOG_PORT}")){
                     temp = temp.replace("${LOG_PORT}",IastProperties.getInstance().getLogPort());
