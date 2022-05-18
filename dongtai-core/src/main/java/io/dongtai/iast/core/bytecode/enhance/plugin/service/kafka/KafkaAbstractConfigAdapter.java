@@ -5,8 +5,10 @@ import io.dongtai.iast.core.bytecode.enhance.plugin.AbstractClassVisitor;
 import io.dongtai.log.DongTaiLog;
 import org.objectweb.asm.*;
 
-public class KafkaProducerAdapter extends AbstractClassVisitor {
-    public KafkaProducerAdapter(ClassVisitor classVisitor, IastContext context) {
+public class KafkaAbstractConfigAdapter extends AbstractClassVisitor {
+    private String classDesc;
+
+    public KafkaAbstractConfigAdapter(ClassVisitor classVisitor, IastContext context) {
         super(classVisitor, context);
     }
 
@@ -15,9 +17,9 @@ public class KafkaProducerAdapter extends AbstractClassVisitor {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
         int argCount = Type.getArgumentTypes(desc).length;
 
-        if ("send".equals(name) && argCount == 2) {
+        if ("<init>".equals(name) && argCount >= 3) {
             DongTaiLog.debug("Adding kafka tracking for type {}.{}", context.getClassName(), name);
-            mv = new KafkaProducerSendAdviceAdapter(mv, access, name, desc);
+            mv = new KafkaAbstractConfigInitAdviceAdapter(mv, access, name, desc);
             setTransformed();
         }
         return mv;

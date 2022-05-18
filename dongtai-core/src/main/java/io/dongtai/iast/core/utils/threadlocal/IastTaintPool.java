@@ -1,13 +1,11 @@
 package io.dongtai.iast.core.utils.threadlocal;
 
 import io.dongtai.iast.core.EngineManager;
-import io.dongtai.iast.core.utils.PropertyUtils;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
+import io.dongtai.iast.core.utils.PropertyUtils;
 import io.dongtai.log.DongTaiLog;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -90,14 +88,17 @@ public class IastTaintPool extends ThreadLocal<HashSet<Object>> {
     }
 
     public void addToPool(Object obj) {
+        if (this.get() == null) {
+            return;
+        }
         this.get().add(obj);
     }
 
     public boolean isEmpty() {
-        return this.get().isEmpty();
+        return this.get() == null || this.get().isEmpty();
     }
 
     public boolean isNotEmpty() {
-        return !this.get().isEmpty();
+        return this.get() != null && !this.get().isEmpty();
     }
 }
