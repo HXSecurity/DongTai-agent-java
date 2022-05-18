@@ -48,6 +48,10 @@ public class ServiceDirReport {
     }
 
     public String genDirTree(String path, int level, String dir) {
+        // fixme: 防止目录过长导致启动卡死，后续对目录长度需讨论。
+        if(dirStringBuilder.length()>65536){
+            return dirStringBuilder.toString();
+        }
         level++;
         File file = new File(path);
         File[] files = file.listFiles();
