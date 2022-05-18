@@ -155,90 +155,93 @@ public class GrpcHandler {
 
     public static void blockingUnaryCall(Object req, Object res) {
         // todo: 判断 req 的相关自定义对象是否与污点有关
-        if (!EngineManager.TAINT_POOL.get().isEmpty()) {
-            MethodEvent event = new MethodEvent(
-                    0,
-                    0,
-                    "io.grpc.stub.ClientCalls",
-                    "io.grpc.stub.ClientCalls",
-                    "blockingUnaryCall",
-                    "io.grpc.stub.ClientCalls.blockingUnaryCall(io.grpc.Channel, io.grpc.MethodDescriptor<ReqT,RespT>, io.grpc.CallOptions, ReqT)",
-                    "io.grpc.stub.ClientCalls.blockingUnaryCall(io.grpc.Channel, io.grpc.MethodDescriptor<ReqT,RespT>, io.grpc.CallOptions, ReqT)",
-                    null,
-                    new Object[]{req},
-                    res,
-                    "GRPC",
-                    false,
-                    null
-            );
-            Set<Object> modelItems = SourceImpl.parseCustomModel(req);
-            boolean isHitTaints = false;
-            for (Object item : modelItems) {
-                isHitTaints = isHitTaints || TaintPoolUtils.poolContains(item, event, false);
-            }
-            if (isHitTaints) {
-                int invokeId = SpyDispatcherImpl.INVOKE_ID_SEQUENCER.getAndIncrement();
-                event.setInvokeId(invokeId);
-                event.setPlugin("GRPC");
-                // todo: 获取 service name
-                event.setServiceName("");
-                // todo: 获取 traceId
-                event.setTraceId(sharedTraceId.get());
-                event.setCallStack(StackUtils.getLatestStack(5));
-                EngineManager.TRACK_MAP.addTrackMethod(invokeId, event);
-                Set<Object> resModelItems = SourceImpl.parseCustomModel(res);
-                sharedRespData.remove();
-                Set<Object> taintPool = EngineManager.TAINT_POOL.get();
-                Set<Object> resModelSet = new HashSet<Object>();
-                for (Object obj : resModelItems) {
-                    // fixme: 暂时只跟踪字符串相关内容
-                    if (obj instanceof String) {
-                        resModelSet.add(obj);
-                        addCustomResp.set(true);
-                        taintPool.add(obj);
-                        int identityHashCode = System.identityHashCode(obj);
-                        event.addTargetHash(identityHashCode);
-                        event.addTargetHashForRpc(obj.hashCode());
-                        EngineManager.TAINT_HASH_CODES.get().add(identityHashCode);
-                    }
-                }
-                sharedRespData.set(resModelSet);
-            }
+        if (EngineManager.TAINT_POOL.isEmpty()) {
+            return;
         }
 
+        MethodEvent event = new MethodEvent(
+                0,
+                0,
+                "io.grpc.stub.ClientCalls",
+                "io.grpc.stub.ClientCalls",
+                "blockingUnaryCall",
+                "io.grpc.stub.ClientCalls.blockingUnaryCall(io.grpc.Channel, io.grpc.MethodDescriptor<ReqT,RespT>, io.grpc.CallOptions, ReqT)",
+                "io.grpc.stub.ClientCalls.blockingUnaryCall(io.grpc.Channel, io.grpc.MethodDescriptor<ReqT,RespT>, io.grpc.CallOptions, ReqT)",
+                null,
+                new Object[]{req},
+                res,
+                "GRPC",
+                false,
+                null
+        );
+        Set<Object> modelItems = SourceImpl.parseCustomModel(req);
+        boolean isHitTaints = false;
+        for (Object item : modelItems) {
+            isHitTaints = isHitTaints || TaintPoolUtils.poolContains(item, event, false);
+        }
+        if (isHitTaints) {
+            int invokeId = SpyDispatcherImpl.INVOKE_ID_SEQUENCER.getAndIncrement();
+            event.setInvokeId(invokeId);
+            event.setPlugin("GRPC");
+            // todo: 获取 service name
+            event.setServiceName("");
+            // todo: 获取 traceId
+            event.setTraceId(sharedTraceId.get());
+            event.setCallStack(StackUtils.getLatestStack(5));
+            EngineManager.TRACK_MAP.addTrackMethod(invokeId, event);
+            Set<Object> resModelItems = SourceImpl.parseCustomModel(res);
+            sharedRespData.remove();
+            Set<Object> taintPool = EngineManager.TAINT_POOL.get();
+            Set<Object> resModelSet = new HashSet<Object>();
+            for (Object obj : resModelItems) {
+                // fixme: 暂时只跟踪字符串相关内容
+                if (obj instanceof String) {
+                    resModelSet.add(obj);
+                    addCustomResp.set(true);
+                    taintPool.add(obj);
+                    int identityHashCode = System.identityHashCode(obj);
+                    event.addTargetHash(identityHashCode);
+                    event.addTargetHashForRpc(obj.hashCode());
+                    EngineManager.TAINT_HASH_CODES.get().add(identityHashCode);
+                }
+            }
+            sharedRespData.set(resModelSet);
+        }
     }
 
     public static void sendMessage(Object message) {
-        if (!EngineManager.TAINT_POOL.get().isEmpty()) {
-            MethodEvent event = new MethodEvent(
-                    0,
-                    0,
-                    "io.grpc.internal.ServerCallImpl",
-                    "io.grpc.internal.ServerCallImpl",
-                    "sendMessage",
-                    "io.grpc.internal.ServerCallImpl.sendMessage(RespT)",
-                    "io.grpc.internal.ServerCallImpl.sendMessage(RespT)",
-                    null,
-                    new Object[]{message},
-                    null,
-                    "GRPC",
-                    false,
-                    null
-            );
-            Set<Object> modelItems = SourceImpl.parseCustomModel(message);
-            boolean isHitTaints = false;
-            for (Object item : modelItems) {
-                isHitTaints = isHitTaints || TaintPoolUtils.poolContains(item, event, false);
-            }
-            if (isHitTaints) {
-                int invokeId = SpyDispatcherImpl.INVOKE_ID_SEQUENCER.getAndIncrement();
-                event.setInvokeId(invokeId);
-                event.setPlugin("GRPC");
-                event.setServiceName("");
-                event.setProjectPropagatorClose(true);
-                event.setCallStack(StackUtils.getLatestStack(5));
-                EngineManager.TRACK_MAP.addTrackMethod(invokeId, event);
-            }
+        if (EngineManager.TAINT_POOL.isEmpty()) {
+            return;
+        }
+
+        MethodEvent event = new MethodEvent(
+                0,
+                0,
+                "io.grpc.internal.ServerCallImpl",
+                "io.grpc.internal.ServerCallImpl",
+                "sendMessage",
+                "io.grpc.internal.ServerCallImpl.sendMessage(RespT)",
+                "io.grpc.internal.ServerCallImpl.sendMessage(RespT)",
+                null,
+                new Object[]{message},
+                null,
+                "GRPC",
+                false,
+                null
+        );
+        Set<Object> modelItems = SourceImpl.parseCustomModel(message);
+        boolean isHitTaints = false;
+        for (Object item : modelItems) {
+            isHitTaints = isHitTaints || TaintPoolUtils.poolContains(item, event, false);
+        }
+        if (isHitTaints) {
+            int invokeId = SpyDispatcherImpl.INVOKE_ID_SEQUENCER.getAndIncrement();
+            event.setInvokeId(invokeId);
+            event.setPlugin("GRPC");
+            event.setServiceName("");
+            event.setProjectPropagatorClose(true);
+            event.setCallStack(StackUtils.getLatestStack(5));
+            EngineManager.TRACK_MAP.addTrackMethod(invokeId, event);
         }
     }
 
@@ -246,7 +249,7 @@ public class GrpcHandler {
         Boolean added = addCustomResp.get();
         if (added != null && added) {
             if (sharedRespData.get().contains(value)) {
-                EngineManager.TAINT_POOL.get().add(value);
+                EngineManager.TAINT_POOL.addToPool(value);
             }
         }
     }

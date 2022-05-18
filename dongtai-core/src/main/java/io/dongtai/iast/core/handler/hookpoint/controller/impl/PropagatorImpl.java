@@ -1,19 +1,13 @@
 package io.dongtai.iast.core.handler.hookpoint.controller.impl;
 
 import io.dongtai.iast.core.EngineManager;
-import io.dongtai.iast.core.handler.hookpoint.models.IastHookRuleModel;
-import io.dongtai.iast.core.handler.hookpoint.models.IastPropagatorModel;
-import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
+import io.dongtai.iast.core.handler.hookpoint.models.*;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.dynamic.TrackUtils;
 import io.dongtai.iast.core.utils.StackUtils;
 import io.dongtai.iast.core.utils.TaintPoolUtils;
-import io.dongtai.log.DongTaiLog;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static io.dongtai.iast.core.utils.HashCode.isNotEmpty;
@@ -35,7 +29,7 @@ public class PropagatorImpl {
     private static final String SPRING_OBJECT = " org.springframework.".substring(1);
 
     public static void solvePropagator(MethodEvent event, AtomicInteger invokeIdSequencer) {
-        if (!EngineManager.TAINT_POOL.get().isEmpty()) {
+        if (!EngineManager.TAINT_POOL.isEmpty()) {
             IastPropagatorModel propagator = IastHookRuleModel.getPropagatorByMethodSignature(event.signature);
             if (propagator != null) {
                 auxiliaryPropagator(propagator, invokeIdSequencer, event);

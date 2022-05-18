@@ -29,7 +29,7 @@ public class KafkaHandler {
     }
 
     public static void trackSend(Object record) {
-        if (EngineManager.TAINT_POOL.get().isEmpty()) {
+        if (EngineManager.TAINT_POOL.isEmpty()) {
             return;
         }
 
