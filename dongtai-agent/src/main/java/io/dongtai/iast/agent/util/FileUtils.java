@@ -30,7 +30,7 @@ public class FileUtils {
             while ((length = is.read(data)) != -1) {
                 fos.write(data, 0, length);
             }
-
+            data = null;
             is.close();
             fos.close();
             return true;

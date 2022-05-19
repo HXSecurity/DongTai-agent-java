@@ -17,6 +17,7 @@ import io.dongtai.iast.core.utils.config.entity.PerformanceEntity;
 import io.dongtai.iast.core.utils.config.entity.PerformanceLimitThreshold;
 import io.dongtai.iast.core.utils.config.entity.RemoteConfigEntity;
 import io.dongtai.iast.core.utils.json.GsonUtils;
+import io.dongtai.iast.core.utils.matcher.ConfigMatcher;
 import io.dongtai.log.DongTaiLog;
 import org.json.JSONObject;
 
@@ -69,6 +70,15 @@ public class RemoteConfigUtils {
     private static Double secondFallbackFrequencyTokenPerSecond;
     private static Double secondFallbackFrequencyInitBurstSeconds;
     private static Long secondFallbackDuration;
+
+    /**
+     * 接口响应时间相关
+     */
+    private static Double apiResponseTime;
+    public static Integer fallbackReqCount = 0;
+    private static Integer reqCount = 0;
+    private static Integer lastReqCount = 0;
+    private static Double responseTimeThresholdRate;
 
     private static Boolean systemIsUninstall;
     private static Boolean jvmIsUninstall;
@@ -137,7 +147,7 @@ public class RemoteConfigUtils {
     }
 
     /**
-     * 同步远程配置
+     * 同步远程配置-v2
      *
      * @param agentId agent的唯一标识
      */
@@ -190,6 +200,9 @@ public class RemoteConfigUtils {
                                 break;
                             case "heavyTrafficLimitTokenPerSecond":
                                 heavyTrafficLimitTokenPerSecond = performanceEntity.getValue();
+                                break;
+                            case "apiResponseTime":
+                                apiResponseTime = performanceEntity.getValue();
                                 break;
                         }
                     }
@@ -253,6 +266,19 @@ public class RemoteConfigUtils {
                 existsRemoteConfigMeta = remoteResponse;
                 DongTaiLog.debug("Sync remote config successful.");
             }
+            if (enableAutoFallback == true){
+                reqCount = EngineManager.getRequestCount() - lastReqCount;
+                lastReqCount = EngineManager.getRequestCount();
+                if (reqCount>0 && fallbackReqCount*1.0/reqCount > getResponseTimeThresholdRate()){
+                    ConfigMatcher.getInstance().FALLBACK_URL.clear();
+                    EngineManager.turnOffEngine();
+                    DongTaiLog.warn("The response time exceed the threshold, Dongtai engine shut down successfully.");
+                }else if (null != systemIsUninstall && systemIsUninstall && reqCount>0 && EngineManager.enableDongTai==0){
+                    EngineManager.turnOnEngine();
+                    DongTaiLog.info("The response time is below the threshold, Dongtai engine open successfully.");
+                }
+                fallbackReqCount = 0;
+            }
         } catch (Throwable t) {
             DongTaiLog.warn("Sync remote config failed, msg: {}, error: {}", t.getMessage(), t.getCause());
         }
@@ -278,6 +304,9 @@ public class RemoteConfigUtils {
      * 根据agentID获取服务端对Agent的配置
      */
     private static String getConfigFromRemoteV2(int agentId) {
+        if (EngineManager.isEngineRunning()){
+            return "{}";
+        }
         JSONObject report = new JSONObject();
         report.put(KEY_AGENT_ID, agentId);
         try {
@@ -343,12 +372,12 @@ public class RemoteConfigUtils {
             if (result.isSuccess()) {
                 return result.getData();
             } else {
-                DongTaiLog.warn("remoteConfig request not success, status:{}, msg:{},response:{}", result.getStatus(), result.getMsg(),
+                DongTaiLog.debug("remoteConfig request not success, status:{}, msg:{},response:{}", result.getStatus(), result.getMsg(),
                         GsonUtils.toJson(remoteResponse));
                 return null;
             }
         } catch (Throwable t) {
-            DongTaiLog.warn("remoteConfig parse failed: msg:{}, err:{}, response:{}", t.getMessage(), t.getCause(), GsonUtils.toJson(remoteResponse));
+            DongTaiLog.debug("remoteConfig parse failed: msg:{}, err:{}, response:{}", t.getMessage(), t.getCause(), GsonUtils.toJson(remoteResponse));
             return null;
         }
     }
@@ -597,6 +626,26 @@ public class RemoteConfigUtils {
     }
 
     /**
+     * 响应时间阈值-降级开关持续时间限制-降级开关打开状态持续最大时间(ms)
+     */
+    public static Double getApiResponseTime(Properties cfg) {
+        if (apiResponseTime == null) {
+            apiResponseTime = Double.valueOf(System.getProperty("dongtai.fallback.response.time", String.valueOf(30000.0)));
+        }
+        return apiResponseTime;
+    }
+
+    /**
+     * 响应时间阈值-降级开关持续时间限制-降级开关打开状态持续最大时间(ms)
+     */
+    public static Double getResponseTimeThresholdRate() {
+        if (responseTimeThresholdRate == null) {
+            responseTimeThresholdRate = Double.valueOf(System.getProperty("dongtai.fallback.response.rate", String.valueOf(0.9)));
+        }
+        return responseTimeThresholdRate;
+    }
+
+    /**
      * 从配置文件中构建性能指标
      *
      * @param configPrefix 配置前缀
@@ -644,5 +693,21 @@ public class RemoteConfigUtils {
             applicationIsUninstall=false;
         }
         return applicationIsUninstall;
+    }
+
+    public static Integer getFallbackReqCount() {
+        return fallbackReqCount;
+    }
+
+    public static void setFallbackReqCount(Integer fallbackReqCount) {
+        RemoteConfigUtils.fallbackReqCount = fallbackReqCount;
+    }
+
+    public static Integer getReqCount() {
+        return reqCount;
+    }
+
+    public static void setReqCount(Integer reqCount) {
+        RemoteConfigUtils.reqCount = reqCount;
     }
 }

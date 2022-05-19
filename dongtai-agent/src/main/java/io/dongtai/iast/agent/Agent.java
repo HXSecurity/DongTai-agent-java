@@ -2,6 +2,7 @@ package io.dongtai.iast.agent;
 
 import java.io.*;
 import java.util.Arrays;
+import java.util.UUID;
 
 import io.dongtai.iast.agent.util.FileUtils;
 import io.dongtai.log.DongTaiLog;
@@ -127,13 +128,13 @@ public class Agent {
 
     private static void extractJattach() throws IOException {
         if (isWindows()) {
-            JATTACH_FILE = System.getProperty("java.io.tmpdir.dongtai") + "iast" + File.separator + "jattach.exe";
+            JATTACH_FILE = System.getProperty("java.io.tmpdir")+ File.separator + "iast"+System.currentTimeMillis() + File.separator + "jattach.exe";
             FileUtils.getResourceToFile("bin/jattach.exe", JATTACH_FILE);
         } else if (isMacOs()) {
-            JATTACH_FILE = System.getProperty("java.io.tmpdir.dongtai") + "iast" + File.separator + "jattach-mac";
+            JATTACH_FILE = System.getProperty("java.io.tmpdir")+ File.separator + "iast"+System.currentTimeMillis() + File.separator + "jattach-mac";
             FileUtils.getResourceToFile("bin/jattach-mac", JATTACH_FILE);
         } else {
-            JATTACH_FILE = System.getProperty("java.io.tmpdir.dongtai") + "iast" + File.separator + "jattach-linux";
+            JATTACH_FILE = System.getProperty("java.io.tmpdir")+ File.separator + "iast"+System.currentTimeMillis() + File.separator + "jattach-linux";
             FileUtils.getResourceToFile("bin/jattach-linux", JATTACH_FILE);
         }
         if ((new File(JATTACH_FILE)).setExecutable(true)) {

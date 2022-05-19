@@ -75,6 +75,7 @@ public abstract class CharacterEncoder {
         }
 
         this.encodeBufferSuffix(var2);
+        var5 = null;
     }
 
     public void encode(byte[] var1, OutputStream var2) throws IOException {
@@ -150,6 +151,7 @@ public abstract class CharacterEncoder {
         } while (var4 >= this.bytesPerLine());
 
         this.encodeBufferSuffix(var2);
+        var5 = null;
     }
 
     public void encodeBuffer(byte[] var1, OutputStream var2) throws IOException {
