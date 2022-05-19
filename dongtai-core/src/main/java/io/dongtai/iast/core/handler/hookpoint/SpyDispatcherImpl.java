@@ -12,6 +12,8 @@ import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.handler.hookpoint.service.ServiceHandler;
 import io.dongtai.iast.core.handler.hookpoint.service.kafka.KafkaHandler;
 import io.dongtai.iast.core.service.ErrorLogReport;
+import io.dongtai.iast.core.utils.config.RemoteConfigUtils;
+import io.dongtai.iast.core.utils.matcher.ConfigMatcher;
 import io.dongtai.log.DongTaiLog;
 
 import java.lang.dongtai.SpyDispatcher;
@@ -57,9 +59,15 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                     GraphBuilder.buildAndReport(request, response);
                     EngineManager.cleanThreadState();
                     long responseTimeEnd = System.currentTimeMillis()-responseTime.get()+8;
-                    DongTaiLog.debug(GraphBuilder.getURL() + " response time: "+responseTimeEnd+"ms");
+                    DongTaiLog.debug("url {} response time: {} ms",GraphBuilder.getURL(),responseTimeEnd);
+                    if (RemoteConfigUtils.enableAutoFallback() && responseTimeEnd > RemoteConfigUtils.getApiResponseTime(null)){
+                        RemoteConfigUtils.fallbackReqCount++;
+                        DongTaiLog.warn("url {} response time: {} ms, greater than {} ms",GraphBuilder.getURL(),responseTimeEnd,RemoteConfigUtils.getApiResponseTime(null));
+                        if (!"/".equals(GraphBuilder.getURL())){
+                            ConfigMatcher.getInstance().FALLBACK_URL.add(GraphBuilder.getURI());
+                        }
+                    }
                 }
-
                 EngineManager.turnOnDongTai();
             }
         } catch (Exception e) {

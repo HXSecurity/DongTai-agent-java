@@ -1,12 +1,12 @@
 package io.dongtai.iast.core.utils.matcher;
 
-import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.FallbackSwitch;
 import io.dongtai.iast.core.utils.ConfigUtils;
 import io.dongtai.iast.core.utils.PropertyUtils;
 import io.dongtai.log.DongTaiLog;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.instrument.Instrumentation;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -30,7 +30,8 @@ public class ConfigMatcher {
     private final AbstractMatcher SERVER_CLASS = new ServerClass();
     private Instrumentation inst;
 
-    public final Set<String> BLACK_URL;
+    private final Set<String> BLACK_URL;
+    public final Set<String> FALLBACK_URL = new HashSet<>();
 
     public static ConfigMatcher getInstance() {
         if (null == INSTANCE) {
@@ -92,12 +93,12 @@ public class ConfigMatcher {
                         if (null != headers.get(strings[0].toLowerCase())) {
                             return true;
                         }
-                    case 3:
-                        if (FallbackSwitch.URL_FALLBACK && uri.contains(strings[0])){
-                            return true;
-                        }
                     default:
-                        continue;
+                }
+            }
+            for (String string : FALLBACK_URL) {
+                if (uri.endsWith(string)){
+                    return true;
                 }
             }
         } catch (Exception e) {

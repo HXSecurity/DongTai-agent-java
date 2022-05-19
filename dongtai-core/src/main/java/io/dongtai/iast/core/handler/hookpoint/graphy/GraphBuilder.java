@@ -23,6 +23,7 @@ import org.json.JSONObject;
 public class GraphBuilder {
 
     private static String URL;
+    private static String URI;
 
     public static void buildAndReport(Object request, Object response) {
         List<GraphNode> nodeList = build();
@@ -100,6 +101,7 @@ public class GraphBuilder {
         String requestURI = requestMeta.getOrDefault("requestURI", "").toString();
         detail.put(ReportConstant.URI, requestURI);
         setURL(requestURL);
+        setURI(requestURI);
         detail.put(ReportConstant.CLIENT_IP, requestMeta.getOrDefault("remoteAddr", ""));
         detail.put(ReportConstant.QUERY_STRING, requestMeta.getOrDefault("queryString", ""));
         detail.put(ReportConstant.REQ_HEADER,
@@ -143,5 +145,13 @@ public class GraphBuilder {
 
     public static void setURL(String URL) {
         GraphBuilder.URL = URL;
+    }
+
+    public static String getURI() {
+        return URI;
+    }
+
+    public static void setURI(String URI) {
+        GraphBuilder.URI = URI;
     }
 }

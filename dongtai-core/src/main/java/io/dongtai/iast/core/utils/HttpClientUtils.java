@@ -1,5 +1,6 @@
 package io.dongtai.iast.core.utils;
 
+import io.dongtai.iast.core.EngineManager;
 import io.dongtai.log.DongTaiLog;
 
 import javax.net.ssl.*;
@@ -26,6 +27,7 @@ public class HttpClientUtils {
     public final static HostnameVerifier DO_NOT_VERIFY = new HttpClientHostnameVerifier();
     private final static PropertyUtils PROPERTIES = PropertyUtils.getInstance();
     private final static Proxy PROXY = loadProxy();
+    private static Integer FAILED_CONNECTION_COUNT = 0;
 
     public static StringBuilder sendGet(String uri, String arg, String value) {
         try {
@@ -104,6 +106,12 @@ public class HttpClientUtils {
             return response;
         } catch (Exception e) {
             DongTaiLog.error("io.dongtai.iast.core.utils.HttpClientUtils.sendRequest(io.dongtai.iast.core.utils.HttpMethods,java.lang.String,java.lang.String,java.lang.String,java.util.HashMap<java.lang.String,java.lang.String>,java.net.Proxy)",e);
+            FAILED_CONNECTION_COUNT++;
+            if (FAILED_CONNECTION_COUNT > 10){
+                DongTaiLog.error("The network connection is abnormal, DongTai engine is shut down.");
+                EngineManager.turnOffEngine();
+                FAILED_CONNECTION_COUNT = 0;
+            }
         } finally {
             if (connection != null) {
                 connection.disconnect();
