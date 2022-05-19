@@ -142,6 +142,7 @@ public class HttpClientUtils {
             while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
                 fileOutputStream.write(dataBuffer, 0, bytesRead);
             }
+            dataBuffer = null;
             in.close();
             fileOutputStream.close();
             DongTaiLog.info("The remote file {} was successfully written to the local cache", fileURI);

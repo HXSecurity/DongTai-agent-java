@@ -82,6 +82,7 @@ public abstract class CharacterDecoder {
         ByteArrayInputStream var3 = new ByteArrayInputStream(var2);
         ByteArrayOutputStream var4 = new ByteArrayOutputStream();
         this.decodeBuffer(var3, var4);
+        var2 = null;
         return var4.toByteArray();
     }
 

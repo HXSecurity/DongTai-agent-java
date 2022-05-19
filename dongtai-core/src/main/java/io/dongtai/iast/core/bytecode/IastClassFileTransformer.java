@@ -158,10 +158,11 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                         return dumpClassIfNecessary(cr.getClassName(), cw.toByteArray(), srcByteCodeArray);
                     }
                 }
+                sourceCodeBak = null;
             }
         } catch (
-                Throwable ignore) {
-            DongTaiLog.debug(ignore);
+                Throwable throwable) {
+            DongTaiLog.debug(throwable);
         } finally {
             if (isRunning) {
                 EngineManager.turnOnDongTai();
