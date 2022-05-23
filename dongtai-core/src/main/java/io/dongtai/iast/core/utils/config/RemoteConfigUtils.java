@@ -304,9 +304,6 @@ public class RemoteConfigUtils {
      * 根据agentID获取服务端对Agent的配置
      */
     private static String getConfigFromRemoteV2(int agentId) {
-        if (!EngineManager.isEngineRunning()){
-            return "{}";
-        }
         JSONObject report = new JSONObject();
         report.put(KEY_AGENT_ID, agentId);
         try {
