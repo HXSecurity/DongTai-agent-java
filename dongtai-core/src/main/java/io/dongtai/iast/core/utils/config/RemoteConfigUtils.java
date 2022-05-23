@@ -266,7 +266,7 @@ public class RemoteConfigUtils {
                 existsRemoteConfigMeta = remoteResponse;
                 DongTaiLog.debug("Sync remote config successful.");
             }
-            if (enableAutoFallback == true){
+            if (enableAutoFallback){
                 reqCount = EngineManager.getRequestCount() - lastReqCount;
                 lastReqCount = EngineManager.getRequestCount();
                 if (reqCount>0 && fallbackReqCount*1.0/reqCount > getResponseTimeThresholdRate()){
@@ -304,7 +304,7 @@ public class RemoteConfigUtils {
      * 根据agentID获取服务端对Agent的配置
      */
     private static String getConfigFromRemoteV2(int agentId) {
-        if (EngineManager.isEngineRunning()){
+        if (!EngineManager.isEngineRunning()){
             return "{}";
         }
         JSONObject report = new JSONObject();
