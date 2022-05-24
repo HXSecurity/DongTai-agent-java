@@ -220,7 +220,7 @@ public class IastProperties {
 
     public String getLogPort() {
         if (logPort == null) {
-            logPort = System.getProperty("dongtai.log.port", "30909");
+            logPort = System.getProperty("dongtai.log.port");
         }
         return logPort;
     }

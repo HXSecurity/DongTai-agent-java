@@ -68,7 +68,19 @@ public class FileUtils {
                         temp = temp.replace("${OPENAPI}", logAddress);
                     }
                 }else if (temp.contains("${LOG_PORT}")){
-                    temp = temp.replace("${LOG_PORT}",IastProperties.getInstance().getLogPort());
+                    String logPort = IastProperties.getInstance().getLogPort();
+                    if (null == logPort){
+                        String s = IastProperties.getInstance().getBaseUrl();
+                        s = s.substring(s.indexOf("://") + 3, s.indexOf("/openapi"));
+                        if(s.contains(":")){
+                            s = s.substring(s.indexOf(":")+1);
+                            temp = temp.replace("${LOG_PORT}", s);
+                        }else {
+                            temp = temp.replace("${LOG_PORT}", "80");
+                        }
+                    }else {
+                        temp = temp.replace("${LOG_PORT}", logPort);
+                    }
                 }else if (temp.contains("${LOG_PATH}")){
                     temp = temp.replace("${LOG_PATH}", System.getProperty("java.io.tmpdir.dongtai")+File.separator+"dongtaiJavaAgentLogs"+File.separator+"dongtai_javaagent.log");
                 }
