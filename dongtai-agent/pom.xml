@@ -7,7 +7,7 @@
     <parent>
         <groupId>io.dongtai.iast</groupId>
         <artifactId>iast</artifactId>
-        <version>1.5.0</version>
+        <version>1.7.0</version>
     </parent>
     <artifactId>dongtai-agent</artifactId>
     <name>dongtai-agent</name>
@@ -48,7 +48,7 @@
         <dependency>
             <groupId>io.dongtai.iast</groupId>
             <artifactId>dongtai-log</artifactId>
-            <version>1.5.0</version>
+            <version>1.7.0</version>
         </dependency>
         <dependency>
             <groupId>io.dongtai.iast</groupId>
