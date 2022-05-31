@@ -1,6 +1,8 @@
 # other javaagent
 # pinpoint javaagent
 com/navercorp/pinpoint/*
+# jrebel
+com/zeroturnaround/*
 # ehcache - cache need't hook
 net/sf/ehcache/*
 # bytebuddy - need't hook
@@ -16,7 +18,7 @@ uri_3a_classloader_3a_/*
 org/asciidoctor/*
 com/sun/jmx/remote/*
 # apple package
-apple/* g
+apple/*
 # octo
 com/octo/captcha/*
 # apache shaded
@@ -24678,8 +24680,9 @@ java/util/Date
 java/util/Dictionary
 java/util/DualPivotQuicksort
 java/util/EmptyStackException
-#java/util/EnumMap
-#java/util/EnumMap$1
+java/util/EnumMap
+java/util/EnumMap$1
+java/util/EnumMap$*
 java/util/EnumMap$EnumMapEntrySet
 java/util/EnumSet
 java/util/EventListener
@@ -24742,6 +24745,8 @@ java/util/ImmutableCollections$AbstractImmutableCollection
 java/util/ImmutableCollections$AbstractImmutableMap
 java/util/IllegalFormatException
 java/util/InvalidPropertiesFormatException
+java/util/JumboEnumSet
+java/util/JumboEnumSet$EnumSetIterator
 java/util/LinkedHashMap$*
 java/util/LinkedHashMap$1
 java/util/LinkedHashMap$2
