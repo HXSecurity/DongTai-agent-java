@@ -21,7 +21,7 @@ public class SignatureAlgorithm {
         String signature = null;
         try {
             MessageDigest digest = MessageDigest.getInstance(algorithm);
-            byte[] buffer = new byte[1024 * 1024 * 10];
+            byte[] buffer = new byte[1024];
 
             int len = 0;
             while ((len = is.read(buffer)) > 0) {
