@@ -30,7 +30,14 @@ public class CryptoBadMacVulScan extends AbstractNormalVulScan {
                 if (matcher.find()) {
                     continue;
                 }
-                sendReport(getLatestStack(), sink.getType());
+                StackTraceElement[] latestStack = getLatestStack();
+                for (StackTraceElement stackTraceElement:latestStack){
+                    // 解决 java.security.SecureRandom.getInstance 导致的 weak hash 误报
+                    if (stackTraceElement.toString().startsWith("java.security.SecureRandom.getInstance")){
+                        return;
+                    }
+                }
+                sendReport(latestStack, sink.getType());
                 break;
             } catch (Exception e) {
                 DongTaiLog.error(e);

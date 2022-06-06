@@ -48,9 +48,11 @@ public class SourceImpl {
      * @param event
      */
     public static void handlerCustomModel(MethodEvent event) {
-        Set<Object> modelValues = parseCustomModel(event.returnValue);
-        for (Object modelValue : modelValues) {
-            EngineManager.TAINT_POOL.addTaintToPool(modelValue, event, true);
+        if (!event.getMethodName().equals("getSession")){
+            Set<Object> modelValues = parseCustomModel(event.returnValue);
+            for (Object modelValue : modelValues) {
+                EngineManager.TAINT_POOL.addTaintToPool(modelValue, event, true);
+            }
         }
     }
 
