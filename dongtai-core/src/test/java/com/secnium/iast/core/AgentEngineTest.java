@@ -1,27 +1,43 @@
 package com.secnium.iast.core;
 
+import io.dongtai.iast.core.utils.threadlocal.BooleanThreadLocal;
 import io.dongtai.log.DongTaiLog;
-
-import java.util.concurrent.TimeUnit;
+import org.junit.Test;
 
 public class AgentEngineTest {
 
     public static void main(String[] args) {
-        new AgentEngineTest().a();
-    }
-
-    public AgentEngineTest(){
 
     }
 
-    public void a(){
+    public AgentEngineTest() {
+
+    }
+
+    @Test
+    public void a() {
+        BooleanThreadLocal booleanThreadLocal = new BooleanThreadLocal(false);
+        System.out.println(booleanThreadLocal.isEnterEntry());
+        booleanThreadLocal.set(true);
+        System.out.println(booleanThreadLocal.isEnterEntry());
+        booleanThreadLocal.remove();
+        System.out.println(booleanThreadLocal.isEnterEntry());
+    }
+
+    @Test
+    public void b(boolean a) {
         try {
-            System.out.println("b");
-            TimeUnit.SECONDS.sleep(10);
-            System.out.println("a");
-        } catch (InterruptedException e) {
-            DongTaiLog.error(e);
+            if (a){
+                try {
+                    throw new IllegalStateException("DongTai agent request replay");
+                }catch (RuntimeException e){
+                    System.out.println("DongTai agent request replay, please ignore");
+                }
+            }
+        } catch (NullPointerException e) {
+            DongTaiLog.info("DongTai agent request replay, please ignore");
         }
     }
+
 
 }
