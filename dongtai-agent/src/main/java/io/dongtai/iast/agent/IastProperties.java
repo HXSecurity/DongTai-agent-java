@@ -21,6 +21,7 @@ public class IastProperties {
     private String projectName;
     private String clusterName;
     private String clusterVersion;
+    private Integer delayTime;
     private String proxyEnableStatus;
     private String proxyHost;
     private int proxyPort = -1;
@@ -127,6 +128,13 @@ public class IastProperties {
             clusterVersion = System.getProperty("dongtai.cluster.version", cfg.getProperty("dongtai.cluster.version", ""));
         }
         return clusterVersion;
+    }
+
+    public Integer getDelayTime() {
+        if (delayTime == null) {
+            delayTime = Integer.parseInt(System.getProperty("iast.engine.delay.time", cfg.getProperty("iast.engine.delay.time", "0")));
+        }
+        return delayTime;
     }
 
     private String getProxyEnableStatus() {
