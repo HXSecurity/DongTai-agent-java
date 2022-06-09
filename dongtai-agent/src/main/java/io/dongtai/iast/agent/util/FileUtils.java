@@ -6,6 +6,7 @@ import io.dongtai.iast.agent.report.AgentRegisterReport;
 import io.dongtai.log.DongTaiLog;
 
 import java.io.*;
+import java.net.URI;
 
 public class FileUtils {
     public static boolean getResourceToFile(String resourceName, String fileName) throws IOException {
@@ -59,11 +60,16 @@ public class FileUtils {
                     String logAddress = IastProperties.getInstance().getLogAddress();
                     if (null == logAddress){
                         String s = IastProperties.getInstance().getBaseUrl();
-                        s = s.substring(s.indexOf("://") + 3, s.indexOf("/openapi"));
-                        if(s.contains(":")){
-                            s = s.substring(0,s.indexOf(":"));
+                        try {
+                            String openApiDomain = new URI(s).getHost();
+                            temp = temp.replace("${OPENAPI}", openApiDomain);
+                        } catch (Exception e) {
+                            s = s.substring(s.indexOf("://") + 3, s.indexOf("/openapi"));
+                            if (s.contains(":")) {
+                                s = s.substring(0, s.indexOf(":"));
+                            }
+                            temp = temp.replace("${OPENAPI}", s);
                         }
-                        temp = temp.replace("${OPENAPI}", s);
                     }else {
                         temp = temp.replace("${OPENAPI}", logAddress);
                     }
