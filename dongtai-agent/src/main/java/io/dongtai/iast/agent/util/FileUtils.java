@@ -77,12 +77,18 @@ public class FileUtils {
                     String logPort = IastProperties.getInstance().getLogPort();
                     if (null == logPort){
                         String s = IastProperties.getInstance().getBaseUrl();
-                        s = s.substring(s.indexOf("://") + 3, s.indexOf("/openapi"));
-                        if(s.contains(":")){
-                            s = s.substring(s.indexOf(":")+1);
-                            temp = temp.replace("${LOG_PORT}", s);
-                        }else {
-                            temp = temp.replace("${LOG_PORT}", "80");
+                        try {
+                            int openApiPort = new URI(s).getPort();
+                            temp = temp.replace("${LOG_PORT}", openApiPort > 0 ? Integer.toString(openApiPort) :
+                                    ("https".equalsIgnoreCase(new URI(s).getScheme()) ? "443" : "80"));
+                        } catch (Exception e) {
+                            s = s.substring(s.indexOf("://") + 3, s.indexOf("/openapi"));
+                            if (s.contains(":")) {
+                                s = s.substring(s.indexOf(":") + 1);
+                                temp = temp.replace("${LOG_PORT}", s);
+                            } else {
+                                temp = temp.replace("${LOG_PORT}", "80");
+                            }
                         }
                     }else {
                         temp = temp.replace("${LOG_PORT}", logPort);
