@@ -1,5 +1,6 @@
 package io.dongtai.iast.agent.monitor;
 
+import io.dongtai.iast.agent.IastProperties;
 import io.dongtai.iast.agent.manager.EngineManager;
 import io.dongtai.iast.agent.monitor.impl.*;
 import io.dongtai.iast.common.utils.version.JavaVersionUtils;
@@ -31,7 +32,7 @@ public class MonitorDaemonThread implements Runnable {
         monitorTasks.add(new DongTaiThreadMonitor());
         this.engineManager = engineManager;
         try {
-            delayTime = Integer.parseInt(System.getProperty("iast.engine.delay.time", "0"));
+            delayTime = IastProperties.getInstance().getDelayTime();
             if (delayTime != 0){
                 DongTaiLog.info("dongtai engine delay time is " + delayTime + " s");
                 delayTime = delayTime * 1000;
