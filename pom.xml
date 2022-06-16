@@ -7,8 +7,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <shade-prefix>io.dongtai.iast.thirdparty</shade-prefix>
 
-        <maven.compiler.source>1.6</maven.compiler.source>
-        <maven.compiler.target>1.6</maven.compiler.target>
+        <maven.compiler.source>6</maven.compiler.source>
+        <maven.compiler.target>6</maven.compiler.target>
         <maven.deploy.plugin.version>3.2.0</maven.deploy.plugin.version>
         <maven.compiler.version>2.3.2</maven.compiler.version>
         <commons.cli.versin>1.4</commons.cli.versin>

@@ -104,8 +104,7 @@ public class SourceImpl {
                     || methodName.equals("getRepeatedField")
                     || methodName.equals("getSerializedSize")
                     || methodName.equals("getMethodOrDie")
-                    || methodName.endsWith("Bytes")
-                    || method.getParameterCount() != 0) {
+                    || methodName.endsWith("Bytes")) {
                 continue;
             }
 

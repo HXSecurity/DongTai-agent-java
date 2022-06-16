@@ -55,7 +55,9 @@ public class HttpImpl {
                 cloneResponseMethod = CLASS_OF_SERVLET_PROXY
                         .getDeclaredMethod("cloneResponse", Object.class, boolean.class);
             }
-        } catch (MalformedURLException | NoSuchMethodException e) {
+        } catch (MalformedURLException e) {
+            DongTaiLog.error("io.dongtai.iast.core.handler.hookpoint.controller.impl.HttpImpl.createClassLoader(java.lang.Object)",e);
+        } catch (NoSuchMethodException e) {
             DongTaiLog.error("io.dongtai.iast.core.handler.hookpoint.controller.impl.HttpImpl.createClassLoader(java.lang.Object)",e);
         }
     }
@@ -127,7 +129,11 @@ public class HttpImpl {
         try {
             Method methodOfRequestMeta = request.getClass().getDeclaredMethod("getPostBody");
             return (String) methodOfRequestMeta.invoke(request);
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+        } catch (NoSuchMethodException e) {
+            DongTaiLog.error(e);
+        } catch (InvocationTargetException e) {
+            DongTaiLog.error(e);
+        } catch (IllegalAccessException e) {
             DongTaiLog.error(e);
         }
         return null;
@@ -138,7 +144,11 @@ public class HttpImpl {
         try {
             methodOfRequestMeta = response.getClass().getDeclaredMethod("getResponseMeta");
             return (Map<String, Object>) methodOfRequestMeta.invoke(response);
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+        } catch (NoSuchMethodException e) {
+            DongTaiLog.error(e);
+        } catch (InvocationTargetException e) {
+            DongTaiLog.error(e);
+        } catch (IllegalAccessException e) {
             DongTaiLog.error(e);
         }
         return null;

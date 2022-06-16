@@ -31,7 +31,7 @@ public class ConfigMatcher {
     private Instrumentation inst;
 
     private final Set<String> BLACK_URL;
-    public final Set<String> FALLBACK_URL = new HashSet<>();
+    public final Set<String> FALLBACK_URL = new HashSet<String>();
 
     public static ConfigMatcher getInstance() {
         if (null == INSTANCE) {

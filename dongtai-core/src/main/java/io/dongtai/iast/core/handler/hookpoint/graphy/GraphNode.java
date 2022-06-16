@@ -34,7 +34,11 @@ public class GraphNode {
 
     private final String sourceValues;
 
+    private final boolean sourceIsReference;
+
     private final String targetValues;
+
+    private final boolean targetIsReference;
 
     /**
      * 当前方法所在类继承的类名称
@@ -126,7 +130,9 @@ public class GraphNode {
                      Set<Integer> sourceHash,
                      Set<Integer> targetHash,
                      String sourceValues,
+                     boolean sourceIsReference,
                      String targetValues,
+                     boolean targetIsReference,
                      Set<Integer> sourceHashForRpc,
                      Set<Integer> targetHashForRpc,
                      String traceId,
@@ -149,7 +155,9 @@ public class GraphNode {
         this.sourceHash = sourceHash;
         this.targetHash = targetHash;
         this.sourceValues = sourceValues;
+        this.sourceIsReference = sourceIsReference;
         this.targetValues = targetValues;
+        this.targetIsReference = targetIsReference;
         this.sourceHashForRpc = sourceHashForRpc;
         this.targetHashForRpc = targetHashForRpc;
         this.traceId = traceId;
@@ -180,7 +188,9 @@ public class GraphNode {
         value.put("retClassName", retClassName);
         value.put("sourceHash", sourceHashArray);
         value.put("sourceValues", sourceValues);
+        value.put("sourceIsReference",sourceIsReference);
         value.put("targetHash", targetHashArray);
+        value.put("targetIsReference", targetIsReference);
         value.put("targetValues", targetValues);
         value.put("sourceHashForRpc", sourceHashForRpcArray);
         value.put("targetHashForRpc", targetHashForRpcArray);

@@ -55,7 +55,7 @@ public class SerializeUtils {
     /**
      * 反序列化对象
      */
-    public static <T extends Serializable> T deserialize2Object(String str, Class<T> type, List<Class<?>> clazzWhiteList)
+    public static <T extends Serializable> T deserialize2Object(String str, Class<T> type, List<Class<? extends Serializable>> clazzWhiteList)
             throws IOException, ClassNotFoundException {
         ObjectInputStream objIn = deserialize(str, clazzWhiteList);
         return type.cast(objIn.readObject());
@@ -64,7 +64,7 @@ public class SerializeUtils {
     /**
      * 反序列化列表对象
      */
-    public static <T extends Serializable> ArrayList<T> deserialize2ArrayList(String str, Class<T> listInnerType, List<Class<?>> clazzWhiteList)
+    public static <T extends Serializable> ArrayList<T> deserialize2ArrayList(String str, Class<T> listInnerType, List<Class<? extends Serializable>> clazzWhiteList)
             throws IOException, ClassNotFoundException {
         ObjectInputStream objIn = deserialize(str, clazzWhiteList);
         return new ArrayList<T>().getClass().cast(objIn.readObject());
@@ -77,7 +77,7 @@ public class SerializeUtils {
         return byteOut.toString(DEFAULT_CHARSET);
     }
 
-    private static ObjectInputStream deserialize(String str, List<Class<?>> clazzWhiteList) throws IOException {
+    private static ObjectInputStream deserialize(String str, List<Class<? extends Serializable>> clazzWhiteList) throws IOException {
         ByteArrayInputStream byteIn = new ByteArrayInputStream(str.getBytes(DEFAULT_CHARSET));
         List<Class<?>> targetClazzWhiteList = new ArrayList<Class<?>>(clazzWhiteList);
         targetClazzWhiteList.addAll(DEFAULT_SAFE_CLASSES);

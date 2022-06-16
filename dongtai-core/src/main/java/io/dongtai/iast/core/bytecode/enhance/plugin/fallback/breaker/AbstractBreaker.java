@@ -13,7 +13,7 @@ import java.util.Properties;
 public abstract class AbstractBreaker {
 
     public static AbstractBreaker newInstance(Properties cfg) {
-        DongTaiLog.info("No suitable breaker,skip create newInstance.");
+        DongTaiLog.debug("No suitable breaker,skip create newInstance.");
         return null;
     }
 

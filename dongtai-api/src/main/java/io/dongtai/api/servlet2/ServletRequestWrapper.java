@@ -122,7 +122,7 @@ public class ServletRequestWrapper extends HttpServletRequestWrapper implements 
 
     public Map<String, String> getHeaders() {
         Enumeration<?> headerNames = this.getHeaderNames();
-        Map<String, String> headers = new HashMap<>(32);
+        Map<String, String> headers = new HashMap<String, String>(32);
         while (headerNames.hasMoreElements()) {
             String name = (String) headerNames.nextElement();
             String value = this.getHeader(name);
@@ -175,5 +175,10 @@ public class ServletRequestWrapper extends HttpServletRequestWrapper implements 
     public String getDongTaiRemoteAddr() {
         String remoteAddr = super.getRemoteAddr();
         return remoteAddr.equals("0:0:0:0:0:0:0:1") ? "127.0.0.1" : remoteAddr;
+    }
+
+    public boolean allowedContentType(String contentType) {
+        return contentType != null && (contentType.contains("application/json")
+                || contentType.contains("application/xml"));
     }
 }

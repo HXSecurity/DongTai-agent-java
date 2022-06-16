@@ -43,7 +43,7 @@ public class IastHookRuleModel {
         this.interfaces = interfaces;
         this.hooks.putAll(interfaces);
         this.hooks.putAll(classs);
-        this.suffixHookPoints = new HashSet<>();
+        this.suffixHookPoints = new HashSet<String>();
         this.suffixHookPoints.add(".dubbo.monitor.support.MonitorFilter");
         this.suffixHookPoints.addAll(suffixHookPoints);
         this.hookClassnames = new HashSet<String>();

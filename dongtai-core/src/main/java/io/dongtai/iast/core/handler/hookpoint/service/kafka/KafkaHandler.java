@@ -8,8 +8,9 @@ import io.dongtai.iast.core.service.ErrorLogReport;
 import io.dongtai.iast.core.utils.StackUtils;
 import io.dongtai.iast.core.utils.TaintPoolUtils;
 
-import java.nio.charset.StandardCharsets;
 import java.util.*;
+
+import static com.google.common.base.Charsets.UTF_8;
 
 public class KafkaHandler {
     private static ThreadLocal<String> sharedTraceId = new ThreadLocal<String>();
@@ -22,7 +23,7 @@ public class KafkaHandler {
 
             Object headers = record.getClass().getMethod("headers").invoke(record);
             headers.getClass().getMethod("add", String.class, byte[].class).
-                    invoke(headers, ContextManager.getHeaderKey(), traceId.getBytes(StandardCharsets.UTF_8));
+                    invoke(headers, ContextManager.getHeaderKey(), traceId.getBytes(UTF_8));
         } catch (Exception e) {
             ErrorLogReport.sendErrorLog(e);
         }

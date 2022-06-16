@@ -16,14 +16,10 @@ public class ServiceHandler {
     public static void reportService(String category, String type, String host, String port, String handler) {
         try {
             ServiceUrlHandler h;
-            switch (handler) {
-                case "KafkaUrlHandler":
-                    h = new KafkaUrlHandler();
-                    break;
-                case "SimpleUrlHandler":
-                default:
-                    h = new SimpleUrlHandler();
-                    break;
+            if ("KafkaUrlHandler".equals(handler)) {
+                h = new KafkaUrlHandler();
+            } else {
+                h = new SimpleUrlHandler();
             }
 
             List<ServiceUrl> srvList = h.processUrl(host, port);

@@ -8,6 +8,7 @@ import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Scanner;
 
+import com.sun.management.OperatingSystemMXBean;
 import io.dongtai.iast.agent.IastProperties;
 import io.dongtai.iast.agent.report.AgentRegisterReport;
 import io.dongtai.log.DongTaiLog;
@@ -95,7 +96,10 @@ public class AgentTest {
     }
 
     public static void main(String[] args) {
-        String a = "52.81.92.214:30158";
-        System.out.println(a.substring(a.indexOf(":")+1));
+        com.sun.management.OperatingSystemMXBean osmxb = (com.sun.management.OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
+        long totalPhysicalMemorySize = osmxb.getTotalPhysicalMemorySize();
+        long freePhysicalMemorySize = osmxb.getFreePhysicalMemorySize();
+        System.out.println(totalPhysicalMemorySize);
+        System.out.println(freePhysicalMemorySize);
     }
 }

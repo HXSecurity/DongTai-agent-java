@@ -4,10 +4,12 @@ import io.dongtai.iast.core.utils.threadlocal.BooleanThreadLocal;
 import io.dongtai.log.DongTaiLog;
 import org.junit.Test;
 
+import java.util.HashMap;
+
 public class AgentEngineTest {
 
     public static void main(String[] args) {
-
+        System.out.println(System.getProperty("os.arch"));
     }
 
     public AgentEngineTest() {
@@ -37,6 +39,11 @@ public class AgentEngineTest {
         } catch (NullPointerException e) {
             DongTaiLog.info("DongTai agent request replay, please ignore");
         }
+    }
+
+    @Test
+    public void c() {
+
     }
 
 

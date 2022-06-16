@@ -8,8 +8,4 @@ public interface DongTaiRequest {
 
     public String getPostBody();
 
-    public default boolean allowedContentType(String contentType) {
-        return contentType != null && (contentType.contains("application/json")
-                || contentType.contains("application/xml"));
-    }
 }

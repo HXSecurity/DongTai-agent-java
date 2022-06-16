@@ -4,7 +4,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class Test {
 
-    private static final ThreadLocal<Long> responseTime = new ThreadLocal<>();
+    private static final ThreadLocal<Long> responseTime = new ThreadLocal<Long>();
 
     public void execute(int count){
         for (int i = 0; i < count; i++) {

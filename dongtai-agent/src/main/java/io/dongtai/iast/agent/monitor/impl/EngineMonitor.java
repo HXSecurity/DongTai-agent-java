@@ -8,6 +8,7 @@ import io.dongtai.iast.agent.report.AgentRegisterReport;
 import io.dongtai.iast.agent.util.ThreadUtils;
 import io.dongtai.iast.agent.util.http.HttpClientUtils;
 import io.dongtai.iast.agent.Constant;
+import io.dongtai.iast.common.utils.version.JavaVersionUtils;
 import io.dongtai.log.DongTaiLog;
 import org.json.JSONObject;
 
@@ -98,12 +99,30 @@ public class EngineMonitor implements IMonitor {
     }
 
     public void startEngine() {
-        boolean status = engineManager.extractPackage();
-        status = status && engineManager.install();
-        status = status && engineManager.start();
+        boolean status = true;
+        if(couldInstallEngine()){
+            // jdk8以上
+            status = status && engineManager.extractPackage();
+            status = status && engineManager.install();
+            status = status && engineManager.start();
+        }else {
+            // jdk6-7
+            status = status && engineManager.extractPackage();
+            status = status && engineManager.install();
+            status = status && engineManager.start();
+        }
         if (!status) {
             DongTaiLog.info("DongTai IAST started failure");
         }
+    }
+
+    private boolean couldInstallEngine() {
+        // 低版本jdk暂不支持安装引擎core包
+        if (JavaVersionUtils.isJava6() || JavaVersionUtils.isJava7()) {
+            DongTaiLog.info("DongTai Engine core couldn't install because of low JDK version:" + JavaVersionUtils.javaVersionStr());
+            return false;
+        }
+        return true;
     }
 
     @Override

@@ -56,7 +56,9 @@ public class GrpcHandler {
                     .getDeclaredMethod("interceptService", Object.class);
             methodOfGetRequestMetadata = classOfGrpcProxy.getDeclaredMethod("getServerMeta");
             grpcPluginPath.delete();
-        } catch (MalformedURLException | NoSuchMethodException e) {
+        } catch (MalformedURLException e) {
+            DongTaiLog.error(e);
+        } catch (NoSuchMethodException e) {
             DongTaiLog.error(e);
         }
     }

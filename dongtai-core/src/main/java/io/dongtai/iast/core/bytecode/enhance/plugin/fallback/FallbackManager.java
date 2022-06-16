@@ -1,9 +1,11 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.fallback;
 
 
+import io.dongtai.iast.common.entity.performance.PerformanceMetrics;
 import io.dongtai.iast.common.utils.version.JavaVersionUtils;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.breaker.AbstractBreaker;
+import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.breaker.PerformanceBreaker;
 import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.limiter.HeavyTrafficRateLimiter;
 import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.limiter.FallbackSwitchFrequencyLimiter;
 import io.dongtai.iast.core.utils.config.RemoteConfigUtils;
@@ -11,6 +13,7 @@ import io.dongtai.iast.core.utils.threadlocal.RateLimiterThreadLocal;
 import io.dongtai.log.DongTaiLog;
 
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -121,11 +124,7 @@ public class FallbackManager {
      * @param contextString 上下文字符串
      */
     public static void invokePerformanceBreakerCheck(String contextString) {
-        if (instance == null || instance.performanceBreaker == null) {
-            DongTaiLog.info("No suitable breaker,skip check.");
-            return;
-        }
-        instance.performanceBreaker.breakCheck(contextString);
+
     }
 
     /**

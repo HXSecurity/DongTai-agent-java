@@ -254,8 +254,8 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                     String className = clazz.getName();
                     Set<String> diagram = classDiagram.getDiagram(className);
                     if (diagram == null) {
-                        diagram = new HashSet<>();
-                        Queue<Class<?>> classQueue = new LinkedList<>();
+                        diagram = new HashSet<String>();
+                        Queue<Class<?>> classQueue = new LinkedList<Class<?>>();
 
                         classQueue.add(clazz);
                         while (classQueue.size() > 0) {

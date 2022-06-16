@@ -13,6 +13,11 @@
 
     <name>dongtai-spy</name>
 
+    <properties>
+        <maven.compiler.source>6</maven.compiler.source>
+        <maven.compiler.target>6</maven.compiler.target>
+    </properties>
+
     <build>
         <finalName>dongtai-spy</finalName>
         <plugins>
@@ -66,6 +71,14 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>6</source>
+                    <target>6</target>
+                </configuration>
             </plugin>
         </plugins>
     </build>

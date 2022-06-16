@@ -64,7 +64,9 @@ public class GraphBuilder {
                                 event.getSourceHashes(),
                                 event.getTargetHashes(),
                                 properties.isLocal() ? event.obj2String(event.inValue) : "",
+                                properties.isLocal() && event.objIsReference(event.inValue),
                                 properties.isLocal() ? event.obj2String(event.outValue) : "",
+                                properties.isLocal() && event.objIsReference(event.inValue),
                                 event.getSourceHashForRpc(),
                                 event.getTargetHashForRpc(),
                                 event.getTraceId(),
@@ -92,29 +94,29 @@ public class GraphBuilder {
         report.put(ReportConstant.REPORT_VALUE_KEY, detail);
 
         detail.put(ReportConstant.AGENT_ID, EngineManager.getAgentId());
-        detail.put(ReportConstant.PROTOCOL, requestMeta.getOrDefault("protocol", "unknown"));
-        detail.put(ReportConstant.SCHEME, requestMeta.getOrDefault("scheme", ""));
-        detail.put(ReportConstant.METHOD, requestMeta.getOrDefault("method", ""));
-        detail.put(ReportConstant.SECURE, requestMeta.getOrDefault("secure", ""));
-        String requestURL = requestMeta.getOrDefault("requestURL", "").toString();
+        detail.put(ReportConstant.PROTOCOL, requestMeta.get("protocol") == null?"unknown":requestMeta.get("protocol"));
+        detail.put(ReportConstant.SCHEME, requestMeta.get("scheme") == null?"":requestMeta.get("scheme"));
+        detail.put(ReportConstant.METHOD, requestMeta.get("method") == null?"":requestMeta.get("method"));
+        detail.put(ReportConstant.SECURE, requestMeta.get("secure") == null?"":requestMeta.get("secure"));
+        String requestURL = requestMeta.get("requestURL") == null?"":requestMeta.get("requestURL").toString();
         detail.put(ReportConstant.URL, requestURL);
-        String requestURI = requestMeta.getOrDefault("requestURI", "").toString();
+        String requestURI = requestMeta.get("requestURI") == null?"":requestMeta.get("requestURI").toString();
         detail.put(ReportConstant.URI, requestURI);
         setURL(requestURL);
         setURI(requestURI);
-        detail.put(ReportConstant.CLIENT_IP, requestMeta.getOrDefault("remoteAddr", ""));
-        detail.put(ReportConstant.QUERY_STRING, requestMeta.getOrDefault("queryString", ""));
+        detail.put(ReportConstant.CLIENT_IP, requestMeta.get("remoteAddr") == null?"":requestMeta.get("remoteAddr"));
+        detail.put(ReportConstant.QUERY_STRING, requestMeta.get("queryString") == null?"":requestMeta.get("queryString"));
         detail.put(ReportConstant.REQ_HEADER,
-                AbstractNormalVulScan.getEncodedHeader((Map<String, String>) requestMeta.getOrDefault("headers", new HashMap<String, String>())));
+                AbstractNormalVulScan.getEncodedHeader( requestMeta.get("headers") == null?new HashMap<String, String>():(Map<String, String>)requestMeta.get("headers")));
         // 设置请求体
         detail.put(ReportConstant.REQ_BODY, request == null ? "" : HttpImpl.getPostBody(request));
         detail.put(ReportConstant.RES_HEADER, responseMeta == null ? ""
-                : Base64Encoder.encodeBase64String(responseMeta.getOrDefault("headers", "").toString().getBytes())
+                : Base64Encoder.encodeBase64String(responseMeta.get("headers") == null?"".getBytes():responseMeta.get("headers").toString().getBytes())
                 .replaceAll("\n", ""));
         detail.put(ReportConstant.RES_BODY, responseMeta == null ? "" : Base64Encoder.encodeBase64String(
                 getResponseBody(responseMeta)));
-        detail.put(ReportConstant.CONTEXT_PATH, requestMeta.getOrDefault("contextPath", ""));
-        detail.put(ReportConstant.REPLAY_REQUEST, requestMeta.getOrDefault("replay-request", false));
+        detail.put(ReportConstant.CONTEXT_PATH, requestMeta.get("contextPath")== null?"":requestMeta.get("contextPath"));
+        detail.put(ReportConstant.REPLAY_REQUEST, requestMeta.get("replay-request")== null?false:requestMeta.get("replay-request"));
 
         detail.put(ReportConstant.SAAS_METHOD_POOL, methodPool);
 
@@ -127,7 +129,7 @@ public class GraphBuilder {
 
     private static byte[] getResponseBody(Map<String, Object> responseMeta) {
         Integer responseLength = PropertyUtils.getInstance().getResponseLength();
-        byte[] responseBody = (byte[]) responseMeta.getOrDefault("body", "");
+        byte[] responseBody = responseMeta.get("body")== null?"".getBytes():responseMeta.get("body").toString().getBytes();
         if (responseLength > 0) {
             byte[] newResponseBody = new byte[responseLength];
             newResponseBody = Arrays.copyOfRange(responseBody, 0, responseLength);

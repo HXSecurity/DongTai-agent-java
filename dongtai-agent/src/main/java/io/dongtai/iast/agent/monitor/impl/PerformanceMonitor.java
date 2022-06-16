@@ -131,16 +131,6 @@ public class PerformanceMonitor implements IMonitor {
         updatePerformanceMetrics(performanceMetrics);
         // 检查性能指标(用于熔断降级)
         checkPerformanceMetrics(performanceMetrics);
-/*        int UsedRate = CPU_USAGE;
-        PerformanceMonitor.AGENT_THRESHOLD_VALUE = PerformanceMonitor.checkThresholdValue();
-        int preStatus = this.engineManager.getRunningStatus();
-        if (isStart(UsedRate, preStatus)) {
-            this.engineManager.start();
-            DongTaiLog.info("The current CPU usage is " + UsedRate + "%, lower than the threshold " + AGENT_THRESHOLD_VALUE + "%，and the detection engine is starting");
-        } else if (isStop(UsedRate, preStatus)) {
-            this.engineManager.stop();
-            DongTaiLog.info("The current CPU usage is " + UsedRate + "%, higher than the threshold " + AGENT_THRESHOLD_VALUE + "%，and the detection engine is stopping");
-        }*/
     }
 
     private void updatePerformanceMetrics(List<PerformanceMetrics> performanceMetrics) {

@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class SpyDispatcherImpl implements SpyDispatcher {
 
     public static final AtomicInteger INVOKE_ID_SEQUENCER = new AtomicInteger(1);
-    private static final ThreadLocal<Long> responseTime = new ThreadLocal<>();
+    private static final ThreadLocal<Long> responseTime = new ThreadLocal<Long>();
 
     /**
      * mark for enter Http Entry Point
@@ -58,12 +58,12 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                     EngineManager.maintainRequestCount();
                     GraphBuilder.buildAndReport(request, response);
                     EngineManager.cleanThreadState();
-                    long responseTimeEnd = System.currentTimeMillis()-responseTime.get()+8;
-                    DongTaiLog.debug("url {} response time: {} ms",GraphBuilder.getURL(),responseTimeEnd);
-                    if (RemoteConfigUtils.enableAutoFallback() && responseTimeEnd > RemoteConfigUtils.getApiResponseTime(null)){
+                    long responseTimeEnd = System.currentTimeMillis() - responseTime.get() + 8;
+                    DongTaiLog.debug("url {} response time: {} ms", GraphBuilder.getURL(), responseTimeEnd);
+                    if (RemoteConfigUtils.enableAutoFallback() && responseTimeEnd > RemoteConfigUtils.getApiResponseTime(null)) {
                         RemoteConfigUtils.fallbackReqCount++;
-                        DongTaiLog.warn("url {} response time: {} ms, greater than {} ms",GraphBuilder.getURL(),responseTimeEnd,RemoteConfigUtils.getApiResponseTime(null));
-                        if (!"/".equals(GraphBuilder.getURL())){
+                        DongTaiLog.warn("url {} response time: {} ms, greater than {} ms", GraphBuilder.getURL(), responseTimeEnd, RemoteConfigUtils.getApiResponseTime(null));
+                        if (!"/".equals(GraphBuilder.getURL())) {
                             ConfigMatcher.getInstance().FALLBACK_URL.add(GraphBuilder.getURI());
                         }
                     }
@@ -478,26 +478,20 @@ public class SpyDispatcherImpl implements SpyDispatcher {
             try {
                 EngineManager.turnOffDongTai();
 
-                if (HookType.SPRINGAPPLICATION.equals(hookType)) {
+                boolean isEntryPointMethod = HookType.HTTP.equals(hookType) || HookType.RPC.equals(hookType);
+                if (EngineManager.isEnterEntry(null) || isEntryPointMethod) {
                     MethodEvent event = new MethodEvent(0, -1, className, matchClassName, methodName,
                             methodSign, methodSign, instance, argumentArray, retValue, framework, isStatic, null);
-                    SpringApplicationImpl.getWebApplicationContext(event);
-                } else {
-                    boolean isEntryPointMethod = HookType.HTTP.equals(hookType) || HookType.RPC.equals(hookType);
-                    if (EngineManager.isEnterEntry(null) || isEntryPointMethod) {
-                        MethodEvent event = new MethodEvent(0, -1, className, matchClassName, methodName,
-                                methodSign, methodSign, instance, argumentArray, retValue, framework, isStatic, null);
-                        if (HookType.HTTP.equals(hookType)) {
-                            HttpImpl.solveHttp(event);
-                        } else if (HookType.RPC.equals(hookType)) {
-                            solveRPC(framework, event);
-                        } else if (HookType.PROPAGATOR.equals(hookType) && !EngineManager.TAINT_POOL.isEmpty()) {
-                            PropagatorImpl.solvePropagator(event, INVOKE_ID_SEQUENCER);
-                        } else if (HookType.SOURCE.equals(hookType)) {
-                            SourceImpl.solveSource(event, INVOKE_ID_SEQUENCER);
-                        } else if (HookType.SINK.equals(hookType)) {
-                            SinkImpl.solveSink(event);
-                        }
+                    if (HookType.HTTP.equals(hookType)) {
+                        HttpImpl.solveHttp(event);
+                    } else if (HookType.RPC.equals(hookType)) {
+                        solveRPC(framework, event);
+                    } else if (HookType.PROPAGATOR.equals(hookType) && !EngineManager.TAINT_POOL.isEmpty()) {
+                        PropagatorImpl.solvePropagator(event, INVOKE_ID_SEQUENCER);
+                    } else if (HookType.SOURCE.equals(hookType)) {
+                        SourceImpl.solveSource(event, INVOKE_ID_SEQUENCER);
+                    } else if (HookType.SINK.equals(hookType)) {
+                        SinkImpl.solveSink(event);
                     }
                 }
             } catch (Exception e) {
@@ -510,10 +504,8 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     }
 
     private void solveRPC(String framework, MethodEvent event) {
-        switch (framework) {
-            case "dubbo":
-                DubboHandler.solveDubbo(event, SpyDispatcherImpl.INVOKE_ID_SEQUENCER);
-                break;
+        if ("dubbo".equals(framework)) {
+            DubboHandler.solveDubbo(event, SpyDispatcherImpl.INVOKE_ID_SEQUENCER);
         }
     }
 }

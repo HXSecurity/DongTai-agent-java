@@ -194,60 +194,38 @@ public class RemoteConfigUtils {
                 }
                 if (null != remoteConfigEntity.getApplication()) {
                     for (PerformanceEntity performanceEntity:application){
-                        switch (performanceEntity.getFallbackName()){
-                            case "hookLimitTokenPerSecond":
-                                hookLimitTokenPerSecond = performanceEntity.getValue();
-                                break;
-                            case "heavyTrafficLimitTokenPerSecond":
-                                heavyTrafficLimitTokenPerSecond = performanceEntity.getValue();
-                                break;
-                            case "apiResponseTime":
-                                apiResponseTime = performanceEntity.getValue();
-                                break;
+                        if ("hookLimitTokenPerSecond".equals(performanceEntity.getFallbackName())) {
+                            hookLimitTokenPerSecond = performanceEntity.getValue();
+                        } else if ("heavyTrafficLimitTokenPerSecond".equals(performanceEntity.getFallbackName())) {
+                            heavyTrafficLimitTokenPerSecond = performanceEntity.getValue();
+                        } else if ("apiResponseTime".equals(performanceEntity.getFallbackName())) {
+                            apiResponseTime = performanceEntity.getValue();
                         }
                     }
                 }
                 if (remoteConfigEntity.getJvm() != null) {
                     for (PerformanceEntity performanceEntity:jvm){
-                        switch (performanceEntity.getFallbackName()){
-                            case "jvmMemUsagePercentage":{
-                                memoryUsage.setMemUsagePercentage(performanceEntity.getValue());
-                                break;
-                            }
-                            case "jvmMemUsageUsed":{
-                                memoryUsage.setUsed(performanceEntity.getValue().longValue());
-                                break;
-                            }
-                            case "threadCount":{
-                                threadInfoMetrics.setThreadCount(performanceEntity.getValue().intValue());
-                                break;
-                            }
-                            case "daemonThreadCount":{
-                                threadInfoMetrics.setDaemonThreadCount(performanceEntity.getValue().intValue());
-                                break;
-                            }
-                            case "dongTaiThreadCount":{
-                                threadInfoMetrics.setDongTaiThreadCount(performanceEntity.getValue().intValue());
-                                break;
-                            }
+                        if ("jvmMemUsagePercentage".equals(performanceEntity.getFallbackName())) {
+                            memoryUsage.setMemUsagePercentage(performanceEntity.getValue());
+                        } else if ("jvmMemUsageUsed".equals(performanceEntity.getFallbackName())) {
+                            memoryUsage.setUsed(performanceEntity.getValue().longValue());
+                        } else if ("threadCount".equals(performanceEntity.getFallbackName())) {
+                            threadInfoMetrics.setThreadCount(performanceEntity.getValue().intValue());
+                        } else if ("daemonThreadCount".equals(performanceEntity.getFallbackName())) {
+                            threadInfoMetrics.setDaemonThreadCount(performanceEntity.getValue().intValue());
+                        } else if ("dongTaiThreadCount".equals(performanceEntity.getFallbackName())) {
+                            threadInfoMetrics.setDongTaiThreadCount(performanceEntity.getValue().intValue());
                         }
                     }
                 }
                 if (remoteConfigEntity.getSystem() != null) {
                     for (PerformanceEntity performanceEntity:system){
-                        switch (performanceEntity.getFallbackName()){
-                            case "cpuUsagePercentage":{
-                                cpuInfoMetrics.setCpuUsagePercentage(performanceEntity.getValue());
-                                break;
-                            }
-                            case "sysMemUsagePercentage":{
-                                memoryNoHeapUsage.setMemUsagePercentage(performanceEntity.getValue());
-                                break;
-                            }
-                            case "sysMemUsageUsed":{
-                                memoryNoHeapUsage.setUsed(performanceEntity.getValue().longValue());
-                                break;
-                            }
+                        if ("cpuUsagePercentage".equals(performanceEntity.getFallbackName())) {
+                            cpuInfoMetrics.setCpuUsagePercentage(performanceEntity.getValue());
+                        } else if ("sysMemUsagePercentage".equals(performanceEntity.getFallbackName())) {
+                            memoryNoHeapUsage.setMemUsagePercentage(performanceEntity.getValue());
+                        } else if ("sysMemUsageUsed".equals(performanceEntity.getFallbackName())) {
+                            memoryNoHeapUsage.setUsed(performanceEntity.getValue().longValue());
                         }
                     }
                 }
@@ -389,7 +367,7 @@ public class RemoteConfigUtils {
      */
     private static List<PerformanceMetrics> combineRemoteAndLocalMetricsThreshold(List<PerformanceMetrics> localThreshold,
                                                                                   PerformanceLimitThreshold remoteThreshold) {
-        List<PerformanceMetrics> performanceMetricsList = new ArrayList<>();
+        List<PerformanceMetrics> performanceMetricsList = new ArrayList<PerformanceMetrics>();
         for (MetricsKey metricsKey : MetricsKey.values()) {
             //远端包含该指标配置
             if (remoteThreshold != null) {
@@ -650,7 +628,7 @@ public class RemoteConfigUtils {
      * @return {@link List}<{@link PerformanceMetrics}> 性能指标列表
      */
     private static List<PerformanceMetrics> buildPerformanceMetrics(String configPrefix, Properties cfg) {
-        List<PerformanceMetrics> performanceMetricsList = new ArrayList<>();
+        List<PerformanceMetrics> performanceMetricsList = new ArrayList<PerformanceMetrics>();
         for (MetricsKey each : MetricsKey.values()) {
             final Object metricsValue = PropertyUtils.getRemoteSyncLocalConfig(String.format("%s.%s", configPrefix, each.getKey()),
                     Object.class, null, cfg);

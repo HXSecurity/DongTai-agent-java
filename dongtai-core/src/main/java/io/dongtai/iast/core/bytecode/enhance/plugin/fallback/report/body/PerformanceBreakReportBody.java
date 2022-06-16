@@ -61,7 +61,7 @@ public class PerformanceBreakReportBody {
          * 熔断前超限日志(最多保留30条)
          */
         @SerializedName(ReportConstant.LIMIT_PERFORMANCE_OVER_THRESHOLD_LOG)
-        private LinkedList<PerformanceOverThresholdLog> performanceOverThresholdLog = new FixSizeLinkedList<>(30);
+        private LinkedList<PerformanceOverThresholdLog> performanceOverThresholdLog = new FixSizeLinkedList<PerformanceOverThresholdLog>(30);
 
     }
 
