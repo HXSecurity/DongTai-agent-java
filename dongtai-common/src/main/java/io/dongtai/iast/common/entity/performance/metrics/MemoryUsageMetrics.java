@@ -26,6 +26,8 @@ max	表示可用于内存管理的最大内存量（以字节为单位）。它�
 package io.dongtai.iast.common.entity.performance.metrics;
 
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.Serializable;
 import java.lang.management.MemoryUsage;
 
@@ -56,6 +58,10 @@ public class MemoryUsageMetrics implements Serializable {
      */
     private Long max;
     /**
+     * 系统最大限制
+     */
+    private Long systemMaxLimit;
+    /**
      * 内存使用率百分比
      */
     private Double memUsagePercentage;
@@ -67,10 +73,55 @@ public class MemoryUsageMetrics implements Serializable {
         this.init = init;
         this.used = used;
         this.committed = committed;
-        this.max = max;
-        if (used != null && used >= 0 && committed != null && committed >= 0) {
-            this.memUsagePercentage = (1.0 - (used * 1.0 / committed)) * 100;
+        this.max = max != null ? max : -1;
+        this.systemMaxLimit = collectSystemMaxLimit();
+        // 统计
+        long trulyMax = getTrulyMaxMem();
+        if (used != null && used >= 0 && trulyMax > 0) {
+            this.memUsagePercentage = (used * 1.0 / trulyMax) * 100;
         }
+    }
+
+    /**
+     * 获取真实可用的最大内存
+     * 取jvm配置内存和系统内存中(大于0的)更小者
+     */
+    private Long getTrulyMaxMem() {
+        if (this.max <= this.systemMaxLimit) {
+            return this.max > 0 ? this.max : this.systemMaxLimit;
+        } else {
+            return this.systemMaxLimit > 0 ? this.systemMaxLimit : this.max;
+        }
+    }
+
+    /**
+     * 获取系统最大内存限制(暂仅适配docker)
+     */
+    private Long collectSystemMaxLimit() {
+        long dockerMaxLimit = -1L;
+        try {
+            String dockerMemLimitCfg = "/sys/fs/cgroup/memory/memory.limit_in_bytes";
+            FileReader fr = null;
+            BufferedReader br = null;
+            try {
+                fr = new FileReader(dockerMemLimitCfg);
+                br = new BufferedReader(fr);
+                for (String line; (line = br.readLine()) != null; ) {
+                    if (line.length() > 0) {
+                        dockerMaxLimit = Long.parseLong(line);
+                    }
+                }
+            } finally {
+                if (br != null) {
+                    br.close();
+                }
+                if (fr != null) {
+                    fr.close();
+                }
+            }
+        } catch (Exception ignored) {
+        }
+        return dockerMaxLimit;
     }
 
     public static MemoryUsageMetrics clone(MemoryUsage memoryUsage) {
@@ -116,4 +167,13 @@ public class MemoryUsageMetrics implements Serializable {
     public void setMemUsagePercentage(Double memUsagePercentage) {
         this.memUsagePercentage = memUsagePercentage;
     }
+
+    public Long getSystemMaxLimit() {
+        return systemMaxLimit;
+    }
+
+    public void setSystemMaxLimit(Long systemMaxLimit) {
+        this.systemMaxLimit = systemMaxLimit;
+    }
+
 }
