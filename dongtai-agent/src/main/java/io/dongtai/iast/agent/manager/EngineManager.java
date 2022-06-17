@@ -29,12 +29,14 @@ public class EngineManager {
     private static final String REMOTE_CONFIG_UTILS_CLASS = "io.dongtai.iast.core.utils.config.RemoteConfigUtils";
     private static final String ENGINE_MANAGER_CLASS = "io.dongtai.iast.core.EngineManager";
     private static final String INJECT_PACKAGE_REMOTE_URI = "/api/v1/engine/download?engineName=dongtai-spy";
+    private static final String INJECT_PACKAGE_REMOTE_URI_JDK6 = "/api/v1/engine/download?engineName=dongtai-spy-jdk6";
     private static final String ENGINE_PACKAGE_REMOTE_URI = "/api/v1/engine/download?engineName=dongtai-core";
+    private static final String ENGINE_PACKAGE_REMOTE_URI_JDK6 = "/api/v1/engine/download?engineName=dongtai-core-jdk6";
     private static final String API_PACKAGE_REMOTE_URI = "/api/v1/engine/download?engineName=dongtai-api";
+    private static final String API_PACKAGE_REMOTE_URI_JDK6 = "/api/v1/engine/download?engineName=dongtai-api-jdk6";
     private static IastClassLoader IAST_CLASS_LOADER;
     private static EngineManager INSTANCE;
     private static String PID;
-
     private final Instrumentation inst;
     private int runningStatus;
     private static boolean isCoreStop;
@@ -248,6 +250,22 @@ public class EngineManager {
     }
 
     /**
+     * 更新IAST引擎需要的jar包，用于启动时加载和热更新检测引擎 - iast-core.jar - iast-inject.jar
+     *
+     * @return 更新状态，成功为true，失败为false
+     */
+    public boolean downloadPackageFromServerJdk6() {
+        String baseUrl = properties.getBaseUrl();
+        // 自定义jar下载地址
+        String spyJarUrl = "".equals(properties.getCustomSpyJarUrl()) ? baseUrl + INJECT_PACKAGE_REMOTE_URI_JDK6 : properties.getCustomSpyJarUrl();
+        String coreJarUrl = "".equals(properties.getCustomCoreJarUrl()) ? baseUrl + ENGINE_PACKAGE_REMOTE_URI_JDK6 : properties.getCustomCoreJarUrl();
+        String apiJarUrl = "".equals(properties.getCustomApiJarUrl()) ? baseUrl + API_PACKAGE_REMOTE_URI_JDK6 : properties.getCustomApiJarUrl();
+        return downloadJarPackageToCacheFromUrl(spyJarUrl, getInjectPackageCachePath()) &&
+                downloadJarPackageToCacheFromUrl(coreJarUrl, getEnginePackageCachePath()) &&
+                downloadJarPackageToCacheFromUrl(apiJarUrl, getApiPackagePath());
+    }
+
+    /**
      * 从 dongtai-agent.jar 提取相关的jar包
      *
      * @return 提取结果，成功为true，失败为false
@@ -284,6 +302,24 @@ public class EngineManager {
         }
     }
 
+    public boolean extractPackageJdk6() {
+        // 解析jar包到本地
+        String spyPackage = getInjectPackageCachePath();
+        String enginePackage = getEnginePackageCachePath();
+        String apiPackage = getApiPackagePath();
+        if (properties.isDebug()) {
+            DongTaiLog.info("current mode: debug, try to read package from directory {}", System.getProperty("java.io.tmpdir.dongtai"));
+            if ((new File(spyPackage)).exists() && (new File(enginePackage)).exists() && (new File(apiPackage)).exists()) {
+                return true;
+            }
+        }
+        if(properties.getIsDownloadPackage().equals("true")){
+            return downloadPackageFromServerJdk6();
+        }else {
+            return extractPackageFromAgent();
+        }
+    }
+
     public boolean install() {
         String spyPackage = EngineManager.getInjectPackageCachePath();
         String corePackage = EngineManager.getEnginePackageCachePath();
@@ -311,7 +347,6 @@ public class EngineManager {
         } catch (Throwable throwable) {
             DongTaiLog.error("Throwable: DongTai engine start failed, please contact staff for help.");
             DongTaiLog.error(throwable);
-
         }
         return false;
     }

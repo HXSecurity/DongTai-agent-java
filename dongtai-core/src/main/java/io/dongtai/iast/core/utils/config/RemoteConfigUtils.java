@@ -180,16 +180,12 @@ public class RemoteConfigUtils {
                 if (null != remoteConfigEntity.getPerformanceLimitRiskMaxMetricsCount()) {
                     Integer performanceLimitRiskMaxMetricsCount = remoteConfigEntity.getPerformanceLimitRiskMaxMetricsCount();
                     if (performanceLimitRiskMaxMetricsCount == 0){
-                        performanceBreakerWaitDuration = null;
+                        performanceBreakerWaitDuration = 1;
                     }else {
                         performanceBreakerWaitDuration =performanceLimitRiskMaxMetricsCount;
                     }
                     if (getApplicationIsUninstall() || getJvmIsUninstall() || getSystemIsUninstall()){
-                        if (performanceLimitRiskMaxMetricsCount == 0){
-                            secondFallbackDuration = (long) (30 * 1000);
-                        }else {
-                            secondFallbackDuration = (long) (performanceLimitRiskMaxMetricsCount * 1000);
-                        }
+                        secondFallbackDuration = (long) (1000);
                     }
                 }
                 if (null != remoteConfigEntity.getApplication()) {

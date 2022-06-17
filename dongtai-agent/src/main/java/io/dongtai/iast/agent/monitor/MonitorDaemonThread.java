@@ -70,11 +70,18 @@ public class MonitorDaemonThread implements Runnable {
 
 
     public void startEngine() {
-        boolean status = couldInstallEngine();
-        // todo: 下载功能优先走本地缓存
-        status = status && engineManager.extractPackage();
-        status = status && engineManager.install();
-        status = status && engineManager.start();
+        boolean status = true;
+        if(couldInstallEngine()){
+            // jdk8以上
+            status = status && engineManager.extractPackage();
+            status = status && engineManager.install();
+            status = status && engineManager.start();
+        }else {
+            // jdk6-7
+            status = status && engineManager.extractPackageJdk6();
+            status = status && engineManager.install();
+            status = status && engineManager.start();
+        }
         if (!status) {
             DongTaiLog.info("DongTai IAST started failure");
         }
