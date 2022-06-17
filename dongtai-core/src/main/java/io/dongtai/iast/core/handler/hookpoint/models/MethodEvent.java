@@ -302,19 +302,38 @@ public class MethodEvent {
         return sb.toString().trim();
     }
 
+    public boolean objIsReference(Object value) {
+        if (null == value) {
+            return false;
+        }
+        try {
+            String valueToString = value.toString();
+            String classObjectToString = value.getClass().getName() + "@" + Integer.toHexString(hashCode());
+            return valueToString.contains(classObjectToString);
+        } catch (Exception e) {
+            DongTaiLog.error(e);
+            return false;
+        }
+    }
+
     @Override
     public String toString() {
         return "MethodEvent{" +
                 "processId=" + processId +
                 ", invokeId=" + invokeId +
                 ", isStatic=" + isStatic +
-                ", javaClassName='" + matchClassName + '\'' +
-                ", javaMethodName='" + methodName + '\'' +
-                ", javaMethodDesc='" + methodDesc + '\'' +
+                ", originClassName='" + originClassName + '\'' +
+                ", matchClassName='" + matchClassName + '\'' +
+                ", methodName='" + methodName + '\'' +
+                ", methodDesc='" + methodDesc + '\'' +
                 ", object=" + object +
                 ", argumentArray=" + Arrays.toString(argumentArray) +
                 ", returnValue=" + returnValue +
                 ", inValue=" + inValue +
+                ", sourceHashes=" + sourceHashes +
+                ", sourceHashForRpc=" + sourceHashForRpc +
+                ", targetHashes=" + targetHashes +
+                ", targetHashForRpc=" + targetHashForRpc +
                 ", outValue=" + outValue +
                 ", signature='" + signature + '\'' +
                 ", subEvent=" + subEvent +
@@ -322,8 +341,13 @@ public class MethodEvent {
                 ", source=" + source +
                 ", auxiliary=" + auxiliary +
                 ", condition='" + condition + '\'' +
-                ", callStack=" + Arrays.toString(callStacks) +
+                ", callStacks=" + Arrays.toString(callStacks) +
+                ", callStack=" + callStack +
                 ", framework='" + framework + '\'' +
+                ", traceId='" + traceId + '\'' +
+                ", serviceName='" + serviceName + '\'' +
+                ", plugin='" + plugin + '\'' +
+                ", projectPropagatorClose=" + projectPropagatorClose +
                 '}';
     }
 

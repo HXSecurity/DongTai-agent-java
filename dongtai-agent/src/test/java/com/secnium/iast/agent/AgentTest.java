@@ -2,7 +2,10 @@ package com.secnium.iast.agent;
 
 import java.io.*;
 import java.lang.management.ManagementFactory;
+import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.RuntimeMXBean;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
@@ -95,7 +98,48 @@ public class AgentTest {
     }
 
     public static void main(String[] args) {
-        String a = "52.81.92.214:30158";
-        System.out.println(a.substring(a.indexOf(":")+1));
+//        com.sun.management.OperatingSystemMXBean osmxb = (com.sun.management.OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
+//        double systemCpuLoad = osmxb.getSystemCpuLoad()/osmxb.getAvailableProcessors();
+//        double processCpuLoad = osmxb.getProcessCpuLoad();
+//        System.out.println(systemCpuLoad);
+//        System.out.println(processCpuLoad);
+
+
+//        OperatingSystemMXBean operatingSystemMXBean = ManagementFactory.getOperatingSystemMXBean();
+//        for (Method method : operatingSystemMXBean.getClass().getDeclaredMethods()) {
+//            method.setAccessible(true);
+//            if (method.getName().startsWith("get")
+//                    && Modifier.isPublic(method.getModifiers())) {
+//                Object value;
+//                try {
+//                    value = method.invoke(operatingSystemMXBean);
+//                } catch (Exception e) {
+//                    value = e;
+//                } // try
+//                System.out.println(method.getName() + " = " + value);
+//            } // if
+//        } // for
+
+
+        OperatingSystemMXBean mbean = (com.sun.management.OperatingSystemMXBean)
+                ManagementFactory.getOperatingSystemMXBean();
+        double load;
+        for(int i=0; i<10; i++) {
+            load = ((com.sun.management.OperatingSystemMXBean) mbean).getSystemCpuLoad();
+            System.out.println(load);
+            if((load<0.0 || load>1.0) && load != -1.0) {
+                throw new RuntimeException("getSystemCpuLoad() returns " + load
+                        +  " which is not in the [0.0,1.0] interval");
+            }
+            try {
+                Thread.sleep(200);
+            } catch(InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private static void printUsage() {
+
     }
 }
