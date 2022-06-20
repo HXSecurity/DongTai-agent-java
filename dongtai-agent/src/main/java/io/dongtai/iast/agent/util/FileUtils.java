@@ -50,15 +50,15 @@ public class FileUtils {
             StringBuffer buf = new StringBuffer();
             // 保存该行前面的内容
             while ((temp = br.readLine()) != null) {
-                if (temp.contains("${HOSTNAME_AGENT_ID}")){
-                    temp = temp.replace("${HOSTNAME_AGENT_ID}", AgentRegisterReport.getInternalHostName()+"-"+AgentRegisterReport.getAgentFlag().toString());
-                }else if (temp.contains("${HOSTNAME}")){
-                    temp = temp.replace("${HOSTNAME}",AgentRegisterReport.getInternalHostName());
-                }else if (temp.contains("${AGENT_ID}")){
-                    temp = temp.replace("${AGENT_ID}",AgentRegisterReport.getAgentFlag().toString());
-                }else if (temp.contains("${OPENAPI}")){
+                if (temp.contains("${HOSTNAME_AGENT_ID}")) {
+                    temp = temp.replace("${HOSTNAME_AGENT_ID}", AgentRegisterReport.getInternalHostName() + "-" + AgentRegisterReport.getAgentFlag().toString());
+                } else if (temp.contains("${HOSTNAME}")) {
+                    temp = temp.replace("${HOSTNAME}", AgentRegisterReport.getInternalHostName());
+                } else if (temp.contains("${AGENT_ID}")) {
+                    temp = temp.replace("${AGENT_ID}", AgentRegisterReport.getAgentFlag().toString());
+                } else if (temp.contains("${OPENAPI}")) {
                     String logAddress = IastProperties.getInstance().getLogAddress();
-                    if (null == logAddress){
+                    if (null == logAddress) {
                         String s = IastProperties.getInstance().getBaseUrl();
                         try {
                             String openApiDomain = new URI(s).getHost();
@@ -70,17 +70,16 @@ public class FileUtils {
                             }
                             temp = temp.replace("${OPENAPI}", s);
                         }
-                    }else {
+                    } else {
                         temp = temp.replace("${OPENAPI}", logAddress);
                     }
-                }else if (temp.contains("${LOG_PORT}")){
+                } else if (temp.contains("${LOG_PORT}")) {
                     String logPort = IastProperties.getInstance().getLogPort();
-                    if (null == logPort){
+                    if (null == logPort) {
                         String s = IastProperties.getInstance().getBaseUrl();
                         try {
                             int openApiPort = new URI(s).getPort();
-                            temp = temp.replace("${LOG_PORT}", openApiPort > 0 ? Integer.toString(openApiPort) :
-                                    ("https".equalsIgnoreCase(new URI(s).getScheme()) ? "443" : "80"));
+                            temp = temp.replace("${LOG_PORT}", openApiPort > 0 ? Integer.toString(openApiPort) : "80");
                         } catch (Exception e) {
                             s = s.substring(s.indexOf("://") + 3, s.indexOf("/openapi"));
                             if (s.contains(":")) {
@@ -90,11 +89,11 @@ public class FileUtils {
                                 temp = temp.replace("${LOG_PORT}", "80");
                             }
                         }
-                    }else {
+                    } else {
                         temp = temp.replace("${LOG_PORT}", logPort);
                     }
-                }else if (temp.contains("${LOG_PATH}")){
-                    temp = temp.replace("${LOG_PATH}", System.getProperty("java.io.tmpdir.dongtai")+File.separator+"dongtaiJavaAgentLogs"+File.separator+"dongtai_javaagent.log");
+                } else if (temp.contains("${LOG_PATH}")) {
+                    temp = temp.replace("${LOG_PATH}", System.getProperty("java.io.tmpdir.dongtai") + File.separator + "dongtaiJavaAgentLogs" + File.separator + "dongtai_javaagent.log");
                 }
                 buf = buf.append(temp);
                 buf = buf.append(System.getProperty("line.separator"));
