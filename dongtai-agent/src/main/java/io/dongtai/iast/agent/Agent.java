@@ -114,8 +114,8 @@ public class Agent {
         }
     }
 
-    private static boolean isLinux() {
-        return OS_NAME.indexOf("linux") >= 0;
+    private static boolean isArm() {
+        return System.getProperty("os.arch").contains("arm") || System.getProperty("os.arch").contains("aarch");
     }
 
     public static boolean isWindows() {
@@ -133,7 +133,10 @@ public class Agent {
         } else if (isMacOs()) {
             JATTACH_FILE = System.getProperty("java.io.tmpdir")+ File.separator + "iast"+System.currentTimeMillis() + File.separator + "jattach-mac";
             FileUtils.getResourceToFile("bin/jattach-mac", JATTACH_FILE);
-        } else {
+        } else if (isArm()){
+            JATTACH_FILE = System.getProperty("java.io.tmpdir")+ File.separator + "iast"+System.currentTimeMillis() + File.separator + "jattach-linux";
+            FileUtils.getResourceToFile("bin/jattach-arm", JATTACH_FILE);
+        }else {
             JATTACH_FILE = System.getProperty("java.io.tmpdir")+ File.separator + "iast"+System.currentTimeMillis() + File.separator + "jattach-linux";
             FileUtils.getResourceToFile("bin/jattach-linux", JATTACH_FILE);
         }
