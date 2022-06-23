@@ -46,18 +46,18 @@ public class AgentTest {
             StringBuffer buf = new StringBuffer();
             // 保存该行前面的内容
             while ((temp = br.readLine()) != null) {
-                if (temp.contains("${HOSTNAME_AGENT_ID}")){
-                    temp.replace("${HOSTNAME_AGENT_ID}", AgentRegisterReport.getInternalHostName()+"-"+AgentRegisterReport.getAgentFlag().toString());
-                }else if (temp.contains("${HOSTNAME}")){
-                    temp.replace("${HOSTNAME}",AgentRegisterReport.getInternalHostName());
-                }else if (temp.contains("${AGENT_ID}")){
-                    temp.replace("${AGENT_ID}",AgentRegisterReport.getAgentFlag().toString());
-                }else if (temp.contains("${OPENAPI}")){
+                if (temp.contains("${HOSTNAME_AGENT_ID}")) {
+                    temp.replace("${HOSTNAME_AGENT_ID}", AgentRegisterReport.getInternalHostName() + "-" + AgentRegisterReport.getAgentFlag().toString());
+                } else if (temp.contains("${HOSTNAME}")) {
+                    temp.replace("${HOSTNAME}", AgentRegisterReport.getInternalHostName());
+                } else if (temp.contains("${AGENT_ID}")) {
+                    temp.replace("${AGENT_ID}", AgentRegisterReport.getAgentFlag().toString());
+                } else if (temp.contains("${OPENAPI}")) {
                     temp.replace("${OPENAPI}", IastProperties.getInstance().getBaseUrl());
-                }else if (temp.contains("${LOG_PORT}")){
-                    temp.replace("${LOG_PORT}",IastProperties.getInstance().getLogPort());
-                }else if (temp.contains("${LOG_PATH}")){
-                    temp.replace("${LOG_PATH}", System.getProperty("dongtai.log.path")+File.separator+"dongtai_javaagent.log");
+                } else if (temp.contains("${LOG_PORT}")) {
+                    temp.replace("${LOG_PORT}", IastProperties.getInstance().getLogPort());
+                } else if (temp.contains("${LOG_PATH}")) {
+                    temp.replace("${LOG_PATH}", System.getProperty("dongtai.log.path") + File.separator + "dongtai_javaagent.log");
                 }
                 buf = buf.append(temp);
                 buf = buf.append(System.getProperty("line.separator"));
@@ -98,48 +98,24 @@ public class AgentTest {
     }
 
     public static void main(String[] args) {
-//        com.sun.management.OperatingSystemMXBean osmxb = (com.sun.management.OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
-//        double systemCpuLoad = osmxb.getSystemCpuLoad()/osmxb.getAvailableProcessors();
-//        double processCpuLoad = osmxb.getProcessCpuLoad();
-//        System.out.println(systemCpuLoad);
-//        System.out.println(processCpuLoad);
-
-
-//        OperatingSystemMXBean operatingSystemMXBean = ManagementFactory.getOperatingSystemMXBean();
-//        for (Method method : operatingSystemMXBean.getClass().getDeclaredMethods()) {
-//            method.setAccessible(true);
-//            if (method.getName().startsWith("get")
-//                    && Modifier.isPublic(method.getModifiers())) {
-//                Object value;
-//                try {
-//                    value = method.invoke(operatingSystemMXBean);
-//                } catch (Exception e) {
-//                    value = e;
-//                } // try
-//                System.out.println(method.getName() + " = " + value);
-//            } // if
-//        } // for
-
-
-        OperatingSystemMXBean mbean = (com.sun.management.OperatingSystemMXBean)
-                ManagementFactory.getOperatingSystemMXBean();
-        double load;
-        for(int i=0; i<10; i++) {
-            load = ((com.sun.management.OperatingSystemMXBean) mbean).getSystemCpuLoad();
-            System.out.println(load);
-            if((load<0.0 || load>1.0) && load != -1.0) {
-                throw new RuntimeException("getSystemCpuLoad() returns " + load
-                        +  " which is not in the [0.0,1.0] interval");
-            }
-            try {
-                Thread.sleep(200);
-            } catch(InterruptedException e) {
-                e.printStackTrace();
-            }
+        File[] files = File.listRoots();
+        for (File file : files) {
+            System.out.println(file + "磁盘的空间大小为：" + file.getTotalSpace() / 1024 / 1024 / 1024 + "G");
+            System.out.println(file + "磁盘的可使用空间大小为：" + file.getUsableSpace() / 1024 / 1024 / 1024 + "G");
+            System.out.println(file + "磁盘的空闲空间大小为：" + file.getFreeSpace() / 1024 / 1024 / 1024 + "G");
+            double rate = ((file.getTotalSpace()-file.getUsableSpace())*1.0/file.getTotalSpace())*100;
+            System.out.println((int) rate);
         }
     }
 
+    @Test
     private static void printUsage() {
-
+        File[] files = File.listRoots();
+        for (File file : files) {
+            System.out.println(file + "磁盘的空间大小为：" + file.getTotalSpace() / 1024 / 1024 / 1024 + "G");
+            System.out.println(file + "磁盘的可使用空间大小为：" + file.getUsableSpace() / 1024 / 1024 / 1024 + "G");
+            System.out.println(file + "磁盘的空闲空间大小为：" + file.getFreeSpace() / 1024 / 1024 / 1024 + "G");
+            System.out.println("------------------------------------------------------------------");
+        }
     }
 }
