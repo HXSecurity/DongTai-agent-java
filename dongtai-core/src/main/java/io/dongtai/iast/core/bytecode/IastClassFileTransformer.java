@@ -46,6 +46,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
     private final PluginRegister plugins;
     private static IastClassFileTransformer INSTANCE;
     private final IastHookRuleModel hookRuleModel;
+    private final static HashMap<Object,byte[]> transformMap = new HashMap<>();
 
     /**
      * Gets a singleton object
@@ -154,6 +155,11 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                     cr.accept(cv, ClassReader.EXPAND_FRAMES);
                     AbstractClassVisitor dumpClassVisitor = (AbstractClassVisitor) cv;
                     if (dumpClassVisitor.hasTransformed()) {
+                        if (null == classBeingRedefined){
+                            transformMap.put(className,srcByteCodeArray);
+                        }else {
+                            transformMap.put(classBeingRedefined,srcByteCodeArray);
+                        }
                         transformCount++;
                         return dumpClassIfNecessary(cr.getClassName(), cw.toByteArray(), srcByteCodeArray);
                     }
@@ -315,5 +321,8 @@ public class IastClassFileTransformer implements ClassFileTransformer {
         DongTaiLog.debug("finish reTransform, class count: {}, time: {}", getTransformCount(), stopWatch.getTime());
     }
 
+    public static HashMap<Object, byte[]> getTransformMap() {
+        return transformMap;
+    }
 }
 
