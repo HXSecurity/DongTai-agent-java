@@ -16,10 +16,7 @@ import io.dongtai.log.DongTaiLog;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -74,6 +71,19 @@ public class PerformanceMonitor implements IMonitor {
 
     public static Integer getCpuUsage() {
         return CPU_USAGE;
+    }
+
+    public static Integer getDiskUsage() {
+        try {
+            File[] files = File.listRoots();
+            for (File file : files) {
+                double rate = ((file.getTotalSpace()-file.getUsableSpace())*1.0/file.getTotalSpace())*100;
+                return (int) rate;
+            }
+        }catch (Exception e){
+            DongTaiLog.error(e);
+        }
+        return 0;
     }
 
     public static List<PerformanceMetrics> getPerformanceMetrics() {

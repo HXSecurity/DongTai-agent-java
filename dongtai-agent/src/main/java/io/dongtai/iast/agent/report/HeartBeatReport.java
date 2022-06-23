@@ -76,7 +76,8 @@ public class HeartBeatReport {
         JSONObject memoryReport = new JSONObject();
         memoryReport.put("total", ByteUtils.formatByteSize(memoryUsage.getMax()));
         memoryReport.put("use", ByteUtils.formatByteSize(memoryUsage.getUsed()));
-        memoryReport.put("rate", memoryUsage.getUsed() / memoryUsage.getMax());
+        double rate = (memoryUsage.getUsed()*1.0 / memoryUsage.getMax())*100;
+        memoryReport.put("rate", (int) rate);
         return memoryReport.toString();
     }
 
@@ -86,7 +87,9 @@ public class HeartBeatReport {
      * @return
      */
     public static String getDiskInfo() {
-        return "{}";
+        JSONObject diskInfo = new JSONObject();
+        diskInfo.put("rate", PerformanceMonitor.getDiskUsage());
+        return diskInfo.toString();
     }
 
 

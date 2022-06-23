@@ -24747,6 +24747,7 @@ java/util/IllegalFormatException
 java/util/InvalidPropertiesFormatException
 java/util/JumboEnumSet
 java/util/JumboEnumSet$EnumSetIterator
+java/util/LinkedHashMap
 java/util/LinkedHashMap$*
 java/util/LinkedHashMap$1
 java/util/LinkedHashMap$2
@@ -24874,9 +24875,9 @@ java/util/spi/LocaleNameProvider
 java/util/spi/LocaleServiceProvider
 java/util/spi/TimeZoneNameProvider
 java/util/StringTokenizer
-java/util/stream/BaseStream
-java/util/stream/IntStream
-java/util/stream/Stream
+# java/util/stream/BaseStream
+# java/util/stream/IntStream
+# java/util/stream/Stream
 java/util/zip/*
 javassist/ByteArrayClassPath
 javassist/CannotCompileException
