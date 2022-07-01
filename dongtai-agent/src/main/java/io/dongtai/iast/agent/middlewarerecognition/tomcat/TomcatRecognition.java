@@ -37,13 +37,13 @@ final class TomcatRecognition {
 
     private static TomcatVersion getVersion(String version) {
         if (version.startsWith(V9_FLAG)) {
-            return TomcatVersion.V7;
+            return TomcatVersion.V9;
         }
         if (version.startsWith(V8_FLAG)) {
             return TomcatVersion.V8;
         }
         if (version.startsWith(V7_FLAG)) {
-            return TomcatVersion.V9;
+            return TomcatVersion.V7;
         }
         if (version.startsWith(V6_FLAG)) {
             return TomcatVersion.V6;
