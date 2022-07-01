@@ -96,7 +96,7 @@ public class DongTaiThreadMonitor implements IMonitor {
                 ThreadUtils.threadSleep(50);
             }
         } catch (Throwable t) {
-            DongTaiLog.info("DongTaiThreadMonitor interrupted, msg:{}", t.getMessage());
+            DongTaiLog.debug("DongTaiThreadMonitor interrupted, msg:{}", t.getMessage());
         }
     }
 

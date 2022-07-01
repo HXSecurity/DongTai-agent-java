@@ -2,8 +2,13 @@ package io.dongtai.iast.agent.manager;
 
 import io.dongtai.iast.agent.IastClassLoader;
 import io.dongtai.iast.agent.IastProperties;
+import io.dongtai.iast.agent.middlewarerecognition.ServerDetect;
+import io.dongtai.iast.agent.middlewarerecognition.tomcat.AbstractTomcat;
+import io.dongtai.iast.agent.monitor.MonitorDaemonThread;
+import io.dongtai.iast.agent.monitor.impl.PerformanceMonitor;
 import io.dongtai.iast.agent.report.AgentRegisterReport;
 import io.dongtai.iast.agent.util.FileUtils;
+import io.dongtai.iast.agent.util.base64.Base64Encoder;
 import io.dongtai.iast.agent.util.http.HttpClientUtils;
 import io.dongtai.log.DongTaiLog;
 import org.json.JSONObject;
@@ -444,8 +449,10 @@ public class EngineManager {
         classOfEngine = null;
         IAST_CLASS_LOADER.closeIfPossible();
         IAST_CLASS_LOADER = null;
+        uninstallObject();
         setRunningStatus(1);
         setCoreStop(true);
+        MonitorDaemonThread.isExit = true;
         return true;
     }
 
@@ -463,5 +470,21 @@ public class EngineManager {
 
     public static void setCoreStop(boolean coreStop) {
         isCoreStop = coreStop;
+    }
+
+    public static void setINSTANCE(EngineManager INSTANCE) {
+        EngineManager.INSTANCE = INSTANCE;
+    }
+
+    private void uninstallObject(){
+        PerformanceMonitor.setPerformanceMetrics(null);
+        ServerDetect.setSERVERS(null);
+        MonitorDaemonThread.setMonitorTasks(null);
+        AgentRegisterReport.setINSTANCE(null);
+        setINSTANCE(null);
+        Base64Encoder.setInstance(null);
+        AbstractTomcat.setTomcatVersion(null);
+        HttpClientUtils.setDoNotVerify(null);
+        IastProperties.setInstance(null);
     }
 }

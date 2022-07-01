@@ -39,7 +39,7 @@ public class ServerConfigMonitor implements IMonitor {
                 }
             }
         } catch (Throwable t) {
-            DongTaiLog.info("ServerConfigMonitor interrupted, msg:{}", t.getMessage());
+            DongTaiLog.debug("ServerConfigMonitor interrupted, msg:{}", t.getMessage());
         }
     }
 

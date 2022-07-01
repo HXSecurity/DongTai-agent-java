@@ -43,6 +43,10 @@ public class MonitorDaemonThread implements Runnable {
         }
     }
 
+    public static void setMonitorTasks(ArrayList<IMonitor> monitorTasks) {
+        MonitorDaemonThread.monitorTasks = monitorTasks;
+    }
+
     @Override
     public void run() {
         if (MonitorDaemonThread.delayTime > 0) {

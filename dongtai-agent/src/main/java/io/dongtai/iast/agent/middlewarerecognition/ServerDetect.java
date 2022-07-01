@@ -21,7 +21,7 @@ import java.lang.management.RuntimeMXBean;
  * @author dongzhiyong@huoxian.cn
  */
 public class ServerDetect {
-    private static final IServer[] SERVERS = {
+    private static IServer[] SERVERS = {
             new Tomcat(),
             new TomcatV9(),
             new TomcatV8(),
@@ -39,6 +39,10 @@ public class ServerDetect {
             new GrpcService(),
             new UnknownService()
     };
+
+    public static void setSERVERS(IServer[] SERVERS) {
+        ServerDetect.SERVERS = SERVERS;
+    }
 
     public static IServer getWebserver() {
         if (AgentLauncher.LAUNCH_MODE.equals(AgentLauncher.LAUNCH_MODE_ATTACH)) {

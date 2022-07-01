@@ -6,12 +6,14 @@ import io.dongtai.iast.core.init.impl.ConfigEngine;
 import io.dongtai.iast.core.init.impl.TransformEngine;
 import io.dongtai.iast.core.service.ServiceDirReport;
 import io.dongtai.iast.core.service.StartUpTimeReport;
+import io.dongtai.iast.core.service.ThreadPools;
 import io.dongtai.iast.core.utils.Constants;
 import io.dongtai.log.DongTaiLog;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.utils.PropertyUtils;
 import org.apache.commons.lang3.time.StopWatch;
 
+import java.lang.dongtai.SpyDispatcherHandler;
 import java.lang.instrument.Instrumentation;
 import java.util.ArrayList;
 import java.util.ListIterator;
@@ -48,13 +50,6 @@ public class AgentEngine {
         stopWatch.start();
         DongTaiLog.debug("DongTai Engine is about to be installed, the installation mode is {}", mode);
         PropertyUtils cfg = PropertyUtils.getInstance(propertiesFilePath);
-        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-            @Override
-            public void uncaughtException(Thread t, Throwable e) {
-                System.out.println("DongTai UncaughtExceptionHandler");
-                DongTaiLog.error(e);
-            }
-        });
         EngineManager.getInstance(agentId);
         AgentEngine agentEngine = AgentEngine.getInstance();
         agentEngine.init(mode, cfg, inst);
@@ -88,13 +83,15 @@ public class AgentEngine {
         AgentEngine agentEngine = AgentEngine.getInstance();
         assert agentEngine != null;
         agentEngine.destroy();
+        ThreadPools.destroy();
+        SpyDispatcherHandler.destroy();
         System.clearProperty("DongTai.IAST.Status");
         DongTaiLog.info("Engine uninstallation succeeded");
     }
 
 
     /**
-     * // 初始化引擎
+     * 初始化引擎
      */
     public void init(String mode, PropertyUtils propertiesUtils, Instrumentation inst) {
         for (IEngine engine : engines) {

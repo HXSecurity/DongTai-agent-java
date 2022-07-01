@@ -137,7 +137,7 @@ public class EngineMonitor implements IMonitor {
                 ThreadUtils.threadSleep(30);
             }
         } catch (Throwable t) {
-            DongTaiLog.info("EngineMonitor interrupted, msg:{}", t.getMessage());
+            DongTaiLog.debug("EngineMonitor interrupted, msg:{}", t.getMessage());
         }
     }
 }

@@ -6,8 +6,8 @@ import io.dongtai.iast.agent.middlewarerecognition.Supplier;
 
 import java.lang.management.RuntimeMXBean;
 
-abstract class AbstractTomcat implements IServer {
-    private static final Supplier<TomcatVersion> TOMCAT_VERSION = getTomcatVersion();
+public abstract class AbstractTomcat implements IServer {
+    private static Supplier<TomcatVersion> TOMCAT_VERSION = getTomcatVersion();
 
     private static final String BOOTSTRAP = "bootstrap.jar";
     private static final String COMMAND = " org.apache.catalina.startup.Bootstrap start".substring(1);
@@ -22,6 +22,9 @@ abstract class AbstractTomcat implements IServer {
         return classPath.contains(BOOTSTRAP) && startCmd.equals(COMMAND);
     }
 
+    public static void setTomcatVersion(Supplier<TomcatVersion> tomcatVersion) {
+        TOMCAT_VERSION = tomcatVersion;
+    }
 
     private static boolean isMatchVersion(TomcatVersion tomcat) {
         return (tomcat == TOMCAT_VERSION.get());

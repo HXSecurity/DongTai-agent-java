@@ -115,7 +115,7 @@ public class Agent {
     }
 
     private static boolean isArm() {
-        return System.getProperty("os.arch").contains("arm") || System.getProperty("os.arch").contains("aarch");
+        return System.getProperty("os.arch").toLowerCase().contains("arm") || System.getProperty("os.arch").toLowerCase().contains("aarch");
     }
 
     public static boolean isWindows() {

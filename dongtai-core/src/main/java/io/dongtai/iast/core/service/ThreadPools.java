@@ -63,4 +63,11 @@ public class ThreadPools {
     public static void sendLimitReport(final String url, final String report) {
         LIMIT_REPORT_THREAD.execute(new ReportThread(url, report));
     }
+
+    public static void destroy() {
+        METHOD_REPORT_THREAD.shutdown();
+        SCA_REPORT_THREAD.shutdown();
+        REPLAY_REQUEST_THREAD.shutdown();
+        LIMIT_REPORT_THREAD.shutdown();
+    }
 }

@@ -35,7 +35,7 @@ public class HeartBeatMonitor implements IMonitor {
                 ThreadUtils.threadSleep(30);
             }
         } catch (Throwable t) {
-            DongTaiLog.info("HeartBeatMonitor interrupted, msg:{}", t.getMessage());
+            DongTaiLog.debug("HeartBeatMonitor interrupted, msg:{}", t.getMessage());
         }
     }
 }

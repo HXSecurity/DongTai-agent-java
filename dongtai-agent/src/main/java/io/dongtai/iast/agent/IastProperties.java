@@ -45,6 +45,10 @@ public class IastProperties {
         return instance;
     }
 
+    public static void setInstance(IastProperties instance) {
+        IastProperties.instance = instance;
+    }
+
     private IastProperties() {
         try {
             init();
