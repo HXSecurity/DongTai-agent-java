@@ -20,13 +20,17 @@ import org.json.JSONObject;
  */
 public class AgentRegisterReport {
 
-    private static AgentRegisterReport INSTANCE;
+    public static AgentRegisterReport INSTANCE;
     private String projectName = null;
     private Integer agentId = -1;
     private static Integer coreRegisterStart = 1;
     final IServer server = ServerDetect.getWebserver();
     private static String AGENT_NAME = null;
     private static String HOST_NAME = null;
+
+    public static void setINSTANCE(AgentRegisterReport INSTANCE) {
+        AgentRegisterReport.INSTANCE = INSTANCE;
+    }
 
     /**
      * 创建agent注册报告

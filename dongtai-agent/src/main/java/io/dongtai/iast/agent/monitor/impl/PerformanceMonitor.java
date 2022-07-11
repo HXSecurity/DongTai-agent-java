@@ -46,6 +46,9 @@ public class PerformanceMonitor implements IMonitor {
         return Constant.THREAD_PREFIX + NAME;
     }
 
+    public static void setPerformanceMetrics(List<PerformanceMetrics> performanceMetrics) {
+        PERFORMANCE_METRICS = performanceMetrics;
+    }
 
     public PerformanceMonitor(EngineManager engineManager) {
         this.engineManager = engineManager;
@@ -255,7 +258,7 @@ public class PerformanceMonitor implements IMonitor {
                 ThreadUtils.threadSleep(30);
             }
         } catch (Throwable t) {
-            DongTaiLog.info("PerformanceMonitor interrupted, msg:{}", t.getMessage());
+            DongTaiLog.debug("PerformanceMonitor interrupted, msg:{}", t.getMessage());
         }
     }
 }

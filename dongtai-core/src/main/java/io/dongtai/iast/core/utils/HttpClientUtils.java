@@ -23,7 +23,7 @@ public class HttpClientUtils {
     private static final String MEDIA_TYPE_APPLICATION_JSON = "application/json";
     private static final String REQUEST_HEADER_TOKEN_KEY = "Authorization";
     private static final String REQUEST_ENCODING_TYPE = "gzip";
-    private static final String SSL_SIGNATURE = "TLS";
+    private static final String SSL_SIGNATURE = "TLSv1.2";
     public final static HostnameVerifier DO_NOT_VERIFY = new HttpClientHostnameVerifier();
     private final static PropertyUtils PROPERTIES = PropertyUtils.getInstance();
     private final static Proxy PROXY = loadProxy();
@@ -108,7 +108,7 @@ public class HttpClientUtils {
             DongTaiLog.error("io.dongtai.iast.core.utils.HttpClientUtils.sendRequest(io.dongtai.iast.core.utils.HttpMethods,java.lang.String,java.lang.String,java.lang.String,java.util.HashMap<java.lang.String,java.lang.String>,java.net.Proxy)",e);
             FAILED_CONNECTION_COUNT++;
             if (FAILED_CONNECTION_COUNT > 10){
-                DongTaiLog.error("The network connection is abnormal, DongTai engine is shut down.");
+                DongTaiLog.info("The network connection is abnormal, DongTai engine is shut down.");
                 EngineManager.turnOffEngine();
                 FAILED_CONNECTION_COUNT = 0;
             }

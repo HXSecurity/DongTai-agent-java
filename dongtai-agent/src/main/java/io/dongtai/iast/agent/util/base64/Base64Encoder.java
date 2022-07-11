@@ -16,6 +16,10 @@ public class Base64Encoder extends CharacterEncoder {
         return instance.encode(data);
     }
 
+    public static void setInstance(Base64Encoder instance) {
+        Base64Encoder.instance = instance;
+    }
+
     private static final char[] PEM_ARRAY = new char[]{'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/'};
 
     public Base64Encoder() {

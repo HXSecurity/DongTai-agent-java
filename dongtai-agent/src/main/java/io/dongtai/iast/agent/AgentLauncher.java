@@ -96,6 +96,7 @@ public class AgentLauncher {
                 DongTaiLog.info("DongTai already installed.");
                 return;
             }
+            MonitorDaemonThread.isExit = false;
             LAUNCH_MODE = LAUNCH_MODE_ATTACH;
             try {
                 if (argsMap.containsKey("debug")) {

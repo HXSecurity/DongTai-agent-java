@@ -54,7 +54,7 @@ public class SecondFallbackMonitor implements IMonitor {
                 ThreadUtils.threadSleep(60);
             }
         } catch (Throwable t) {
-            DongTaiLog.info("SecondFallbackMonitor interrupted, msg:{}", t.getMessage());
+            DongTaiLog.debug("SecondFallbackMonitor interrupted, msg:{}", t.getMessage());
         }
     }
 }

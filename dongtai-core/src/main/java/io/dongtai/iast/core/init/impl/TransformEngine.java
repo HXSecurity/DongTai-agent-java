@@ -7,7 +7,6 @@ import io.dongtai.log.DongTaiLog;
 
 import java.lang.instrument.ClassDefinition;
 import java.lang.instrument.Instrumentation;
-import java.lang.instrument.UnmodifiableClassException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
@@ -69,10 +68,12 @@ public class TransformEngine implements IEngine {
             }
         }
         classDefinitionArrayList.toArray(classDefinitions);
-        try {
-            inst.redefineClasses(classDefinitions);
-        } catch (ClassNotFoundException | UnmodifiableClassException e) {
-            DongTaiLog.error(e);
+        for (ClassDefinition classDefinition:classDefinitionArrayList){
+            try {
+                inst.redefineClasses(classDefinition);
+            }catch (Exception e){
+                DongTaiLog.error(e);
+            }
         }
         inst = null;
         classFileTransformer = null;

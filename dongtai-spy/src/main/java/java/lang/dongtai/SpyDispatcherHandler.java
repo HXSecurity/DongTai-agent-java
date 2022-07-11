@@ -6,6 +6,8 @@ package java.lang.dongtai;
  */
 public class SpyDispatcherHandler {
 
+    private static final SpyDispatcher nopSpy = new NopSpy();
+
     private static SpyDispatcher dispatcher;
 
     public static void setDispatcher(SpyDispatcher dispatcher) {
@@ -14,5 +16,9 @@ public class SpyDispatcherHandler {
 
     public static SpyDispatcher getDispatcher() {
         return dispatcher;
+    }
+
+    public static void destroy() {
+        setDispatcher(nopSpy);
     }
 }
