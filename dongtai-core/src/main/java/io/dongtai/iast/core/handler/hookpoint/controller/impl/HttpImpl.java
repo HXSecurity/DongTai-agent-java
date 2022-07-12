@@ -27,6 +27,7 @@ public class HttpImpl {
     private static Class<?> CLASS_OF_SERVLET_PROXY;
     private static IastClassLoader iastClassLoader;
     public static File IAST_REQUEST_JAR_PACKAGE;
+    private static Map<String, Object> REQUEST_META;
 
     static {
         IAST_REQUEST_JAR_PACKAGE = new File(System.getProperty("java.io.tmpdir.dongtai") + "iast" + File.separator + "dongtai-api.jar");
@@ -83,6 +84,12 @@ public class HttpImpl {
         if (req == null) {
             return null;
         }
+        if (ConfigMatcher.getInstance().disableExtension((String) REQUEST_META.get("requestURI"))) {
+            return req;
+        }
+        if (ConfigMatcher.getInstance().getBlackUrl(REQUEST_META)) {
+            return req;
+        }
         try {
             if (cloneRequestMethod == null) {
                 createClassLoader(req);
@@ -105,6 +112,12 @@ public class HttpImpl {
         if (response == null) {
             return null;
         }
+        if (ConfigMatcher.getInstance().disableExtension((String) REQUEST_META.get("requestURI"))) {
+            return response;
+        }
+        if (ConfigMatcher.getInstance().getBlackUrl(REQUEST_META)) {
+            return response;
+        }
         try {
             if (cloneResponseMethod == null) {
                 loadCloneResponseMethod();
@@ -114,6 +127,8 @@ public class HttpImpl {
             return response;
         } catch (InvocationTargetException e) {
             return response;
+        } finally {
+            REQUEST_META = null;
         }
     }
 
@@ -152,22 +167,23 @@ public class HttpImpl {
     public static void solveHttp(MethodEvent event)
             throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         DongTaiLog.debug(EngineManager.SCOPE_TRACKER.get().toString());
-        Map<String, Object> requestMeta = getRequestMeta(event.argumentArray[0]);
-        Boolean isReplay = (Boolean) requestMeta.get("replay-request");
+        REQUEST_META = null;
+        REQUEST_META = getRequestMeta(event.argumentArray[0]);
+        Boolean isReplay = (Boolean) REQUEST_META.get("replay-request");
         if (isReplay){
             EngineManager.ENTER_REPLAY_ENTRYPOINT.enterEntry();
         }
         // todo Consider increasing the capture of html request responses
-        if (ConfigMatcher.getInstance().disableExtension((String) requestMeta.get("requestURI"))) {
+        if (ConfigMatcher.getInstance().disableExtension((String) REQUEST_META.get("requestURI"))) {
             return;
         }
-        if (ConfigMatcher.getInstance().getBlackUrl(requestMeta)) {
+        if (ConfigMatcher.getInstance().getBlackUrl(REQUEST_META)) {
             return;
         }
 
         // todo: add custom header escape
-        EngineManager.enterHttpEntry(requestMeta);
-        DongTaiLog.debug("HTTP Request:{} {} from: {}", requestMeta.get("method"), requestMeta.get("requestURI"),
+        EngineManager.enterHttpEntry(REQUEST_META);
+        DongTaiLog.debug("HTTP Request:{} {} from: {}", REQUEST_META.get("method"), REQUEST_META.get("requestURI"),
                 event.signature);
     }
 
