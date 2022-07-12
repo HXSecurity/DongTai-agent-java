@@ -19,7 +19,7 @@ public class EngineMonitor implements IMonitor {
     private final EngineManager engineManager;
     public static Boolean isCoreRegisterStart = false;
     private static final String NAME = "EngineMonitor";
-
+    private static Boolean isUninstallHeart = true;
 
     public EngineMonitor(EngineManager engineManager) {
         this.engineManager = engineManager;
@@ -58,6 +58,7 @@ public class EngineMonitor implements IMonitor {
                 break;
             case CORE_UNINSTALL:
                 DongTaiLog.info("engine uninstall");
+                setIsUninstallHeart(false);
                 engineManager.uninstall();
                 break;
             case CORE_PERFORMANCE_FORCE_OPEN:
@@ -123,6 +124,14 @@ public class EngineMonitor implements IMonitor {
             return false;
         }
         return true;
+    }
+
+    public static Boolean getIsUninstallHeart() {
+        return isUninstallHeart;
+    }
+
+    public static void setIsUninstallHeart(Boolean isUninstallHeart) {
+        EngineMonitor.isUninstallHeart = isUninstallHeart;
     }
 
     @Override

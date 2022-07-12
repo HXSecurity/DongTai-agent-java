@@ -86,6 +86,7 @@ public class AgentLauncher {
                 DongTaiLog.info("DongTai wasn't installed.");
                 return;
             }
+            EngineMonitor.setIsUninstallHeart(true);
             DongTaiLog.info("Engine is about to be uninstalled");
             uninstall();
             // attach手动卸载后停止守护线程

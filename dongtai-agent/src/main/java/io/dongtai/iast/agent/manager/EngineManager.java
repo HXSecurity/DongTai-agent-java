@@ -5,6 +5,7 @@ import io.dongtai.iast.agent.IastProperties;
 import io.dongtai.iast.agent.middlewarerecognition.ServerDetect;
 import io.dongtai.iast.agent.middlewarerecognition.tomcat.AbstractTomcat;
 import io.dongtai.iast.agent.monitor.MonitorDaemonThread;
+import io.dongtai.iast.agent.monitor.impl.EngineMonitor;
 import io.dongtai.iast.agent.monitor.impl.PerformanceMonitor;
 import io.dongtai.iast.agent.report.AgentRegisterReport;
 import io.dongtai.iast.agent.util.FileUtils;
@@ -449,10 +450,12 @@ public class EngineManager {
         classOfEngine = null;
         IAST_CLASS_LOADER.closeIfPossible();
         IAST_CLASS_LOADER = null;
-        uninstallObject();
         setRunningStatus(1);
         setCoreStop(true);
-        MonitorDaemonThread.isExit = true;
+        if (EngineMonitor.getIsUninstallHeart()){
+            uninstallObject();
+            MonitorDaemonThread.isExit = true;
+        }
         return true;
     }
 
