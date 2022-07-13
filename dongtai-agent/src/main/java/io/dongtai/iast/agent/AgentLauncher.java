@@ -79,8 +79,49 @@ public class AgentLauncher {
      * @param inst inst
      */
     public static void agentmain(String args, Instrumentation inst) {
-        DongTaiLog.info("Protect By DongTai IAST: " + System.getProperty("protect.by.dongtai", "false"));
         Map<String, String> argsMap = parseArgs(args);
+        try {
+            if (argsMap.containsKey("debug")) {
+                System.setProperty("dongtai.debug", argsMap.get("debug"));
+            }
+            if (argsMap.containsKey("appCreate")) {
+                System.setProperty("dongtai.app.create", argsMap.get("appCreate"));
+            }
+            if (argsMap.containsKey("appName")) {
+                System.setProperty("dongtai.app.name", argsMap.get("appName"));
+            }
+            if (argsMap.containsKey("appVersion")) {
+                System.setProperty("dongtai.app.version", argsMap.get("appVersion"));
+            }
+            if (argsMap.containsKey("clusterName")) {
+                System.setProperty("dongtai.cluster.name", argsMap.get("clusterName"));
+            }
+            if (argsMap.containsKey("clusterVersion")) {
+                System.setProperty("dongtai.cluster.version", argsMap.get("clusterVersion"));
+            }
+            if (argsMap.containsKey("dongtaiServer")) {
+                System.setProperty("dongtai.server.url", argsMap.get("dongtaiServer"));
+            }
+            if (argsMap.containsKey("dongtaiToken")) {
+                System.setProperty("dongtai.server.token", argsMap.get("dongtaiToken"));
+            }
+            if (argsMap.containsKey("serverPackage")) {
+                System.setProperty("dongtai.server.package", argsMap.get("serverPackage"));
+            }
+            if (argsMap.containsKey("logLevel")) {
+                System.setProperty("dongtai.log.level", argsMap.get("logLevel"));
+            }
+            if (argsMap.containsKey("logPath")) {
+                System.setProperty("dongtai.log.path", argsMap.get("logPath"));
+            }
+        } catch (Exception e) {
+            DongTaiLog.error(e);
+        }
+        String tmpdir = System.getProperty("java.io.tmpdir");
+        String appName = System.getProperty("dongtai.app.name");
+        String appVersion = System.getProperty("dongtai.app.version");
+        System.setProperty("java.io.tmpdir.dongtai", tmpdir + File.separator + appName + "-" + appVersion + "-" + UUID.randomUUID().toString().replaceAll("-", "") + File.separator);
+        DongTaiLog.info("Protect By DongTai IAST: " + System.getProperty("protect.by.dongtai", "false"));
         if ("uninstall".equals(argsMap.get("mode"))) {
             if (System.getProperty("protect.by.dongtai", null) == null) {
                 DongTaiLog.info("DongTai wasn't installed.");
@@ -99,44 +140,7 @@ public class AgentLauncher {
             }
             MonitorDaemonThread.isExit = false;
             LAUNCH_MODE = LAUNCH_MODE_ATTACH;
-            try {
-                if (argsMap.containsKey("debug")) {
-                    System.setProperty("dongtai.debug", argsMap.get("debug"));
-                }
-                if (argsMap.containsKey("appCreate")) {
-                    System.setProperty("dongtai.app.create", argsMap.get("appCreate"));
-                }
-                if (argsMap.containsKey("appName")) {
-                    System.setProperty("dongtai.app.name", argsMap.get("appName"));
-                }
-                if (argsMap.containsKey("appVersion")) {
-                    System.setProperty("dongtai.app.version", argsMap.get("appVersion"));
-                }
-                if (argsMap.containsKey("clusterName")) {
-                    System.setProperty("dongtai.cluster.name", argsMap.get("clusterName"));
-                }
-                if (argsMap.containsKey("clusterVersion")) {
-                    System.setProperty("dongtai.cluster.version", argsMap.get("clusterVersion"));
-                }
-                if (argsMap.containsKey("dongtaiServer")) {
-                    System.setProperty("dongtai.server.url", argsMap.get("dongtaiServer"));
-                }
-                if (argsMap.containsKey("dongtaiToken")) {
-                    System.setProperty("dongtai.server.token", argsMap.get("dongtaiToken"));
-                }
-                if (argsMap.containsKey("serverPackage")) {
-                    System.setProperty("dongtai.server.package", argsMap.get("serverPackage"));
-                }
-                if (argsMap.containsKey("logLevel")) {
-                    System.setProperty("dongtai.log.level", argsMap.get("logLevel"));
-                }
-                if (argsMap.containsKey("logPath")) {
-                    System.setProperty("dongtai.log.path", argsMap.get("logPath"));
-                }
-                install(inst);
-            } catch (Exception e) {
-                DongTaiLog.error(e);
-            }
+            install(inst);
         }
     }
 
