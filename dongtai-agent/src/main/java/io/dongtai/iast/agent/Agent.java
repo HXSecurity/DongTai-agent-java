@@ -2,10 +2,9 @@ package io.dongtai.iast.agent;
 
 import java.io.*;
 import java.util.Arrays;
-import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import io.dongtai.iast.agent.util.FileUtils;
-import io.dongtai.log.DongTaiLog;
 import org.apache.commons.cli.*;
 
 /**
@@ -103,14 +102,14 @@ public class Agent {
             Process process = Runtime.getRuntime().exec(execution);
             process.waitFor();
             if (process.exitValue() == 0) {
-                DongTaiLog.info("attach to process {} success, command: {}", pid, Arrays.toString(execution));
+                System.out.println("[io.dongtai.iast.agent] [INFO] attach to process "+pid+" success, command: "+Arrays.toString(execution));
             } else {
-                DongTaiLog.error("attach failure, please try again with command: {}", Arrays.toString(execution));
+                System.out.println("[io.dongtai.iast.agent] [ERROR] attach failure, please try again with command: "+Arrays.toString(execution));
             }
         } catch (IOException e) {
-            DongTaiLog.error("io.dongtai.iast.agent.Agent.doAttach(java.lang.String,java.lang.String)",e);
+            e.printStackTrace();
         } catch (InterruptedException e) {
-            DongTaiLog.error("io.dongtai.iast.agent.Agent.doAttach(java.lang.String,java.lang.String)",e);
+            e.printStackTrace();
         }
     }
 
@@ -141,9 +140,9 @@ public class Agent {
             FileUtils.getResourceToFile("bin/jattach-linux", JATTACH_FILE);
         }
         if ((new File(JATTACH_FILE)).setExecutable(true)) {
-            DongTaiLog.info("jattach extract success. wait for attach");
+            System.out.println("[io.dongtai.iast.agent] [INFO] jattach extract success. wait for attach");
         } else {
-            DongTaiLog.info("jattach extract failure. please set execute permission, file: {}", JATTACH_FILE);
+            System.out.println("[io.dongtai.iast.agent] [INFO] jattach extract failure. please set execute permission, file: "+JATTACH_FILE);
         }
     }
 
@@ -152,7 +151,8 @@ public class Agent {
      *
      * @param args
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
+        TimeUnit.SECONDS.sleep(10);
         String[] agentArgs = new String[0];
         try {
             agentArgs = parseAgentArgs(args);
@@ -162,9 +162,9 @@ public class Agent {
                 doAttach(agentArgs[0], agentArgs[1]);
             }
         } catch (ParseException e) {
-            DongTaiLog.error(e);
+            e.printStackTrace();
         } catch (IOException e) {
-            DongTaiLog.error(e);
+            e.printStackTrace();
         }
     }
 

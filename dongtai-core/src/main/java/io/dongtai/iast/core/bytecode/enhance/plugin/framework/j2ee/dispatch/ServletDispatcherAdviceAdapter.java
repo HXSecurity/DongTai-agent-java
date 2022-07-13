@@ -30,8 +30,8 @@ public class ServletDispatcherAdviceAdapter extends AbstractAdviceAdapter {
         mv.visitJumpInsn(EQ, elseLabel);
 
         cloneHttpServletRequest();
-        cloneHttpServletResponse();
         captureMethodState(-1, HookType.HTTP.getValue(), false);
+        cloneHttpServletResponse();
         mark(elseLabel);
     }
 
