@@ -9,9 +9,7 @@ import jakarta.servlet.http.HttpServletResponseWrapper;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author owefsad
@@ -23,7 +21,7 @@ public class JakartaResponseWrapper extends HttpServletResponseWrapper implement
 
     public JakartaResponseWrapper(HttpServletResponse response) {
         super(response);
-        response.addHeader("DongTai", "v1.7.2");
+        response.addHeader("DongTai", "v1.7.4");
     }
 
     @Override
