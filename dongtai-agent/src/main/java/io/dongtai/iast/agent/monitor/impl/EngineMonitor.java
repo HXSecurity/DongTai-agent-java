@@ -5,6 +5,7 @@ import io.dongtai.iast.agent.monitor.IMonitor;
 import io.dongtai.iast.agent.monitor.MonitorDaemonThread;
 import io.dongtai.iast.agent.monitor.ServerCommandEnum;
 import io.dongtai.iast.agent.report.AgentRegisterReport;
+import io.dongtai.iast.agent.report.HeartBeatReport;
 import io.dongtai.iast.agent.util.ThreadUtils;
 import io.dongtai.iast.agent.util.http.HttpClientUtils;
 import io.dongtai.iast.agent.Constant;
@@ -20,6 +21,7 @@ public class EngineMonitor implements IMonitor {
     public static Boolean isCoreRegisterStart = false;
     private static final String NAME = "EngineMonitor";
     private static Boolean isUninstallHeart = true;
+    private String coreStatus = "1";
 
     public EngineMonitor(EngineManager engineManager) {
         this.engineManager = engineManager;
@@ -34,7 +36,21 @@ public class EngineMonitor implements IMonitor {
     @Override
     public void check() throws Exception {
         String status = checkForStatus();
-        ServerCommandEnum serviceCmdEnum = ServerCommandEnum.getEnum(status);
+        if ("1".equals(status) && !"1".equals(coreStatus)) {
+            coreStatus = "1";
+            DongTaiLog.info("engine start");
+            if (EngineManager.checkCoreIsInstalled()) {
+                engineManager.start();
+            } else {
+                startEngine();
+            }
+        } else if ("2".equals(status) && !"2".equals(coreStatus)) {
+            coreStatus = "2";
+            DongTaiLog.info("engine stop");
+            engineManager.stop();
+        }
+        HttpClientUtils.sendPost(Constant.API_AGENT_STATUS, HeartBeatReport.generateAgentStatusMsg());
+/*        ServerCommandEnum serviceCmdEnum = ServerCommandEnum.getEnum(status);
         if (serviceCmdEnum == null || serviceCmdEnum == ServerCommandEnum.NO_CMD) {
             return;
         }
@@ -70,7 +86,7 @@ public class EngineMonitor implements IMonitor {
                 forceSwitchPerformanceBreaker(false);
                 break;
             default:
-        }
+        }*/
     }
 
     private void forceSwitchPerformanceBreaker(boolean turnOn) {
@@ -91,7 +107,8 @@ public class EngineMonitor implements IMonitor {
             String respRaw = String.valueOf(HttpClientUtils.sendGet(Constant.API_ENGINE_ACTION, "agentId", String.valueOf(AgentRegisterReport.getAgentFlag())));
             if (respRaw != null && !respRaw.isEmpty()) {
                 JSONObject resp = new JSONObject(respRaw);
-                return resp.get("data").toString();
+                JSONObject data = (JSONObject) resp.get("data");
+                return data.get("exceptRunningStatus").toString();
             }
         } catch (Exception e) {
             return "other";
@@ -101,12 +118,12 @@ public class EngineMonitor implements IMonitor {
 
     public void startEngine() {
         boolean status = true;
-        if(couldInstallEngine()){
+        if (couldInstallEngine()) {
             // jdk8以上
             status = status && engineManager.extractPackage();
             status = status && engineManager.install();
             status = status && engineManager.start();
-        }else {
+        } else {
             // jdk6-7
             status = status && engineManager.extractPackage();
             status = status && engineManager.install();
