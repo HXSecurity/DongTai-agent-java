@@ -73,7 +73,11 @@ public class IastReplayModel {
 
         StringBuilder url = new StringBuilder();
         // fixme 根据协议，判断使用http/https
-        url.append("http://");
+        if (EngineManager.SERVER.getProtocol().toLowerCase().contains("https")){
+            url.append("https://");
+        }else {
+            url.append("http://");
+        }
         url.append(host);
         if (getRequestQueryString().isEmpty()) {
             url.append(requestUrl);
