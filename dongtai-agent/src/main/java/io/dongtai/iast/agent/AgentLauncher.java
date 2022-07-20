@@ -1,21 +1,19 @@
 package io.dongtai.iast.agent;
 
 import io.dongtai.iast.agent.manager.EngineManager;
-import io.dongtai.iast.agent.monitor.impl.EngineMonitor;
 import io.dongtai.iast.agent.monitor.MonitorDaemonThread;
+import io.dongtai.iast.agent.monitor.impl.EngineMonitor;
 import io.dongtai.iast.agent.report.AgentRegisterReport;
 import io.dongtai.iast.agent.util.FileUtils;
 import io.dongtai.iast.agent.util.ThreadUtils;
 import io.dongtai.log.DongTaiLog;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.lang.instrument.Instrumentation;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
-import static io.dongtai.iast.agent.Agent.isMacOs;
-import static io.dongtai.iast.agent.Agent.isWindows;
+import static io.dongtai.iast.agent.Agent.*;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -188,7 +186,12 @@ public class AgentLauncher {
                 FLUENT_FILE_CONF
         };
         try {
-            Runtime.getRuntime().exec(execution);
+            final Process process = Runtime.getRuntime().exec(execution);
+            Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+                public void run() {
+                    process.destroy();
+                }
+            }));
         } catch (IOException e) {
             DongTaiLog.error(e);
         }
