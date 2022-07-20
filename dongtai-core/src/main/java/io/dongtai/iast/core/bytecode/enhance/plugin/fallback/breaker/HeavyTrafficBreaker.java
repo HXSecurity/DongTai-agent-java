@@ -67,7 +67,7 @@ public class HeavyTrafficBreaker extends AbstractBreaker {
                     CircuitBreaker.State state = event.getStateTransition().getToState();
                     if (state == CircuitBreaker.State.OPEN) {
                         FallbackSwitch.setHeavyTrafficLimitFallback(true);
-//                        HeavyTrafficRateLimitReport.sendReport(trafficLimitRate);
+                        HeavyTrafficRateLimitReport.sendReport(trafficLimitRate);
                     }
                     // 因为本断路器的样本来自流量，打开后无法获取新样本，故需要在 HALF_OPEN 状态直接转到 CLOSE 状态
                     if (state == CircuitBreaker.State.HALF_OPEN) {

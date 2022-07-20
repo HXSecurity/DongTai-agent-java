@@ -24,7 +24,7 @@ public class SecondFallbackReportBody {
      * type 字段
      */
     @SerializedName(ReportConstant.REPORT_KEY)
-    private Integer reportKey = ReportConstant.REPORT_SECOND_FALLBACK;
+    private Integer type = ReportConstant.REPORT_SECOND_FALLBACK;
 
     /**
      * detail 字段

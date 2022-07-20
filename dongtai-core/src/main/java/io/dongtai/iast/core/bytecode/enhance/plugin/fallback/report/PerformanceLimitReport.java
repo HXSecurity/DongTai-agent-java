@@ -2,7 +2,8 @@ package io.dongtai.iast.core.bytecode.enhance.plugin.fallback.report;
 
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.report.body.PerformanceBreakReportBody;
-import io.dongtai.iast.core.utils.json.GsonUtils;
+import io.dongtai.log.DongTaiLog;
+import org.json.JSONObject;
 
 import java.util.Date;
 
@@ -21,11 +22,16 @@ public class PerformanceLimitReport extends AbstractLimitReport {
     }
 
     public static void sendReport() {
-        PERFORMANCE_BREAK_REPORT_BODY.getDetail().setAgentId(EngineManager.getAgentId());
-        PERFORMANCE_BREAK_REPORT_BODY.getDetail().setBreakDate(new Date());
+        try {
+            PERFORMANCE_BREAK_REPORT_BODY.getDetail().setAgentId(EngineManager.getAgentId());
+            PERFORMANCE_BREAK_REPORT_BODY.getDetail().setBreakDate(new Date());
 /*        String report = GsonUtils.toJson(PERFORMANCE_BREAK_REPORT_BODY);
         sendReport(report);*/
-        PERFORMANCE_BREAK_REPORT_BODY.clearAllPerformanceBreakLog();
+            sendReport(new JSONObject(PERFORMANCE_BREAK_REPORT_BODY).toString());
+            PERFORMANCE_BREAK_REPORT_BODY.clearAllPerformanceBreakLog();
+        } catch (Throwable e) {
+            DongTaiLog.error("sendReport failed. report: PerformanceLimitReport, reason: {}", e);
+        }
     }
 
 }

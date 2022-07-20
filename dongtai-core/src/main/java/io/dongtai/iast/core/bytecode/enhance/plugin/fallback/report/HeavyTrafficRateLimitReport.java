@@ -2,7 +2,8 @@ package io.dongtai.iast.core.bytecode.enhance.plugin.fallback.report;
 
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.report.body.HeavyTrafficLimitReportBody;
-import io.dongtai.iast.core.utils.json.GsonUtils;
+import io.dongtai.log.DongTaiLog;
+import org.json.JSONObject;
 
 import java.util.Date;
 
@@ -19,8 +20,12 @@ public class HeavyTrafficRateLimitReport extends AbstractLimitReport {
      * @param trafficLimitRate qps 阈值
      */
     public static void sendReport(double trafficLimitRate) {
-        String report = createReport(trafficLimitRate);
-        sendReport(report);
+        try {
+            String report = createReport(trafficLimitRate);
+            sendReport(report);
+        } catch (Throwable e) {
+            DongTaiLog.error("sendReport failed. report: HeavyTrafficRateLimitReport, reason: {}", e);
+        }
     }
 
     protected static String createReport(double trafficLimitRate) {
@@ -30,6 +35,6 @@ public class HeavyTrafficRateLimitReport extends AbstractLimitReport {
                 .setLimitDate(new Date())
                 .setLimitRate(trafficLimitRate)
         );
-        return GsonUtils.toJson(reportBody);
+        return new JSONObject(reportBody).toString();
     }
 }

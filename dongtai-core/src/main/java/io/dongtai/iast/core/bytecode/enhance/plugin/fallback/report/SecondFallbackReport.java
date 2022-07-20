@@ -3,7 +3,8 @@ package io.dongtai.iast.core.bytecode.enhance.plugin.fallback.report;
 import io.dongtai.iast.common.utils.FixSizeLinkedList;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.report.body.SecondFallbackReportBody;
-import io.dongtai.iast.core.utils.json.GsonUtils;
+import io.dongtai.log.DongTaiLog;
+import org.json.JSONObject;
 
 /**
  * 二次降级发送报告
@@ -26,9 +27,14 @@ public class SecondFallbackReport extends AbstractLimitReport {
      * 发送报告
      */
     public static void sendReport(){
-        FALLBACK_REPORT_LOG.getDetail().setAgentId(EngineManager.getAgentId());
+        try {
+            FALLBACK_REPORT_LOG.getDetail().setAgentId(EngineManager.getAgentId());
 //        sendReport(GsonUtils.toJson(FALLBACK_REPORT_LOG));
-        FALLBACK_REPORT_LOG.clear();
+            sendReport(new JSONObject(FALLBACK_REPORT_LOG).toString());
+            FALLBACK_REPORT_LOG.clear();
+        } catch (Throwable e) {
+            DongTaiLog.error("sendReport failed. report: SecondFallbackReport, reason: {}", e);
+        }
     }
 
     /**
