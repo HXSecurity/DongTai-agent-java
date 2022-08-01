@@ -9,7 +9,9 @@ public class Constant {
 
     public final static String API_AGENT_REGISTER = "/api/v1/agent/register";
     public final static String API_REPORT_UPLOAD = "/api/v1/report/upload";
-    public final static String API_ENGINE_ACTION = "/api/v1/engine/action";
+    public final static String API_AGENT_STATUS = "/api/v1/actual_action";
+//    public final static String API_ENGINE_ACTION = "/api/v1/engine/action";
+    public final static String API_ENGINE_ACTION = "/api/v1/except_action";
 
     public static final String KEY_NETWORK = "network";
     public static final String KEY_AGENT_VERSION = "version";
@@ -39,6 +41,8 @@ public class Constant {
     public static final String KEY_PERFORMANCE = "performance";
     public static final String KEY_CORE_INSTALLED = "isCoreInstalled";
     public static final String KEY_CORE_RUNNING = "isCoreRunning";
+    public static final String KEY_CORE_STATUS = "actualRunningStatus";
+    public static final String KEY_CORE_STATE = "stateStatus";
     public static final String KEY_RETURN_QUEUE = "returnQueue";
 
     // 线程异常上报

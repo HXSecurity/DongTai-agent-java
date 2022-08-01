@@ -39,6 +39,20 @@ public class HeartBeatReport {
         return report.toString();
     }
 
+    public static String generateAgentStatusMsg() {
+        JSONObject detail = new JSONObject();
+        detail.put(Constant.KEY_AGENT_ID, AgentRegisterReport.getAgentFlag());
+        Integer status = 0;
+        if (EngineManager.checkCoreIsRunning()){
+            status = 1;
+        }else {
+            status = 2;
+        }
+        detail.put(Constant.KEY_CORE_STATUS, status);
+        detail.put(Constant.KEY_CORE_STATE, EngineManager.checkCoreIsFallback() ? 3 : status);
+        return detail.toString();
+    }
+
     /**
      * Query CPU usage
      *

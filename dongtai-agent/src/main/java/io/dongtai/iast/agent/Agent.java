@@ -2,7 +2,6 @@ package io.dongtai.iast.agent;
 
 import java.io.*;
 import java.util.Arrays;
-import java.util.concurrent.TimeUnit;
 
 import io.dongtai.iast.agent.util.FileUtils;
 import org.apache.commons.cli.*;
@@ -152,7 +151,6 @@ public class Agent {
      * @param args
      */
     public static void main(String[] args) throws InterruptedException {
-        TimeUnit.SECONDS.sleep(10);
         String[] agentArgs = new String[0];
         try {
             agentArgs = parseAgentArgs(args);

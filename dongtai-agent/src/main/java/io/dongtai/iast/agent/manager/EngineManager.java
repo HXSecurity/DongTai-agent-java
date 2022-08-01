@@ -34,6 +34,7 @@ public class EngineManager {
     private static final String FALLBACK_MANAGER_CLASS = "io.dongtai.iast.core.bytecode.enhance.plugin.fallback.FallbackManager";
     private static final String REMOTE_CONFIG_UTILS_CLASS = "io.dongtai.iast.core.utils.config.RemoteConfigUtils";
     private static final String ENGINE_MANAGER_CLASS = "io.dongtai.iast.core.EngineManager";
+    private static final String ENGINE_FALLBACK_CLASS = "io.dongtai.iast.core.bytecode.enhance.plugin.fallback.FallbackSwitch";
     private static final String INJECT_PACKAGE_REMOTE_URI = "/api/v1/engine/download?engineName=dongtai-spy";
     private static final String INJECT_PACKAGE_REMOTE_URI_JDK6 = "/api/v1/engine/download?engineName=dongtai-spy-jdk6";
     private static final String ENGINE_PACKAGE_REMOTE_URI = "/api/v1/engine/download?engineName=dongtai-core";
@@ -118,6 +119,22 @@ public class EngineManager {
                 return false;
             }
             return (Boolean) engineManagerClass.getMethod("isEngineRunning").invoke(null);
+        } catch (Throwable e) {
+            DongTaiLog.info("checkCoreIsRunning failed, msg:{}, cause:{}", e.getMessage(), e.getCause());
+            return false;
+        }
+    }
+
+    public static boolean checkCoreIsFallback() {
+        if (IAST_CLASS_LOADER == null) {
+            return false;
+        }
+        try {
+            final Class<?> engineManagerClass = IAST_CLASS_LOADER.loadClass(ENGINE_FALLBACK_CLASS);
+            if (engineManagerClass == null) {
+                return false;
+            }
+            return (Boolean) engineManagerClass.getMethod("isEngineFallback").invoke(null);
         } catch (Throwable e) {
             DongTaiLog.info("checkCoreIsRunning failed, msg:{}, cause:{}", e.getMessage(), e.getCause());
             return false;
