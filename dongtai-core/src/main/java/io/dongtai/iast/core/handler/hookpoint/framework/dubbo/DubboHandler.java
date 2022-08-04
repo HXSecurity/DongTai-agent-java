@@ -90,7 +90,7 @@ public class DubboHandler {
         if (arguments != null && arguments.length > 0) {
             Set<Object> validArguments = new HashSet<Object>(arguments.length);
             for (Object argument : arguments) {
-                if (isNotEmpty(argument) && isAllowTaintType(argument)) {
+                if (TaintPoolUtils.isNotEmpty(argument) && TaintPoolUtils.isAllowTaintType(argument)) {
                     validArguments.add(argument);
                 }
             }
@@ -159,36 +159,6 @@ public class DubboHandler {
         } catch (Exception e) {
             return null;
         }
-    }
-
-    public static boolean isAllowTaintType(Object obj) {
-        return !(obj instanceof Boolean || obj instanceof Integer);
-    }
-
-    /**
-     * 检查对象是否为空 - 集合类型，检查大小 - 字符串类型，检查是否为空字符串 - 其他情况，均认为非空
-     *
-     * @param obj 待检查的实例化对象
-     * @return true-对象不为空；false-对象为空
-     */
-    private static boolean isNotEmpty(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (obj instanceof Map) {
-            Map<?, ?> taintValue = (Map<?, ?>) obj;
-            return !taintValue.isEmpty();
-        } else if (obj instanceof List) {
-            List<?> taintValue = (List<?>) obj;
-            return !taintValue.isEmpty();
-        } else if (obj instanceof Set) {
-            Set<?> taintValue = (Set<?>) obj;
-            return !taintValue.isEmpty();
-        } else if (obj instanceof String) {
-            String taintValue = (String) obj;
-            return !taintValue.isEmpty();
-        }
-        return true;
     }
 
     public static void solveClientExit(Object invocation, Object rpcResult) {
