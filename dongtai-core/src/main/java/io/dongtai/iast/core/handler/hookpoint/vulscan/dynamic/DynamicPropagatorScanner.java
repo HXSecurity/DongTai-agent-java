@@ -9,6 +9,7 @@ import io.dongtai.iast.core.handler.hookpoint.vulscan.IVulScan;
 import io.dongtai.iast.core.utils.StackUtils;
 import io.dongtai.iast.core.utils.TaintPoolUtils;
 import io.dongtai.log.DongTaiLog;
+
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -53,6 +54,10 @@ public class DynamicPropagatorScanner implements IVulScan {
                 // fixme: solve exception
                 DongTaiLog.error(e);
             }
+        }
+
+        if (FastjsonScanner.isSinkMethod(sink) && FastjsonScanner.isSafe(sink, event)) {
+            return;
         }
 
         if (sinkSourceHitTaintPool(event, sink)) {
