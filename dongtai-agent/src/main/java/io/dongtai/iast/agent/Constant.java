@@ -4,7 +4,7 @@ package io.dongtai.iast.agent;
  * @author dongzhiyong@huoxian.cn
  */
 public class Constant {
-    public static final String AGENT_VERSION_VALUE = "v1.7.4";
+    public static final String AGENT_VERSION_VALUE = "v1.7.5";
     public static final String LANGUAGE = "JAVA";
 
     public final static String API_AGENT_REGISTER = "/api/v1/agent/register";
