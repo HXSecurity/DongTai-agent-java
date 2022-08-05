@@ -11,8 +11,4 @@ public class HashCode {
             return System.identityHashCode(obj);
         }
     }
-
-    public static boolean isNotEmpty(Object obj) {
-        return !(obj == null || calc(obj) == 0);
-    }
 }
