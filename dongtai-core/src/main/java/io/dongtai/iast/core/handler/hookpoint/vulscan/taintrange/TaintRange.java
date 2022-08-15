@@ -1,4 +1,4 @@
-package io.dongtai.iast.core.handler.hookpoint.vulscan;
+package io.dongtai.iast.core.handler.hookpoint.vulscan.taintrange;
 
 public class TaintRange {
     public static final String UNTRUSTED = "untrusted";

@@ -1,4 +1,4 @@
-package io.dongtai.iast.core.handler.hookpoint.vulscan;
+package io.dongtai.iast.core.handler.hookpoint.vulscan.taintrange;
 
 import java.util.*;
 

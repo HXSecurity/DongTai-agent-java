@@ -1,7 +1,5 @@
-package io.dongtai.iast.core.handler;
+package io.dongtai.iast.core.handler.hookpoint.vulscan.taintrange;
 
-import io.dongtai.iast.core.handler.hookpoint.vulscan.TaintRange;
-import io.dongtai.iast.core.handler.hookpoint.vulscan.TaintRanges;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.function.ThrowingRunnable;
