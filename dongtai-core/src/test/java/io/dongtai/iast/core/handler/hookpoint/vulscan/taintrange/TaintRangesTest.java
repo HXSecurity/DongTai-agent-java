@@ -76,6 +76,69 @@ public class TaintRangesTest {
     }
 
     @Test
+    public void testSplit() {
+        Map<TaintRange, String> tests = new HashMap<TaintRange, String>() {{
+            put(new TaintRange(1, 4), "Taints:[untrusted(8,13)]");
+            put(new TaintRange(1, 5), "Taints:[untrusted(9,14)]");
+            put(new TaintRange(1, 7), "Taints:[untrusted(11,16)]");
+            put(new TaintRange(1, 11), "Taints:[untrusted(15,20)]");
+            put(new TaintRange(6, 7), "Taints:[untrusted(5,6), untrusted(7,11)]");
+            put(new TaintRange(6, 11), "Taints:[untrusted(5,6), untrusted(11,15)]");
+            put(new TaintRange(5, 15), "Taints:[untrusted(15,20)]");
+            put(new TaintRange(10, 15), "Taints:[untrusted(5,10)]");
+            put(new TaintRange(11, 15), "Taints:[untrusted(5,10)]");
+        }};
+
+        for (Map.Entry<TaintRange, String> entry : tests.entrySet()) {
+            TaintRanges ts = new TaintRanges(new TaintRange(5, 10));
+            ts.split(entry.getKey().start, entry.getKey().stop);
+            Assert.assertEquals(entry.getKey().toString(), entry.getValue(), ts.toString());
+        }
+    }
+
+    @Test
+    public void testSubRange() {
+        Map<TaintRange, String> tests = new HashMap<TaintRange, String>() {{
+            put(new TaintRange(1, 4), "Taints:[]");
+            put(new TaintRange(1, 5), "Taints:[]");
+            put(new TaintRange(1, 7), "Taints:[untrusted(5,7)]");
+            put(new TaintRange(1, 11), "Taints:[untrusted(5,10)]");
+            put(new TaintRange(6, 7), "Taints:[untrusted(6,7)]");
+            put(new TaintRange(6, 11), "Taints:[untrusted(6,10)]");
+            put(new TaintRange(5, 15), "Taints:[untrusted(5,10)]");
+            put(new TaintRange(10, 15), "Taints:[]");
+            put(new TaintRange(11, 15), "Taints:[]");
+        }};
+
+        for (Map.Entry<TaintRange, String> entry : tests.entrySet()) {
+            TaintRanges ts = new TaintRanges(new TaintRange(5, 10));
+            ts.subRange(entry.getKey().start, entry.getKey().stop);
+            Assert.assertEquals(entry.getKey().toString(), entry.getValue(), ts.toString());
+        }
+    }
+
+    @Test
+    public void testClear() {
+        Map<TaintRange, String> tests = new HashMap<TaintRange, String>() {{
+            put(new TaintRange(1, 4), "Taints:[untrusted(5,10)]");
+            put(new TaintRange(1, 5), "Taints:[untrusted(5,10)]");
+            put(new TaintRange(1, 7), "Taints:[untrusted(7,10)]");
+            put(new TaintRange(1, 11), "Taints:[]");
+            put(new TaintRange(6, 7), "Taints:[untrusted(5,6), untrusted(7,10)]");
+            put(new TaintRange(6, 11), "Taints:[untrusted(5,6)]");
+            put(new TaintRange(5, 15), "Taints:[]");
+            put(new TaintRange(10, 15), "Taints:[untrusted(5,10)]");
+            put(new TaintRange(11, 15), "Taints:[untrusted(5,10)]");
+        }};
+
+        for (Map.Entry<TaintRange, String> entry : tests.entrySet()) {
+            TaintRanges ts = new TaintRanges(new TaintRange(5, 10));
+            ts.clear(entry.getKey().start, entry.getKey().stop);
+            Assert.assertEquals(entry.getKey().toString(), entry.getValue(), ts.toString());
+        }
+    }
+
+    @Test
     public void testMerge() {
         TaintRange tr1;
         TaintRange tr2;

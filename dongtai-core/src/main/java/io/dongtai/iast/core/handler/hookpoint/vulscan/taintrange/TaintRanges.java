@@ -31,10 +31,19 @@ public class TaintRanges {
         }
     }
 
+    public TaintRanges clone() {
+        TaintRanges taintRanges = new TaintRanges();
+        int size = this.taintRanges.size();
+        for (int i = 0; i < size; i++) {
+            taintRanges.taintRanges.add(this.taintRanges.get(i).clone());
+        }
+        return taintRanges;
+    }
+
     public void shift(int i) {
         for (TaintRange taintRange : this.taintRanges) {
             if (taintRange.start + i < 0 || taintRange.stop + i < 0) {
-                throw new RuntimeException("taint range shift range into negative value: " + i + ", " + toString());
+                throw new RuntimeException("taint range shift range into negative value: " + i);
             }
             taintRange.start += i;
             taintRange.stop += i;
@@ -43,10 +52,10 @@ public class TaintRanges {
 
     public void trim(int start, int end) {
         if (start < 0) {
-            throw new RuntimeException("taint range trim invalid range start: " + start);
+            throw new RuntimeException("taint range trim invalid start: " + start);
         }
         if (end < start) {
-            throw new RuntimeException("taint range trim invalid range stop: " + end + ", start: " + start);
+            throw new RuntimeException("taint range trim invalid stop: " + end + " < start: " + start);
         }
         if (end == start) {
             this.taintRanges.clear();
@@ -83,18 +92,64 @@ public class TaintRanges {
         }
     }
 
-    public TaintRanges clone() {
-        TaintRanges taintRanges = new TaintRanges();
-        int size = this.taintRanges.size();
-        for (int i = 0; i < size; i++) {
-            taintRanges.taintRanges.add(this.taintRanges.get(i).clone());
+    public void split(int start, int stop) {
+        if (start < 0) {
+            throw new RuntimeException("taint range split invalid start: " + start);
         }
-        return taintRanges;
+        if (stop < start) {
+            throw new RuntimeException("taint range split invalid stop: " + stop + " < start:" + start);
+        }
+        if (stop != start) {
+            int width = stop - start;
+            List<TaintRange> newTaintRange = new ArrayList<TaintRange>();
+            for (TaintRange taintRange : this.taintRanges) {
+                if (start <= taintRange.stop) {
+                    if (start > taintRange.start && start < taintRange.stop) {
+                        newTaintRange.add(new TaintRange(taintRange.getName(), stop, taintRange.stop + width));
+                        taintRange.stop = start;
+                    } else if (start <= taintRange.start) {
+                        taintRange.start += width;
+                        taintRange.stop += width;
+                    }
+                }
+            }
+            this.taintRanges.addAll(newTaintRange);
+        }
+    }
+
+    public void subRange(int start, int stop) {
+        if (start < 0) {
+            throw new RuntimeException("taint range subRange invalid start: " + start);
+        }
+        if (stop < start) {
+            throw new RuntimeException("taint range subRange invalid stop: " + stop + " < start:" + start);
+        }
+        if (stop == start) {
+            this.taintRanges.clear();
+            return;
+        }
+        Iterator<TaintRange> it = this.taintRanges.iterator();
+        while (it.hasNext()) {
+            TaintRange next = it.next();
+            switch (next.compareRange(start, stop)) {
+                case BELOW:
+                case ABOVE:
+                    it.remove();
+                    break;
+                default:
+                    next.start = Math.max(next.start, start);
+                    next.stop = Math.min(next.stop, stop);
+                    break;
+            }
+        }
     }
 
     public void clear(int start, int stop) {
-        if (start < 0 || start > stop) {
-            throw new RuntimeException("taint range clear invalid range " + start + " to " + stop + " on " + toString());
+        if (start < 0) {
+            throw new RuntimeException("taint range clear invalid start: " + start);
+        }
+        if (stop <= start) {
+            throw new RuntimeException("taint range clear invalid stop: " + stop + " <= start:" + start);
         }
         Iterator<TaintRange> it = this.taintRanges.iterator();
         TaintRange taintRange = null;

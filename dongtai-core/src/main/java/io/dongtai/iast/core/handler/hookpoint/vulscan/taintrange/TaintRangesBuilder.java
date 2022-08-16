@@ -14,9 +14,11 @@ public class TaintRangesBuilder {
                     }
                     taintRanges.add(taintRange);
                 }
-                return;
+            } else {
+                taintRanges.addAll(tgtTaintRanges);
             }
-            taintRanges.addAll(tgtTaintRanges);
+
+            taintRanges.merge();
         }
     }
 
@@ -67,7 +69,30 @@ public class TaintRangesBuilder {
                 taintRanges.addAll(tgtTaintRanges);
                 break;
             default:
+                return;
+        }
+        taintRanges.merge();
+    }
+
+    public void insert(TaintRanges taintRanges, TaintRanges srcTaintRanges, Object source, TaintRanges tgtTaintRanges, int p1, int p2, int p3, int argC) {
+        int length = this.getLength(source);
+        switch (argC) {
+            case 1:
+                tgtTaintRanges.shift(p1);
+                srcTaintRanges.split(p1, length + p1);
+                taintRanges.addAll(srcTaintRanges);
+                taintRanges.addAll(tgtTaintRanges);
                 break;
+            case 3:
+                length = p3 - p2;
+                tgtTaintRanges.subRange(p2, p3);
+                tgtTaintRanges.shift(p1 - p2);
+                srcTaintRanges.split(p1, length + p1);
+                taintRanges.addAll(srcTaintRanges);
+                taintRanges.addAll(tgtTaintRanges);
+                break;
+            default:
+                return;
         }
         taintRanges.merge();
     }
