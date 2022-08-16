@@ -118,6 +118,27 @@ public class TaintRangesTest {
     }
 
     @Test
+    public void testRemove() {
+        Map<TaintRange, String> tests = new HashMap<TaintRange, String>() {{
+            put(new TaintRange(1, 4), "Taints:[untrusted(2,7)]");
+            put(new TaintRange(1, 5), "Taints:[untrusted(1,6)]");
+            put(new TaintRange(1, 7), "Taints:[untrusted(1,4)]");
+            put(new TaintRange(1, 11), "Taints:[]");
+            put(new TaintRange(6, 7), "Taints:[untrusted(5,9)]");
+            put(new TaintRange(6, 11), "Taints:[untrusted(5,6)]");
+            put(new TaintRange(5, 15), "Taints:[]");
+            put(new TaintRange(10, 15), "Taints:[untrusted(5,10)]");
+            put(new TaintRange(11, 15), "Taints:[untrusted(5,10)]");
+        }};
+
+        for (Map.Entry<TaintRange, String> entry : tests.entrySet()) {
+            TaintRanges ts = new TaintRanges(new TaintRange(5, 10));
+            ts.remove(entry.getKey().start, entry.getKey().stop);
+            Assert.assertEquals(entry.getKey().toString(), entry.getValue(), ts.toString());
+        }
+    }
+
+    @Test
     public void testClear() {
         Map<TaintRange, String> tests = new HashMap<TaintRange, String>() {{
             put(new TaintRange(1, 4), "Taints:[untrusted(5,10)]");

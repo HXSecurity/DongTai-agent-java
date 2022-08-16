@@ -144,6 +144,41 @@ public class TaintRanges {
         }
     }
 
+    public void remove(int start, int stop) {
+        if (start < 0) {
+            throw new RuntimeException("taint range remove invalid start: " + start);
+        }
+        if (stop < start) {
+            throw new RuntimeException("taint range remove invalid stop: " + stop + " < start:" + start);
+        }
+        if (stop != start) {
+            int length = stop - start;
+            Iterator<TaintRange> it = this.taintRanges.iterator();
+            while (it.hasNext()) {
+                TaintRange next = it.next();
+                switch (next.compareRange(start, stop)) {
+                    case LOW_SPAN:
+                        next.stop = start;
+                        break;
+                    case WITHIN:
+                        it.remove();
+                        break;
+                    case CONTAIN:
+                        next.stop -= length;
+                        break;
+                    case HIGH_SPAN:
+                        next.start = start;
+                        next.stop -= stop - next.start;
+                        break;
+                    case ABOVE:
+                        next.start -= length;
+                        next.stop -= length;
+                        break;
+                }
+            }
+        }
+    }
+
     public void clear(int start, int stop) {
         if (start < 0) {
             throw new RuntimeException("taint range clear invalid start: " + start);
