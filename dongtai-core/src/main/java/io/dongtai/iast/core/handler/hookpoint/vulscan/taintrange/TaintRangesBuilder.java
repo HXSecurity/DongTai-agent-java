@@ -4,6 +4,19 @@ import java.io.ByteArrayOutputStream;
 import java.io.StringWriter;
 
 public class TaintRangesBuilder {
+    public enum Command {
+        KEEP,
+        APPEND,
+        SUBSET,
+        INSERT,
+        REMOVE,
+        REPLACE,
+        CONCAT,
+        TRIM,
+        TRIM_RIGHT,
+        TRIM_LEFT,
+    }
+
     public void keep(TaintRanges taintRanges, Object target, int argC, TaintRanges tgtTaintRanges) {
         if (argC == 0) {
             int length = this.getLength(target);
@@ -95,6 +108,73 @@ public class TaintRangesBuilder {
                 return;
         }
         taintRanges.merge();
+    }
+
+    public void remove(TaintRanges taintRanges, Object source, TaintRanges tgtTaintRanges, int p1, int p2, int argC) {
+        switch (argC) {
+            case 0:
+                tgtTaintRanges.remove(0, this.getLength(source));
+                break;
+            case 1:
+                tgtTaintRanges.remove(p1, p1 + 1);
+                taintRanges.addAll(tgtTaintRanges);
+                break;
+            case 2:
+                tgtTaintRanges.remove(p1, p2);
+                taintRanges.addAll(tgtTaintRanges);
+                break;
+            default:
+                return;
+        }
+        taintRanges.merge();
+    }
+
+    public void replace(TaintRanges taintRanges, Object target, TaintRanges srcTaintRanges, TaintRanges tgtTaintRanges) {
+        // @TODO
+        taintRanges.add(new TaintRange(0, this.getLength(target)));
+    }
+
+    public void concat(TaintRanges taintRanges, Object target, TaintRanges srcTaintRanges, Object source, TaintRanges tgtTaintRanges, Object[] params) {
+        if (params != null && params.length == 1 && source.equals(params[0])) {
+            tgtTaintRanges.shift(this.getLength(target) - this.getLength(source));
+        }
+        taintRanges.addAll(srcTaintRanges);
+        taintRanges.addAll(tgtTaintRanges);
+        taintRanges.merge();
+    }
+
+    public void trim(Command command, TaintRanges taintRanges, Object source, TaintRanges tgtTaintRanges, int argC) {
+        if (argC > 0) {
+            return;
+        }
+        if (!tgtTaintRanges.isEmpty()) {
+            if (!(source instanceof CharSequence)) {
+                taintRanges.addAll(tgtTaintRanges.getTaintRanges());
+                return;
+            }
+            int left = 0;
+            CharSequence charSequence = (CharSequence) source;
+            int length = charSequence.length();
+            if (command.equals(Command.TRIM) || command.equals(Command.TRIM_LEFT)) {
+                while (left < length && Character.isWhitespace(charSequence.charAt(left))) {
+                    left++;
+                }
+            }
+            if (command.equals(Command.TRIM) || command.equals(Command.TRIM_RIGHT)) {
+                int right = length;
+                while (right > 0 && Character.isWhitespace(charSequence.charAt(right - 1))) {
+                    right--;
+                }
+                length = right;
+            }
+            for (TaintRange taintRange : tgtTaintRanges.getTaintRanges()) {
+                int max = Math.max(0, taintRange.getStart() - left);
+                int min = Math.min(length, taintRange.getStop()) - left;
+                if (min > max) {
+                    taintRanges.add(new TaintRange(taintRange.getName(), max, min));
+                }
+            }
+        }
     }
 
     public int getLength(Object obj) {

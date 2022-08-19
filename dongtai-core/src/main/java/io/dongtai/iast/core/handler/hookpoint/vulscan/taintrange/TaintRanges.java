@@ -31,6 +31,12 @@ public class TaintRanges {
         }
     }
 
+    public void addAll(Collection<TaintRange> taintRanges) {
+        if (taintRanges != null) {
+            this.taintRanges.addAll(taintRanges);
+        }
+    }
+
     public TaintRanges clone() {
         TaintRanges taintRanges = new TaintRanges();
         int size = this.taintRanges.size();
@@ -38,6 +44,10 @@ public class TaintRanges {
             taintRanges.taintRanges.add(this.taintRanges.get(i).clone());
         }
         return taintRanges;
+    }
+
+    public boolean isEmpty() {
+        return this.taintRanges.isEmpty();
     }
 
     public void shift(int i) {
