@@ -25,6 +25,7 @@ public class AgentLauncher {
     public static String LAUNCH_MODE;
     private static String FLUENT_FILE;
     private static String FLUENT_FILE_CONF;
+    public static Process fluent;
 
     static {
         /**
@@ -186,10 +187,10 @@ public class AgentLauncher {
                 FLUENT_FILE_CONF
         };
         try {
-            final Process process = Runtime.getRuntime().exec(execution);
+            fluent = Runtime.getRuntime().exec(execution);
             Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
                 public void run() {
-                    process.destroy();
+                    fluent.destroy();
                 }
             }));
         } catch (IOException e) {
