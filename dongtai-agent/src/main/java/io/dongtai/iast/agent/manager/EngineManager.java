@@ -1,5 +1,6 @@
 package io.dongtai.iast.agent.manager;
 
+import io.dongtai.iast.agent.AgentLauncher;
 import io.dongtai.iast.agent.IastClassLoader;
 import io.dongtai.iast.agent.IastProperties;
 import io.dongtai.iast.agent.middlewarerecognition.ServerDetect;
@@ -472,6 +473,12 @@ public class EngineManager {
         if (EngineMonitor.getIsUninstallHeart()){
             uninstallObject();
             MonitorDaemonThread.isExit = true;
+        }
+        try {
+            AgentLauncher.fluent.destroy();
+        }catch (Exception ignored){
+        }finally {
+            AgentLauncher.fluent=null;
         }
         return true;
     }
