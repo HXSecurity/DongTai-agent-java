@@ -54,7 +54,7 @@ public class PropagatorImpl {
                     return;
                 }
 
-                event.inValue = event.object;
+                event.setInValue(event.object);
                 setTarget(propagator, event);
                 addPropagator(event, invokeIdSequencer);
             } else if (sourceString.startsWith(PARAMS_PARAM)) {
@@ -74,7 +74,7 @@ public class PropagatorImpl {
                     inValues.add(tempObj);
                 }
                 if (!inValues.isEmpty()) {
-                    event.inValue = inValues.toArray();
+                    event.setInValue(inValues.toArray());
                     setTarget(propagator, event);
                     addPropagator(event, invokeIdSequencer);
                 }
@@ -95,7 +95,7 @@ public class PropagatorImpl {
                     if (event.returnValue == null) {
                         break;
                     }
-                    inValues.add(event.returnValue);
+                    event.setInValue(event.returnValue);
                 } else if (source.startsWith(PARAMS_PARAM)) {
                     int[] positions = (int[]) propagator.getSourcePosition();
                     for (int pos : positions) {
@@ -116,7 +116,7 @@ public class PropagatorImpl {
                     }
                 }
                 if (condition > 0 && (!andCondition || conditionSources.length == condition)) {
-                    event.inValue = inValues.toArray();
+                    event.setInValue(inValues.toArray());
                     setTarget(propagator, event);
                     addPropagator(event, invokeIdSequencer);
                 }
@@ -127,21 +127,21 @@ public class PropagatorImpl {
     private static void setTarget(IastPropagatorModel propagator, MethodEvent event) {
         String target = propagator.getTarget();
         if (PARAMS_OBJECT.equals(target)) {
-            event.outValue = event.object;
+            event.setOutValue(event.object);
         } else if (PARAMS_RETURN.equals(target)) {
-            event.outValue = event.returnValue;
+            event.setOutValue(event.returnValue);
         } else if (target.startsWith(PARAMS_PARAM)) {
             ArrayList<Object> outValues = new ArrayList<Object>();
             Object tempPositions = propagator.getTargetPosition();
             int[] positions = (int[]) tempPositions;
             if (positions.length == 1) {
-                event.outValue = event.argumentArray[positions[0]];
+                event.setOutValue(event.argumentArray[positions[0]]);
             } else {
                 for (int pos : positions) {
                     outValues.add(event.argumentArray[pos]);
                 }
                 if (!outValues.isEmpty()) {
-                    event.outValue = outValues.toArray();
+                    event.setOutValue(outValues.toArray());
                 }
             }
         }

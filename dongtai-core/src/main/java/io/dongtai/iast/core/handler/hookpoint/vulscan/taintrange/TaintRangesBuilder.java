@@ -177,6 +177,28 @@ public class TaintRangesBuilder {
         }
     }
 
+    public String obj2String(Object obj) {
+        if (obj == null) {
+            return "";
+        }
+
+        if (obj instanceof CharSequence) {
+            return ((CharSequence) obj).toString();
+        } else if (obj instanceof StringWriter) {
+            return ((StringWriter) obj).getBuffer().toString();
+        } else if (obj instanceof ByteArrayOutputStream) {
+            return ((ByteArrayOutputStream) obj).toString();
+        } else if (obj instanceof Character) {
+            return ((Character) obj).toString();
+        } else if (obj instanceof byte[]) {
+            return new String((byte[]) obj);
+        } else if (obj instanceof char[]) {
+            return new String((char[]) obj);
+        } else {
+            return (obj.getClass().getName() + "@" + Integer.toHexString(obj.hashCode()));
+        }
+    }
+
     public int getLength(Object obj) {
         if (obj == null) {
             return 0;

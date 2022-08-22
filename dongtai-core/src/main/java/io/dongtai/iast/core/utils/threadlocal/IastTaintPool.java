@@ -35,51 +35,51 @@ public class IastTaintPool extends ThreadLocal<HashSet<Object>> {
                 this.get().add(obj);
                 event.addTargetHash(obj.hashCode());
 
-            String[] tempObjs = (String[]) obj;
-            if (PROPERTIES.isNormalMode()) {
-                for (String tempObj : tempObjs) {
-                    this.get().add(tempObj);
-                    subHashCode = System.identityHashCode(tempObj);
+                String[] tempObjs = (String[]) obj;
+                if (PROPERTIES.isNormalMode()) {
+                    for (String tempObj : tempObjs) {
+                        this.get().add(tempObj);
+                        subHashCode = System.identityHashCode(tempObj);
+                        EngineManager.TAINT_HASH_CODES.get().add(subHashCode);
+                        event.addTargetHash(subHashCode);
+                        event.addTargetHashForRpc(tempObj.hashCode());
+                    }
+                } else {
+                    for (String tempObj : tempObjs) {
+                        this.get().add(tempObj);
+                        event.addTargetHash(tempObj.hashCode());
+                    }
+                }
+            } else if (obj instanceof Map) {
+                this.get().add(obj);
+                event.addTargetHash(obj.hashCode());
+                if (isSource) {
+                    Map<String, String[]> tempMap = (Map<String, String[]>) obj;
+                    Set<Map.Entry<String, String[]>> entries = tempMap.entrySet();
+                    for (Map.Entry<String, String[]> entry : entries) {
+                        Object key = entry.getKey();
+                        Object value = entry.getValue();
+                        addTaintToPool(key, event, true);
+                        addTaintToPool(value, event, true);
+                    }
+                }
+            } else if (obj.getClass().isArray() && !obj.getClass().getComponentType().isPrimitive()) {
+                Object[] tempObjs = (Object[]) obj;
+                if (tempObjs.length != 0) {
+                    for (Object tempObj : tempObjs) {
+                        addTaintToPool(tempObj, event, isSource);
+                    }
+                }
+            } else {
+                this.get().add(obj);
+                if (obj instanceof String && PROPERTIES.isNormalMode()) {
+                    subHashCode = System.identityHashCode(obj);
                     EngineManager.TAINT_HASH_CODES.get().add(subHashCode);
-                    event.addTargetHash(subHashCode);
-                    event.addTargetHashForRpc(tempObj.hashCode());
+                } else {
+                    subHashCode = obj.hashCode();
                 }
-            } else {
-                for (String tempObj : tempObjs) {
-                    this.get().add(tempObj);
-                    event.addTargetHash(tempObj.hashCode());
-                }
-            }
-        } else if (obj instanceof Map) {
-            this.get().add(obj);
-            event.addTargetHash(obj.hashCode());
-            if (isSource) {
-                Map<String, String[]> tempMap = (Map<String, String[]>) obj;
-                Set<Map.Entry<String, String[]>> entries = tempMap.entrySet();
-                for (Map.Entry<String, String[]> entry : entries) {
-                    Object key = entry.getKey();
-                    Object value = entry.getValue();
-                    addTaintToPool(key, event, true);
-                    addTaintToPool(value, event, true);
-                }
-            }
-        } else if (obj.getClass().isArray() && !obj.getClass().getComponentType().isPrimitive()) {
-            Object[] tempObjs = (Object[]) obj;
-            if (tempObjs.length != 0) {
-                for (Object tempObj : tempObjs) {
-                    addTaintToPool(tempObj, event, isSource);
-                }
-            }
-        } else {
-            this.get().add(obj);
-            if (obj instanceof String && PROPERTIES.isNormalMode()) {
-                subHashCode = System.identityHashCode(obj);
-                EngineManager.TAINT_HASH_CODES.get().add(subHashCode);
-            } else {
-                subHashCode = obj.hashCode();
-            }
-            event.addTargetHash(subHashCode);
-            event.addTargetHashForRpc(obj.hashCode());
+                event.addTargetHash(subHashCode);
+                event.addTargetHashForRpc(obj.hashCode());
 
             }
         }catch (Exception e){

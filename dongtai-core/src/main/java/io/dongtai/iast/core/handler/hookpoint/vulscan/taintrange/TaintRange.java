@@ -1,5 +1,7 @@
 package io.dongtai.iast.core.handler.hookpoint.vulscan.taintrange;
 
+import org.json.JSONObject;
+
 public class TaintRange {
     public static final String UNTRUSTED = "untrusted";
 
@@ -129,5 +131,13 @@ public class TaintRange {
 
     public String toString() {
         return this.name + "(" + this.start + "," + this.stop + ")";
+    }
+
+    public JSONObject toJson() {
+        JSONObject json = new JSONObject();
+        json.put("name", this.name);
+        json.put("start", this.start);
+        json.put("stop", this.stop);
+        return json;
     }
 }

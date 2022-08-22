@@ -1,11 +1,11 @@
 package io.dongtai.iast.core.handler.hookpoint.models;
 
+import io.dongtai.iast.core.handler.hookpoint.vulscan.taintrange.TaintRanges;
+import io.dongtai.iast.core.utils.PropertyUtils;
 import io.dongtai.log.DongTaiLog;
+import org.json.JSONObject;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 方法事件
@@ -83,6 +83,8 @@ public class MethodEvent {
      */
     public Object inValue;
 
+    public String inValueString = "";
+
     public Set<Integer> getSourceHashes() {
         return sourceHashes;
     }
@@ -128,6 +130,8 @@ public class MethodEvent {
      * 方法的传出值
      */
     public Object outValue;
+
+    public String outValueString = "";
 
     /**
      * 方法的签名
@@ -199,6 +203,28 @@ public class MethodEvent {
     }
 
     public Boolean projectPropagatorClose = false;
+
+    public List<MethodEventTargetRange> targetRanges = new ArrayList<MethodEventTargetRange>();
+
+    public static class MethodEventTargetRange {
+        private final Integer hash;
+        private final String value;
+        private final TaintRanges ranges;
+
+        public MethodEventTargetRange(Integer hash, String value, TaintRanges ranges) {
+            this.hash = hash;
+            this.value = value;
+            this.ranges = ranges;
+        }
+
+        public JSONObject toJson() {
+            JSONObject json = new JSONObject();
+            json.put("hash", this.hash);
+            json.put("value", this.value);
+            json.put("ranges", this.ranges.toJson());
+            return json;
+        }
+    }
 
     /**
      * 构造调用事件
@@ -389,5 +415,17 @@ public class MethodEvent {
 
     public void setPlugin(String plugin) {
         this.plugin = plugin;
+    }
+
+    public void setInValue(Object inValue) {
+        PropertyUtils properties = PropertyUtils.getInstance();
+        this.inValue = inValue;
+        this.inValueString = properties.isLocal() ? obj2String(inValue) : "";
+    }
+
+    public void setOutValue(Object outValue) {
+        PropertyUtils properties = PropertyUtils.getInstance();
+        this.outValue = outValue;
+        this.outValueString = properties.isLocal() ? obj2String(outValue) : "";
     }
 }

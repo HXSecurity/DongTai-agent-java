@@ -110,12 +110,12 @@ public class DynamicPropagatorScanner implements IVulScan {
                     }
                 }
                 if (hitTaintPool) {
-                    event.inValue = sourceValue;
+                    event.setInValue(sourceValue);
                 }
             } else {
                 hitTaintPool = TaintPoolUtils.poolContains(event.object, event);
                 if (hitTaintPool) {
-                    event.inValue = event.object;
+                    event.setInValue(event.object);
                 }
             }
         }

@@ -1,5 +1,7 @@
 package io.dongtai.iast.core.handler.hookpoint.vulscan.taintrange;
 
+import org.json.JSONArray;
+
 import java.util.*;
 
 public class TaintRanges {
@@ -249,5 +251,13 @@ public class TaintRanges {
 
     public String toString() {
         return "Taints:" + this.taintRanges;
+    }
+
+    public JSONArray toJson() {
+        JSONArray json = new JSONArray();
+        for (TaintRange tr : this.taintRanges) {
+            json.put(tr.toJson());
+        }
+        return json;
     }
 }
