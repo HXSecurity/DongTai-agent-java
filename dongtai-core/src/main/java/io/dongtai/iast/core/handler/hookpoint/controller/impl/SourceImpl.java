@@ -97,6 +97,7 @@ public class SourceImpl {
             event.addTargetHash(hash);
             event.addTargetHashForRpc(obj.hashCode());
             EngineManager.TAINT_POOL.get().add(obj);
+            EngineManager.TAINT_RANGES_POOL.add(hash, tr);
         }
     }
 
