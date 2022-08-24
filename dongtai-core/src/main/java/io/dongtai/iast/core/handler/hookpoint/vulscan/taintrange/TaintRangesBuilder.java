@@ -17,45 +17,45 @@ public class TaintRangesBuilder {
         TRIM_LEFT,
     }
 
-    public void keep(TaintRanges taintRanges, Object target, int argC, TaintRanges tgtTaintRanges) {
+    public void keep(TaintRanges taintRanges, Object target, int argC, TaintRanges newTaintRanges) {
         if (argC == 0) {
             int length = this.getLength(target);
             if (length > 0) {
-                for (TaintRange taintRange : tgtTaintRanges.getTaintRanges()) {
+                for (TaintRange taintRange : newTaintRanges.getTaintRanges()) {
                     if (taintRange.getStart() < length && taintRange.getStop() > length) {
                         taintRange.setStop(length);
                     }
                     taintRanges.add(taintRange);
                 }
             } else {
-                taintRanges.addAll(tgtTaintRanges);
+                taintRanges.addAll(newTaintRanges);
             }
 
             taintRanges.merge();
         }
     }
 
-    public void append(TaintRanges taintRanges, Object target, TaintRanges srcTaintRanges,
-                       Object source, TaintRanges tgtTaintRanges, int p1, int p2, int argC) {
+    public void append(TaintRanges taintRanges, Object target, TaintRanges oldTaintRanges,
+                       Object source, TaintRanges newTaintRanges, int p1, int p2, int argC) {
         int length = this.getLength(target);
         switch (argC) {
             case 0:
                 // src.append(tgt)
-                tgtTaintRanges.shift(length - this.getLength(source));
-                taintRanges.addAll(srcTaintRanges);
-                taintRanges.addAll(tgtTaintRanges);
+                newTaintRanges.shift(length - this.getLength(source));
+                taintRanges.addAll(oldTaintRanges);
+                taintRanges.addAll(newTaintRanges);
                 break;
             case 2:
-                tgtTaintRanges.trim(p1, p2);
-                tgtTaintRanges.shift(length - (p2 - p1));
-                taintRanges.addAll(srcTaintRanges);
-                taintRanges.addAll(tgtTaintRanges);
+                newTaintRanges.trim(p1, p2);
+                newTaintRanges.shift(length - (p2 - p1));
+                taintRanges.addAll(oldTaintRanges);
+                taintRanges.addAll(newTaintRanges);
                 break;
             case 3:
-                tgtTaintRanges.trim(p1, p1 + p2);
-                tgtTaintRanges.shift(length - p2);
-                taintRanges.addAll(srcTaintRanges);
-                taintRanges.addAll(tgtTaintRanges);
+                newTaintRanges.trim(p1, p1 + p2);
+                newTaintRanges.shift(length - p2);
+                taintRanges.addAll(oldTaintRanges);
+                taintRanges.addAll(newTaintRanges);
                 break;
             default:
                 return;
@@ -63,23 +63,23 @@ public class TaintRangesBuilder {
         taintRanges.merge();
     }
 
-    public void subset(TaintRanges taintRanges, TaintRanges srcTaintRanges, Object source, TaintRanges tgtTaintRanges, int p1, int p2, int p3, int argC) {
+    public void subset(TaintRanges taintRanges, TaintRanges oldTaintRanges, Object source, TaintRanges newTaintRanges, int p1, int p2, int p3, int argC) {
         int length = this.getLength(source);
         switch (argC) {
             case 1:
-                tgtTaintRanges.trim(p1, length);
-                taintRanges.addAll(tgtTaintRanges);
+                newTaintRanges.trim(p1, length);
+                taintRanges.addAll(newTaintRanges);
                 break;
             case 2:
-                tgtTaintRanges.trim(p1, p2);
-                taintRanges.addAll(tgtTaintRanges);
+                newTaintRanges.trim(p1, p2);
+                taintRanges.addAll(newTaintRanges);
                 break;
             case 3:
-                srcTaintRanges.clear(p3, (p3 + p2) - p1);
-                tgtTaintRanges.trim(p1, p2);
-                tgtTaintRanges.shift(p3);
-                taintRanges.addAll(srcTaintRanges);
-                taintRanges.addAll(tgtTaintRanges);
+                oldTaintRanges.clear(p3, (p3 + p2) - p1);
+                newTaintRanges.trim(p1, p2);
+                newTaintRanges.shift(p3);
+                taintRanges.addAll(oldTaintRanges);
+                taintRanges.addAll(newTaintRanges);
                 break;
             default:
                 return;
