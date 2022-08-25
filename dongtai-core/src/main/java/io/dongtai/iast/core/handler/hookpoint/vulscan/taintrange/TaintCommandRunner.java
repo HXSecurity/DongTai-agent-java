@@ -100,6 +100,17 @@ public class TaintCommandRunner {
             case INSERT:
                 this.builder.insert(tr, oldTaintRanges, source, srcTaintRanges, p1, p2, p3, this.paramsCount);
                 break;
+            case REMOVE:
+                this.builder.remove(tr, source, srcTaintRanges, p1, p2, this.paramsCount);
+                break;
+            case CONCAT:
+                this.builder.concat(tr, target, oldTaintRanges, source, srcTaintRanges, params);
+                break;
+            case TRIM:
+            case TRIM_LEFT:
+            case TRIM_RIGHT:
+                this.builder.trim(this.command, tr, source, srcTaintRanges, this.paramsCount);
+                break;
             default:
                 break;
         }
@@ -339,5 +350,37 @@ public class TaintCommandRunner {
         put(METHOD, create(METHOD, TaintCommand.INSERT, Arrays.asList("P1", "P3", "P4")));
         METHOD = "java.lang.StringBuffer.insert(int,char[],int,int)";
         put(METHOD, create(METHOD, TaintCommand.INSERT, Arrays.asList("P1", "P3", "P4")));
+
+        // REMOVE StringBuilder
+        METHOD = "java.lang.StringBuilder.delete(int,int)";
+        put(METHOD, create(METHOD, TaintCommand.REMOVE, Arrays.asList("P1", "P2")));
+        METHOD = "java.io.StringBuilder.deleteCharAt(int)";
+        put(METHOD, create(METHOD, TaintCommand.REMOVE, Collections.singletonList("P1")));
+
+        // REMOVE StringBuffer
+        METHOD = "java.lang.StringBuffer.delete(int,int)";
+        put(METHOD, create(METHOD, TaintCommand.REMOVE, Arrays.asList("P1", "P2")));
+        METHOD = "java.io.StringBuffer.deleteCharAt(int)";
+        put(METHOD, create(METHOD, TaintCommand.REMOVE, Collections.singletonList("P1")));
+
+        // REMOVE ByteArrayOutputStream/apache ByteArrayOutputStream
+        METHOD = "java.io.ByteArrayOutputStream.reset()";
+        put(METHOD, create(METHOD, TaintCommand.REMOVE));
+        METHOD = "org.apache.commons.io.output.ByteArrayOutputStream.reset()";
+        put(METHOD, create(METHOD, TaintCommand.REMOVE));
+
+        // CONCAT String
+        METHOD = "java.lang.String.concat(java.lang.String)";
+        put(METHOD, create(METHOD, TaintCommand.CONCAT));
+
+        // TRIM String
+        METHOD = "java.lang.String.strip()";
+        put(METHOD, create(METHOD, TaintCommand.TRIM));
+        METHOD = "java.lang.String.stripLeading()";
+        put(METHOD, create(METHOD, TaintCommand.TRIM_LEFT));
+        METHOD = "java.lang.String.stripTrailing()";
+        put(METHOD, create(METHOD, TaintCommand.TRIM_RIGHT));
+        METHOD = "java.lang.String.trim()";
+        put(METHOD, create(METHOD, TaintCommand.TRIM));
     }};
 }
