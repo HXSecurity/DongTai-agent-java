@@ -4,31 +4,18 @@ import java.io.ByteArrayOutputStream;
 import java.io.StringWriter;
 
 public class TaintRangesBuilder {
-    public enum Command {
-        KEEP,
-        APPEND,
-        SUBSET,
-        INSERT,
-        REMOVE,
-        REPLACE,
-        CONCAT,
-        TRIM,
-        TRIM_RIGHT,
-        TRIM_LEFT,
-    }
-
-    public void keep(TaintRanges taintRanges, Object target, int argC, TaintRanges newTaintRanges) {
+    public void keep(TaintRanges taintRanges, Object target, int argC, TaintRanges srcTaintRanges) {
         if (argC == 0) {
-            int length = this.getLength(target);
+            int length = getLength(target);
             if (length > 0) {
-                for (TaintRange taintRange : newTaintRanges.getTaintRanges()) {
+                for (TaintRange taintRange : srcTaintRanges.getTaintRanges()) {
                     if (taintRange.getStart() < length && taintRange.getStop() > length) {
                         taintRange.setStop(length);
                     }
                     taintRanges.add(taintRange);
                 }
             } else {
-                taintRanges.addAll(newTaintRanges);
+                taintRanges.addAll(srcTaintRanges);
             }
 
             taintRanges.merge();
@@ -36,26 +23,26 @@ public class TaintRangesBuilder {
     }
 
     public void append(TaintRanges taintRanges, Object target, TaintRanges oldTaintRanges,
-                       Object source, TaintRanges newTaintRanges, int p1, int p2, int argC) {
-        int length = this.getLength(target);
+                       Object source, TaintRanges srcTaintRanges, int p1, int p2, int argC) {
+        int length = getLength(target);
         switch (argC) {
             case 0:
                 // src.append(tgt)
-                newTaintRanges.shift(length - this.getLength(source));
+                srcTaintRanges.shift(length - getLength(source));
                 taintRanges.addAll(oldTaintRanges);
-                taintRanges.addAll(newTaintRanges);
+                taintRanges.addAll(srcTaintRanges);
                 break;
             case 2:
-                newTaintRanges.trim(p1, p2);
-                newTaintRanges.shift(length - (p2 - p1));
+                srcTaintRanges.trim(p1, p2);
+                srcTaintRanges.shift(length - (p2 - p1));
                 taintRanges.addAll(oldTaintRanges);
-                taintRanges.addAll(newTaintRanges);
+                taintRanges.addAll(srcTaintRanges);
                 break;
             case 3:
-                newTaintRanges.trim(p1, p1 + p2);
-                newTaintRanges.shift(length - p2);
+                srcTaintRanges.trim(p1, p1 + p2);
+                srcTaintRanges.shift(length - p2);
                 taintRanges.addAll(oldTaintRanges);
-                taintRanges.addAll(newTaintRanges);
+                taintRanges.addAll(srcTaintRanges);
                 break;
             default:
                 return;
@@ -63,23 +50,23 @@ public class TaintRangesBuilder {
         taintRanges.merge();
     }
 
-    public void subset(TaintRanges taintRanges, TaintRanges oldTaintRanges, Object source, TaintRanges newTaintRanges, int p1, int p2, int p3, int argC) {
-        int length = this.getLength(source);
+    public void subset(TaintRanges taintRanges, TaintRanges oldTaintRanges, Object source, TaintRanges srcTaintRanges, int p1, int p2, int p3, int argC) {
+        int length = getLength(source);
         switch (argC) {
             case 1:
-                newTaintRanges.trim(p1, length);
-                taintRanges.addAll(newTaintRanges);
+                srcTaintRanges.trim(p1, length);
+                taintRanges.addAll(srcTaintRanges);
                 break;
             case 2:
-                newTaintRanges.trim(p1, p2);
-                taintRanges.addAll(newTaintRanges);
+                srcTaintRanges.trim(p1, p2);
+                taintRanges.addAll(srcTaintRanges);
                 break;
             case 3:
                 oldTaintRanges.clear(p3, (p3 + p2) - p1);
-                newTaintRanges.trim(p1, p2);
-                newTaintRanges.shift(p3);
+                srcTaintRanges.trim(p1, p2);
+                srcTaintRanges.shift(p3);
                 taintRanges.addAll(oldTaintRanges);
-                taintRanges.addAll(newTaintRanges);
+                taintRanges.addAll(srcTaintRanges);
                 break;
             default:
                 return;
@@ -88,7 +75,7 @@ public class TaintRangesBuilder {
     }
 
     public void insert(TaintRanges taintRanges, TaintRanges srcTaintRanges, Object source, TaintRanges tgtTaintRanges, int p1, int p2, int p3, int argC) {
-        int length = this.getLength(source);
+        int length = getLength(source);
         switch (argC) {
             case 1:
                 tgtTaintRanges.shift(p1);
@@ -113,7 +100,7 @@ public class TaintRangesBuilder {
     public void remove(TaintRanges taintRanges, Object source, TaintRanges tgtTaintRanges, int p1, int p2, int argC) {
         switch (argC) {
             case 0:
-                tgtTaintRanges.remove(0, this.getLength(source));
+                tgtTaintRanges.remove(0, getLength(source));
                 break;
             case 1:
                 tgtTaintRanges.remove(p1, p1 + 1);
@@ -131,19 +118,19 @@ public class TaintRangesBuilder {
 
     public void replace(TaintRanges taintRanges, Object target, TaintRanges srcTaintRanges, TaintRanges tgtTaintRanges) {
         // @TODO
-        taintRanges.add(new TaintRange(0, this.getLength(target)));
+        taintRanges.add(new TaintRange(0, getLength(target)));
     }
 
     public void concat(TaintRanges taintRanges, Object target, TaintRanges srcTaintRanges, Object source, TaintRanges tgtTaintRanges, Object[] params) {
         if (params != null && params.length == 1 && source.equals(params[0])) {
-            tgtTaintRanges.shift(this.getLength(target) - this.getLength(source));
+            tgtTaintRanges.shift(getLength(target) - getLength(source));
         }
         taintRanges.addAll(srcTaintRanges);
         taintRanges.addAll(tgtTaintRanges);
         taintRanges.merge();
     }
 
-    public void trim(Command command, TaintRanges taintRanges, Object source, TaintRanges tgtTaintRanges, int argC) {
+    public void trim(TaintCommand command, TaintRanges taintRanges, Object source, TaintRanges tgtTaintRanges, int argC) {
         if (argC > 0) {
             return;
         }
@@ -155,12 +142,12 @@ public class TaintRangesBuilder {
             int left = 0;
             CharSequence charSequence = (CharSequence) source;
             int length = charSequence.length();
-            if (command.equals(Command.TRIM) || command.equals(Command.TRIM_LEFT)) {
+            if (command.equals(TaintCommand.TRIM) || command.equals(TaintCommand.TRIM_LEFT)) {
                 while (left < length && Character.isWhitespace(charSequence.charAt(left))) {
                     left++;
                 }
             }
-            if (command.equals(Command.TRIM) || command.equals(Command.TRIM_RIGHT)) {
+            if (command.equals(TaintCommand.TRIM) || command.equals(TaintCommand.TRIM_RIGHT)) {
                 int right = length;
                 while (right > 0 && Character.isWhitespace(charSequence.charAt(right - 1))) {
                     right--;
@@ -177,7 +164,7 @@ public class TaintRangesBuilder {
         }
     }
 
-    public String obj2String(Object obj) {
+    public static String obj2String(Object obj) {
         if (obj == null) {
             return "";
         }
@@ -199,7 +186,7 @@ public class TaintRangesBuilder {
         }
     }
 
-    public int getLength(Object obj) {
+    public static int getLength(Object obj) {
         if (obj == null) {
             return 0;
         }

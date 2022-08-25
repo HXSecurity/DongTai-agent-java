@@ -167,50 +167,75 @@ public class PropagatorImpl {
     }
 
     private static void trackTaintRange(IastPropagatorModel propagator, MethodEvent event) {
-        TaintCommandRunner r = TaintCommand.getCommand(event.signature);
-        if (r == null) {
-            return;
-        }
+        TaintCommandRunner r = TaintCommandRunner.getCommandRunner(event.signature);
 
         TaintRanges oldTaintRanges = new TaintRanges();
-        TaintRanges newTaintRanges = new TaintRanges();
+        TaintRanges srcTaintRanges = new TaintRanges();
 
-        String srcValue;
-        String srcLoc = propagator.getSource();
-        if (PARAMS_OBJECT.equals(srcLoc)) {
-            newTaintRanges = getTaintRanges(event.object);
-            srcValue = r.getTaintRangesBuilder().obj2String(event.object);
-        } else if (srcLoc.startsWith(PARAMS_PARAM)) {
-            int[] positions = (int[]) propagator.getSourcePosition();
-            if (positions.length == 1) {
-                newTaintRanges = getTaintRanges(event.argumentArray[positions[0]]);
-                srcValue = r.getTaintRangesBuilder().obj2String(event.argumentArray[positions[0]]);
-            } else {
-                return;
+        String srcValue = null;
+        if (r != null) {
+            String srcLoc = propagator.getSource();
+            if (PARAMS_OBJECT.equals(srcLoc)) {
+                srcTaintRanges = getTaintRanges(event.object);
+                srcValue = TaintRangesBuilder.obj2String(event.object);
+            } else if (srcLoc.startsWith("O|P")) {
+                oldTaintRanges = getTaintRanges(event.object);
+                int[] positions = (int[]) propagator.getSourcePosition();
+                if (positions.length == 1 && event.argumentArray.length >= positions[0]) {
+                    srcTaintRanges = getTaintRanges(event.argumentArray[positions[0]]);
+                    srcValue = TaintRangesBuilder.obj2String(event.argumentArray[positions[0]]);
+                }
+            } else if (srcLoc.startsWith(PARAMS_PARAM)) {
+                // invalid policy
+                if (srcLoc.contains(CONDITION_OR) || srcLoc.contains(CONDITION_AND)) {
+                    return;
+                }
+                int[] positions = (int[]) propagator.getSourcePosition();
+                if (positions.length == 1 && event.argumentArray.length >= positions[0]) {
+                    srcTaintRanges = getTaintRanges(event.argumentArray[positions[0]]);
+                    srcValue = TaintRangesBuilder.obj2String(event.argumentArray[positions[0]]);
+                }
             }
-        } else {
-            // @TODO: concat O|P1
-            return;
         }
 
         int tgtHash;
         String tgtValue;
+        Object tgt;
         String tgtLoc = propagator.getTarget();
         if (PARAMS_OBJECT.equals(tgtLoc)) {
-            tgtHash = System.identityHashCode(event.object);
-            tgtValue = r.getTaintRangesBuilder().obj2String(event.object);
+            tgt = event.object;
+            tgtHash = System.identityHashCode(tgt);
+            tgtValue = TaintRangesBuilder.obj2String(tgt);
+            oldTaintRanges = getTaintRanges(tgt);
         } else if (PARAMS_RETURN.equals(tgtLoc)) {
-            tgtHash = System.identityHashCode(event.returnValue);
-            tgtValue = r.getTaintRangesBuilder().obj2String(event.returnValue);
-        } else if (srcLoc.startsWith(PARAMS_PARAM)) {
-            int[] positions = (int[]) propagator.getSourcePosition();
-            tgtHash = System.identityHashCode(event.argumentArray[positions[0]]);
-            tgtValue = r.getTaintRangesBuilder().obj2String(event.argumentArray[positions[0]]);
+            tgt = event.returnValue;
+            tgtHash = System.identityHashCode(tgt);
+            tgtValue = TaintRangesBuilder.obj2String(tgt);
+        } else if (tgtLoc.startsWith(PARAMS_PARAM)) {
+            // invalid policy
+            if (tgtLoc.contains(CONDITION_OR) || tgtLoc.contains(CONDITION_AND)) {
+                return;
+            }
+            int[] positions = (int[]) propagator.getTargetPosition();
+            if (positions.length != 1 || event.argumentArray.length < positions[0]) {
+                // target can only have one parameter
+                return;
+            }
+            tgt = event.argumentArray[positions[0]];
+            tgtHash = System.identityHashCode(tgt);
+            tgtValue = TaintRangesBuilder.obj2String(tgt);
+            oldTaintRanges = getTaintRanges(tgt);
         } else {
+            // invalid policy
             return;
         }
 
-        TaintRanges tr = r.run(srcValue, tgtValue, event.argumentArray, oldTaintRanges, newTaintRanges);
+        TaintRanges tr;
+        if (r != null && srcValue != null) {
+            tr = r.run(srcValue, tgtValue, event.argumentArray, oldTaintRanges, srcTaintRanges);
+        } else {
+            tr = new TaintRanges(new TaintRange(0, TaintRangesBuilder.getLength(tgt)));
+        }
         event.targetRanges.add(new MethodEvent.MethodEventTargetRange(tgtHash, tgtValue, tr));
         EngineManager.TAINT_RANGES_POOL.add(tgtHash, tr);
     }

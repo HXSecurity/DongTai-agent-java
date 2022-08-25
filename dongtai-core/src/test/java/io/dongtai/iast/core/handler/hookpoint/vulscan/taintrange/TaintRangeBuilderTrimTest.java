@@ -16,7 +16,7 @@ public class TaintRangeBuilderTrimTest {
         ts = new TaintRanges();
         tgtTs = new TaintRanges(new TaintRange(3, 7));
         // "  fOOBAr ".trim()     // fOOBAr
-        tb.trim(TaintRangesBuilder.Command.TRIM, ts, "  fOOBAr ", tgtTs, 0);
+        tb.trim(TaintCommand.Command.TRIM, ts, "  fOOBAr ", tgtTs, 0);
         Assert.assertEquals("Taints:[untrusted(1,5)]", ts.toString());
     }
 
@@ -29,7 +29,7 @@ public class TaintRangeBuilderTrimTest {
         ts = new TaintRanges();
         tgtTs = new TaintRanges(new TaintRange(3, 7));
         // "  fOOBAr".trim()     // fOOBAr
-        tb.trim(TaintRangesBuilder.Command.TRIM_LEFT, ts, "  fOOBAr", tgtTs, 0);
+        tb.trim(TaintCommand.Command.TRIM_LEFT, ts, "  fOOBAr", tgtTs, 0);
         Assert.assertEquals("Taints:[untrusted(1,5)]", ts.toString());
     }
 
@@ -42,7 +42,7 @@ public class TaintRangeBuilderTrimTest {
         ts = new TaintRanges();
         tgtTs = new TaintRanges(new TaintRange(1, 5));
         // "fOOBAr ".trim()     // fOOBAr
-        tb.trim(TaintRangesBuilder.Command.TRIM_RIGHT, ts, "fOOBAr ", tgtTs, 0);
+        tb.trim(TaintCommand.Command.TRIM_RIGHT, ts, "fOOBAr ", tgtTs, 0);
         Assert.assertEquals("Taints:[untrusted(1,5)]", ts.toString());
     }
 }

@@ -86,13 +86,13 @@ public class SourceImpl {
         } else if ("java.util.Optional".equals(obj.getClass().getName())) {
             trackOptional(tb, event, obj, depth);
         } else {
-            int len = tb.getLength(obj);
+            int len = TaintRangesBuilder.getLength(obj);
             if (len == 0) {
                 return;
             }
 
             TaintRanges tr = new TaintRanges(new TaintRange(0, len));
-            event.targetRanges.add(new MethodEvent.MethodEventTargetRange(hash, tb.obj2String(obj), tr));
+            event.targetRanges.add(new MethodEvent.MethodEventTargetRange(hash, TaintRangesBuilder.obj2String(obj), tr));
             EngineManager.TAINT_HASH_CODES.get().add(hash);
             event.addTargetHash(hash);
             event.addTargetHashForRpc(obj.hashCode());
