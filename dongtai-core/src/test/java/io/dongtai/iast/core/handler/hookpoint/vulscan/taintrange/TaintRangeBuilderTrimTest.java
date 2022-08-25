@@ -10,39 +10,39 @@ public class TaintRangeBuilderTrimTest {
     public void testTrim() {
         TaintRanges ts;
 
-        TaintRanges tgtTs;
+        TaintRanges srcTs;
         TaintRangesBuilder tb = new TaintRangesBuilder();
 
         ts = new TaintRanges();
-        tgtTs = new TaintRanges(new TaintRange(3, 7));
+        srcTs = new TaintRanges(new TaintRange(3, 7));
         // "  fOOBAr ".trim()     // fOOBAr
-        tb.trim(TaintCommand.Command.TRIM, ts, "  fOOBAr ", tgtTs, 0);
+        tb.trim(TaintCommand.TRIM, ts, "  fOOBAr ", srcTs, 0);
         Assert.assertEquals("Taints:[untrusted(1,5)]", ts.toString());
     }
 
     @Test
     public void testTrimLeft() {
         TaintRanges ts;
-        TaintRanges tgtTs;
+        TaintRanges srcTs;
         TaintRangesBuilder tb = new TaintRangesBuilder();
 
         ts = new TaintRanges();
-        tgtTs = new TaintRanges(new TaintRange(3, 7));
+        srcTs = new TaintRanges(new TaintRange(3, 7));
         // "  fOOBAr".trim()     // fOOBAr
-        tb.trim(TaintCommand.Command.TRIM_LEFT, ts, "  fOOBAr", tgtTs, 0);
+        tb.trim(TaintCommand.TRIM_LEFT, ts, "  fOOBAr", srcTs, 0);
         Assert.assertEquals("Taints:[untrusted(1,5)]", ts.toString());
     }
 
     @Test
     public void testTrimRight() throws IOException {
         TaintRanges ts;
-        TaintRanges tgtTs;
+        TaintRanges srcTs;
         TaintRangesBuilder tb = new TaintRangesBuilder();
 
         ts = new TaintRanges();
-        tgtTs = new TaintRanges(new TaintRange(1, 5));
+        srcTs = new TaintRanges(new TaintRange(1, 5));
         // "fOOBAr ".trim()     // fOOBAr
-        tb.trim(TaintCommand.Command.TRIM_RIGHT, ts, "fOOBAr ", tgtTs, 0);
+        tb.trim(TaintCommand.TRIM_RIGHT, ts, "fOOBAr ", srcTs, 0);
         Assert.assertEquals("Taints:[untrusted(1,5)]", ts.toString());
     }
 }

@@ -97,6 +97,9 @@ public class TaintCommandRunner {
             case SUBSET:
                 this.builder.subset(tr, oldTaintRanges, source, srcTaintRanges, p1, p2, p3, this.paramsCount);
                 break;
+            case INSERT:
+                this.builder.insert(tr, oldTaintRanges, source, srcTaintRanges, p1, p2, p3, this.paramsCount);
+                break;
             default:
                 break;
         }
@@ -298,5 +301,43 @@ public class TaintCommandRunner {
         put(METHOD, create(METHOD, TaintCommand.SUBSET, Arrays.asList("0", "P2")));
         METHOD = "java.util.Arrays.copyOfRange(char[],int,int)";
         put(METHOD, create(METHOD, TaintCommand.SUBSET, Arrays.asList("P2", "P3")));
+
+        // INSERT CharArrayReader/PipedReader/PipedInputStream
+        METHOD = "java.io.CharArrayReader.<init>(char[],int,int)";
+        put(METHOD, create(METHOD, TaintCommand.INSERT, Arrays.asList("0", "P2", "P3")));
+        METHOD = "java.io.CharArrayReader.read(char[],int,int)";
+        put(METHOD, create(METHOD, TaintCommand.INSERT, Arrays.asList("0", "P2", "P3")));
+        METHOD = "java.io.PipedReader.read(char[],int,int)";
+        put(METHOD, create(METHOD, TaintCommand.INSERT, Arrays.asList("0", "P2", "P3")));
+        METHOD = "java.io.PipedInputStream.read(byte[],int,int)";
+        put(METHOD, create(METHOD, TaintCommand.INSERT, Arrays.asList("0", "P2", "P3")));
+
+        // INSERT StringBuilder
+        METHOD = "java.lang.StringBuilder.insert(int,java.lang.String)";
+        put(METHOD, create(METHOD, TaintCommand.INSERT, Collections.singletonList("P1")));
+        METHOD = "java.lang.StringBuilder.insert(int,char[])";
+        put(METHOD, create(METHOD, TaintCommand.INSERT, Collections.singletonList("P1")));
+        METHOD = "java.lang.StringBuilder.insert(int,char)";
+        put(METHOD, create(METHOD, TaintCommand.INSERT, Collections.singletonList("P1")));
+        METHOD = "java.lang.StringBuilder.insert(int,java.lang.CharSequence)";
+        put(METHOD, create(METHOD, TaintCommand.INSERT, Collections.singletonList("P1")));
+        METHOD = "java.lang.StringBuilder.insert(int,java.lang.CharSequence,int,int)";
+        put(METHOD, create(METHOD, TaintCommand.INSERT, Arrays.asList("P1", "P3", "P4")));
+        METHOD = "java.lang.StringBuilder.insert(int,char[],int,int)";
+        put(METHOD, create(METHOD, TaintCommand.INSERT, Arrays.asList("P1", "P3", "P4")));
+
+        // INSERT StringBuffer
+        METHOD = "java.lang.StringBuffer.insert(int,java.lang.String)";
+        put(METHOD, create(METHOD, TaintCommand.INSERT, Collections.singletonList("P1")));
+        METHOD = "java.lang.StringBuffer.insert(int,char[])";
+        put(METHOD, create(METHOD, TaintCommand.INSERT, Collections.singletonList("P1")));
+        METHOD = "java.lang.StringBuffer.insert(int,char)";
+        put(METHOD, create(METHOD, TaintCommand.INSERT, Collections.singletonList("P1")));
+        METHOD = "java.lang.StringBuffer.insert(int,java.lang.CharSequence)";
+        put(METHOD, create(METHOD, TaintCommand.INSERT, Collections.singletonList("P1")));
+        METHOD = "java.lang.StringBuffer.insert(int,java.lang.CharSequence,int,int)";
+        put(METHOD, create(METHOD, TaintCommand.INSERT, Arrays.asList("P1", "P3", "P4")));
+        METHOD = "java.lang.StringBuffer.insert(int,char[],int,int)";
+        put(METHOD, create(METHOD, TaintCommand.INSERT, Arrays.asList("P1", "P3", "P4")));
     }};
 }
