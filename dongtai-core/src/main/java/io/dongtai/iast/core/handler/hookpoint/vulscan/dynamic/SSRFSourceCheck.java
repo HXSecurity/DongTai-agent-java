@@ -14,14 +14,16 @@ public class SSRFSourceCheck {
     private static final String JAVA_NET_URL_OPEN_CONNECTION_PROXY = "java.net.URL.openConnection(java.net.Proxy)";
     private static final String JAVA_NET_URL_OPEN_STREAM = "java.net.URL.openStream()";
 
+    // TODO: use method execute for sink
     private static final String APACHE_HTTP_CLIENT_REQUEST_SET_URI = " org.apache.http.client.methods.HttpRequestBase.setURI(java.net.URI)".substring(1);
-
+    private static final String APACHE_LEGACY_HTTP_CLIENT_REQUEST_SET_URI = " org.apache.commons.httpclient.HttpMethodBase.setURI(org.apache.commons.httpclient.HttpMethodBase.URI)".substring(1);
 
     private static final Set<String> SSRF_SINK_METHODS = new HashSet<>(Arrays.asList(
             JAVA_NET_URL_OPEN_CONNECTION,
             JAVA_NET_URL_OPEN_CONNECTION_PROXY,
             JAVA_NET_URL_OPEN_STREAM,
-            APACHE_HTTP_CLIENT_REQUEST_SET_URI
+            APACHE_HTTP_CLIENT_REQUEST_SET_URI,
+            APACHE_LEGACY_HTTP_CLIENT_REQUEST_SET_URI
     ));
 
     public static boolean isSinkMethod(IastSinkModel sink) {
@@ -34,7 +36,8 @@ public class SSRFSourceCheck {
                 || JAVA_NET_URL_OPEN_CONNECTION_PROXY.equals(sink.getSignature())
                 || JAVA_NET_URL_OPEN_STREAM.equals(sink.getSignature())) {
             return javaNetURLSourceHit(event, sink);
-        } else if (APACHE_HTTP_CLIENT_REQUEST_SET_URI.equals(sink.getSignature())) {
+        } else if (APACHE_HTTP_CLIENT_REQUEST_SET_URI.equals(sink.getSignature())
+                || APACHE_LEGACY_HTTP_CLIENT_REQUEST_SET_URI.equals(sink.getSignature())) {
             return apacheHttpClientRequestSetURISourceHit(event, sink);
         }
         return hitTaintPool;
@@ -56,29 +59,43 @@ public class SSRFSourceCheck {
             event.inValue = url.toString();
             return addSourceType(event, protocol, userInfo, host, path, query);
         } catch (Exception e) {
-            DongTaiLog.warn("java.net.URL get protocol and host failed: " + e.getMessage());
+            DongTaiLog.warn("java.net.URL get source failed: " + e.getMessage());
             return false;
         }
     }
 
     private static boolean apacheHttpClientRequestSetURISourceHit(MethodEvent event, IastSinkModel sink) {
         try {
-            if (event.argumentArray.length < 1 || !(event.argumentArray[0] instanceof URI)) {
+            if (event.argumentArray.length < 1 || event.argumentArray[0] == null) {
                 return false;
             }
 
-            URI uri = (URI) event.argumentArray[0];
+            Object obj = event.argumentArray[0];
+            if (event.argumentArray[0] instanceof URI) {
+                URI uri = (URI) obj;
 
-            String protocol = uri.getScheme();
-            String authority = uri.getUserInfo();
-            String host = uri.getHost();
-            String path = uri.getPath();
-            String query = uri.getPath();
+                String protocol = uri.getScheme();
+                String userInfo = uri.getUserInfo();
+                String host = uri.getHost();
+                String path = uri.getPath();
+                String query = uri.getQuery();
 
-            event.inValue = uri.toString();
-            return addSourceType(event, protocol, authority, host, path, query);
+                event.inValue = uri.toString();
+                return addSourceType(event, protocol, userInfo, host, path, query);
+            } else if ("org.apache.commons.httpclient.HttpMethodBase".equals(obj.getClass().getName())) {
+                String protocol = (String) obj.getClass().getMethod("getScheme").invoke(obj);
+                String userInfo = (String) obj.getClass().getMethod("getUserinfo").invoke(obj);
+                String host = (String) obj.getClass().getMethod("getHost").invoke(obj);
+                String path = (String) obj.getClass().getMethod("getPath").invoke(obj);
+                String query = (String) obj.getClass().getMethod("getQuery").invoke(obj);
+
+                event.inValue = (String) obj.getClass().getMethod("toString").invoke(obj);
+                return addSourceType(event, protocol, userInfo, host, path, query);
+            }
+
+            return false;
         } catch (Exception e) {
-            DongTaiLog.warn("apache http client get protocol and host failed: " + e.getMessage());
+            DongTaiLog.warn("apache http client get source failed: " + e.getMessage());
             return false;
         }
     }
