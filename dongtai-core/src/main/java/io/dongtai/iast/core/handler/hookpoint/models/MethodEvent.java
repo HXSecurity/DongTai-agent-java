@@ -206,6 +206,25 @@ public class MethodEvent {
 
     public List<MethodEventTargetRange> targetRanges = new ArrayList<MethodEventTargetRange>();
 
+    public List<MethodEventSourceType> sourceTypes;
+
+    public static class MethodEventSourceType {
+        private final Integer hash;
+        private final String type;
+
+        public MethodEventSourceType(Integer hash, String type) {
+            this.hash = hash;
+            this.type = type;
+        }
+
+        public JSONObject toJson() {
+            JSONObject json = new JSONObject();
+            json.put("hash", this.hash);
+            json.put("type", this.type);
+            return json;
+        }
+    }
+
     public static class MethodEventTargetRange {
         private final Integer hash;
         private final String value;

@@ -72,7 +72,8 @@ public class GraphBuilder {
                                 event.getServiceName(),
                                 event.getPlugin(),
                                 event.getProjectPropagatorClose(),
-                                event.targetRanges
+                                event.targetRanges,
+                                event.sourceTypes
                         )
                 );
             }catch (Exception e){

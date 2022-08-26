@@ -177,9 +177,9 @@ public class TaintRangesBuilder {
         } else if (obj instanceof Character) {
             return ((Character) obj).toString();
         } else if (obj instanceof byte[]) {
-            return new String((byte[]) obj);
+            return trimRight((byte[]) obj);
         } else if (obj instanceof char[]) {
-            return new String((char[]) obj);
+            return trimRight((char[]) obj);
         } else {
             return (obj.getClass().getName() + "@" + Integer.toHexString(obj.hashCode()));
         }
@@ -217,5 +217,23 @@ public class TaintRangesBuilder {
         } else {
             return (obj.getClass().getName() + "@" + Integer.toHexString(obj.hashCode())).length();
         }
+    }
+
+    public static String trimRight(char[] value) {
+        int len = value.length;
+        char[] val = value;
+        while ((len > 0) && (val[len - 1] <= ' ')) {
+            len--;
+        }
+        return new String(value, 0, len);
+    }
+
+    public static String trimRight(byte[] value) {
+        int len = value.length;
+        byte[] val = value;
+        while ((len > 0) && (val[len - 1] <= ' ')) {
+            len--;
+        }
+        return new String(value, 0, len);
     }
 }

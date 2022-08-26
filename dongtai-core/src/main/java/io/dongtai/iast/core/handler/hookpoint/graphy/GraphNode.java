@@ -118,6 +118,8 @@ public class GraphNode {
 
     private List<MethodEvent.MethodEventTargetRange> targetRanges = new ArrayList<MethodEvent.MethodEventTargetRange>();
 
+    public List<MethodEvent.MethodEventSourceType> sourceTypes;
+
     public GraphNode(boolean isSource,
                      int invokeId,
                      String callerClass,
@@ -142,7 +144,8 @@ public class GraphNode {
                      String serviceName,
                      String plugin,
                      Boolean projectPropagatorClose,
-                     List<MethodEvent.MethodEventTargetRange> targetRanges
+                     List<MethodEvent.MethodEventTargetRange> targetRanges,
+                     List<MethodEvent.MethodEventSourceType> sourceTypes
     ) {
         this.isSource = isSource;
         this.invokeId = invokeId;
@@ -169,6 +172,7 @@ public class GraphNode {
         this.plugin = plugin;
         this.projectPropagatorClose = projectPropagatorClose;
         this.targetRanges = targetRanges;
+        this.sourceTypes = sourceTypes;
     }
 
     public JSONObject toJson() {
@@ -231,6 +235,14 @@ public class GraphNode {
         value.put("targetRange", tr);
         for (MethodEvent.MethodEventTargetRange range : targetRanges) {
             tr.put(range.toJson());
+        }
+
+        if (sourceTypes != null && sourceTypes.size() > 0) {
+            JSONArray st = new JSONArray();
+            value.put("sourceType", st);
+            for (MethodEvent.MethodEventSourceType s : sourceTypes) {
+                st.put(s.toJson());
+            }
         }
 
         return value;
