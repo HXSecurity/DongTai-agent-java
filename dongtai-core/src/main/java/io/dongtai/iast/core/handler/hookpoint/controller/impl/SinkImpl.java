@@ -25,10 +25,13 @@ public class SinkImpl {
      * @param event sink点事件
      */
     public static void solveSink(MethodEvent event) {
-        Asserts.NOT_NULL("method.event", event);
+        if (null == event){
+            return;
+        }
         IastSinkModel sink = IastHookRuleModel.getSinkByMethodSignature(event.signature);
-        Asserts.NOT_NULL("sink", sink);
-
+        if (null == sink){
+            return;
+        }
         String sinkType = sink.getType();
         if (VulnType.CRYPTO_WEEK_RANDOMNESS.equals(sinkType)) {
             new CryptoWeakRandomnessVulScan().scan(sink, event);
