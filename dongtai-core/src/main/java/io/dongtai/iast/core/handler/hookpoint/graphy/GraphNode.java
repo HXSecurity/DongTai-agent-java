@@ -1,9 +1,10 @@
 package io.dongtai.iast.core.handler.hookpoint.graphy;
 
+import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.Set;
+import java.util.*;
 
 /**
  * 图节点，用于服务器端污点方法图的构造
@@ -115,6 +116,10 @@ public class GraphNode {
     private final String plugin;
     private final Boolean projectPropagatorClose;
 
+    private List<MethodEvent.MethodEventTargetRange> targetRanges = new ArrayList<MethodEvent.MethodEventTargetRange>();
+
+    public List<MethodEvent.MethodEventSourceType> sourceTypes;
+
     public GraphNode(boolean isSource,
                      int invokeId,
                      String callerClass,
@@ -138,7 +143,9 @@ public class GraphNode {
                      String traceId,
                      String serviceName,
                      String plugin,
-                     Boolean projectPropagatorClose
+                     Boolean projectPropagatorClose,
+                     List<MethodEvent.MethodEventTargetRange> targetRanges,
+                     List<MethodEvent.MethodEventSourceType> sourceTypes
     ) {
         this.isSource = isSource;
         this.invokeId = invokeId;
@@ -164,6 +171,8 @@ public class GraphNode {
         this.serviceName = serviceName;
         this.plugin = plugin;
         this.projectPropagatorClose = projectPropagatorClose;
+        this.targetRanges = targetRanges;
+        this.sourceTypes = sourceTypes;
     }
 
     public JSONObject toJson() {
@@ -220,6 +229,20 @@ public class GraphNode {
 
         for (Integer hash : this.targetHashForRpc) {
             targetHashForRpcArray.put(hash);
+        }
+
+        JSONArray tr = new JSONArray();
+        value.put("targetRange", tr);
+        for (MethodEvent.MethodEventTargetRange range : targetRanges) {
+            tr.put(range.toJson());
+        }
+
+        if (sourceTypes != null && sourceTypes.size() > 0) {
+            JSONArray st = new JSONArray();
+            value.put("sourceType", st);
+            for (MethodEvent.MethodEventSourceType s : sourceTypes) {
+                st.put(s.toJson());
+            }
         }
 
         return value;

@@ -1,7 +1,6 @@
 package io.dongtai.iast.core.handler.hookpoint.graphy;
 
 import io.dongtai.iast.core.EngineManager;
-import io.dongtai.iast.core.utils.PropertyUtils;
 import io.dongtai.iast.core.bytecode.enhance.IastClassDiagram;
 import io.dongtai.iast.core.handler.hookpoint.controller.impl.HttpImpl;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
@@ -9,13 +8,13 @@ import io.dongtai.iast.core.handler.hookpoint.vulscan.ReportConstant;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.normal.AbstractNormalVulScan;
 import io.dongtai.iast.core.service.ThreadPools;
 import io.dongtai.iast.core.utils.Constants;
+import io.dongtai.iast.core.utils.PropertyUtils;
 import io.dongtai.iast.core.utils.base64.Base64Encoder;
-
-import java.util.*;
-
 import io.dongtai.log.DongTaiLog;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.util.*;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -63,16 +62,18 @@ public class GraphBuilder {
                                 "",
                                 event.getSourceHashes(),
                                 event.getTargetHashes(),
-                                properties.isLocal() ? event.obj2String(event.inValue) : "",
+                                event.inValueString,
                                 properties.isLocal() && event.objIsReference(event.inValue),
-                                properties.isLocal() ? event.obj2String(event.outValue) : "",
-                                properties.isLocal() && event.objIsReference(event.inValue),
+                                event.outValueString,
+                                properties.isLocal() && event.objIsReference(event.outValue),
                                 event.getSourceHashForRpc(),
                                 event.getTargetHashForRpc(),
                                 event.getTraceId(),
                                 event.getServiceName(),
                                 event.getPlugin(),
-                                event.getProjectPropagatorClose()
+                                event.getProjectPropagatorClose(),
+                                event.targetRanges,
+                                event.sourceTypes
                         )
                 );
             }catch (Exception e){

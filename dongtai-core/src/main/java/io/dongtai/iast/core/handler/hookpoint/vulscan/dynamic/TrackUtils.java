@@ -3,9 +3,7 @@ package io.dongtai.iast.core.handler.hookpoint.vulscan.dynamic;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.utils.StringUtils;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -134,10 +132,10 @@ public class TrackUtils {
 
                     if (!matchArg) {
                         // 污点与方法返回值相同，本身相同，参数不同
-                        event.inValue = event.object;
+                        event.setInValue(event.object);
                         matchStatus = true;
                     } else {
-                        event.inValue = argTaint;
+                        event.setInValue(argTaint);
                         matchStatus = true;
                     }
                 } else {
@@ -166,12 +164,12 @@ public class TrackUtils {
 
                     if (matchArg) {
                         // 污点与方法返回值相同、本身不同、参数相同，传播值本身，参数
-                        event.inValue = argTaint;
+                        event.setInValue(argTaint);
                         matchStatus = true;
                     } else {
                         // 如果方法没有参数，设置污点为对象；
                         if (event.argumentArray.length == 0) {
-                            event.inValue = event.object;
+                            event.setInValue(event.object);
                         } /*else if (event.isStatic) {
                             //  如果方法有参数，设置污点为参数
                             event.inValue = event.argumentArray;
@@ -180,7 +178,7 @@ public class TrackUtils {
                     }
                 }
                 if (matchStatus) {
-                    event.outValue = event.returnValue;
+                    event.setOutValue(event.returnValue);
                 }
             } else {
                 // 污点与方法返回值不同
@@ -202,14 +200,14 @@ public class TrackUtils {
 
                     // 污点与方法返回值不同、本身相同、参数不同
                     if (!matchArg) {
-                        event.inValue = event.object;
+                        event.setInValue(event.object);
                         matchStatus = true;
                     } else {
-                        event.inValue = argTaint;
+                        event.setInValue(argTaint);
                         matchStatus = true;
                     }
                     if (matchStatus) {
-                        event.outValue = event.object;
+                        event.setOutValue(event.object);
                     }
                 } else {
                     // 污点与方法返回值、方法本身不相同
@@ -228,8 +226,8 @@ public class TrackUtils {
                     }
 
                     if (matchArg) {
-                        event.inValue = argTaint;
-                        event.outValue = argTaint;
+                        event.setInValue(argTaint);
+                        event.setOutValue(argTaint);
                         matchStatus = true;
                     }
                 }
@@ -253,9 +251,9 @@ public class TrackUtils {
                 }
 
                 if (!matchArg) {
-                    event.inValue = event.object;
+                    event.setInValue(event.object);
                 } else {
-                    event.inValue = argTaint;
+                    event.setInValue(argTaint);
                 }
             } else {
                 // 污点与方法本身不相同
@@ -274,10 +272,10 @@ public class TrackUtils {
                 }
                 // 污点与方法返回值相同、本身不同、参数相同
                 if (matchArg) {
-                    event.inValue = argTaint;
+                    event.setInValue(argTaint);
                 } else {
                     // 如果方法未执行完，且污点与参数、本身均不同，则加入当前污点为方法污点
-                    event.inValue = taintValue;
+                    event.setInValue(taintValue);
                 }
             }
             matchStatus = true;

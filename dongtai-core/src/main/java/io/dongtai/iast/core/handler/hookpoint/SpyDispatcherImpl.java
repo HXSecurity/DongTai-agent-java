@@ -501,7 +501,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                     }
                 }
             } catch (Exception e) {
-                DongTaiLog.error(e);
+                DongTaiLog.error("collect method pool failed: " + e.toString(), e);
             } finally {
                 EngineManager.turnOnDongTai();
             }
