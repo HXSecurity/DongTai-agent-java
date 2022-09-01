@@ -1,6 +1,7 @@
 package io.dongtai.iast.core.handler.hookpoint.models;
 
 import io.dongtai.iast.core.handler.hookpoint.vulscan.taintrange.TaintRanges;
+import io.dongtai.iast.core.handler.hookpoint.vulscan.taintrange.TaintRangesBuilder;
 import io.dongtai.iast.core.utils.PropertyUtils;
 import io.dongtai.log.DongTaiLog;
 import org.json.JSONObject;
@@ -323,8 +324,12 @@ public class MethodEvent {
             return "";
         }
         try {
-            // 判断是否是基本类型的数组，基本类型的数组无法类型转换为Object[]，导致java.lang.ClassCastException异常
-            if (value.getClass().isArray() && !value.getClass().getComponentType().isPrimitive()) {
+            if (value instanceof byte[]) {
+                return TaintRangesBuilder.trimRight((byte[]) value);
+            } else if (value instanceof char[]) {
+                return TaintRangesBuilder.trimRight((char[]) value);
+            } else if (value.getClass().isArray() && !value.getClass().getComponentType().isPrimitive()) {
+                // 判断是否是基本类型的数组，基本类型的数组无法类型转换为Object[]，导致java.lang.ClassCastException异常
                 Object[] taints = (Object[]) value;
                 for (Object taint : taints) {
                     if (taint != null) {
