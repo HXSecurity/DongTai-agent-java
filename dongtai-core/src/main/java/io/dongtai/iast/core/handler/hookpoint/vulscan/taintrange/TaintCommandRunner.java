@@ -193,6 +193,10 @@ public class TaintCommandRunner {
         METHOD = "java.io.StringWriter.toString()";
         put(METHOD, create(METHOD, TaintCommand.KEEP)); // O=>R
 
+        // KEEP
+        METHOD = "okhttp3.internal.HostnamesKt.toCanonicalHost(java.lang.String)";
+        put(METHOD, create(METHOD, TaintCommand.KEEP)); // P1=>R
+
         // APPEND String
         METHOD = "java.lang.String.<init>(char[],int,int)";
         put(METHOD, create(METHOD, TaintCommand.APPEND, Arrays.asList("P2", "P3", "0"))); // P1=>O
@@ -311,6 +315,14 @@ public class TaintCommandRunner {
         METHOD = "java.util.Arrays.copyOf(char[],int)";
         put(METHOD, create(METHOD, TaintCommand.SUBSET, Arrays.asList("0", "P2"))); // P1=>R
         METHOD = "java.util.Arrays.copyOfRange(char[],int,int)";
+        put(METHOD, create(METHOD, TaintCommand.SUBSET, Arrays.asList("P2", "P3"))); // P1=>R
+
+        // SUBSET
+        METHOD = "okhttp3.HttpUrl$Companion.percentDecode$okhttp(java.lang.String,int,int,boolean)";
+        put(METHOD, create(METHOD, TaintCommand.SUBSET, Arrays.asList("P2", "P3"))); // P1=>R
+        METHOD = "okhttp3.HttpUrl$Builder.canonicalizeHost(java.lang.String,int,int)";
+        put(METHOD, create(METHOD, TaintCommand.SUBSET, Arrays.asList("P2", "P3"))); // P1=>R
+        METHOD = "com.squareup.okhttp.HttpUrl$Builder.canonicalizeHost(java.lang.String,int,int)";
         put(METHOD, create(METHOD, TaintCommand.SUBSET, Arrays.asList("P2", "P3"))); // P1=>R
 
         // INSERT CharArrayReader/PipedReader/PipedInputStream
