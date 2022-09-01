@@ -23,7 +23,7 @@ public class SSRFSourceCheck {
     private static final String OKHTTP_CALL_EXECUTE = "com.squareup.okhttp.Call.execute()";
     private static final String OKHTTP_CALL_ENQUEUE = "com.squareup.okhttp.Call.enqueue(com.squareup.okhttp.Callback)";
 
-    private static final String APACHE_LEGACY_HTTP_CLIENT_METHOD_BASE = " org.apache.commons.httpclient.HttpMethodBase".substring(1);
+    private static final String APACHE_LEGACY_HTTP_CLIENT_URI = " org.apache.commons.httpclient.URI".substring(1);
     private static final String OKHTTP3_INTERNAL_REAL_CALL = "okhttp3.internal.connection.RealCall";
     private static final String OKHTTP3_REAL_CALL = "okhttp3.RealCall";
     private static final String OKHTTP_CALL = "com.squareup.okhttp.Call";
@@ -115,14 +115,14 @@ public class SSRFSourceCheck {
             }
 
             Object obj = event.argumentArray[0];
-            if (event.argumentArray[0] instanceof URI) {
+            if (obj instanceof URI) {
                 return processJavaNetUri(event, obj);
-            } else if (APACHE_LEGACY_HTTP_CLIENT_METHOD_BASE.equals(obj.getClass().getName())) {
-                String protocol = (String) obj.getClass().getMethod("getScheme").invoke(obj);
-                String userInfo = (String) obj.getClass().getMethod("getUserinfo").invoke(obj);
-                String host = (String) obj.getClass().getMethod("getHost").invoke(obj);
-                String path = (String) obj.getClass().getMethod("getPath").invoke(obj);
-                String query = (String) obj.getClass().getMethod("getQuery").invoke(obj);
+            } else if (APACHE_LEGACY_HTTP_CLIENT_URI.equals(obj.getClass().getName())) {
+                Object protocol = obj.getClass().getMethod("getRawScheme").invoke(obj);
+                Object userInfo = obj.getClass().getMethod("getRawUserinfo").invoke(obj);
+                Object host = obj.getClass().getMethod("getRawHost").invoke(obj);
+                Object path = obj.getClass().getMethod("getRawPath").invoke(obj);
+                Object query = obj.getClass().getMethod("getRawQuery").invoke(obj);
 
                 event.setInValue((String) obj.getClass().getMethod("toString").invoke(obj));
                 return addSourceType(event, protocol, userInfo, host, path, query);
@@ -175,7 +175,7 @@ public class SSRFSourceCheck {
         }
     }
 
-    private static boolean addSourceType(MethodEvent event, String protocol, String userInfo, String host, String path, String query) {
+    private static boolean addSourceType(MethodEvent event, Object protocol, Object userInfo, Object host, Object path, Object query) {
         boolean hit1 = !"".equals(protocol) && TaintPoolUtils.poolContains(protocol, event);
         boolean hit2 = !"".equals(userInfo) && TaintPoolUtils.poolContains(userInfo, event);
         boolean hit3 = !"".equals(host) && TaintPoolUtils.poolContains(host, event);
