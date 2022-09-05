@@ -230,6 +230,10 @@ public class PropagatorImpl {
             return;
         }
 
+        if (!TaintPoolUtils.isNotEmpty(tgt)) {
+            return;
+        }
+
         TaintRanges tr;
         if (r != null && srcValue != null) {
             tr = r.run(srcValue, tgtValue, event.argumentArray, oldTaintRanges, srcTaintRanges);
