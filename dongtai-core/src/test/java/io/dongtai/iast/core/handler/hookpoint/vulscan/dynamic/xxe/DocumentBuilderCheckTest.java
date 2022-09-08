@@ -42,7 +42,7 @@ public class DocumentBuilderCheckTest {
         dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
         builder = dbf.newDocumentBuilder();
         support = checker.getSupport(builder);
-        Assert.assertEquals("DocumentBuilder secure-processing & disallow ltd", Support.ALLOWED, support);
+        Assert.assertEquals("DocumentBuilder secure-processing & disallow led", Support.ALLOWED, support);
 
         dbf = DocumentBuilderFactory.newInstance();
         dbf.setFeature("http://javax.xml.XMLConstants/feature/secure-processing", true);
@@ -57,14 +57,14 @@ public class DocumentBuilderCheckTest {
         dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
         builder = dbf.newDocumentBuilder();
         support = checker.getSupport(builder);
-        Assert.assertEquals("DocumentBuilder disallow ege/epe/ltd", Support.DISALLOWED, support);
+        Assert.assertEquals("DocumentBuilder disallow ege/epe/led", Support.DISALLOWED, support);
 
         dbf = DocumentBuilderFactory.newInstance();
         dbf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
         dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
         builder = dbf.newDocumentBuilder();
         support = checker.getSupport(builder);
-        Assert.assertEquals("DocumentBuilder disallow epe/ltd", Support.ALLOWED, support);
+        Assert.assertEquals("DocumentBuilder disallow epe/led", Support.ALLOWED, support);
 
         dbf = DocumentBuilderFactory.newInstance();
         dbf.setFeature("http://xml.org/sax/features/external-general-entities", false);

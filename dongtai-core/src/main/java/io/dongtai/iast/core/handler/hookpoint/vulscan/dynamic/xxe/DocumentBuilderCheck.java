@@ -1,6 +1,5 @@
 package io.dongtai.iast.core.handler.hookpoint.vulscan.dynamic.xxe;
 
-import com.sun.org.apache.xerces.internal.impl.Constants;
 import io.dongtai.iast.core.utils.ReflectUtils;
 import io.dongtai.log.DongTaiLog;
 
@@ -10,14 +9,6 @@ import java.lang.reflect.*;
 public class DocumentBuilderCheck extends AbstractCheck implements Checker {
     private static final String ORACLE_XDKJAVA_SECURITY_RESOLVE_ENTITY_DEFAULT = "oracle.xdkjava.security.resolveEntityDefault";
     private static final String ORACLE_XML_PARSER_XMLPARSER_EXPAND_ENTITY_REF = "oracle.xml.parser.XMLParser.ExpandEntityRef";
-
-    private static final String ORG_APACHE_XERCES_INTERNAL_IMPL_XMLENTITY_MANAGER = " org.apache.xerces.internal.impl.XMLEntityManager".substring(1);
-    private static final String ORG_APACHE_XERCES_IMPL_XMLENTITY_MANAGER = " org.apache.xerces.impl.XMLEntityManager".substring(1);
-
-    private static final String COM_SUN_ORG_APACHE_XERCES_INTERNAL_UTILS_SECURITY_SUPPORT = "com.sun.org.apache.xerces.internal.utils.SecuritySupport";
-    private static final String COM_SUN_ORG_APACHE_XALAN_INTERNAL_UTILS_SECURITY_SUPPORT = "com.sun.org.apache.xalan.internal.utils.SecuritySupport";
-    private static final String COM_SUN_ORG_APACHE_XERCES = "com.sun.org.apache.xerces";
-    private static final String COM_SUN_ORG_APACHE_XALAN = "com.sun.org.apache.xalan";
 
     public boolean match(Object obj) {
         try {
@@ -76,11 +67,7 @@ public class DocumentBuilderCheck extends AbstractCheck implements Checker {
                 return Support.UNKNOWN;
             }
 
-            Field fConfigurationField = ReflectUtils.getRecursiveField(domParser.getClass(), "fConfiguration");
-            if (fConfigurationField == null) {
-                return Support.UNKNOWN;
-            }
-            Object fConfiguration = fConfigurationField.get(domParser);
+            Object fConfiguration = getXMLConfiguration(domParser);
             if (fConfiguration == null) {
                 return Support.UNKNOWN;
             }
@@ -101,99 +88,13 @@ public class DocumentBuilderCheck extends AbstractCheck implements Checker {
                     return Support.DISALLOWED;
                 }
             }
-            Field fEntityManagerField = ReflectUtils.getRecursiveField(cls, "fEntityManager");
-            if (fEntityManagerField != null) {
-                return getEntityManagerSupport(domParser, fEntityManagerField.get(fConfiguration),
-                        externalGeneralEntitiesSupport, externalParameterEntitiesSupport, loadExternalDTDSupport);
-            }
+
+            String fAccessExternalDTD = getFeatureAccessExternalDTD(domParser);
+            return getEntityManagerSupport(fConfiguration, fAccessExternalDTD);
         } catch (Throwable e) {
             DongTaiLog.debug("failed to check document builder", e);
         }
 
-        return Support.UNKNOWN;
-    }
-
-    private Support getEntityManagerSupport(Object domParser, Object entityManager,
-                                                   boolean externalGeneralEntitiesSupport,
-                                                   boolean externalParameterEntitiesSupport,
-                                                   boolean loadExternalDTDSupport) {
-        Support supportDTDSupport = Support.getSupport(entityManager, "fSupportDTD");
-        String fAccessExternalDTD = getFeatureAccessExternalDTD(domParser);
-
-        if (!supportDTDSupport.isSupport()) {
-            return Support.DISALLOWED;
-        }
-
-        if (!externalGeneralEntitiesSupport && !externalParameterEntitiesSupport && !loadExternalDTDSupport) {
-            return Support.DISALLOWED;
-        }
-
-        if (!getSecurityAccessSupport(entityManager, fAccessExternalDTD).isSupport()) {
-            if (!loadExternalDTDSupport) {
-                return Support.ALLOWED;
-            }
-            return Support.DISALLOWED;
-        }
-
-        return Support.ALLOWED;
-    }
-
-    private String getFeatureAccessExternalDTD(Object domParser) {
-        try {
-            String fAccessExternalDTD;
-            Method getPropertyMethod = ReflectUtils.getDeclaredMethodFromClass(domParser.getClass(), "getProperty", new Class<?>[]{String.class});
-            if (getPropertyMethod != null) {
-                Object securityPropertyManager = getPropertyMethod.invoke(domParser, Constants.XML_SECURITY_PROPERTY_MANAGER);
-                Method getValueMethod = ReflectUtils.getPublicMethodFromClass(securityPropertyManager.getClass(), "getValue", new Class<?>[]{String.class});
-                fAccessExternalDTD = (String) getValueMethod.invoke(securityPropertyManager, Feature.ACCESS_EXTERNAL_DTD.getDtd()[0]);
-                return fAccessExternalDTD;
-            }
-        } catch (IllegalAccessException e) {
-            DongTaiLog.debug("Access denied when get fAccessExternalDTD from securityPropertyManager {}", e);
-        } catch (NoSuchMethodException e) {
-            DongTaiLog.debug("No method to get fAccessExternalDTD from securityPropertyManager {}", e);
-        } catch (InvocationTargetException e) {
-            DongTaiLog.debug("Problem when get fAccessExternalDTD from securityPropertyManager {}", e);
-        }
-        return "all";
-    }
-
-    private Support getSecurityAccessSupport(Object obj, String fAccessExternalDTD) {
-        String className;
-        Support support = Support.UNKNOWN;
-        Class<?> cls = obj.getClass();
-        String name = cls.getName();
-        if (name.endsWith(ORG_APACHE_XERCES_INTERNAL_IMPL_XMLENTITY_MANAGER)
-                || name.endsWith(ORG_APACHE_XERCES_IMPL_XMLENTITY_MANAGER)) {
-            if (name.startsWith(COM_SUN_ORG_APACHE_XALAN)) {
-                className = COM_SUN_ORG_APACHE_XALAN_INTERNAL_UTILS_SECURITY_SUPPORT;
-            } else if (name.startsWith(COM_SUN_ORG_APACHE_XERCES)) {
-                className = COM_SUN_ORG_APACHE_XERCES_INTERNAL_UTILS_SECURITY_SUPPORT;
-            } else {
-                DongTaiLog.debug("Couldn't guess SecuritySupport class name based on entity manager {}", name);
-                return support;
-            }
-            DongTaiLog.debug("Invoking security class {}", className);
-            ClassLoader loader = cls.getClassLoader();
-            if (loader == null) {
-                loader = Thread.currentThread().getContextClassLoader();
-            }
-
-            try {
-                Class<?> loadClass = loader.loadClass(className);
-                Class<?>[] ps = new Class[]{String.class, String.class, String.class};
-                String checkAccess = (String) ReflectUtils.getDeclaredMethodFromClass(loadClass, "checkAccess", ps)
-                        .invoke(null, "file:///etc/issue", fAccessExternalDTD, "all");
-                Boolean fISCreatedByResolver = (Boolean) ReflectUtils.getDeclaredFieldFromClassByName(cls, "fISCreatedByResolver")
-                        .get(obj);
-                if (fISCreatedByResolver != null && !fISCreatedByResolver && checkAccess != null) {
-                    return Support.DISALLOWED;
-                }
-                return Support.ALLOWED;
-            } catch (Exception e) {
-                return Support.ALLOWED;
-            }
-        }
         return Support.UNKNOWN;
     }
 
