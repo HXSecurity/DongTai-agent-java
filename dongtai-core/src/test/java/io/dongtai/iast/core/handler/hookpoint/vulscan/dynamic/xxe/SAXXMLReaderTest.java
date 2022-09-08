@@ -10,31 +10,34 @@ import javax.xml.parsers.*;
 import java.io.IOException;
 import java.io.StringReader;
 
-public class XMLParserCheckTest extends XXECheckTest {
+public class SAXXMLReaderTest extends XXECheckTest {
+    private final static String NAME = "SAXXMLReader";
+
     @Test
-    public void testXMLReaderGetSupport() throws ParserConfigurationException, SAXException {
+    public void testGetSupport() throws ParserConfigurationException, SAXException {
         SAXParserFactory spf;
         SAXParser parser;
         XMLReader reader;
         Support support;
-        XMLReaderCheck checker = new XMLReaderCheck();
+        ApacheXMLParserCheck checker = new ApacheXMLParserCheck();
         String realContent = getXXERealContent();
 
         spf = SAXParserFactory.newInstance();
         parser = spf.newSAXParser();
         reader = parser.getXMLReader();
+        Assert.assertTrue(NAME + " match ApacheXMLParserCheck", checker.match(reader));
         support = checker.getSupport(reader);
-        Assert.assertEquals("XMLReader default", Support.ALLOWED, support);
-        Assert.assertEquals("XMLReader content default", realContent, xmlReaderGetNode(reader));
+        Assert.assertEquals(NAME + " default", Support.ALLOWED, support);
+        Assert.assertEquals(NAME + "[C] default", realContent, xmlReaderGetNode(reader));
 
         spf = SAXParserFactory.newInstance();
         spf.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
         parser = spf.newSAXParser();
         reader = parser.getXMLReader();
         support = checker.getSupport(reader);
-        Assert.assertEquals("XMLReader disallow-doctype-decl", Support.DISALLOWED, support);
+        Assert.assertEquals(NAME + " disallow-doctype-decl", Support.DISALLOWED, support);
         final XMLReader reader1 = reader;
-        Assert.assertThrows("DocumentBuilder content disallow-doctype-decl", SAXException.class, new ThrowingRunnable() {
+        Assert.assertThrows(NAME + "[C] disallow-doctype-decl", SAXException.class, new ThrowingRunnable() {
             @Override
             public void run() throws SAXException {
                 xmlReaderGetNode(reader1);
@@ -48,25 +51,25 @@ public class XMLParserCheckTest extends XXECheckTest {
         parser = spf.newSAXParser();
         reader = parser.getXMLReader();
         support = checker.getSupport(reader);
-        Assert.assertEquals("XMLReader disallow ege/epe/led", Support.DISALLOWED, support);
-        Assert.assertEquals("XMLReader content disallow ege/epe/led", SAFE_OR_BLIND, xmlReaderGetNode(reader));
+        Assert.assertEquals(NAME + " disallow ege/epe/led", Support.DISALLOWED, support);
+        Assert.assertEquals(NAME + "[C] disallow ege/epe/led", SAFE_OR_BLIND, xmlReaderGetNode(reader));
 
         spf = SAXParserFactory.newInstance();
         spf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
         parser = spf.newSAXParser();
         reader = parser.getXMLReader();
         support = checker.getSupport(reader);
-        Assert.assertEquals("XMLReader disallow epe", Support.ALLOWED, support);
-        Assert.assertEquals("XMLReader content disallow epe", realContent, xmlReaderGetNode(reader));
+        Assert.assertEquals(NAME + " disallow epe", Support.ALLOWED, support);
+        Assert.assertEquals(NAME + "[C] disallow epe", realContent, xmlReaderGetNode(reader));
 
         spf = SAXParserFactory.newInstance();
         spf.setFeature("http://javax.xml.XMLConstants/feature/secure-processing", true);
         parser = spf.newSAXParser();
         reader = parser.getXMLReader();
         support = checker.getSupport(reader);
-        Assert.assertEquals("XMLReader secure-processing", Support.DISALLOWED, support);
+        Assert.assertEquals(NAME + " secure-processing", Support.DISALLOWED, support);
         final XMLReader reader2 = reader;
-        Assert.assertThrows("DocumentBuilder content secure-processing", SAXException.class, new ThrowingRunnable() {
+        Assert.assertThrows(NAME + "[C] secure-processing", SAXException.class, new ThrowingRunnable() {
             @Override
             public void run() throws SAXException {
                 xmlReaderGetNode(reader2);
@@ -79,8 +82,8 @@ public class XMLParserCheckTest extends XXECheckTest {
         parser = spf.newSAXParser();
         reader = parser.getXMLReader();
         support = checker.getSupport(reader);
-        Assert.assertEquals("XMLReader secure-processing and disallow led", Support.ALLOWED, support);
-        Assert.assertEquals("XMLReader content secure-processing and disallow led", realContent, xmlReaderGetNode(reader));
+        Assert.assertEquals(NAME + " secure-processing and disallow led", Support.ALLOWED, support);
+        Assert.assertEquals(NAME + "[C] secure-processing and disallow led", realContent, xmlReaderGetNode(reader));
     }
 
     private String xmlReaderGetNode(XMLReader reader) throws SAXException {
