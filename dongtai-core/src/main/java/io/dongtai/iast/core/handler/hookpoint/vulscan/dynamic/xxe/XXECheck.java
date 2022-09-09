@@ -10,7 +10,8 @@ public class XXECheck {
     private static final List<Checker> CHECKS = Arrays.asList(
             new DocumentBuilderCheck(),
             new ApacheXMLParserCheck(),
-            new SAXXMLReaderCheck()
+            new SAXXMLReaderCheck(),
+            new XMLInputFactoryCheck()
     );
     public static boolean isSafe(MethodEvent event, IastSinkModel sink) {
         if (event.object == null) {

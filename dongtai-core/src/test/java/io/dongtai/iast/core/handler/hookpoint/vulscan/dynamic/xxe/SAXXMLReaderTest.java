@@ -28,7 +28,7 @@ public class SAXXMLReaderTest extends XXECheckTest {
         Assert.assertTrue(NAME + " match ApacheXMLParserCheck", checker.match(reader));
         support = checker.getSupport(reader);
         Assert.assertEquals(NAME + " default", Support.ALLOWED, support);
-        Assert.assertEquals(NAME + "[C] default", realContent, xmlReaderGetNode(reader));
+        Assert.assertEquals(NAME + "[C] default", realContent, getNode(reader));
 
         spf = SAXParserFactory.newInstance();
         spf.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
@@ -40,7 +40,7 @@ public class SAXXMLReaderTest extends XXECheckTest {
         Assert.assertThrows(NAME + "[C] disallow-doctype-decl", SAXException.class, new ThrowingRunnable() {
             @Override
             public void run() throws SAXException {
-                xmlReaderGetNode(reader1);
+                getNode(reader1);
             }
         });
 
@@ -52,7 +52,7 @@ public class SAXXMLReaderTest extends XXECheckTest {
         reader = parser.getXMLReader();
         support = checker.getSupport(reader);
         Assert.assertEquals(NAME + " disallow ege/epe/led", Support.DISALLOWED, support);
-        Assert.assertEquals(NAME + "[C] disallow ege/epe/led", SAFE_OR_BLIND, xmlReaderGetNode(reader));
+        Assert.assertEquals(NAME + "[C] disallow ege/epe/led", SAFE_OR_BLIND, getNode(reader));
 
         spf = SAXParserFactory.newInstance();
         spf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
@@ -60,7 +60,7 @@ public class SAXXMLReaderTest extends XXECheckTest {
         reader = parser.getXMLReader();
         support = checker.getSupport(reader);
         Assert.assertEquals(NAME + " disallow epe", Support.ALLOWED, support);
-        Assert.assertEquals(NAME + "[C] disallow epe", realContent, xmlReaderGetNode(reader));
+        Assert.assertEquals(NAME + "[C] disallow epe", realContent, getNode(reader));
 
         spf = SAXParserFactory.newInstance();
         spf.setFeature("http://javax.xml.XMLConstants/feature/secure-processing", true);
@@ -72,7 +72,7 @@ public class SAXXMLReaderTest extends XXECheckTest {
         Assert.assertThrows(NAME + "[C] secure-processing", SAXException.class, new ThrowingRunnable() {
             @Override
             public void run() throws SAXException {
-                xmlReaderGetNode(reader2);
+                getNode(reader2);
             }
         });
 
@@ -83,10 +83,10 @@ public class SAXXMLReaderTest extends XXECheckTest {
         reader = parser.getXMLReader();
         support = checker.getSupport(reader);
         Assert.assertEquals(NAME + " secure-processing and disallow led", Support.ALLOWED, support);
-        Assert.assertEquals(NAME + "[C] secure-processing and disallow led", realContent, xmlReaderGetNode(reader));
+        Assert.assertEquals(NAME + "[C] secure-processing and disallow led", realContent, getNode(reader));
     }
 
-    private String xmlReaderGetNode(XMLReader reader) throws SAXException {
+    private String getNode(XMLReader reader) throws SAXException {
         String payload = getPayload();
 
         try {
