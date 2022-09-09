@@ -4,7 +4,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.function.ThrowingRunnable;
 import org.xml.sax.*;
-import org.xml.sax.helpers.DefaultHandler;
 
 import javax.xml.parsers.*;
 import java.io.IOException;
@@ -92,7 +91,7 @@ public class SAXXMLReaderTest extends XXECheckTest {
         String payload = getPayload();
 
         try {
-            XMLReaderContentHandler handler = new XMLReaderContentHandler();
+            CustomContentHandler handler = new CustomContentHandler();
             reader.setContentHandler(handler);
             reader.parse(new InputSource(new StringReader(payload)));
             String foo = handler.getFoo();
@@ -105,37 +104,4 @@ public class SAXXMLReaderTest extends XXECheckTest {
         }
     }
 
-    private static class XMLReaderContentHandler extends DefaultHandler {
-        private String foo;
-        private StringBuffer tmp;
-
-        @Override
-        public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-            super.startElement(uri, localName, qName, attributes);
-            if ("foo".equals(qName)) {
-                this.tmp = new StringBuffer();
-            }
-        }
-
-        @Override
-        public void characters(char[] ch, int start, int length) throws SAXException {
-            try {
-                this.tmp.append(ch, start, length);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        @Override
-        public void endElement(String uri, String localName, String qName) throws SAXException {
-            super.endElement(uri, localName, qName);
-            if ("foo".equals(qName)) {
-                this.foo = this.tmp.toString();
-            }
-        }
-
-        public String getFoo() {
-            return this.foo;
-        }
-    }
 }

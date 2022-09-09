@@ -10,6 +10,7 @@ public class XXECheck {
     private static final List<XXEChecker> CHECKS = Arrays.asList(
             new XomCheck(),
             new DocumentBuilderCheck(),
+            new JavaxSAXParserCheck(),
             new ApacheXMLParserCheck(),
             new XMLUnmarshallerCheck(),
             new SAXXMLReaderCheck(),

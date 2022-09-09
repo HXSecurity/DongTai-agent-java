@@ -1,5 +1,9 @@
 package io.dongtai.iast.core.handler.hookpoint.vulscan.dynamic.xxe;
 
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
+
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 
@@ -37,6 +41,40 @@ public class XXECheckTest {
         } catch (IOException e) {
             System.out.println("XXE check test get real content failed: " + e.toString());
             return "";
+        }
+    }
+
+    static class CustomContentHandler extends DefaultHandler {
+        private String foo;
+        private StringBuffer tmp;
+
+        @Override
+        public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+            super.startElement(uri, localName, qName, attributes);
+            if ("foo".equals(qName)) {
+                this.tmp = new StringBuffer();
+            }
+        }
+
+        @Override
+        public void characters(char[] ch, int start, int length) throws SAXException {
+            try {
+                this.tmp.append(ch, start, length);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public void endElement(String uri, String localName, String qName) throws SAXException {
+            super.endElement(uri, localName, qName);
+            if ("foo".equals(qName)) {
+                this.foo = this.tmp.toString();
+            }
+        }
+
+        public String getFoo() {
+            return this.foo;
         }
     }
 }
