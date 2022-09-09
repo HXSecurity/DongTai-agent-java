@@ -73,6 +73,17 @@ public class ReflectUtils {
         return null;
     }
 
+    public static Method getDeclaredMethodFromSuperClass(Class<?> cls, String methodName, Class<?>[] parameterTypes) {
+        if (cls == Object.class) {
+            return null;
+        }
+        Method method = getDeclaredMethodFromClass(cls, methodName, parameterTypes);
+        if (method == null) {
+            return getDeclaredMethodFromSuperClass(cls.getSuperclass(), methodName, parameterTypes);
+        }
+        return method;
+    }
+
     public static boolean isDescendantOf(Class<?> cls, String className) {
         if (cls == null) {
             return false;

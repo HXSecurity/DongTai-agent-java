@@ -11,6 +11,7 @@ public class XXECheck {
             new XomCheck(),
             new DocumentBuilderCheck(),
             new ApacheXMLParserCheck(),
+            new XMLUnmarshallerCheck(),
             new SAXXMLReaderCheck(),
             new XMLInputFactoryCheck()
     );
@@ -21,8 +22,8 @@ public class XXECheck {
         }
 
         for (XXEChecker chk : CHECKS) {
-            chk.setMethodEvent(event);
-            Object obj = chk.getCheckObject();
+            chk.setSourceObjectAndParameters(event.object, event.argumentArray);
+            Object obj = chk.getSourceObject();
             if (chk.match(obj)) {
                 Support support = chk.getSupport(obj);
                 switch (support) {

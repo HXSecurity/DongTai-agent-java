@@ -1,7 +1,6 @@
 package io.dongtai.iast.core.handler.hookpoint.vulscan.dynamic.xxe;
 
 import com.sun.org.apache.xerces.internal.impl.Constants;
-import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.utils.ReflectUtils;
 import io.dongtai.log.DongTaiLog;
 
@@ -16,14 +15,16 @@ public abstract class AbstractCheck {
     private static final String COM_SUN_ORG_APACHE_XERCES = "com.sun.org.apache.xerces";
     private static final String COM_SUN_ORG_APACHE_XALAN = "com.sun.org.apache.xalan";
 
-    protected MethodEvent event;
+    protected Object sourceObject;
+    protected Object[] sourceParameters;
 
-    public void setMethodEvent(MethodEvent event) {
-        this.event = event;
+    public void setSourceObjectAndParameters(Object sourceObject, Object[] sourceParameters) {
+        this.sourceObject = sourceObject;
+        this.sourceParameters = sourceParameters;
     }
 
-    public Object getCheckObject() {
-        return this.event.object;
+    public Object getSourceObject() {
+        return this.sourceObject;
     }
 
     public Object getXMLConfiguration(Object obj) {
