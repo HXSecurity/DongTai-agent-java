@@ -2,8 +2,8 @@
 # pinpoint javaagent
 com/navercorp/pinpoint/*
 # arthas
-com/taobao
-com/alibaba
+com/taobao/*
+com/alibaba/arthas/*
 # jrebel
 com/zeroturnaround/*
 # ehcache - cache need't hook

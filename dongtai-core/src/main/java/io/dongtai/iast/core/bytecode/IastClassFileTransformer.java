@@ -170,6 +170,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                 Throwable throwable) {
             DongTaiLog.debug(throwable);
         } finally {
+            classDiagram.setLoader(null);
             if (isRunning) {
                 EngineManager.turnOnDongTai();
             }
