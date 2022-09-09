@@ -7,7 +7,7 @@
     <parent>
         <groupId>io.dongtai.iast</groupId>
         <artifactId>iast</artifactId>
-        <version>1.7.5</version>
+        <version>1.7.6</version>
     </parent>
     <artifactId>dongtai-agent</artifactId>
     <name>dongtai-agent</name>
