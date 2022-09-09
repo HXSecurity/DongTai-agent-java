@@ -21,7 +21,7 @@ public class JakartaResponseWrapper extends HttpServletResponseWrapper implement
 
     public JakartaResponseWrapper(HttpServletResponse response) {
         super(response);
-        response.addHeader("DongTai", "v1.7.5");
+        response.addHeader("DongTai", "v1.7.6");
     }
 
     @Override
