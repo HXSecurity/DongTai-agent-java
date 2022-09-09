@@ -5,7 +5,7 @@ import io.dongtai.log.DongTaiLog;
 
 import java.lang.reflect.*;
 
-public class XMLInputFactoryCheck extends AbstractCheck implements Checker {
+public class XMLInputFactoryCheck extends AbstractCheck implements XXEChecker {
     public boolean match(Object obj) {
         return obj != null && ReflectUtils.isDescendantOf(obj.getClass(), " javax.xml.stream.XMLInputFactory".substring(1));
     }

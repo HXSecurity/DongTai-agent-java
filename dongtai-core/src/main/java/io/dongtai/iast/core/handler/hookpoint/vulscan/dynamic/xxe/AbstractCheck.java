@@ -16,8 +16,14 @@ public abstract class AbstractCheck {
     private static final String COM_SUN_ORG_APACHE_XERCES = "com.sun.org.apache.xerces";
     private static final String COM_SUN_ORG_APACHE_XALAN = "com.sun.org.apache.xalan";
 
-    public Object getCheckObject(MethodEvent event) {
-        return event.object;
+    protected MethodEvent event;
+
+    public void setMethodEvent(MethodEvent event) {
+        this.event = event;
+    }
+
+    public Object getCheckObject() {
+        return this.event.object;
     }
 
     public Object getXMLConfiguration(Object obj) {

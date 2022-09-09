@@ -6,7 +6,7 @@ import io.dongtai.log.DongTaiLog;
 import javax.xml.parsers.DocumentBuilder;
 import java.lang.reflect.*;
 
-public class DocumentBuilderCheck extends AbstractCheck implements Checker {
+public class DocumentBuilderCheck extends AbstractCheck implements XXEChecker {
     private static final String ORACLE_XDKJAVA_SECURITY_RESOLVE_ENTITY_DEFAULT = "oracle.xdkjava.security.resolveEntityDefault";
     private static final String ORACLE_XML_PARSER_XMLPARSER_EXPAND_ENTITY_REF = "oracle.xml.parser.XMLParser.ExpandEntityRef";
 

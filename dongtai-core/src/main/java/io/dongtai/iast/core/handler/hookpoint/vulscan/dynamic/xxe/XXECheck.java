@@ -7,19 +7,22 @@ import java.util.Arrays;
 import java.util.List;
 
 public class XXECheck {
-    private static final List<Checker> CHECKS = Arrays.asList(
+    private static final List<XXEChecker> CHECKS = Arrays.asList(
+            new XomCheck(),
             new DocumentBuilderCheck(),
             new ApacheXMLParserCheck(),
             new SAXXMLReaderCheck(),
             new XMLInputFactoryCheck()
     );
+
     public static boolean isSafe(MethodEvent event, IastSinkModel sink) {
         if (event.object == null) {
             return false;
         }
 
-        for (Checker chk : CHECKS) {
-            Object obj = chk.getCheckObject(event);
+        for (XXEChecker chk : CHECKS) {
+            chk.setMethodEvent(event);
+            Object obj = chk.getCheckObject();
             if (chk.match(obj)) {
                 Support support = chk.getSupport(obj);
                 switch (support) {

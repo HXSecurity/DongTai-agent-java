@@ -2,7 +2,7 @@ package io.dongtai.iast.core.handler.hookpoint.vulscan.dynamic.xxe;
 
 import io.dongtai.iast.core.utils.ReflectUtils;
 
-public class ApacheXMLParserCheck extends AbstractCheck implements Checker {
+public class ApacheXMLParserCheck extends AbstractCheck implements XXEChecker {
     private static final String ORG_APACHE_XERCES_PARSERS_XMLPARSER = " org.apache.xerces.parsers.XMLParser".substring(1);
     private static final String COM_SUN_ORG_APACHE_XERCES_INTERNAL_PARSERS_XMLPARSER = " com.sun.org.apache.xerces.internal.parsers.XMLParser".substring(1);
 
