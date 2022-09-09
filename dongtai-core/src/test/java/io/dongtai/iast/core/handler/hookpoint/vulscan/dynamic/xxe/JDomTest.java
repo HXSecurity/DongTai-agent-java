@@ -12,21 +12,24 @@ import org.xml.sax.XMLReader;
 import java.io.IOException;
 import java.io.StringReader;
 
-public class jDomTest extends XXECheckTest {
+public class JDomTest extends XXECheckTest {
     private final static String NAME = "jDomSAXReader";
+
     @Test
     public void testGetSupport() throws JDOMException, NoSuchFieldException, IllegalAccessException {
         SAXBuilder saxBuilder;
         XMLReader reader;
         Support support;
-        SAXXMLReaderCheck checker = new SAXXMLReaderCheck();
+        ApacheXMLParserCheck checker = new ApacheXMLParserCheck();
         String realContent = getXXERealContent();
         String node;
 
         saxBuilder = new SAXBuilder();
         node = getNode(saxBuilder);
         reader = (XMLReader) ReflectUtils.getFieldFromClass(saxBuilder.getClass(), "saxParser").get(saxBuilder);
-        Assert.assertTrue(NAME + " match SAXXMLReaderCheck", checker.match(reader));
+        XXEChecker chk = XXECheck.getChecker(reader);
+        Assert.assertNotNull(chk);
+        Assert.assertEquals(NAME + " match ApacheXMLParserCheck", checker.getClass(), chk.getClass());
         support = checker.getSupport(reader);
         Assert.assertEquals(NAME + " default", Support.ALLOWED, support);
         Assert.assertEquals(NAME + "[C] default", realContent, node);

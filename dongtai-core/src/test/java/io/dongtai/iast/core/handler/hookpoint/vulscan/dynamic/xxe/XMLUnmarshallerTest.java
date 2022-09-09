@@ -42,10 +42,18 @@ public class XMLUnmarshallerTest extends XXECheckTest {
 
         context = JAXBContext.newInstance(Foo.class);
         um = context.createUnmarshaller();
-        Assert.assertTrue(NAME + " match XMLUnmarshallerCheck", checker.match(um));
+        XXEChecker chk = XXECheck.getChecker(um);
+        Assert.assertNotNull(chk);
+        Assert.assertEquals(NAME + " match XMLUnmarshallerCheck", checker.getClass(), chk.getClass());
         support = checker.getSupport(um);
-        Assert.assertEquals(NAME + " default", Support.ALLOWED, support);
-        Assert.assertEquals(NAME + "[C] default", realContent, getNode(um));
+        Assert.assertEquals(NAME + " default", Support.DISALLOWED, support);
+        final Unmarshaller um10 = um;
+        Assert.assertThrows(NAME + "[C] default", SAXParseException.class, new ThrowingRunnable() {
+            @Override
+            public void run() throws SAXParseException {
+                getNode(um10);
+            }
+        });
 
         // parser features
 
@@ -60,12 +68,23 @@ public class XMLUnmarshallerTest extends XXECheckTest {
         Assert.assertEquals(NAME + " parser disallow-doctype-decl", Support.DISALLOWED, support);
         final Unmarshaller um11 = um;
         final Source source11 = source;
-        Assert.assertThrows(NAME + "[C] parser disallow-doctype-decl", JAXBException.class, new ThrowingRunnable() {
+        Assert.assertThrows(NAME + "[C] parser disallow-doctype-decl", SAXParseException.class, new ThrowingRunnable() {
             @Override
-            public void run() throws JAXBException {
+            public void run() throws SAXParseException {
                 getNode(um11, source11);
             }
         });
+
+        context = JAXBContext.newInstance(Foo.class);
+        um = context.createUnmarshaller();
+        parser = SAXParserFactory.newInstance();
+        parser.setFeature("http://apache.org/xml/features/disallow-doctype-decl", false);
+        reader = parser.newSAXParser().getXMLReader();
+        source = new SAXSource(reader, new InputSource(new StringReader(payload)));
+        checker.setSourceObjectAndParameters(um, new Object[]{source});
+        support = checker.getSupport(um);
+        Assert.assertEquals(NAME + " parser enable doctype-decl", Support.ALLOWED, support);
+        Assert.assertEquals(NAME + "[C] parser enable doctype-decl", realContent, getNode(um, source));
 
         context = JAXBContext.newInstance(Foo.class);
         um = context.createUnmarshaller();
@@ -75,8 +94,46 @@ public class XMLUnmarshallerTest extends XXECheckTest {
         source = new SAXSource(reader, new InputSource(new StringReader(payload)));
         checker.setSourceObjectAndParameters(um, new Object[]{source});
         support = checker.getSupport(um);
-        Assert.assertEquals(NAME + " parser secure-processing", Support.ALLOWED, support);
-        Assert.assertEquals(NAME + "[C] parser secure-processing", realContent, getNode(um, source));
+        Assert.assertEquals(NAME + " parser secure-processing", Support.DISALLOWED, support);
+        final Unmarshaller um12 = um;
+        final Source source12 = source;
+        Assert.assertThrows(NAME + "[C] parser secure-processing", SAXParseException.class, new ThrowingRunnable() {
+            @Override
+            public void run() throws SAXParseException {
+                getNode(um12, source12);
+            }
+        });
+
+        context = JAXBContext.newInstance(Foo.class);
+        um = context.createUnmarshaller();
+        parser = SAXParserFactory.newInstance();
+        parser.setFeature("http://javax.xml.XMLConstants/feature/secure-processing", true);
+        parser.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+        reader = parser.newSAXParser().getXMLReader();
+        source = new SAXSource(reader, new InputSource(new StringReader(payload)));
+        checker.setSourceObjectAndParameters(um, new Object[]{source});
+        support = checker.getSupport(um);
+        Assert.assertEquals(NAME + " parser secure-processing & disallow led", Support.ALLOWED, support);
+        Assert.assertEquals(NAME + "[C] parser secure-processing & disallow led", realContent, getNode(um, source));
+
+        context = JAXBContext.newInstance(Foo.class);
+        um = context.createUnmarshaller();
+        parser = SAXParserFactory.newInstance();
+        parser.setFeature("http://javax.xml.XMLConstants/feature/secure-processing", true);
+        parser.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+        reader = parser.newSAXParser().getXMLReader();
+        source = new SAXSource(reader, new InputSource(new StringReader(payload)));
+        checker.setSourceObjectAndParameters(um, new Object[]{source});
+        support = checker.getSupport(um);
+        Assert.assertEquals(NAME + " parser secure-processing & disallow epe", Support.DISALLOWED, support);
+        final Unmarshaller um13 = um;
+        final Source source13 = source;
+        Assert.assertThrows(NAME + "[C] parser secure-processing & disallow epe", SAXParseException.class, new ThrowingRunnable() {
+            @Override
+            public void run() throws SAXParseException {
+                getNode(um13, source13);
+            }
+        });
 
         context = JAXBContext.newInstance(Foo.class);
         um = context.createUnmarshaller();
@@ -127,9 +184,9 @@ public class XMLUnmarshallerTest extends XXECheckTest {
         Assert.assertEquals(NAME + " reader disallow-doctype-decl", Support.DISALLOWED, support);
         final Unmarshaller um21 = um;
         final Source source21 = source;
-        Assert.assertThrows(NAME + "[C] reader disallow-doctype-decl", JAXBException.class, new ThrowingRunnable() {
+        Assert.assertThrows(NAME + "[C] reader disallow-doctype-decl", SAXParseException.class, new ThrowingRunnable() {
             @Override
-            public void run() throws JAXBException {
+            public void run() throws SAXParseException {
                 getNode(um21, source21);
             }
         });
@@ -182,28 +239,36 @@ public class XMLUnmarshallerTest extends XXECheckTest {
         Assert.assertEquals(NAME + "[C] reader disallow epe/led", SAFE_OR_BLIND, getNode(um, source));
     }
 
-    private String getNode(Unmarshaller um) throws JAXBException {
+    private String getNode(Unmarshaller um) throws SAXParseException {
         return getNode(um, null);
     }
 
-    private String getNode(Unmarshaller um, Source source) throws JAXBException {
+    private String getNode(Unmarshaller um, Source source) throws SAXParseException {
         String payload = getPayload();
         Object obj;
 
-        if (source != null) {
-            obj = um.unmarshal(source);
-        } else {
-            obj = um.unmarshal(new InputSource(new StringReader(payload)));
-        }
+        try {
 
-        if (obj instanceof Foo) {
-            String foo = ((Foo) obj).bar;
-            if ("".equals(foo)) {
-                return SAFE_OR_BLIND;
+            if (source != null) {
+                obj = um.unmarshal(source);
+            } else {
+                obj = um.unmarshal(new InputSource(new StringReader(payload)));
             }
-            return foo;
+
+            if (obj instanceof Foo) {
+                String bar = ((Foo) obj).bar;
+                if ("".equals(bar)) {
+                    return SAFE_OR_BLIND;
+                }
+                return bar;
+            }
+            return "error: invalid xml";
+        } catch (JAXBException e) {
+            if (e.getLinkedException().getClass() == SAXParseException.class) {
+                throw (SAXParseException) e.getLinkedException();
+            }
+            return "error: " + e.toString();
         }
-        return "error: invalid xml";
     }
 
     @XmlRootElement

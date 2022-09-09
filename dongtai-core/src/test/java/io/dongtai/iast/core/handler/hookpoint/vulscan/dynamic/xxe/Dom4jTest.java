@@ -16,12 +16,14 @@ public class Dom4jTest extends XXECheckTest {
         SAXReader saxReader;
         XMLReader reader;
         Support support;
-        SAXXMLReaderCheck checker = new SAXXMLReaderCheck();
+        ApacheXMLParserCheck checker = new ApacheXMLParserCheck();
         String realContent = getXXERealContent();
 
         saxReader = new SAXReader();
         reader = saxReader.getXMLReader();
-        Assert.assertTrue(NAME + " match SAXXMLReaderCheck", checker.match(reader));
+        XXEChecker chk = XXECheck.getChecker(reader);
+        Assert.assertNotNull(chk);
+        Assert.assertEquals(NAME + " match ApacheXMLParserCheck", checker.getClass(), chk.getClass());
         support = checker.getSupport(reader);
         Assert.assertEquals(NAME + " default", Support.ALLOWED, support);
         Assert.assertEquals(NAME + "[C] default", realContent, getNode(saxReader));

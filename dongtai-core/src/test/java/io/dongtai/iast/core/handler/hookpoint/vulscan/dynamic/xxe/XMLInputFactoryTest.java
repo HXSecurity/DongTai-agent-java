@@ -20,6 +20,9 @@ public class XMLInputFactoryTest extends XXECheckTest {
 
         xif = XMLInputFactory.newInstance();
         Assert.assertTrue(NAME + " match XMLInputFactoryCheck", checker.match(xif));
+        XXEChecker chk = XXECheck.getChecker(xif);
+        Assert.assertNotNull(chk);
+        Assert.assertEquals(NAME + " match XMLInputFactoryCheck", checker.getClass(), chk.getClass());
         support = checker.getSupport(xif);
         Assert.assertEquals(NAME + " default", Support.ALLOWED, support);
         Assert.assertEquals(NAME + "[C] default", realContent, getNode(xif));

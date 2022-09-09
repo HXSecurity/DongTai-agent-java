@@ -38,4 +38,13 @@ public class XXECheck {
 
         return false;
     }
+
+    public static XXEChecker getChecker(Object obj) {
+        for (XXEChecker chk : CHECKS) {
+            if (chk.match(obj)) {
+                return chk;
+            }
+        }
+        return null;
+    }
 }

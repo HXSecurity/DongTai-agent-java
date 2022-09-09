@@ -19,13 +19,14 @@ public class DocumentBuilderTest extends XXECheckTest {
         DocumentBuilderFactory dbf;
         DocumentBuilder builder;
         Support support;
-        String foo;
         DocumentBuilderCheck checker = new DocumentBuilderCheck();
         String realContent = getXXERealContent();
 
         dbf = DocumentBuilderFactory.newInstance();
         builder = dbf.newDocumentBuilder();
-        Assert.assertTrue(NAME + " match DocumentBuilderCheck", checker.match(builder));
+        XXEChecker chk = XXECheck.getChecker(builder);
+        Assert.assertNotNull(chk);
+        Assert.assertEquals(NAME + " match DocumentBuilderCheck", checker.getClass(), chk.getClass());
         support = checker.getSupport(builder);
         Assert.assertEquals(NAME + " default", Support.ALLOWED, support);
         Assert.assertEquals(NAME + "[C] default", realContent, getNode(builder));
@@ -56,6 +57,7 @@ public class DocumentBuilderTest extends XXECheckTest {
         builder = dbf.newDocumentBuilder();
         support = checker.getSupport(builder);
         Assert.assertEquals(NAME + " secure-processing", Support.DISALLOWED, support);
+        dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", true);
         DocumentBuilder finalBuilder2 = builder;
         Assert.assertThrows(NAME + "[C] secure-processing", SAXException.class, new ThrowingRunnable() {
             @Override
