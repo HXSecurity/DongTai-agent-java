@@ -130,7 +130,7 @@ public class KafkaHandler {
 
                 Set<Object> resModelSet = new HashSet<Object>();
                 resModelSet.add(rd);
-                event.outValue = resModelSet;
+                event.setOutValue(resModelSet);
 
                 EngineManager.TRACK_MAP.addTrackMethod(invokeId, event);
                 EngineManager.TAINT_POOL.addTaintToPool(rd, event, true);

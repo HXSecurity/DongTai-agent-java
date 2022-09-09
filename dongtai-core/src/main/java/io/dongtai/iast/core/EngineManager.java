@@ -1,21 +1,18 @@
 package io.dongtai.iast.core;
 
 import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.FallbackManager;
-import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.report.HookPointRateLimitReport;
 import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.FallbackSwitch;
 import io.dongtai.iast.core.handler.context.ContextManager;
 import io.dongtai.iast.core.handler.hookpoint.IastServer;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.service.ServerAddressReport;
-import io.dongtai.iast.core.utils.config.RemoteConfigUtils;
-import io.dongtai.iast.core.utils.threadlocal.*;
 import io.dongtai.iast.core.service.ServiceFactory;
 import io.dongtai.iast.core.utils.PropertyUtils;
+import io.dongtai.iast.core.utils.config.RemoteConfigUtils;
+import io.dongtai.iast.core.utils.threadlocal.*;
 import io.dongtai.log.DongTaiLog;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -35,6 +32,7 @@ public class EngineManager {
     public static final IastTrackMap TRACK_MAP = new IastTrackMap();
     public static final IastTaintPool TAINT_POOL = new IastTaintPool();
     public static final IastTaintHashCodes TAINT_HASH_CODES = new IastTaintHashCodes();
+    public static final TaintRangesPool TAINT_RANGES_POOL = new TaintRangesPool();
     public static final IastScopeTracker SCOPE_TRACKER = new IastScopeTracker();
     private static final IastServerPort LOGIN_LOGIC_WEIGHT = new IastServerPort();
     /**
@@ -138,6 +136,7 @@ public class EngineManager {
         EngineManager.TRACK_MAP.remove();
         EngineManager.TAINT_POOL.remove();
         EngineManager.TAINT_HASH_CODES.remove();
+        EngineManager.TAINT_RANGES_POOL.remove();
         EngineManager.SCOPE_TRACKER.remove();
         FallbackSwitch.clearHeavyHookFallback();
         EngineManager.getFallbackManager().getHookRateLimiter().remove();

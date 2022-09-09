@@ -3,6 +3,7 @@ package io.dongtai.iast.core.handler.hookpoint.controller.impl;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.hookpoint.models.*;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.dynamic.TrackUtils;
+import io.dongtai.iast.core.handler.hookpoint.vulscan.taintrange.*;
 import io.dongtai.iast.core.utils.StackUtils;
 import io.dongtai.iast.core.utils.TaintPoolUtils;
 
@@ -54,7 +55,7 @@ public class PropagatorImpl {
                     return;
                 }
 
-                event.inValue = event.object;
+                event.setInValue(event.object);
                 setTarget(propagator, event);
                 addPropagator(event, invokeIdSequencer);
             } else if (sourceString.startsWith(PARAMS_PARAM)) {
@@ -74,7 +75,7 @@ public class PropagatorImpl {
                     inValues.add(tempObj);
                 }
                 if (!inValues.isEmpty()) {
-                    event.inValue = inValues.toArray();
+                    event.setInValue(inValues.toArray());
                     setTarget(propagator, event);
                     addPropagator(event, invokeIdSequencer);
                 }
@@ -95,7 +96,7 @@ public class PropagatorImpl {
                     if (event.returnValue == null) {
                         break;
                     }
-                    inValues.add(event.returnValue);
+                    event.setInValue(event.returnValue);
                 } else if (source.startsWith(PARAMS_PARAM)) {
                     int[] positions = (int[]) propagator.getSourcePosition();
                     for (int pos : positions) {
@@ -116,7 +117,7 @@ public class PropagatorImpl {
                     }
                 }
                 if (condition > 0 && (!andCondition || conditionSources.length == condition)) {
-                    event.inValue = inValues.toArray();
+                    event.setInValue(inValues.toArray());
                     setTarget(propagator, event);
                     addPropagator(event, invokeIdSequencer);
                 }
@@ -127,27 +128,120 @@ public class PropagatorImpl {
     private static void setTarget(IastPropagatorModel propagator, MethodEvent event) {
         String target = propagator.getTarget();
         if (PARAMS_OBJECT.equals(target)) {
-            event.outValue = event.object;
+            event.setOutValue(event.object);
+            trackTaintRange(propagator, event);
         } else if (PARAMS_RETURN.equals(target)) {
-            event.outValue = event.returnValue;
+            event.setOutValue(event.returnValue);
+            trackTaintRange(propagator, event);
         } else if (target.startsWith(PARAMS_PARAM)) {
             ArrayList<Object> outValues = new ArrayList<Object>();
             Object tempPositions = propagator.getTargetPosition();
             int[] positions = (int[]) tempPositions;
             if (positions.length == 1) {
-                event.outValue = event.argumentArray[positions[0]];
+                event.setOutValue(event.argumentArray[positions[0]]);
+                trackTaintRange(propagator, event);
             } else {
                 for (int pos : positions) {
                     outValues.add(event.argumentArray[pos]);
+                    trackTaintRange(propagator, event);
                 }
                 if (!outValues.isEmpty()) {
-                    event.outValue = outValues.toArray();
+                    event.setOutValue(outValues.toArray());
                 }
             }
         }
         if (TaintPoolUtils.isNotEmpty(event.outValue)) {
             EngineManager.TAINT_POOL.addTaintToPool(event.outValue, event, false);
         }
+    }
+
+    private static TaintRanges getTaintRanges(Object obj) {
+        int hash = System.identityHashCode(obj);
+        TaintRanges tr = EngineManager.TAINT_RANGES_POOL.get(hash);
+        if (tr == null) {
+            tr = new TaintRanges();
+        } else {
+            tr = tr.clone();
+        }
+        return tr;
+    }
+
+    private static void trackTaintRange(IastPropagatorModel propagator, MethodEvent event) {
+        TaintCommandRunner r = TaintCommandRunner.getCommandRunner(event.signature);
+
+        TaintRanges oldTaintRanges = new TaintRanges();
+        TaintRanges srcTaintRanges = new TaintRanges();
+
+        String srcValue = null;
+        if (r != null) {
+            String srcLoc = propagator.getSource();
+            if (PARAMS_OBJECT.equals(srcLoc)) {
+                srcTaintRanges = getTaintRanges(event.object);
+                srcValue = TaintRangesBuilder.obj2String(event.object);
+            } else if (srcLoc.startsWith("O|P")) {
+                oldTaintRanges = getTaintRanges(event.object);
+                int[] positions = (int[]) propagator.getSourcePosition();
+                if (positions.length == 1 && event.argumentArray.length >= positions[0]) {
+                    srcTaintRanges = getTaintRanges(event.argumentArray[positions[0]]);
+                    srcValue = TaintRangesBuilder.obj2String(event.argumentArray[positions[0]]);
+                }
+            } else if (srcLoc.startsWith(PARAMS_PARAM)) {
+                // invalid policy
+                if (srcLoc.contains(CONDITION_OR) || srcLoc.contains(CONDITION_AND)) {
+                    return;
+                }
+                int[] positions = (int[]) propagator.getSourcePosition();
+                if (positions.length == 1 && event.argumentArray.length >= positions[0]) {
+                    srcTaintRanges = getTaintRanges(event.argumentArray[positions[0]]);
+                    srcValue = TaintRangesBuilder.obj2String(event.argumentArray[positions[0]]);
+                }
+            }
+        }
+
+        int tgtHash;
+        String tgtValue;
+        Object tgt;
+        String tgtLoc = propagator.getTarget();
+        if (PARAMS_OBJECT.equals(tgtLoc)) {
+            tgt = event.object;
+            tgtHash = System.identityHashCode(tgt);
+            tgtValue = TaintRangesBuilder.obj2String(tgt);
+            oldTaintRanges = getTaintRanges(tgt);
+        } else if (PARAMS_RETURN.equals(tgtLoc)) {
+            tgt = event.returnValue;
+            tgtHash = System.identityHashCode(tgt);
+            tgtValue = TaintRangesBuilder.obj2String(tgt);
+        } else if (tgtLoc.startsWith(PARAMS_PARAM)) {
+            // invalid policy
+            if (tgtLoc.contains(CONDITION_OR) || tgtLoc.contains(CONDITION_AND)) {
+                return;
+            }
+            int[] positions = (int[]) propagator.getTargetPosition();
+            if (positions.length != 1 || event.argumentArray.length < positions[0]) {
+                // target can only have one parameter
+                return;
+            }
+            tgt = event.argumentArray[positions[0]];
+            tgtHash = System.identityHashCode(tgt);
+            tgtValue = TaintRangesBuilder.obj2String(tgt);
+            oldTaintRanges = getTaintRanges(tgt);
+        } else {
+            // invalid policy
+            return;
+        }
+
+        if (!TaintPoolUtils.isNotEmpty(tgt)) {
+            return;
+        }
+
+        TaintRanges tr;
+        if (r != null && srcValue != null) {
+            tr = r.run(srcValue, tgtValue, event.argumentArray, oldTaintRanges, srcTaintRanges);
+        } else {
+            tr = new TaintRanges(new TaintRange(0, TaintRangesBuilder.getLength(tgt)));
+        }
+        event.targetRanges.add(new MethodEvent.MethodEventTargetRange(tgtHash, tgtValue, tr));
+        EngineManager.TAINT_RANGES_POOL.add(tgtHash, tr);
     }
 
     private static void autoPropagator(AtomicInteger invokeIdSequence, MethodEvent event) {

@@ -142,15 +142,30 @@ public class TaintPoolUtils {
 
     public static boolean isAllowTaintType(Class<?> objType) {
         return objType != Boolean.class &&
+                objType != Boolean[].class &&
+                objType != Short.class &&
+                objType != Short[].class &&
                 objType != Integer.class &&
+                objType != Integer[].class &&
                 objType != Long.class &&
+                objType != Long[].class &&
                 objType != Double.class &&
+                objType != Double[].class &&
                 objType != Float.class &&
+                objType != Float[].class &&
                 objType != BigDecimal.class &&
+                objType != BigDecimal[].class &&
                 objType != boolean.class &&
+                objType != boolean[].class &&
+                objType != short.class &&
+                objType != short[].class &&
                 objType != int.class &&
+                objType != int[].class &&
                 objType != long.class &&
+                objType != long[].class &&
                 objType != double.class &&
+                objType != double[].class &&
+                objType != float[].class &&
                 objType != float.class;
     }
 

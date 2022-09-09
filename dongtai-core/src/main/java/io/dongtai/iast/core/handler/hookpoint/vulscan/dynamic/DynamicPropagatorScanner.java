@@ -95,28 +95,33 @@ public class DynamicPropagatorScanner implements IVulScan {
                 Object attributeValue = event.argumentArray[1];
                 hitTaintPool = TaintPoolUtils.poolContains(attributeValue, event);
             }
-        } else {
-            int[] taintPositionIndexArray = sink.getPos();
+            return hitTaintPool;
+        }
 
-            if (taintPositionIndexArray != null) {
-                Object sourceValue = null;
-                for (int index : taintPositionIndexArray) {
-                    if (event.argumentArray.length > index) {
-                        hitTaintPool = TaintPoolUtils.poolContains(event.argumentArray[index], event);
-                        if (hitTaintPool) {
-                            sourceValue = event.argumentArray[index];
-                            break;
-                        }
+        if (SSRFSourceCheck.isSinkMethod(sink)) {
+            return SSRFSourceCheck.sourceHitTaintPool(event, sink);
+        }
+
+        int[] taintPositionIndexArray = sink.getPos();
+
+        if (taintPositionIndexArray != null) {
+            Object sourceValue = null;
+            for (int index : taintPositionIndexArray) {
+                if (event.argumentArray.length > index) {
+                    hitTaintPool = TaintPoolUtils.poolContains(event.argumentArray[index], event);
+                    if (hitTaintPool) {
+                        sourceValue = event.argumentArray[index];
+                        break;
                     }
                 }
-                if (hitTaintPool) {
-                    event.inValue = sourceValue;
-                }
-            } else {
-                hitTaintPool = TaintPoolUtils.poolContains(event.object, event);
-                if (hitTaintPool) {
-                    event.inValue = event.object;
-                }
+            }
+            if (hitTaintPool) {
+                event.setInValue(sourceValue);
+            }
+        } else {
+            hitTaintPool = TaintPoolUtils.poolContains(event.object, event);
+            if (hitTaintPool) {
+                event.setInValue(event.object);
             }
         }
         return hitTaintPool;

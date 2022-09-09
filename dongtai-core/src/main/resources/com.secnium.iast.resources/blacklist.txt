@@ -23792,7 +23792,7 @@ java/lang/SecurityManager
 #java/lang/String
 java/lang/String$1
 java/lang/String$CaseInsensitiveComparator
-java/lang/StringBuffer
+#java/lang/StringBuffer
 #java/lang/StringBuilder
 java/lang/StringCoding
 java/lang/StringCoding$1

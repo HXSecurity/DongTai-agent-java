@@ -2,10 +2,12 @@ package io.dongtai.iast.core.handler.hookpoint.controller.impl;
 
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
+import io.dongtai.iast.core.handler.hookpoint.vulscan.taintrange.*;
 import io.dongtai.iast.core.utils.StackUtils;
 import io.dongtai.iast.core.utils.TaintPoolUtils;
 import io.dongtai.log.DongTaiLog;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -37,14 +39,106 @@ public class SourceImpl {
 
         int invokeId = invokeIdSequencer.getAndIncrement();
         event.setInvokeId(invokeId);
-        event.inValue = event.argumentArray;
-        event.outValue = event.returnValue;
+        event.setInValue(event.argumentArray);
+        event.setOutValue(event.returnValue);
 
-        handlerCustomModel(event);
         EngineManager.TRACK_MAP.addTrackMethod(invokeId, event);
-        EngineManager.TAINT_POOL.addTaintToPool(event.returnValue, event, true);
+        trackTarget(event);
     }
 
+    private static void trackTarget(MethodEvent event) {
+        int length = TaintRangesBuilder.getLength(event.returnValue);
+        if (length == 0) {
+            return;
+        }
+
+        trackObject(event, event.returnValue, 0);
+        // @TODO: hook json serializer for custom model
+        handlerCustomModel(event);
+    }
+
+    private static void trackObject(MethodEvent event, Object obj, int depth) {
+        if (depth >= 10 || !TaintPoolUtils.isNotEmpty(obj) || !TaintPoolUtils.isAllowTaintType(obj)) {
+            return;
+        }
+
+        int hash = System.identityHashCode(obj);
+        if (EngineManager.TAINT_HASH_CODES.get().contains(hash)) {
+            return;
+        }
+
+        Class<?> cls = obj.getClass();
+        if (cls.isArray() && !cls.getComponentType().isPrimitive()) {
+            trackArray(event, obj, depth);
+        } else if (obj instanceof Iterator) {
+            trackIterator(event, (Iterator<?>) obj, depth);
+        } else if (obj instanceof Map) {
+            trackMap(event, (Map<?, ?>) obj, depth);
+        } else if (obj instanceof Map.Entry) {
+            trackMapEntry(event, (Map.Entry<?, ?>) obj, depth);
+        } else if (obj instanceof Collection) {
+            if (obj instanceof List) {
+                trackList(event, (List<?>) obj, depth);
+            } else {
+                trackIterator(event, ((Collection<?>) obj).iterator(), depth);
+            }
+        } else if ("java.util.Optional".equals(obj.getClass().getName())) {
+            trackOptional(event, obj, depth);
+        } else {
+            int len = TaintRangesBuilder.getLength(obj);
+            if (len == 0) {
+                return;
+            }
+
+            TaintRanges tr = new TaintRanges(new TaintRange(0, len));
+            event.targetRanges.add(new MethodEvent.MethodEventTargetRange(hash, TaintRangesBuilder.obj2String(obj), tr));
+            EngineManager.TAINT_HASH_CODES.get().add(hash);
+            event.addTargetHash(hash);
+            event.addTargetHashForRpc(obj.hashCode());
+            EngineManager.TAINT_POOL.get().add(obj);
+            EngineManager.TAINT_RANGES_POOL.add(hash, tr);
+        }
+    }
+
+    private static void trackArray(MethodEvent event, Object arr, int depth) {
+        int length = Array.getLength(arr);
+        for (int i = 0; i < length; i++) {
+            trackObject(event, Array.get(arr, i), depth);
+        }
+    }
+
+    private static void trackIterator(MethodEvent event, Iterator<?> it, int depth) {
+        while (it.hasNext()) {
+            trackObject(event, it.next(), depth + 1);
+        }
+    }
+
+    private static void trackMap(MethodEvent event, Map<?, ?> map, int depth) {
+        for (Object key : map.keySet()) {
+            trackObject(event, key, depth);
+            trackObject(event, map.get(key), depth);
+        }
+    }
+
+    private static void trackMapEntry(MethodEvent event, Map.Entry<?, ?> entry, int depth) {
+        trackObject(event, entry.getKey(), depth + 1);
+        trackObject(event, entry.getValue(), depth + 1);
+    }
+
+    private static void trackList(MethodEvent event, List<?> list, int depth) {
+        for (Object obj : list) {
+            trackObject(event, obj, depth);
+        }
+    }
+
+    private static void trackOptional(MethodEvent event, Object obj, int depth) {
+        try {
+            Object v = ((Optional<?>) obj).orElse(null);
+            trackObject(event, v, depth);
+        } catch (Exception e) {
+            DongTaiLog.warn("track optional object failed: " + e.getMessage());
+        }
+    }
 
     /**
      * todo: 处理过程和结果需要细化
@@ -55,7 +149,7 @@ public class SourceImpl {
         if (!event.getMethodName().equals("getSession")) {
             Set<Object> modelValues = parseCustomModel(event.returnValue);
             for (Object modelValue : modelValues) {
-                EngineManager.TAINT_POOL.addTaintToPool(modelValue, event, true);
+                trackObject(event, modelValue, 0);
             }
         }
     }

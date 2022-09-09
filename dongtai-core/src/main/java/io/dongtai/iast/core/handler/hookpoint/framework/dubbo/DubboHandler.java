@@ -102,7 +102,7 @@ public class DubboHandler {
                 int invokeId = invokeIdSequencer.getAndIncrement();
                 event.setInvokeId(invokeId);
                 event.inValue = "";
-                event.outValue = verifiedArguments;
+                event.setOutValue(verifiedArguments);
 
                 EngineManager.TRACK_MAP.addTrackMethod(invokeId, event);
                 EngineManager.TAINT_POOL.addTaintToPool(verifiedArguments, event, true);
@@ -223,7 +223,7 @@ public class DubboHandler {
                     EngineManager.TAINT_HASH_CODES.get().add(identityHashCode);
                 }
             }
-            event.outValue = resModelSet;
+            event.setOutValue(resModelSet);
         }
     }
 
