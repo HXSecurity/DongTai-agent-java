@@ -7,11 +7,10 @@ import io.dongtai.iast.core.service.ThreadPools;
 import io.dongtai.iast.core.utils.Constants;
 import io.dongtai.iast.core.utils.StackUtils;
 import io.dongtai.iast.core.utils.base64.Base64Encoder;
-
-import java.util.Map;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.util.Map;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -57,7 +56,7 @@ public abstract class AbstractNormalVulScan implements IVulScan {
     }
 
     protected StackTraceElement[] getLatestStack() {
-        return StackUtils.createCallStack(10);
+        return StackUtils.createCallStack(0);
     }
 
     public static String getEncodedHeader(Map<String, String> headers) {
