@@ -6,6 +6,7 @@ import io.dongtai.iast.core.handler.hookpoint.SpyDispatcherImpl;
 import io.dongtai.iast.core.handler.hookpoint.models.IastSinkModel;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.IVulScan;
+import io.dongtai.iast.core.handler.hookpoint.vulscan.dynamic.xxe.XXECheck;
 import io.dongtai.iast.core.utils.StackUtils;
 import io.dongtai.iast.core.utils.TaintPoolUtils;
 import io.dongtai.log.DongTaiLog;
@@ -33,6 +34,9 @@ public class DynamicPropagatorScanner implements IVulScan {
     private static String HTTP_CLIENT_4 = " org.apache.commons.httpclient.HttpClient.executeMethod(org.apache.commons.httpclient.HostConfiguration,org.apache.commons.httpclient.HttpMethod,org.apache.commons.httpclient.HttpState)"
             .substring(1);
 
+    private final static String SINK_TYPE_SSRF = "ssrf";
+    private final static String SINK_TYPE_XXE = "xxe";
+
     @Override
     public void scan(IastSinkModel sink, MethodEvent event) {
         // todo: 判断是否为 ssrf，如果是，增加 header 头
@@ -57,6 +61,10 @@ public class DynamicPropagatorScanner implements IVulScan {
         }
 
         if (FastjsonScanner.isSinkMethod(sink) && FastjsonScanner.isSafe(sink, event)) {
+            return;
+        }
+
+        if (SINK_TYPE_XXE.equals(sink.getType()) && XXECheck.isSafe(event, sink)) {
             return;
         }
 
@@ -98,7 +106,7 @@ public class DynamicPropagatorScanner implements IVulScan {
             return hitTaintPool;
         }
 
-        if (SSRFSourceCheck.isSinkMethod(sink)) {
+        if (SINK_TYPE_SSRF.equals(sink.getType()) && SSRFSourceCheck.isSinkMethod(sink)) {
             return SSRFSourceCheck.sourceHitTaintPool(event, sink);
         }
 

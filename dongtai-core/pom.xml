@@ -15,6 +15,9 @@
         <jdk.version.level>2</jdk.version.level>
         <lombok.version>1.18.20</lombok.version>
         <apache-httpclient.version>4.5.13</apache-httpclient.version>
+        <pkg.dom4j.version>2.1.3</pkg.dom4j.version>
+        <pkg.jdom.version>1.1.3</pkg.jdom.version>
+        <pkg.xom.version>1.3.7</pkg.xom.version>
     </properties>
 
     <build>
@@ -253,6 +256,28 @@
             <artifactId>maven-artifact</artifactId>
             <version>3.8.2</version>
         </dependency>
+
+        <!-- just for tests -->
+        <dependency>
+            <groupId>org.dom4j</groupId>
+            <artifactId>dom4j</artifactId>
+            <version>${pkg.dom4j.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jdom</groupId>
+            <artifactId>jdom</artifactId>
+            <version>${pkg.jdom.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- xom dependency xalan will cause feature secure-processing failed
+        <dependency>
+            <groupId>xom</groupId>
+            <artifactId>xom</artifactId>
+            <version>${pkg.xom.version}</version>
+            <scope>test</scope>
+        </dependency>
+        -->
     </dependencies>
 
 </project>
