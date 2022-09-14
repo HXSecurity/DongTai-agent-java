@@ -35,7 +35,7 @@ public class SourceImpl {
         }
 
         event.source = true;
-        event.setCallStacks(StackUtils.createCallStack(9));
+        event.setCallStacks(StackUtils.createCallStack(4));
 
         int invokeId = invokeIdSequencer.getAndIncrement();
         event.setInvokeId(invokeId);

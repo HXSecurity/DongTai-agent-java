@@ -38,7 +38,7 @@ public class PropagatorImpl {
 
     private static void addPropagator(MethodEvent event, AtomicInteger invokeIdSequencer) {
         event.source = false;
-        event.setCallStacks(StackUtils.createCallStack(STACK_DEPTH));
+        event.setCallStacks(StackUtils.createCallStack(6));
         int invokeId = invokeIdSequencer.getAndIncrement();
         event.setInvokeId(invokeId);
         EngineManager.TRACK_MAP.get().put(invokeId, event);
