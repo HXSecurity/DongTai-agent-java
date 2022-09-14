@@ -7,8 +7,7 @@ import io.dongtai.iast.core.handler.hookpoint.vulscan.taintrange.*;
 import io.dongtai.iast.core.utils.StackUtils;
 import io.dongtai.iast.core.utils.TaintPoolUtils;
 
-import java.util.ArrayList;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -25,6 +24,20 @@ public class PropagatorImpl {
     private static final String CONDITION_AND_RE_PATTERN = "[\\|&]";
     private static final int STACK_DEPTH = 11;
 
+    private final static Set<String> SKIP_SCOPE_METHODS = new HashSet<String>(Arrays.asList(
+            "java.net.URI.<init>(java.lang.String)",
+            "java.net.URI.<init>(java.lang.String,java.lang.String,java.lang.String)",
+            "java.net.URI.<init>(java.lang.String,java.lang.String,java.lang.String,java.lang.String,java.lang.String)",
+            "java.net.URI.<init>(java.lang.String,java.lang.String,java.lang.String,java.lang.String)", // indirect
+            "java.net.URI.<init>(java.lang.String,java.lang.String,java.lang.String,int,java.lang.String,java.lang.String,java.lang.String)",
+            "java.net.URL.<init>(java.lang.String)", // indirect
+            "java.net.URL.<init>(java.net.URL,java.lang.String)", // indirect
+            "java.net.URL.<init>(java.net.URL,java.lang.String,java.net.URLStreamHandler)",
+            "java.net.URL.<init>(java.lang.String,java.lang.String,java.lang.String)", // indirect
+            "java.net.URL.<init>(java.lang.String,java.lang.String,int,java.lang.String)", // indirect
+            "java.net.URL.<init>(java.lang.String,java.lang.String,int,java.lang.String,java.net.URLStreamHandler)"
+    ));
+
     public static void solvePropagator(MethodEvent event, AtomicInteger invokeIdSequencer) {
         if (!EngineManager.TAINT_POOL.isEmpty()) {
             IastPropagatorModel propagator = IastHookRuleModel.getPropagatorByMethodSignature(event.signature);
@@ -36,7 +49,15 @@ public class PropagatorImpl {
         }
     }
 
-    private static void addPropagator(MethodEvent event, AtomicInteger invokeIdSequencer) {
+    private static void addPropagator(IastPropagatorModel propagator, MethodEvent event, AtomicInteger invokeIdSequencer) {
+        // skip same source and target
+        if (event.getSourceHashes().size() == event.getTargetHashes().size()
+                && event.getSourceHashes().equals(event.getTargetHashes())
+                && propagator != null
+                && !(PARAMS_OBJECT.equals(propagator.getSource()) && PARAMS_OBJECT.equals(propagator.getTarget()))) {
+            return;
+        }
+
         event.source = false;
         event.setCallStacks(StackUtils.createCallStack(6));
         int invokeId = invokeIdSequencer.getAndIncrement();
@@ -57,7 +78,7 @@ public class PropagatorImpl {
 
                 event.setInValue(event.object);
                 setTarget(propagator, event);
-                addPropagator(event, invokeIdSequencer);
+                addPropagator(propagator, event, invokeIdSequencer);
             } else if (sourceString.startsWith(PARAMS_PARAM)) {
                 ArrayList<Object> inValues = new ArrayList<Object>();
                 int[] positions = (int[]) propagator.getSourcePosition();
@@ -77,7 +98,7 @@ public class PropagatorImpl {
                 if (!inValues.isEmpty()) {
                     event.setInValue(inValues.toArray());
                     setTarget(propagator, event);
-                    addPropagator(event, invokeIdSequencer);
+                    addPropagator(propagator, event, invokeIdSequencer);
                 }
             }
         } else {
@@ -119,7 +140,7 @@ public class PropagatorImpl {
                 if (condition > 0 && (!andCondition || conditionSources.length == condition)) {
                     event.setInValue(inValues.toArray());
                     setTarget(propagator, event);
-                    addPropagator(event, invokeIdSequencer);
+                    addPropagator(propagator, event, invokeIdSequencer);
                 }
             }
         }
@@ -263,8 +284,12 @@ public class PropagatorImpl {
             } else {
                 event.addTargetHash(event.outValue.hashCode());
             }
-            addPropagator(event, invokeIdSequence);
+            addPropagator(null, event, invokeIdSequence);
         }
+    }
+
+    public static boolean isSkipScope(String signature) {
+        return SKIP_SCOPE_METHODS.contains(signature);
     }
 
     private static boolean contains(String obj) {

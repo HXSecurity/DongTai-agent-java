@@ -103,15 +103,18 @@ public interface AsmMethods {
     );
     Method SPY$enterPropagator = InnerHelper.getAsmMethod(
             SpyDispatcher.class,
-            "enterPropagator"
+            "enterPropagator",
+            String.class
     );
     Method SPY$leavePropagator = InnerHelper.getAsmMethod(
             SpyDispatcher.class,
-            "leavePropagator"
+            "leavePropagator",
+            String.class
     );
     Method SPY$isFirstLevelPropagator = InnerHelper.getAsmMethod(
             SpyDispatcher.class,
-            "isFirstLevelPropagator"
+            "isFirstLevelPropagator",
+            String.class
     );
     Method SPY$enterSink = InnerHelper.getAsmMethod(
             SpyDispatcher.class,
