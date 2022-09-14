@@ -69,7 +69,7 @@ public class DynamicPropagatorScanner implements IVulScan {
         }
 
         if (sinkSourceHitTaintPool(event, sink)) {
-            event.setCallStacks(StackUtils.createCallStack(11));
+            event.setCallStacks(StackUtils.createCallStack(5));
             int invokeId = SpyDispatcherImpl.INVOKE_ID_SEQUENCER.getAndIncrement();
             event.setInvokeId(invokeId);
             EngineManager.TRACK_MAP.addTrackMethod(invokeId, event);

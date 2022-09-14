@@ -97,7 +97,7 @@ public class DubboHandler {
             if (!validArguments.isEmpty()) {
                 Object[] verifiedArguments = validArguments.toArray();
                 event.source = true;
-                event.setCallStacks(StackUtils.createCallStack(9));
+                event.setCallStacks(StackUtils.createCallStack(5));
 
                 int invokeId = invokeIdSequencer.getAndIncrement();
                 event.setInvokeId(invokeId);

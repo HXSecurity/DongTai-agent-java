@@ -306,7 +306,7 @@ public class MethodEvent {
 
     public void setCallStacks(StackTraceElement[] callStacks) {
         this.callStacks = callStacks;
-        this.setCallStack(callStacks[0]);
+        this.setCallStack(callStacks[1]);
     }
 
     public Object getObject() {
