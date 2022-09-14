@@ -279,11 +279,11 @@ public class SpyDispatcherImpl implements SpyDispatcher {
      * @since 1.3.1
      */
     @Override
-    public void enterPropagator() {
+    public void enterPropagator(String signature) {
         try {
             if (EngineManager.isDongTaiRunning() && EngineManager.isEngineRunning()) {
                 EngineManager.turnOffDongTai();
-                EngineManager.SCOPE_TRACKER.enterPropagation();
+                EngineManager.SCOPE_TRACKER.enterPropagation(PropagatorImpl.isSkipScope(signature));
                 EngineManager.turnOnDongTai();
             }
         } catch (Exception e) {
@@ -297,11 +297,11 @@ public class SpyDispatcherImpl implements SpyDispatcher {
      * @since 1.3.1
      */
     @Override
-    public void leavePropagator() {
+    public void leavePropagator(String signature) {
         try {
             if (EngineManager.isDongTaiRunning() && EngineManager.isEngineRunning()) {
                 EngineManager.turnOffDongTai();
-                EngineManager.SCOPE_TRACKER.leavePropagation();
+                EngineManager.SCOPE_TRACKER.leavePropagation(PropagatorImpl.isSkipScope(signature));
                 EngineManager.turnOnDongTai();
             }
         } catch (Exception e) {
@@ -316,9 +316,10 @@ public class SpyDispatcherImpl implements SpyDispatcher {
      * @since 1.3.1
      */
     @Override
-    public boolean isFirstLevelPropagator() {
+    public boolean isFirstLevelPropagator(String signature) {
         try {
-            return EngineManager.isDongTaiRunning() && EngineManager.isEngineRunning() && EngineManager.SCOPE_TRACKER.isFirstLevelPropagator();
+            return EngineManager.isDongTaiRunning() && EngineManager.isEngineRunning()
+                    && EngineManager.SCOPE_TRACKER.isFirstLevelPropagator();
         } catch (Exception e) {
             return false;
         }

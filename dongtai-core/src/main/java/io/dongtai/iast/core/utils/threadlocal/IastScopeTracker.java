@@ -52,12 +52,12 @@ public class IastScopeTracker extends ThreadLocal<TrackerHelper> {
         return this.get().isFirstLevelSource();
     }
 
-    public void enterPropagation() {
-        this.get().enterPropagation();
+    public void enterPropagation(boolean isSkipScope) {
+        this.get().enterPropagation(isSkipScope);
     }
 
-    public void leavePropagation() {
-        this.get().leavePropagation();
+    public void leavePropagation(boolean isSkipScope) {
+        this.get().leavePropagation(isSkipScope);
     }
 
     public boolean isFirstLevelPropagator() {

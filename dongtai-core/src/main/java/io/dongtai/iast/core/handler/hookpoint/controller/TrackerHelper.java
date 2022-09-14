@@ -7,6 +7,10 @@ public class TrackerHelper {
 
     private int trackCounts = 0;
     private int propagationDepth = 0;
+    /**
+     * TODO: for nested propagation track
+     */
+    private int propagationSkipDepth = 0;
     private int sourceLevel = 0;
     private int enterHttp = 0;
     private int leaveSource = 0;
@@ -30,15 +34,21 @@ public class TrackerHelper {
         this.trackCounts--;
     }
 
-    public void enterPropagation() {
+    public void enterPropagation(boolean isSkipScope) {
         if (isEnterEntry()) {
             this.propagationDepth++;
         }
+        if (isSkipScope) {
+            this.propagationSkipDepth++;
+        }
     }
 
-    public void leavePropagation() {
+    public void leavePropagation(boolean isSkipScope) {
         if (isEnterEntry()) {
             this.propagationDepth--;
+        }
+        if (isSkipScope) {
+            this.propagationSkipDepth--;
         }
     }
 
@@ -49,7 +59,7 @@ public class TrackerHelper {
      */
     public boolean isFirstLevelPropagator() {
         return isEnterEntry() && this.sourceLevel == 0 && this.leaveSource == 1
-                && this.propagationDepth == 1;
+                && (this.propagationDepth == 1 || this.propagationSkipDepth > 0);
     }
 
     public void enterHttp() {

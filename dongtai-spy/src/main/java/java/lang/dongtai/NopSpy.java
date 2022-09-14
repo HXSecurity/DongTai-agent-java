@@ -150,7 +150,7 @@ public class NopSpy implements SpyDispatcher {
      * @since 1.3.1
      */
     @Override
-    public void enterPropagator() {
+    public void enterPropagator(String signature) {
 
     }
 
@@ -160,7 +160,7 @@ public class NopSpy implements SpyDispatcher {
      * @since 1.3.1
      */
     @Override
-    public void leavePropagator() {
+    public void leavePropagator(String signature) {
 
     }
 
@@ -171,7 +171,7 @@ public class NopSpy implements SpyDispatcher {
      * @since 1.3.1
      */
     @Override
-    public boolean isFirstLevelPropagator() {
+    public boolean isFirstLevelPropagator(String signature) {
         return false;
     }
 

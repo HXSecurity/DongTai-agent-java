@@ -1,9 +1,9 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.core.adapter;
 
-import io.dongtai.iast.core.utils.PropertyUtils;
 import io.dongtai.iast.core.bytecode.enhance.IastContext;
 import io.dongtai.iast.core.bytecode.enhance.plugin.AbstractAdviceAdapter;
 import io.dongtai.iast.core.handler.hookpoint.controller.HookType;
+import io.dongtai.iast.core.utils.PropertyUtils;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 
@@ -34,6 +34,7 @@ public class PropagateAdviceAdapter extends AbstractAdviceAdapter {
                 Label elseLabel = new Label();
                 Label endLabel = new Label();
                 invokeStatic(ASM_TYPE_SPY_HANDLER, SPY_HANDLER$getDispatcher);
+                push(signature);
                 invokeInterface(ASM_TYPE_SPY_DISPATCHER, SPY$isFirstLevelPropagator);
                 mv.visitJumpInsn(EQ, elseLabel);
                 captureMethodState(opcode, HookType.PROPAGATOR.getValue(), true);
@@ -50,11 +51,13 @@ public class PropagateAdviceAdapter extends AbstractAdviceAdapter {
 
     private void enterPropagator() {
         invokeStatic(ASM_TYPE_SPY_HANDLER, SPY_HANDLER$getDispatcher);
+        push(signature);
         invokeInterface(ASM_TYPE_SPY_DISPATCHER, SPY$enterPropagator);
     }
 
     private void leavePropagator() {
         invokeStatic(ASM_TYPE_SPY_HANDLER, SPY_HANDLER$getDispatcher);
+        push(signature);
         invokeInterface(ASM_TYPE_SPY_DISPATCHER, SPY$leavePropagator);
     }
 }

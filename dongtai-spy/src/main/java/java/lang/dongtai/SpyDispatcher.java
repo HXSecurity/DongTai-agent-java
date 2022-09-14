@@ -102,14 +102,14 @@ public interface SpyDispatcher {
      *
      * @since 1.3.1
      */
-    void enterPropagator();
+    void enterPropagator(String signature);
 
     /**
      * mark for leave Source Entry Point
      *
      * @since 1.3.1
      */
-    void leavePropagator();
+    void leavePropagator(String signature);
 
     /**
      * Determines whether it is a layer 1 Propagator entry
@@ -117,7 +117,7 @@ public interface SpyDispatcher {
      * @return true if is a layer 1 Propagator entry; else false
      * @since 1.3.1
      */
-    boolean isFirstLevelPropagator();
+    boolean isFirstLevelPropagator(String signature);
 
     /**
      * mark for enter Sink Entry Point
