@@ -17,7 +17,7 @@
         <sun.tools.systempath>${java.home}/../lib/tools.jar</sun.tools.systempath>
         <nanoxml.version>2.2.3</nanoxml.version>
 
-        <dongtai.version>1.7.6</dongtai.version>
+        <dongtai.version>1.7.7</dongtai.version>
         <!-- java 1.6 最高可用版本-->
         <logback-classic.version>1.2.1</logback-classic.version>
         <commons-lang3.version>3.4</commons-lang3.version>
@@ -42,7 +42,7 @@
 
     <groupId>io.dongtai.iast</groupId>
     <artifactId>iast</artifactId>
-    <version>1.7.6</version>
+    <version>1.7.7</version>
     <packaging>pom</packaging>
 
     <name>dongtai-agent-java</name>
