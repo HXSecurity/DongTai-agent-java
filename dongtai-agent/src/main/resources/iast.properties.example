@@ -1,7 +1,7 @@
 # iast.properties file example
-iast.name=dongtai-Enterprise 1.7.6
+iast.name=dongtai-Enterprise 1.7.7
 iast.response.name=dongtai
-iast.response.value=1.7.6
+iast.response.value=1.7.7
 iast.server.url=https://iast.io/openapi
 iast.server.token=39133a96f5735c253edd908078846c1051824edc
 iast.allhook.enable=false
