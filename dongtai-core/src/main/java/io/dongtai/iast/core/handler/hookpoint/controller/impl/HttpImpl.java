@@ -1,7 +1,6 @@
 package io.dongtai.iast.core.handler.hookpoint.controller.impl;
 
 import io.dongtai.iast.core.EngineManager;
-import io.dongtai.iast.core.utils.PropertyUtils;
 import io.dongtai.iast.core.handler.hookpoint.IastClassLoader;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.utils.HttpClientUtils;
@@ -160,7 +159,6 @@ public class HttpImpl {
      */
     public static void solveHttp(MethodEvent event)
             throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        DongTaiLog.debug(EngineManager.SCOPE_TRACKER.get().toString());
         REQUEST_META.set(getRequestMeta(event.argumentArray[0]));
         Boolean isReplay = (Boolean) REQUEST_META.get().get("replay-request");
         if (isReplay){

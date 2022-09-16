@@ -35,7 +35,7 @@ public class XMLInputFactoryCheck extends AbstractCheck implements XXEChecker {
                 return Support.DISALLOWED;
             }
 
-            String fAccessExternalDTD = getFeatureAccessExternalDTD(obj);
+            String fAccessExternalDTD = getFeatureAccessExternalDTDFromSecurityPropertyManager(obj);
             if ("".equals(fAccessExternalDTD)) {
                 return Support.DISALLOWED;
             }
