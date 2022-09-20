@@ -3,21 +3,13 @@ package io.dongtai.iast.agent.util.http;
 import io.dongtai.iast.agent.IastProperties;
 import io.dongtai.log.DongTaiLog;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.InetSocketAddress;
-import java.net.Proxy;
-import java.net.URL;
+import javax.net.ssl.*;
+import java.io.*;
+import java.net.*;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.GZIPOutputStream;
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -113,7 +105,7 @@ public class HttpClientUtils {
                 response.append('\r');
             }
             rd.close();
-            DongTaiLog.debug("dongtai upload url is {}, request is {} ,response is {}", urlStr, data, response.toString());
+            DongTaiLog.trace("dongtai upload url is {}, request is {} ,response is {}", urlStr, data, response.toString());
             return response;
         } catch (Exception e){
             DongTaiLog.error(e);

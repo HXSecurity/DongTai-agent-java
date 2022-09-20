@@ -4,16 +4,12 @@ import io.dongtai.iast.agent.manager.EngineManager;
 import io.dongtai.iast.agent.monitor.MonitorDaemonThread;
 import io.dongtai.iast.agent.monitor.impl.EngineMonitor;
 import io.dongtai.iast.agent.report.AgentRegisterReport;
-import io.dongtai.iast.agent.util.FileUtils;
 import io.dongtai.iast.agent.util.ThreadUtils;
 import io.dongtai.log.DongTaiLog;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.instrument.Instrumentation;
 import java.util.*;
-
-import static io.dongtai.iast.agent.Agent.*;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -23,9 +19,6 @@ public class AgentLauncher {
     public static final String LAUNCH_MODE_AGENT = "agent";
     public static final String LAUNCH_MODE_ATTACH = "attach";
     public static String LAUNCH_MODE;
-    private static String FLUENT_FILE;
-    private static String FLUENT_FILE_CONF;
-    public static Process fluent;
 
     static {
         /**
@@ -113,6 +106,9 @@ public class AgentLauncher {
             if (argsMap.containsKey("logPath")) {
                 System.setProperty("dongtai.log.path", argsMap.get("logPath"));
             }
+            if (argsMap.containsKey("disableLogCollector")) {
+                System.setProperty("dongtai.disable.log-collector", argsMap.get("disableLogCollector"));
+            }
         } catch (Exception e) {
             DongTaiLog.error(e);
         }
@@ -162,7 +158,7 @@ public class AgentLauncher {
         IastProperties.getInstance();
         Boolean send = AgentRegisterReport.send();
         if (send) {
-            extractFluent();
+            LogCollector.extractFluent();
             DongTaiLog.info("Agent registered successfully.");
             Boolean agentStat = AgentRegisterReport.agentStat();
             if (!agentStat) {
@@ -176,46 +172,6 @@ public class AgentLauncher {
             System.setProperty("protect.by.dongtai", "true");
         } else {
             DongTaiLog.error("Agent registered failed. Start without DongTai IAST.");
-        }
-    }
-
-    private static void doFluent() {
-        String[] execution = {
-                "nohup",
-                FLUENT_FILE,
-                "-c",
-                FLUENT_FILE_CONF
-        };
-        try {
-            fluent = Runtime.getRuntime().exec(execution);
-            Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-                public void run() {
-                    fluent.destroy();
-                }
-            }));
-        } catch (IOException e) {
-            DongTaiLog.error(e);
-        }
-    }
-
-    private static void extractFluent() {
-        try {
-            if (!isMacOs() && !isWindows()) {
-                FLUENT_FILE = System.getProperty("java.io.tmpdir.dongtai") + "iast" + File.separator + "fluent";
-                FileUtils.getResourceToFile("bin/fluent", FLUENT_FILE);
-
-                FLUENT_FILE_CONF = System.getProperty("java.io.tmpdir.dongtai") + "iast" + File.separator + "fluent.conf";
-                FileUtils.getResourceToFile("bin/fluent.conf", FLUENT_FILE_CONF);
-                FileUtils.confReplace(FLUENT_FILE_CONF);
-                if ((new File(FLUENT_FILE)).setExecutable(true)) {
-                    DongTaiLog.info("fluent extract success.");
-                } else {
-                    DongTaiLog.info("fluent extract failure. please set execute permission, file: {}", FLUENT_FILE);
-                }
-                doFluent();
-            }
-        } catch (IOException e) {
-            DongTaiLog.error(e);
         }
     }
 

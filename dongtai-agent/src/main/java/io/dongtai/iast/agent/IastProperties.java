@@ -3,9 +3,7 @@ package io.dongtai.iast.agent;
 import io.dongtai.iast.agent.util.FileUtils;
 import io.dongtai.log.DongTaiLog;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Properties;
 
 /**
@@ -37,6 +35,7 @@ public class IastProperties {
     private String customCoreJarUrl;
     private String customSpyJarUrl;
     private String customApiJarUrl;
+    private Boolean disableLogCollector;
 
     public static IastProperties getInstance() {
         if (null == instance) {
@@ -249,6 +248,15 @@ public class IastProperties {
             fallbackVersion = System.getProperty("dongtai.fallback.version", "v2");
         }
         return fallbackVersion;
+    }
+
+    public Boolean getDisableLogCollector() {
+        if (disableLogCollector == null) {
+            String disable = System.getProperty("dongtai.disable.log-collector",
+                    cfg.getProperty("dongtai.disable.log-collector", "false"));
+            disableLogCollector = "true".equals(disable);
+        }
+        return disableLogCollector;
     }
 
     public boolean isDebug() {
