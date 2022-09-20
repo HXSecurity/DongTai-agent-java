@@ -89,7 +89,7 @@ public class DocumentBuilderCheck extends AbstractCheck implements XXEChecker {
                 }
             }
 
-            String fAccessExternalDTD = getFeatureAccessExternalDTD(domParser);
+            String fAccessExternalDTD = getFeatureAccessExternalDTDFromSecurityPropertyManager(domParser);
             return getEntityManagerSupport(fConfiguration, fAccessExternalDTD);
         } catch (Throwable e) {
             DongTaiLog.debug("failed to check document builder", e);

@@ -1,10 +1,11 @@
 package io.dongtai.iast.core.handler.hookpoint.vulscan.dynamic.xxe;
 
-import com.sun.org.apache.xerces.internal.impl.Constants;
 import io.dongtai.iast.core.utils.ReflectUtils;
 import io.dongtai.log.DongTaiLog;
 
 import java.lang.reflect.*;
+import java.util.Collections;
+import java.util.List;
 
 public abstract class AbstractCheck {
     private static final String ORG_APACHE_XERCES_INTERNAL_IMPL_XMLENTITY_MANAGER = " org.apache.xerces.internal.impl.XMLEntityManager".substring(1);
@@ -23,8 +24,8 @@ public abstract class AbstractCheck {
         this.sourceParameters = sourceParameters;
     }
 
-    public Object getSourceObject() {
-        return this.sourceObject;
+    public List<Object> getCheckObjects() {
+        return Collections.singletonList(this.sourceObject);
     }
 
     public Object getXMLConfiguration(Object obj) {
@@ -43,7 +44,10 @@ public abstract class AbstractCheck {
 
     public Object getXMLEntityManager(Object obj) {
         try {
-            Field fEntityManagerField = ReflectUtils.getRecursiveField(obj.getClass(), "fEntityManager");
+            Field fEntityManagerField = ReflectUtils.getDeclaredFieldFromSuperClassByName(obj.getClass(), "fEntityManager");
+            if (fEntityManagerField == null) {
+                return null;
+            }
             return fEntityManagerField.get(obj);
         } catch (IllegalAccessException e) {
             DongTaiLog.debug("Access denied to get XMLEntityManager {}", e);
@@ -78,7 +82,7 @@ public abstract class AbstractCheck {
 
         Object fConfiguration = getXMLConfiguration(obj);
         if (fConfiguration != null) {
-            String fAccessExternalDTD = getFeatureAccessExternalDTD(obj);
+            String fAccessExternalDTD = getFeatureAccessExternalDTDFromSecurityPropertyManager(obj);
             Support support = getEntityManagerSupport(fConfiguration, fAccessExternalDTD);
             if (support == Support.DISALLOWED) {
                 return support;
@@ -164,12 +168,25 @@ public abstract class AbstractCheck {
         return Support.ALLOWED;
     }
 
-    String getFeatureAccessExternalDTD(Object obj) {
+    public Object getFeatureAccessExternalDTD(Object obj) {
+        try {
+            Field fAccessExternalDTDField = ReflectUtils.getRecursiveField(obj.getClass(), "fAccessExternalDTD");
+            if (fAccessExternalDTDField == null) {
+                return null;
+            }
+            return fAccessExternalDTDField.get(obj);
+        } catch (IllegalAccessException e) {
+            DongTaiLog.debug("Access denied to get fAccessExternalDTDField {}", e);
+            return null;
+        }
+    }
+
+    String getFeatureAccessExternalDTDFromSecurityPropertyManager(Object obj) {
         try {
             String fAccessExternalDTD;
             Method getPropertyMethod = ReflectUtils.getDeclaredMethodFromClass(obj.getClass(), "getProperty", new Class<?>[]{String.class});
             if (getPropertyMethod != null) {
-                Object securityPropertyManager = getPropertyMethod.invoke(obj, Constants.XML_SECURITY_PROPERTY_MANAGER);
+                Object securityPropertyManager = getPropertyMethod.invoke(obj, "http://www.oracle.com/xml/jaxp/properties/xmlSecurityPropertyManager");
                 Method getValueMethod = ReflectUtils.getPublicMethodFromClass(securityPropertyManager.getClass(), "getValue", new Class<?>[]{String.class});
                 fAccessExternalDTD = (String) getValueMethod.invoke(securityPropertyManager, Feature.ACCESS_EXTERNAL_DTD.getDtd()[0]);
                 return fAccessExternalDTD;
@@ -243,6 +260,20 @@ public abstract class AbstractCheck {
             DongTaiLog.debug("Problem call getFeature() {}", e);
         }
         return support;
+    }
+
+    public Support getPropertySupport(Object obj) {
+        Method getPropertyMethod = ReflectUtils.getDeclaredMethodFromSuperClass(obj.getClass(), "getProperty", new Class<?>[]{String.class});
+        if (getPropertyMethod == null) {
+            return Support.ALLOWED;
+        }
+        if (!invokeMethod(getPropertyMethod, obj, " javax.xml.stream.supportDTD".substring(1), true)) {
+            return Support.DISALLOWED;
+        }
+        if (!invokeMethod(getPropertyMethod, obj, " javax.xml.stream.isSupportingExternalEntities".substring(1), true)) {
+            return Support.DISALLOWED;
+        }
+        return Support.ALLOWED;
     }
 
     private static boolean invokeMethod(Method method, Object obj, String parameter, boolean defaultVal) {

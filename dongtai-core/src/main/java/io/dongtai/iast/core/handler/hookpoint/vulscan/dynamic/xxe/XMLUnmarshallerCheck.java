@@ -50,7 +50,7 @@ public class XMLUnmarshallerCheck extends AbstractCheck implements XXEChecker {
             return Support.ALLOWED;
         }
 
-        String fAccessExternalDTD = getFeatureAccessExternalDTD(obj);
+        String fAccessExternalDTD = getFeatureAccessExternalDTDFromSecurityPropertyManager(obj);
         return getEntityManagerSupport(fConfiguration, fAccessExternalDTD);
     }
 
