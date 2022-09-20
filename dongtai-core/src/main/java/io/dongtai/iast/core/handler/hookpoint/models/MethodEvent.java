@@ -443,8 +443,12 @@ public class MethodEvent {
 
     public void setInValue(Object inValue) {
         PropertyUtils properties = PropertyUtils.getInstance();
+        this.setInValue(inValue, properties.isLocal() ? obj2String(inValue) : "");
+    }
+
+    public void setInValue(Object inValue, String inValueString) {
         this.inValue = inValue;
-        this.inValueString = properties.isLocal() ? obj2String(inValue) : "";
+        this.inValueString = inValueString;
     }
 
     public void setOutValue(Object outValue) {

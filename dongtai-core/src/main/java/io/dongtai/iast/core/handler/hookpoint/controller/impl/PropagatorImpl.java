@@ -81,6 +81,7 @@ public class PropagatorImpl {
                 addPropagator(propagator, event, invokeIdSequencer);
             } else if (sourceString.startsWith(PARAMS_PARAM)) {
                 ArrayList<Object> inValues = new ArrayList<Object>();
+                ArrayList<String> inValuesString = new ArrayList<String>();
                 int[] positions = (int[]) propagator.getSourcePosition();
                 for (int pos : positions) {
                     if (pos >= event.argumentArray.length) {
@@ -94,9 +95,10 @@ public class PropagatorImpl {
                         continue;
                     }
                     inValues.add(tempObj);
+                    inValuesString.add(event.obj2String(tempObj));
                 }
                 if (!inValues.isEmpty()) {
-                    event.setInValue(inValues.toArray());
+                    event.setInValue(inValues.toArray(), inValuesString.toString());
                     setTarget(propagator, event);
                     addPropagator(propagator, event, invokeIdSequencer);
                 }
