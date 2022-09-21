@@ -32,13 +32,9 @@ public class HttpClientUtils {
     private static final String REQUEST_HEADER_TOKEN_KEY = "Authorization";
     private static final String REQUEST_ENCODING_TYPE = "gzip";
     private static final String SSL_SIGNATURE = "TLSv1.2";
-    public static HostnameVerifier DO_NOT_VERIFY = new HttpClientHostnameVerifier();
+    private final static HostnameVerifier DO_NOT_VERIFY = new HttpClientHostnameVerifier();
     private final static IastProperties PROPERTIES = IastProperties.getInstance();
     private final static Proxy PROXY = loadProxy();
-
-    public static void setDoNotVerify(HostnameVerifier doNotVerify) {
-        DO_NOT_VERIFY = doNotVerify;
-    }
 
     public static StringBuilder sendGet(String uri, String arg, String value) {
         try {
