@@ -492,7 +492,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                             HttpImpl.solveHttp(event);
                         } else if (HookType.RPC.equals(hookType)) {
                             solveRPC(framework, event);
-                        } else if (HookType.PROPAGATOR.equals(hookType) && !EngineManager.TAINT_POOL.isEmpty()) {
+                        } else if (HookType.PROPAGATOR.equals(hookType)) {
                             PropagatorImpl.solvePropagator(event, INVOKE_ID_SEQUENCER);
                         } else if (HookType.SOURCE.equals(hookType)) {
                             SourceImpl.solveSource(event, INVOKE_ID_SEQUENCER);

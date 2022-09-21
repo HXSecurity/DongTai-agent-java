@@ -29,7 +29,7 @@ public class KafkaHandler {
     }
 
     public static void trackSend(Object record) {
-        if (EngineManager.TAINT_POOL.isEmpty()) {
+        if (EngineManager.TAINT_HASH_CODES.isEmpty()) {
             return;
         }
 
@@ -49,7 +49,7 @@ public class KafkaHandler {
                 null
         );
 
-        boolean isHitTaints = TaintPoolUtils.poolContains(record, event, true);
+        boolean isHitTaints = TaintPoolUtils.poolContains(record, event);
         if (isHitTaints) {
             int invokeId = SpyDispatcherImpl.INVOKE_ID_SEQUENCER.getAndIncrement();
             event.setInvokeId(invokeId);
@@ -101,7 +101,6 @@ public class KafkaHandler {
 
                 EngineManager.REQUEST_CONTEXT.set(requestMeta);
                 EngineManager.TRACK_MAP.set(new HashMap<Integer, MethodEvent>(1024));
-                EngineManager.TAINT_POOL.set(new HashSet<Object>());
                 EngineManager.TAINT_HASH_CODES.set(new HashSet<Integer>());
 
                 MethodEvent event = new MethodEvent(
@@ -133,7 +132,7 @@ public class KafkaHandler {
                 event.setOutValue(resModelSet);
 
                 EngineManager.TRACK_MAP.addTrackMethod(invokeId, event);
-                EngineManager.TAINT_POOL.addTaintToPool(rd, event, true);
+                EngineManager.TAINT_HASH_CODES.addObject(rd, event, true);
 
                 EngineManager.SCOPE_TRACKER.leaveSource();
                 EngineManager.SCOPE_TRACKER.leaveKafka();

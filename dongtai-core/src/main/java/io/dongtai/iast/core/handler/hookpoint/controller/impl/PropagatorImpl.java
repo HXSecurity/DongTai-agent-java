@@ -2,7 +2,6 @@ package io.dongtai.iast.core.handler.hookpoint.controller.impl;
 
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.hookpoint.models.*;
-import io.dongtai.iast.core.handler.hookpoint.vulscan.dynamic.TrackUtils;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.taintrange.*;
 import io.dongtai.iast.core.utils.StackUtils;
 import io.dongtai.iast.core.utils.TaintPoolUtils;
@@ -39,13 +38,13 @@ public class PropagatorImpl {
     ));
 
     public static void solvePropagator(MethodEvent event, AtomicInteger invokeIdSequencer) {
-        if (!EngineManager.TAINT_POOL.isEmpty()) {
-            IastPropagatorModel propagator = IastHookRuleModel.getPropagatorByMethodSignature(event.signature);
-            if (propagator != null) {
-                auxiliaryPropagator(propagator, invokeIdSequencer, event);
-            } else {
-                autoPropagator(invokeIdSequencer, event);
-            }
+        if (EngineManager.TAINT_HASH_CODES.isEmpty()) {
+            return;
+        }
+
+        IastPropagatorModel propagator = IastHookRuleModel.getPropagatorByMethodSignature(event.signature);
+        if (propagator != null) {
+            auxiliaryPropagator(propagator, invokeIdSequencer, event);
         }
     }
 
@@ -173,9 +172,8 @@ public class PropagatorImpl {
                 }
             }
         }
-        if (TaintPoolUtils.isNotEmpty(event.outValue)) {
-            EngineManager.TAINT_POOL.addTaintToPool(event.outValue, event, false);
-        }
+
+        EngineManager.TAINT_HASH_CODES.addObject(event.outValue, event, false);
     }
 
     private static TaintRanges getTaintRanges(Object obj) {
@@ -265,29 +263,6 @@ public class PropagatorImpl {
         }
         event.targetRanges.add(new MethodEvent.MethodEventTargetRange(tgtHash, tgtValue, tr));
         EngineManager.TAINT_RANGES_POOL.add(tgtHash, tr);
-    }
-
-    private static void autoPropagator(AtomicInteger invokeIdSequence, MethodEvent event) {
-        // 处理自动传播问题
-        // 检查污点池，判断是否存在命中的污点
-        Set<Object> pools = EngineManager.TAINT_POOL.get();
-        for (Object taintValue : pools) {
-            if (TrackUtils.smartEventMatchAndSetTaint(taintValue, event)) {
-                // 将event.outValue加入污点池
-                break;
-                // 将当前方法加入污点方法池
-            }
-        }
-        if (TaintPoolUtils.isNotEmpty(event.outValue)) {
-            pools.add(event.outValue);
-            if (event.outValue instanceof String) {
-                event.addTargetHash(System.identityHashCode(event.outValue));
-                event.addTargetHashForRpc(event.outValue.hashCode());
-            } else {
-                event.addTargetHash(event.outValue.hashCode());
-            }
-            addPropagator(null, event, invokeIdSequence);
-        }
     }
 
     public static boolean isSkipScope(String signature) {

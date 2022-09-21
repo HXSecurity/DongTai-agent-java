@@ -124,7 +124,6 @@ public class GrpcHandler {
             requestMeta.put("headers", metadata);
             EngineManager.REQUEST_CONTEXT.set(requestMeta);
             EngineManager.TRACK_MAP.set(new HashMap<Integer, MethodEvent>(1024));
-            EngineManager.TAINT_POOL.set(new HashSet<Object>());
             EngineManager.TAINT_HASH_CODES.set(new HashSet<Integer>());
             EngineManager.SCOPE_TRACKER.get().enterGrpc();
             EngineManager.turnOnDongTai();
@@ -155,7 +154,7 @@ public class GrpcHandler {
 
     public static void blockingUnaryCall(Object req, Object res) {
         // todo: 判断 req 的相关自定义对象是否与污点有关
-        if (EngineManager.TAINT_POOL.isEmpty()) {
+        if (EngineManager.TAINT_HASH_CODES.isEmpty()) {
             return;
         }
 
@@ -177,7 +176,7 @@ public class GrpcHandler {
         Set<Object> modelItems = SourceImpl.parseCustomModel(req);
         boolean isHitTaints = false;
         for (Object item : modelItems) {
-            isHitTaints = isHitTaints || TaintPoolUtils.poolContains(item, event, false);
+            isHitTaints = isHitTaints || TaintPoolUtils.poolContains(item, event);
         }
         if (isHitTaints) {
             int invokeId = SpyDispatcherImpl.INVOKE_ID_SEQUENCER.getAndIncrement();
@@ -191,18 +190,16 @@ public class GrpcHandler {
             EngineManager.TRACK_MAP.addTrackMethod(invokeId, event);
             Set<Object> resModelItems = SourceImpl.parseCustomModel(res);
             sharedRespData.remove();
-            Set<Object> taintPool = EngineManager.TAINT_POOL.get();
             Set<Object> resModelSet = new HashSet<Object>();
             for (Object obj : resModelItems) {
                 // fixme: 暂时只跟踪字符串相关内容
                 if (obj instanceof String) {
                     resModelSet.add(obj);
                     addCustomResp.set(true);
-                    taintPool.add(obj);
                     int identityHashCode = System.identityHashCode(obj);
                     event.addTargetHash(identityHashCode);
                     event.addTargetHashForRpc(obj.hashCode());
-                    EngineManager.TAINT_HASH_CODES.get().add(identityHashCode);
+                    EngineManager.TAINT_HASH_CODES.add(identityHashCode);
                 }
             }
             sharedRespData.set(resModelSet);
@@ -210,7 +207,7 @@ public class GrpcHandler {
     }
 
     public static void sendMessage(Object message) {
-        if (EngineManager.TAINT_POOL.isEmpty()) {
+        if (EngineManager.TAINT_HASH_CODES.isEmpty()) {
             return;
         }
 
@@ -232,7 +229,7 @@ public class GrpcHandler {
         Set<Object> modelItems = SourceImpl.parseCustomModel(message);
         boolean isHitTaints = false;
         for (Object item : modelItems) {
-            isHitTaints = isHitTaints || TaintPoolUtils.poolContains(item, event, false);
+            isHitTaints = isHitTaints || TaintPoolUtils.poolContains(item, event);
         }
         if (isHitTaints) {
             int invokeId = SpyDispatcherImpl.INVOKE_ID_SEQUENCER.getAndIncrement();
@@ -249,7 +246,7 @@ public class GrpcHandler {
         Boolean added = addCustomResp.get();
         if (added != null && added) {
             if (sharedRespData.get().contains(value)) {
-                EngineManager.TAINT_POOL.addToPool(value);
+                EngineManager.TAINT_HASH_CODES.add(System.identityHashCode(value));
             }
         }
     }

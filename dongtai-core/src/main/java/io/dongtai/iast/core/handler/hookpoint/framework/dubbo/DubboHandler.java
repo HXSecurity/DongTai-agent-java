@@ -70,7 +70,6 @@ public class DubboHandler {
         }
 
         EngineManager.TRACK_MAP.set(new HashMap<Integer, MethodEvent>(1024));
-        EngineManager.TAINT_POOL.set(new HashSet<Object>());
         EngineManager.TAINT_HASH_CODES.set(new HashSet<Integer>());
     }
 
@@ -105,7 +104,7 @@ public class DubboHandler {
                 event.setOutValue(verifiedArguments);
 
                 EngineManager.TRACK_MAP.addTrackMethod(invokeId, event);
-                EngineManager.TAINT_POOL.addTaintToPool(verifiedArguments, event, true);
+                EngineManager.TAINT_HASH_CODES.addObject(verifiedArguments, event, true);
             }
         }
     }
@@ -162,7 +161,7 @@ public class DubboHandler {
     }
 
     public static void solveClientExit(Object invocation, Object rpcResult) {
-        if (EngineManager.TAINT_POOL.isEmpty()) {
+        if (EngineManager.TAINT_HASH_CODES.isEmpty()) {
             return;
         }
 
@@ -197,7 +196,7 @@ public class DubboHandler {
         }
         boolean isHitTaints = false;
         for (Object item : modelItems) {
-            isHitTaints = isHitTaints || TaintPoolUtils.poolContains(item, event, true);
+            isHitTaints = isHitTaints || TaintPoolUtils.poolContains(item, event);
         }
         if (isHitTaints) {
             int invokeId = SpyDispatcherImpl.INVOKE_ID_SEQUENCER.getAndIncrement();
@@ -210,17 +209,15 @@ public class DubboHandler {
             event.setCallStack(StackUtils.getLatestStack(5));
             EngineManager.TRACK_MAP.addTrackMethod(invokeId, event);
             Set<Object> resModelItems = SourceImpl.parseCustomModel(rpcResult);
-            Set<Object> taintPool = EngineManager.TAINT_POOL.get();
             Set<Object> resModelSet = new HashSet<Object>();
             for (Object obj : resModelItems) {
                 // fixme: 暂时只跟踪字符串相关内容
                 if (obj instanceof String) {
                     resModelSet.add(obj);
-                    taintPool.add(obj);
                     int identityHashCode = System.identityHashCode(obj);
                     event.addTargetHash(identityHashCode);
                     event.addTargetHashForRpc(obj.hashCode());
-                    EngineManager.TAINT_HASH_CODES.get().add(identityHashCode);
+                    EngineManager.TAINT_HASH_CODES.add(identityHashCode);
                 }
             }
             event.setOutValue(resModelSet);
@@ -229,7 +226,7 @@ public class DubboHandler {
 
     public static void solveServiceExit(Object invocation, Object rpcResult) {
         try {
-            if (EngineManager.TAINT_POOL.isEmpty()) {
+            if (EngineManager.TAINT_HASH_CODES.isEmpty()) {
                 return;
             }
 
@@ -251,7 +248,7 @@ public class DubboHandler {
             Set<Object> modelItems = SourceImpl.parseCustomModel(rpcResult);
             boolean isHitTaints = false;
             for (Object item : modelItems) {
-                isHitTaints = isHitTaints || TaintPoolUtils.poolContains(item, event, false);
+                isHitTaints = isHitTaints || TaintPoolUtils.poolContains(item, event);
             }
             if (isHitTaints) {
                 int invokeId = SpyDispatcherImpl.INVOKE_ID_SEQUENCER.getAndIncrement();

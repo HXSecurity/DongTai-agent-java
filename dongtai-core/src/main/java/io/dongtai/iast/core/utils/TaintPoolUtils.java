@@ -26,88 +26,48 @@ public class TaintPoolUtils {
         return obj instanceof String || obj instanceof Map || obj instanceof List;
     }
 
-    public static boolean poolContains(Object obj, MethodEvent event, boolean isNormal) {
+    public static boolean poolContains(Object obj, MethodEvent event) {
         if (obj == null) {
             return false;
         }
 
         boolean isContains;
-        boolean isString = obj instanceof String;
-        // 检查对象是否存在
-        isContains = contains(obj, isString, event, isNormal);
-        if (!isContains) {
-            if (obj instanceof String[]) {
-                String[] stringArray = (String[]) obj;
-                for (String stringItem : stringArray) {
-                    isContains = contains(stringItem, true, event, isNormal);
-                    if (isContains) {
-                        EngineManager.TAINT_POOL.addToPool(obj);
-                        event.addSourceHash(obj.hashCode());
-                        break;
-                    }
+        // check object hash exists
+        isContains = contains(obj);
+        if (isContains) {
+            event.addSourceHash(System.identityHashCode(obj));
+            return true;
+        }
+
+        if (obj instanceof String[]) {
+            String[] stringArray = (String[]) obj;
+            for (String stringItem : stringArray) {
+                isContains = contains(stringItem);
+                if (isContains) {
+                    event.addSourceHash(System.identityHashCode(obj));
+                    return true;
                 }
             }
-            if (obj instanceof Object[]) {
-                Object[] objArray = (Object[]) obj;
-                for (Object objItem : objArray) {
-                    if (poolContains(objItem, event)) {
-                        EngineManager.TAINT_POOL.addToPool(obj);
-                        event.addSourceHash(obj.hashCode());
-                        return true;
-                    }
+        } else if (obj instanceof Object[]) {
+            Object[] objArray = (Object[]) obj;
+            for (Object objItem : objArray) {
+                if (poolContains(objItem, event)) {
+                    return true;
                 }
             }
         }
-        return isContains;
-    }
 
-    public static boolean poolContains(Object obj, MethodEvent event) {
-        return poolContains(obj, event, true);
+        return false;
     }
 
     /**
      * 判断污点是否匹配
      *
-     * @param obj      Object
-     * @param isString boolean
-     * @param event    MethodEvent
+     * @param obj Object
      * @return boolean
      */
-    private static boolean contains(Object obj, boolean isString, MethodEvent event, boolean isNormal) {
-        Set<Object> taints = EngineManager.TAINT_POOL.get();
-        int hashcode = 0;
-        // 检查是否
-
-        if (isString && PropertyUtils.getInstance().isNormalMode() && isNormal) {
-            Iterator<Object> iterator = taints.iterator();
-            hashcode = System.identityHashCode(obj);
-            while (iterator.hasNext()) {
-                try {
-                    Object value = iterator.next();
-                    if (obj.equals(value)) {
-                        // 检查当前污点的hashcode是否在hashcode池中，如果在，则标记传播
-                        if (EngineManager.TAINT_HASH_CODES.get().contains(hashcode)) {
-                            event.addSourceHash(hashcode);
-                            return true;
-                        }
-                    }
-                } catch (Throwable ignore) {
-
-                }
-            }
-        } else {
-            try {
-                if (taints.contains(obj)) {
-                    event.addSourceHash(obj.hashCode());
-                    return true;
-                }
-            } catch (Throwable ignore) {
-
-            }
-            return false;
-        }
-
-        return false;
+    private static boolean contains(Object obj) {
+        return EngineManager.TAINT_HASH_CODES.contains(System.identityHashCode(obj));
     }
 
     /**

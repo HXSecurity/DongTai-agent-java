@@ -1,16 +1,10 @@
 package io.dongtai.iast.core.handler.hookpoint.controller.impl;
 
 import io.dongtai.iast.core.EngineManager;
-import io.dongtai.iast.core.handler.hookpoint.models.IastHookRuleModel;
-import io.dongtai.iast.core.handler.hookpoint.models.IastSinkModel;
-import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
+import io.dongtai.iast.core.handler.hookpoint.models.*;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.VulnType;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.dynamic.DynamicPropagatorScanner;
-import io.dongtai.iast.core.handler.hookpoint.vulscan.normal.CookieFlagsMissingVulScan;
-import io.dongtai.iast.core.handler.hookpoint.vulscan.normal.CryptoBacCiphersVulScan;
-import io.dongtai.iast.core.handler.hookpoint.vulscan.normal.CryptoBadMacVulScan;
-import io.dongtai.iast.core.handler.hookpoint.vulscan.normal.CryptoWeakRandomnessVulScan;
-import io.dongtai.iast.core.utils.Asserts;
+import io.dongtai.iast.core.handler.hookpoint.vulscan.normal.*;
 
 /**
  * 危险方法hook点处理方法
@@ -41,7 +35,7 @@ public class SinkImpl {
             new CryptoBacCiphersVulScan().scan(sink, event);
         } else if (VulnType.COOKIE_FLAGS_MISSING.equals(sinkType)) {
             new CookieFlagsMissingVulScan().scan(sink, event);
-        } else if (EngineManager.TAINT_POOL.isNotEmpty()) {
+        } else if (!EngineManager.TAINT_HASH_CODES.isEmpty()) {
             new DynamicPropagatorScanner().scan(sink, event);
         }
     }
