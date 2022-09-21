@@ -39,6 +39,7 @@ public class SourceImpl {
 
         int invokeId = invokeIdSequencer.getAndIncrement();
         event.setInvokeId(invokeId);
+        // @TODO: use source/target
         event.setInValue(event.argumentArray);
         event.setOutValue(event.returnValue);
 
@@ -63,7 +64,7 @@ public class SourceImpl {
         }
 
         int hash = System.identityHashCode(obj);
-        if (EngineManager.TAINT_HASH_CODES.get().contains(hash)) {
+        if (EngineManager.TAINT_HASH_CODES.contains(hash)) {
             return;
         }
 
@@ -92,10 +93,8 @@ public class SourceImpl {
 
             TaintRanges tr = new TaintRanges(new TaintRange(0, len));
             event.targetRanges.add(new MethodEvent.MethodEventTargetRange(hash, TaintRangesBuilder.obj2String(obj), tr));
-            EngineManager.TAINT_HASH_CODES.get().add(hash);
+            EngineManager.TAINT_HASH_CODES.add(hash);
             event.addTargetHash(hash);
-            event.addTargetHashForRpc(obj.hashCode());
-            EngineManager.TAINT_POOL.get().add(obj);
             EngineManager.TAINT_RANGES_POOL.add(hash, tr);
         }
     }

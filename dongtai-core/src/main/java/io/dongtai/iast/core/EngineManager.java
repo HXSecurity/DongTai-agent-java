@@ -30,7 +30,6 @@ public class EngineManager {
     private static final BooleanThreadLocal ENTER_HTTP_ENTRYPOINT = new BooleanThreadLocal(false);
     public static final RequestContext REQUEST_CONTEXT = new RequestContext();
     public static final IastTrackMap TRACK_MAP = new IastTrackMap();
-    public static final IastTaintPool TAINT_POOL = new IastTaintPool();
     public static final IastTaintHashCodes TAINT_HASH_CODES = new IastTaintHashCodes();
     public static final TaintRangesPool TAINT_RANGES_POOL = new TaintRangesPool();
     public static final IastScopeTracker SCOPE_TRACKER = new IastScopeTracker();
@@ -134,7 +133,6 @@ public class EngineManager {
         EngineManager.ENTER_HTTP_ENTRYPOINT.remove();
         EngineManager.REQUEST_CONTEXT.remove();
         EngineManager.TRACK_MAP.remove();
-        EngineManager.TAINT_POOL.remove();
         EngineManager.TAINT_HASH_CODES.remove();
         EngineManager.TAINT_RANGES_POOL.remove();
         EngineManager.SCOPE_TRACKER.remove();
@@ -267,7 +265,6 @@ public class EngineManager {
         ENTER_HTTP_ENTRYPOINT.enterEntry();
         REQUEST_CONTEXT.set(requestMeta);
         TRACK_MAP.set(new HashMap<Integer, MethodEvent>(1024));
-        TAINT_POOL.set(new HashSet<Object>());
         TAINT_HASH_CODES.set(new HashSet<Integer>());
     }
 
@@ -325,7 +322,6 @@ public class EngineManager {
         }
 
         TRACK_MAP.set(new HashMap<Integer, MethodEvent>(1024));
-        TAINT_POOL.set(new HashSet<Object>());
         TAINT_HASH_CODES.set(new HashSet<Integer>());
     }
 
