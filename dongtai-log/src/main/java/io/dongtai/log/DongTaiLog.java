@@ -232,7 +232,7 @@ public class DongTaiLog {
     }
 
     public static void error(Throwable t) {
-        if (canLog(Level.FINER) && enablePrintLog) {
+        if (canLog(Level.SEVERE) && enablePrintLog) {
             String msg = t.getMessage();
             if (enableColor) {
                 System.out.println(getTime() + TITTLE_COLOR_PREFIX + ERROR_COLOR_PREFIX + msg);
@@ -248,8 +248,8 @@ public class DongTaiLog {
     }
 
     public static void error(String des, Throwable t) {
-        if (canLog(Level.FINER) && enablePrintLog) {
-            String msg = des+"\n"+t.getMessage();
+        if (canLog(Level.SEVERE) && enablePrintLog) {
+            String msg = des + "\n" + t.getMessage();
             if (enableColor) {
                 System.out.println(getTime() + TITTLE_COLOR_PREFIX + ERROR_COLOR_PREFIX + msg);
             } else {
