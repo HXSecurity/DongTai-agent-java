@@ -12,10 +12,9 @@ public class LogCollector {
     private static String FLUENT_FILE;
     private static String FLUENT_FILE_CONF;
     private static Process fluent;
-    private final static boolean DISABLED = IastProperties.getInstance().getDisableLogCollector();
 
     public static void extractFluent() {
-        if (DISABLED) {
+        if (IastProperties.getInstance().getDisableLogCollector()) {
             return;
         }
         try {
@@ -26,20 +25,18 @@ public class LogCollector {
                 FLUENT_FILE_CONF = System.getProperty("java.io.tmpdir.dongtai") + "iast" + File.separator + "fluent.conf";
                 FileUtils.getResourceToFile("bin/fluent.conf", FLUENT_FILE_CONF);
                 FileUtils.confReplace(FLUENT_FILE_CONF);
-                if ((new File(FLUENT_FILE)).setExecutable(true)) {
-                    DongTaiLog.info("fluent extract success.");
-                } else {
-                    DongTaiLog.info("fluent extract failure. please set execute permission, file: {}", FLUENT_FILE);
+                if (!(new File(FLUENT_FILE)).setExecutable(true)) {
+                    DongTaiLog.info("fluent setExecutable failure. please set execute permission, file: {}", FLUENT_FILE);
                 }
                 doFluent();
             }
         } catch (IOException e) {
-            DongTaiLog.error(e);
+            DongTaiLog.error("fluent extract failure", e);
         }
     }
 
     public static void doFluent() {
-        if (DISABLED) {
+        if (IastProperties.getInstance().getDisableLogCollector()) {
             return;
         }
         String[] execution = {
@@ -50,22 +47,24 @@ public class LogCollector {
         };
         try {
             fluent = Runtime.getRuntime().exec(execution);
+            DongTaiLog.info("fluent process started");
             Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
                 public void run() {
-                    fluent.destroy();
+                    stopFluent();
                 }
             }));
         } catch (IOException e) {
-            DongTaiLog.error(e);
+            DongTaiLog.error("fluent process start failed", e);
         }
     }
 
     public static void stopFluent() {
-        if (DISABLED || fluent == null) {
+        if (fluent == null) {
             return;
         }
         try {
             fluent.destroy();
+            DongTaiLog.info("fluent process stopped");
         } catch (Exception ignored) {
         } finally {
             fluent = null;
