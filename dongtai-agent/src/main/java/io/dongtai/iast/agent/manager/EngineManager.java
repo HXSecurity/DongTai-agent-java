@@ -511,7 +511,6 @@ public class EngineManager {
         setINSTANCE(null);
         Base64Encoder.setInstance(null);
         AbstractTomcat.setTomcatVersion(null);
-        HttpClientUtils.setDoNotVerify(null);
         IastProperties.setInstance(null);
     }
 }

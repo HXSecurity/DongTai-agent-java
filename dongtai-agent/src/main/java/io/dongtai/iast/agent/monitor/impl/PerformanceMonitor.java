@@ -5,7 +5,8 @@ import io.dongtai.iast.agent.IastProperties;
 import io.dongtai.iast.agent.manager.EngineManager;
 import io.dongtai.iast.agent.monitor.IMonitor;
 import io.dongtai.iast.agent.monitor.MonitorDaemonThread;
-import io.dongtai.iast.agent.monitor.collector.*;
+import io.dongtai.iast.agent.monitor.collector.IPerformanceCollector;
+import io.dongtai.iast.agent.monitor.collector.MetricsBindCollectorEnum;
 import io.dongtai.iast.agent.report.AgentRegisterReport;
 import io.dongtai.iast.agent.util.ThreadUtils;
 import io.dongtai.iast.common.entity.performance.PerformanceMetrics;
@@ -17,9 +18,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
+import java.net.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -90,6 +89,9 @@ public class PerformanceMonitor implements IMonitor {
     }
 
     public static List<PerformanceMetrics> getPerformanceMetrics() {
+        if (PERFORMANCE_METRICS == null) {
+            PERFORMANCE_METRICS = new ArrayList<PerformanceMetrics>();
+        }
         return PERFORMANCE_METRICS;
     }
 
