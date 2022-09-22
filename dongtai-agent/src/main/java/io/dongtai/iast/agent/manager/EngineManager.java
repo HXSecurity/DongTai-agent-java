@@ -1,8 +1,6 @@
 package io.dongtai.iast.agent.manager;
 
-import io.dongtai.iast.agent.AgentLauncher;
-import io.dongtai.iast.agent.IastClassLoader;
-import io.dongtai.iast.agent.IastProperties;
+import io.dongtai.iast.agent.*;
 import io.dongtai.iast.agent.middlewarerecognition.ServerDetect;
 import io.dongtai.iast.agent.middlewarerecognition.tomcat.AbstractTomcat;
 import io.dongtai.iast.agent.monitor.MonitorDaemonThread;
@@ -19,9 +17,7 @@ import java.io.*;
 import java.lang.instrument.Instrumentation;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.InvocationTargetException;
-import java.net.HttpURLConnection;
-import java.net.Proxy;
-import java.net.URL;
+import java.net.*;
 import java.util.jar.JarFile;
 
 /**
@@ -474,12 +470,7 @@ public class EngineManager {
             uninstallObject();
             MonitorDaemonThread.isExit = true;
         }
-        try {
-            AgentLauncher.fluent.destroy();
-        }catch (Exception ignored){
-        }finally {
-            AgentLauncher.fluent=null;
-        }
+        LogCollector.stopFluent();
         return true;
     }
 

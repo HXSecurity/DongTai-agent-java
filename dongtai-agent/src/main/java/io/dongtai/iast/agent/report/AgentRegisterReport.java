@@ -8,12 +8,11 @@ import io.dongtai.iast.agent.middlewarerecognition.ServerDetect;
 import io.dongtai.iast.agent.util.base64.Base64Encoder;
 import io.dongtai.iast.agent.util.http.HttpClientUtils;
 import io.dongtai.log.DongTaiLog;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.net.*;
 import java.util.Enumeration;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -225,11 +224,11 @@ public class AgentRegisterReport {
                 setAgentData(responseRaw);
             }
         } catch (NullPointerException e) {
-            DongTaiLog.error("Agent registration to {} failed, Token: {}, Reason: {}", IastProperties.getInstance().getBaseUrl(), IastProperties.getInstance().getIastServerToken(), e.getMessage());
+            DongTaiLog.error("Agent registration to {} failed, Token: {}, Reason: {}",
+                    IastProperties.getInstance().getBaseUrl(), IastProperties.getInstance().getIastServerToken(), e.getMessage());
         } catch (Exception e) {
-            DongTaiLog.error(e);
             DongTaiLog.error("Agent registration to {} failed 10 seconds later, cause: {}, token: {}",
-                    IastProperties.getInstance().getBaseUrl(), e.getMessage(), IastProperties.getInstance().getIastServerToken());
+                    IastProperties.getInstance().getBaseUrl(), e.toString(), IastProperties.getInstance().getIastServerToken());
         }
     }
 
@@ -252,11 +251,12 @@ public class AgentRegisterReport {
                 JSONObject data = (JSONObject) responseObj.get("data");
                 agentId = (Integer) data.get("id");
                 coreRegisterStart = (Integer) data.get("coreAutoStart");
-            }else {
-                DongTaiLog.error("Register msg: "+ responseRaw);
+            } else {
+                DongTaiLog.error("Register msg: " + responseRaw);
             }
-        }catch (Exception e){
-            DongTaiLog.error("DongTai server no response.");
+        } catch (Exception e) {
+            DongTaiLog.error("Parse {} register response failed: {}",
+                    IastProperties.getInstance().getBaseUrl(), e.toString());
         }
     }
 

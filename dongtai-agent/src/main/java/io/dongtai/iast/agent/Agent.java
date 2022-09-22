@@ -1,10 +1,11 @@
 package io.dongtai.iast.agent;
 
-import java.io.*;
-import java.util.Arrays;
-
 import io.dongtai.iast.agent.util.FileUtils;
 import org.apache.commons.cli.*;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -31,6 +32,7 @@ public class Agent {
         attachOptions.addOption(build("server_package", "server_package", "optional: DongTai core package download way."));
         attachOptions.addOption(build("log_level", "log_level", "optional: DongTai agent log print level."));
         attachOptions.addOption(build("log_path", "log_path", "optional: DongTai agent log print path."));
+        attachOptions.addOption(build("disable_log_collector", "disable_log_collector", "optional: DongTai agent disable log collector."));
 
         CommandLineParser parser = new DefaultParser();
         HelpFormatter formatter = new HelpFormatter();
@@ -80,6 +82,9 @@ public class Agent {
             }
             if (result.hasOption("log_path")) {
                 attachArgs.append("&logPath=").append(result.getOptionValue("log_path"));
+            }
+            if (result.hasOption("disable_log_collector")) {
+                attachArgs.append("&disableLogCollector=").append(result.getOptionValue("disable_log_collector"));
             }
             return new String[]{pid, attachArgs.toString()};
         } else {
