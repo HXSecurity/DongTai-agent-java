@@ -92,7 +92,7 @@ public class SourceImpl {
             }
 
             TaintRanges tr = new TaintRanges(new TaintRange(0, len));
-            event.targetRanges.add(new MethodEvent.MethodEventTargetRange(hash, TaintRangesBuilder.obj2String(obj), tr));
+            event.targetRanges.add(new MethodEvent.MethodEventTargetRange(hash, tr));
             EngineManager.TAINT_HASH_CODES.add(hash);
             event.addTargetHash(hash);
             EngineManager.TAINT_RANGES_POOL.add(hash, tr);

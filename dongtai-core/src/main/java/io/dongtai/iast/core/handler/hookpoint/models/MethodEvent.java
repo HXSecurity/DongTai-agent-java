@@ -1,11 +1,11 @@
 package io.dongtai.iast.core.handler.hookpoint.models;
 
 import io.dongtai.iast.core.handler.hookpoint.vulscan.taintrange.TaintRanges;
-import io.dongtai.iast.core.handler.hookpoint.vulscan.taintrange.TaintRangesBuilder;
 import io.dongtai.iast.core.utils.PropertyUtils;
 import io.dongtai.log.DongTaiLog;
 import org.json.JSONObject;
 
+import java.io.StringWriter;
 import java.util.*;
 
 /**
@@ -228,19 +228,16 @@ public class MethodEvent {
 
     public static class MethodEventTargetRange {
         private final Integer hash;
-        private final String value;
         private final TaintRanges ranges;
 
-        public MethodEventTargetRange(Integer hash, String value, TaintRanges ranges) {
+        public MethodEventTargetRange(Integer hash, TaintRanges ranges) {
             this.hash = hash;
-            this.value = value;
             this.ranges = ranges;
         }
 
         public JSONObject toJson() {
             JSONObject json = new JSONObject();
             json.put("hash", this.hash);
-            json.put("value", this.value);
             json.put("ranges", this.ranges.toJson());
             return json;
         }
@@ -324,11 +321,7 @@ public class MethodEvent {
             return "";
         }
         try {
-            if (value instanceof byte[]) {
-                return TaintRangesBuilder.trimRight((byte[]) value);
-            } else if (value instanceof char[]) {
-                return TaintRangesBuilder.trimRight((char[]) value);
-            } else if (value.getClass().isArray() && !value.getClass().getComponentType().isPrimitive()) {
+            if (value.getClass().isArray() && !value.getClass().getComponentType().isPrimitive()) {
                 // 判断是否是基本类型的数组，基本类型的数组无法类型转换为Object[]，导致java.lang.ClassCastException异常
                 Object[] taints = (Object[]) value;
                 for (Object taint : taints) {
@@ -343,6 +336,8 @@ public class MethodEvent {
                         }
                     }
                 }
+            } else if (value instanceof StringWriter) {
+                sb.append(((StringWriter) value).getBuffer().toString());
             } else {
                 sb.append(value.toString());
             }
