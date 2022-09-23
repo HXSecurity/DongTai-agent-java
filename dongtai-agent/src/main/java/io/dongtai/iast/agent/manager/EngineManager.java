@@ -38,6 +38,7 @@ public class EngineManager {
     private static final String ENGINE_PACKAGE_REMOTE_URI_JDK6 = "/api/v1/engine/download?engineName=dongtai-core-jdk6";
     private static final String API_PACKAGE_REMOTE_URI = "/api/v1/engine/download?engineName=dongtai-api";
     private static final String API_PACKAGE_REMOTE_URI_JDK6 = "/api/v1/engine/download?engineName=dongtai-api-jdk6";
+    private final static String TMP_DIR = IastProperties.getInstance().getTmpDir();
     private static IastClassLoader IAST_CLASS_LOADER;
     private static EngineManager INSTANCE;
     private static String PID;
@@ -170,7 +171,7 @@ public class EngineManager {
      * @return engine包的本地保存路径
      */
     private static String getEnginePackageCachePath() {
-        return System.getProperty("java.io.tmpdir.dongtai") + "iast" + File.separator + "dongtai-core.jar";
+        return TMP_DIR + "dongtai-core.jar";
     }
 
     /**
@@ -179,7 +180,7 @@ public class EngineManager {
      * @return inject包的本地路径
      */
     private static String getInjectPackageCachePath() {
-        return System.getProperty("java.io.tmpdir.dongtai") + "iast" + File.separator + "dongtai-spy.jar";
+        return TMP_DIR + "dongtai-spy.jar";
     }
 
     /**
@@ -188,11 +189,11 @@ public class EngineManager {
      * @return inject包的本地路径
      */
     private static String getApiPackagePath() {
-        return System.getProperty("java.io.tmpdir.dongtai") + "iast" + File.separator + "dongtai-api.jar";
+        return TMP_DIR + "dongtai-api.jar";
     }
 
     private static String getGrpcPackagePath() {
-        return System.getProperty("java.io.tmpdir.dongtai") + "iast" + File.separator + "dongtai-grpc.jar";
+        return TMP_DIR + "dongtai-grpc.jar";
     }
 
 
@@ -213,16 +214,17 @@ public class EngineManager {
 
             connection.setRequestMethod("GET");
             connection.setRequestProperty("User-Agent", "DongTai-IAST-Agent");
-            connection.setRequestProperty("Authorization", "Token " + properties.getIastServerToken());
+            connection.setRequestProperty("Authorization", "Token " + properties.getServerToken());
             connection.setUseCaches(false);
             connection.setDoOutput(true);
 
-            if (connection.getContentType().equals("application/json")) {
+            if ("application/json".equals(connection.getContentType())) {
                 BufferedReader streamReader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
                 StringBuilder responseStrBuilder = new StringBuilder();
                 String inputStr;
-                while ((inputStr = streamReader.readLine()) != null)
+                while ((inputStr = streamReader.readLine()) != null) {
                     responseStrBuilder.append(inputStr);
+                }
 
                 JSONObject jsonObject = new JSONObject(responseStrBuilder.toString());
                 DongTaiLog.error("DongTai Core Package: {} download failed. response: {}", fileUrl, jsonObject);
@@ -310,14 +312,14 @@ public class EngineManager {
         String enginePackage = getEnginePackageCachePath();
         String apiPackage = getApiPackagePath();
         if (properties.isDebug()) {
-            DongTaiLog.info("current mode: debug, try to read package from directory {}", System.getProperty("java.io.tmpdir.dongtai"));
+            DongTaiLog.info("current mode: debug, try to read package from directory {}", TMP_DIR);
             if ((new File(spyPackage)).exists() && (new File(enginePackage)).exists() && (new File(apiPackage)).exists()) {
                 return true;
             }
         }
-        if(properties.getIsDownloadPackage().equals("true")){
+        if ("true".equalsIgnoreCase(properties.getIsDownloadPackage())) {
             return downloadPackageFromServer();
-        }else {
+        } else {
             return extractPackageFromAgent();
         }
     }
@@ -328,14 +330,14 @@ public class EngineManager {
         String enginePackage = getEnginePackageCachePath();
         String apiPackage = getApiPackagePath();
         if (properties.isDebug()) {
-            DongTaiLog.info("current mode: debug, try to read package from directory {}", System.getProperty("java.io.tmpdir.dongtai"));
+            DongTaiLog.info("current mode: debug, try to read package from directory {}", TMP_DIR);
             if ((new File(spyPackage)).exists() && (new File(enginePackage)).exists() && (new File(apiPackage)).exists()) {
                 return true;
             }
         }
-        if(properties.getIsDownloadPackage().equals("true")){
+        if ("true".equalsIgnoreCase(properties.getIsDownloadPackage())) {
             return downloadPackageFromServerJdk6();
-        }else {
+        } else {
             return extractPackageFromAgent();
         }
     }
@@ -353,20 +355,22 @@ public class EngineManager {
             classOfEngine = IAST_CLASS_LOADER.loadClass(ENGINE_ENTRYPOINT_CLASS);
             String agentPath = this.getClass().getProtectionDomain().getCodeSource().getLocation().getFile();
             classOfEngine.getMethod("install", String.class, String.class, Integer.class, Instrumentation.class,
-                    String.class)
+                            String.class)
                     .invoke(null, launchMode, this.properties.getPropertiesFilePath(),
                             AgentRegisterReport.getAgentFlag(), inst, agentPath);
             setRunningStatus(0);
             setCoreStop(false);
             return true;
         } catch (IOException e) {
-            DongTaiLog.error("DongTai engine start failed, Reason: dongtai-spy.jar or dongtai-core.jar open failed. path: \n\tdongtai-core.jar: " + corePackage + "\n\tdongtai-spy.jar: " + spyPackage);
+            DongTaiLog.error("DongTai engine install failed, Reason: dongtai-spy.jar or dongtai-core.jar open failed. path: \n\tdongtai-core.jar: " + corePackage + "\n\tdongtai-spy.jar: " + spyPackage);
         } catch (ClassNotFoundException e) {
-            DongTaiLog.error(e);
-            DongTaiLog.error("ClassNotFoundException: DongTai engine start failed, please contact staff for help.");
-        } catch (Throwable throwable) {
-            DongTaiLog.error("Throwable: DongTai engine start failed, please contact staff for help.");
-            DongTaiLog.error(throwable);
+            DongTaiLog.error("DongTai engine can not found AgentEngine class", e);
+        } catch (NoSuchMethodException e) {
+            DongTaiLog.error("DongTai engine can not found install method", e);
+        } catch (IllegalAccessException e) {
+            DongTaiLog.error("DongTai engine call install method permission denied", e);
+        } catch (InvocationTargetException e) {
+            DongTaiLog.error("DongTai engine install failed", e);
         }
         return false;
     }
@@ -385,18 +389,12 @@ public class EngineManager {
                 return true;
             }
             return false;
-        } catch (InvocationTargetException e) {
-            DongTaiLog.error(e);
-            DongTaiLog.error("DongTai engine start failed, please contact staff for help.");
         } catch (NoSuchMethodException e) {
-            DongTaiLog.error(e);
-            DongTaiLog.error("DongTai engine start failed, please contact staff for help.");
+            DongTaiLog.error("DongTai engine can not found start method", e);
         } catch (IllegalAccessException e) {
-            DongTaiLog.error(e);
-            DongTaiLog.error("DongTai engine start failed, please contact staff for help.");
-        } catch (Throwable throwable) {
-            DongTaiLog.error("DongTai engine start failed, please contact staff for help.");
-            DongTaiLog.error(throwable);
+            DongTaiLog.error("DongTai engine call start method permission denied", e);
+        } catch (InvocationTargetException e) {
+            DongTaiLog.error("DongTai engine start failed", e);
         }
         return false;
     }
@@ -417,20 +415,12 @@ public class EngineManager {
                 return true;
             }
             return false;
-        } catch (InvocationTargetException e) {
-            DongTaiLog.error("DongTai engine stop failed, please contact staff for help.");
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            e.printStackTrace(pw);
-            DongTaiLog.error(sw.toString());
         } catch (NoSuchMethodException e) {
-            DongTaiLog.error("DongTai engine stop failed, please contact staff for help.");
+            DongTaiLog.error("DongTai engine can not found stop method", e);
         } catch (IllegalAccessException e) {
-            DongTaiLog.error("DongTai engine stop failed, please contact staff for help.");
-            DongTaiLog.error(e);
-        } catch (Throwable throwable) {
-            DongTaiLog.error("DongTai engine stop failed, please contact staff for help.");
-            DongTaiLog.error(throwable);
+            DongTaiLog.error("DongTai engine call stop method permission denied", e);
+        } catch (InvocationTargetException e) {
+            DongTaiLog.error("DongTai engine stop failed", e);
         }
         return false;
     }
@@ -452,12 +442,12 @@ public class EngineManager {
                 classOfEngine.getMethod("destroy", String.class, String.class, Instrumentation.class)
                         .invoke(null, launchMode, this.properties.getPropertiesFilePath(), inst);
             }
-        } catch (IllegalAccessException e) {
-            DongTaiLog.error(e);
-        } catch (InvocationTargetException e) {
-            DongTaiLog.error(e);
         } catch (NoSuchMethodException e) {
-            DongTaiLog.error(e);
+            DongTaiLog.error("DongTai engine can not found destroy method", e);
+        } catch (IllegalAccessException e) {
+            DongTaiLog.error("DongTai engine call destroy method permission denied", e);
+        } catch (InvocationTargetException e) {
+            DongTaiLog.error("DongTai engine destroy failed", e);
         }
 
         // 关闭SandboxClassLoader

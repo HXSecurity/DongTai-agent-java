@@ -29,7 +29,7 @@ import java.util.List;
  */
 public class PerformanceMonitor implements IMonitor {
     private final static IastProperties PROPERTIES = IastProperties.getInstance();
-    private final static String TOKEN = PROPERTIES.getIastServerToken();
+    private final static String TOKEN = PROPERTIES.getServerToken();
     private final static String START_URL = PROPERTIES.getBaseUrl() + "/api/v1/agent/limit";
     private final static String AGENT_TOKEN = URLEncoder.encode(AgentRegisterReport.getAgentToken());
     private static Integer AGENT_THRESHOLD_VALUE;

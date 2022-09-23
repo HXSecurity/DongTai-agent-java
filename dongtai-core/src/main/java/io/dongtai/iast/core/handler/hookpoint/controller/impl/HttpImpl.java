@@ -4,6 +4,7 @@ import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.hookpoint.IastClassLoader;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.utils.HttpClientUtils;
+import io.dongtai.iast.core.utils.PropertyUtils;
 import io.dongtai.iast.core.utils.matcher.ConfigMatcher;
 import io.dongtai.log.DongTaiLog;
 
@@ -29,7 +30,7 @@ public class HttpImpl {
     private final static ThreadLocal<Map<String, Object>> REQUEST_META = new ThreadLocal<>();
 
     static {
-        IAST_REQUEST_JAR_PACKAGE = new File(System.getProperty("java.io.tmpdir.dongtai") + "iast" + File.separator + "dongtai-api.jar");
+        IAST_REQUEST_JAR_PACKAGE = new File(PropertyUtils.getTmpDir() + "dongtai-api.jar");
         if (!IAST_REQUEST_JAR_PACKAGE.exists()) {
             HttpClientUtils.downloadRemoteJar("/api/v1/engine/download?engineName=dongtai-api", IAST_REQUEST_JAR_PACKAGE.getAbsolutePath());
         }
