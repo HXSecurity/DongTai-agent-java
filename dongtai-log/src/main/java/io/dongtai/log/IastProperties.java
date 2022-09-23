@@ -1,8 +1,6 @@
 package io.dongtai.log;
 
-import java.io.*;
-import java.net.URLDecoder;
-import java.util.Properties;
+import java.io.File;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -22,7 +20,12 @@ public class IastProperties {
 
     public static String getLogPath() {
         if (dongtaiLogPath == null) {
-            dongtaiLogPath = System.getProperty("dongtai.log.path", System.getProperty("java.io.tmpdir.dongtai")+File.separator+"dongtaiJavaAgentLogs");
+            String tmpDir = System.getProperty("java.io.tmpdir.dongtai");
+            if (null == tmpDir || tmpDir.isEmpty()) {
+                return "";
+            }
+            dongtaiLogPath = System.getProperty("dongtai.log.path",
+                    tmpDir + File.separator + "logs");
         }
         return dongtaiLogPath;
     }
