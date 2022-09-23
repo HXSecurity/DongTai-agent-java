@@ -16,7 +16,7 @@ public class DongTaiLog {
     static String filePath;
     static boolean enableColor;
     static boolean isCreateLog = false;
-    public static java.util.logging.Level LEVEL;
+    public static LogLevel LEVEL = getCurrentLevel();
 
     private static final String RESET = "\033[0m";
     private static final int RED = 31;
@@ -24,243 +24,213 @@ public class DongTaiLog {
     private static final int YELLOW = 33;
     private static final int BLUE = 34;
 
-    private static final String TITTLE = "[io.dongtai.iast.agent] ";
-    private static final String TITTLE_COLOR_PREFIX = "[" + colorStr("io.dongtai.iast.agent", BLUE) + "] ";
-
-    private static final String TRACE_PREFIX = "[TRACE] ";
-    private static final String TRACE_COLOR_PREFIX = "[" + colorStr("TRACE", GREEN) + "] ";
-
-    private static final String DEBUG_PREFIX = "[DEBUG] ";
-    private static final String DEBUG_COLOR_PREFIX = "[" + colorStr("DEBUG", GREEN) + "] ";
-
-    private static final String INFO_PREFIX = "[INFO] ";
-    private static final String INFO_COLOR_PREFIX = "[" + colorStr("INFO", GREEN) + "] ";
-
-    private static final String WARN_PREFIX = "[WARN] ";
-    private static final String WARN_COLOR_PREFIX = "[" + colorStr("WARN", YELLOW) + "] ";
-
-    private static final String ERROR_PREFIX = "[ERROR] ";
-    private static final String ERROR_COLOR_PREFIX = "[" + colorStr("ERROR", RED) + "] ";
+    private static final String TITLE = "[io.dongtai.iast.agent] ";
+    private static final String TITLE_COLOR = "[" + colorStr("io.dongtai.iast.agent", BLUE) + "] ";
 
     static {
         if (System.console() != null && !System.getProperty("os.name").toLowerCase().contains("windows")) {
             enableColor = true;
         }
-        String logLevel = IastProperties.getLogLevel();
-        if ("info".equals(logLevel)) {
-            LEVEL = Level.CONFIG;
-        } else if ("debug".equals(logLevel)) {
-            LEVEL = Level.FINER;
-        } else if ("warn".equals(logLevel)) {
-            LEVEL = Level.WARNING;
-        } else if ("error".equals(logLevel)) {
-            LEVEL = Level.SEVERE;
-        } else if ("trace".equals(logLevel)) {
-            LEVEL = Level.FINEST;
+
+        enablePrintLog = !"false".equalsIgnoreCase(IastProperties.enablePrintLog());
+        filePath = IastProperties.getLogPath();
+        if (enablePrintLog && !isCreateLog && !filePath.isEmpty()) {
+            File f = new File(filePath);
+            if (!f.exists()) {
+                f.mkdirs();
+            }
+            File file = new File(filePath, File.separator + "dongtai_javaagent.log");
+            if (!file.exists()) {
+                try {
+                    file.createNewFile();
+                } catch (IOException ignore) {
+                } finally {
+                    isCreateLog = true;
+                }
+            }
         }
     }
 
-    /**
-     * set logger Level
-     *
-     * @param level
-     * @return
-     * @see java.util.logging.Level
-     */
-    public static Level level(Level level) {
-        Level old = LEVEL;
-        LEVEL = level;
-        return old;
+    public enum LogLevel {
+        TRACE(Level.FINEST, "[TRACE] ", "[" + colorStr("TRACE", BLUE) + "] "),
+        DEBUG(Level.FINER, "[DEBUG] ", "[" + colorStr("DEBUG", BLUE) + "] "),
+        INFO(Level.INFO, "[INFO] ", "[" + colorStr("INFO", GREEN) + "] "),
+        WARN(Level.WARNING, "[WARN] ", "[" + colorStr("WARN", YELLOW) + "] "),
+        ERROR(Level.SEVERE, "[ERROR] ", "[" + colorStr("ERROR", RED) + "] "),
+        ;
+
+        private final Level level;
+        private final String prefix;
+        private final String colorPrefix;
+
+        LogLevel(Level level, String prefix, String colorPrefix) {
+            this.level = level;
+            this.prefix = prefix;
+            this.colorPrefix = colorPrefix;
+        }
+
+        private Level getLevel() {
+            return level;
+        }
+
+        private String getPrefix() {
+            return prefix;
+        }
+
+        private String getColorPrefix() {
+            return colorPrefix;
+        }
+    }
+
+    private static LogLevel getCurrentLevel() {
+        String logLevel = IastProperties.getLogLevel();
+        LogLevel lvl;
+        if ("trace".equals(logLevel)) {
+            lvl = LogLevel.TRACE;
+        } else if ("info".equals(logLevel)) {
+            lvl = LogLevel.INFO;
+        } else if ("debug".equals(logLevel)) {
+            lvl = LogLevel.DEBUG;
+        } else if ("warn".equals(logLevel)) {
+            lvl = LogLevel.WARN;
+        } else if ("error".equals(logLevel)) {
+            lvl = LogLevel.ERROR;
+        } else {
+            lvl = LogLevel.INFO;
+        }
+        return lvl;
+    }
+
+    public static void setLevel(LogLevel lvl) {
+        LEVEL = lvl;
+    }
+
+    public static boolean canLog(LogLevel lvl) {
+        return enablePrintLog && lvl.getLevel().intValue() >= LEVEL.getLevel().intValue();
     }
 
     private static String colorStr(String msg, int colorCode) {
         return "\033[" + colorCode + "m" + msg + RESET;
     }
 
-    public static void trace(String msg) {
-        if (canLog(Level.FINEST) && enablePrintLog) {
-            if (enableColor) {
-                System.out.println(getTime() + TITTLE_COLOR_PREFIX + TRACE_COLOR_PREFIX + msg);
-            } else {
-                System.out.println(getTime() + TITTLE + TRACE_PREFIX + msg);
-            }
-            msg = getTime() + TITTLE + TRACE_PREFIX + msg;
-            writeLogToFile(msg);
+    private static String getPrefix(LogLevel lvl, boolean useColor) {
+        if (useColor) {
+            return getTime() + TITLE_COLOR + lvl.getColorPrefix();
         }
+        return getTime() + TITLE + lvl.getPrefix();
+    }
+
+    private static String getMessage(String msg, Throwable t) {
+        if (t != null) {
+            if (msg == null || msg.isEmpty()) {
+                msg = "Exception: " + t.toString();
+            } else {
+                msg += ", Exception: " + t.toString();
+            }
+        }
+        return msg;
+    }
+
+    public static void log(LogLevel lvl, String msg, Throwable t) {
+        if (!canLog(lvl)) {
+            return;
+        }
+        msg = getMessage(msg, t);
+        if (msg.isEmpty()) {
+            return;
+        }
+        System.out.println(getPrefix(lvl, enableColor) + msg);
+        writeLogToFile(getPrefix(lvl, false) + msg, t);
+    }
+
+    public static void trace(String msg, Throwable t) {
+        log(LogLevel.TRACE, msg, t);
+    }
+
+    public static void trace(String msg) {
+        trace(msg, (Throwable) null);
     }
 
     public static void trace(String format, Object... arguments) {
-        if (canLog(Level.FINEST)) {
+        if (canLog(LogLevel.TRACE)) {
             trace(format(format, arguments));
         }
     }
 
     public static void trace(Throwable t) {
-        if (canLog(Level.FINEST) && enablePrintLog) {
-            String msg = t.getMessage();
-            if (enableColor) {
-                System.out.println(getTime() + TITTLE_COLOR_PREFIX + TRACE_COLOR_PREFIX + msg);
-            } else {
-                System.out.println(getTime() + TITTLE + TRACE_PREFIX + msg);
-            }
-            msg = getTime() + TITTLE + TRACE_PREFIX + msg;
-            StringWriter stringWriter = new StringWriter();
-            t.printStackTrace(new PrintWriter(stringWriter));
-            msg = msg + stringWriter;
-            writeLogToFile(msg);
-        }
+        trace("", t);
+    }
+
+    public static void debug(String msg, Throwable t) {
+        log(LogLevel.DEBUG, msg, t);
     }
 
     public static void debug(String msg) {
-        if (canLog(Level.FINER) && enablePrintLog) {
-            if (enableColor) {
-                System.out.println(getTime() + TITTLE_COLOR_PREFIX + DEBUG_COLOR_PREFIX + msg);
-            } else {
-                System.out.println(getTime() + TITTLE + DEBUG_PREFIX + msg);
-            }
-            msg = getTime() + TITTLE + DEBUG_PREFIX + msg;
-            writeLogToFile(msg);
-        }
+        debug(msg, (Throwable) null);
     }
 
     public static void debug(String format, Object... arguments) {
-        if (canLog(Level.FINER)) {
+        if (canLog(LogLevel.DEBUG)) {
             debug(format(format, arguments));
         }
     }
 
     public static void debug(Throwable t) {
-        if (canLog(Level.FINER) && enablePrintLog) {
-            String msg = t.getMessage();
-            if (enableColor) {
-                System.out.println(getTime() + TITTLE_COLOR_PREFIX + DEBUG_COLOR_PREFIX + msg);
-            } else {
-                System.out.println(getTime() + TITTLE + DEBUG_PREFIX + msg);
-            }
-            msg = getTime() + TITTLE + DEBUG_PREFIX + msg;
-            StringWriter stringWriter = new StringWriter();
-            t.printStackTrace(new PrintWriter(stringWriter));
-            msg = msg + stringWriter;
-            writeLogToFile(msg);
-        }
+        debug("", t);
+    }
+
+    public static void info(String msg, Throwable t) {
+        log(LogLevel.INFO, msg, t);
     }
 
     public static void info(String msg) {
-        if (canLog(Level.CONFIG) && enablePrintLog) {
-            if (enableColor) {
-                System.out.println(getTime() + TITTLE_COLOR_PREFIX + INFO_COLOR_PREFIX + msg);
-            } else {
-                System.out.println(getTime() + TITTLE + INFO_PREFIX + msg);
-            }
-            msg = getTime() + TITTLE + INFO_PREFIX + msg;
-            writeLogToFile(msg);
-        }
+        info(msg, (Throwable) null);
     }
 
     public static void info(String format, Object... arguments) {
-        if (canLog(Level.CONFIG)) {
+        if (canLog(LogLevel.INFO)) {
             info(format(format, arguments));
         }
     }
 
     public static void info(Throwable t) {
-        if (canLog(Level.CONFIG) && enablePrintLog) {
-            String msg = t.getMessage();
-            if (enableColor) {
-                System.out.println(getTime() + TITTLE_COLOR_PREFIX + INFO_COLOR_PREFIX + msg);
-            } else {
-                System.out.println(getTime() + TITTLE + INFO_PREFIX + msg);
-            }
-            msg = getTime() + TITTLE + INFO_PREFIX + msg;
-            StringWriter stringWriter = new StringWriter();
-            t.printStackTrace(new PrintWriter(stringWriter));
-            msg = msg + stringWriter;
-            writeLogToFile(msg);
-        }
+        info("", t);
+    }
+
+    public static void warn(String msg, Throwable t) {
+        log(LogLevel.WARN, msg, t);
     }
 
     public static void warn(String msg) {
-        if (canLog(Level.WARNING) && enablePrintLog) {
-            if (enableColor) {
-                System.out.println(getTime() + TITTLE_COLOR_PREFIX + WARN_COLOR_PREFIX + msg);
-            } else {
-                System.out.println(getTime() + TITTLE + WARN_PREFIX + msg);
-            }
-            msg = getTime() + TITTLE + WARN_PREFIX + msg;
-            writeLogToFile(msg);
-        }
+        warn(msg, (Throwable) null);
     }
 
     public static void warn(String format, Object... arguments) {
-        if (canLog(Level.WARNING)) {
+        if (canLog(LogLevel.WARN)) {
             warn(format(format, arguments));
         }
     }
 
     public static void warn(Throwable t) {
-        if (canLog(Level.WARNING) && enablePrintLog) {
-            String msg = t.getMessage();
-            if (enableColor) {
-                System.out.println(getTime() + TITTLE_COLOR_PREFIX + WARN_COLOR_PREFIX + msg);
-            } else {
-                System.out.println(getTime() + TITTLE + WARN_PREFIX + msg);
-            }
-            msg = getTime() + TITTLE + WARN_PREFIX + msg;
-            StringWriter stringWriter = new StringWriter();
-            t.printStackTrace(new PrintWriter(stringWriter));
-            msg = msg + stringWriter;
-            writeLogToFile(msg);
-        }
+        warn("", t);
+    }
+
+    public static void error(String msg, Throwable t) {
+        log(LogLevel.ERROR, msg, t);
     }
 
     public static void error(String msg) {
-        if (canLog(Level.SEVERE) && enablePrintLog) {
-            if (enableColor) {
-                System.out.println(getTime() + TITTLE_COLOR_PREFIX + ERROR_COLOR_PREFIX + msg);
-            } else {
-                System.out.println(getTime() + TITTLE + ERROR_PREFIX + msg);
-            }
-            msg = getTime() + TITTLE + ERROR_PREFIX + msg;
-            writeLogToFile(msg);
-        }
+        error(msg, (Throwable) null);
     }
 
     public static void error(String format, Object... arguments) {
-        if (canLog(Level.SEVERE)) {
+        if (canLog(LogLevel.ERROR)) {
             error(format(format, arguments));
         }
     }
 
     public static void error(Throwable t) {
-        if (canLog(Level.SEVERE) && enablePrintLog) {
-            String msg = t.getMessage();
-            if (enableColor) {
-                System.out.println(getTime() + TITTLE_COLOR_PREFIX + ERROR_COLOR_PREFIX + msg);
-            } else {
-                System.out.println(getTime() + TITTLE + ERROR_PREFIX + msg);
-            }
-            msg = getTime() + TITTLE + ERROR_PREFIX + msg;
-            StringWriter stringWriter = new StringWriter();
-            t.printStackTrace(new PrintWriter(stringWriter));
-            msg = msg + stringWriter;
-            writeLogToFile(msg);
-        }
-    }
-
-    public static void error(String des, Throwable t) {
-        if (canLog(Level.SEVERE) && enablePrintLog) {
-            String msg = des + "\n" + t.getMessage();
-            if (enableColor) {
-                System.out.println(getTime() + TITTLE_COLOR_PREFIX + ERROR_COLOR_PREFIX + msg);
-            } else {
-                System.out.println(getTime() + TITTLE + ERROR_PREFIX + msg);
-            }
-            msg = getTime() + TITTLE + ERROR_PREFIX + msg;
-            StringWriter stringWriter = new StringWriter();
-            t.printStackTrace(new PrintWriter(stringWriter));
-            msg = msg + stringWriter;
-            writeLogToFile(msg);
-        }
+        error("", t);
     }
 
     private static String format(String from, Object... arguments) {
@@ -276,19 +246,24 @@ public class DongTaiLog {
         return null;
     }
 
-    private static boolean canLog(Level level) {
-        return level.intValue() >= LEVEL.intValue();
-    }
-
     private static String getTime() {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone("Asia/Shanghai"));
         return simpleDateFormat.format(new Date()) + " ";
     }
 
-    private static void writeLogToFile(String msg) {
+    private static void writeLogToFile(String msg, Throwable t) {
+        if (filePath.isEmpty()) {
+            return;
+        }
         FileOutputStream o = null;
         try {
+            if (t != null) {
+                StringWriter stringWriter = new StringWriter();
+                t.printStackTrace(new PrintWriter(stringWriter));
+                msg = msg + stringWriter;
+            }
+
             File file = new File(filePath + "/dongtai_javaagent.log");
             o = new FileOutputStream(file, true);
             o.write(msg.getBytes());
@@ -297,30 +272,6 @@ public class DongTaiLog {
             o.close();
         } catch (Exception e) {
             DongTaiLog.error(e);
-        }
-    }
-
-    static {
-        if ("true".equals(IastProperties.enablePrintLog())) {
-            enablePrintLog = true;
-        } else if ("false".equals(IastProperties.enablePrintLog())) {
-            enablePrintLog = false;
-        }
-        filePath = IastProperties.getLogPath();
-        if (enablePrintLog && !isCreateLog) {
-            File f = new File(filePath);
-            if (!f.exists()) {
-                f.mkdirs();
-            }
-            File file = new File(filePath, File.separator+"dongtai_javaagent.log");
-            if (!file.exists()) {
-                try {
-                    file.createNewFile();
-                } catch (IOException ignore) {
-                } finally {
-                    isCreateLog = true;
-                }
-            }
         }
     }
 }
