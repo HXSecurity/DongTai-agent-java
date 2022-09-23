@@ -77,7 +77,7 @@ public class HttpClientUtils {
             }
             connection.setRequestProperty(REQUEST_HEADER_USER_AGENT, "DongTai-IAST-Agent");
             connection.setRequestProperty(REQUEST_HEADER_TOKEN_KEY,
-                    "Token " + IastProperties.getInstance().getIastServerToken());
+                    "Token " + IastProperties.getInstance().getServerToken());
             // 插入自定义的
             if (null != headers) {
                 for (Map.Entry<String, String> entry : headers.entrySet()) {

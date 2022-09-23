@@ -7,9 +7,9 @@ import io.dongtai.iast.agent.report.AgentRegisterReport;
 import io.dongtai.iast.agent.util.ThreadUtils;
 import io.dongtai.log.DongTaiLog;
 
-import java.io.File;
 import java.lang.instrument.Instrumentation;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -29,21 +29,6 @@ public class AgentLauncher {
          * fix bug: java.lang.ClassCastException: weblogic.net.http.SOAPHttpsURLConnection cannot be cast to javax.net.ssl.HttpsURLConnection
          */
         System.setProperty("UseSunHttpHandler", "true");
-        if (System.getProperty("java.io.tmpdir.dongtai") == null) {
-            String tmpdir = System.getProperty("java.io.tmpdir");
-            String appName = System.getProperty("dongtai.app.name");
-            String appVersion = System.getProperty("dongtai.app.version");
-            if (tmpdir == null) {
-                tmpdir = File.separator + "tmp";
-            }
-            if (appName == null) {
-                appName = "DemoProject";
-            }
-            if (appVersion == null) {
-                appVersion = "v1.0.0";
-            }
-            System.setProperty("java.io.tmpdir.dongtai", tmpdir + File.separator + appName + "-" + appVersion + "-" + UUID.randomUUID().toString().replaceAll("-", "") + File.separator);
-        }
     }
 
     /**
@@ -60,7 +45,7 @@ public class AgentLauncher {
         try {
             install(inst);
         } catch (Exception e) {
-            DongTaiLog.error(e);
+            DongTaiLog.error("agent premain failed", e);
         }
     }
 
@@ -73,49 +58,15 @@ public class AgentLauncher {
     public static void agentmain(String args, Instrumentation inst) {
         Map<String, String> argsMap = parseArgs(args);
         try {
-            if (argsMap.containsKey("debug")) {
-                System.setProperty("dongtai.debug", argsMap.get("debug"));
-            }
-            if (argsMap.containsKey("appCreate")) {
-                System.setProperty("dongtai.app.create", argsMap.get("appCreate"));
-            }
-            if (argsMap.containsKey("appName")) {
-                System.setProperty("dongtai.app.name", argsMap.get("appName"));
-            }
-            if (argsMap.containsKey("appVersion")) {
-                System.setProperty("dongtai.app.version", argsMap.get("appVersion"));
-            }
-            if (argsMap.containsKey("clusterName")) {
-                System.setProperty("dongtai.cluster.name", argsMap.get("clusterName"));
-            }
-            if (argsMap.containsKey("clusterVersion")) {
-                System.setProperty("dongtai.cluster.version", argsMap.get("clusterVersion"));
-            }
-            if (argsMap.containsKey("dongtaiServer")) {
-                System.setProperty("dongtai.server.url", argsMap.get("dongtaiServer"));
-            }
-            if (argsMap.containsKey("dongtaiToken")) {
-                System.setProperty("dongtai.server.token", argsMap.get("dongtaiToken"));
-            }
-            if (argsMap.containsKey("serverPackage")) {
-                System.setProperty("dongtai.server.package", argsMap.get("serverPackage"));
-            }
-            if (argsMap.containsKey("logLevel")) {
-                System.setProperty("dongtai.log.level", argsMap.get("logLevel"));
-            }
-            if (argsMap.containsKey("logPath")) {
-                System.setProperty("dongtai.log.path", argsMap.get("logPath"));
-            }
-            if (argsMap.containsKey("disableLogCollector")) {
-                System.setProperty("dongtai.disable.log-collector", argsMap.get("disableLogCollector"));
+            for (String prop : IastProperties.ATTACH_ARG_MAP.values()) {
+                if (argsMap.containsKey(prop)) {
+                    System.setProperty(prop, argsMap.get(prop));
+                }
             }
         } catch (Exception e) {
-            DongTaiLog.error(e);
+            DongTaiLog.error("agent set properties failed", e);
         }
-        String tmpdir = System.getProperty("java.io.tmpdir");
-        String appName = System.getProperty("dongtai.app.name");
-        String appVersion = System.getProperty("dongtai.app.version");
-        System.setProperty("java.io.tmpdir.dongtai", tmpdir + File.separator + appName + "-" + appVersion + "-" + UUID.randomUUID().toString().replaceAll("-", "") + File.separator);
+
         DongTaiLog.info("Protect By DongTai IAST: " + System.getProperty("protect.by.dongtai", "false"));
         if ("uninstall".equals(argsMap.get("mode"))) {
             if (System.getProperty("protect.by.dongtai", null) == null) {

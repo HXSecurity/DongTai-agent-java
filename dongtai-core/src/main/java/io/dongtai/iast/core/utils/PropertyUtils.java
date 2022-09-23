@@ -3,10 +3,7 @@ package io.dongtai.iast.core.utils;
 import io.dongtai.iast.core.utils.json.GsonUtils;
 import io.dongtai.log.DongTaiLog;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.util.Properties;
 
 /**
@@ -65,8 +62,12 @@ public class PropertyUtils {
                 fis.close();
             }
         } catch (IOException e) {
-            DongTaiLog.error("io.dongtai.iast.core.utils.PropertyUtils.init()",e);
+            DongTaiLog.error("io.dongtai.iast.core.utils.PropertyUtils.init()", e);
         }
+    }
+
+    public static String getTmpDir() {
+        return System.getProperty("java.io.tmpdir.dongtai");
     }
 
     public String getIastName() {

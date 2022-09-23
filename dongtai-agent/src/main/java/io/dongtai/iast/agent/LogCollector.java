@@ -14,15 +14,15 @@ public class LogCollector {
     private static Process fluent;
 
     public static void extractFluent() {
-        if (IastProperties.getInstance().getDisableLogCollector()) {
+        if (IastProperties.getInstance().getLogDisableCollector()) {
             return;
         }
         try {
             if (!isMacOs() && !isWindows()) {
-                FLUENT_FILE = System.getProperty("java.io.tmpdir.dongtai") + "iast" + File.separator + "fluent";
+                FLUENT_FILE = IastProperties.getInstance().getTmpDir() + "fluent";
                 FileUtils.getResourceToFile("bin/fluent", FLUENT_FILE);
 
-                FLUENT_FILE_CONF = System.getProperty("java.io.tmpdir.dongtai") + "iast" + File.separator + "fluent.conf";
+                FLUENT_FILE_CONF = IastProperties.getInstance().getTmpDir() + "fluent.conf";
                 FileUtils.getResourceToFile("bin/fluent.conf", FLUENT_FILE_CONF);
                 FileUtils.confReplace(FLUENT_FILE_CONF);
                 if (!(new File(FLUENT_FILE)).setExecutable(true)) {
@@ -36,7 +36,7 @@ public class LogCollector {
     }
 
     public static void doFluent() {
-        if (IastProperties.getInstance().getDisableLogCollector()) {
+        if (IastProperties.getInstance().getLogDisableCollector()) {
             return;
         }
         String[] execution = {

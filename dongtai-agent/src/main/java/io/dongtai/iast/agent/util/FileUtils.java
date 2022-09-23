@@ -93,7 +93,8 @@ public class FileUtils {
                         temp = temp.replace("${LOG_PORT}", logPort);
                     }
                 } else if (temp.contains("${LOG_PATH}")) {
-                    temp = temp.replace("${LOG_PATH}", System.getProperty("java.io.tmpdir.dongtai") + File.separator + "dongtaiJavaAgentLogs" + File.separator + "dongtai_javaagent.log");
+                    temp = temp.replace("${LOG_PATH}", IastProperties.getInstance().getTmpDir()
+                            + File.separator + "logs" + File.separator + "dongtai_javaagent.log");
                 }
                 buf = buf.append(temp);
                 buf = buf.append(System.getProperty("line.separator"));

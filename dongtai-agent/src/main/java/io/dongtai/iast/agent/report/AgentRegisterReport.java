@@ -225,10 +225,10 @@ public class AgentRegisterReport {
             }
         } catch (NullPointerException e) {
             DongTaiLog.error("Agent registration to {} failed, Token: {}, Reason: {}",
-                    IastProperties.getInstance().getBaseUrl(), IastProperties.getInstance().getIastServerToken(), e.getMessage());
+                    IastProperties.getInstance().getBaseUrl(), IastProperties.getInstance().getServerToken(), e.getMessage());
         } catch (Exception e) {
             DongTaiLog.error("Agent registration to {} failed 10 seconds later, cause: {}, token: {}",
-                    IastProperties.getInstance().getBaseUrl(), e.toString(), IastProperties.getInstance().getIastServerToken());
+                    IastProperties.getInstance().getBaseUrl(), e.toString(), IastProperties.getInstance().getServerToken());
         }
     }
 
