@@ -19,15 +19,30 @@ public class IastProperties {
     }
 
     public static String getLogPath() {
-        if (dongtaiLogPath == null) {
+        if (dongtaiLogPath == null || dongtaiLogPath.isEmpty()) {
+            String path = System.getProperty("dongtai.log.path");
+            if (path != null && path.endsWith(File.separator)) {
+                path = path.substring(0, path.length() - 1);
+            }
+            if (path != null && !path.isEmpty()) {
+                dongtaiLogPath = path;
+                return dongtaiLogPath;
+            }
+
             String tmpDir = System.getProperty("java.io.tmpdir.dongtai");
+            if (tmpDir != null && tmpDir.endsWith(File.separator)) {
+                tmpDir = tmpDir.substring(0, tmpDir.length() - 1);
+            }
             if (null == tmpDir || tmpDir.isEmpty()) {
                 return "";
             }
-            dongtaiLogPath = System.getProperty("dongtai.log.path",
-                    tmpDir + File.separator + "logs");
+            dongtaiLogPath = tmpDir + File.separator + "logs";
         }
         return dongtaiLogPath;
+    }
+
+    public static void setLogPath(String path) {
+        dongtaiLogPath = path;
     }
 
     public static String getLogLevel() {
