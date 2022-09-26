@@ -123,15 +123,15 @@ jobs:
 
       - uses: manyuanrong/setup-ossutil@v2.0
         with:
-          endpoint: "oss-cn-beijing.aliyuncs.com"
+          endpoint: ${{ secrets.CHART_OSS_ENDPOINT }}
           access-key-id: ${{ secrets.OSS_KEY_ID }}
           access-key-secret: ${{ secrets.OSS_KEY_SECRET }}
       - run: |
-          ossutil cp -rf dongtai-agent/target/dongtai-agent.jar oss://dongtai/agent_test/java/dongtai-agent.jar --meta x-oss-object-acl:public-read
-          ossutil cp -rf dongtai-agent/src/main/resources/bin/ oss://dongtai/agent_test/java/ --meta x-oss-object-acl:public-read
+          ossutil cp -rf dongtai-agent/target/dongtai-agent.jar oss://dongtai-helm-charts/agent_test/java/dongtai-agent.jar --meta x-oss-object-acl:public-read
+          ossutil cp -rf dongtai-agent/src/main/resources/bin/ oss://dongtai-helm-charts/agent_test/java/ --meta x-oss-object-acl:public-read
 
-          ossutil cp -rf dongtai-agent/target/dongtai-agent.jar oss://dongtai/agent_test/java/latest/dongtai-agent.jar --meta x-oss-object-acl:public-read
-          ossutil cp -rf dongtai-agent/src/main/resources/bin/ oss://dongtai/agent_test/java/latest/ --meta x-oss-object-acl:public-read
+          ossutil cp -rf dongtai-agent/target/dongtai-agent.jar oss://dongtai-helm-charts/agent_test/java/latest/dongtai-agent.jar --meta x-oss-object-acl:public-read
+          ossutil cp -rf dongtai-agent/src/main/resources/bin/ oss://dongtai-helm-charts/agent_test/java/latest/ --meta x-oss-object-acl:public-read
 
       - name: Trigger Openapi Workflow
         uses: benc-uk/workflow-dispatch@v1
@@ -139,4 +139,4 @@ jobs:
           workflow: Deploy DongTai OpenAPI To AWS
           token: ${{ secrets.BIDAYA0_PAT_FOR_OPENAPI }}
           ref: main
-          repo: HXSecurity/DongTai-openapi
+          repo: HXSecurity/DongTai
