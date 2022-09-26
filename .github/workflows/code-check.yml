@@ -136,7 +136,7 @@ jobs:
       - name: Trigger Openapi Workflow
         uses: benc-uk/workflow-dispatch@v1
         with:
-          workflow: Deploy DongTai OpenAPI To AWS
+          workflow: Deploy DongTai Server To Dev
           token: ${{ secrets.BIDAYA0_PAT_FOR_OPENAPI }}
           ref: main
           repo: HXSecurity/DongTai
