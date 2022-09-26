@@ -8,6 +8,8 @@ import java.util.Arrays;
 import java.util.List;
 
 public class XXECheck {
+    public final static String SINK_TYPE = "xxe";
+
     private static final List<XXEChecker> CHECKS = Arrays.asList(
             new XMLStreamReaderCheck(),
             new XomCheck(),
