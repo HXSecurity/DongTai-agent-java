@@ -44,7 +44,7 @@ public class TaintPoolUtils {
             for (String stringItem : stringArray) {
                 isContains = contains(stringItem);
                 if (isContains) {
-                    event.addSourceHash(System.identityHashCode(obj));
+                    event.addSourceHash(System.identityHashCode(stringItem));
                     return true;
                 }
             }
