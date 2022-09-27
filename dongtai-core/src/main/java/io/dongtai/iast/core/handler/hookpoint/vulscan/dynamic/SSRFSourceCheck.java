@@ -12,6 +12,8 @@ import java.net.URL;
 import java.util.*;
 
 public class SSRFSourceCheck {
+    public final static String SINK_TYPE = "ssrf";
+
     private static final String JAVA_NET_URL_OPEN_CONNECTION = "java.net.URL.openConnection()";
     private static final String JAVA_NET_URL_OPEN_CONNECTION_PROXY = "java.net.URL.openConnection(java.net.Proxy)";
     private static final String JAVA_NET_URL_OPEN_STREAM = "java.net.URL.openStream()";

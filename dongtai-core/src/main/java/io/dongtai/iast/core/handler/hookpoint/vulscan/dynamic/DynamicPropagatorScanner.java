@@ -12,30 +12,15 @@ import io.dongtai.iast.core.utils.TaintPoolUtils;
 import io.dongtai.log.DongTaiLog;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.HashSet;
 
 /**
  * @author dongzhiyong@huoxian.cn
  */
 public class DynamicPropagatorScanner implements IVulScan {
-
-    private static String REDIRECT_METHOD_NAME = "location";
-    private static String REDIRECT_LOWER_METHOD_NAME = "Location";
-    private static String UNVALIDATED_REDIRECT = "unvalidated-redirect";
-    private static HashSet<String> SIGNATURES = new HashSet<String>(Arrays.asList(
-            " javax.servlet.http.HttpServletResponse.setHeader(java.lang.String,java.lang.String)".substring(1),
-            " javax.servlet.http.HttpServletResponse.addHeader(java.lang.String,java.lang.String)".substring(1),
-            " io.netty.handler.codec.http.DefaultHttpHeaders.add0(int,int,java.lang.CharSequence,java.lang.CharSequence)"
-                    .substring(1)
-    ));
     private static String HTTP_CLIENT_5 = " org.apache.hc.client5.http.impl.classic.CloseableHttpClient.doExecute(org.apache.hc.core5.http.HttpHost,org.apache.hc.core5.http.ClassicHttpRequest,org.apache.hc.core5.http.protocol.HttpContext)"
             .substring(1);
     private static String HTTP_CLIENT_4 = " org.apache.commons.httpclient.HttpClient.executeMethod(org.apache.commons.httpclient.HostConfiguration,org.apache.commons.httpclient.HttpMethod,org.apache.commons.httpclient.HttpState)"
             .substring(1);
-
-    private final static String SINK_TYPE_SSRF = "ssrf";
-    private final static String SINK_TYPE_XXE = "xxe";
 
     @Override
     public void scan(IastSinkModel sink, MethodEvent event) {
@@ -64,7 +49,7 @@ public class DynamicPropagatorScanner implements IVulScan {
             return;
         }
 
-        if (SINK_TYPE_XXE.equals(sink.getType()) && XXECheck.isSafe(event, sink)) {
+        if (XXECheck.SINK_TYPE.equals(sink.getType()) && XXECheck.isSafe(event, sink)) {
             return;
         }
 
@@ -96,18 +81,13 @@ public class DynamicPropagatorScanner implements IVulScan {
      */
     private boolean sinkSourceHitTaintPool(MethodEvent event, IastSinkModel sink) {
         boolean hitTaintPool = false;
-        if (isRedirectVul(sink.getType(), event.signature)) {
-            String attribute = String.valueOf(event.argumentArray[0]);
-            DongTaiLog.debug("add Header method, attribute name is {} ", attribute);
-            if (attributeIsLocation(attribute)) {
-                Object attributeValue = event.argumentArray[1];
-                hitTaintPool = TaintPoolUtils.poolContains(attributeValue, event);
-            }
-            return hitTaintPool;
+
+        if (SSRFSourceCheck.SINK_TYPE.equals(sink.getType()) && SSRFSourceCheck.isSinkMethod(sink)) {
+            return SSRFSourceCheck.sourceHitTaintPool(event, sink);
         }
 
-        if (SINK_TYPE_SSRF.equals(sink.getType()) && SSRFSourceCheck.isSinkMethod(sink)) {
-            return SSRFSourceCheck.sourceHitTaintPool(event, sink);
+        if (UnvalidatedRedirectCheck.SINK_TYPE.equals(sink.getType()) && UnvalidatedRedirectCheck.isSinkMethod(sink)) {
+            return UnvalidatedRedirectCheck.sourceHitTaintPool(event, sink);
         }
 
         int[] taintPositionIndexArray = sink.getPos();
@@ -134,26 +114,4 @@ public class DynamicPropagatorScanner implements IVulScan {
         }
         return hitTaintPool;
     }
-
-    /**
-     * 检查是否为重定向方法调用
-     *
-     * @param vulType         sink点类型
-     * @param methodSignature 方法签名
-     * @return true，false
-     */
-    public static boolean isRedirectVul(String vulType, String methodSignature) {
-        return UNVALIDATED_REDIRECT.equals(vulType) && SIGNATURES.contains(methodSignature);
-    }
-
-    /**
-     * 检查addHeader方法中设置的属性名称是否为location/Location
-     *
-     * @param attribute 属性名
-     * @return true，false 正常理解即可
-     */
-    private static boolean attributeIsLocation(String attribute) {
-        return REDIRECT_METHOD_NAME.equals(attribute) || REDIRECT_LOWER_METHOD_NAME.equals(attribute);
-    }
-
 }
