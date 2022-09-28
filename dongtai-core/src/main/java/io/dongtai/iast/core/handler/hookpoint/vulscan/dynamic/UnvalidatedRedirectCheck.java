@@ -12,7 +12,7 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.HashSet;
 
-public class UnvalidatedRedirectCheck {
+public class UnvalidatedRedirectCheck implements SinkSourceChecker {
     public final static String SINK_TYPE = "unvalidated-redirect";
 
     private final static String REDIRECT_KEY = "location";
@@ -40,17 +40,19 @@ public class UnvalidatedRedirectCheck {
             NETTY_ADD_HEADER
     ));
 
-    public static boolean isSinkMethod(IastSinkModel sink) {
-        return REDIRECT_SIGNATURES.contains(sink.getSignature())
-                || REDIRECT_URI_SIGNATURES.contains(sink.getSignature())
-                || HEADER_SIGNATURES.contains(sink.getSignature());
+    public boolean match(IastSinkModel sink) {
+        return SINK_TYPE.equals(sink.getType()) && (
+                REDIRECT_SIGNATURES.contains(sink.getSignature())
+                        || REDIRECT_URI_SIGNATURES.contains(sink.getSignature())
+                        || HEADER_SIGNATURES.contains(sink.getSignature())
+        );
     }
 
-    public static boolean sourceHitTaintPool(MethodEvent event, IastSinkModel sink) {
+    public boolean checkSource(MethodEvent event, IastSinkModel sink) {
         if (REDIRECT_SIGNATURES.contains(sink.getSignature())) {
             return checkRedirect(event, sink);
         } else if (REDIRECT_URI_SIGNATURES.contains(sink.getSignature())) {
-            return checkRedirectUri(event, sink);
+            return checkRedirectURI(event, sink);
         } else if (HEADER_SIGNATURES.contains(sink.getSignature())) {
             return checkHeader(event, sink);
         }
@@ -64,7 +66,7 @@ public class UnvalidatedRedirectCheck {
         return checkValue(event.argumentArray[0], event);
     }
 
-    private static boolean checkRedirectUri(MethodEvent event, IastSinkModel sink) {
+    private static boolean checkRedirectURI(MethodEvent event, IastSinkModel sink) {
         if (event.argumentArray.length == 0 || !(event.argumentArray[0] instanceof URI)) {
             return false;
         }

@@ -11,7 +11,7 @@ import java.net.URI;
 import java.net.URL;
 import java.util.*;
 
-public class SSRFSourceCheck {
+public class SSRFSourceCheck implements SinkSourceChecker {
     public final static String SINK_TYPE = "ssrf";
 
     private static final String JAVA_NET_URL_OPEN_CONNECTION = "java.net.URL.openConnection()";
@@ -45,26 +45,26 @@ public class SSRFSourceCheck {
             OKHTTP_CALL_ENQUEUE
     ));
 
-    public static boolean isSinkMethod(IastSinkModel sink) {
-        return SSRF_SINK_METHODS.contains(sink.getSignature());
+    public boolean match(IastSinkModel sink) {
+        return SINK_TYPE.equals(sink.getType()) && SSRF_SINK_METHODS.contains(sink.getSignature());
     }
 
-    public static boolean sourceHitTaintPool(MethodEvent event, IastSinkModel sink) {
+    public boolean checkSource(MethodEvent event, IastSinkModel sink) {
         boolean hitTaintPool = false;
         if (JAVA_NET_URL_OPEN_CONNECTION.equals(sink.getSignature())
                 || JAVA_NET_URL_OPEN_CONNECTION_PROXY.equals(sink.getSignature())
                 || JAVA_NET_URL_OPEN_STREAM.equals(sink.getSignature())) {
-            return javaNetURLSourceHit(event, sink);
+            return checkJavaNetURL(event, sink);
         } else if (APACHE_HTTP_CLIENT_REQUEST_SET_URI.equals(sink.getSignature())
                 || APACHE_LEGACY_HTTP_CLIENT_REQUEST_SET_URI.equals(sink.getSignature())) {
-            return apacheHttpClientSourceHit(event, sink);
+            return checkApacheHttpClient(event, sink);
         } else if (APACHE_HTTP_CLIENT5_EXECUTE.equals(sink.getSignature())) {
-            return apacheHttpClient5SourceHit(event, sink);
+            return checkApacheHttpClient5(event, sink);
         } else if (OKHTTP3_CALL_EXECUTE.equals(sink.getSignature())
                 || OKHTTP3_CALL_ENQUEUE.equals(sink.getSignature())
                 || OKHTTP_CALL_EXECUTE.equals(sink.getSignature())
                 || OKHTTP_CALL_ENQUEUE.equals(sink.getSignature())) {
-            return okhttpSourceHit(event, sink);
+            return CheckOkhttp(event, sink);
         }
         return hitTaintPool;
     }
@@ -115,11 +115,11 @@ public class SSRFSourceCheck {
         }
     }
 
-    private static boolean javaNetURLSourceHit(MethodEvent event, IastSinkModel sink) {
+    private static boolean checkJavaNetURL(MethodEvent event, IastSinkModel sink) {
         return processJavaNetUrl(event, event.object);
     }
 
-    private static boolean apacheHttpClientSourceHit(MethodEvent event, IastSinkModel sink) {
+    private static boolean checkApacheHttpClient(MethodEvent event, IastSinkModel sink) {
         try {
             if (event.argumentArray.length < 1 || event.argumentArray[0] == null) {
                 return false;
@@ -148,7 +148,7 @@ public class SSRFSourceCheck {
         }
     }
 
-    private static boolean apacheHttpClient5SourceHit(MethodEvent event, IastSinkModel sink) {
+    private static boolean checkApacheHttpClient5(MethodEvent event, IastSinkModel sink) {
         try {
             if (event.argumentArray.length < 2 || event.argumentArray[1] == null) {
                 return false;
@@ -178,7 +178,7 @@ public class SSRFSourceCheck {
         }
     }
 
-    private static boolean okhttpSourceHit(MethodEvent event, IastSinkModel sink) {
+    private static boolean CheckOkhttp(MethodEvent event, IastSinkModel sink) {
         try {
             Class<?> cls = event.object.getClass();
             if (OKHTTP3_REAL_CALL.equals(cls.getName()) || OKHTTP3_INTERNAL_REAL_CALL.equals(cls.getName())

@@ -18,7 +18,7 @@ public class SAXXMLReaderTest extends XXECheckTest {
         SAXParser parser;
         XMLReader reader;
         Support support;
-        ApacheXMLParserCheck checker = new ApacheXMLParserCheck();
+        SAXXMLReaderCheck checker = new SAXXMLReaderCheck();
         String realContent = getXXERealContent();
 
         spf = SAXParserFactory.newInstance();
@@ -26,7 +26,7 @@ public class SAXXMLReaderTest extends XXECheckTest {
         reader = parser.getXMLReader();
         XXEChecker chk = XXECheck.getChecker(reader);
         Assert.assertNotNull(chk);
-        Assert.assertEquals(NAME + " match ApacheXMLParserCheck", checker.getClass(), chk.getClass());
+        Assert.assertEquals(NAME + " match SAXXMLReaderCheck", checker.getClass(), chk.getClass());
         support = checker.getSupport(reader);
         Assert.assertEquals(NAME + " default", Support.ALLOWED, support);
         Assert.assertEquals(NAME + "[C] default", realContent, getNode(reader));
