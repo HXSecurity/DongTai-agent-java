@@ -90,6 +90,10 @@ public class DynamicPropagatorScanner implements IVulScan {
             return UnvalidatedRedirectCheck.sourceHitTaintPool(event, sink);
         }
 
+        if (PathTraversalCheck.SINK_TYPE.equals(sink.getType()) && PathTraversalCheck.isSinkMethod(sink)) {
+            return PathTraversalCheck.sourceHitTaintPool(event, sink);
+        }
+
         int[] taintPositionIndexArray = sink.getPos();
 
         if (taintPositionIndexArray != null) {
