@@ -9,18 +9,18 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 
-public class FastjsonScanner {
+public class FastjsonCheck implements SinkSafeChecker {
     public static List<String> FASTJSON_SINK_METHODS = Arrays.asList(
             "com.alibaba.fastjson.JSON.parseObject(java.lang.String)",
             "com.alibaba.fastjson.JSON.parse(java.lang.String,int)",
             "com.alibaba.fastjson.JSON.parse(java.lang.String)"
     );
 
-    public static boolean isSinkMethod(IastSinkModel sink) {
+    public boolean match(IastSinkModel sink) {
         return FASTJSON_SINK_METHODS.contains(sink.getSignature());
     }
 
-    public static boolean isSafe(IastSinkModel sink, MethodEvent event) {
+    public boolean isSafe(MethodEvent event, IastSinkModel sink) {
         try {
             Class<?> cls = Class.forName("com.alibaba.fastjson.JSON");
             Field f = cls.getDeclaredField("VERSION");

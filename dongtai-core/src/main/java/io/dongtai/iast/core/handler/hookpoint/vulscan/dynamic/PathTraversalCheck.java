@@ -12,7 +12,7 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.HashSet;
 
-public class PathTraversalCheck {
+public class PathTraversalCheck implements SinkSourceChecker {
     public final static String SINK_TYPE = "path-traversal";
 
     private final static String NIO_FS_GET_PATH = "java.nio.file.FileSystem.getPath(java.lang.String,java.lang.String[])";
@@ -30,22 +30,24 @@ public class PathTraversalCheck {
             "java.io.File.<init>(java.net.URI)"
     ));
 
-    public static boolean isSinkMethod(IastSinkModel sink) {
-        return SIGNATURES.contains(sink.getSignature())
-                || URI_SIGNATURES.contains(sink.getSignature()) ||
-                NIO_FS_GET_PATH.equals(sink.getSignature());
+    public boolean match(IastSinkModel sink) {
+        return SINK_TYPE.equals(sink.getType()) && (
+                SIGNATURES.contains(sink.getSignature())
+                        || URI_SIGNATURES.contains(sink.getSignature())
+                        || NIO_FS_GET_PATH.equals(sink.getSignature())
+        );
     }
 
-    public static boolean sourceHitTaintPool(MethodEvent event, IastSinkModel sink) {
+    public boolean checkSource(MethodEvent event, IastSinkModel sink) {
         if (SIGNATURES.contains(sink.getSignature())) {
-            return pathCheck(event, sink);
+            return checkPathArgument(event, sink);
         } else if (URI_SIGNATURES.contains(sink.getSignature())) {
-            return uriCheck(event, sink);
+            return checkURI(event, sink);
         }
         return false;
     }
 
-    private static boolean pathCheck(MethodEvent event, IastSinkModel sink) {
+    private static boolean checkPathArgument(MethodEvent event, IastSinkModel sink) {
         try {
             if (NIO_FS_GET_PATH.equals(sink.getSignature())) {
                 if (event.argumentArray.length < 2) {
@@ -53,28 +55,28 @@ public class PathTraversalCheck {
                 }
                 String[] paths = (String[]) event.argumentArray[1];
                 if (paths.length == 0) {
-                    return check((String) event.argumentArray[0], event);
+                    return checkPath((String) event.argumentArray[0], event);
                 }
-                return check(paths[paths.length - 1], event);
+                return checkPath(paths[paths.length - 1], event);
             }
 
-            return check((String) event.argumentArray[event.argumentArray.length-1], event);
+            return checkPath((String) event.argumentArray[event.argumentArray.length - 1], event);
         } catch (Throwable e) {
             DongTaiLog.warn(SINK_TYPE + " check path failed", e);
             return false;
         }
     }
 
-    private static boolean uriCheck(MethodEvent event, IastSinkModel sink) {
+    private static boolean checkURI(MethodEvent event, IastSinkModel sink) {
         if (event.argumentArray.length == 0 || !(event.argumentArray[0] instanceof URI)) {
             return false;
         }
 
         URI uri = (URI) event.argumentArray[0];
-        return check(uri.getPath(), event);
+        return checkPath(uri.getPath(), event);
     }
 
-    private static boolean check(String path, MethodEvent event) {
+    private static boolean checkPath(String path, MethodEvent event) {
         if (!TaintPoolUtils.poolContains(path, event)) {
             return false;
         }

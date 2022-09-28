@@ -12,15 +12,27 @@ import io.dongtai.iast.core.utils.TaintPoolUtils;
 import io.dongtai.log.DongTaiLog;
 
 import java.lang.reflect.Method;
+import java.util.*;
 
 /**
  * @author dongzhiyong@huoxian.cn
  */
 public class DynamicPropagatorScanner implements IVulScan {
-    private static String HTTP_CLIENT_5 = " org.apache.hc.client5.http.impl.classic.CloseableHttpClient.doExecute(org.apache.hc.core5.http.HttpHost,org.apache.hc.core5.http.ClassicHttpRequest,org.apache.hc.core5.http.protocol.HttpContext)"
+    private final static String HTTP_CLIENT_5 = " org.apache.hc.client5.http.impl.classic.CloseableHttpClient.doExecute(org.apache.hc.core5.http.HttpHost,org.apache.hc.core5.http.ClassicHttpRequest,org.apache.hc.core5.http.protocol.HttpContext)"
             .substring(1);
-    private static String HTTP_CLIENT_4 = " org.apache.commons.httpclient.HttpClient.executeMethod(org.apache.commons.httpclient.HostConfiguration,org.apache.commons.httpclient.HttpMethod,org.apache.commons.httpclient.HttpState)"
+    private final static String HTTP_CLIENT_4 = " org.apache.commons.httpclient.HttpClient.executeMethod(org.apache.commons.httpclient.HostConfiguration,org.apache.commons.httpclient.HttpMethod,org.apache.commons.httpclient.HttpState)"
             .substring(1);
+
+    private final static Set<SinkSafeChecker> SAFE_CHECKERS = new HashSet<SinkSafeChecker>(Arrays.asList(
+            new FastjsonCheck(),
+            new XXECheck()
+    ));
+
+    private final static Set<SinkSourceChecker> SOURCE_CHECKERS = new HashSet<SinkSourceChecker>(Arrays.asList(
+            new PathTraversalCheck(),
+            new SSRFSourceCheck(),
+            new UnvalidatedRedirectCheck()
+    ));
 
     @Override
     public void scan(IastSinkModel sink, MethodEvent event) {
@@ -45,12 +57,10 @@ public class DynamicPropagatorScanner implements IVulScan {
             }
         }
 
-        if (FastjsonScanner.isSinkMethod(sink) && FastjsonScanner.isSafe(sink, event)) {
-            return;
-        }
-
-        if (XXECheck.SINK_TYPE.equals(sink.getType()) && XXECheck.isSafe(event, sink)) {
-            return;
+        for (SinkSafeChecker chk : SAFE_CHECKERS) {
+            if (chk.match(sink) && chk.isSafe(event, sink)) {
+                return;
+            }
         }
 
         if (sinkSourceHitTaintPool(event, sink)) {
@@ -82,16 +92,10 @@ public class DynamicPropagatorScanner implements IVulScan {
     private boolean sinkSourceHitTaintPool(MethodEvent event, IastSinkModel sink) {
         boolean hitTaintPool = false;
 
-        if (SSRFSourceCheck.SINK_TYPE.equals(sink.getType()) && SSRFSourceCheck.isSinkMethod(sink)) {
-            return SSRFSourceCheck.sourceHitTaintPool(event, sink);
-        }
-
-        if (UnvalidatedRedirectCheck.SINK_TYPE.equals(sink.getType()) && UnvalidatedRedirectCheck.isSinkMethod(sink)) {
-            return UnvalidatedRedirectCheck.sourceHitTaintPool(event, sink);
-        }
-
-        if (PathTraversalCheck.SINK_TYPE.equals(sink.getType()) && PathTraversalCheck.isSinkMethod(sink)) {
-            return PathTraversalCheck.sourceHitTaintPool(event, sink);
+        for (SinkSourceChecker chk : SOURCE_CHECKERS) {
+            if (chk.match(sink)) {
+                return chk.checkSource(event, sink);
+            }
         }
 
         int[] taintPositionIndexArray = sink.getPos();

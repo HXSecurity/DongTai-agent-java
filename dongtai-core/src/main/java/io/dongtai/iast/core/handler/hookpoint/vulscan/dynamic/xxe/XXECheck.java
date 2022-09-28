@@ -2,15 +2,15 @@ package io.dongtai.iast.core.handler.hookpoint.vulscan.dynamic.xxe;
 
 import io.dongtai.iast.core.handler.hookpoint.models.IastSinkModel;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
+import io.dongtai.iast.core.handler.hookpoint.vulscan.dynamic.SinkSafeChecker;
 import io.dongtai.log.DongTaiLog;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
-public class XXECheck {
+public class XXECheck implements SinkSafeChecker {
     public final static String SINK_TYPE = "xxe";
 
-    private static final List<XXEChecker> CHECKS = Arrays.asList(
+    private static final Set<XXEChecker> CHECKS = new HashSet<XXEChecker>(Arrays.asList(
             new XMLStreamReaderCheck(),
             new XomCheck(),
             new DocumentBuilderCheck(),
@@ -19,9 +19,13 @@ public class XXECheck {
             new XMLUnmarshallerCheck(),
             new SAXXMLReaderCheck(),
             new XMLInputFactoryCheck()
-    );
+    ));
 
-    public static boolean isSafe(MethodEvent event, IastSinkModel sink) {
+    public boolean match(IastSinkModel sink) {
+        return SINK_TYPE.equals(sink.getType());
+    }
+
+    public boolean isSafe(MethodEvent event, IastSinkModel sink) {
         if (event.object == null) {
             return false;
         }
