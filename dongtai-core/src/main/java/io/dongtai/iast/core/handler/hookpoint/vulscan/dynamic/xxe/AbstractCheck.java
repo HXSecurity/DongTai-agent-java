@@ -7,7 +7,7 @@ import java.lang.reflect.*;
 import java.util.Collections;
 import java.util.List;
 
-public abstract class AbstractCheck {
+public abstract class AbstractCheck implements XXEChecker {
     private static final String ORG_APACHE_XERCES_INTERNAL_IMPL_XMLENTITY_MANAGER = " org.apache.xerces.internal.impl.XMLEntityManager".substring(1);
     private static final String ORG_APACHE_XERCES_IMPL_XMLENTITY_MANAGER = " org.apache.xerces.impl.XMLEntityManager".substring(1);
 
@@ -19,14 +19,22 @@ public abstract class AbstractCheck {
     protected Object sourceObject;
     protected Object[] sourceParameters;
 
+    @Override
     public void setSourceObjectAndParameters(Object sourceObject, Object[] sourceParameters) {
         this.sourceObject = sourceObject;
         this.sourceParameters = sourceParameters;
     }
 
+    @Override
     public List<Object> getCheckObjects() {
         return Collections.singletonList(this.sourceObject);
     }
+
+    @Override
+    public abstract boolean match(Object obj);
+
+    @Override
+    public abstract Support getSupport(Object obj);
 
     public Object getXMLConfiguration(Object obj) {
         try {

@@ -7,10 +7,11 @@ import io.dongtai.log.DongTaiLog;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-public class XMLUnmarshallerCheck extends AbstractCheck implements XXEChecker {
+public class XMLUnmarshallerCheck extends AbstractCheck {
     private final static String JAVAX_XML_BIND_UNMARSHALLER = " javax.xml.bind.Unmarshaller".substring(1);
     private static final String JAVAX_XML_TRANSFORM_SAX_SAXSOURCE = " javax.xml.transform.sax.SAXSource".substring(1);
 
+    @Override
     public boolean match(Object obj) {
         boolean isMatch = false;
         if (obj == null) {
@@ -26,6 +27,7 @@ public class XMLUnmarshallerCheck extends AbstractCheck implements XXEChecker {
         return true;
     }
 
+    @Override
     public Support getSupport(Object obj) {
         Class<?> cls;
         cls = obj.getClass();

@@ -5,7 +5,8 @@ import io.dongtai.log.DongTaiLog;
 
 import java.lang.reflect.InvocationTargetException;
 
-public class JavaxSAXParserCheck extends AbstractCheck implements XXEChecker {
+public class JavaxSAXParserCheck extends AbstractCheck {
+    @Override
     public boolean match(Object obj) {
         if (obj == null) {
             return false;
@@ -13,6 +14,7 @@ public class JavaxSAXParserCheck extends AbstractCheck implements XXEChecker {
         return ReflectUtils.isDescendantOf(obj.getClass().getSuperclass(), "javax.xml.parsers.SAXParser");
     }
 
+    @Override
     public Support getSupport(Object obj) {
         Object xmlReader = getJavaxSAXParserXMLReader(obj);
         if (xmlReader == null) {

@@ -16,10 +16,12 @@ public class FastjsonCheck implements SinkSafeChecker {
             "com.alibaba.fastjson.JSON.parse(java.lang.String)"
     );
 
+    @Override
     public boolean match(IastSinkModel sink) {
         return FASTJSON_SINK_METHODS.contains(sink.getSignature());
     }
 
+    @Override
     public boolean isSafe(MethodEvent event, IastSinkModel sink) {
         try {
             Class<?> cls = Class.forName("com.alibaba.fastjson.JSON");

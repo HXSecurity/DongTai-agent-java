@@ -6,10 +6,11 @@ import io.dongtai.log.DongTaiLog;
 import javax.xml.parsers.DocumentBuilder;
 import java.lang.reflect.*;
 
-public class DocumentBuilderCheck extends AbstractCheck implements XXEChecker {
+public class DocumentBuilderCheck extends AbstractCheck {
     private static final String ORACLE_XDKJAVA_SECURITY_RESOLVE_ENTITY_DEFAULT = "oracle.xdkjava.security.resolveEntityDefault";
     private static final String ORACLE_XML_PARSER_XMLPARSER_EXPAND_ENTITY_REF = "oracle.xml.parser.XMLParser.ExpandEntityRef";
 
+    @Override
     public boolean match(Object obj) {
         try {
             if (obj == null) {
@@ -24,6 +25,7 @@ public class DocumentBuilderCheck extends AbstractCheck implements XXEChecker {
         }
     }
 
+    @Override
     public Support getSupport(Object obj) {
         Support support = getDocumentBuilderSupport(obj);
         if (support != Support.UNKNOWN) {

@@ -30,6 +30,7 @@ public class PathTraversalCheck implements SinkSourceChecker {
             "java.io.File.<init>(java.net.URI)"
     ));
 
+    @Override
     public boolean match(IastSinkModel sink) {
         return SINK_TYPE.equals(sink.getType()) && (
                 SIGNATURES.contains(sink.getSignature())
@@ -38,6 +39,7 @@ public class PathTraversalCheck implements SinkSourceChecker {
         );
     }
 
+    @Override
     public boolean checkSource(MethodEvent event, IastSinkModel sink) {
         if (SIGNATURES.contains(sink.getSignature())) {
             return checkPathArgument(event, sink);
