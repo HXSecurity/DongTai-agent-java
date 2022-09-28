@@ -1,12 +1,16 @@
 blank_issues_enabled: false
 contact_links:
   - name: 🐛 Bug report
-    url: https://github.com/HXSecurity/DongTai/issues/new?assignees=exexute,Nizernizer&labels=bug&projects=1&template=bug_report.yaml
+    url: https://github.com/HXSecurity/DongTai/issues/new?labels=bug&projects=1&template=bug_report.yaml
     about: Report a bug to help us improve DongTai
 
   - name: 🚀 Feature request
-    url: https://github.com/HXSecurity/DongTai/issues/new?assignees=exexute,Nizernizer&labels=feature&projects=1&template=feature_request.yaml
+    url: https://github.com/HXSecurity/DongTai/issues/new?labels=feature&projects=1&template=feature_request.yaml
     about: Suggest an idea for DongTai
+
+  - name: "🔍 False positives/negatives vulnerability report"
+    url: https://github.com/HXSecurity/DongTai/issues/new?labels=detection&projects=1&template=vul_scan_report.yaml
+    about: "Report a false positives/negatives vulnerability to help us improve DongTai vulnerability detection."
 
   - name: ❓ Ask a question
     url: https://github.com/HXSecurity/DongTai/discussions/new?category=q-a
