@@ -5,7 +5,8 @@ import io.dongtai.log.DongTaiLog;
 
 import java.lang.reflect.Field;
 
-public class XomCheck extends AbstractCheck implements XXEChecker {
+public class XomCheck extends AbstractCheck {
+    @Override
     public boolean match(Object obj) {
         if (obj == null) {
             return false;
@@ -13,6 +14,7 @@ public class XomCheck extends AbstractCheck implements XXEChecker {
         return obj.getClass().getName().endsWith("nu.xom.Builder");
     }
 
+    @Override
     public Support getSupport(Object obj) {
         Object parser = getXomParser(obj);
         if (parser == null || isXomXml1(parser) || getXMLParserSupport(parser).isSupport()) {

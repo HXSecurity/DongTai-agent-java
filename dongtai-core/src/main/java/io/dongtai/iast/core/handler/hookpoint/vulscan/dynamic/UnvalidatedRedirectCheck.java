@@ -40,6 +40,7 @@ public class UnvalidatedRedirectCheck implements SinkSourceChecker {
             NETTY_ADD_HEADER
     ));
 
+    @Override
     public boolean match(IastSinkModel sink) {
         return SINK_TYPE.equals(sink.getType()) && (
                 REDIRECT_SIGNATURES.contains(sink.getSignature())
@@ -48,6 +49,7 @@ public class UnvalidatedRedirectCheck implements SinkSourceChecker {
         );
     }
 
+    @Override
     public boolean checkSource(MethodEvent event, IastSinkModel sink) {
         if (REDIRECT_SIGNATURES.contains(sink.getSignature())) {
             return checkRedirect(event, sink);

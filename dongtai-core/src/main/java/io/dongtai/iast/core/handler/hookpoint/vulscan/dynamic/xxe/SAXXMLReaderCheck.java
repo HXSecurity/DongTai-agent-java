@@ -2,7 +2,8 @@ package io.dongtai.iast.core.handler.hookpoint.vulscan.dynamic.xxe;
 
 import io.dongtai.iast.core.utils.ReflectUtils;
 
-public class SAXXMLReaderCheck extends AbstractCheck implements XXEChecker {
+public class SAXXMLReaderCheck extends AbstractCheck {
+    @Override
     public boolean match(Object obj) {
         if (obj == null) {
             return false;
@@ -10,6 +11,7 @@ public class SAXXMLReaderCheck extends AbstractCheck implements XXEChecker {
         return ReflectUtils.isImplementsInterface(obj.getClass(), "org.xml.sax.XMLReader");
     }
 
+    @Override
     public Support getSupport(Object obj) {
         return getXMLParserSupport(obj);
     }

@@ -45,10 +45,12 @@ public class SSRFSourceCheck implements SinkSourceChecker {
             OKHTTP_CALL_ENQUEUE
     ));
 
+    @Override
     public boolean match(IastSinkModel sink) {
         return SINK_TYPE.equals(sink.getType()) && SSRF_SINK_METHODS.contains(sink.getSignature());
     }
 
+    @Override
     public boolean checkSource(MethodEvent event, IastSinkModel sink) {
         boolean hitTaintPool = false;
         if (JAVA_NET_URL_OPEN_CONNECTION.equals(sink.getSignature())

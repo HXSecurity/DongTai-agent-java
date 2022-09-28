@@ -7,7 +7,8 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-public class XMLStreamReaderCheck extends AbstractCheck implements XXEChecker {
+public class XMLStreamReaderCheck extends AbstractCheck {
+    @Override
     public List<Object> getCheckObjects() {
         List<Object> objs = new ArrayList<Object>();
         if (this.sourceParameters.length > 0 && this.sourceParameters[0] != null) {
@@ -17,10 +18,12 @@ public class XMLStreamReaderCheck extends AbstractCheck implements XXEChecker {
         return objs;
     }
 
+    @Override
     public boolean match(Object obj) {
         return obj.getClass().getName().contains(".XMLStreamReader");
     }
 
+    @Override
     public Support getSupport(Object obj) {
         Object fEntityManager = getXMLEntityManager(obj);
         if (fEntityManager != null) {

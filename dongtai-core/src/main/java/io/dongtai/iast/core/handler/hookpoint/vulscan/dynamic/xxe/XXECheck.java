@@ -21,10 +21,12 @@ public class XXECheck implements SinkSafeChecker {
             new XMLInputFactoryCheck()
     ));
 
+    @Override
     public boolean match(IastSinkModel sink) {
         return SINK_TYPE.equals(sink.getType());
     }
 
+    @Override
     public boolean isSafe(MethodEvent event, IastSinkModel sink) {
         if (event.object == null) {
             return false;
