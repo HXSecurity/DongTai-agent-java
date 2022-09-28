@@ -45,20 +45,18 @@ public class DubboHandler {
         // todo: register server
         if (attachments != null) {
             Map<String, String> requestHeaders = new HashMap<String, String>(attachments.size());
-            for (Map.Entry<String, String> entry : attachments.entrySet()) {
-                requestHeaders.put(entry.getKey(), entry.getValue());
-            }
+            requestHeaders.putAll(attachments);
             if (null == EngineManager.SERVER) {
                 // todo: read server addr and send to OpenAPI Service
                 EngineManager.SERVER = new IastServer(requestHeaders.get("dubbo"), 0, "TCP",true);
             }
             Map<String, Object> requestMeta = new HashMap<String, Object>(12);
-            requestMeta.put("protocol", "dubbo/" + requestHeaders.get("dubbo"));
+            requestMeta.put("protocol", "dubbo/" + (requestHeaders.get("dubbo") == null ? requestHeaders.get("dubbo") : "unknown"));
             requestMeta.put("scheme", "dubbo");
             requestMeta.put("method", "RPC");
             requestMeta.put("secure", "true");
             requestMeta.put("requestURL", dubboService.split("\\?")[0]);
-            requestMeta.put("requestURI", requestHeaders.get("path"));
+            requestMeta.put("requestURI", requestHeaders.get("path") == null ? requestHeaders.get("path") : "");
             requestMeta.put("remoteAddr", "");
             requestMeta.put("queryString", "");
             requestMeta.put("headers", requestHeaders);
@@ -191,37 +189,48 @@ public class DubboHandler {
             if (TaintPoolUtils.isJdkType(arg)) {
                 modelItems.add(arg);
             } else {
-                modelItems.add(SourceImpl.parseCustomModel(arg));
+                Set<Object> models = SourceImpl.parseCustomModel(arg);
+                if (models.size() > 0) {
+                    modelItems.add(models);
+                }
             }
         }
         boolean isHitTaints = false;
         for (Object item : modelItems) {
             isHitTaints = isHitTaints || TaintPoolUtils.poolContains(item, event);
         }
-        if (isHitTaints) {
-            int invokeId = SpyDispatcherImpl.INVOKE_ID_SEQUENCER.getAndIncrement();
-            event.setInvokeId(invokeId);
-            event.setPlugin("DUBBO");
-            // todo: 获取 service name
-            event.setServiceName("");
-            // todo: 获取 traceId
-            event.setTraceId(sharedTraceId.get());
-            event.setCallStack(StackUtils.getLatestStack(5));
-            EngineManager.TRACK_MAP.addTrackMethod(invokeId, event);
-            Set<Object> resModelItems = SourceImpl.parseCustomModel(rpcResult);
-            Set<Object> resModelSet = new HashSet<Object>();
-            for (Object obj : resModelItems) {
-                // fixme: 暂时只跟踪字符串相关内容
-                if (obj instanceof String) {
-                    resModelSet.add(obj);
-                    int identityHashCode = System.identityHashCode(obj);
-                    event.addTargetHash(identityHashCode);
-                    event.addTargetHashForRpc(obj.hashCode());
-                    EngineManager.TAINT_HASH_CODES.add(identityHashCode);
-                }
-            }
-            event.setOutValue(resModelSet);
+        if (!isHitTaints) {
+            return;
         }
+
+        int invokeId = SpyDispatcherImpl.INVOKE_ID_SEQUENCER.getAndIncrement();
+        event.setInvokeId(invokeId);
+        event.setPlugin("DUBBO");
+        // todo: 获取 service name
+        event.setServiceName("");
+        // todo: 获取 traceId
+        event.setTraceId(sharedTraceId.get());
+        event.setCallStack(StackUtils.getLatestStack(5));
+        Set<Object> resModelItems = SourceImpl.parseCustomModel(rpcResult);
+        Set<Object> resModelSet = new HashSet<Object>();
+        for (Object obj : resModelItems) {
+            // fixme: 暂时只跟踪字符串相关内容
+            if (obj instanceof String) {
+                if (((String) obj).isEmpty()) {
+                    continue;
+                }
+                resModelSet.add(obj);
+                int identityHashCode = System.identityHashCode(obj);
+                event.addTargetHash(identityHashCode);
+                event.addTargetHashForRpc(obj.hashCode());
+                EngineManager.TAINT_HASH_CODES.add(identityHashCode);
+            }
+        }
+        if (resModelSet.isEmpty()) {
+            return;
+        }
+        event.setOutValue(resModelSet);
+        EngineManager.TRACK_MAP.addTrackMethod(invokeId, event);
     }
 
     public static void solveServiceExit(Object invocation, Object rpcResult) {
