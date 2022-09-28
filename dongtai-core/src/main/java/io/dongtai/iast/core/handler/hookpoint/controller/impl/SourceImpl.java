@@ -161,6 +161,9 @@ public class SourceImpl {
      */
     public static Set<Object> parseCustomModel(Object model) {
         Set<Object> modelValues = new HashSet<Object>();
+        if (!TaintPoolUtils.isNotEmpty(model)) {
+            return modelValues;
+        }
         Class<?> sourceClass = model.getClass();
         if (sourceClass.getClassLoader() == null) {
             return modelValues;
