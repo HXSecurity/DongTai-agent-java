@@ -25,7 +25,8 @@ public class DynamicPropagatorScanner implements IVulScan {
 
     private final static Set<SinkSafeChecker> SAFE_CHECKERS = new HashSet<SinkSafeChecker>(Arrays.asList(
             new FastjsonCheck(),
-            new XXECheck()
+            new XXECheck(),
+            new ReflectionInjectionCheck()
     ));
 
     private final static Set<SinkSourceChecker> SOURCE_CHECKERS = new HashSet<SinkSourceChecker>(Arrays.asList(
