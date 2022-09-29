@@ -115,9 +115,24 @@ public class TaintRangesBuilder {
         taintRanges.merge();
     }
 
-    public void replace(TaintRanges taintRanges, Object target, TaintRanges oldTaintRanges, TaintRanges srcTaintRanges) {
-        // @TODO
-        taintRanges.add(new TaintRange(0, getLength(target)));
+    public void replace(TaintRanges taintRanges, Object target, TaintRanges oldTaintRanges, Object source, TaintRanges srcTaintRanges, int p1, int p2, int argC) {
+        // @TODO: String.replace
+        switch (argC) {
+            case 2:
+                int tgtLen = getLength(target);
+                int srcLen = getLength(source);
+                if (tgtLen < p2) {
+                    oldTaintRanges.remove(tgtLen, p2);
+                    p2 = tgtLen;
+                }
+                oldTaintRanges.remove(p1, p2);
+                oldTaintRanges.split(p1, p1 + srcLen);
+                srcTaintRanges.shift(p1);
+                taintRanges.addAll(oldTaintRanges);
+                taintRanges.addAll(srcTaintRanges);
+            default:
+        }
+        taintRanges.merge();
     }
 
     public void concat(TaintRanges taintRanges, Object target, TaintRanges oldTaintRanges, Object source, TaintRanges srcTaintRanges, Object[] params) {
