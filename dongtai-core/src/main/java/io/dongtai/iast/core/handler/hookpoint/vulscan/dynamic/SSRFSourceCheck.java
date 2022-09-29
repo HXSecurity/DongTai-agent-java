@@ -71,7 +71,7 @@ public class SSRFSourceCheck implements SinkSourceChecker {
         return hitTaintPool;
     }
 
-    private static boolean processJavaNetUrl(MethodEvent event, Object u) {
+    private boolean processJavaNetUrl(MethodEvent event, Object u) {
         try {
             if (!(u instanceof URL)) {
                 return false;
@@ -94,7 +94,7 @@ public class SSRFSourceCheck implements SinkSourceChecker {
         }
     }
 
-    private static boolean processJavaNetUri(MethodEvent event, Object u) {
+    private boolean processJavaNetUri(MethodEvent event, Object u) {
         try {
             if (!(u instanceof URI)) {
                 return false;
@@ -117,11 +117,11 @@ public class SSRFSourceCheck implements SinkSourceChecker {
         }
     }
 
-    private static boolean checkJavaNetURL(MethodEvent event, IastSinkModel sink) {
+    private boolean checkJavaNetURL(MethodEvent event, IastSinkModel sink) {
         return processJavaNetUrl(event, event.object);
     }
 
-    private static boolean checkApacheHttpClient(MethodEvent event, IastSinkModel sink) {
+    private boolean checkApacheHttpClient(MethodEvent event, IastSinkModel sink) {
         try {
             if (event.argumentArray.length < 1 || event.argumentArray[0] == null) {
                 return false;
@@ -150,7 +150,7 @@ public class SSRFSourceCheck implements SinkSourceChecker {
         }
     }
 
-    private static boolean checkApacheHttpClient5(MethodEvent event, IastSinkModel sink) {
+    private boolean checkApacheHttpClient5(MethodEvent event, IastSinkModel sink) {
         try {
             if (event.argumentArray.length < 2 || event.argumentArray[1] == null) {
                 return false;
@@ -180,7 +180,7 @@ public class SSRFSourceCheck implements SinkSourceChecker {
         }
     }
 
-    private static boolean CheckOkhttp(MethodEvent event, IastSinkModel sink) {
+    private boolean CheckOkhttp(MethodEvent event, IastSinkModel sink) {
         try {
             Class<?> cls = event.object.getClass();
             if (OKHTTP3_REAL_CALL.equals(cls.getName()) || OKHTTP3_INTERNAL_REAL_CALL.equals(cls.getName())
@@ -223,7 +223,7 @@ public class SSRFSourceCheck implements SinkSourceChecker {
         }
     }
 
-    private static boolean addSourceType(MethodEvent event, Map<String, Object> sourceMap) {
+    private boolean addSourceType(MethodEvent event, Map<String, Object> sourceMap) {
         boolean hit = false;
         event.sourceTypes = new ArrayList<MethodEvent.MethodEventSourceType>();
         for (Map.Entry<String, Object> entry : sourceMap.entrySet()) {

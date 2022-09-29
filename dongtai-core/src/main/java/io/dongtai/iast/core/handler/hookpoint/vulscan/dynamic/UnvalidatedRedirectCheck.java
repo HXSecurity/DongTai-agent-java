@@ -61,14 +61,14 @@ public class UnvalidatedRedirectCheck implements SinkSourceChecker {
         return false;
     }
 
-    private static boolean checkRedirect(MethodEvent event, IastSinkModel sink) {
+    private boolean checkRedirect(MethodEvent event, IastSinkModel sink) {
         if (event.argumentArray.length == 0) {
             return false;
         }
         return checkValue(event.argumentArray[0], event);
     }
 
-    private static boolean checkRedirectURI(MethodEvent event, IastSinkModel sink) {
+    private boolean checkRedirectURI(MethodEvent event, IastSinkModel sink) {
         if (event.argumentArray.length == 0 || !(event.argumentArray[0] instanceof URI)) {
             return false;
         }
@@ -77,7 +77,7 @@ public class UnvalidatedRedirectCheck implements SinkSourceChecker {
         return checkValue(schema, event);
     }
 
-    private static boolean checkHeader(MethodEvent event, IastSinkModel sink) {
+    private boolean checkHeader(MethodEvent event, IastSinkModel sink) {
         int keyPos = 0;
         int valPos = 1;
         if (NETTY_ADD_HEADER.equals(sink.getSignature())) {
@@ -101,7 +101,7 @@ public class UnvalidatedRedirectCheck implements SinkSourceChecker {
         }
     }
 
-    private static boolean checkValue(Object val, MethodEvent event) {
+    private boolean checkValue(Object val, MethodEvent event) {
         if (!TaintPoolUtils.poolContains(val, event)) {
             return false;
         }

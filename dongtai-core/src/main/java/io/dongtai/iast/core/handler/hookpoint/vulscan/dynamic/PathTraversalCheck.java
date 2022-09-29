@@ -49,7 +49,7 @@ public class PathTraversalCheck implements SinkSourceChecker {
         return false;
     }
 
-    private static boolean checkPathArgument(MethodEvent event, IastSinkModel sink) {
+    private boolean checkPathArgument(MethodEvent event, IastSinkModel sink) {
         try {
             if (NIO_FS_GET_PATH.equals(sink.getSignature())) {
                 if (event.argumentArray.length < 2) {
@@ -69,7 +69,7 @@ public class PathTraversalCheck implements SinkSourceChecker {
         }
     }
 
-    private static boolean checkURI(MethodEvent event, IastSinkModel sink) {
+    private boolean checkURI(MethodEvent event, IastSinkModel sink) {
         if (event.argumentArray.length == 0 || !(event.argumentArray[0] instanceof URI)) {
             return false;
         }
@@ -78,7 +78,7 @@ public class PathTraversalCheck implements SinkSourceChecker {
         return checkPath(uri.getPath(), event);
     }
 
-    private static boolean checkPath(String path, MethodEvent event) {
+    private boolean checkPath(String path, MethodEvent event) {
         if (!TaintPoolUtils.poolContains(path, event)) {
             return false;
         }
