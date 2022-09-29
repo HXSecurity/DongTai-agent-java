@@ -100,6 +100,9 @@ public class TaintCommandRunner {
             case INSERT:
                 this.builder.insert(tr, oldTaintRanges, source, srcTaintRanges, p1, p2, p3, this.paramsCount);
                 break;
+            case REPLACE:
+                this.builder.replace(tr, target, oldTaintRanges, source, srcTaintRanges, p1, p2, this.paramsCount);
+                break;
             case REMOVE:
                 this.builder.remove(tr, source, srcTaintRanges, p1, p2, this.paramsCount);
                 break;
@@ -362,6 +365,12 @@ public class TaintCommandRunner {
         put(METHOD, create(METHOD, TaintCommand.INSERT, Arrays.asList("P1", "P3", "P4"))); // P2=>O
         METHOD = "java.lang.StringBuffer.insert(int,char[],int,int)";
         put(METHOD, create(METHOD, TaintCommand.INSERT, Arrays.asList("P1", "P3", "P4"))); // P2=>O
+
+        // REPLACE
+        METHOD = "java.lang.StringBuilder.replace(int,int,java.lang.String)";
+        put(METHOD, create(METHOD, TaintCommand.REPLACE, Arrays.asList("P1", "P2"))); // P3=>O
+        METHOD = "java.lang.StringBuffer.replace(int,int,java.lang.String)";
+        put(METHOD, create(METHOD, TaintCommand.REPLACE, Arrays.asList("P1", "P2"))); // P3=>O
 
         // REMOVE StringBuilder
         METHOD = "java.lang.StringBuilder.delete(int,int)";
