@@ -12,6 +12,7 @@ dongtai-agent/target/
 UnitText/target/
 target/
 **/dependency-reduced-pom.xml
+.flattened-pom.xml
 
 ## for eclipse and vscode
 .classpath
