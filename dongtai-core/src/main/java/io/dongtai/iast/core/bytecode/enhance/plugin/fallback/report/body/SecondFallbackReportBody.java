@@ -1,12 +1,11 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.fallback.report.body;
 
 import com.google.gson.annotations.SerializedName;
+import io.dongtai.iast.common.constants.ReportKey;
+import io.dongtai.iast.common.constants.ReportType;
 import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.FallbackSwitch;
-import io.dongtai.iast.core.handler.hookpoint.vulscan.ReportConstant;
 import io.dongtai.iast.core.utils.StopwatchUtils;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.apache.commons.lang3.time.StopWatch;
 
 import java.util.Date;
@@ -23,13 +22,13 @@ public class SecondFallbackReportBody {
     /**
      * type 字段
      */
-    @SerializedName(ReportConstant.REPORT_KEY)
-    private Integer type = ReportConstant.REPORT_SECOND_FALLBACK;
+    @SerializedName(ReportKey.TYPE)
+    private Integer type = ReportType.SECOND_FALLBACK;
 
     /**
      * detail 字段
      */
-    @SerializedName(ReportConstant.REPORT_VALUE_KEY)
+    @SerializedName(ReportKey.DETAIL)
     private SecondFallbackReportDetail detail;
 
     public SecondFallbackReportBody(LinkedList<AbstractSecondFallbackReportLog> secondFallbackReportDetailLog) {
@@ -72,13 +71,13 @@ public class SecondFallbackReportBody {
         /**
          * IAST agent 编号
          */
-        @SerializedName(ReportConstant.AGENT_ID)
+        @SerializedName(ReportKey.AGENT_ID)
         private Integer agentId;
 
         /**
          * 详细日志
          */
-        @SerializedName(ReportConstant.SECOND_FALLBACK_OVER_THRESHOLD_LOG)
+        @SerializedName("secondFallbackOverThresholdLog")
         private LinkedList<AbstractSecondFallbackReportLog> secondFallbackReportDetailLog;
 
         public SecondFallbackReportDetail(LinkedList<AbstractSecondFallbackReportLog> secondFallbackReportDetailLog) {

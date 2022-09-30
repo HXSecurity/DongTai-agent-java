@@ -1,6 +1,5 @@
 package io.dongtai.iast.agent.monitor.impl;
 
-import io.dongtai.iast.agent.Constant;
 import io.dongtai.iast.agent.IastProperties;
 import io.dongtai.iast.agent.manager.EngineManager;
 import io.dongtai.iast.agent.monitor.IMonitor;
@@ -9,6 +8,7 @@ import io.dongtai.iast.agent.monitor.collector.IPerformanceCollector;
 import io.dongtai.iast.agent.monitor.collector.MetricsBindCollectorEnum;
 import io.dongtai.iast.agent.report.AgentRegisterReport;
 import io.dongtai.iast.agent.util.ThreadUtils;
+import io.dongtai.iast.common.constants.AgentConstant;
 import io.dongtai.iast.common.entity.performance.PerformanceMetrics;
 import io.dongtai.iast.common.entity.performance.metrics.CpuInfoMetrics;
 import io.dongtai.iast.common.enums.MetricsKey;
@@ -42,7 +42,7 @@ public class PerformanceMonitor implements IMonitor {
 
     @Override
     public String getName() {
-        return Constant.THREAD_PREFIX + NAME;
+        return AgentConstant.THREAD_NAME_PREFIX + NAME;
     }
 
     public static void setPerformanceMetrics(List<PerformanceMetrics> performanceMetrics) {

@@ -46,6 +46,11 @@
             <artifactId>dongtai-log</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.dongtai.iast</groupId>
+            <artifactId>dongtai-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

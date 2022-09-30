@@ -1,12 +1,10 @@
 package io.dongtai.iast.core.service;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import io.dongtai.iast.core.utils.Constants;
+import io.dongtai.iast.common.constants.AgentConstant;
 import io.dongtai.iast.core.utils.PropertyUtils;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -36,7 +34,7 @@ public class ServiceFactory {
     public ServiceFactory() {
         this.queueService = Executors
                 .newSingleThreadScheduledExecutor(
-                        new ThreadFactoryBuilder().setNameFormat(Constants.THREAD_NAME_PREFIX + "HeartBeat").build());
+                        new ThreadFactoryBuilder().setNameFormat(AgentConstant.THREAD_NAME_PREFIX + "HeartBeat").build());
     }
 
     public void start() {

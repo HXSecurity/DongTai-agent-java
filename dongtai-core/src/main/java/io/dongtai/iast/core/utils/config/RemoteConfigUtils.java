@@ -1,21 +1,16 @@
 package io.dongtai.iast.core.utils.config;
 
 import com.google.gson.reflect.TypeToken;
+import io.dongtai.iast.common.constants.ApiPath;
 import io.dongtai.iast.common.entity.performance.PerformanceMetrics;
-import io.dongtai.iast.common.entity.performance.metrics.CpuInfoMetrics;
-import io.dongtai.iast.common.entity.performance.metrics.MemoryUsageMetrics;
-import io.dongtai.iast.common.entity.performance.metrics.ThreadInfoMetrics;
+import io.dongtai.iast.common.entity.performance.metrics.*;
 import io.dongtai.iast.common.entity.response.PlainResult;
 import io.dongtai.iast.common.enums.MetricsKey;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.FallbackSwitch;
-import io.dongtai.iast.core.utils.Constants;
 import io.dongtai.iast.core.utils.HttpClientUtils;
 import io.dongtai.iast.core.utils.PropertyUtils;
-import io.dongtai.iast.core.utils.config.entity.RemoteConfigEntityV2;
-import io.dongtai.iast.core.utils.config.entity.PerformanceEntity;
-import io.dongtai.iast.core.utils.config.entity.PerformanceLimitThreshold;
-import io.dongtai.iast.core.utils.config.entity.RemoteConfigEntity;
+import io.dongtai.iast.core.utils.config.entity.*;
 import io.dongtai.iast.core.utils.json.GsonUtils;
 import io.dongtai.iast.core.utils.matcher.ConfigMatcher;
 import io.dongtai.log.DongTaiLog;
@@ -287,7 +282,7 @@ public class RemoteConfigUtils {
         JSONObject report = new JSONObject();
         report.put(KEY_AGENT_ID, agentId);
         try {
-            StringBuilder response = HttpClientUtils.sendPost(Constants.API_SERVER_CONFIG, report.toString());
+            StringBuilder response = HttpClientUtils.sendPost(ApiPath.SERVER_CONFIG, report.toString());
             return response.toString();
         } catch (Throwable t) {
             // todo 现在无法获取服务端配置，不需要打印日志。等服务端上线后取消注释下面的代码
@@ -303,7 +298,7 @@ public class RemoteConfigUtils {
         JSONObject report = new JSONObject();
         report.put(KEY_AGENT_ID, agentId);
         try {
-            StringBuilder response = HttpClientUtils.sendPost(Constants.API_SERVER_CONFIG_V2, report.toString());
+            StringBuilder response = HttpClientUtils.sendPost(ApiPath.SERVER_CONFIG_V2, report.toString());
             return response.toString();
         } catch (Throwable t) {
             // todo 现在无法获取服务端配置，不需要打印日志。等服务端上线后取消注释下面的代码

@@ -1,6 +1,7 @@
 package io.dongtai.api.servlet2;
 
 import io.dongtai.api.DongTaiResponse;
+import io.dongtai.iast.common.constants.AgentConstant;
 import io.dongtai.log.DongTaiLog;
 
 import javax.servlet.ServletOutputStream;
@@ -17,7 +18,7 @@ public class ServletResponseWrapper extends HttpServletResponseWrapper implement
 
     public ServletResponseWrapper(HttpServletResponse response) {
         super(response);
-        response.addHeader("DongTai", "v1.7.7");
+        response.addHeader("DongTai", AgentConstant.VERSION_VALUE);
     }
 
     private String getLine() {

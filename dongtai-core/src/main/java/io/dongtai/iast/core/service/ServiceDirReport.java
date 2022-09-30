@@ -1,8 +1,7 @@
 package io.dongtai.iast.core.service;
 
+import io.dongtai.iast.common.constants.*;
 import io.dongtai.iast.core.EngineManager;
-import io.dongtai.iast.core.handler.hookpoint.vulscan.ReportConstant;
-import io.dongtai.iast.core.utils.Constants;
 import io.dongtai.log.DongTaiLog;
 import org.json.JSONObject;
 
@@ -19,31 +18,31 @@ public class ServiceDirReport {
     }
 
     public String getServereAddressMsg() {
-        if (new File("/var/run/secrets/kubernetes.io").exists()){
+        if (new File("/var/run/secrets/kubernetes.io").exists()) {
             serviceType = "k8s";
-        }else if (new File("/.dockerenv").exists()){
+        } else if (new File("/.dockerenv").exists()) {
             serviceType = "docker";
-        }else {
+        } else {
             serviceType = "virtual";
         }
         JSONObject report = new JSONObject();
         JSONObject detail = new JSONObject();
-        report.put(ReportConstant.REPORT_KEY, ReportConstant.REPORT_SERVICE_DIR);
-        report.put(ReportConstant.REPORT_VALUE_KEY, detail);
+        report.put(ReportKey.TYPE, ReportType.SERVICE_DIR);
+        report.put(ReportKey.DETAIL, detail);
 
-        detail.put(ReportConstant.AGENT_ID, EngineManager.getAgentId());
-        detail.put(ReportConstant.SERVICE_DIR, this.serviceDir);
-        detail.put(ReportConstant.SERVICE_TYPE, this.serviceType);
+        detail.put(ReportKey.AGENT_ID, EngineManager.getAgentId());
+        detail.put("serviceDir", this.serviceDir);
+        detail.put("serviceType", this.serviceType);
 
         return report.toString();
     }
 
     public void send() {
         try {
-            serviceDir = genDirTree(getWebServerPath(),0,"");
-            ThreadPools.sendReport(Constants.API_REPORT_UPLOAD, this.getServereAddressMsg());
+            serviceDir = genDirTree(getWebServerPath(), 0, "");
+            ThreadPools.sendReport(ApiPath.REPORT_UPLOAD, this.getServereAddressMsg());
         } catch (Exception e) {
-            DongTaiLog.error("send ServiceDir to {} error, reason: {}", Constants.API_REPORT_UPLOAD, e);
+            DongTaiLog.error("send ServiceDir to {} error, reason: {}", ApiPath.REPORT_UPLOAD, e);
         }
     }
 

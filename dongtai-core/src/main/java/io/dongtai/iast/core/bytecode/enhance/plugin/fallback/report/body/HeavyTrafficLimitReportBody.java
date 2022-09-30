@@ -1,10 +1,9 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.fallback.report.body;
 
 import com.google.gson.annotations.SerializedName;
-import io.dongtai.iast.core.handler.hookpoint.vulscan.ReportConstant;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import io.dongtai.iast.common.constants.ReportKey;
+import io.dongtai.iast.common.constants.ReportType;
+import lombok.*;
 import lombok.experimental.Accessors;
 
 import java.util.Date;
@@ -20,12 +19,12 @@ public class HeavyTrafficLimitReportBody {
     /**
      * 报告类型
      */
-    @SerializedName(ReportConstant.REPORT_KEY)
-    private Integer type = ReportConstant.REPORT_LIMIT_HEAVY_TRAFFIC_RATE;
+    @SerializedName(ReportKey.TYPE)
+    private Integer type = ReportType.LIMIT_HEAVY_TRAFFIC_RATE;
     /**
      * 报告详情
      */
-    @SerializedName(ReportConstant.REPORT_VALUE_KEY)
+    @SerializedName(ReportKey.DETAIL)
     private HeavyTrafficLimitDetail detail = new HeavyTrafficLimitDetail();
 
     /**
@@ -42,17 +41,17 @@ public class HeavyTrafficLimitReportBody {
         /**
          * agentId
          */
-        @SerializedName(ReportConstant.AGENT_ID)
+        @SerializedName(ReportKey.AGENT_ID)
         private Integer agentId;
         /**
          * 限流发生时间
          */
-        @SerializedName(ReportConstant.LIMIT_TRAFFIC_OCCUR_DATE)
+        @SerializedName("limitDate")
         private Date limitDate;
         /**
          * 限流阈值
          */
-        @SerializedName(ReportConstant.LIMIT_TRAFFIC_RATE)
+        @SerializedName("limitRate")
         private Double limitRate;
 
     }

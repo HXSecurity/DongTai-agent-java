@@ -2,6 +2,7 @@ package io.dongtai.api.jakarta;
 
 
 import io.dongtai.api.DongTaiResponse;
+import io.dongtai.iast.common.constants.AgentConstant;
 import io.dongtai.log.DongTaiLog;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,7 +22,7 @@ public class JakartaResponseWrapper extends HttpServletResponseWrapper implement
 
     public JakartaResponseWrapper(HttpServletResponse response) {
         super(response);
-        response.addHeader("DongTai", "v1.7.7");
+        response.addHeader("DongTai", AgentConstant.VERSION_VALUE);
     }
 
     @Override

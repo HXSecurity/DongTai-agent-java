@@ -1,7 +1,7 @@
 package io.dongtai.iast.core.service;
 
+import io.dongtai.iast.common.constants.AgentConstant;
 import io.dongtai.iast.core.replay.HttpRequestReplay;
-import io.dongtai.iast.core.utils.Constants;
 
 import java.util.concurrent.*;
 
@@ -14,7 +14,7 @@ public class ThreadPools {
             new LinkedBlockingQueue<Runnable>(5120), new ThreadFactory() {
         @Override
         public Thread newThread(Runnable r) {
-            return new Thread(r, Constants.THREAD_NAME_PREFIX + "VulReport-" + r.hashCode());
+            return new Thread(r, AgentConstant.THREAD_NAME_PREFIX + "VulReport-" + r.hashCode());
         }
     });
 
@@ -22,7 +22,7 @@ public class ThreadPools {
             new LinkedBlockingQueue<Runnable>(10000), new ThreadFactory() {
         @Override
         public Thread newThread(Runnable r) {
-            return new Thread(r, Constants.THREAD_NAME_PREFIX + "Report-" + r.hashCode());
+            return new Thread(r, AgentConstant.THREAD_NAME_PREFIX + "Report-" + r.hashCode());
         }
     });
 
@@ -30,7 +30,7 @@ public class ThreadPools {
             new LinkedBlockingQueue<Runnable>(1024), new ThreadFactory() {
         @Override
         public Thread newThread(Runnable r) {
-            return new Thread(r, Constants.THREAD_NAME_PREFIX + "VulReplay-" + r.hashCode());
+            return new Thread(r, AgentConstant.THREAD_NAME_PREFIX + "VulReplay-" + r.hashCode());
         }
 
     });
@@ -39,7 +39,7 @@ public class ThreadPools {
             new LinkedBlockingQueue<Runnable>(5120), new ThreadFactory() {
         @Override
         public Thread newThread(Runnable r) {
-            return new Thread(r, Constants.THREAD_NAME_PREFIX + "LimitReport-" + r.hashCode());
+            return new Thread(r, AgentConstant.THREAD_NAME_PREFIX + "LimitReport-" + r.hashCode());
         }
     });
 

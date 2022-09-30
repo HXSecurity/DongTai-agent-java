@@ -1,7 +1,7 @@
 package io.dongtai.iast.core.service;
 
-import io.dongtai.iast.core.handler.hookpoint.vulscan.ReportConstant;
-import io.dongtai.iast.core.service.ThreadPools;
+import io.dongtai.iast.common.constants.ApiPath;
+import io.dongtai.iast.common.constants.ReportKey;
 import org.json.JSONObject;
 
 /**
@@ -11,9 +11,9 @@ public class StartUpTimeReport {
 
     public static void sendReport(Integer id, Integer startUpTime) {
         JSONObject report = new JSONObject();
-        report.put(ReportConstant.AGENT_ID, id);
-        report.put(ReportConstant.STARTUP_TIME, startUpTime);
+        report.put(ReportKey.AGENT_ID, id);
+        report.put("startupTime", startUpTime);
 
-        ThreadPools.sendReport("/api/v1/agent/gzipstartuptime", report.toString());
+        ThreadPools.sendReport(ApiPath.STARTUP_TIME, report.toString());
     }
 }

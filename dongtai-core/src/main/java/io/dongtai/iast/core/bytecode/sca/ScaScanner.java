@@ -1,7 +1,8 @@
 package io.dongtai.iast.core.bytecode.sca;
 
+import io.dongtai.iast.common.constants.ReportKey;
+import io.dongtai.iast.common.constants.ReportType;
 import io.dongtai.iast.core.EngineManager;
-import io.dongtai.iast.core.handler.hookpoint.vulscan.ReportConstant;
 import io.dongtai.iast.core.service.ThreadPools;
 import io.dongtai.log.DongTaiLog;
 import org.json.JSONArray;
@@ -91,11 +92,11 @@ public class ScaScanner {
             this.scaType = scaType;
             this.scaReport = new JSONObject();
             this.packages = new JSONArray();
-            scaReport.put(ReportConstant.REPORT_KEY, ReportConstant.REPORT_SCA_BATCH);
+            scaReport.put(ReportKey.TYPE, ReportType.SCA_BATCH);
             JSONObject detail = new JSONObject();
-            detail.put(ReportConstant.AGENT_ID, EngineManager.getAgentId());
-            detail.put("packages", packages);
-            scaReport.put(ReportConstant.REPORT_VALUE_KEY, detail);
+            detail.put(ReportKey.AGENT_ID, EngineManager.getAgentId());
+            detail.put(ScaReport.KEY_SCA_PACKAGES, packages);
+            scaReport.put(ReportKey.DETAIL, detail);
         }
 
         public void scan(File file) {
@@ -106,10 +107,10 @@ public class ScaScanner {
                     String signature = SignatureAlgorithm.getSignature(file, ScaScanner.ALGORITHM);
                     if (null != signature) {
                         JSONObject packageObj = new JSONObject();
-                        packageObj.put(ReportConstant.SCA_PACKAGE_PATH, packagePath);
-                        packageObj.put(ReportConstant.SCA_PACKAGE_NAME, packageName);
-                        packageObj.put(ReportConstant.SCA_PACKAGE_SIGNATURE, signature);
-                        packageObj.put(ReportConstant.SCA_PACKAGE_ALGORITHM, ScaScanner.ALGORITHM);
+                        packageObj.put(ScaReport.KEY_SCA_PACKAGE_PATH, packagePath);
+                        packageObj.put(ScaReport.KEY_SCA_PACKAGE_NAME, packageName);
+                        packageObj.put(ScaReport.KEY_SCA_PACKAGE_SIGNATURE, signature);
+                        packageObj.put(ScaReport.KEY_SCA_PACKAGE_ALGORITHM, ScaScanner.ALGORITHM);
                         packages.put(packageObj);
                     }
                 }
@@ -136,11 +137,11 @@ public class ScaScanner {
                 if (packagePath.endsWith(JAR)) {
                     File file = new File(packagePath);
                     JSONObject packageObj = new JSONObject();
-                    packageObj.put(ReportConstant.SCA_PACKAGE_PATH, packagePath);
-                    packageObj.put(ReportConstant.SCA_PACKAGE_NAME, file.getName());
-                    packageObj.put(ReportConstant.SCA_PACKAGE_SIGNATURE,
+                    packageObj.put(ScaReport.KEY_SCA_PACKAGE_PATH, packagePath);
+                    packageObj.put(ScaReport.KEY_SCA_PACKAGE_NAME, file.getName());
+                    packageObj.put(ScaReport.KEY_SCA_PACKAGE_SIGNATURE,
                             SignatureAlgorithm.getSignature(file, ScaScanner.ALGORITHM));
-                    packageObj.put(ReportConstant.SCA_PACKAGE_ALGORITHM, ScaScanner.ALGORITHM);
+                    packageObj.put(ScaReport.KEY_SCA_PACKAGE_ALGORITHM, ScaScanner.ALGORITHM);
                     this.packages.put(packageObj);
                 }
             }
@@ -171,10 +172,10 @@ public class ScaScanner {
                             continue;
                         }
                         JSONObject packageObj = new JSONObject();
-                        packageObj.put(ReportConstant.SCA_PACKAGE_PATH, "jar:file:" + packagePath + "!/" + entryName);
-                        packageObj.put(ReportConstant.SCA_PACKAGE_NAME, packageName);
-                        packageObj.put(ReportConstant.SCA_PACKAGE_SIGNATURE, signature);
-                        packageObj.put(ReportConstant.SCA_PACKAGE_ALGORITHM, ScaScanner.ALGORITHM);
+                        packageObj.put(ScaReport.KEY_SCA_PACKAGE_PATH, "jar:file:" + packagePath + "!/" + entryName);
+                        packageObj.put(ScaReport.KEY_SCA_PACKAGE_NAME, packageName);
+                        packageObj.put(ScaReport.KEY_SCA_PACKAGE_SIGNATURE, signature);
+                        packageObj.put(ScaReport.KEY_SCA_PACKAGE_ALGORITHM, ScaScanner.ALGORITHM);
                         packages.put(packageObj);
                     }
                 }

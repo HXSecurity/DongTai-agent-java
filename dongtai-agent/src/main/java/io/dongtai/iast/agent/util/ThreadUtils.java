@@ -1,6 +1,6 @@
 package io.dongtai.iast.agent.util;
 
-import io.dongtai.iast.agent.Constant;
+import io.dongtai.iast.common.constants.AgentConstant;
 import io.dongtai.iast.common.entity.performance.metrics.ThreadInfoMetrics;
 import io.dongtai.log.DongTaiLog;
 
@@ -25,7 +25,7 @@ public class ThreadUtils {
             Thread[] threads = getCurrentActiveThreads();
             for (Thread thread : threads) {
                 // 匹配DongTai线程
-                if (thread.getName() != null && thread.getName().startsWith(Constant.THREAD_PREFIX)) {
+                if (thread.getName() != null && thread.getName().startsWith(AgentConstant.THREAD_NAME_PREFIX)) {
                     ThreadInfoMetrics.ThreadInfo dongTaiThread = new ThreadInfoMetrics.ThreadInfo();
                     dongTaiThread.setId(thread.getId());
                     dongTaiThread.setName(thread.getName());
@@ -63,7 +63,7 @@ public class ThreadUtils {
             final Thread[] threads = getCurrentActiveThreads();
             for (Thread thread : threads) {
                 if (thread.getId() == threadId && thread.getName() != null
-                        && thread.getName().startsWith(Constant.THREAD_PREFIX)) {
+                        && thread.getName().startsWith(AgentConstant.THREAD_NAME_PREFIX)) {
                     thread.interrupt();
                     return true;
                 }

@@ -3,12 +3,12 @@ package io.dongtai.iast.agent.monitor.impl;
 import io.dongtai.iast.agent.manager.EngineManager;
 import io.dongtai.iast.agent.monitor.IMonitor;
 import io.dongtai.iast.agent.monitor.MonitorDaemonThread;
-import io.dongtai.iast.agent.monitor.ServerCommandEnum;
 import io.dongtai.iast.agent.report.AgentRegisterReport;
 import io.dongtai.iast.agent.report.HeartBeatReport;
 import io.dongtai.iast.agent.util.ThreadUtils;
 import io.dongtai.iast.agent.util.http.HttpClientUtils;
-import io.dongtai.iast.agent.Constant;
+import io.dongtai.iast.common.constants.AgentConstant;
+import io.dongtai.iast.common.constants.ApiPath;
 import io.dongtai.iast.common.utils.version.JavaVersionUtils;
 import io.dongtai.log.DongTaiLog;
 import org.json.JSONObject;
@@ -29,7 +29,7 @@ public class EngineMonitor implements IMonitor {
 
     @Override
     public String getName() {
-        return Constant.THREAD_PREFIX + NAME;
+        return AgentConstant.THREAD_NAME_PREFIX + NAME;
     }
 
 
@@ -49,7 +49,7 @@ public class EngineMonitor implements IMonitor {
             DongTaiLog.info("engine stop");
             engineManager.stop();
         }
-        HttpClientUtils.sendPost(Constant.API_AGENT_STATUS, HeartBeatReport.generateAgentStatusMsg());
+        HttpClientUtils.sendPost(ApiPath.ACTUAL_ACTION, HeartBeatReport.generateAgentStatusMsg());
 /*        ServerCommandEnum serviceCmdEnum = ServerCommandEnum.getEnum(status);
         if (serviceCmdEnum == null || serviceCmdEnum == ServerCommandEnum.NO_CMD) {
             return;
@@ -104,7 +104,7 @@ public class EngineMonitor implements IMonitor {
 
     private String checkForStatus() {
         try {
-            String respRaw = String.valueOf(HttpClientUtils.sendGet(Constant.API_ENGINE_ACTION, "agentId", String.valueOf(AgentRegisterReport.getAgentFlag())));
+            String respRaw = String.valueOf(HttpClientUtils.sendGet(ApiPath.EXCEPT_ACTION, "agentId", String.valueOf(AgentRegisterReport.getAgentFlag())));
             if (respRaw != null && !respRaw.isEmpty()) {
                 JSONObject resp = new JSONObject(respRaw);
                 JSONObject data = (JSONObject) resp.get("data");

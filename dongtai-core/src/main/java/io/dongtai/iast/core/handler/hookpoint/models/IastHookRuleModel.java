@@ -1,5 +1,6 @@
 package io.dongtai.iast.core.handler.hookpoint.models;
 
+import io.dongtai.iast.common.constants.ApiPath;
 import io.dongtai.iast.core.handler.hookpoint.controller.HookType;
 import io.dongtai.iast.core.utils.*;
 import io.dongtai.log.DongTaiLog;
@@ -248,7 +249,7 @@ public class IastHookRuleModel {
         }
 
         private static JSONArray loadRemoteRule() {
-            StringBuilder respRaw = HttpClientUtils.sendGet(Constants.API_HOOK_PROFILE, null, null);
+            StringBuilder respRaw = HttpClientUtils.sendGet(ApiPath.HOOK_PROFILE, null, null);
             if (respRaw != null) {
                 JSONObject resp = new JSONObject(respRaw.toString());
                 return resp.getJSONArray("data");

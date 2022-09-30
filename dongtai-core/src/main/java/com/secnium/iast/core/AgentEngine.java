@@ -1,16 +1,14 @@
 package com.secnium.iast.core;
 
+import io.dongtai.iast.common.constants.AgentConstant;
+import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.bytecode.IastClassFileTransformer;
 import io.dongtai.iast.core.init.IEngine;
 import io.dongtai.iast.core.init.impl.ConfigEngine;
 import io.dongtai.iast.core.init.impl.TransformEngine;
-import io.dongtai.iast.core.service.ServiceDirReport;
-import io.dongtai.iast.core.service.StartUpTimeReport;
-import io.dongtai.iast.core.service.ThreadPools;
-import io.dongtai.iast.core.utils.Constants;
-import io.dongtai.log.DongTaiLog;
-import io.dongtai.iast.core.EngineManager;
+import io.dongtai.iast.core.service.*;
 import io.dongtai.iast.core.utils.PropertyUtils;
+import io.dongtai.log.DongTaiLog;
 import org.apache.commons.lang3.time.StopWatch;
 
 import java.lang.dongtai.SpyDispatcherHandler;
@@ -62,7 +60,7 @@ public class AgentEngine {
         IastClassFileTransformer transformer = IastClassFileTransformer.getInstance(inst);
         DongTaiLog.info("DongTai Engine is successfully installed to the JVM, and it takes {} s",
                 stopWatch.getTime() / 1000);
-        DongTaiLog.info("DongTai Agent Version: {}, DongTai Server: {}", Constants.AGENT_VERSION_VALUE, cfg.getBaseUrl());
+        DongTaiLog.info("DongTai Agent Version: {}, DongTai Server: {}", AgentConstant.VERSION_VALUE, cfg.getBaseUrl());
         new ServiceDirReport().send();
     }
 

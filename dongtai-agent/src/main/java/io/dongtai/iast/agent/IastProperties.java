@@ -1,6 +1,7 @@
 package io.dongtai.iast.agent;
 
 import io.dongtai.iast.agent.util.FileUtils;
+import io.dongtai.iast.common.constants.AgentConstant;
 import io.dongtai.log.DongTaiLog;
 
 import java.io.*;
@@ -106,7 +107,7 @@ public class IastProperties {
         }
         dir.append(sysTmpDir).append(File.separator)
                 .append("dongtai-").append(System.getProperty("user.name")).append(File.separator)
-                .append(Constant.AGENT_VERSION_VALUE).append(File.separator);
+                .append(AgentConstant.VERSION_VALUE).append(File.separator);
 
         this.tmpDir = dir.toString();
         System.setProperty("java.io.tmpdir.dongtai", this.tmpDir);
