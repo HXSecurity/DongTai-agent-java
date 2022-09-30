@@ -14,8 +14,6 @@ public class PropertyUtils {
     private static PropertyUtils instance;
     public Properties cfg = null;
     private String iastName;
-    private String iastResponseName;
-    private String iastResponseValue;
     private String iastServerToken;
     private String allHookState;
     private String dumpClassState;
@@ -77,20 +75,6 @@ public class PropertyUtils {
         return iastName;
     }
 
-    public String getIastResponseFlagName() {
-        if (null == iastResponseName) {
-            iastResponseName = cfg.getProperty("iast.response.name");
-        }
-        return iastResponseName;
-    }
-
-    public String getIastResponseFlagValue() {
-        if (null == iastResponseValue) {
-            iastResponseValue = cfg.getProperty("iast.response.value");
-        }
-        return iastResponseValue;
-    }
-
     public String getIastServerToken() {
         if (null == iastServerToken) {
             iastServerToken = System.getProperty("dongtai.server.token", cfg.getProperty("iast.server.token"));
@@ -101,8 +85,6 @@ public class PropertyUtils {
     @Override
     public String toString() {
         return "[IastName=" + getIastName() +
-                ", IastResponseName=" + getIastResponseFlagName() +
-                "，IastResponseVersion=" + getIastResponseFlagValue() +
                 "，IastServerUrl=" + getBaseUrl() +
                 "，IastServerToken=" + getIastServerToken() +
                 "]";

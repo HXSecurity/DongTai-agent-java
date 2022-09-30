@@ -1,13 +1,12 @@
 package io.dongtai.iast.core.handler.hookpoint.graphy;
 
+import io.dongtai.iast.common.constants.*;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.bytecode.enhance.IastClassDiagram;
 import io.dongtai.iast.core.handler.hookpoint.controller.impl.HttpImpl;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
-import io.dongtai.iast.core.handler.hookpoint.vulscan.ReportConstant;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.normal.AbstractNormalVulScan;
 import io.dongtai.iast.core.service.ThreadPools;
-import io.dongtai.iast.core.utils.Constants;
 import io.dongtai.iast.core.utils.PropertyUtils;
 import io.dongtai.iast.core.utils.base64.Base64Encoder;
 import io.dongtai.log.DongTaiLog;
@@ -27,7 +26,7 @@ public class GraphBuilder {
     public static void buildAndReport(Object request, Object response) {
         List<GraphNode> nodeList = build();
         String report = convertToReport(nodeList, request, response);
-        ThreadPools.sendPriorityReport(Constants.API_REPORT_UPLOAD, report);
+        ThreadPools.sendPriorityReport(ApiPath.REPORT_UPLOAD, report);
         EngineManager.ENTER_REPLAY_ENTRYPOINT.remove();
     }
 
@@ -90,36 +89,36 @@ public class GraphBuilder {
         JSONObject detail = new JSONObject();
         JSONArray methodPool = new JSONArray();
 
-        report.put(ReportConstant.REPORT_KEY, ReportConstant.REPORT_VULN_SAAS_POOL);
-        report.put(ReportConstant.REPORT_TYPE, "v2");
-        report.put(ReportConstant.REPORT_VALUE_KEY, detail);
+        report.put(ReportKey.TYPE, ReportType.VULN_SAAS_POOL);
+        report.put(ReportKey.VERSION, "v2");
+        report.put(ReportKey.DETAIL, detail);
 
-        detail.put(ReportConstant.AGENT_ID, EngineManager.getAgentId());
-        detail.put(ReportConstant.PROTOCOL, requestMeta.getOrDefault("protocol", "unknown"));
-        detail.put(ReportConstant.SCHEME, requestMeta.getOrDefault("scheme", ""));
-        detail.put(ReportConstant.METHOD, requestMeta.getOrDefault("method", ""));
-        detail.put(ReportConstant.SECURE, requestMeta.getOrDefault("secure", ""));
+        detail.put(ReportKey.AGENT_ID, EngineManager.getAgentId());
+        detail.put(ReportKey.PROTOCOL, requestMeta.getOrDefault("protocol", "unknown"));
+        detail.put(ReportKey.SCHEME, requestMeta.getOrDefault("scheme", ""));
+        detail.put(ReportKey.METHOD, requestMeta.getOrDefault("method", ""));
+        detail.put(ReportKey.SECURE, requestMeta.getOrDefault("secure", ""));
         String requestURL = requestMeta.getOrDefault("requestURL", "").toString();
-        detail.put(ReportConstant.URL, requestURL);
+        detail.put(ReportKey.URL, requestURL);
         String requestURI = requestMeta.getOrDefault("requestURI", "").toString();
-        detail.put(ReportConstant.URI, requestURI);
+        detail.put(ReportKey.URI, requestURI);
         setURL(requestURL);
         setURI(requestURI);
-        detail.put(ReportConstant.CLIENT_IP, requestMeta.getOrDefault("remoteAddr", ""));
-        detail.put(ReportConstant.QUERY_STRING, requestMeta.getOrDefault("queryString", ""));
-        detail.put(ReportConstant.REQ_HEADER,
+        detail.put(ReportKey.CLIENT_IP, requestMeta.getOrDefault("remoteAddr", ""));
+        detail.put(ReportKey.QUERY_STRING, requestMeta.getOrDefault("queryString", ""));
+        detail.put(ReportKey.REQ_HEADER,
                 AbstractNormalVulScan.getEncodedHeader((Map<String, String>) requestMeta.getOrDefault("headers", new HashMap<String, String>())));
         // 设置请求体
-        detail.put(ReportConstant.REQ_BODY, request == null ? "" : HttpImpl.getPostBody(request));
-        detail.put(ReportConstant.RES_HEADER, responseMeta == null ? ""
+        detail.put(ReportKey.REQ_BODY, request == null ? "" : HttpImpl.getPostBody(request));
+        detail.put(ReportKey.RES_HEADER, responseMeta == null ? ""
                 : Base64Encoder.encodeBase64String(responseMeta.getOrDefault("headers", "").toString().getBytes())
                 .replaceAll("\n", ""));
-        detail.put(ReportConstant.RES_BODY, responseMeta == null ? "" : Base64Encoder.encodeBase64String(
+        detail.put(ReportKey.RES_BODY, responseMeta == null ? "" : Base64Encoder.encodeBase64String(
                 getResponseBody(responseMeta)));
-        detail.put(ReportConstant.CONTEXT_PATH, requestMeta.getOrDefault("contextPath", ""));
-        detail.put(ReportConstant.REPLAY_REQUEST, requestMeta.getOrDefault("replay-request", false));
+        detail.put(ReportKey.CONTEXT_PATH, requestMeta.getOrDefault("contextPath", ""));
+        detail.put(ReportKey.REPLAY_REQUEST, requestMeta.getOrDefault("replay-request", false));
 
-        detail.put(ReportConstant.SAAS_METHOD_POOL, methodPool);
+        detail.put(ReportKey.METHOD_POOL, methodPool);
 
         for (GraphNode node : nodeList) {
             methodPool.put(node.toJson());

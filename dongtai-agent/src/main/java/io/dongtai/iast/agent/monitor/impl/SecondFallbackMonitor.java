@@ -1,10 +1,10 @@
 package io.dongtai.iast.agent.monitor.impl;
 
-import io.dongtai.iast.agent.Constant;
 import io.dongtai.iast.agent.manager.EngineManager;
 import io.dongtai.iast.agent.monitor.IMonitor;
 import io.dongtai.iast.agent.monitor.MonitorDaemonThread;
 import io.dongtai.iast.agent.util.ThreadUtils;
+import io.dongtai.iast.common.constants.AgentConstant;
 import io.dongtai.log.DongTaiLog;
 
 /**
@@ -39,7 +39,7 @@ public class SecondFallbackMonitor implements IMonitor {
 
     @Override
     public String getName() {
-        return Constant.THREAD_PREFIX + NAME;
+        return AgentConstant.THREAD_NAME_PREFIX + NAME;
     }
 
     @Override

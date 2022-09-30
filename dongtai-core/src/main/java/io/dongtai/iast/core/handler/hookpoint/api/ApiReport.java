@@ -1,12 +1,11 @@
 package io.dongtai.iast.core.handler.hookpoint.api;
 
+import io.dongtai.iast.common.constants.*;
 import io.dongtai.iast.core.EngineManager;
-import io.dongtai.iast.core.handler.hookpoint.vulscan.ReportConstant;
-import io.dongtai.iast.core.utils.Constants;
-import java.util.Map;
-
 import io.dongtai.iast.core.service.ThreadPools;
 import org.json.JSONObject;
+
+import java.util.Map;
 
 /**
  * send api sitemap
@@ -17,17 +16,17 @@ public class ApiReport {
 
     public static void sendReport(Map<String, Object> apiList) {
         String report = createReport(apiList);
-        ThreadPools.sendReport(Constants.API_REPORT_UPLOAD, report);
+        ThreadPools.sendReport(ApiPath.REPORT_UPLOAD, report);
     }
 
     private static String createReport(Map<String, Object> apiList) {
         JSONObject report = new JSONObject();
         JSONObject detail = new JSONObject();
-        report.put(ReportConstant.REPORT_KEY, ReportConstant.REPORT_API);
-        report.put(ReportConstant.REPORT_VALUE_KEY, detail);
-        detail.put(ReportConstant.AGENT_ID, EngineManager.getAgentId());
+        report.put(ReportKey.TYPE, ReportType.API);
+        report.put(ReportKey.DETAIL, detail);
+        detail.put(ReportKey.AGENT_ID, EngineManager.getAgentId());
         JSONObject apiListJson = new JSONObject(apiList);
-        detail.put(ReportConstant.API_DATA, apiListJson.get(ReportConstant.API_DATA));
+        detail.put(ReportKey.API_DATA, apiListJson.get(ReportKey.API_DATA));
         return report.toString();
     }
 

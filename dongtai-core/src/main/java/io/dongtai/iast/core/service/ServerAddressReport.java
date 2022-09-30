@@ -1,13 +1,10 @@
 package io.dongtai.iast.core.service;
 
+import io.dongtai.iast.common.constants.ApiPath;
+import io.dongtai.iast.common.constants.ReportKey;
 import io.dongtai.iast.core.EngineManager;
-import io.dongtai.iast.core.handler.hookpoint.vulscan.ReportConstant;
-import io.dongtai.iast.core.utils.Constants;
-import io.dongtai.iast.core.utils.HttpClientUtils;
 import io.dongtai.log.DongTaiLog;
 import org.json.JSONObject;
-
-import java.io.IOException;
 
 /**
  * 上报agent队列与请求数量
@@ -27,19 +24,19 @@ public class ServerAddressReport implements Runnable {
 
     public String getServereAddressMsg() {
         JSONObject report = new JSONObject();
-        report.put(ReportConstant.AGENT_ID, EngineManager.getAgentId());
-        report.put(ReportConstant.SERVER_ADDR, this.serverAddr);
-        report.put(ReportConstant.SERVER_PORT, this.serverPort);
-        report.put(ReportConstant.SERVER_PROTOCOL, this.protocol);
+        report.put(ReportKey.AGENT_ID, EngineManager.getAgentId());
+        report.put("serverAddr", this.serverAddr);
+        report.put("serverPort", this.serverPort);
+        report.put("protocol", this.protocol);
         return report.toString();
     }
 
     @Override
     public void run() {
         try {
-            ThreadPools.sendReport(Constants.SERVER_ADDRESS, this.getServereAddressMsg());
+            ThreadPools.sendReport(ApiPath.AGENT_UPDATE, this.getServereAddressMsg());
         } catch (Exception e) {
-            DongTaiLog.error("send API Queue to {} error, reason: {}", Constants.API_REPORT_UPLOAD, e);
+            DongTaiLog.error("send API Queue to {} error, reason: {}", ApiPath.REPORT_UPLOAD, e);
         }
     }
 }

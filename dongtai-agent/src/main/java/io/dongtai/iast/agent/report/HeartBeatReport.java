@@ -1,9 +1,10 @@
 package io.dongtai.iast.agent.report;
 
-import io.dongtai.iast.agent.Constant;
 import io.dongtai.iast.agent.manager.EngineManager;
 import io.dongtai.iast.agent.monitor.impl.PerformanceMonitor;
 import io.dongtai.iast.agent.util.ByteUtils;
+import io.dongtai.iast.common.constants.ReportKey;
+import io.dongtai.iast.common.constants.ReportType;
 import io.dongtai.iast.common.entity.performance.PerformanceMetrics;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -24,32 +25,32 @@ public class HeartBeatReport {
     public static String generateHeartBeatMsg() {
         JSONObject report = new JSONObject();
         JSONObject detail = new JSONObject();
-        report.put(Constant.KEY_UPDATE_REPORT, Constant.REPORT_HEART_BEAT);
-        report.put(Constant.KEY_REPORT_VALUE, detail);
+        report.put(ReportKey.TYPE, ReportType.HEART_BEAT);
+        report.put(ReportKey.DETAIL, detail);
 
-        detail.put(Constant.KEY_AGENT_ID, AgentRegisterReport.getAgentFlag());
-        detail.put(Constant.KEY_MEMORY, getMemInfo());
-        detail.put(Constant.KEY_CPU, readCpuInfo());
-        detail.put(Constant.KEY_DISK,getDiskInfo());
-        detail.put(Constant.KEY_PERFORMANCE, readRecentlyPerformanceMetrics());
-        detail.put(Constant.KEY_CORE_INSTALLED, EngineManager.checkCoreIsInstalled() ? 1 : 0);
-        detail.put(Constant.KEY_CORE_RUNNING, EngineManager.checkCoreIsRunning() ? 1 : 0);
-        detail.put(Constant.KEY_RETURN_QUEUE, 0);
+        detail.put(ReportKey.AGENT_ID, AgentRegisterReport.getAgentFlag());
+        detail.put("memory", getMemInfo());
+        detail.put("cpu", readCpuInfo());
+        detail.put("disk", getDiskInfo());
+        detail.put("performance", readRecentlyPerformanceMetrics());
+        detail.put(ReportKey.IS_CORE_INSTALLED, EngineManager.checkCoreIsInstalled() ? 1 : 0);
+        detail.put(ReportKey.IS_CORE_RUNNING, EngineManager.checkCoreIsRunning() ? 1 : 0);
+        detail.put(ReportKey.RETURN_QUEUE, 0);
 
         return report.toString();
     }
 
     public static String generateAgentStatusMsg() {
         JSONObject detail = new JSONObject();
-        detail.put(Constant.KEY_AGENT_ID, AgentRegisterReport.getAgentFlag());
+        detail.put(ReportKey.AGENT_ID, AgentRegisterReport.getAgentFlag());
         Integer status = 0;
-        if (EngineManager.checkCoreIsRunning()){
+        if (EngineManager.checkCoreIsRunning()) {
             status = 1;
-        }else {
+        } else {
             status = 2;
         }
-        detail.put(Constant.KEY_CORE_STATUS, status);
-        detail.put(Constant.KEY_CORE_STATE, EngineManager.checkCoreIsFallback() ? 3 : status);
+        detail.put("actualRunningStatus", status);
+        detail.put("stateStatus", EngineManager.checkCoreIsFallback() ? 3 : status);
         return detail.toString();
     }
 

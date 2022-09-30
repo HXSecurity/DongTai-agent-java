@@ -1,10 +1,9 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.fallback.report.body;
 
 import com.google.gson.annotations.SerializedName;
-import io.dongtai.iast.core.handler.hookpoint.vulscan.ReportConstant;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import io.dongtai.iast.common.constants.ReportKey;
+import io.dongtai.iast.common.constants.ReportType;
+import lombok.*;
 import lombok.experimental.Accessors;
 
 import java.util.Date;
@@ -20,12 +19,12 @@ public class HookPointRateLimitReportBody {
     /**
      * 报告类型
      */
-    @SerializedName(ReportConstant.REPORT_KEY)
-    private Integer type = ReportConstant.REPORT_LIMIT_HOOK_POINT_RATE;
+    @SerializedName(ReportKey.TYPE)
+    private Integer type = ReportType.LIMIT_HOOK_POINT_RATE;
     /**
      * 报告详情
      */
-    @SerializedName(ReportConstant.REPORT_VALUE_KEY)
+    @SerializedName(ReportKey.DETAIL)
     private HookPointRateLimitDetail detail = new HookPointRateLimitDetail();
 
     /**
@@ -42,37 +41,37 @@ public class HookPointRateLimitReportBody {
         /**
          * agentId
          */
-        @SerializedName(ReportConstant.AGENT_ID)
+        @SerializedName(ReportKey.AGENT_ID)
         private Integer agentId;
         /**
          * 限流发生时间
          */
-        @SerializedName(ReportConstant.LIMIT_HOOK_LIMIT_DATE)
+        @SerializedName("limitDate")
         private Date limitDate;
         /**
          * 触发限流的类名
          */
-        @SerializedName(ReportConstant.LIMIT_HOOK_POINT_CLASS_NAME)
+        @SerializedName("className")
         private String className;
         /**
          * 触发限流的方法
          */
-        @SerializedName(ReportConstant.LIMIT_HOOK_POINT_METHOD)
+        @SerializedName("method")
         private String method;
         /**
          * 触发限流的方法签名
          */
-        @SerializedName(ReportConstant.LIMIT_HOOK_POINT_METHOD_SIGN)
+        @SerializedName("methodSign")
         private String methodSign;
         /**
          * hook点类型
          */
-        @SerializedName(ReportConstant.LIMIT_HOOK_POINT_TYPE)
+        @SerializedName("hookType")
         private Integer hookType;
         /**
          * 限流速率
          */
-        @SerializedName(ReportConstant.LIMIT_HOOK_POINT_RATE)
+        @SerializedName("limitRate")
         private Double limitRate;
 
     }

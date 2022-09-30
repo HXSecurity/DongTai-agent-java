@@ -1,21 +1,19 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.hardcoded;
 
+import io.dongtai.iast.common.constants.*;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.bytecode.enhance.IastContext;
 import io.dongtai.iast.core.bytecode.enhance.plugin.AbstractClassVisitor;
 import io.dongtai.iast.core.bytecode.enhance.plugin.DispatchPlugin;
-import io.dongtai.iast.core.handler.hookpoint.vulscan.ReportConstant;
 import io.dongtai.iast.core.service.ThreadPools;
-import io.dongtai.iast.core.utils.Constants;
 import io.dongtai.iast.core.utils.base64.Base64Encoder;
 import io.dongtai.iast.core.utils.commonUtils;
-
-import java.lang.reflect.Modifier;
-import java.util.regex.Pattern;
-
 import org.json.JSONObject;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.FieldVisitor;
+
+import java.lang.reflect.Modifier;
+import java.util.regex.Pattern;
 
 /**
  * 检测字节码中使用硬编码的转换类
@@ -116,15 +114,15 @@ public class DispatchHardcodedPlugin implements DispatchPlugin {
                                    String value) {
             JSONObject report = new JSONObject();
             JSONObject detail = new JSONObject();
-            report.put(ReportConstant.REPORT_KEY, ReportConstant.REPORT_VUL_HARDCORD);
-            report.put(ReportConstant.REPORT_VALUE_KEY, detail);
-            detail.put(ReportConstant.AGENT_ID, EngineManager.getAgentId());
+            report.put(ReportKey.TYPE, ReportType.VUL_HARDCODE);
+            report.put(ReportKey.DETAIL, detail);
+            detail.put(ReportKey.AGENT_ID, EngineManager.getAgentId());
             detail.put("file", fileName);
             detail.put("class", className);
             detail.put("isJdk", isJDKClass);
             detail.put("field", fieldName);
             detail.put("value", value);
-            ThreadPools.sendPriorityReport(Constants.API_REPORT_UPLOAD, report.toString());
+            ThreadPools.sendPriorityReport(ApiPath.REPORT_UPLOAD, report.toString());
         }
     }
 }

@@ -5,6 +5,7 @@ import io.dongtai.iast.agent.monitor.MonitorDaemonThread;
 import io.dongtai.iast.agent.monitor.impl.EngineMonitor;
 import io.dongtai.iast.agent.report.AgentRegisterReport;
 import io.dongtai.iast.agent.util.ThreadUtils;
+import io.dongtai.iast.common.constants.AgentConstant;
 import io.dongtai.log.DongTaiLog;
 
 import java.lang.instrument.Instrumentation;
@@ -136,7 +137,7 @@ public class AgentLauncher {
 
         agentMonitorDaemonThread.setDaemon(true);
         agentMonitorDaemonThread.setPriority(1);
-        agentMonitorDaemonThread.setName(Constant.THREAD_PREFIX + "MonitorDaemon");
+        agentMonitorDaemonThread.setName(AgentConstant.THREAD_NAME_PREFIX + "MonitorDaemon");
         agentMonitorDaemonThread.start();
     }
 

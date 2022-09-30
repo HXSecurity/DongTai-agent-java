@@ -1,12 +1,13 @@
 package io.dongtai.iast.agent.report;
 
-import io.dongtai.iast.agent.Constant;
 import io.dongtai.iast.agent.IastProperties;
 import io.dongtai.iast.agent.manager.EngineManager;
 import io.dongtai.iast.agent.middlewarerecognition.IServer;
 import io.dongtai.iast.agent.middlewarerecognition.ServerDetect;
 import io.dongtai.iast.agent.util.base64.Base64Encoder;
 import io.dongtai.iast.agent.util.http.HttpClientUtils;
+import io.dongtai.iast.common.constants.AgentConstant;
+import io.dongtai.iast.common.constants.ApiPath;
 import io.dongtai.log.DongTaiLog;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -38,24 +39,24 @@ public class AgentRegisterReport {
      */
     private String generateAgentRegisterMsg() {
         JSONObject object = new JSONObject();
-        object.put(Constant.KEY_AGENT_TOKEN, AgentRegisterReport.getAgentToken());
-        object.put(Constant.KEY_AGENT_VERSION, Constant.AGENT_VERSION_VALUE);
-        object.put(Constant.KEY_PROJECT_NAME, getProjectName());
-        object.put(Constant.KEY_CLUSTER_NAME, getClusterName());
-        object.put(Constant.KEY_CLUSTER_VERSION, getClusterVersion());
-        object.put(Constant.KEY_PID, EngineManager.getPID());
-        object.put(Constant.KEY_HOSTNAME, AgentRegisterReport.getInternalHostName());
-        object.put(Constant.KEY_LANGUAGE, Constant.LANGUAGE);
-        object.put(Constant.KEY_NETWORK, readIpInfo());
-        object.put(Constant.KEY_SERVER_ENV,
+        object.put("name", AgentRegisterReport.getAgentToken());
+        object.put("version", AgentConstant.VERSION_VALUE);
+        object.put("projectName", getProjectName());
+        object.put("clusterName", getClusterName());
+        object.put("clusterVersion", getClusterVersion());
+        object.put("pid", EngineManager.getPID());
+        object.put("hostname", AgentRegisterReport.getInternalHostName());
+        object.put("language", AgentConstant.LANGUAGE);
+        object.put("network", readIpInfo());
+        object.put("serverEnv",
                 Base64Encoder.encodeBase64String(System.getProperties().toString().getBytes()).replaceAll("\n", ""));
-        object.put(Constant.KEY_CONTAINER_NAME, null == server ? "" : server.getName());
-        object.put(Constant.KEY_CONTAINER_VERSION, null == server ? "" : server.getVersion());
-        object.put(Constant.KEY_SERVER_PATH, ServerDetect.getWebServerPath());
-        object.put(Constant.KEY_SERVER_ADDR, "");
-        object.put(Constant.KEY_SERVER_PORT, "");
-        object.put(Constant.KEY_AUTO_CREATE_PROJECT, IastProperties.getInstance().isAutoCreateProject());
-        object.put(Constant.KEY_PROJECT_VERSION, IastProperties.getInstance().getProjectVersion());
+        object.put("containerName", null == server ? "" : server.getName());
+        object.put("containerVersion", null == server ? "" : server.getVersion());
+        object.put("serverPath", ServerDetect.getWebServerPath());
+        object.put("serverAddr", "");
+        object.put("serverPort", "");
+        object.put("autoCreateProject", IastProperties.getInstance().isAutoCreateProject());
+        object.put("projectVersion", IastProperties.getInstance().getProjectVersion());
 
         return object.toString();
     }
@@ -70,7 +71,7 @@ public class AgentRegisterReport {
             String osName = System.getProperty("os.name");
             String hostname = getInternalHostName();
             AGENT_NAME =
-                    osName + "-" + hostname + "-" + Constant.AGENT_VERSION_VALUE + "-" + IastProperties.getInstance()
+                    osName + "-" + hostname + "-" + AgentConstant.VERSION_VALUE + "-" + IastProperties.getInstance()
                             .getEngineName();
         }
         return AGENT_NAME;
@@ -219,7 +220,7 @@ public class AgentRegisterReport {
                 DongTaiLog.debug("DongTai will install for {} Service", server.getName());
             }
             String msg = generateAgentRegisterMsg();
-            StringBuilder responseRaw = HttpClientUtils.sendPost(Constant.API_AGENT_REGISTER, msg);
+            StringBuilder responseRaw = HttpClientUtils.sendPost(ApiPath.AGENT_REGISTER, msg);
             if (!isRegistered()) {
                 setAgentData(responseRaw);
             }

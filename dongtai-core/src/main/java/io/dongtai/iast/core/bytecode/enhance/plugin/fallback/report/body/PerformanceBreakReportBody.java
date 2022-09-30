@@ -1,9 +1,10 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.fallback.report.body;
 
 import com.google.gson.annotations.SerializedName;
+import io.dongtai.iast.common.constants.ReportKey;
+import io.dongtai.iast.common.constants.ReportType;
 import io.dongtai.iast.common.entity.performance.PerformanceMetrics;
 import io.dongtai.iast.common.utils.FixSizeLinkedList;
-import io.dongtai.iast.core.handler.hookpoint.vulscan.ReportConstant;
 import lombok.Data;
 
 import java.util.Date;
@@ -21,13 +22,13 @@ public class PerformanceBreakReportBody {
     /**
      * 报告类型
      */
-    @SerializedName(ReportConstant.REPORT_KEY)
-    private Integer type = ReportConstant.REPORT_LIMIT_PERFORMANCE_FALLBACK;
+    @SerializedName(ReportKey.TYPE)
+    private Integer type = ReportType.LIMIT_PERFORMANCE_FALLBACK;
 
     /**
      * 报告详情
      */
-    @SerializedName(ReportConstant.REPORT_VALUE_KEY)
+    @SerializedName(ReportKey.DETAIL)
     private PerformanceBreakDetail detail = new PerformanceBreakDetail();
 
     public void appendPerformanceBreakLog(PerformanceOverThresholdLog performanceOverThresholdLog) {
@@ -50,17 +51,17 @@ public class PerformanceBreakReportBody {
         /**
          * agentId
          */
-        @SerializedName(ReportConstant.AGENT_ID)
+        @SerializedName(ReportKey.AGENT_ID)
         private Integer agentId;
         /**
          * 熔断时间
          */
-        @SerializedName(ReportConstant.LIMIT_PERFORMANCE_BREAK_DATE)
+        @SerializedName("breakDate")
         private Date breakDate;
         /**
          * 熔断前超限日志(最多保留30条)
          */
-        @SerializedName(ReportConstant.LIMIT_PERFORMANCE_OVER_THRESHOLD_LOG)
+        @SerializedName("performanceOverThresholdLog")
         private LinkedList<PerformanceOverThresholdLog> performanceOverThresholdLog = new FixSizeLinkedList<>(30);
 
     }

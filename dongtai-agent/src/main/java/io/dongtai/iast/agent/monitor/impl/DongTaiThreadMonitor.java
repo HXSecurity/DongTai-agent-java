@@ -1,19 +1,16 @@
 package io.dongtai.iast.agent.monitor.impl;
 
-import io.dongtai.iast.agent.Constant;
 import io.dongtai.iast.agent.monitor.IMonitor;
 import io.dongtai.iast.agent.monitor.MonitorDaemonThread;
 import io.dongtai.iast.agent.util.ThreadUtils;
 import io.dongtai.iast.agent.util.http.HttpClientUtils;
+import io.dongtai.iast.common.constants.*;
 import io.dongtai.iast.common.entity.performance.metrics.ThreadInfoMetrics;
 import io.dongtai.log.DongTaiLog;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class DongTaiThreadMonitor implements IMonitor {
     private static final String NAME = "DongTaiThreadMonitor";
@@ -26,7 +23,7 @@ public class DongTaiThreadMonitor implements IMonitor {
 
     @Override
     public String getName() {
-        return Constant.THREAD_PREFIX + NAME;
+        return AgentConstant.THREAD_NAME_PREFIX + NAME;
     }
 
     @Override
@@ -56,7 +53,7 @@ public class DongTaiThreadMonitor implements IMonitor {
         // 两次生成的notAliveThread不一致时，再上报.
         Boolean notAliveThreadReportFlag = false;
         if (!notAliveThreads.toString().equals(NOT_ALIVE_THREAD)) {
-            detail.put(Constant.KEY_NOT_EXIST_THREADS, notAliveThreads.toString());
+            detail.put("notExistThread", notAliveThreads.toString());
             NOT_ALIVE_THREAD = notAliveThreads.toString();
             notAliveThreadReportFlag = true;
         }
@@ -72,12 +69,12 @@ public class DongTaiThreadMonitor implements IMonitor {
                 jsonObj.put("killRes", ThreadUtils.killDongTaiThread(each.getId()));
                 highCpuThreadJsonList.put(jsonObj);
             }
-            detail.put(Constant.KEY_HIGH_CPU_THREADS, highCpuThreadJsonList);
+            detail.put("highCpuThread", highCpuThreadJsonList);
         }
         if (notAliveThreadReportFlag || highCpuDaemonThreads.size() > 0) {
-            report.put(Constant.KEY_UPDATE_REPORT, Constant.REPORT_ERROR_THREAD);
-            report.put(Constant.KEY_REPORT_VALUE, detail);
-            HttpClientUtils.sendPost(Constant.API_REPORT_UPLOAD, report.toString());
+            report.put(ReportKey.TYPE, ReportType.ERROR_THREAD);
+            report.put(ReportKey.DETAIL, detail);
+            HttpClientUtils.sendPost(ApiPath.REPORT_UPLOAD, report.toString());
         }
     }
 
