@@ -5,7 +5,7 @@
     <parent>
         <artifactId>iast</artifactId>
         <groupId>io.dongtai.iast</groupId>
-        <version>1.7.7</version>
+        <version>${revision}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -24,7 +24,7 @@
         <dependency>
             <groupId>io.dongtai.iast</groupId>
             <artifactId>dongtai-core</artifactId>
-            <version>${dongtai.version}</version>
+            <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
