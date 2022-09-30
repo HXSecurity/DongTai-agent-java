@@ -1,11 +1,9 @@
-package io.dongtai.iast.core.utils.base64;
+package io.dongtai.iast.common.utils.base64;
 
 
 import io.dongtai.log.DongTaiLog;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PushbackInputStream;
+import java.io.*;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -26,7 +24,7 @@ public class Base64Decoder extends CharacterDecoder {
         try {
             return instance.decodeBuffer(data);
         } catch (IOException e) {
-            DongTaiLog.error("io.dongtai.iast.core.utils.base64.Base64Decoder.decodeBase64FromString(java.lang.String)",e);
+            DongTaiLog.error("base64 decode from string failed", e);
         }
         return null;
     }
@@ -48,7 +46,7 @@ public class Base64Decoder extends CharacterDecoder {
         byte var7 = -1;
         byte var8 = -1;
         if (var3 < 2) {
-            throw new IOException("BASE64Decoder: Not enough bytes for an atom.");
+            DongTaiLog.error("BASE64Decoder: Not enough bytes for an atom.");
         } else {
             int var4;
             do {

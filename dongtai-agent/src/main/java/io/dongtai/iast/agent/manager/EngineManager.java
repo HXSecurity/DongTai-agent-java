@@ -8,8 +8,8 @@ import io.dongtai.iast.agent.monitor.impl.EngineMonitor;
 import io.dongtai.iast.agent.monitor.impl.PerformanceMonitor;
 import io.dongtai.iast.agent.report.AgentRegisterReport;
 import io.dongtai.iast.agent.util.FileUtils;
-import io.dongtai.iast.agent.util.base64.Base64Encoder;
 import io.dongtai.iast.agent.util.http.HttpClientUtils;
+import io.dongtai.iast.common.utils.base64.Base64Encoder;
 import io.dongtai.log.DongTaiLog;
 import org.json.JSONObject;
 
