@@ -18,7 +18,7 @@ public class JDomTest extends XXECheckTest {
     @Test
     public void testGetSupport() throws JDOMException, NoSuchFieldException, IllegalAccessException {
         SAXBuilder saxBuilder;
-        XMLReader reader;
+        Object reader;
         Support support;
         ApacheXMLParserCheck checker = new ApacheXMLParserCheck();
         String realContent = getXXERealContent();
@@ -26,7 +26,7 @@ public class JDomTest extends XXECheckTest {
 
         saxBuilder = new SAXBuilder();
         node = getNode(saxBuilder);
-        reader = (XMLReader) ReflectUtils.getFieldFromClass(saxBuilder.getClass(), "saxParser").get(saxBuilder);
+        reader = ReflectUtils.getFieldFromClass(saxBuilder.getClass(), "saxParser").get(saxBuilder);
         XXEChecker chk = XXECheck.getChecker(reader);
         Assert.assertNotNull(chk);
         Assert.assertEquals(NAME + " match ApacheXMLParserCheck", checker.getClass(), chk.getClass());

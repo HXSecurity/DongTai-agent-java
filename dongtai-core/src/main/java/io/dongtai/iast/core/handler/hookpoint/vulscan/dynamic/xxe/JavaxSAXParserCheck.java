@@ -28,7 +28,7 @@ public class JavaxSAXParserCheck extends AbstractCheck {
 
     private Object getJavaxSAXParserXMLReader(Object obj) {
         try {
-            return ReflectUtils.getPublicMethodFromClass(obj.getClass(), "getXMLReader").invoke(obj, null);
+            return ReflectUtils.getPublicMethodFromClass(obj.getClass(), "getXMLReader").invoke(obj);
         } catch (IllegalAccessException e) {
             DongTaiLog.debug("Failed to get access to getXMLReader method on SAXParser {}", e);
             return null;
