@@ -1,4 +1,4 @@
-package io.dongtai.iast.agent.util.base64;
+package io.dongtai.iast.common.utils.base64;
 
 import io.dongtai.log.DongTaiLog;
 
@@ -92,8 +92,8 @@ public abstract class CharacterEncoder {
             this.encode((InputStream) var3, var2);
             var4 = var2.toString("8859_1");
             return var4;
-        } catch (Exception var6) {
-            DongTaiLog.error("CharacterEncoder.encode internal error.");
+        } catch (Exception e) {
+            DongTaiLog.error("CharacterEncoder.encode internal error", e);
             return "";
         }
     }
@@ -165,8 +165,8 @@ public abstract class CharacterEncoder {
 
         try {
             this.encodeBuffer((InputStream) var3, var2);
-        } catch (Exception var5) {
-            DongTaiLog.error("CharacterEncoder.encodeBuffer internal error");
+        } catch (Exception e) {
+            DongTaiLog.error("CharacterEncoder.encodeBuffer internal error", e);
         }
 
         return var2.toString();

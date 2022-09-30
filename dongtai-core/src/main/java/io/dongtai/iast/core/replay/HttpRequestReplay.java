@@ -1,21 +1,15 @@
 package io.dongtai.iast.core.replay;
 
-import io.dongtai.iast.core.EngineManager;
+import io.dongtai.iast.common.utils.base64.Base64Decoder;
 import io.dongtai.iast.core.handler.hookpoint.models.IastReplayModel;
-import io.dongtai.iast.core.utils.HttpClientHostnameVerifier;
-import io.dongtai.iast.core.utils.HttpClientUtils;
-import io.dongtai.iast.core.utils.HttpMethods;
-import io.dongtai.iast.core.utils.base64.Base64Decoder;
+import io.dongtai.iast.core.utils.*;
 import io.dongtai.log.DongTaiLog;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;

@@ -1,11 +1,11 @@
 package io.dongtai.iast.core.handler.hookpoint.vulscan.normal;
 
 import io.dongtai.iast.common.constants.*;
+import io.dongtai.iast.common.utils.base64.Base64Encoder;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.IVulScan;
 import io.dongtai.iast.core.service.ThreadPools;
 import io.dongtai.iast.core.utils.StackUtils;
-import io.dongtai.iast.core.utils.base64.Base64Encoder;
 import org.json.JSONArray;
 import org.json.JSONObject;
 

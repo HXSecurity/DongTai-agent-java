@@ -1,12 +1,12 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.hardcoded;
 
 import io.dongtai.iast.common.constants.*;
+import io.dongtai.iast.common.utils.base64.Base64Encoder;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.bytecode.enhance.IastContext;
 import io.dongtai.iast.core.bytecode.enhance.plugin.AbstractClassVisitor;
 import io.dongtai.iast.core.bytecode.enhance.plugin.DispatchPlugin;
 import io.dongtai.iast.core.service.ThreadPools;
-import io.dongtai.iast.core.utils.base64.Base64Encoder;
 import io.dongtai.iast.core.utils.commonUtils;
 import org.json.JSONObject;
 import org.objectweb.asm.ClassVisitor;
