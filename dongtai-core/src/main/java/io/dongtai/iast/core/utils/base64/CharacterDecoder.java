@@ -77,8 +77,7 @@ public abstract class CharacterDecoder {
     }
 
     public byte[] decodeBuffer(String var1) throws IOException {
-        byte[] var2 = new byte[var1.length()];
-        var1.getBytes(0, var1.length(), var2, 0);
+        byte[] var2 = var1.getBytes();
         ByteArrayInputStream var3 = new ByteArrayInputStream(var2);
         ByteArrayOutputStream var4 = new ByteArrayOutputStream();
         this.decodeBuffer(var3, var4);
