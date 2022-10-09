@@ -44,9 +44,10 @@ public class AgentLauncher {
         }
         LAUNCH_MODE = LAUNCH_MODE_AGENT;
         try {
+            IastProperties.getInstance();
             install(inst);
         } catch (Exception e) {
-            DongTaiLog.error("agent premain failed", e);
+            System.out.println("agent premain failed: " + e.toString());
         }
     }
 
@@ -57,37 +58,38 @@ public class AgentLauncher {
      * @param inst inst
      */
     public static void agentmain(String args, Instrumentation inst) {
-        Map<String, String> argsMap = parseArgs(args);
         try {
+            Map<String, String> argsMap = parseArgs(args);
             for (String prop : IastProperties.ATTACH_ARG_MAP.values()) {
                 if (argsMap.containsKey(prop)) {
                     System.setProperty(prop, argsMap.get(prop));
                 }
             }
-        } catch (Exception e) {
-            DongTaiLog.error("agent set properties failed", e);
-        }
 
-        DongTaiLog.info("Protect By DongTai IAST: " + System.getProperty("protect.by.dongtai", "false"));
-        if ("uninstall".equals(argsMap.get("mode"))) {
-            if (System.getProperty("protect.by.dongtai", null) == null) {
-                DongTaiLog.info("DongTai wasn't installed.");
-                return;
+            IastProperties.getInstance();
+            DongTaiLog.info("Protect By DongTai IAST: " + System.getProperty("protect.by.dongtai", "false"));
+            if ("uninstall".equals(argsMap.get("mode"))) {
+                if (System.getProperty("protect.by.dongtai", null) == null) {
+                    DongTaiLog.info("DongTai wasn't installed.");
+                    return;
+                }
+                EngineMonitor.setIsUninstallHeart(true);
+                DongTaiLog.info("Engine is about to be uninstalled");
+                uninstall();
+                // attach手动卸载后停止守护线程
+                ThreadUtils.killAllDongTaiThreads();
+                System.clearProperty("protect.by.dongtai");
+            } else {
+                if (System.getProperty("protect.by.dongtai", null) != null) {
+                    DongTaiLog.info("DongTai already installed.");
+                    return;
+                }
+                MonitorDaemonThread.isExit = false;
+                LAUNCH_MODE = LAUNCH_MODE_ATTACH;
+                install(inst);
             }
-            EngineMonitor.setIsUninstallHeart(true);
-            DongTaiLog.info("Engine is about to be uninstalled");
-            uninstall();
-            // attach手动卸载后停止守护线程
-            ThreadUtils.killAllDongTaiThreads();
-            System.clearProperty("protect.by.dongtai");
-        } else {
-            if (System.getProperty("protect.by.dongtai", null) != null) {
-                DongTaiLog.info("DongTai already installed.");
-                return;
-            }
-            MonitorDaemonThread.isExit = false;
-            LAUNCH_MODE = LAUNCH_MODE_ATTACH;
-            install(inst);
+        } catch (Exception e) {
+            System.out.println("agent agentmain failed: " + e.toString());
         }
     }
 
@@ -107,7 +109,6 @@ public class AgentLauncher {
      * @param inst inst
      */
     private static void install(final Instrumentation inst) {
-        IastProperties.getInstance();
         Boolean send = AgentRegisterReport.send();
         if (send) {
             LogCollector.extractFluent();
