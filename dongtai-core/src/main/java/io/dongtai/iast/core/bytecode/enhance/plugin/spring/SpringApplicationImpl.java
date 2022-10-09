@@ -27,6 +27,7 @@ public class SpringApplicationImpl {
             loadApplicationContext();
             GetApiThread getApiThread = new GetApiThread(applicationContext);
             getApiThread.start();
+            iastClassLoader = null;
         }
     }
 

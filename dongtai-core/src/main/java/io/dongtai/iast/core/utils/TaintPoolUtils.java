@@ -77,27 +77,31 @@ public class TaintPoolUtils {
      * @return true-对象不为空；false-对象为空
      */
     public static boolean isNotEmpty(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (HashCode.calc(obj) == 0) {
-            return false;
-        }
+        try {
+            if (obj == null) {
+                return false;
+            }
+            if (HashCode.calc(obj) == 0) {
+                return false;
+            }
 
-        if (obj instanceof Map) {
-            Map<?, ?> taintValue = (Map<?, ?>) obj;
-            return !taintValue.isEmpty();
-        } else if (obj instanceof List) {
-            List<?> taintValue = (List<?>) obj;
-            return !taintValue.isEmpty();
-        } else if (obj instanceof Set) {
-            Set<?> taintValue = (Set<?>) obj;
-            return !taintValue.isEmpty();
-        } else if (obj instanceof String) {
-            String taintValue = (String) obj;
-            return !taintValue.isEmpty();
+            if (obj instanceof Map) {
+                Map<?, ?> taintValue = (Map<?, ?>) obj;
+                return !taintValue.isEmpty();
+            } else if (obj instanceof List) {
+                List<?> taintValue = (List<?>) obj;
+                return !taintValue.isEmpty();
+            } else if (obj instanceof Set) {
+                Set<?> taintValue = (Set<?>) obj;
+                return !taintValue.isEmpty();
+            } else if (obj instanceof String) {
+                String taintValue = (String) obj;
+                return !taintValue.isEmpty();
+            }
+            return true;
+        }catch (Exception e){
+            return false;
         }
-        return true;
     }
 
     public static boolean isAllowTaintType(Class<?> objType) {
