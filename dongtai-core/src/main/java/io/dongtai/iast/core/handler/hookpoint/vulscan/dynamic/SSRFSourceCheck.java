@@ -32,7 +32,7 @@ public class SSRFSourceCheck implements SinkSourceChecker {
     private static final String OKHTTP3_REAL_CALL = "okhttp3.RealCall";
     private static final String OKHTTP_CALL = "com.squareup.okhttp.Call";
 
-    private static final Set<String> SSRF_SINK_METHODS = new HashSet<>(Arrays.asList(
+    private static final Set<String> SSRF_SINK_METHODS = new HashSet<String>(Arrays.asList(
             JAVA_NET_URL_OPEN_CONNECTION,
             JAVA_NET_URL_OPEN_CONNECTION_PROXY,
             JAVA_NET_URL_OPEN_STREAM,
@@ -77,7 +77,7 @@ public class SSRFSourceCheck implements SinkSourceChecker {
                 return false;
             }
 
-            URL url = (URL) u;
+            final URL url = (URL) u;
             Map<String, Object> sourceMap = new HashMap<String, Object>() {{
                 put("PROTOCOL", url.getProtocol());
                 put("USERINFO", url.getUserInfo());
@@ -100,7 +100,7 @@ public class SSRFSourceCheck implements SinkSourceChecker {
                 return false;
             }
 
-            URI uri = (URI) u;
+            final URI uri = (URI) u;
             Map<String, Object> sourceMap = new HashMap<String, Object>() {{
                 put("PROTOCOL", uri.getScheme());
                 put("USERINFO", uri.getUserInfo());
@@ -127,7 +127,7 @@ public class SSRFSourceCheck implements SinkSourceChecker {
                 return false;
             }
 
-            Object obj = event.argumentArray[0];
+            final Object obj = event.argumentArray[0];
             if (obj instanceof URI) {
                 return processJavaNetUri(event, obj);
             } else if (APACHE_LEGACY_HTTP_CLIENT_URI.equals(obj.getClass().getName())) {
@@ -156,10 +156,10 @@ public class SSRFSourceCheck implements SinkSourceChecker {
                 return false;
             }
 
-            Object reqObj = event.argumentArray[1];
+            final Object reqObj = event.argumentArray[1];
             if (APACHE_HTTP_CLIENT5_HTTP_REQUEST.equals(reqObj.getClass().getName())
                     || APACHE_HTTP_CLIENT5_HTTP_REQUEST.equals(reqObj.getClass().getSuperclass().getName())) {
-                Object authorityObj = reqObj.getClass().getMethod("getAuthority").invoke(reqObj);
+                final Object authorityObj = reqObj.getClass().getMethod("getAuthority").invoke(reqObj);
                 Map<String, Object> sourceMap = new HashMap<String, Object>() {{
                     put("PROTOCOL", reqObj.getClass().getMethod("getScheme").invoke(reqObj));
                     put("USERINFO", authorityObj.getClass().getMethod("getUserInfo").invoke(authorityObj));
@@ -203,16 +203,17 @@ public class SSRFSourceCheck implements SinkSourceChecker {
                     return false;
                 }
 
+                final Object fUrl = url;
                 Map<String, Object> sourceMap = new HashMap<String, Object>() {{
-                    put("PROTOCOL", url.getClass().getMethod("scheme").invoke(url));
-                    put("USERNAME", url.getClass().getMethod("username").invoke(url));
-                    put("PASSWORD", url.getClass().getMethod("password").invoke(url));
-                    put("HOST", url.getClass().getMethod("host").invoke(url));
-                    put("PATH", url.getClass().getMethod("encodedPath").invoke(url));
-                    put("QUERY", url.getClass().getMethod("query").invoke(url));
+                    put("PROTOCOL", fUrl.getClass().getMethod("scheme").invoke(fUrl));
+                    put("USERNAME", fUrl.getClass().getMethod("username").invoke(fUrl));
+                    put("PASSWORD", fUrl.getClass().getMethod("password").invoke(fUrl));
+                    put("HOST", fUrl.getClass().getMethod("host").invoke(fUrl));
+                    put("PATH", fUrl.getClass().getMethod("encodedPath").invoke(fUrl));
+                    put("QUERY", fUrl.getClass().getMethod("query").invoke(fUrl));
                 }};
 
-                event.setInValue((String) url.getClass().getMethod("toString").invoke(url));
+                event.setInValue((String) fUrl.getClass().getMethod("toString").invoke(fUrl));
                 return addSourceType(event, sourceMap);
             }
 

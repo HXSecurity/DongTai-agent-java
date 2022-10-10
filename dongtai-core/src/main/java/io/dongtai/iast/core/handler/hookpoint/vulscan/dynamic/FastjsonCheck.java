@@ -47,7 +47,7 @@ public class FastjsonCheck implements SinkSafeChecker {
             Class<?> cfgClass = Class.forName("com.alibaba.fastjson.parser.ParserConfig");
             Object cfg = cfgClass.getMethod("getGlobalInstance").invoke(null);
             Object isSafeMode = cfg.getClass().getMethod("isSafeMode").invoke(cfg);
-            return isSafeMode != null && (boolean) isSafeMode;
+            return isSafeMode != null && (Boolean) isSafeMode;
         } catch (Exception e) {
             DongTaiLog.warn("fastjson version and safe mode check failed: " + e.getMessage());
             return true;

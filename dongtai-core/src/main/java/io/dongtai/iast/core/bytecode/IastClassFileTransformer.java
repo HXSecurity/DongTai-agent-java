@@ -13,9 +13,7 @@ import io.dongtai.iast.core.utils.PropertyUtils;
 import io.dongtai.iast.core.utils.matcher.ConfigMatcher;
 import io.dongtai.log.DongTaiLog;
 import org.apache.commons.lang3.time.StopWatch;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,8 +26,7 @@ import java.security.ProtectionDomain;
 import java.util.*;
 
 import static org.apache.commons.io.FileUtils.writeByteArrayToFile;
-import static org.objectweb.asm.ClassWriter.COMPUTE_FRAMES;
-import static org.objectweb.asm.ClassWriter.COMPUTE_MAXS;
+import static org.objectweb.asm.ClassWriter.*;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -46,7 +43,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
     private final PluginRegister plugins;
     private static IastClassFileTransformer INSTANCE;
     private final IastHookRuleModel hookRuleModel;
-    private final static HashMap<Object,byte[]> transformMap = new HashMap<>();
+    private final static HashMap<Object, byte[]> transformMap = new HashMap<Object, byte[]>();
 
     /**
      * Gets a singleton object
@@ -261,8 +258,8 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                     String className = clazz.getName();
                     Set<String> diagram = classDiagram.getDiagram(className);
                     if (diagram == null) {
-                        diagram = new HashSet<>();
-                        Queue<Class<?>> classQueue = new LinkedList<>();
+                        diagram = new HashSet<String>();
+                        Queue<Class<?>> classQueue = new LinkedList<Class<?>>();
 
                         classQueue.add(clazz);
                         while (classQueue.size() > 0) {

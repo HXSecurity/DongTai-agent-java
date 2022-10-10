@@ -27,7 +27,7 @@ public class HttpImpl {
     private static Class<?> CLASS_OF_SERVLET_PROXY;
     private static IastClassLoader iastClassLoader;
     public static File IAST_REQUEST_JAR_PACKAGE;
-    private final static ThreadLocal<Map<String, Object>> REQUEST_META = new ThreadLocal<>();
+    private final static ThreadLocal<Map<String, Object>> REQUEST_META = new ThreadLocal<Map<String, Object>>();
 
     static {
         IAST_REQUEST_JAR_PACKAGE = new File(PropertyUtils.getTmpDir() + "dongtai-api.jar");
@@ -56,8 +56,10 @@ public class HttpImpl {
                 cloneResponseMethod = CLASS_OF_SERVLET_PROXY
                         .getDeclaredMethod("cloneResponse", Object.class, boolean.class);
             }
-        } catch (MalformedURLException | NoSuchMethodException e) {
-            DongTaiLog.error("io.dongtai.iast.core.handler.hookpoint.controller.impl.HttpImpl.createClassLoader(java.lang.Object)",e);
+        } catch (MalformedURLException e) {
+            DongTaiLog.error("HttpImpl createClassLoader failed", e);
+        } catch (NoSuchMethodException e) {
+            DongTaiLog.error("HttpImpl createClassLoader failed", e);
         }
     }
 
@@ -136,8 +138,12 @@ public class HttpImpl {
         try {
             Method methodOfRequestMeta = request.getClass().getDeclaredMethod("getPostBody");
             return (String) methodOfRequestMeta.invoke(request);
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-            DongTaiLog.error(e);
+        } catch (NoSuchMethodException e) {
+            DongTaiLog.error("HttpImpl getPostBody failed", e);
+        } catch (IllegalAccessException e) {
+            DongTaiLog.error("HttpImpl getPostBody failed", e);
+        } catch (InvocationTargetException e) {
+            DongTaiLog.error("HttpImpl getPostBody failed", e);
         }
         return null;
     }
@@ -147,8 +153,12 @@ public class HttpImpl {
         try {
             methodOfRequestMeta = response.getClass().getDeclaredMethod("getResponseMeta");
             return (Map<String, Object>) methodOfRequestMeta.invoke(response);
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-            DongTaiLog.error(e);
+        } catch (NoSuchMethodException e) {
+            DongTaiLog.error("HttpImpl getResponseMeta failed", e);
+        } catch (IllegalAccessException e) {
+            DongTaiLog.error("HttpImpl getResponseMeta failed", e);
+        } catch (InvocationTargetException e) {
+            DongTaiLog.error("HttpImpl getResponseMeta failed", e);
         }
         return null;
     }

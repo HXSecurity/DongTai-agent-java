@@ -44,7 +44,7 @@ public class DocumentBuilderTest extends XXECheckTest {
         builder = dbf.newDocumentBuilder();
         support = checker.getSupport(builder);
         Assert.assertEquals(NAME + " disallow-doctype-decl", Support.DISALLOWED, support);
-        DocumentBuilder finalBuilder1 = builder;
+        final DocumentBuilder finalBuilder1 = builder;
         Assert.assertThrows(NAME + "[C] disallow-doctype-decl", SAXException.class, new ThrowingRunnable() {
             @Override
             public void run() throws SAXException {
@@ -58,7 +58,7 @@ public class DocumentBuilderTest extends XXECheckTest {
         support = checker.getSupport(builder);
         Assert.assertEquals(NAME + " secure-processing", Support.DISALLOWED, support);
         dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", true);
-        DocumentBuilder finalBuilder2 = builder;
+        final DocumentBuilder finalBuilder2 = builder;
         Assert.assertThrows(NAME + "[C] secure-processing", SAXException.class, new ThrowingRunnable() {
             @Override
             public void run() throws SAXException {
@@ -80,7 +80,7 @@ public class DocumentBuilderTest extends XXECheckTest {
         builder = dbf.newDocumentBuilder();
         support = checker.getSupport(builder);
         Assert.assertEquals(NAME + " secure-processing & disallow epe", Support.DISALLOWED, support);
-        DocumentBuilder finalBuilder3 = builder;
+        final DocumentBuilder finalBuilder3 = builder;
         Assert.assertThrows(NAME + "[C] secure-processing & disallow epe", SAXException.class, new ThrowingRunnable() {
             @Override
             public void run() throws SAXException {
