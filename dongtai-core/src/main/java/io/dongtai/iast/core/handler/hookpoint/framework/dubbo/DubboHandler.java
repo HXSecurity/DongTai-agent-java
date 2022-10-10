@@ -184,7 +184,7 @@ public class DubboHandler {
                 null
         );
         //SourceImpl.parseCustomModel(args)
-        Set<Object> modelItems = new HashSet<>();
+        Set<Object> modelItems = new HashSet<Object>();
         for (Object arg : args) {
             if (TaintPoolUtils.isJdkType(arg)) {
                 modelItems.add(arg);

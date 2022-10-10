@@ -16,30 +16,20 @@ public class DispatchGrpc implements DispatchPlugin {
     @Override
     public ClassVisitor dispatch(ClassVisitor classVisitor, IastContext context) {
         String className = context.getClassName();
-        switch (className) {
-            case classOfAbstractStub:
-                classVisitor = new AbstractStubAdapter(classVisitor, null);
-                break;
-            case classOfClientCalls:
-                classVisitor = new ClientCallsAdapter(classVisitor, null);
-                break;
-            case classOfAbstractServerImplBuilder:
-                classVisitor = new AbstractServerImplBuilderAdapter(classVisitor, null);
-                break;
-            case classOfServerTransportListenerImpl:
-                classVisitor = new ServerTransportListenerImplAdapter(classVisitor, null);
-                break;
-            case classOfServerStreamListenerImpl:
-                classVisitor = new ServerStreamListenerImplAdapter(classVisitor, null);
-                break;
-            case classOfServerCallImpl:
-                classVisitor = new ServerCallImplAdapter(classVisitor, null);
-                break;
-            case classOfByteString:
-                classVisitor = new ByteStringAdapter(classVisitor, null);
-                break;
-            default:
-                break;
+        if (classOfAbstractStub.equals(className)) {
+            classVisitor = new AbstractStubAdapter(classVisitor, null);
+        } else if (classOfClientCalls.equals(className)) {
+            classVisitor = new ClientCallsAdapter(classVisitor, null);
+        } else if (classOfAbstractServerImplBuilder.equals(className)) {
+            classVisitor = new AbstractServerImplBuilderAdapter(classVisitor, null);
+        } else if (classOfServerTransportListenerImpl.equals(className)) {
+            classVisitor = new ServerTransportListenerImplAdapter(classVisitor, null);
+        } else if (classOfServerStreamListenerImpl.equals(className)) {
+            classVisitor = new ServerStreamListenerImplAdapter(classVisitor, null);
+        } else if (classOfServerCallImpl.equals(className)) {
+            classVisitor = new ServerCallImplAdapter(classVisitor, null);
+        } else if (classOfByteString.equals(className)) {
+            classVisitor = new ByteStringAdapter(classVisitor, null);
         }
         return classVisitor;
     }

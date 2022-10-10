@@ -1,16 +1,13 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.fallback.breaker;
 
 import io.dongtai.iast.common.entity.performance.PerformanceMetrics;
-import io.dongtai.iast.common.entity.performance.metrics.CpuInfoMetrics;
-import io.dongtai.iast.common.entity.performance.metrics.GarbageInfoMetrics;
-import io.dongtai.iast.common.entity.performance.metrics.MemoryUsageMetrics;
-import io.dongtai.iast.common.entity.performance.metrics.ThreadInfoMetrics;
+import io.dongtai.iast.common.entity.performance.metrics.*;
 import io.dongtai.iast.common.enums.MetricsKey;
 import io.dongtai.iast.common.utils.serialize.SerializeUtils;
 import io.dongtai.iast.core.EngineManager;
+import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.FallbackSwitch;
 import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.checker.IPerformanceChecker;
 import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.checker.MetricsBindCheckerEnum;
-import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.FallbackSwitch;
 import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.report.PerformanceLimitReport;
 import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.report.body.PerformanceBreakReportBody;
 import io.dongtai.iast.core.utils.config.RemoteConfigUtils;
@@ -163,7 +160,7 @@ public class PerformanceBreaker extends AbstractBreaker {
             return SerializeUtils.deserialize2ArrayList(contextString, PerformanceMetrics.class, clazzWhiteList);
         } catch (Exception e) {
             DongTaiLog.warn("convert2MetricsList failed, err:{}", e.getMessage());
-            return new ArrayList<>();
+            return new ArrayList<PerformanceMetrics>();
         }
     }
 

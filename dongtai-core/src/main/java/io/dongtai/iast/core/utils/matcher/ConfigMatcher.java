@@ -6,9 +6,7 @@ import io.dongtai.log.DongTaiLog;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.instrument.Instrumentation;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 各种匹配方法（通过配置文件匹配）
@@ -31,7 +29,7 @@ public class ConfigMatcher {
     private Instrumentation inst;
 
     private final Set<String> BLACK_URL;
-    public final Set<String> FALLBACK_URL = new HashSet<>();
+    public final Set<String> FALLBACK_URL = new HashSet<String>();
 
     public static ConfigMatcher getInstance() {
         if (null == INSTANCE) {

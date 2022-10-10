@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class SpyDispatcherImpl implements SpyDispatcher {
 
     public static final AtomicInteger INVOKE_ID_SEQUENCER = new AtomicInteger(1);
-    private static final ThreadLocal<Long> responseTime = new ThreadLocal<>();
+    private static final ThreadLocal<Long> responseTime = new ThreadLocal<Long>();
 
     /**
      * mark for enter Http Entry Point
@@ -511,10 +511,8 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     }
 
     private void solveRPC(String framework, MethodEvent event) {
-        switch (framework) {
-            case "dubbo":
-                DubboHandler.solveDubbo(event, SpyDispatcherImpl.INVOKE_ID_SEQUENCER);
-                break;
+        if ("dubbo".equals(framework)) {
+            DubboHandler.solveDubbo(event, SpyDispatcherImpl.INVOKE_ID_SEQUENCER);
         }
     }
 }
