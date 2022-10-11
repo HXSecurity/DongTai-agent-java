@@ -2,6 +2,9 @@ package io.dongtai.iast.common.utils;
 
 import io.dongtai.iast.common.enums.HttpMethods;
 import io.dongtai.log.DongTaiLog;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.json.JSONObject;
 import org.junit.*;
 
@@ -59,7 +62,27 @@ public class AbstractHttpClientUtilsTest {
         resp = AbstractHttpClientUtils.sendRequest(HttpMethods.POST, url, data, headers, 0, "", -1, null);
         respObj = new JSONObject(resp.toString());
         status = respObj.getInt("status");
-        Assert.assertEquals("captcha/refresh status", 202, status);
+        Assert.assertEquals("user/login status", 202, status);
+
+        url = BASE_URL + ":55555";
+        final String exMsg = "custom exception handler";
+        HttpClientBuilder hcb = AbstractHttpClientUtils.getClientBuilder(0, "", -1);
+        RequestConfig requestConfig = RequestConfig.custom()
+                .setConnectTimeout(3000)
+                .setSocketTimeout(3000)
+                .build();
+        hcb.setDefaultRequestConfig(requestConfig);
+        CloseableHttpClient client = hcb.build();
+        resp = AbstractHttpClientUtils.sendRequest(client, HttpMethods.GET, url, null, headers, new AbstractHttpClientUtils.HttpClientExceptionHandler() {
+            @Override
+            public void run() {
+                clear();
+                System.out.println(exMsg);
+            }
+        });
+        String log = outputStreamCaptor.toString();
+        Assert.assertEquals("exception handler resp", "", resp.toString());
+        Assert.assertEquals("exception handler", exMsg, log.trim());
     }
 
     @Test

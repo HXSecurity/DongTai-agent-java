@@ -30,12 +30,17 @@ public class AbstractHttpClientUtils {
     protected static StringBuilder sendRequest(HttpMethods method, String url, String data, Map<String, String> headers,
                                                int maxRetries, String proxyHost, int proxyPort,
                                                HttpClientExceptionHandler handler) {
+        CloseableHttpClient client = getClient(maxRetries, proxyHost, proxyPort);
+
+        return sendRequest(client, method, url, data, headers, handler);
+    }
+
+    protected static StringBuilder sendRequest(CloseableHttpClient client, HttpMethods method, String url, String data,
+                                               Map<String, String> headers, HttpClientExceptionHandler handler) {
         StringBuilder response = new StringBuilder();
-        CloseableHttpClient client = null;
         CloseableHttpResponse resp = null;
 
         try {
-            client = getClient(maxRetries, proxyHost, proxyPort);
             if (method.equals(HttpMethods.GET)) {
                 HttpGet req = new HttpGet(url);
                 resp = sendRequestInternal(client, req, data, headers, handler);
@@ -110,7 +115,12 @@ public class AbstractHttpClientUtils {
         return null;
     }
 
-    private static CloseableHttpClient getClient(int maxRetries, String proxyHost, int proxyPort) {
+    public static CloseableHttpClient getClient(int maxRetries, String proxyHost, int proxyPort) {
+        HttpClientBuilder hcb = getClientBuilder(maxRetries, proxyHost, proxyPort);
+        return hcb.build();
+    }
+
+    public static HttpClientBuilder getClientBuilder(int maxRetries, String proxyHost, int proxyPort) {
         HttpClientBuilder hcb = HttpClients.custom()
                 .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE);
         if (maxRetries > 0) {
@@ -122,7 +132,7 @@ public class AbstractHttpClientUtils {
             hcb.setProxy(new HttpHost(proxyHost, proxyPort));
         }
         hcb.setUserAgent("DongTai-IAST-Agent");
-        return hcb.build();
+        return hcb;
     }
 
     /**
