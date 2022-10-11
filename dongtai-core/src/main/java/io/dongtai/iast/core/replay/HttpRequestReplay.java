@@ -1,14 +1,15 @@
 package io.dongtai.iast.core.replay;
 
+import io.dongtai.iast.common.enums.HttpMethods;
 import io.dongtai.iast.common.utils.base64.Base64Decoder;
 import io.dongtai.iast.core.handler.hookpoint.models.IastReplayModel;
-import io.dongtai.iast.core.utils.*;
+import io.dongtai.iast.core.utils.HttpClientHostnameVerifier;
+import io.dongtai.iast.core.utils.IastTrustManager;
 import io.dongtai.log.DongTaiLog;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.*;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -31,6 +32,7 @@ import java.util.Map;
 public class HttpRequestReplay implements Runnable {
     private static final String PROTOCOL_HTTPS = "https";
     public final static HostnameVerifier DO_NOT_VERIFY = new HttpClientHostnameVerifier();
+    private static final String SSL_SIGNATURE = "TLSv1.2";
     private final StringBuilder replayRequestRaw;
 
     public HttpRequestReplay(StringBuilder replayRequestRaw) {
@@ -83,13 +85,12 @@ public class HttpRequestReplay implements Runnable {
      * @param fullUrl http请求的地址
      * @param data    http请求的数据，用于post请求
      * @param headers http请求的header头
-     * @throws Exception http请求中抛出的异常
      */
     private static void sendRequest(String method, String fullUrl, String data, HashMap<String, String> headers) {
         DongTaiLog.debug("Do request replay: method={},url={},data={},header={}",method,fullUrl,data,headers.toString());
         HttpURLConnection connection = null;
         try {
-            HttpClientUtils.trustAllHosts();
+            trustAllHosts();
             URL url = new URL(fullUrl);
             if (PROTOCOL_HTTPS.equals(url.getProtocol().toLowerCase())) {
                 HttpsURLConnection https = (HttpsURLConnection) url.openConnection();
@@ -125,13 +126,24 @@ public class HttpRequestReplay implements Runnable {
                 response.append('\r');
             }
             rd.close();
-            DongTaiLog.debug("Request replay response: {}",response);
+            DongTaiLog.debug("Request replay response: {}", response);
         } catch (Exception e) {
-            DongTaiLog.error("io.dongtai.iast.core.replay.HttpRequestReplay.sendRequest(java.lang.String,java.lang.String,java.lang.String,java.util.HashMap<java.lang.String,java.lang.String>)",e);
+            DongTaiLog.error("io.dongtai.iast.core.replay.HttpRequestReplay.sendRequest(java.lang.String,java.lang.String,java.lang.String,java.util.HashMap<java.lang.String,java.lang.String>)", e);
         } finally {
             if (connection != null) {
                 connection.disconnect();
             }
+        }
+    }
+
+    public static void trustAllHosts() {
+        TrustManager[] trustAllCerts = new TrustManager[]{new IastTrustManager()};
+        try {
+            SSLContext sc = SSLContext.getInstance(SSL_SIGNATURE);
+            sc.init(null, trustAllCerts, new java.security.SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+        } catch (Exception e) {
+            DongTaiLog.error(e);
         }
     }
 
