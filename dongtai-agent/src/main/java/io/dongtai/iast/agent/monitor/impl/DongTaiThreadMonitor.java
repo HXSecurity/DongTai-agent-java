@@ -2,8 +2,8 @@ package io.dongtai.iast.agent.monitor.impl;
 
 import io.dongtai.iast.agent.monitor.IMonitor;
 import io.dongtai.iast.agent.monitor.MonitorDaemonThread;
+import io.dongtai.iast.agent.util.HttpClientUtils;
 import io.dongtai.iast.agent.util.ThreadUtils;
-import io.dongtai.iast.agent.util.http.HttpClientUtils;
 import io.dongtai.iast.common.constants.*;
 import io.dongtai.iast.common.entity.performance.metrics.ThreadInfoMetrics;
 import io.dongtai.log.DongTaiLog;

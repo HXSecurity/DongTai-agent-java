@@ -5,13 +5,16 @@ import io.dongtai.iast.agent.monitor.IMonitor;
 import io.dongtai.iast.agent.monitor.MonitorDaemonThread;
 import io.dongtai.iast.agent.report.AgentRegisterReport;
 import io.dongtai.iast.agent.report.HeartBeatReport;
+import io.dongtai.iast.agent.util.HttpClientUtils;
 import io.dongtai.iast.agent.util.ThreadUtils;
-import io.dongtai.iast.agent.util.http.HttpClientUtils;
 import io.dongtai.iast.common.constants.AgentConstant;
 import io.dongtai.iast.common.constants.ApiPath;
 import io.dongtai.iast.common.utils.version.JavaVersionUtils;
 import io.dongtai.log.DongTaiLog;
 import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -104,8 +107,10 @@ public class EngineMonitor implements IMonitor {
 
     private String checkForStatus() {
         try {
-            String respRaw = String.valueOf(HttpClientUtils.sendGet(ApiPath.EXCEPT_ACTION, "agentId", String.valueOf(AgentRegisterReport.getAgentFlag())));
-            if (respRaw != null && !respRaw.isEmpty()) {
+            Map<String, String> parameters = new HashMap<String, String>();
+            parameters.put("agentId", String.valueOf(AgentRegisterReport.getAgentFlag()));
+            String respRaw = HttpClientUtils.sendGet(ApiPath.EXCEPT_ACTION, parameters).toString();
+            if (!respRaw.isEmpty()) {
                 JSONObject resp = new JSONObject(respRaw);
                 JSONObject data = (JSONObject) resp.get("data");
                 return data.get("exceptRunningStatus").toString();

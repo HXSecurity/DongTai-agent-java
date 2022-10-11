@@ -4,7 +4,7 @@ import io.dongtai.iast.agent.IastProperties;
 import io.dongtai.iast.agent.manager.EngineManager;
 import io.dongtai.iast.agent.middlewarerecognition.IServer;
 import io.dongtai.iast.agent.middlewarerecognition.ServerDetect;
-import io.dongtai.iast.agent.util.http.HttpClientUtils;
+import io.dongtai.iast.agent.util.HttpClientUtils;
 import io.dongtai.iast.common.constants.AgentConstant;
 import io.dongtai.iast.common.constants.ApiPath;
 import io.dongtai.iast.common.utils.base64.Base64Encoder;

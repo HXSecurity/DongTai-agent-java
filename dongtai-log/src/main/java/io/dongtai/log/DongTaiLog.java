@@ -12,9 +12,9 @@ import java.util.regex.Matcher;
  */
 public class DongTaiLog {
 
-    static boolean enablePrintLog;
+    public static boolean enablePrintLog;
     static String filePath;
-    static boolean enableColor;
+    public static boolean enableColor;
     static boolean isCreateLog = false;
     public static LogLevel LEVEL = getCurrentLevel();
 
