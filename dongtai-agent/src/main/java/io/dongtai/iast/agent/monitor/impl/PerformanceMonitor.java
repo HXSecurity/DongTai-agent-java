@@ -6,7 +6,6 @@ import io.dongtai.iast.agent.monitor.IMonitor;
 import io.dongtai.iast.agent.monitor.MonitorDaemonThread;
 import io.dongtai.iast.agent.monitor.collector.IPerformanceCollector;
 import io.dongtai.iast.agent.monitor.collector.MetricsBindCollectorEnum;
-import io.dongtai.iast.agent.report.AgentRegisterReport;
 import io.dongtai.iast.agent.util.ThreadUtils;
 import io.dongtai.iast.common.constants.AgentConstant;
 import io.dongtai.iast.common.entity.performance.PerformanceMetrics;
@@ -14,11 +13,8 @@ import io.dongtai.iast.common.entity.performance.metrics.CpuInfoMetrics;
 import io.dongtai.iast.common.enums.MetricsKey;
 import io.dongtai.iast.common.utils.serialize.SerializeUtils;
 import io.dongtai.log.DongTaiLog;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
-import java.io.*;
-import java.net.*;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,10 +25,6 @@ import java.util.List;
  */
 public class PerformanceMonitor implements IMonitor {
     private final static IastProperties PROPERTIES = IastProperties.getInstance();
-    private final static String TOKEN = PROPERTIES.getServerToken();
-    private final static String START_URL = PROPERTIES.getBaseUrl() + "/api/v1/agent/limit";
-    private final static String AGENT_TOKEN = URLEncoder.encode(AgentRegisterReport.getAgentToken());
-    private static Integer AGENT_THRESHOLD_VALUE;
     private static Integer CPU_USAGE = 0;
     private static List<PerformanceMetrics> PERFORMANCE_METRICS = new ArrayList<PerformanceMetrics>();
 
@@ -65,12 +57,6 @@ public class PerformanceMonitor implements IMonitor {
         needCollectMetrics.add(MetricsKey.THREAD_INFO);
     }
 
-    public double memUsedRate() {
-        double free = (double) Runtime.getRuntime().freeMemory();
-        double max = (double) Runtime.getRuntime().maxMemory();
-        return free / max;
-    }
-
     public static Integer getCpuUsage() {
         return CPU_USAGE;
     }
@@ -93,43 +79,6 @@ public class PerformanceMonitor implements IMonitor {
             PERFORMANCE_METRICS = new ArrayList<PerformanceMetrics>();
         }
         return PERFORMANCE_METRICS;
-    }
-
-    public static Integer checkThresholdValue() {
-        int thresholdValue = 100;
-        try {
-            String respRaw = getThresholdValue();
-            if (respRaw != null && !respRaw.isEmpty()) {
-                JSONObject resp = new JSONObject(respRaw);
-                JSONArray limitArray = (JSONArray) resp.get("data");
-                JSONObject cpuLimit = (JSONObject) limitArray.get(0);
-                thresholdValue = Integer.parseInt(cpuLimit.get("value").toString());
-            }
-        } catch (Exception ignored) {
-        }
-        return 100;
-    }
-
-    /**
-     * 是否到达停止引擎的阈值
-     * // 前置状态：0
-     * // 切换状态：1
-     *
-     * @return true, 需要停止；false - 不需要停止
-     */
-    public boolean isStop(double UsedRate, int preStatus) {
-        return UsedRate > AGENT_THRESHOLD_VALUE && (preStatus == 0);
-    }
-
-    /**
-     * 是否到达启动引擎的阈值
-     * // 前置状态：1
-     * // 切换状态：0
-     *
-     * @return true, 需要启动；false - 不需要启动
-     */
-    public boolean isStart(double UsedRate, int preStatus) {
-        return UsedRate < AGENT_THRESHOLD_VALUE && (preStatus == 1);
     }
 
     /**
@@ -194,58 +143,6 @@ public class PerformanceMonitor implements IMonitor {
         } catch (Throwable t) {
             DongTaiLog.error("checkPerformanceMetrics failed, msg:{}, err:{}", t.getMessage(), t.getCause());
         }
-    }
-
-    private static String getThresholdValue() {
-        HttpURLConnection connection = null;
-        InputStream is = null;
-        BufferedReader br = null;
-        String result = null;
-        try {
-            URL url = new URL(PerformanceMonitor.START_URL + "?agentName=" + AGENT_TOKEN);
-            connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestProperty("Content-type", "application/json; charset=utf-8");
-            connection.setRequestProperty("Authorization", "Token " + TOKEN);
-            connection.setDoInput(true);
-            connection.setDoOutput(true);
-            connection.setUseCaches(false);
-            connection.setRequestMethod("GET");
-            connection.setConnectTimeout(5000);
-            connection.setReadTimeout(5000);
-            connection.connect();
-            if (connection.getResponseCode() == 200) {
-                is = connection.getInputStream();
-                br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-                StringBuilder sbf = new StringBuilder();
-                String temp = null;
-                while ((temp = br.readLine()) != null) {
-                    sbf.append(temp);
-                }
-                result = sbf.toString();
-            }
-        } catch (IOException ignored) {
-        } finally {
-            if (null != br) {
-                try {
-                    br.close();
-                } catch (IOException ignored) {
-                }
-            }
-            if (null != is) {
-                try {
-                    is.close();
-                } catch (IOException ignored) {
-                }
-            }
-            if (null != connection) {
-                connection.disconnect();
-            }
-        }
-        return result;
-    }
-
-    static {
-        AGENT_THRESHOLD_VALUE = 100;
     }
 
     @Override

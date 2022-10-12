@@ -18,7 +18,7 @@ public class ThreadPools {
         }
     });
 
-    private static final ExecutorService SCA_REPORT_THREAD = new ThreadPoolExecutor(0, 5, 10L, TimeUnit.SECONDS,
+    private static final ExecutorService COMMON_REPORT_THREAD = new ThreadPoolExecutor(0, 5, 10L, TimeUnit.SECONDS,
             new LinkedBlockingQueue<Runnable>(10000), new ThreadFactory() {
         @Override
         public Thread newThread(Runnable r) {
@@ -45,7 +45,7 @@ public class ThreadPools {
 
 
     public static void execute(Runnable r) {
-        SCA_REPORT_THREAD.execute(r);
+        COMMON_REPORT_THREAD.execute(r);
     }
 
     public static void sendPriorityReport(final String url, final String report) {
@@ -53,7 +53,7 @@ public class ThreadPools {
     }
 
     public static void sendReport(final String url, final String report) {
-        SCA_REPORT_THREAD.execute(new ReportThread(url, report));
+        COMMON_REPORT_THREAD.execute(new ReportThread(url, report));
     }
 
     public static void submitReplayTask(StringBuilder replayRequestRaw) {
@@ -66,7 +66,7 @@ public class ThreadPools {
 
     public static void destroy() {
         METHOD_REPORT_THREAD.shutdown();
-        SCA_REPORT_THREAD.shutdown();
+        COMMON_REPORT_THREAD.shutdown();
         REPLAY_REQUEST_THREAD.shutdown();
         LIMIT_REPORT_THREAD.shutdown();
     }

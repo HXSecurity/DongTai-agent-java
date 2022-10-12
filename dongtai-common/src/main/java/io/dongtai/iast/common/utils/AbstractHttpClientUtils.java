@@ -35,6 +35,21 @@ public class AbstractHttpClientUtils {
         return sendRequest(client, method, url, data, headers, handler);
     }
 
+    public static StringBuilder sendReplayRequest(String method, String url, String data, Map<String, String> headers) {
+        StringBuilder response = new StringBuilder();
+        CloseableHttpClient client = getReplayClient();
+        HttpMethods m;
+        if (HttpMethods.GET.equals(method)) {
+            m = HttpMethods.GET;
+        } else if (HttpMethods.POST.equals(method)) {
+            m = HttpMethods.POST;
+        } else {
+            return response;
+        }
+
+        return sendRequest(client, m, url, data, headers, null);
+    }
+
     protected static StringBuilder sendRequest(CloseableHttpClient client, HttpMethods method, String url, String data,
                                                Map<String, String> headers, HttpClientExceptionHandler handler) {
         StringBuilder response = new StringBuilder();
@@ -55,7 +70,7 @@ public class AbstractHttpClientUtils {
                 }
 
                 response.append(EntityUtils.toString(resp.getEntity(), "UTF-8"));
-                DongTaiLog.trace("dongtai request url is {}, request is {} ,response is {}",
+                DongTaiLog.trace("dongtai request url is {}, request is {}, response is {}",
                         url, data, response.toString());
                 return response;
             }
@@ -135,6 +150,13 @@ public class AbstractHttpClientUtils {
         return hcb;
     }
 
+    public static CloseableHttpClient getReplayClient() {
+        HttpClientBuilder hcb = HttpClients.custom()
+                .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
+                .disableAutomaticRetries();
+        return hcb.build();
+    }
+
     /**
      * Download file
      *
@@ -160,7 +182,8 @@ public class AbstractHttpClientUtils {
                     || MEDIA_TYPE_TEXT_PLAIN.equals(contentType)
                     || MEDIA_TYPE_TEXT_HTML.equals(contentType)) {
                 String r = EntityUtils.toString(resp.getEntity(), "UTF-8");
-                DongTaiLog.error("The remote file {} download failed. response: {}", fileURL, r);
+                DongTaiLog.error("The remote file {} download failed. response code: {}, body: {}",
+                        fileURL, resp.getStatusLine().getStatusCode(), r);
                 return false;
             }
 

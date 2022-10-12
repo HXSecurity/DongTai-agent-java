@@ -50,6 +50,7 @@ public class AbstractHttpClientUtilsTest {
         StringBuilder resp;
         JSONObject respObj;
         int status;
+        String log;
 
         url = BASE_URL + "/api/v1/captcha/refresh";
         resp = AbstractHttpClientUtils.sendRequest(HttpMethods.GET, url, null, headers, 0, "", -1, null);
@@ -63,6 +64,13 @@ public class AbstractHttpClientUtilsTest {
         respObj = new JSONObject(resp.toString());
         status = respObj.getInt("status");
         Assert.assertEquals("user/login status", 202, status);
+
+        url = BASE_URL + "/api/v1/profiles";
+        AbstractHttpClientUtils.sendRequest(HttpMethods.GET, url, data, headers, 0, "", -1, null);
+        log = outputStreamCaptor.toString();
+        Assert.assertTrue("invalid openapi token",
+                log.contains("[ERROR]") && log.contains("response status code invalid: 401"));
+        clear();
 
         url = BASE_URL + ":55555";
         final String exMsg = "custom exception handler";
@@ -80,7 +88,7 @@ public class AbstractHttpClientUtilsTest {
                 System.out.println(exMsg);
             }
         });
-        String log = outputStreamCaptor.toString();
+        log = outputStreamCaptor.toString();
         Assert.assertEquals("exception handler resp", "", resp.toString());
         Assert.assertEquals("exception handler", exMsg, log.trim());
     }
@@ -93,6 +101,7 @@ public class AbstractHttpClientUtilsTest {
         boolean ok = AbstractHttpClientUtils.downloadFile(url, "/tmp/agent.jar", headers, "", -1);
         Assert.assertFalse("invalid token download", ok);
         String log = outputStreamCaptor.toString();
-        Assert.assertTrue("invalid token download error", log.contains("[ERROR]") && log.contains("download failed"));
+        Assert.assertTrue("invalid token download error",
+                log.contains("[ERROR]") && log.contains("download failed") && log.contains("response code: 401"));
     }
 }
