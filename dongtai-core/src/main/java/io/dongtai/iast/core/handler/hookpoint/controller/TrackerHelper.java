@@ -1,5 +1,7 @@
 package io.dongtai.iast.core.handler.hookpoint.controller;
 
+import io.dongtai.iast.core.EngineManager;
+
 /**
  * @author dongzhiyong@huoxian.cn
  */
@@ -37,6 +39,8 @@ public class TrackerHelper {
     public void enterPropagation(boolean isSkipScope) {
         if (isEnterEntry()) {
             this.propagationDepth++;
+        }else {
+            EngineManager.cleanThreadState();
         }
         if (isSkipScope) {
             this.propagationSkipDepth++;
@@ -46,6 +50,8 @@ public class TrackerHelper {
     public void leavePropagation(boolean isSkipScope) {
         if (isEnterEntry()) {
             this.propagationDepth--;
+        }else {
+            EngineManager.cleanThreadState();
         }
         if (isSkipScope) {
             this.propagationSkipDepth--;
@@ -73,6 +79,8 @@ public class TrackerHelper {
     public void enterSource() {
         if (isEnterEntry()) {
             this.sourceLevel++;
+        }else {
+            EngineManager.cleanThreadState();
         }
     }
 
@@ -82,6 +90,8 @@ public class TrackerHelper {
             if (leaveSource == 0) {
                 leaveSource = 1;
             }
+        }else {
+            EngineManager.cleanThreadState();
         }
     }
 
@@ -92,12 +102,16 @@ public class TrackerHelper {
     public void enterSink() {
         if (isEnterEntry()) {
             this.sinkDepth++;
+        }else {
+            EngineManager.cleanThreadState();
         }
     }
 
     public void leaveSink() {
         if (isEnterEntry()) {
             this.sinkDepth--;
+        }else {
+            EngineManager.cleanThreadState();
         }
     }
 

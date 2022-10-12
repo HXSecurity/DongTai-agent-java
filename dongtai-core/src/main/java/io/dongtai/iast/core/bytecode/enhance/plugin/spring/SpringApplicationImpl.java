@@ -25,7 +25,6 @@ public class SpringApplicationImpl {
             loadApplicationContext();
             GetApiThread getApiThread = new GetApiThread(applicationContext);
             getApiThread.start();
-            iastClassLoader = null;
         }
     }
 
@@ -41,6 +40,9 @@ public class SpringApplicationImpl {
                 getAPI = proxyClass.getDeclaredMethod("getAPI", Object.class);
             } catch (NoSuchMethodException e) {
                 DongTaiLog.error("io.dongtai.iast.core.bytecode.enhance.plugin.spring.SpringApplicationImpl.loadApplicationContext()",e);
+            }finally {
+                iastClassLoader = null;
+                getAPI = null;
             }
         }
     }

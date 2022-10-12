@@ -24,10 +24,6 @@ public class ServiceFactory {
         return INSTANCE;
     }
 
-    public static void setNullINSTANCE(){
-        INSTANCE = null;
-    }
-
     public static void startService() {
         if (!ServiceFactory.RUNNING) {
             ServiceFactory.RUNNING = true;
@@ -45,5 +41,11 @@ public class ServiceFactory {
         agentQueueSender = new AgentQueueReport();
         queueService.scheduleWithFixedDelay(agentQueueSender, 0, PropertyUtils.getInstance().getHeartBeatInterval(),
                 TimeUnit.SECONDS);
+    }
+
+    public void destroy(){
+        INSTANCE = null;
+        queueService.shutdown();
+        agentQueueSender = null;
     }
 }

@@ -82,6 +82,7 @@ public class AgentEngine {
         assert agentEngine != null;
         agentEngine.destroy();
         ThreadPools.destroy();
+        ServiceFactory.getInstance().destroy();
         SpyDispatcherHandler.destroy();
         System.clearProperty("DongTai.IAST.Status");
         DongTaiLog.info("Engine uninstallation succeeded");
