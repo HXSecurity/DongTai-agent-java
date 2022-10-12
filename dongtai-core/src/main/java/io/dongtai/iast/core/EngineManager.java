@@ -138,6 +138,7 @@ public class EngineManager {
         EngineManager.SCOPE_TRACKER.remove();
         FallbackSwitch.clearHeavyHookFallback();
         EngineManager.getFallbackManager().getHookRateLimiter().remove();
+        ContextManager.getCONTEXT().remove();
     }
 
     public static void maintainRequestCount() {

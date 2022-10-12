@@ -42,4 +42,10 @@ public class ServiceFactory {
         queueService.scheduleWithFixedDelay(agentQueueSender, 0, PropertyUtils.getInstance().getHeartBeatInterval(),
                 TimeUnit.SECONDS);
     }
+
+    public void destroy(){
+        INSTANCE = null;
+        queueService.shutdown();
+        agentQueueSender = null;
+    }
 }

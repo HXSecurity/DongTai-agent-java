@@ -9,6 +9,10 @@ public class ContextManager {
 
     private static ThreadLocal<TracingContext> CONTEXT = new ThreadLocal<TracingContext>();
 
+    public static ThreadLocal<TracingContext> getCONTEXT() {
+        return CONTEXT;
+    }
+
     private static TracingContext getOrCreate() {
         TracingContext context = CONTEXT.get();
         if (context == null) {

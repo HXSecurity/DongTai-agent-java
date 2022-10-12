@@ -34,6 +34,7 @@ org/quartz/*
 io/shardingjdbc/*
 # micrometer
 io/micrometer/*
+io/opentelemetry/*
 groovy/*sun/rmi/transport/DGCAckHandler$1
 # https://github.com/AutoGeneral/cors-filter
 com/thetransactioncompany/*
