@@ -1,4 +1,4 @@
-package io.dongtai.iast.agent.util.http;
+package io.dongtai.iast.common.enums;
 
 /**
  * 创建HTTP请求方法的枚举对象

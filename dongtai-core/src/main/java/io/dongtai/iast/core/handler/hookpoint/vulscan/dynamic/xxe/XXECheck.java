@@ -10,7 +10,7 @@ import java.util.*;
 public class XXECheck implements SinkSafeChecker {
     public final static String SINK_TYPE = "xxe";
 
-    private static final Set<XXEChecker> CHECKS = new LinkedHashSet<>(Arrays.asList(
+    private static final Set<XXEChecker> CHECKS = new LinkedHashSet<XXEChecker>(Arrays.asList(
             new XMLStreamReaderCheck(),
             new XomCheck(),
             new DocumentBuilderCheck(),

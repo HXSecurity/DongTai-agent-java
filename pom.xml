@@ -10,14 +10,13 @@
 
         <maven.compiler.source>1.6</maven.compiler.source>
         <maven.compiler.target>1.6</maven.compiler.target>
-        <maven.deploy.plugin.version>3.2.0</maven.deploy.plugin.version>
+
         <maven.compiler.version>2.3.2</maven.compiler.version>
         <maven.flatten.plugin.version>1.3.0</maven.flatten.plugin.version>
         <commons.cli.versin>1.4</commons.cli.versin>
         <sun.tools.version>1.6</sun.tools.version>
         <!--docker环境下配置-->
         <sun.tools.systempath>${java.home}/../lib/tools.jar</sun.tools.systempath>
-        <nanoxml.version>2.2.3</nanoxml.version>
 
         <!-- java 1.6 最高可用版本-->
         <logback-classic.version>1.2.1</logback-classic.version>
@@ -29,8 +28,6 @@
         <retrofit.version>1.9.0</retrofit.version>
         <asm.version>9.2</asm.version>
         <junit.version>4.13.1</junit.version>
-        <proguard.version>2.2.0</proguard.version>
-        <jdk.version.level>2</jdk.version.level>
         <javax.servlet-api>3.1.0</javax.servlet-api>
         <servlet-api>2.4</servlet-api>
         <jakarta.servlet-api>5.0.0</jakarta.servlet-api>

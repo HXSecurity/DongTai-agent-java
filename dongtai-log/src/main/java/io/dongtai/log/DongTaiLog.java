@@ -12,9 +12,9 @@ import java.util.regex.Matcher;
  */
 public class DongTaiLog {
 
-    static boolean enablePrintLog;
+    public static boolean enablePrintLog;
     static String filePath;
-    static boolean enableColor;
+    public static boolean enableColor;
     static boolean isCreateLog = false;
     public static LogLevel LEVEL = getCurrentLevel();
 
@@ -257,6 +257,7 @@ public class DongTaiLog {
             return;
         }
         FileOutputStream o = null;
+        File file = new File(filePath + File.separator + "dongtai_javaagent.log");
         try {
             if (t != null) {
                 StringWriter stringWriter = new StringWriter();
@@ -264,14 +265,13 @@ public class DongTaiLog {
                 msg = msg + stringWriter;
             }
 
-            File file = new File(filePath + "/dongtai_javaagent.log");
             o = new FileOutputStream(file, true);
             o.write(msg.getBytes());
             o.write(System.getProperty("line.separator").getBytes());
             o.flush();
             o.close();
         } catch (Exception e) {
-            DongTaiLog.error(e);
+            System.out.println("the log file " + file.getPath() + " is not writable: " + e.toString());
         }
     }
 }

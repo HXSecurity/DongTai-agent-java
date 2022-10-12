@@ -8,16 +8,15 @@ import io.dongtai.iast.agent.monitor.impl.EngineMonitor;
 import io.dongtai.iast.agent.monitor.impl.PerformanceMonitor;
 import io.dongtai.iast.agent.report.AgentRegisterReport;
 import io.dongtai.iast.agent.util.FileUtils;
-import io.dongtai.iast.agent.util.http.HttpClientUtils;
+import io.dongtai.iast.agent.util.HttpClientUtils;
 import io.dongtai.iast.common.utils.base64.Base64Encoder;
 import io.dongtai.log.DongTaiLog;
-import org.json.JSONObject;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.lang.instrument.Instrumentation;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.InvocationTargetException;
-import java.net.*;
 import java.util.jar.JarFile;
 
 /**
@@ -196,79 +195,20 @@ public class EngineManager {
         return TMP_DIR + "dongtai-grpc.jar";
     }
 
-
-    /**
-     * 从远程URI下载jar包到指定的本地文件
-     *
-     * @param fileUrl  远程URI
-     * @param fileName 本地文件路径
-     * @return 下载结果，成功为true，失败为false
-     */
-    private boolean downloadJarPackageToCacheFromUrl(String fileUrl, String fileName) {
-        boolean status = false;
-        try {
-            URL url = new URL(fileUrl);
-            Proxy proxy = HttpClientUtils.loadProxy();
-            HttpURLConnection connection = proxy == null ? (HttpURLConnection) url.openConnection()
-                    : (HttpURLConnection) url.openConnection(proxy);
-
-            connection.setRequestMethod("GET");
-            connection.setRequestProperty("User-Agent", "DongTai-IAST-Agent");
-            connection.setRequestProperty("Authorization", "Token " + properties.getServerToken());
-            connection.setUseCaches(false);
-            connection.setDoOutput(true);
-
-            if ("application/json".equals(connection.getContentType())) {
-                BufferedReader streamReader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
-                StringBuilder responseStrBuilder = new StringBuilder();
-                String inputStr;
-                while ((inputStr = streamReader.readLine()) != null) {
-                    responseStrBuilder.append(inputStr);
-                }
-
-                JSONObject jsonObject = new JSONObject(responseStrBuilder.toString());
-                DongTaiLog.error("DongTai Core Package: {} download failed. response: {}", fileUrl, jsonObject);
-                return false;
-            } else {
-                BufferedInputStream in = new BufferedInputStream(connection.getInputStream());
-                final File classPath = new File(new File(fileName).getParent());
-
-                if (!classPath.mkdirs() && !classPath.exists()) {
-                    DongTaiLog.info("Check or create local file cache path, path is " + classPath);
-                }
-                FileOutputStream fileOutputStream = new FileOutputStream(fileName);
-                byte[] dataBuffer = new byte[1024];
-                int bytesRead;
-                while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
-                    fileOutputStream.write(dataBuffer, 0, bytesRead);
-                }
-                dataBuffer = null;
-                in.close();
-                fileOutputStream.close();
-                DongTaiLog.info("The remote file " + fileUrl + " was successfully written to the local cache.");
-                status = true;
-            }
-        } catch (Exception ignore) {
-            DongTaiLog.error("The remote file " + fileUrl + " download failure, please check the dongtai-token.");
-        }
-        return status;
-    }
-
     /**
      * 更新IAST引擎需要的jar包，用于启动时加载和热更新检测引擎 - iast-core.jar - iast-inject.jar
      *
      * @return 更新状态，成功为true，失败为false
      */
     public boolean downloadPackageFromServer() {
-        String baseUrl = properties.getBaseUrl();
         // 自定义jar下载地址
-        String spyJarUrl = "".equals(properties.getCustomSpyJarUrl()) ? baseUrl + INJECT_PACKAGE_REMOTE_URI : properties.getCustomSpyJarUrl();
-        String coreJarUrl = "".equals(properties.getCustomCoreJarUrl()) ? baseUrl + ENGINE_PACKAGE_REMOTE_URI : properties.getCustomCoreJarUrl();
-        String apiJarUrl = "".equals(properties.getCustomApiJarUrl()) ? baseUrl + API_PACKAGE_REMOTE_URI : properties.getCustomApiJarUrl();
-        return downloadJarPackageToCacheFromUrl(spyJarUrl, getInjectPackageCachePath()) &&
-                downloadJarPackageToCacheFromUrl(coreJarUrl, getEnginePackageCachePath()) &&
-                downloadJarPackageToCacheFromUrl(apiJarUrl, getApiPackagePath()) &&
-                downloadJarPackageToCacheFromUrl(baseUrl + "/api/v1/engine/download?engineName=dongtai-grpc", getGrpcPackagePath());
+        String spyJarUrl = "".equals(properties.getCustomSpyJarUrl()) ? INJECT_PACKAGE_REMOTE_URI : properties.getCustomSpyJarUrl();
+        String coreJarUrl = "".equals(properties.getCustomCoreJarUrl()) ? ENGINE_PACKAGE_REMOTE_URI : properties.getCustomCoreJarUrl();
+        String apiJarUrl = "".equals(properties.getCustomApiJarUrl()) ? API_PACKAGE_REMOTE_URI : properties.getCustomApiJarUrl();
+        return HttpClientUtils.downloadRemoteJar(spyJarUrl, getInjectPackageCachePath()) &&
+                HttpClientUtils.downloadRemoteJar(coreJarUrl, getEnginePackageCachePath()) &&
+                HttpClientUtils.downloadRemoteJar(apiJarUrl, getApiPackagePath()) &&
+                HttpClientUtils.downloadRemoteJar("/api/v1/engine/download?engineName=dongtai-grpc", getGrpcPackagePath());
     }
 
     /**
@@ -277,14 +217,13 @@ public class EngineManager {
      * @return 更新状态，成功为true，失败为false
      */
     public boolean downloadPackageFromServerJdk6() {
-        String baseUrl = properties.getBaseUrl();
         // 自定义jar下载地址
-        String spyJarUrl = "".equals(properties.getCustomSpyJarUrl()) ? baseUrl + INJECT_PACKAGE_REMOTE_URI_JDK6 : properties.getCustomSpyJarUrl();
-        String coreJarUrl = "".equals(properties.getCustomCoreJarUrl()) ? baseUrl + ENGINE_PACKAGE_REMOTE_URI_JDK6 : properties.getCustomCoreJarUrl();
-        String apiJarUrl = "".equals(properties.getCustomApiJarUrl()) ? baseUrl + API_PACKAGE_REMOTE_URI_JDK6 : properties.getCustomApiJarUrl();
-        return downloadJarPackageToCacheFromUrl(spyJarUrl, getInjectPackageCachePath()) &&
-                downloadJarPackageToCacheFromUrl(coreJarUrl, getEnginePackageCachePath()) &&
-                downloadJarPackageToCacheFromUrl(apiJarUrl, getApiPackagePath());
+        String spyJarUrl = "".equals(properties.getCustomSpyJarUrl()) ? INJECT_PACKAGE_REMOTE_URI_JDK6 : properties.getCustomSpyJarUrl();
+        String coreJarUrl = "".equals(properties.getCustomCoreJarUrl()) ? ENGINE_PACKAGE_REMOTE_URI_JDK6 : properties.getCustomCoreJarUrl();
+        String apiJarUrl = "".equals(properties.getCustomApiJarUrl()) ? API_PACKAGE_REMOTE_URI_JDK6 : properties.getCustomApiJarUrl();
+        return HttpClientUtils.downloadRemoteJar(spyJarUrl, getInjectPackageCachePath()) &&
+                HttpClientUtils.downloadRemoteJar(coreJarUrl, getEnginePackageCachePath()) &&
+                HttpClientUtils.downloadRemoteJar(apiJarUrl, getApiPackagePath());
     }
 
     /**

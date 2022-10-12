@@ -56,8 +56,10 @@ public class GrpcHandler {
                     .getDeclaredMethod("interceptService", Object.class);
             methodOfGetRequestMetadata = classOfGrpcProxy.getDeclaredMethod("getServerMeta");
             grpcPluginPath.delete();
-        } catch (MalformedURLException | NoSuchMethodException e) {
-            DongTaiLog.error(e);
+        } catch (MalformedURLException e) {
+            DongTaiLog.error("GrpcHandler createClassLoader failed", e);
+        } catch (NoSuchMethodException e) {
+            DongTaiLog.error("GrpcHandler createClassLoader failed", e);
         }
     }
 

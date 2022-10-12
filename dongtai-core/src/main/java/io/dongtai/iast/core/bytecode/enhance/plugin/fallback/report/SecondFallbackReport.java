@@ -14,7 +14,7 @@ import org.json.JSONObject;
  */
 public class SecondFallbackReport extends AbstractLimitReport {
 
-    private static final SecondFallbackReportBody FALLBACK_REPORT_LOG = new SecondFallbackReportBody(new FixSizeLinkedList<>(30));
+    private static final SecondFallbackReportBody FALLBACK_REPORT_LOG = new SecondFallbackReportBody(new FixSizeLinkedList<SecondFallbackReportBody.AbstractSecondFallbackReportLog>(30));
 
     /**
      * 二次降级日志是否为空

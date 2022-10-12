@@ -1,15 +1,13 @@
 package io.dongtai.iast.core.init.impl;
 
-import io.dongtai.iast.core.utils.PropertyUtils;
-import io.dongtai.iast.core.init.IEngine;
 import io.dongtai.iast.core.bytecode.IastClassFileTransformer;
+import io.dongtai.iast.core.init.IEngine;
+import io.dongtai.iast.core.utils.PropertyUtils;
 import io.dongtai.log.DongTaiLog;
 
 import java.lang.instrument.ClassDefinition;
 import java.lang.instrument.Instrumentation;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -53,7 +51,7 @@ public class TransformEngine implements IEngine {
         HashMap<Object, byte[]> transformMap = IastClassFileTransformer.getTransformMap();
         int classSize = transformMap.size();
         ClassDefinition[] classDefinitions = new ClassDefinition[classSize];
-        ArrayList<ClassDefinition> classDefinitionArrayList = new ArrayList<>();
+        ArrayList<ClassDefinition> classDefinitionArrayList = new ArrayList<ClassDefinition>();
         Set<Object> classes = transformMap.keySet();
         for (Object aClass:classes){
             if(aClass instanceof String){
