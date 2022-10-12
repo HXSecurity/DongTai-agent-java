@@ -39,22 +39,22 @@ public class TrackerHelper {
     public void enterPropagation(boolean isSkipScope) {
         if (isEnterEntry()) {
             this.propagationDepth++;
+            if (isSkipScope) {
+                this.propagationSkipDepth++;
+            }
         }else {
             EngineManager.cleanThreadState();
-        }
-        if (isSkipScope) {
-            this.propagationSkipDepth++;
         }
     }
 
     public void leavePropagation(boolean isSkipScope) {
         if (isEnterEntry()) {
             this.propagationDepth--;
+            if (isSkipScope) {
+                this.propagationSkipDepth--;
+            }
         }else {
             EngineManager.cleanThreadState();
-        }
-        if (isSkipScope) {
-            this.propagationSkipDepth--;
         }
     }
 
