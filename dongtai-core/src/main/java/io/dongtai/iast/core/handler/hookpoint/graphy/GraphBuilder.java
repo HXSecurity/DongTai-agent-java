@@ -26,6 +26,10 @@ public class GraphBuilder {
     public static void buildAndReport(Object request, Object response) {
         List<GraphNode> nodeList = build();
         String report = convertToReport(nodeList, request, response);
+        if (null == report){
+            EngineManager.ENTER_REPLAY_ENTRYPOINT.remove();
+            return;
+        }
         ThreadPools.sendPriorityReport(ApiPath.REPORT_UPLOAD, report);
         EngineManager.ENTER_REPLAY_ENTRYPOINT.remove();
     }
@@ -83,48 +87,58 @@ public class GraphBuilder {
     }
 
     public static String convertToReport(List<GraphNode> nodeList, Object request, Object response) {
-        Map<String, Object> requestMeta = EngineManager.REQUEST_CONTEXT.get();
-        Map<String, Object> responseMeta = response == null ? null : HttpImpl.getResponseMeta(response);
-        JSONObject report = new JSONObject();
-        JSONObject detail = new JSONObject();
-        JSONArray methodPool = new JSONArray();
+        try {
+            Map<String, Object> requestMeta = EngineManager.REQUEST_CONTEXT.get();
+            Map<String, Object> responseMeta = response == null ? null : HttpImpl.getResponseMeta(response);
+            JSONObject report = new JSONObject();
+            JSONObject detail = new JSONObject();
+            JSONArray methodPool = new JSONArray();
 
-        report.put(ReportKey.TYPE, ReportType.VULN_SAAS_POOL);
-        report.put(ReportKey.VERSION, "v2");
-        report.put(ReportKey.DETAIL, detail);
+            report.put(ReportKey.TYPE, ReportType.VULN_SAAS_POOL);
+            report.put(ReportKey.VERSION, "v2");
+            report.put(ReportKey.DETAIL, detail);
 
-        detail.put(ReportKey.AGENT_ID, EngineManager.getAgentId());
-        detail.put(ReportKey.PROTOCOL, requestMeta.getOrDefault("protocol", "unknown"));
-        detail.put(ReportKey.SCHEME, requestMeta.getOrDefault("scheme", ""));
-        detail.put(ReportKey.METHOD, requestMeta.getOrDefault("method", ""));
-        detail.put(ReportKey.SECURE, requestMeta.getOrDefault("secure", ""));
-        String requestURL = requestMeta.getOrDefault("requestURL", "").toString();
-        detail.put(ReportKey.URL, requestURL);
-        String requestURI = requestMeta.getOrDefault("requestURI", "").toString();
-        detail.put(ReportKey.URI, requestURI);
-        setURL(requestURL);
-        setURI(requestURI);
-        detail.put(ReportKey.CLIENT_IP, requestMeta.getOrDefault("remoteAddr", ""));
-        detail.put(ReportKey.QUERY_STRING, requestMeta.getOrDefault("queryString", ""));
-        detail.put(ReportKey.REQ_HEADER,
-                AbstractNormalVulScan.getEncodedHeader((Map<String, String>) requestMeta.getOrDefault("headers", new HashMap<String, String>())));
-        // 设置请求体
-        detail.put(ReportKey.REQ_BODY, request == null ? "" : HttpImpl.getPostBody(request));
-        detail.put(ReportKey.RES_HEADER, responseMeta == null ? ""
-                : Base64Encoder.encodeBase64String(responseMeta.getOrDefault("headers", "").toString().getBytes())
-                .replaceAll("\n", ""));
-        detail.put(ReportKey.RES_BODY, responseMeta == null ? "" : Base64Encoder.encodeBase64String(
-                getResponseBody(responseMeta)));
-        detail.put(ReportKey.CONTEXT_PATH, requestMeta.getOrDefault("contextPath", ""));
-        detail.put(ReportKey.REPLAY_REQUEST, requestMeta.getOrDefault("replay-request", false));
+            detail.put(ReportKey.AGENT_ID, EngineManager.getAgentId());
+            detail.put(ReportKey.PROTOCOL, requestMeta.getOrDefault("protocol", "unknown"));
+            detail.put(ReportKey.SCHEME, requestMeta.getOrDefault("scheme", ""));
+            detail.put(ReportKey.METHOD, requestMeta.getOrDefault("method", ""));
+            detail.put(ReportKey.SECURE, requestMeta.getOrDefault("secure", ""));
+            String requestURL = requestMeta.getOrDefault("requestURL", "").toString();
+            if(null == requestURL){
+                return null;
+            }
+            detail.put(ReportKey.URL, requestURL);
+            String requestURI = requestMeta.getOrDefault("requestURI", "").toString();
+            if (null == requestURI){
+                return null;
+            }
+            detail.put(ReportKey.URI, requestURI);
+            setURL(requestURL);
+            setURI(requestURI);
+            detail.put(ReportKey.CLIENT_IP, requestMeta.getOrDefault("remoteAddr", ""));
+            detail.put(ReportKey.QUERY_STRING, requestMeta.getOrDefault("queryString", ""));
+            detail.put(ReportKey.REQ_HEADER,
+                    AbstractNormalVulScan.getEncodedHeader((Map<String, String>) requestMeta.getOrDefault("headers", new HashMap<String, String>())));
+            // 设置请求体
+            detail.put(ReportKey.REQ_BODY, request == null ? "" : HttpImpl.getPostBody(request));
+            detail.put(ReportKey.RES_HEADER, responseMeta == null ? ""
+                    : Base64Encoder.encodeBase64String(responseMeta.getOrDefault("headers", "").toString().getBytes())
+                    .replaceAll("\n", ""));
+            detail.put(ReportKey.RES_BODY, responseMeta == null ? "" : Base64Encoder.encodeBase64String(
+                    getResponseBody(responseMeta)));
+            detail.put(ReportKey.CONTEXT_PATH, requestMeta.getOrDefault("contextPath", ""));
+            detail.put(ReportKey.REPLAY_REQUEST, requestMeta.getOrDefault("replay-request", false));
 
-        detail.put(ReportKey.METHOD_POOL, methodPool);
+            detail.put(ReportKey.METHOD_POOL, methodPool);
 
-        for (GraphNode node : nodeList) {
-            methodPool.put(node.toJson());
+            for (GraphNode node : nodeList) {
+                methodPool.put(node.toJson());
+            }
+
+            return report.toString();
+        } catch (Exception e){
+            return null;
         }
-
-        return report.toString();
     }
 
     private static byte[] getResponseBody(Map<String, Object> responseMeta) {
