@@ -160,51 +160,55 @@ public class SourceImpl {
      * @return Set<Object>
      */
     public static Set<Object> parseCustomModel(Object model) {
-        Set<Object> modelValues = new HashSet<Object>();
-        if (!TaintPoolUtils.isNotEmpty(model)) {
-            return modelValues;
-        }
-        Class<?> sourceClass = model.getClass();
-        if (sourceClass.getClassLoader() == null) {
-            return modelValues;
-        }
-        String className = sourceClass.getName();
-        if (className.startsWith("cn.huoxian.iast.api.") ||
-                className.startsWith("io.dongtai.api.") ||
-                className.startsWith(" org.apache.shiro.web.servlet".substring(1)) ||
-                VALUES_ENUMERATOR.equals(className) ||
-                className.startsWith(SPRING_OBJECT) ||
-                className.endsWith("RequestWrapper") ||
-                className.endsWith("ResponseWrapper")
-
-        ) {
-            return modelValues;
-        }
-        // getter methods
-        Method[] methods = sourceClass.getMethods();
-        Object itemValue = null;
-        for (Method method : methods) {
-            if (!TaintPoolUtils.isAllowTaintGetterMethod(method)) {
-                continue;
+        try{
+            Set<Object> modelValues = new HashSet<Object>();
+            if (!TaintPoolUtils.isNotEmpty(model)) {
+                return modelValues;
             }
+            Class<?> sourceClass = model.getClass();
+            if (sourceClass.getClassLoader() == null) {
+                return modelValues;
+            }
+            String className = sourceClass.getName();
+            if (className.startsWith("cn.huoxian.iast.api.") ||
+                    className.startsWith("io.dongtai.api.") ||
+                    className.startsWith(" org.apache.shiro.web.servlet".substring(1)) ||
+                    VALUES_ENUMERATOR.equals(className) ||
+                    className.startsWith(SPRING_OBJECT) ||
+                    className.endsWith("RequestWrapper") ||
+                    className.endsWith("ResponseWrapper")
 
-            try {
-                itemValue = method.invoke(model);
-                if (!TaintPoolUtils.isNotEmpty(itemValue)) {
+            ) {
+                return modelValues;
+            }
+            // getter methods
+            Method[] methods = sourceClass.getMethods();
+            Object itemValue = null;
+            for (Method method : methods) {
+                if (!TaintPoolUtils.isAllowTaintGetterMethod(method)) {
                     continue;
                 }
-                modelValues.add(itemValue);
-                if (itemValue instanceof List) {
-                    List<?> itemValueList = (List<?>) itemValue;
-                    for (Object listValue : itemValueList) {
-                        modelValues.addAll(parseCustomModel(listValue));
+
+                try {
+                    itemValue = method.invoke(model);
+                    if (!TaintPoolUtils.isNotEmpty(itemValue)) {
+                        continue;
                     }
+                    modelValues.add(itemValue);
+                    if (itemValue instanceof List) {
+                        List<?> itemValueList = (List<?>) itemValue;
+                        for (Object listValue : itemValueList) {
+                            modelValues.addAll(parseCustomModel(listValue));
+                        }
+                    }
+                } catch (Exception e) {
+                    DongTaiLog.error(e);
                 }
-            } catch (Exception e) {
-                DongTaiLog.error(e);
             }
+            return modelValues;
+        }catch (Exception e){
+            return null;
         }
-        return modelValues;
     }
 
     private static boolean allowCall(MethodEvent event) {
