@@ -1,4 +1,4 @@
-package io.dongtai.iast.core.handler.hookpoint.models;
+package io.dongtai.iast.core.handler.hookpoint.models.policy;
 
 import java.util.HashSet;
 import java.util.Set;

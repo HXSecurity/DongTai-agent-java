@@ -1,4 +1,4 @@
-package io.dongtai.iast.core.handler.hookpoint.models;
+package io.dongtai.iast.core.handler.hookpoint.models.policy;
 
 import org.junit.Assert;
 import org.junit.Test;
