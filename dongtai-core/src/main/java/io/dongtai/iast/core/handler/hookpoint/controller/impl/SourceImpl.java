@@ -172,8 +172,8 @@ public class SourceImpl {
             String className = sourceClass.getName();
             if (className.startsWith("cn.huoxian.iast.api.") ||
                     className.startsWith("io.dongtai.api.") ||
-                    className.startsWith("org.apache.tomcat") ||
-                    className.startsWith("org.apache.catalina") ||
+                    className.startsWith(" org.apache.tomcat".substring(1)) ||
+                    className.startsWith(" org.apache.catalina".substring(1)) ||
                     className.startsWith(" org.apache.shiro.web.servlet".substring(1)) ||
                     VALUES_ENUMERATOR.equals(className) ||
                     className.startsWith(SPRING_OBJECT) ||
