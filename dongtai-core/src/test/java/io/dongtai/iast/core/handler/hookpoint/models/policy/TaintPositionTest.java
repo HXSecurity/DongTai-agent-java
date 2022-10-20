@@ -95,17 +95,17 @@ public class TaintPositionTest {
     @Test
     public void testParse() {
         Map<String, Set<TaintPosition>> tests = new HashMap<String, Set<TaintPosition>>() {{
-            put("O", new HashSet<>(Collections.singletonList(new TaintPosition("O"))));
-            put("R", new HashSet<>(Collections.singletonList(new TaintPosition("R"))));
-            put("P3", new HashSet<>(Collections.singletonList(new TaintPosition("P3"))));
-            put("P1,3,7", new HashSet<>(Arrays.asList(new TaintPosition("P1"), new TaintPosition("P3"),
+            put("O", new HashSet<TaintPosition>(Collections.singletonList(new TaintPosition("O"))));
+            put("R", new HashSet<TaintPosition>(Collections.singletonList(new TaintPosition("R"))));
+            put("P3", new HashSet<TaintPosition>(Collections.singletonList(new TaintPosition("P3"))));
+            put("P1,3,7", new HashSet<TaintPosition>(Arrays.asList(new TaintPosition("P1"), new TaintPosition("P3"),
                     new TaintPosition("P7"))));
-            put("P1,3,3", new HashSet<>(Arrays.asList(new TaintPosition("P1"), new TaintPosition("P3"))));
-            put("O|P2", new HashSet<>(Arrays.asList(new TaintPosition("O"), new TaintPosition("P2"))));
-            put("O|O|P2|P2||", new HashSet<>(Arrays.asList(new TaintPosition("O"), new TaintPosition("P2"))));
-            put("O|P2,3", new HashSet<>(Arrays.asList(new TaintPosition("O"), new TaintPosition("P2"),
+            put("P1,3,3", new HashSet<TaintPosition>(Arrays.asList(new TaintPosition("P1"), new TaintPosition("P3"))));
+            put("O|P2", new HashSet<TaintPosition>(Arrays.asList(new TaintPosition("O"), new TaintPosition("P2"))));
+            put("O|O|P2|P2||", new HashSet<TaintPosition>(Arrays.asList(new TaintPosition("O"), new TaintPosition("P2"))));
+            put("O|P2,3", new HashSet<TaintPosition>(Arrays.asList(new TaintPosition("O"), new TaintPosition("P2"),
                     new TaintPosition("P3"))));
-            put(" O | P 2 , 3 ", new HashSet<>(Arrays.asList(new TaintPosition("O"), new TaintPosition("P2"),
+            put(" O | P 2 , 3 ", new HashSet<TaintPosition>(Arrays.asList(new TaintPosition("O"), new TaintPosition("P2"),
                     new TaintPosition("P3"))));
         }};
 
