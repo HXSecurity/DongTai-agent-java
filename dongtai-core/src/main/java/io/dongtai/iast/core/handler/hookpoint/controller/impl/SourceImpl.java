@@ -184,7 +184,6 @@ public class SourceImpl {
                 return modelValues;
             }
             // getter methods
-            DongTaiLog.debug(className);
             Method[] methods = sourceClass.getMethods();
             Object itemValue = null;
             for (Method method : methods) {
