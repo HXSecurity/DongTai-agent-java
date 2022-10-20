@@ -172,16 +172,19 @@ public class SourceImpl {
             String className = sourceClass.getName();
             if (className.startsWith("cn.huoxian.iast.api.") ||
                     className.startsWith("io.dongtai.api.") ||
+                    className.startsWith("org.apache.tomcat") ||
+                    className.startsWith("org.apache.catalina") ||
                     className.startsWith(" org.apache.shiro.web.servlet".substring(1)) ||
                     VALUES_ENUMERATOR.equals(className) ||
                     className.startsWith(SPRING_OBJECT) ||
-                    className.endsWith("RequestWrapper") ||
-                    className.endsWith("ResponseWrapper")
+                    className.contains("RequestWrapper") ||
+                    className.contains("ResponseWrapper")
 
             ) {
                 return modelValues;
             }
             // getter methods
+            DongTaiLog.debug(className);
             Method[] methods = sourceClass.getMethods();
             Object itemValue = null;
             for (Method method : methods) {
@@ -207,7 +210,7 @@ public class SourceImpl {
             }
             return modelValues;
         }catch (Exception e){
-            return null;
+            return new HashSet<Object>();
         }
     }
 
