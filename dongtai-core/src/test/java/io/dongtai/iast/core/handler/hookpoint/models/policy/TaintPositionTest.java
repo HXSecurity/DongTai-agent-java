@@ -93,7 +93,7 @@ public class TaintPositionTest {
     }
 
     @Test
-    public void testParse() {
+    public void testParse() throws TaintPositionException {
         Map<String, Set<TaintPosition>> tests = new HashMap<String, Set<TaintPosition>>() {{
             put("O", new HashSet<TaintPosition>(Collections.singletonList(new TaintPosition("O"))));
             put("R", new HashSet<TaintPosition>(Collections.singletonList(new TaintPosition("R"))));
@@ -115,7 +115,7 @@ public class TaintPositionTest {
     }
 
     @Test
-    public void testHasObject() {
+    public void testHasObject() throws TaintPositionException {
         Map<String, Boolean> tests = new HashMap<String, Boolean>() {{
             put("O", true);
             put("R", false);
@@ -133,7 +133,7 @@ public class TaintPositionTest {
     }
 
     @Test
-    public void testHasReturn() {
+    public void testHasReturn() throws TaintPositionException {
         Map<String, Boolean> tests = new HashMap<String, Boolean>() {{
             put("O", false);
             put("R", true);
@@ -151,7 +151,7 @@ public class TaintPositionTest {
     }
 
     @Test
-    public void testHasParameter() {
+    public void testHasParameter() throws TaintPositionException {
         Map<String, Boolean> tests = new HashMap<String, Boolean>() {{
             put("O", false);
             put("R", false);
@@ -169,7 +169,8 @@ public class TaintPositionTest {
     }
 
     @Test
-    public void testHasParameterIndex() {
+    public void testHasParameterIndex() throws TaintPositionException {
+        // @formatter:off
         Map<Map<String, Integer>, Boolean> tests = new HashMap<Map<String, Integer>, Boolean>() {{
             put(new HashMap<String, Integer>() {{ put("O", 0); }}, false);
             put(new HashMap<String, Integer>() {{ put("R", 1); }}, false);
@@ -180,6 +181,7 @@ public class TaintPositionTest {
             put(new HashMap<String, Integer>() {{ put("P2,4", 2); }}, false);
             put(new HashMap<String, Integer>() {{ put("P2,4", 4); }}, false);
         }};
+        // @formatter:on
 
         for (Map.Entry<Map<String, Integer>, Boolean> entry : tests.entrySet()) {
             Set<TaintPosition> tps = TaintPosition.parse(entry.getKey().entrySet().iterator().next().getKey());

@@ -76,16 +76,16 @@ public class TaintPosition {
         return this.parameterIndex;
     }
 
-    public static Set<TaintPosition> parse(String position) {
+    public static Set<TaintPosition> parse(String position) throws TaintPositionException {
         if (position == null || position.isEmpty()) {
-            return null;
+            throw new TaintPositionException("taint position can not be empty");
         }
         return parse(position.split(OR));
     }
 
-    private static Set<TaintPosition> parse(String[] positions) {
+    private static Set<TaintPosition> parse(String[] positions) throws TaintPositionException {
         if (positions == null || positions.length == 0) {
-            return null;
+            throw new TaintPositionException("taint positions can not be empty");
         }
         Set<TaintPosition> tps = new HashSet<TaintPosition>();
         for (String position : positions) {
@@ -106,7 +106,7 @@ public class TaintPosition {
         return tps;
     }
 
-    private static Set<TaintPosition> parseParameter(String indiesStr) {
+    private static Set<TaintPosition> parseParameter(String indiesStr) throws TaintPositionException {
         String[] indies = indiesStr.split(",");
         Set<TaintPosition> tps = new HashSet<TaintPosition>();
         for (String index : indies) {
@@ -115,8 +115,12 @@ public class TaintPosition {
         return tps;
     }
 
-    private static TaintPosition parseOne(String position) {
-        return new TaintPosition(position);
+    private static TaintPosition parseOne(String position) throws TaintPositionException {
+        try {
+            return new TaintPosition(position);
+        } catch (IllegalArgumentException e) {
+            throw new TaintPositionException(e.getMessage(), e.getCause());
+        }
     }
 
     public static boolean hasObject(Set<TaintPosition> positions) {
