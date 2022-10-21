@@ -1,0 +1,27 @@
+{
+  "status": 201,
+  "msg": "success",
+  "data": [
+    {
+      "type": 4,
+      "source": "P1",
+      "target": "",
+      "signature": "javax.mail.Message.setFrom(javax.mail.Address)",
+      "inherit": "all"
+    },
+    {
+      "type": 4,
+      "source": "P1,2",
+      "target": "",
+      "signature": "javax.mail.Message.setHeader(java.lang.String,java.lang.String)",
+      "inherit": "all"
+    },
+    {
+      "type": 4,
+      "source": "P1",
+      "target": "",
+      "signature": "javax.xml.bind.Unmarshaller.unmarshal(javax.xml.transform.Source)",
+      "inherit": "true"
+    }
+  ]
+}

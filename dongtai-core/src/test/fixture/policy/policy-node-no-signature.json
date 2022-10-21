@@ -1,0 +1,12 @@
+{
+  "status": 201,
+  "msg": "success",
+  "data": [
+    {
+      "type": 1,
+      "source": "P1",
+      "target": "R",
+      "inherit": "false"
+    }
+  ]
+}

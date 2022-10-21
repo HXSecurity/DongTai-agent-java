@@ -1,0 +1,11 @@
+{
+  "status": 201,
+  "msg": "success",
+  "data": [
+    {
+      "type": 2,
+      "signature": "A.b()",
+      "inherit": "false"
+    }
+  ]
+}

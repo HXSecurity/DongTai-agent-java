@@ -1,0 +1,12 @@
+{
+  "status": 201,
+  "msg": "success",
+  "data": [
+    {
+      "type": 2,
+      "signature": "A.b()",
+      "target": "invalid",
+      "inherit": "false"
+    }
+  ]
+}
