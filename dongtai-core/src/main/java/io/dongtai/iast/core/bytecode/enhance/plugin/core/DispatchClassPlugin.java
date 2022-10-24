@@ -1,12 +1,9 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.core;
 
-import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.bytecode.enhance.IastContext;
 import io.dongtai.iast.core.bytecode.enhance.plugin.AbstractClassVisitor;
 import io.dongtai.iast.core.bytecode.enhance.plugin.DispatchPlugin;
-import io.dongtai.iast.core.bytecode.enhance.plugin.core.adapter.PropagateAdviceAdapter;
-import io.dongtai.iast.core.bytecode.enhance.plugin.core.adapter.SinkAdviceAdapter;
-import io.dongtai.iast.core.bytecode.enhance.plugin.core.adapter.SourceAdviceAdapter;
+import io.dongtai.iast.core.bytecode.enhance.plugin.core.adapter.*;
 import io.dongtai.iast.core.handler.hookpoint.controller.HookType;
 import io.dongtai.iast.core.handler.hookpoint.models.IastHookRuleModel;
 import io.dongtai.iast.core.handler.hookpoint.models.IastSinkModel;
@@ -14,26 +11,22 @@ import io.dongtai.iast.core.handler.hookpoint.vulscan.VulnType;
 import io.dongtai.iast.core.utils.AsmUtils;
 import io.dongtai.iast.core.utils.matcher.Method;
 import io.dongtai.log.DongTaiLog;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.commons.JSRInlinerAdapter;
 
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Set;
 
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.commons.JSRInlinerAdapter;
-
 /**
  * @author dongzhiyong@huoxian.cn
  */
 public class DispatchClassPlugin implements DispatchPlugin {
-
-    private final boolean enableAllHook;
     private Set<String> ancestors;
     private String className;
 
     public DispatchClassPlugin() {
-        this.enableAllHook = EngineManager.getInstance().supportLazyHook();
     }
 
     @Override
@@ -47,9 +40,6 @@ public class DispatchClassPlugin implements DispatchPlugin {
             DongTaiLog.trace("class {} hit rule {}, class diagrams: {}", className, matchClassName,
                     Arrays.toString(ancestors.toArray()));
             context.setMatchClassName(matchClassName);
-            modifiedClassVisitor = new ClassVisit(classVisitor, context);
-        } else if (enableAllHook && !context.isBootstrapClassLoader()) {
-            context.setMatchClassName(className);
             modifiedClassVisitor = new ClassVisit(classVisitor, context);
         }
 

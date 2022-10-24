@@ -24,7 +24,6 @@ public class EngineManager {
 
     private static EngineManager instance;
     private final int agentId;
-    private final boolean supportLazyHook;
     private final boolean saveBytecode;
 
     private static final BooleanThreadLocal ENTER_HTTP_ENTRYPOINT = new BooleanThreadLocal(false);
@@ -105,7 +104,6 @@ public class EngineManager {
 
     private EngineManager(int agentId) {
         PropertyUtils cfg = PropertyUtils.getInstance();
-        this.supportLazyHook = cfg.isEnableAllHook();
         this.saveBytecode = cfg.isEnableDumpClass();
         this.agentId = agentId;
         String fallbackVersion = System.getProperty("dongtai.fallback.version", "v2");
@@ -178,10 +176,6 @@ public class EngineManager {
      */
     public static boolean isEngineRunning() {
         return !FallbackSwitch.isEngineFallback() && EngineManager.enableDongTai == 1;
-    }
-
-    public boolean supportLazyHook() {
-        return instance.supportLazyHook;
     }
 
     public static boolean getIsLoginLogic() {

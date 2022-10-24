@@ -67,6 +67,6 @@ public class HttpClientUtils extends AbstractHttpClientUtils {
     }
 
     private static void setToken(Map<String, String> headers) {
-        headers.put(REQUEST_HEADER_TOKEN_KEY, "Token " + PROPERTIES.getIastServerToken());
+        headers.put(REQUEST_HEADER_TOKEN_KEY, "Token " + PROPERTIES.getServerToken());
     }
 }
