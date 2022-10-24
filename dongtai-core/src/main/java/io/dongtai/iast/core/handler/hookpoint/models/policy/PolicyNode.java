@@ -20,10 +20,6 @@ public abstract class PolicyNode {
         this.inheritable = inheritable;
     }
 
-    public void setInheritable(String inheritable) {
-        this.inheritable = Inheritable.parse(inheritable);
-    }
-
     public MethodMatcher getMethodMatcher() {
         return methodMatcher;
     }

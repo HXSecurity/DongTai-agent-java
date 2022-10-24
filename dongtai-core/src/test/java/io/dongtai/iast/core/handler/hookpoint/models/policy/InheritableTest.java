@@ -8,7 +8,7 @@ import java.util.*;
 
 public class InheritableTest {
     @Test
-    public void testParse() {
+    public void testParse() throws PolicyException {
         Map<String, Inheritable> tests = new HashMap<String, Inheritable>() {{
             put("false", Inheritable.SELF);
             put("true", Inheritable.SUBCLASS);
@@ -25,9 +25,9 @@ public class InheritableTest {
         List<String> exceptionTests = Arrays.asList(null, "", " false", "false ", "invalid");
 
         for (String s : exceptionTests) {
-            Assert.assertThrows("parse exception " + s, IllegalArgumentException.class, new ThrowingRunnable() {
+            Assert.assertThrows("parse exception " + s, PolicyException.class, new ThrowingRunnable() {
                 @Override
-                public void run() throws IllegalArgumentException {
+                public void run() throws PolicyException {
                     Inheritable.parse(s);
                 }
             });

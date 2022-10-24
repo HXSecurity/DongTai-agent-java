@@ -12,29 +12,12 @@ import java.io.IOException;
 import java.util.Set;
 
 public class PolicyBuilder {
-    public static final String ERR_POLICY_CONFIG_FROM_SERVER_INVALID = "policy config from server is invalid";
-    public static final String ERR_POLICY_CONFIG_FILE_READ_FAILED = "read policy config file %s failed";
-    public static final String ERR_POLICY_CONFIG_FILE_INVALID = "policy config file %s is invalid";
-    public static final String ERR_POLICY_CONFIG_EMPTY = "policy config can not be empty";
-    public static final String ERR_POLICY_NODE_EMPTY = "policy node can not be empty";
-    public static final String ERR_POLICY_NODE_TYPE_EMPTY = "policy node type cat not be empty";
-    public static final String ERR_POLICY_NODE_TYPE_INVALID = "policy node type is invalid";
-    public static final String ERR_POLICY_NODE_SIGNATURE_NOT_EXISTS = "policy node signature does not exists";
-    public static final String ERR_POLICY_NODE_SIGNATURE_EMPTY = "policy node signature cat not be empty";
-    public static final String ERR_POLICY_NODE_SIGNATURE_INVALID = "policy node signature is invalid";
-    public static final String ERR_POLICY_SOURCE_NODE_INVALID = "policy source node is invalid";
-    public static final String ERR_POLICY_SOURCE_NODE_TARGET_INVALID = "policy source node target is invalid";
-    public static final String ERR_POLICY_PROPAGATOR_NODE_INVALID = "policy propagator node is invalid";
-    public static final String ERR_POLICY_PROPAGATOR_NODE_SOURCE_INVALID = "policy propagator node source is invalid";
-    public static final String ERR_POLICY_PROPAGATOR_NODE_TARGET_INVALID = "policy propagator node target is invalid";
-    public static final String ERR_POLICY_SINK_NODE_INVALID = "policy sink node is invalid";
-    public static final String ERR_POLICY_SINK_NODE_SOURCE_INVALID = "policy sink node source is invalid";
-
     private static final String KEY_DATA = "data";
     private static final String KEY_TYPE = "type";
     private static final String KEY_SOURCE = "source";
     private static final String KEY_TARGET = "target";
     private static final String KEY_SIGNATURE = "signature";
+    private static final String KEY_INHERIT = "inherit";
     private static final String KEY_COMMAND = "command";
 
     public static JSONArray fetchFromServer() throws PolicyException {
@@ -43,7 +26,7 @@ public class PolicyBuilder {
             JSONObject respObj = new JSONObject(resp.toString());
             return respObj.getJSONArray(KEY_DATA);
         } catch (JSONException e) {
-            throw new PolicyException(ERR_POLICY_CONFIG_FROM_SERVER_INVALID, e);
+            throw new PolicyException(PolicyException.ERR_POLICY_CONFIG_FROM_SERVER_INVALID, e);
         }
     }
 
@@ -54,35 +37,35 @@ public class PolicyBuilder {
             JSONObject respObj = new JSONObject(content);
             return respObj.getJSONArray(KEY_DATA);
         } catch (IOException e) {
-            throw new PolicyException(String.format(ERR_POLICY_CONFIG_FILE_READ_FAILED, path), e);
+            throw new PolicyException(String.format(PolicyException.ERR_POLICY_CONFIG_FILE_READ_FAILED, path), e);
         } catch (JSONException e) {
-            throw new PolicyException(String.format(ERR_POLICY_CONFIG_FILE_INVALID, path), e);
+            throw new PolicyException(String.format(PolicyException.ERR_POLICY_CONFIG_FILE_INVALID, path), e);
         }
     }
 
     public static Policy build(JSONArray policyConfig) throws PolicyException {
         if (policyConfig == null || policyConfig.length() == 0) {
-            throw new PolicyException(ERR_POLICY_CONFIG_EMPTY);
+            throw new PolicyException(PolicyException.ERR_POLICY_CONFIG_EMPTY);
         }
         int policyLen = policyConfig.length();
         Policy policy = new Policy();
         for (int i = 0; i < policyLen; i++) {
             JSONObject node = policyConfig.getJSONObject(i);
             if (node == null || node.length() == 0) {
-                throw new PolicyException(ERR_POLICY_NODE_EMPTY);
+                throw new PolicyException(PolicyException.ERR_POLICY_NODE_EMPTY);
             }
 
             try {
                 int type = node.getInt(KEY_TYPE);
                 PolicyNodeType nodeType = PolicyNodeType.get(type);
                 if (nodeType == null) {
-                    throw new PolicyException(ERR_POLICY_NODE_TYPE_INVALID + ": " + node.toString());
+                    throw new PolicyException(PolicyException.ERR_POLICY_NODE_TYPE_INVALID + ": " + node.toString());
                 }
                 buildSource(policy, nodeType, node);
                 buildPropagator(policy, nodeType, node);
                 buildSink(policy, nodeType, node);
             } catch (JSONException e) {
-                throw new PolicyException(ERR_POLICY_NODE_TYPE_EMPTY + ": " + node.toString(), e);
+                throw new PolicyException(PolicyException.ERR_POLICY_NODE_TYPE_EMPTY + ": " + node.toString(), e);
             } catch (PolicyException e) {
                 DongTaiLog.error(e.getMessage());
             }
@@ -100,12 +83,13 @@ public class PolicyBuilder {
             targets = TaintPosition.parse(node.getString(KEY_TARGET));
             MethodMatcher methodMatcher = buildMethodMatcher(node);
             SourceNode sourceNode = new SourceNode(targets, methodMatcher);
+            setInheritable(node, sourceNode);
             policy.addSource(sourceNode);
         } catch (JSONException e) {
-            throw new PolicyException(ERR_POLICY_SOURCE_NODE_INVALID + ": " + node.toString(), e);
+            throw new PolicyException(PolicyException.ERR_POLICY_SOURCE_NODE_INVALID + ": " + node.toString(), e);
         } catch (TaintPositionException e) {
             if (targets == null || targets.isEmpty()) {
-                throw new PolicyException(ERR_POLICY_SOURCE_NODE_TARGET_INVALID + ": " + node.toString(), e);
+                throw new PolicyException(PolicyException.ERR_POLICY_SOURCE_NODE_TARGET_INVALID + ": " + node.toString(), e);
             }
         }
     }
@@ -124,15 +108,16 @@ public class PolicyBuilder {
             MethodMatcher methodMatcher = buildMethodMatcher(node);
             // @TODO: command
             PropagatorNode propagatorNode = new PropagatorNode(sources, targets, null, new String[]{}, methodMatcher);
+            setInheritable(node, propagatorNode);
             policy.addPropagator(propagatorNode);
         } catch (JSONException e) {
-            throw new PolicyException(ERR_POLICY_PROPAGATOR_NODE_INVALID + ": " + node.toString(), e);
+            throw new PolicyException(PolicyException.ERR_POLICY_PROPAGATOR_NODE_INVALID + ": " + node.toString(), e);
         } catch (TaintPositionException e) {
             if (sources == null || sources.isEmpty()) {
-                throw new PolicyException(ERR_POLICY_PROPAGATOR_NODE_SOURCE_INVALID + ": " + node.toString(), e);
+                throw new PolicyException(PolicyException.ERR_POLICY_PROPAGATOR_NODE_SOURCE_INVALID + ": " + node.toString(), e);
             }
             if (targets == null || targets.isEmpty()) {
-                throw new PolicyException(ERR_POLICY_PROPAGATOR_NODE_TARGET_INVALID + ": " + node.toString(), e);
+                throw new PolicyException(PolicyException.ERR_POLICY_PROPAGATOR_NODE_TARGET_INVALID + ": " + node.toString(), e);
             }
         }
     }
@@ -147,12 +132,13 @@ public class PolicyBuilder {
             sources = TaintPosition.parse(node.getString(KEY_SOURCE));
             MethodMatcher methodMatcher = buildMethodMatcher(node);
             SinkNode sinkNode = new SinkNode(sources, methodMatcher);
+            setInheritable(node, sinkNode);
             policy.addSink(sinkNode);
         } catch (JSONException e) {
-            throw new PolicyException(ERR_POLICY_SINK_NODE_INVALID + ": " + node.toString(), e);
+            throw new PolicyException(PolicyException.ERR_POLICY_SINK_NODE_INVALID + ": " + node.toString(), e);
         } catch (TaintPositionException e) {
             if (sources == null || sources.isEmpty()) {
-                throw new PolicyException(ERR_POLICY_SINK_NODE_SOURCE_INVALID + ": " + node.toString(), e);
+                throw new PolicyException(PolicyException.ERR_POLICY_SINK_NODE_SOURCE_INVALID + ": " + node.toString(), e);
             }
         }
     }
@@ -161,16 +147,21 @@ public class PolicyBuilder {
         try {
             String sign = node.getString(KEY_SIGNATURE);
             if (StringUtils.isEmpty(sign)) {
-                throw new PolicyException(ERR_POLICY_NODE_SIGNATURE_EMPTY + ": " + node.toString());
+                throw new PolicyException(PolicyException.ERR_POLICY_NODE_SIGNATURE_EMPTY + ": " + node.toString());
             }
             Signature signature = Signature.parse(sign);
 
             // @TODO add other method matcher
             return new SignatureMethodMatcher(signature);
         } catch (JSONException e) {
-            throw new PolicyException(ERR_POLICY_NODE_SIGNATURE_NOT_EXISTS + ": " + node.toString(), e);
+            throw new PolicyException(PolicyException.ERR_POLICY_NODE_SIGNATURE_NOT_EXISTS + ": " + node.toString(), e);
         } catch (IllegalArgumentException e) {
-            throw new PolicyException(ERR_POLICY_NODE_SIGNATURE_INVALID + ": " + node.toString(), e);
+            throw new PolicyException(PolicyException.ERR_POLICY_NODE_SIGNATURE_INVALID + ": " + node.toString(), e);
         }
+    }
+
+    private static void setInheritable(JSONObject node, PolicyNode policyNode) throws JSONException, PolicyException {
+        Inheritable inheritable = Inheritable.parse(node.getString(KEY_INHERIT));
+        policyNode.setInheritable(inheritable);
     }
 }

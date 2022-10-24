@@ -14,7 +14,7 @@ public enum Inheritable {
         this.value = value;
     }
 
-    public static Inheritable parse(String str) {
+    public static Inheritable parse(String str) throws PolicyException {
         if (!StringUtils.isEmpty(str)) {
             Inheritable[] values = values();
             for (Inheritable inheritable : values) {
@@ -23,6 +23,6 @@ public enum Inheritable {
                 }
             }
         }
-        throw new IllegalArgumentException("invalid inheritable value " + str);
+        throw new PolicyException(PolicyException.ERR_POLICY_NODE_INHERITABLE_INVALID + ": " + str);
     }
 }
