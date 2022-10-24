@@ -27,7 +27,6 @@ public class GraphBuilder {
         List<GraphNode> nodeList = build();
         String report = convertToReport(nodeList, request, response);
         ThreadPools.sendPriorityReport(ApiPath.REPORT_UPLOAD, report);
-        EngineManager.ENTER_REPLAY_ENTRYPOINT.remove();
     }
 
     /**
@@ -75,7 +74,7 @@ public class GraphBuilder {
                                 event.sourceTypes
                         )
                 );
-            }catch (Exception e){
+            } catch (Exception e) {
                 DongTaiLog.debug(e);
             }
         }
@@ -99,8 +98,14 @@ public class GraphBuilder {
         detail.put(ReportKey.METHOD, requestMeta.getOrDefault("method", ""));
         detail.put(ReportKey.SECURE, requestMeta.getOrDefault("secure", ""));
         String requestURL = requestMeta.getOrDefault("requestURL", "").toString();
+        if (null == requestURL) {
+            return null;
+        }
         detail.put(ReportKey.URL, requestURL);
         String requestURI = requestMeta.getOrDefault("requestURI", "").toString();
+        if (null == requestURI) {
+            return null;
+        }
         detail.put(ReportKey.URI, requestURI);
         setURL(requestURL);
         setURI(requestURI);
@@ -123,7 +128,6 @@ public class GraphBuilder {
         for (GraphNode node : nodeList) {
             methodPool.put(node.toJson());
         }
-
         return report.toString();
     }
 

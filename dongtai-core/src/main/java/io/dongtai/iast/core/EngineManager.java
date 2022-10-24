@@ -136,6 +136,7 @@ public class EngineManager {
         EngineManager.TAINT_HASH_CODES.remove();
         EngineManager.TAINT_RANGES_POOL.remove();
         EngineManager.SCOPE_TRACKER.remove();
+        EngineManager.ENTER_REPLAY_ENTRYPOINT.remove();
         FallbackSwitch.clearHeavyHookFallback();
         EngineManager.getFallbackManager().getHookRateLimiter().remove();
         ContextManager.getCONTEXT().remove();
