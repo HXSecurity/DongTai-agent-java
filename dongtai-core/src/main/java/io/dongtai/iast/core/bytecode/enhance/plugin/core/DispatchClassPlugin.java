@@ -35,7 +35,7 @@ public class DispatchClassPlugin implements DispatchPlugin {
             return classVisitor;
         }
 
-        DongTaiLog.info("class {} hit rule {}, class diagrams: {}", className, matchedClassName,
+        DongTaiLog.trace("class {} hit rule {}, class diagrams: {}", className, matchedClassName,
                 Arrays.toString(ancestors.toArray()));
         classContext.setMatchedClassName(matchedClassName);
         return new ClassVisit(classVisitor, classContext, policy);
@@ -91,7 +91,7 @@ public class DispatchClassPlugin implements DispatchPlugin {
             }
 
             if (methodIsTransformed) {
-                DongTaiLog.info("rewrite method {} for listener[class={}]", matchedSignature, context.getClassName());
+                DongTaiLog.trace("rewrite method {} for listener[class={}]", matchedSignature, context.getClassName());
             }
 
             return mv;

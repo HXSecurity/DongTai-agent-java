@@ -235,7 +235,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
 
             writeByteArrayToFile(enhancedClass, data);
             writeByteArrayToFile(originalClass, originalData);
-            DongTaiLog.info("dump class {} to {} success.", className, enhancedClass);
+            DongTaiLog.trace("dump class {} to {} success.", className, enhancedClass);
         } catch (IOException e) {
             DongTaiLog.error("dump class {} failed. reason: {}", className, e);
         }
