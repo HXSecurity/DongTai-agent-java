@@ -33,11 +33,6 @@ public class DispatchHardcodedPlugin implements DispatchPlugin {
         return classVisitor;
     }
 
-    @Override
-    public String isMatch() {
-        return null;
-    }
-
     private class ExtractClassContent extends AbstractClassVisitor {
 
         private String source;

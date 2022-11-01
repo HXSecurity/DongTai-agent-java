@@ -34,11 +34,6 @@ public class DispatchJ2ee implements DispatchPlugin {
         return classVisitor;
     }
 
-    @Override
-    public String isMatch() {
-        return null;
-    }
-
     private boolean isServletDispatch(String className, Set<String> diagram) {
         boolean isServlet = FACES_SERVLET.equals(className);
         isServlet = (isServlet || HTTP_SERVLET.equals(className));

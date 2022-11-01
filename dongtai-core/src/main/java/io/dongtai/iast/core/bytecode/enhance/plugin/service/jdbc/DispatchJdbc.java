@@ -27,9 +27,4 @@ public class DispatchJdbc implements DispatchPlugin {
 
         return classVisitor;
     }
-
-    @Override
-    public String isMatch() {
-        return null;
-    }
 }

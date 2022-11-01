@@ -34,9 +34,4 @@ public class DispatchGrpc implements DispatchPlugin {
         }
         return classVisitor;
     }
-
-    @Override
-    public String isMatch() {
-        return null;
-    }
 }

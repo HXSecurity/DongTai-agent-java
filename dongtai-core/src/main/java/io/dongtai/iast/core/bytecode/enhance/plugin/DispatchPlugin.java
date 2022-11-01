@@ -16,11 +16,4 @@ public interface DispatchPlugin {
      * @return ClassVisitor 命中的类访问起
      */
     ClassVisitor dispatch(ClassVisitor classVisitor, ClassContext context, Policy policy);
-
-    /**
-     * 判断是否命中当前插件，如果命中则返回命中插件的类名，否则返回null
-     *
-     * @return String 命中插件的类的全限定类名
-     */
-    String isMatch();
 }

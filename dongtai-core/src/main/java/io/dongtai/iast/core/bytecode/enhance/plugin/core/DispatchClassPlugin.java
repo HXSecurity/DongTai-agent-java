@@ -41,20 +41,6 @@ public class DispatchClassPlugin implements DispatchPlugin {
         return new ClassVisit(classVisitor, classContext, policy);
     }
 
-    @Override
-    public String isMatch() {
-        // if (IastHookRuleModel.hookByName(className)) {
-        //     return className;
-        // }
-        //
-        // for (String superClassName : ancestors) {
-        //     if (IastHookRuleModel.hookBySuperClass(superClassName)) {
-        //         return superClassName;
-        //     }
-        // }
-        return null;
-    }
-
     public class ClassVisit extends AbstractClassVisitor {
         private int classVersion;
         private final MethodAdapter[] methodAdapters;
