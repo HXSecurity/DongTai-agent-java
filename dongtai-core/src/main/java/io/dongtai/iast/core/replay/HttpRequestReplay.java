@@ -2,6 +2,7 @@ package io.dongtai.iast.core.replay;
 
 import io.dongtai.iast.common.utils.base64.Base64Decoder;
 import io.dongtai.iast.core.handler.hookpoint.models.IastReplayModel;
+import io.dongtai.iast.core.scope.ScopeManager;
 import io.dongtai.iast.core.utils.HttpClientUtils;
 import io.dongtai.log.DongTaiLog;
 import org.json.JSONArray;
@@ -73,6 +74,7 @@ public class HttpRequestReplay implements Runnable {
     @Override
     public void run() {
         try {
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
             JSONObject resp = new JSONObject(replayRequestRaw.toString());
             Integer statusCode = (Integer) resp.get("status");
             if (statusCode != 201) {
@@ -101,6 +103,8 @@ public class HttpRequestReplay implements Runnable {
                 }
             }
         } catch (Throwable ignore) {
+        } finally {
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
         }
     }
 }

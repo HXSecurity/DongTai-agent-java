@@ -1,7 +1,8 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.autobinding;
 
-import io.dongtai.iast.core.bytecode.enhance.IastContext;
+import io.dongtai.iast.core.bytecode.enhance.ClassContext;
 import io.dongtai.iast.core.bytecode.enhance.plugin.DispatchPlugin;
+import io.dongtai.iast.core.handler.hookpoint.models.policy.Policy;
 import org.objectweb.asm.ClassVisitor;
 
 /**
@@ -12,7 +13,7 @@ public class DispatchSpringAutoBinding implements DispatchPlugin {
     String classname;
 
     @Override
-    public ClassVisitor dispatch(ClassVisitor classVisitor, IastContext context) {
+    public ClassVisitor dispatch(ClassVisitor classVisitor, ClassContext context, Policy policy) {
         classname = context.getClassName();
         if (autobindClassname.equals(classname)) {
             classVisitor = new SpringAutoBindingAdapter(classVisitor, context);

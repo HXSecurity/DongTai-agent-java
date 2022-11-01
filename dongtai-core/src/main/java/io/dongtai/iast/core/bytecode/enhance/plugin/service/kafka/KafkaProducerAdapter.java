@@ -1,12 +1,12 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.service.kafka;
 
-import io.dongtai.iast.core.bytecode.enhance.IastContext;
+import io.dongtai.iast.core.bytecode.enhance.ClassContext;
 import io.dongtai.iast.core.bytecode.enhance.plugin.AbstractClassVisitor;
 import io.dongtai.log.DongTaiLog;
 import org.objectweb.asm.*;
 
 public class KafkaProducerAdapter extends AbstractClassVisitor {
-    public KafkaProducerAdapter(ClassVisitor classVisitor, IastContext context) {
+    public KafkaProducerAdapter(ClassVisitor classVisitor, ClassContext context) {
         super(classVisitor, context);
     }
 

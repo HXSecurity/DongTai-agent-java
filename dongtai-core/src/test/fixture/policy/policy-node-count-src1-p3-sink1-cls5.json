@@ -53,13 +53,15 @@
       "type": 4,
       "signature": "A4.b1()",
       "source": "",
-      "inherit": "false"
+      "inherit": "false",
+      "vul_type": "ssrf"
     },
     {
       "type": 4,
       "signature": "A4.b2()",
       "source": "P1",
-      "inherit": "false"
+      "inherit": "false",
+      "vul_type": "ssrf"
     }
   ]
 }

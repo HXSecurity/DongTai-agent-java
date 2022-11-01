@@ -4,6 +4,7 @@ import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.context.ContextManager;
 import io.dongtai.iast.core.handler.hookpoint.SpyDispatcherImpl;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
+import io.dongtai.iast.core.scope.ScopeManager;
 import io.dongtai.iast.core.service.ErrorLogReport;
 import io.dongtai.iast.core.utils.StackUtils;
 import io.dongtai.iast.core.utils.TaintPoolUtils;
@@ -71,8 +72,8 @@ public class KafkaHandler {
             HashMap<String, String> headerMap = new HashMap<String, String>();
 
             while (it.hasNext()) {
-                EngineManager.SCOPE_TRACKER.enterKafka();
-                EngineManager.SCOPE_TRACKER.enterSource();
+                // @TODO: scope enter kafka
+                ScopeManager.SCOPE_TRACKER.getPolicyScope().enterSource();
                 Object rd = it.next();
                 String topic = (String) rd.getClass().getMethod("topic").invoke(rd);
                 String partition = String.valueOf(rd.getClass().getMethod("partition").invoke(rd));
@@ -134,8 +135,8 @@ public class KafkaHandler {
                 EngineManager.TRACK_MAP.addTrackMethod(invokeId, event);
                 EngineManager.TAINT_HASH_CODES.addObject(rd, event, true);
 
-                EngineManager.SCOPE_TRACKER.leaveSource();
-                EngineManager.SCOPE_TRACKER.leaveKafka();
+                ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveSource();
+                // @TODO: scope leave kafka
             }
         } catch (Exception e) {
             ErrorLogReport.sendErrorLog(e);

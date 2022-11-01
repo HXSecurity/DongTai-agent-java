@@ -1,7 +1,8 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.authentication.jwt;
 
-import io.dongtai.iast.core.bytecode.enhance.IastContext;
+import io.dongtai.iast.core.bytecode.enhance.ClassContext;
 import io.dongtai.iast.core.bytecode.enhance.plugin.DispatchPlugin;
+import io.dongtai.iast.core.handler.hookpoint.models.policy.Policy;
 import org.objectweb.asm.ClassVisitor;
 
 import java.util.Set;
@@ -12,7 +13,7 @@ public class DispatchHandlerInterceptor implements DispatchPlugin {
     private Set<String> ancestors;
 
     @Override
-    public ClassVisitor dispatch(ClassVisitor classVisitor, IastContext context) {
+    public ClassVisitor dispatch(ClassVisitor classVisitor, ClassContext context, Policy policy) {
         ancestors = context.getAncestors();
         String supportedClassName = isMatch();
         if (supportedClassName != null) {

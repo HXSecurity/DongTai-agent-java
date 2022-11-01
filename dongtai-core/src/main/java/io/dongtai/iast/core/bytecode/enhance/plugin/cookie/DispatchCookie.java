@@ -1,12 +1,12 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.cookie;
 
-import io.dongtai.iast.core.bytecode.enhance.IastContext;
+import io.dongtai.iast.core.bytecode.enhance.ClassContext;
 import io.dongtai.iast.core.bytecode.enhance.plugin.DispatchPlugin;
+import io.dongtai.iast.core.handler.hookpoint.models.policy.Policy;
+import io.dongtai.log.DongTaiLog;
+import org.objectweb.asm.ClassVisitor;
 
 import java.util.Set;
-
-import org.objectweb.asm.ClassVisitor;
-import io.dongtai.log.DongTaiLog;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -21,13 +21,13 @@ public class DispatchCookie implements DispatchPlugin {
 
 
     @Override
-    public ClassVisitor dispatch(ClassVisitor classVisitor, IastContext context) {
+    public ClassVisitor dispatch(ClassVisitor classVisitor, ClassContext context, Policy policy) {
         ancestors = context.getAncestors();
         classname = context.getClassName();
         String matchClassname = isMatch();
         if (null != matchClassname) {
             DongTaiLog.trace("Cookie match class for {} from {}", classname, matchClassname);
-            context.setMatchClassName(matchClassname);
+            context.setMatchedClassName(matchClassname);
             classVisitor = new CookieAdapter(classVisitor, context);
         }
         return classVisitor;

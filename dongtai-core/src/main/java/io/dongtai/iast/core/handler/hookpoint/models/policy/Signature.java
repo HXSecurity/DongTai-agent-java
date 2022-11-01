@@ -64,11 +64,15 @@ public class Signature {
 
         String className = classAndMethod.substring(0, methodStartIndex);
         String methodName = classAndMethod.substring(methodStartIndex + 1, parametersStartIndex);
-        String parametersStr = sign.substring(parametersStartIndex + 1, parametersEndIndex);
+        String parametersStr = sign.substring(parametersStartIndex + 1, parametersEndIndex).trim();
         if (!parametersStr.isEmpty() && (parametersStr.contains("(") || parametersStr.contains(")"))) {
             throw new IllegalArgumentException(ERR_SIGNATURE_INVALID + ": " + sign);
         }
-        String[] parameters = parametersStr.split(",");
+
+        String[] parameters = new String[]{};
+        if (!parametersStr.isEmpty()) {
+            parameters = parametersStr.split(",");
+        }
         return new Signature(className, methodName, parameters);
     }
 

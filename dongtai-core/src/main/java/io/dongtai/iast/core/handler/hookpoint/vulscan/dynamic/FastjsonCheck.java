@@ -1,7 +1,8 @@
 package io.dongtai.iast.core.handler.hookpoint.vulscan.dynamic;
 
-import io.dongtai.iast.core.handler.hookpoint.models.IastSinkModel;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
+import io.dongtai.iast.core.handler.hookpoint.models.policy.SignatureMethodMatcher;
+import io.dongtai.iast.core.handler.hookpoint.models.policy.SinkNode;
 import io.dongtai.log.DongTaiLog;
 import org.apache.maven.artifact.versioning.ComparableVersion;
 
@@ -16,13 +17,19 @@ public class FastjsonCheck implements SinkSafeChecker {
             "com.alibaba.fastjson.JSON.parse(java.lang.String)"
     );
 
+    private String policySignature;
+
     @Override
-    public boolean match(IastSinkModel sink) {
-        return FASTJSON_SINK_METHODS.contains(sink.getSignature());
+    public boolean match(MethodEvent event, SinkNode sinkNode) {
+        if (sinkNode.getMethodMatcher() instanceof SignatureMethodMatcher) {
+            this.policySignature = ((SignatureMethodMatcher) sinkNode.getMethodMatcher()).getSignature().toString();
+        }
+
+        return FASTJSON_SINK_METHODS.contains(this.policySignature);
     }
 
     @Override
-    public boolean isSafe(MethodEvent event, IastSinkModel sink) {
+    public boolean isSafe(MethodEvent event, SinkNode sinkNode) {
         try {
             Class<?> cls = Class.forName("com.alibaba.fastjson.JSON");
             Field f = cls.getDeclaredField("VERSION");

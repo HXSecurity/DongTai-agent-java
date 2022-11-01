@@ -1,6 +1,6 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.framework.j2ee.dispatch;
 
-import io.dongtai.iast.core.bytecode.enhance.IastContext;
+import io.dongtai.iast.core.bytecode.enhance.ClassContext;
 import io.dongtai.iast.core.bytecode.enhance.plugin.AbstractAdviceAdapter;
 import io.dongtai.iast.core.handler.hookpoint.controller.HookType;
 import org.objectweb.asm.Label;
@@ -15,7 +15,7 @@ public class ServletDispatcherAdviceAdapter extends AbstractAdviceAdapter {
     boolean isJakarta;
 
     public ServletDispatcherAdviceAdapter(MethodVisitor mv, int access, String name, String desc, String signature,
-                                          IastContext context, boolean isJakarta) {
+                                          ClassContext context, boolean isJakarta) {
         super(mv, access, name, desc, context, "j2ee", signature);
         this.isJakarta = isJakarta;
     }

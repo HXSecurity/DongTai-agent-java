@@ -1,11 +1,12 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.technology;
 
-import io.dongtai.iast.core.bytecode.enhance.IastContext;
+import io.dongtai.iast.core.bytecode.enhance.ClassContext;
 import io.dongtai.iast.core.bytecode.enhance.plugin.AbstractClassVisitor;
 import io.dongtai.iast.core.bytecode.enhance.plugin.DispatchPlugin;
+import io.dongtai.iast.core.handler.hookpoint.models.policy.Policy;
+import io.dongtai.log.DongTaiLog;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
-import io.dongtai.log.DongTaiLog;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -66,12 +67,12 @@ final public class DispatchTechnologyPlugin implements DispatchPlugin {
     }
 
     @Override
-    public ClassVisitor dispatch(ClassVisitor classVisitor, IastContext context) {
+    public ClassVisitor dispatch(ClassVisitor classVisitor, ClassContext context, Policy policy) {
         classname = context.getClassName();
         String matchClassName = isMatch();
         if (matchClassName != null) {
             DongTaiLog.debug("current class {} hit rule \"Technology\"", classname);
-            context.setMatchClassName(matchClassName);
+            context.setMatchedClassName(matchClassName);
             classVisitor = new ClassVisit(classVisitor, context, this.technologyMap.get(matchClassName));
         }
         return classVisitor;
@@ -88,7 +89,7 @@ final public class DispatchTechnologyPlugin implements DispatchPlugin {
     public static class ClassVisit extends AbstractClassVisitor {
         private final Map<String, String> technologyMapDetail;
 
-        ClassVisit(ClassVisitor classVisitor, IastContext context, Map<String, String> technologyMapDetail) {
+        ClassVisit(ClassVisitor classVisitor, ClassContext context, Map<String, String> technologyMapDetail) {
             super(classVisitor, context);
             this.technologyMapDetail = technologyMapDetail;
         }

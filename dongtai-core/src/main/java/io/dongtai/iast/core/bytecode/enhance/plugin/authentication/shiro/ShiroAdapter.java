@@ -1,6 +1,6 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.authentication.shiro;
 
-import io.dongtai.iast.core.bytecode.enhance.IastContext;
+import io.dongtai.iast.core.bytecode.enhance.ClassContext;
 import io.dongtai.iast.core.bytecode.enhance.plugin.AbstractClassVisitor;
 import org.objectweb.asm.*;
 
@@ -9,7 +9,7 @@ import static org.objectweb.asm.Opcodes.*;
 
 public class ShiroAdapter extends AbstractClassVisitor {
 
-    public ShiroAdapter(ClassVisitor classVisitor, IastContext context) {
+    public ShiroAdapter(ClassVisitor classVisitor, ClassContext context) {
         super(classVisitor, context);
     }
 

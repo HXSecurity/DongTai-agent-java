@@ -9,6 +9,7 @@ import org.json.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Set;
 
 public class PolicyBuilder {
@@ -18,6 +19,7 @@ public class PolicyBuilder {
     private static final String KEY_TARGET = "target";
     private static final String KEY_SIGNATURE = "signature";
     private static final String KEY_INHERIT = "inherit";
+    private static final String KEY_VUL_TYPE = "vul_type";
     private static final String KEY_COMMAND = "command";
 
     public static JSONArray fetchFromServer() throws PolicyException {
@@ -56,16 +58,10 @@ public class PolicyBuilder {
             }
 
             try {
-                int type = node.getInt(KEY_TYPE);
-                PolicyNodeType nodeType = PolicyNodeType.get(type);
-                if (nodeType == null) {
-                    throw new PolicyException(PolicyException.ERR_POLICY_NODE_TYPE_INVALID + ": " + node.toString());
-                }
+                PolicyNodeType nodeType = parseNodeType(node);
                 buildSource(policy, nodeType, node);
                 buildPropagator(policy, nodeType, node);
                 buildSink(policy, nodeType, node);
-            } catch (JSONException e) {
-                throw new PolicyException(PolicyException.ERR_POLICY_NODE_TYPE_EMPTY + ": " + node.toString(), e);
             } catch (PolicyException e) {
                 DongTaiLog.error(e.getMessage());
             }
@@ -78,20 +74,10 @@ public class PolicyBuilder {
             return;
         }
 
-        Set<TaintPosition> targets = null;
-        try {
-            targets = TaintPosition.parse(node.getString(KEY_TARGET));
-            MethodMatcher methodMatcher = buildMethodMatcher(node);
-            SourceNode sourceNode = new SourceNode(targets, methodMatcher);
-            setInheritable(node, sourceNode);
-            policy.addSource(sourceNode);
-        } catch (JSONException e) {
-            throw new PolicyException(PolicyException.ERR_POLICY_SOURCE_NODE_INVALID + ": " + node.toString(), e);
-        } catch (TaintPositionException e) {
-            if (targets == null || targets.isEmpty()) {
-                throw new PolicyException(PolicyException.ERR_POLICY_SOURCE_NODE_TARGET_INVALID + ": " + node.toString(), e);
-            }
-        }
+        MethodMatcher methodMatcher = buildMethodMatcher(node);
+        SourceNode sourceNode = new SourceNode(parseTarget(node, type), methodMatcher);
+        setInheritable(node, sourceNode);
+        policy.addSource(sourceNode);
     }
 
     public static void buildPropagator(Policy policy, PolicyNodeType type, JSONObject node) throws PolicyException {
@@ -100,26 +86,13 @@ public class PolicyBuilder {
             return;
         }
 
-        Set<TaintPosition> sources = null;
-        Set<TaintPosition> targets = null;
-        try {
-            sources = TaintPosition.parse(node.getString(KEY_SOURCE));
-            targets = TaintPosition.parse(node.getString(KEY_TARGET));
-            MethodMatcher methodMatcher = buildMethodMatcher(node);
-            // @TODO: command
-            PropagatorNode propagatorNode = new PropagatorNode(sources, targets, null, new String[]{}, methodMatcher);
-            setInheritable(node, propagatorNode);
-            policy.addPropagator(propagatorNode);
-        } catch (JSONException e) {
-            throw new PolicyException(PolicyException.ERR_POLICY_PROPAGATOR_NODE_INVALID + ": " + node.toString(), e);
-        } catch (TaintPositionException e) {
-            if (sources == null || sources.isEmpty()) {
-                throw new PolicyException(PolicyException.ERR_POLICY_PROPAGATOR_NODE_SOURCE_INVALID + ": " + node.toString(), e);
-            }
-            if (targets == null || targets.isEmpty()) {
-                throw new PolicyException(PolicyException.ERR_POLICY_PROPAGATOR_NODE_TARGET_INVALID + ": " + node.toString(), e);
-            }
-        }
+        Set<TaintPosition> sources = parseSource(node, type);
+        Set<TaintPosition> targets = parseTarget(node, type);
+        MethodMatcher methodMatcher = buildMethodMatcher(node);
+        // @TODO: command
+        PropagatorNode propagatorNode = new PropagatorNode(sources, targets, null, new String[]{}, methodMatcher);
+        setInheritable(node, propagatorNode);
+        policy.addPropagator(propagatorNode);
     }
 
     public static void buildSink(Policy policy, PolicyNodeType type, JSONObject node) throws PolicyException {
@@ -127,19 +100,75 @@ public class PolicyBuilder {
             return;
         }
 
-        Set<TaintPosition> sources = null;
+        MethodMatcher methodMatcher = buildMethodMatcher(node);
+        SinkNode sinkNode = new SinkNode(parseSource(node, type), methodMatcher);
+        setInheritable(node, sinkNode);
+        setVulType(node, sinkNode);
+        policy.addSink(sinkNode);
+    }
+
+    private static PolicyNodeType parseNodeType(JSONObject node) throws PolicyException {
         try {
-            sources = TaintPosition.parse(node.getString(KEY_SOURCE));
-            MethodMatcher methodMatcher = buildMethodMatcher(node);
-            SinkNode sinkNode = new SinkNode(sources, methodMatcher);
-            setInheritable(node, sinkNode);
-            policy.addSink(sinkNode);
-        } catch (JSONException e) {
-            throw new PolicyException(PolicyException.ERR_POLICY_SINK_NODE_INVALID + ": " + node.toString(), e);
-        } catch (TaintPositionException e) {
-            if (sources == null || sources.isEmpty()) {
-                throw new PolicyException(PolicyException.ERR_POLICY_SINK_NODE_SOURCE_INVALID + ": " + node.toString(), e);
+            int type = node.getInt(KEY_TYPE);
+            PolicyNodeType nodeType = PolicyNodeType.get(type);
+            if (nodeType == null) {
+                throw new PolicyException(PolicyException.ERR_POLICY_NODE_TYPE_INVALID + ": " + node.toString());
             }
+            return nodeType;
+        } catch (JSONException e) {
+            throw new PolicyException(PolicyException.ERR_POLICY_NODE_TYPE_INVALID + ": " + node.toString(), e);
+        }
+    }
+
+    private static Set<TaintPosition> parseSource(JSONObject node, PolicyNodeType type) throws PolicyException {
+        try {
+            return TaintPosition.parse(node.getString(KEY_SOURCE));
+        } catch (JSONException e) {
+            if (!PolicyNodeType.FILTER.equals(type)) {
+                throw new PolicyException(PolicyException.ERR_POLICY_NODE_SOURCE_INVALID + ": " + node.toString(), e);
+            }
+        } catch (TaintPositionException e) {
+            if (!PolicyNodeType.FILTER.equals(type)) {
+                throw new PolicyException(PolicyException.ERR_POLICY_NODE_SOURCE_INVALID + ": " + node.toString(), e);
+            }
+        }
+        return new HashSet<TaintPosition>();
+    }
+
+    private static Set<TaintPosition> parseTarget(JSONObject node, PolicyNodeType type) throws PolicyException {
+        try {
+            return TaintPosition.parse(node.getString(KEY_TARGET));
+        } catch (JSONException e) {
+            if (!PolicyNodeType.FILTER.equals(type)) {
+                throw new PolicyException(PolicyException.ERR_POLICY_NODE_TARGET_INVALID + ": " + node.toString(), e);
+            }
+        } catch (TaintPositionException e) {
+            if (!PolicyNodeType.FILTER.equals(type)) {
+                throw new PolicyException(PolicyException.ERR_POLICY_NODE_TARGET_INVALID + ": " + node.toString(), e);
+            }
+        }
+        return new HashSet<TaintPosition>();
+
+    }
+
+    private static void setInheritable(JSONObject node, PolicyNode policyNode) throws PolicyException {
+        try {
+            Inheritable inheritable = Inheritable.parse(node.getString(KEY_INHERIT));
+            policyNode.setInheritable(inheritable);
+        } catch (JSONException e) {
+            throw new PolicyException(PolicyException.ERR_POLICY_NODE_INHERITABLE_INVALID + ": " + node.toString(), e);
+        }
+    }
+
+    private static void setVulType(JSONObject node, SinkNode sinkNode) throws PolicyException {
+        try {
+            String vulType = node.getString(KEY_VUL_TYPE);
+            if (vulType == null || vulType.isEmpty()) {
+                throw new PolicyException(PolicyException.ERR_POLICY_SINK_NODE_VUL_TYPE_INVALID + ": " + node.toString());
+            }
+            sinkNode.setVulType(vulType);
+        } catch (JSONException e) {
+            throw new PolicyException(PolicyException.ERR_POLICY_SINK_NODE_VUL_TYPE_INVALID + ": " + node.toString(), e);
         }
     }
 
@@ -147,21 +176,16 @@ public class PolicyBuilder {
         try {
             String sign = node.getString(KEY_SIGNATURE);
             if (StringUtils.isEmpty(sign)) {
-                throw new PolicyException(PolicyException.ERR_POLICY_NODE_SIGNATURE_EMPTY + ": " + node.toString());
+                throw new PolicyException(PolicyException.ERR_POLICY_NODE_SIGNATURE_INVALID + ": " + node.toString());
             }
             Signature signature = Signature.parse(sign);
 
             // @TODO add other method matcher
             return new SignatureMethodMatcher(signature);
         } catch (JSONException e) {
-            throw new PolicyException(PolicyException.ERR_POLICY_NODE_SIGNATURE_NOT_EXISTS + ": " + node.toString(), e);
+            throw new PolicyException(PolicyException.ERR_POLICY_NODE_SIGNATURE_INVALID + ": " + node.toString(), e);
         } catch (IllegalArgumentException e) {
             throw new PolicyException(PolicyException.ERR_POLICY_NODE_SIGNATURE_INVALID + ": " + node.toString(), e);
         }
-    }
-
-    private static void setInheritable(JSONObject node, PolicyNode policyNode) throws JSONException, PolicyException {
-        Inheritable inheritable = Inheritable.parse(node.getString(KEY_INHERIT));
-        policyNode.setInheritable(inheritable);
     }
 }

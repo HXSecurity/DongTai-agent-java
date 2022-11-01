@@ -1,11 +1,11 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.framework.grpc;
 
-import io.dongtai.iast.core.bytecode.enhance.IastContext;
+import io.dongtai.iast.core.bytecode.enhance.ClassContext;
 import io.dongtai.iast.core.bytecode.enhance.plugin.AbstractClassVisitor;
 import org.objectweb.asm.*;
 
 public class AbstractStubAdapter extends AbstractClassVisitor {
-    public AbstractStubAdapter(ClassVisitor classVisitor, IastContext context) {
+    public AbstractStubAdapter(ClassVisitor classVisitor, ClassContext context) {
         super(classVisitor, context);
     }
 

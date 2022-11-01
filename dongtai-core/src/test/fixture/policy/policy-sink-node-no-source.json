@@ -5,7 +5,8 @@
     {
       "type": 4,
       "signature": "A.b()",
-      "inherit": "false"
+      "inherit": "false",
+      "vul_type": "ssrf"
     }
   ]
 }

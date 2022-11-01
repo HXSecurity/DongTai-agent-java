@@ -1,7 +1,8 @@
 package io.dongtai.iast.core.handler.hookpoint.vulscan.dynamic;
 
-import io.dongtai.iast.core.handler.hookpoint.models.IastSinkModel;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
+import io.dongtai.iast.core.handler.hookpoint.models.policy.SignatureMethodMatcher;
+import io.dongtai.iast.core.handler.hookpoint.models.policy.SinkNode;
 
 import java.util.*;
 
@@ -14,15 +15,21 @@ public class ReflectionInjectionCheck implements SinkSafeChecker {
         put(FOR_NAME_CLASS_LOADER, new HashSet<String>(Collections.singleton("org.jruby.javasupport.JavaSupport.loadJavaClass")));
     }};
 
+    private String policySignature;
+
     @Override
-    public boolean match(IastSinkModel sink) {
-        return STACK_BLACKLIST.containsKey(sink.getSignature());
+    public boolean match(MethodEvent event, SinkNode sinkNode) {
+        if (sinkNode.getMethodMatcher() instanceof SignatureMethodMatcher) {
+            this.policySignature = ((SignatureMethodMatcher) sinkNode.getMethodMatcher()).getSignature().toString();
+        }
+
+        return STACK_BLACKLIST.containsKey(this.policySignature);
     }
 
     @Override
-    public boolean isSafe(MethodEvent event, IastSinkModel sink) {
+    public boolean isSafe(MethodEvent event, SinkNode sinkNode) {
         StackTraceElement[] stacks = Thread.currentThread().getStackTrace();
-        HashSet<String> blacklist = STACK_BLACKLIST.get(sink.getSignature());
+        HashSet<String> blacklist = STACK_BLACKLIST.get(this.policySignature);
         if (blacklist == null) {
             return false;
         }

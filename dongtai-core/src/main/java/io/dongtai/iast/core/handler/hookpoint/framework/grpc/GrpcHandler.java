@@ -7,6 +7,7 @@ import io.dongtai.iast.core.handler.hookpoint.SpyDispatcherImpl;
 import io.dongtai.iast.core.handler.hookpoint.controller.impl.SourceImpl;
 import io.dongtai.iast.core.handler.hookpoint.graphy.GraphBuilder;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
+import io.dongtai.iast.core.scope.ScopeManager;
 import io.dongtai.iast.core.service.ErrorLogReport;
 import io.dongtai.iast.core.utils.*;
 import io.dongtai.log.DongTaiLog;
@@ -127,8 +128,7 @@ public class GrpcHandler {
             EngineManager.REQUEST_CONTEXT.set(requestMeta);
             EngineManager.TRACK_MAP.set(new HashMap<Integer, MethodEvent>(1024));
             EngineManager.TAINT_HASH_CODES.set(new HashSet<Integer>());
-            EngineManager.SCOPE_TRACKER.get().enterGrpc();
-            EngineManager.turnOnDongTai();
+            // @TODO: scope enter grpc
         } catch (Exception e) {
             DongTaiLog.error(e);
         }
@@ -139,9 +139,9 @@ public class GrpcHandler {
      */
     public static void closeGrpcCall() {
         try {
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
             if (EngineManager.isEnterEntry(null)) {
-                EngineManager.turnOffDongTai();
-                EngineManager.SCOPE_TRACKER.get().leaveGrpc();
+                // @TODO: scope leave grpc
                 EngineManager.maintainRequestCount();
                 GraphBuilder.buildAndReport(null, null);
                 EngineManager.cleanThreadState();
@@ -150,7 +150,7 @@ public class GrpcHandler {
             ErrorLogReport.sendErrorLog(e);
             EngineManager.cleanThreadState();
         } finally {
-            EngineManager.turnOnDongTai();
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
         }
     }
 

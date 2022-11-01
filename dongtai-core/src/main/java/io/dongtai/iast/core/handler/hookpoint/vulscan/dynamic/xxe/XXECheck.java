@@ -1,7 +1,7 @@
 package io.dongtai.iast.core.handler.hookpoint.vulscan.dynamic.xxe;
 
-import io.dongtai.iast.core.handler.hookpoint.models.IastSinkModel;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
+import io.dongtai.iast.core.handler.hookpoint.models.policy.SinkNode;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.dynamic.SinkSafeChecker;
 import io.dongtai.log.DongTaiLog;
 
@@ -22,12 +22,12 @@ public class XXECheck implements SinkSafeChecker {
     ));
 
     @Override
-    public boolean match(IastSinkModel sink) {
-        return SINK_TYPE.equals(sink.getType());
+    public boolean match(MethodEvent event, SinkNode sinkNode) {
+        return SINK_TYPE.equals(sinkNode.getVulType());
     }
 
     @Override
-    public boolean isSafe(MethodEvent event, IastSinkModel sink) {
+    public boolean isSafe(MethodEvent event, SinkNode sinkNode) {
         if (event.object == null) {
             return false;
         }

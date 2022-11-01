@@ -1,13 +1,11 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.framework.j2ee.jsp;
 
-import io.dongtai.iast.core.bytecode.enhance.IastContext;
+import io.dongtai.iast.core.bytecode.enhance.ClassContext;
 import io.dongtai.iast.core.bytecode.enhance.plugin.AbstractClassVisitor;
 import io.dongtai.iast.core.bytecode.enhance.plugin.framework.j2ee.dispatch.ServletDispatcherAdviceAdapter;
 import io.dongtai.iast.core.utils.AsmUtils;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Type;
 import io.dongtai.log.DongTaiLog;
+import org.objectweb.asm.*;
 
 
 /**
@@ -16,7 +14,7 @@ import io.dongtai.log.DongTaiLog;
 public class JspPageAdapter extends AbstractClassVisitor {
 
 
-    JspPageAdapter(ClassVisitor classVisitor, IastContext context) {
+    JspPageAdapter(ClassVisitor classVisitor, ClassContext context) {
         super(classVisitor, context);
     }
 
@@ -24,7 +22,7 @@ public class JspPageAdapter extends AbstractClassVisitor {
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
         if ("_jspService".equals(name)) {
-            String iastMethodSignature = AsmUtils.buildSignature(context.getMatchClassName(), name, desc);
+            String iastMethodSignature = AsmUtils.buildSignature(context.getMatchedClassName(), name, desc);
             mv = new JspAdviceAdapter(mv, access, name, desc, iastMethodSignature, context);
             setTransformed();
         }
@@ -33,7 +31,7 @@ public class JspPageAdapter extends AbstractClassVisitor {
 
     private class JspAdviceAdapter extends ServletDispatcherAdviceAdapter {
 
-        JspAdviceAdapter(MethodVisitor methodVisitor, int access, String name, String desc, String signature, IastContext context) {
+        JspAdviceAdapter(MethodVisitor methodVisitor, int access, String name, String desc, String signature, ClassContext context) {
             super(methodVisitor, access, name, desc, signature, context, false);
         }
 

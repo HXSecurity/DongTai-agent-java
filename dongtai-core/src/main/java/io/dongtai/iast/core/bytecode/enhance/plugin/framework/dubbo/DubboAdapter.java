@@ -1,18 +1,18 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.framework.dubbo;
 
-import io.dongtai.iast.core.bytecode.enhance.IastContext;
+import io.dongtai.iast.core.bytecode.enhance.ClassContext;
 import io.dongtai.iast.core.bytecode.enhance.plugin.AbstractClassVisitor;
 import io.dongtai.iast.core.utils.AsmUtils;
+import io.dongtai.log.DongTaiLog;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
-import io.dongtai.log.DongTaiLog;
 
 /**
  * @author dongzhiyong@huoxian.cn
  */
 public class DubboAdapter extends AbstractClassVisitor {
 
-    public DubboAdapter(ClassVisitor classVisitor, IastContext context) {
+    public DubboAdapter(ClassVisitor classVisitor, ClassContext context) {
         super(classVisitor, context);
     }
 
@@ -24,7 +24,7 @@ public class DubboAdapter extends AbstractClassVisitor {
             DongTaiLog.trace("Adding Dubbo Source tracking for type {}", context.getClassName());
             mv = new DubboAdviceAdapter(mv, access, name, desc, signCode, context);
             setTransformed();
-            DongTaiLog.trace("rewrite method {}.{} for listener[match={}]", context.getClassName(), name, context.getMatchClassName());
+            DongTaiLog.trace("rewrite method {}.{} for listener[match={}]", context.getClassName(), name, context.getMatchedClassName());
         }
         return mv;
     }

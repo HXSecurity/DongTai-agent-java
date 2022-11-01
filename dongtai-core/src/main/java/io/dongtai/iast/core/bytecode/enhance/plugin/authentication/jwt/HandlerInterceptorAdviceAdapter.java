@@ -1,13 +1,13 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.authentication.jwt;
 
-import io.dongtai.iast.core.bytecode.enhance.IastContext;
+import io.dongtai.iast.core.bytecode.enhance.ClassContext;
 import io.dongtai.iast.core.bytecode.enhance.plugin.AbstractAdviceAdapter;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 
 public class HandlerInterceptorAdviceAdapter extends AbstractAdviceAdapter {
 
-    public HandlerInterceptorAdviceAdapter(MethodVisitor mv, int access, String name, String desc, IastContext context,
+    public HandlerInterceptorAdviceAdapter(MethodVisitor mv, int access, String name, String desc, ClassContext context,
                                            String type, String signCode) {
         super(mv, access, name, desc, context, type, signCode);
     }

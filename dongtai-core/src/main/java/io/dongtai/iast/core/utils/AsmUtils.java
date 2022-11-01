@@ -86,6 +86,18 @@ public class AsmUtils {
         }
     }
 
+    public static String[] buildParameterTypes(String desc) {
+        Type[] argTypes = Type.getArgumentTypes(desc);
+        if (argTypes.length == 0) {
+            return new String[]{};
+        }
+        String[] args = new String[argTypes.length];
+        for (byte index = 0; index < argTypes.length; index++) {
+            args[index] = argTypes[index].getClassName();
+        }
+        return args;
+    }
+
     public static String buildSignature(String className, String methodName, String desc) {
         Type[] argTypes = Type.getArgumentTypes(desc);
         StringBuilder sb = new StringBuilder();

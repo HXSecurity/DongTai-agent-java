@@ -1,13 +1,13 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.cookie;
 
-import io.dongtai.iast.core.bytecode.enhance.IastContext;
+import io.dongtai.iast.core.bytecode.enhance.ClassContext;
 import org.objectweb.asm.ClassVisitor;
 
 /**
  * @author dongzhiyong@huoxian.cn
  */
 public class CookieAdapter extends BaseType {
-    public CookieAdapter(ClassVisitor classVisitor, IastContext context) {
+    public CookieAdapter(ClassVisitor classVisitor, ClassContext context) {
         super(classVisitor, context, null);
     }
 

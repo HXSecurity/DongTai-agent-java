@@ -102,14 +102,14 @@ public interface SpyDispatcher {
      *
      * @since 1.3.1
      */
-    void enterPropagator(String signature);
+    void enterPropagator(boolean skipScope);
 
     /**
      * mark for leave Source Entry Point
      *
      * @since 1.3.1
      */
-    void leavePropagator(String signature);
+    void leavePropagator(boolean skipScope);
 
     /**
      * Determines whether it is a layer 1 Propagator entry
@@ -117,7 +117,7 @@ public interface SpyDispatcher {
      * @return true if is a layer 1 Propagator entry; else false
      * @since 1.3.1
      */
-    boolean isFirstLevelPropagator(String signature);
+    boolean isFirstLevelPropagator();
 
     /**
      * mark for enter Sink Entry Point
@@ -182,4 +182,8 @@ public interface SpyDispatcher {
     boolean collectMethodPool(Object instance, Object[] argumentArray, Object retValue, String framework,
                               String className, String matchClassName, String methodName, String signCode,
                               boolean isStatic, int handlerType);
+
+    public boolean collectMethod(Object instance, Object[] parameters, Object retObject, String methodMatcher,
+                                 String className, String matchedClassName, String methodName, String signature,
+                                 boolean isStatic);
 }

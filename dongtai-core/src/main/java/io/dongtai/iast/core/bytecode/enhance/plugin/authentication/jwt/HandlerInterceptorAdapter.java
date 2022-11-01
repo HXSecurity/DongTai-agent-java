@@ -1,18 +1,13 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.authentication.jwt;
 
-import io.dongtai.iast.core.bytecode.enhance.IastContext;
+import io.dongtai.iast.core.bytecode.enhance.ClassContext;
 import io.dongtai.iast.core.bytecode.enhance.plugin.AbstractClassVisitor;
-import io.dongtai.iast.core.bytecode.enhance.plugin.spring.SpringApplicationAdviceAdapter;
 import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
-
-import static org.objectweb.asm.Opcodes.*;
 
 public class HandlerInterceptorAdapter extends AbstractClassVisitor {
 
-    public HandlerInterceptorAdapter(ClassVisitor classVisitor, IastContext context) {
+    public HandlerInterceptorAdapter(ClassVisitor classVisitor, ClassContext context) {
         super(classVisitor, context);
     }
 

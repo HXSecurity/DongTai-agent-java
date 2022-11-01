@@ -1,5 +1,7 @@
 package io.dongtai.iast.core.handler.hookpoint.models.policy;
 
+import io.dongtai.iast.core.bytecode.enhance.MethodContext;
+
 import java.util.Arrays;
 
 public class SignatureMethodMatcher implements MethodMatcher {
@@ -9,8 +11,8 @@ public class SignatureMethodMatcher implements MethodMatcher {
         this.signature = signature;
     }
 
-    public boolean match(MethodModel method) {
-        if (!this.signature.getClassName().equals(method.getClassName())) {
+    public boolean match(MethodContext method) {
+        if (!this.signature.getClassName().equals(method.getMatchedClassName())) {
             return false;
         }
         if (!this.signature.getMethodName().equals(method.getMethodName())) {

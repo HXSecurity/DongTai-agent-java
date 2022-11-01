@@ -1,6 +1,7 @@
 package io.dongtai.iast.core.init.impl;
 
 import io.dongtai.iast.core.bytecode.IastClassFileTransformer;
+import io.dongtai.iast.core.handler.hookpoint.models.policy.PolicyManager;
 import io.dongtai.iast.core.init.IEngine;
 import io.dongtai.iast.core.utils.PropertyUtils;
 import io.dongtai.log.DongTaiLog;
@@ -18,8 +19,8 @@ public class TransformEngine implements IEngine {
     private IastClassFileTransformer classFileTransformer;
 
     @Override
-    public void init(PropertyUtils cfg, Instrumentation inst) {
-        this.classFileTransformer = IastClassFileTransformer.getInstance(inst);
+    public void init(PropertyUtils cfg, Instrumentation inst, PolicyManager policyManager) {
+        this.classFileTransformer = IastClassFileTransformer.getInstance(inst, policyManager);
         this.inst = inst;
     }
 

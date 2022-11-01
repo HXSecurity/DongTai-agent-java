@@ -1,7 +1,8 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.authentication.shiro;
 
-import io.dongtai.iast.core.bytecode.enhance.IastContext;
+import io.dongtai.iast.core.bytecode.enhance.ClassContext;
 import io.dongtai.iast.core.bytecode.enhance.plugin.DispatchPlugin;
+import io.dongtai.iast.core.handler.hookpoint.models.policy.Policy;
 import org.objectweb.asm.ClassVisitor;
 
 public class DispatchShiro implements DispatchPlugin {
@@ -10,7 +11,7 @@ public class DispatchShiro implements DispatchPlugin {
     private String className;
 
     @Override
-    public ClassVisitor dispatch(ClassVisitor classVisitor, IastContext context) {
+    public ClassVisitor dispatch(ClassVisitor classVisitor, ClassContext context, Policy policy) {
         className = context.getClassName();
         String supportedClassName = isMatch();
         if (supportedClassName != null) {

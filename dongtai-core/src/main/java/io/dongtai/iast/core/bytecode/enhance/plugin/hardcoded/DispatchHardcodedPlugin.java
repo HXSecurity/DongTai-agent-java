@@ -3,9 +3,10 @@ package io.dongtai.iast.core.bytecode.enhance.plugin.hardcoded;
 import io.dongtai.iast.common.constants.*;
 import io.dongtai.iast.common.utils.base64.Base64Encoder;
 import io.dongtai.iast.core.EngineManager;
-import io.dongtai.iast.core.bytecode.enhance.IastContext;
+import io.dongtai.iast.core.bytecode.enhance.ClassContext;
 import io.dongtai.iast.core.bytecode.enhance.plugin.AbstractClassVisitor;
 import io.dongtai.iast.core.bytecode.enhance.plugin.DispatchPlugin;
+import io.dongtai.iast.core.handler.hookpoint.models.policy.Policy;
 import io.dongtai.iast.core.service.ThreadPools;
 import io.dongtai.iast.core.utils.commonUtils;
 import org.json.JSONObject;
@@ -24,7 +25,7 @@ public class DispatchHardcodedPlugin implements DispatchPlugin {
 
 
     @Override
-    public ClassVisitor dispatch(ClassVisitor classVisitor, IastContext context) {
+    public ClassVisitor dispatch(ClassVisitor classVisitor, ClassContext context, Policy policy) {
         if (!context.isBootstrapClassLoader()) {
             classVisitor = new ExtractClassContent(classVisitor, context);
             return classVisitor;
@@ -41,7 +42,7 @@ public class DispatchHardcodedPlugin implements DispatchPlugin {
 
         private String source;
 
-        public ExtractClassContent(ClassVisitor classVisitor, IastContext context) {
+        public ExtractClassContent(ClassVisitor classVisitor, ClassContext context) {
             super(classVisitor, context);
         }
 

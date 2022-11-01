@@ -7,6 +7,7 @@ import io.dongtai.iast.core.handler.hookpoint.IastServer;
 import io.dongtai.iast.core.handler.hookpoint.SpyDispatcherImpl;
 import io.dongtai.iast.core.handler.hookpoint.controller.impl.SourceImpl;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
+import io.dongtai.iast.core.scope.ScopeManager;
 import io.dongtai.iast.core.utils.StackUtils;
 import io.dongtai.iast.core.utils.TaintPoolUtils;
 import io.dongtai.log.DongTaiLog;
@@ -79,7 +80,7 @@ public class DubboHandler {
         Map<String, String> attachments = getAttachments(invocation);
         enterDubboEntry(dubboService, attachments);
 
-        if (EngineManager.isEnterHttp()) {
+        if (ScopeManager.SCOPE_TRACKER.getHttpEntryScope().in()) {
             return;
         }
 

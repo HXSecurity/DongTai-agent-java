@@ -1,5 +1,6 @@
 package io.dongtai.iast.core.handler.hookpoint;
 
+import com.secnium.iast.core.AgentEngine;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.FallbackSwitch;
 import io.dongtai.iast.core.bytecode.enhance.plugin.spring.SpringApplicationImpl;
@@ -9,9 +10,8 @@ import io.dongtai.iast.core.handler.hookpoint.framework.dubbo.DubboHandler;
 import io.dongtai.iast.core.handler.hookpoint.framework.grpc.GrpcHandler;
 import io.dongtai.iast.core.handler.hookpoint.graphy.GraphBuilder;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
-import io.dongtai.iast.core.handler.hookpoint.service.ServiceHandler;
-import io.dongtai.iast.core.handler.hookpoint.service.kafka.KafkaHandler;
-import io.dongtai.iast.core.service.ErrorLogReport;
+import io.dongtai.iast.core.handler.hookpoint.models.policy.*;
+import io.dongtai.iast.core.scope.ScopeManager;
 import io.dongtai.iast.core.utils.config.RemoteConfigUtils;
 import io.dongtai.iast.core.utils.matcher.ConfigMatcher;
 import io.dongtai.log.DongTaiLog;
@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class SpyDispatcherImpl implements SpyDispatcher {
 
     public static final AtomicInteger INVOKE_ID_SEQUENCER = new AtomicInteger(1);
-    private static final ThreadLocal<Long> responseTime = new ThreadLocal<Long>();
+    private static final ThreadLocal<Long> RESPONSE_TIME = new ThreadLocal<Long>();
 
     /**
      * mark for enter Http Entry Point
@@ -35,9 +35,12 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public void enterHttp() {
         try {
-            EngineManager.SCOPE_TRACKER.enterHttp();
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
+            ScopeManager.SCOPE_TRACKER.getHttpRequestScope().enter();
         } catch (Exception e) {
-            DongTaiLog.error(e);
+            DongTaiLog.error("enter http failed", e);
+        } finally {
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
         }
     }
 
@@ -50,48 +53,47 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public void leaveHttp(Object request, Object response) {
         try {
-            if (EngineManager.isDongTaiRunning()) {
-                EngineManager.turnOffDongTai();
-
-                EngineManager.SCOPE_TRACKER.leaveHttp();
-                if (EngineManager.SCOPE_TRACKER.isExitedHttp() && EngineManager.isEnterHttp()) {
-                    EngineManager.maintainRequestCount();
-                    GraphBuilder.buildAndReport(request, response);
-                    EngineManager.cleanThreadState();
-                    long responseTimeEnd = System.currentTimeMillis()-responseTime.get()+8;
-                    DongTaiLog.debug("url {} response time: {} ms",GraphBuilder.getURL(),responseTimeEnd);
-                    if (RemoteConfigUtils.enableAutoFallback() && responseTimeEnd > RemoteConfigUtils.getApiResponseTime(null)){
-                        RemoteConfigUtils.fallbackReqCount++;
-                        DongTaiLog.warn("url {} response time: {} ms, greater than {} ms",GraphBuilder.getURL(),responseTimeEnd,RemoteConfigUtils.getApiResponseTime(null));
-                        if (!"/".equals(GraphBuilder.getURL())){
-                            ConfigMatcher.getInstance().FALLBACK_URL.add(GraphBuilder.getURI());
-                        }
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
+            ScopeManager.SCOPE_TRACKER.getHttpRequestScope().leave();
+            if (!ScopeManager.SCOPE_TRACKER.getHttpRequestScope().in()
+                    && ScopeManager.SCOPE_TRACKER.getHttpEntryScope().in()) {
+                EngineManager.maintainRequestCount();
+                GraphBuilder.buildAndReport(request, response);
+                EngineManager.cleanThreadState();
+                long responseTimeEnd = System.currentTimeMillis() - RESPONSE_TIME.get() + 8;
+                DongTaiLog.debug("url {} response time: {} ms", GraphBuilder.getURL(), responseTimeEnd);
+                if (RemoteConfigUtils.enableAutoFallback() && responseTimeEnd > RemoteConfigUtils.getApiResponseTime(null)) {
+                    RemoteConfigUtils.fallbackReqCount++;
+                    DongTaiLog.warn("url {} response time: {} ms, greater than {} ms", GraphBuilder.getURL(), responseTimeEnd, RemoteConfigUtils.getApiResponseTime(null));
+                    if (!"/".equals(GraphBuilder.getURL())) {
+                        ConfigMatcher.getInstance().FALLBACK_URL.add(GraphBuilder.getURI());
                     }
                 }
-                EngineManager.turnOnDongTai();
             }
         } catch (Exception e) {
-            DongTaiLog.error(e);
+            DongTaiLog.error("leave http failed", e);
             EngineManager.cleanThreadState();
         } finally {
             FallbackSwitch.clearHeavyHookFallback();
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
         }
     }
 
     /**
      * Determines whether it is a layer 1 HTTP entry
      *
-     * @return
      * @since 1.3.1
      */
     @Override
     public boolean isFirstLevelHttp() {
         try {
-            responseTime.set(System.currentTimeMillis());
-            return EngineManager.isEngineRunning() && EngineManager.SCOPE_TRACKER
-                    .isFirstLevelHttp();
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
+            RESPONSE_TIME.set(System.currentTimeMillis());
+            return ScopeManager.SCOPE_TRACKER.getHttpRequestScope().isFirst();
         } catch (Exception e) {
-            DongTaiLog.error(e);
+            DongTaiLog.error("check first level http failed", e);
+        } finally {
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
         }
         return false;
     }
@@ -101,25 +103,30 @@ public class SpyDispatcherImpl implements SpyDispatcher {
      *
      * @param req       HttpRequest Object
      * @param isJakarta true if jakarta-servlet-api else false
-     * @return
      * @since 1.3.1
      */
     @Override
     public Object cloneRequest(Object req, boolean isJakarta) {
-        return HttpImpl.cloneRequest(req, isJakarta);
+        try {
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
+            return HttpImpl.cloneRequest(req, isJakarta);
+        } finally {
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
+        }
     }
 
     /**
      * clone response object for copy http response data.
-     *
-     * @param response
-     * @param isJakarta
-     * @return
      * @since 1.3.1
      */
     @Override
     public Object cloneResponse(Object response, boolean isJakarta) {
-        return HttpImpl.cloneResponse(response, isJakarta);
+        try {
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
+            return HttpImpl.cloneResponse(response, isJakarta);
+        } finally {
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
+        }
     }
 
     /**
@@ -129,11 +136,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
      */
     @Override
     public void enterDubbo() {
-        try {
-            EngineManager.SCOPE_TRACKER.enterDubbo();
-        } catch (Exception e) {
-            DongTaiLog.error(e);
-        }
+        // @TODO: refactor
     }
 
     /**
@@ -143,26 +146,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
      */
     @Override
     public void leaveDubbo(Object invocation, Object rpcResult) {
-        try {
-            if (EngineManager.isDongTaiRunning() && EngineManager.isEnterEntry(null)) {
-                EngineManager.turnOffDongTai();
-
-                EngineManager.leaveDubbo();
-                if (EngineManager.isEnterEntry(null)) {
-                    DubboHandler.solveClientExit(invocation, rpcResult);
-                } else if (EngineManager.isExitedDubbo()) {
-                    DubboHandler.solveServiceExit(invocation, rpcResult);
-                    EngineManager.maintainRequestCount();
-                    GraphBuilder.buildAndReport(null, null);
-                    EngineManager.cleanThreadState();
-                }
-
-                EngineManager.turnOnDongTai();
-            }
-        } catch (Exception e) {
-            DongTaiLog.error(e);
-            EngineManager.cleanThreadState();
-        }
+        // @TODO: refactor
     }
 
     /**
@@ -173,56 +157,28 @@ public class SpyDispatcherImpl implements SpyDispatcher {
      */
     @Override
     public boolean isFirstLevelDubbo() {
-        try {
-            return EngineManager.isEngineRunning() && EngineManager.isFirstLevelDubbo();
-        } catch (Exception e) {
-            DongTaiLog.error(e);
-            ErrorLogReport.sendErrorLog(e);
-        }
+        // @TODO: refactor
         return false;
     }
 
     @Override
     public void enterKafka(Object record) {
-        try {
-            EngineManager.SCOPE_TRACKER.enterKafka();
-        } catch (Exception e) {
-            ErrorLogReport.sendErrorLog(e);
-        }
+        // @TODO: refactor
     }
 
     @Override
     public void kafkaBeforeSend(Object record) {
-        KafkaHandler.beforeSend(record);
+        // @TODO: refactor
     }
 
     @Override
     public void kafkaAfterPoll(Object record) {
-        EngineManager.turnOffDongTai();
-        KafkaHandler.afterPoll(record);
-
-        EngineManager.turnOnDongTai();
+        // @TODO: refactor
     }
 
     @Override
     public void leaveKafka() {
-        try {
-            if (EngineManager.isEnterEntry(null)) {
-                EngineManager.turnOffDongTai();
-
-                EngineManager.leaveKafka();
-                if (EngineManager.isExitedKafka() && !EngineManager.isEnterHttp()) {
-                    EngineManager.maintainRequestCount();
-                    GraphBuilder.buildAndReport(null, null);
-                    EngineManager.cleanThreadState();
-                }
-
-                EngineManager.turnOnDongTai();
-            }
-        } catch (Exception e) {
-            ErrorLogReport.sendErrorLog(e);
-            EngineManager.cleanThreadState();
-        }
+        // @TODO: refactor
     }
 
     /**
@@ -233,11 +189,12 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public void enterSource() {
         try {
-            if (EngineManager.isDongTaiRunning()) {
-                EngineManager.SCOPE_TRACKER.enterSource();
-            }
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterSource();
         } catch (Exception e) {
-            DongTaiLog.error(e);
+            DongTaiLog.error("enter source failed", e);
+        } finally {
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
         }
     }
 
@@ -249,11 +206,12 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public void leaveSource() {
         try {
-            if (EngineManager.isDongTaiRunning()) {
-                EngineManager.SCOPE_TRACKER.leaveSource();
-            }
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveSource();
         } catch (Exception e) {
-            DongTaiLog.error(e);
+            DongTaiLog.error("leave source failed", e);
+        } finally {
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
         }
     }
 
@@ -266,9 +224,9 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public boolean isFirstLevelSource() {
         try {
-            return EngineManager.isDongTaiRunning() && EngineManager.isEngineRunning() && EngineManager.SCOPE_TRACKER
-                    .isFirstLevelSource();
-        } catch (Exception e) {
+            return ScopeManager.SCOPE_TRACKER.isEnterEntry()
+                    && ScopeManager.SCOPE_TRACKER.getPolicyScope().isValidSource();
+        } catch (Exception ignore) {
             return false;
         }
     }
@@ -279,15 +237,14 @@ public class SpyDispatcherImpl implements SpyDispatcher {
      * @since 1.3.1
      */
     @Override
-    public void enterPropagator(String signature) {
+    public void enterPropagator(boolean skipScope) {
         try {
-            if (EngineManager.isDongTaiRunning() && EngineManager.isEngineRunning()) {
-                EngineManager.turnOffDongTai();
-                EngineManager.SCOPE_TRACKER.enterPropagation(PropagatorImpl.isSkipScope(signature));
-                EngineManager.turnOnDongTai();
-            }
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterPropagator(skipScope);
         } catch (Exception e) {
-            DongTaiLog.error(e);
+            DongTaiLog.error("enter propagator failed", e);
+        } finally {
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
         }
     }
 
@@ -297,15 +254,14 @@ public class SpyDispatcherImpl implements SpyDispatcher {
      * @since 1.3.1
      */
     @Override
-    public void leavePropagator(String signature) {
+    public void leavePropagator(boolean skipScope) {
         try {
-            if (EngineManager.isDongTaiRunning() && EngineManager.isEngineRunning()) {
-                EngineManager.turnOffDongTai();
-                EngineManager.SCOPE_TRACKER.leavePropagation(PropagatorImpl.isSkipScope(signature));
-                EngineManager.turnOnDongTai();
-            }
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().leavePropagator(skipScope);
         } catch (Exception e) {
-            DongTaiLog.error(e);
+            DongTaiLog.error("leave propagator failed", e);
+        } finally {
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
         }
     }
 
@@ -316,11 +272,11 @@ public class SpyDispatcherImpl implements SpyDispatcher {
      * @since 1.3.1
      */
     @Override
-    public boolean isFirstLevelPropagator(String signature) {
+    public boolean isFirstLevelPropagator() {
         try {
-            return EngineManager.isDongTaiRunning() && EngineManager.isEngineRunning()
-                    && EngineManager.SCOPE_TRACKER.isFirstLevelPropagator();
-        } catch (Exception e) {
+            return ScopeManager.SCOPE_TRACKER.isEnterEntry()
+                    && ScopeManager.SCOPE_TRACKER.getPolicyScope().isValidPropagator();
+        } catch (Exception ignore) {
             return false;
         }
     }
@@ -333,11 +289,12 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public void enterSink() {
         try {
-            if (EngineManager.isDongTaiRunning()) {
-                EngineManager.SCOPE_TRACKER.enterSink();
-            }
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterSink();
         } catch (Exception e) {
-            DongTaiLog.error(e);
+            DongTaiLog.error("enter sink failed", e);
+        } finally {
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
         }
     }
 
@@ -349,24 +306,25 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public void leaveSink() {
         try {
-            if (EngineManager.isDongTaiRunning()) {
-                EngineManager.SCOPE_TRACKER.leaveSink();
-            }
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveSink();
         } catch (Exception e) {
-            DongTaiLog.error(e);
+            DongTaiLog.error("leave sink failed", e);
+        } finally {
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
         }
     }
 
     /**
      * Determines whether it is a layer 1 Sink entry
      *
-     * @return
      * @since 1.3.1
      */
     @Override
     public boolean isFirstLevelSink() {
         try {
-            return EngineManager.isDongTaiRunning() && EngineManager.isEngineRunning() && EngineManager.isTopLevelSink();
+            return ScopeManager.SCOPE_TRACKER.isEnterEntry()
+                    && ScopeManager.SCOPE_TRACKER.getPolicyScope().isValidSink();
         } catch (Exception e) {
             return false;
         }
@@ -384,52 +342,32 @@ public class SpyDispatcherImpl implements SpyDispatcher {
 
     @Override
     public void startGrpcCall() {
-        GrpcHandler.startTrace();
+        // @TODO: refactor
     }
 
     @Override
     public void closeGrpcCall() {
-        GrpcHandler.closeGrpcCall();
+        // @TODO: refactor
     }
 
     @Override
     public void blockingUnaryCall(Object req, Object res) {
-        if (EngineManager.isDongTaiRunning() && EngineManager.isEngineRunning()) {
-            EngineManager.turnOffDongTai();
-            GrpcHandler.blockingUnaryCall(req, res);
-            EngineManager.turnOnDongTai();
-        }
+        // @TODO: refactor
     }
 
     @Override
     public void sendMessage(Object message) {
-        if (EngineManager.isDongTaiRunning() && EngineManager.isEngineRunning()) {
-            EngineManager.turnOffDongTai();
-            GrpcHandler.sendMessage(message);
-            EngineManager.turnOnDongTai();
-        }
+        // @TODO: refactor
     }
 
     @Override
     public void toStringUtf8(Object value) {
-        if (EngineManager.isDongTaiRunning() && EngineManager.isEngineRunning()) {
-            EngineManager.turnOffDongTai();
-            GrpcHandler.toStringUtf8(value);
-            EngineManager.turnOnDongTai();
-        }
+        // @TODO: refactor
     }
 
     @Override
     public void reportService(String category, String type, String host, String port, String handler) {
-        if (EngineManager.isEngineRunning()) {
-            if (EngineManager.isDongTaiRunning()) {
-                EngineManager.turnOffDongTai();
-                ServiceHandler.reportService(category, type, host, port, handler);
-                EngineManager.turnOnDongTai();
-            } else {
-                ServiceHandler.reportService(category, type, host, port, handler);
-            }
-        }
+        // @TODO: refactor
     }
 
     @Override
@@ -444,68 +382,36 @@ public class SpyDispatcherImpl implements SpyDispatcher {
 
     /**
      * mark for enter Source Entry Point
-     *
-     * @param instance       current class install object value, null if static class
-     * @param argumentArray
-     * @param retValue
-     * @param framework
-     * @param className
-     * @param matchClassName
-     * @param methodName
-     * @param methodSign
-     * @param isStatic
-     * @param hookType
-     * @return false if normal else throw a exception
      * @since 1.3.1
      */
     @Override
     public boolean collectMethodPool(Object instance, Object[] argumentArray, Object retValue, String framework,
                                      String className, String matchClassName, String methodName, String methodSign, boolean isStatic,
                                      int hookType) {
-        // hook点降级判断
-        if (EngineManager.isHookPointFallback()) {
-            return false;
-        }
-        // 尝试获取hook限速令牌,耗尽时降级
-        if (!EngineManager.getFallbackManager().getHookRateLimiter().acquire()) {
-            EngineManager.openHookPointFallback(className, methodName, methodSign, hookType);
-            return false;
-        }
-        if (!EngineManager.isDongTaiRunning() && (EngineManager.isEnterEntry(null) || HookType.HTTP.equals(hookType) || HookType.RPC.equals(hookType))) {
-            EngineManager.turnOnDongTai();
-        }
+        try {
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
 
-        if (EngineManager.isDongTaiRunning()) {
-            try {
-                EngineManager.turnOffDongTai();
-
-                if (HookType.SPRINGAPPLICATION.equals(hookType)) {
-                    MethodEvent event = new MethodEvent(0, -1, className, matchClassName, methodName,
-                            methodSign, methodSign, instance, argumentArray, retValue, framework, isStatic, null);
-                    SpringApplicationImpl.getWebApplicationContext(event);
-                } else {
-                    boolean isEntryPointMethod = HookType.HTTP.equals(hookType) || HookType.RPC.equals(hookType);
-                    if (EngineManager.isEnterEntry(null) || isEntryPointMethod) {
-                        MethodEvent event = new MethodEvent(0, -1, className, matchClassName, methodName,
-                                methodSign, methodSign, instance, argumentArray, retValue, framework, isStatic, null);
-                        if (HookType.HTTP.equals(hookType)) {
-                            HttpImpl.solveHttp(event);
-                        } else if (HookType.RPC.equals(hookType)) {
-                            solveRPC(framework, event);
-                        } else if (HookType.PROPAGATOR.equals(hookType)) {
-                            PropagatorImpl.solvePropagator(event, INVOKE_ID_SEQUENCER);
-                        } else if (HookType.SOURCE.equals(hookType)) {
-                            SourceImpl.solveSource(event, INVOKE_ID_SEQUENCER);
-                        } else if (HookType.SINK.equals(hookType)) {
-                            SinkImpl.solveSink(event);
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                DongTaiLog.error("collect method pool failed: " + e.toString(), e);
-            } finally {
-                EngineManager.turnOnDongTai();
+            if (!isCollectAllowed(className, methodName, methodSign, hookType, true)) {
+                return false;
             }
+
+            if (HookType.SPRINGAPPLICATION.equals(hookType)) {
+                MethodEvent event = new MethodEvent(0, -1, className, matchClassName, methodName,
+                        methodSign, methodSign, instance, argumentArray, retValue, framework, isStatic, null);
+                SpringApplicationImpl.getWebApplicationContext(event);
+            } else {
+                MethodEvent event = new MethodEvent(0, -1, className, matchClassName, methodName,
+                        methodSign, methodSign, instance, argumentArray, retValue, framework, isStatic, null);
+                if (HookType.HTTP.equals(hookType)) {
+                    HttpImpl.solveHttp(event);
+                } else if (HookType.RPC.equals(hookType)) {
+                    solveRPC(framework, event);
+                }
+            }
+        } catch (Exception e) {
+            DongTaiLog.error("collect method pool failed: " + e.toString(), e);
+        } finally {
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
         }
         return false;
     }
@@ -514,5 +420,79 @@ public class SpyDispatcherImpl implements SpyDispatcher {
         if ("dubbo".equals(framework)) {
             DubboHandler.solveDubbo(event, SpyDispatcherImpl.INVOKE_ID_SEQUENCER);
         }
+    }
+
+    @Override
+    public boolean collectMethod(Object instance, Object[] parameters, Object retObject, String methodMatcher,
+                                 String className, String matchedClassName, String methodName, String signature,
+                                 boolean isStatic) {
+        try {
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
+            PolicyNode policyNode = getPolicyNode(methodMatcher);
+            if (policyNode == null) {
+                return false;
+            }
+
+            if (!isCollectAllowed(className, methodName, signature, policyNode.getType().getType(), false)) {
+                return false;
+            }
+
+            MethodEvent event = new MethodEvent(0, -1, className, matchedClassName, methodName,
+                    signature, signature, instance, parameters, retObject, "", isStatic, null);
+
+            if ((policyNode instanceof SourceNode) && PolicyNodeType.SOURCE.equals(policyNode.getType())) {
+                SourceImpl.solveSource(event, (SourceNode) policyNode, INVOKE_ID_SEQUENCER);
+                return true;
+            } else if ((policyNode instanceof PropagatorNode) && PolicyNodeType.PROPAGATOR.equals(policyNode.getType())) {
+                PropagatorImpl.solvePropagator(event, (PropagatorNode) policyNode, INVOKE_ID_SEQUENCER);
+                return true;
+            } else if ((policyNode instanceof SinkNode) && PolicyNodeType.SINK.equals(policyNode.getType())) {
+                SinkImpl.solveSink(event, (SinkNode) policyNode);
+                return true;
+            }
+
+            return false;
+        } catch (Throwable e) {
+            DongTaiLog.error("collect method failed", e);
+        } finally {
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
+        }
+        return false;
+    }
+
+    private boolean isCollectAllowed(String className, String methodName, String signature,
+                                     int policyNodeType, boolean isEntry) {
+        if (!isEntry) {
+            if (!ScopeManager.SCOPE_TRACKER.isEnterEntry()) {
+                return false;
+            }
+        }
+
+        // check hook point fallback
+        if (EngineManager.isHookPointFallback()) {
+            return false;
+        }
+
+        // 尝试获取hook限速令牌, 耗尽时降级
+        if (!EngineManager.getFallbackManager().getHookRateLimiter().acquire()) {
+            EngineManager.openHookPointFallback(className, methodName, signature, policyNodeType);
+            return false;
+        }
+
+        return true;
+    }
+
+    private PolicyNode getPolicyNode(String methodMatcher) {
+        AgentEngine agentEngine = AgentEngine.getInstance();
+        PolicyManager policyManager = agentEngine.getPolicyManager();
+        if (policyManager == null) {
+            return null;
+        }
+        Policy policy = policyManager.getPolicy();
+        if (policy == null) {
+            return null;
+        }
+
+        return policy.getPolicyNode(methodMatcher);
     }
 }

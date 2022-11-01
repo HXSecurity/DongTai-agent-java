@@ -2,6 +2,7 @@ package io.dongtai.iast.core.service;
 
 import io.dongtai.iast.common.constants.*;
 import io.dongtai.iast.core.EngineManager;
+import io.dongtai.iast.core.scope.ScopeManager;
 import io.dongtai.iast.core.utils.HttpClientUtils;
 import io.dongtai.log.DongTaiLog;
 import org.json.JSONObject;
@@ -34,12 +35,15 @@ public class AgentQueueReport implements Runnable {
     public void run() {
         if (EngineManager.isEngineRunning()){
             try {
+                ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
                 StringBuilder replayRequestRaw = HttpClientUtils.sendPost(ApiPath.REPORT_UPLOAD, generateHeartBeatMsg());
-                if (EngineManager.isEngineRunning()){
+                if (EngineManager.isEngineRunning()) {
                     ThreadPools.submitReplayTask(replayRequestRaw);
                 }
             } catch (Exception e) {
                 DongTaiLog.debug("send API Queue to {} error, reason: {}", ApiPath.REPORT_UPLOAD, e);
+            } finally {
+                ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
             }
         }
     }

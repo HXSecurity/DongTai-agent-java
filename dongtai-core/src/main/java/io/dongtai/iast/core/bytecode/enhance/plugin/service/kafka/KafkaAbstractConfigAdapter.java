@@ -1,6 +1,6 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.service.kafka;
 
-import io.dongtai.iast.core.bytecode.enhance.IastContext;
+import io.dongtai.iast.core.bytecode.enhance.ClassContext;
 import io.dongtai.iast.core.bytecode.enhance.plugin.AbstractClassVisitor;
 import io.dongtai.log.DongTaiLog;
 import org.objectweb.asm.*;
@@ -8,7 +8,7 @@ import org.objectweb.asm.*;
 public class KafkaAbstractConfigAdapter extends AbstractClassVisitor {
     private String classDesc;
 
-    public KafkaAbstractConfigAdapter(ClassVisitor classVisitor, IastContext context) {
+    public KafkaAbstractConfigAdapter(ClassVisitor classVisitor, ClassContext context) {
         super(classVisitor, context);
     }
 

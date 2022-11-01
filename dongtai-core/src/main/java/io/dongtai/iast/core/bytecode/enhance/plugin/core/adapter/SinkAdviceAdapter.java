@@ -1,6 +1,6 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.core.adapter;
 
-import io.dongtai.iast.core.bytecode.enhance.IastContext;
+import io.dongtai.iast.core.bytecode.enhance.ClassContext;
 import io.dongtai.iast.core.bytecode.enhance.plugin.AbstractAdviceAdapter;
 import io.dongtai.iast.core.handler.hookpoint.controller.HookType;
 import org.objectweb.asm.Label;
@@ -10,7 +10,7 @@ import org.objectweb.asm.MethodVisitor;
  * @author dongzhiyong@huoxian.cn
  */
 public class SinkAdviceAdapter extends AbstractAdviceAdapter {
-    public SinkAdviceAdapter(MethodVisitor mv, int access, String name, String desc, IastContext context,
+    public SinkAdviceAdapter(MethodVisitor mv, int access, String name, String desc, ClassContext context,
                              String framework, String signCode, boolean overpower) {
         super(mv, access, name, desc, context, framework, signCode);
     }
@@ -68,16 +68,6 @@ public class SinkAdviceAdapter extends AbstractAdviceAdapter {
     private void isTopLevelSink() {
         invokeStatic(ASM_TYPE_SPY_HANDLER, SPY_HANDLER$getDispatcher);
         invokeInterface(ASM_TYPE_SPY_DISPATCHER, SPY$isFirstLevelSink);
-    }
-
-    private void isNotRequestReplay() {
-        invokeStatic(ASM_TYPE_SPY_HANDLER, SPY_HANDLER$getDispatcher);
-        invokeInterface(ASM_TYPE_SPY_DISPATCHER, SPY$isNotReplayRequest);
-    }
-
-    private void isRequestReplay() {
-        invokeStatic(ASM_TYPE_SPY_HANDLER, SPY_HANDLER$getDispatcher);
-        invokeInterface(ASM_TYPE_SPY_DISPATCHER, SPY$isReplayRequest);
     }
 
     /**

@@ -1,13 +1,13 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.spring;
 
-import io.dongtai.iast.core.bytecode.enhance.IastContext;
+import io.dongtai.iast.core.bytecode.enhance.ClassContext;
 import io.dongtai.iast.core.bytecode.enhance.plugin.AbstractClassVisitor;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 
 public class SpringApplicationAdapter extends AbstractClassVisitor {
 
-    public SpringApplicationAdapter(ClassVisitor classVisitor, IastContext context) {
+    public SpringApplicationAdapter(ClassVisitor classVisitor, ClassContext context) {
         super(classVisitor, context);
     }
 

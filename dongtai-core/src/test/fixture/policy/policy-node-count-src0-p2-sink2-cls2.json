@@ -20,13 +20,15 @@
       "type": 4,
       "signature": "A1.b1()",
       "source": "P1",
-      "inherit": "false"
+      "inherit": "false",
+      "vul_type": "ssrf"
     },
     {
       "type": 4,
       "signature": "A2.b1()",
       "source": "P1",
-      "inherit": "false"
+      "inherit": "false",
+      "vul_type": "ssrf"
     }
   ]
 }

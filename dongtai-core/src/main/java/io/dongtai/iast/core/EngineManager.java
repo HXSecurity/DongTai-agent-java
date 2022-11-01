@@ -5,6 +5,7 @@ import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.FallbackSwitch;
 import io.dongtai.iast.core.handler.context.ContextManager;
 import io.dongtai.iast.core.handler.hookpoint.IastServer;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
+import io.dongtai.iast.core.scope.ScopeManager;
 import io.dongtai.iast.core.service.ServerAddressReport;
 import io.dongtai.iast.core.service.ServiceFactory;
 import io.dongtai.iast.core.utils.PropertyUtils;
@@ -26,17 +27,11 @@ public class EngineManager {
     private final int agentId;
     private final boolean saveBytecode;
 
-    private static final BooleanThreadLocal ENTER_HTTP_ENTRYPOINT = new BooleanThreadLocal(false);
     public static final RequestContext REQUEST_CONTEXT = new RequestContext();
     public static final IastTrackMap TRACK_MAP = new IastTrackMap();
     public static final IastTaintHashCodes TAINT_HASH_CODES = new IastTaintHashCodes();
     public static final TaintRangesPool TAINT_RANGES_POOL = new TaintRangesPool();
-    public static final IastScopeTracker SCOPE_TRACKER = new IastScopeTracker();
     private static final IastServerPort LOGIN_LOGIC_WEIGHT = new IastServerPort();
-    /**
-     * 标记是否位于 IAST 的代码中，如果该值为 true 表示 iast 在运行中；如果 该值为 false 表示当前位置在iast的代码中，所有iast逻辑都bypass，直接退出
-     */
-    private static final BooleanThreadLocal DONGTAI_STATE = new BooleanThreadLocal(false);
     /**
      * 限制器统一管理器
      */
@@ -44,29 +39,10 @@ public class EngineManager {
 
     public static IastServer SERVER;
 
-    private static boolean logined = false;
     private static final AtomicInteger reqCounts = new AtomicInteger(0);
     public static int enableDongTai = 0;
 
     public static final BooleanThreadLocal ENTER_REPLAY_ENTRYPOINT = new BooleanThreadLocal(false);
-
-    public static void turnOnDongTai() {
-        DONGTAI_STATE.set(true);
-    }
-
-    public static void turnOffDongTai() {
-        DONGTAI_STATE.set(false);
-    }
-
-    /**
-     * Determine whether the current code flow enters the engine processing logic
-     *
-     * @return
-     */
-    public static Boolean isDongTaiRunning() {
-        Boolean status = DONGTAI_STATE.get();
-        return status != null && status;
-    }
 
     /**
      * hook点是否降级
@@ -128,12 +104,11 @@ public class EngineManager {
      */
     public static void cleanThreadState() {
         EngineManager.LOGIN_LOGIC_WEIGHT.remove();
-        EngineManager.ENTER_HTTP_ENTRYPOINT.remove();
         EngineManager.REQUEST_CONTEXT.remove();
         EngineManager.TRACK_MAP.remove();
         EngineManager.TAINT_HASH_CODES.remove();
         EngineManager.TAINT_RANGES_POOL.remove();
-        EngineManager.SCOPE_TRACKER.remove();
+        ScopeManager.SCOPE_TRACKER.remove();
         EngineManager.ENTER_REPLAY_ENTRYPOINT.remove();
         FallbackSwitch.clearHeavyHookFallback();
         EngineManager.getFallbackManager().getHookRateLimiter().remove();
@@ -176,38 +151,6 @@ public class EngineManager {
      */
     public static boolean isEngineRunning() {
         return !FallbackSwitch.isEngineFallback() && EngineManager.enableDongTai == 1;
-    }
-
-    public static boolean getIsLoginLogic() {
-        return LOGIN_LOGIC_WEIGHT.get() != null && LOGIN_LOGIC_WEIGHT.get().equals(2);
-    }
-
-    public static boolean getIsLoginLogicUrl() {
-        return LOGIN_LOGIC_WEIGHT.get() != null && LOGIN_LOGIC_WEIGHT.get().equals(1);
-    }
-
-    public static void setIsLoginLogic() {
-        if (LOGIN_LOGIC_WEIGHT.get() == null) {
-            LOGIN_LOGIC_WEIGHT.set(1);
-        } else {
-            LOGIN_LOGIC_WEIGHT.set(LOGIN_LOGIC_WEIGHT.get() + 1);
-        }
-    }
-
-    public static boolean isLogined() {
-        return logined;
-    }
-
-    public static synchronized void setLogined() {
-        logined = true;
-    }
-
-    public static boolean isTopLevelSink() {
-        return SCOPE_TRACKER.isFirstLevelSink();
-    }
-
-    public static boolean hasTaintValue() {
-        return SCOPE_TRACKER.hasTaintValue();
     }
 
     public boolean isEnableDumpClass() {
@@ -258,10 +201,10 @@ public class EngineManager {
             headers.put("dt-traceid", newTraceId);
             headers.put("dt-spandid", spanId);
         }
-        ENTER_HTTP_ENTRYPOINT.enterEntry();
         REQUEST_CONTEXT.set(requestMeta);
         TRACK_MAP.set(new HashMap<Integer, MethodEvent>(1024));
         TAINT_HASH_CODES.set(new HashSet<Integer>());
+        ScopeManager.SCOPE_TRACKER.getHttpEntryScope().enter();
     }
 
     /**
@@ -283,7 +226,7 @@ public class EngineManager {
                 attachments.put(ContextManager.getHeaderKey(), ContextManager.getSegmentId());
             }
         }
-        if (ENTER_HTTP_ENTRYPOINT.isEnterEntry()) {
+        if (ScopeManager.SCOPE_TRACKER.getHttpEntryScope().in()) {
             return;
         }
 
@@ -321,52 +264,8 @@ public class EngineManager {
         TAINT_HASH_CODES.set(new HashSet<Integer>());
     }
 
-    /**
-     * @return
-     * @since 1.2.0
-     */
-    public static boolean isEnterHttp() {
-        return ENTER_HTTP_ENTRYPOINT.isEnterEntry();
-    }
-
-    /**
-     * @since 1.2.0
-     */
-    public static void leaveDubbo() {
-        SCOPE_TRACKER.leaveDubbo();
-    }
-
-    /**
-     * @since 1.2.0
-     */
-    public static boolean isExitedDubbo() {
-        return SCOPE_TRACKER.isExitedDubbo();
-    }
-
-    /**
-     * @since 1.2.0
-     */
-    public static boolean isFirstLevelDubbo() {
-        return SCOPE_TRACKER.isFirstLevelDubbo();
-    }
-
-    public static void leaveKafka() {
-        SCOPE_TRACKER.leaveKafka();
-    }
-
-    public static boolean isExitedKafka() {
-        return SCOPE_TRACKER.isExitedKafka();
-    }
-
     public static boolean isEnterEntry(String currentFramework) {
-        if (currentFramework != null) {
-            if (currentFramework.equals("DUBBO")) {
-                return EngineManager.isEnterHttp() || SCOPE_TRACKER.get().isFirstLevelGrpc();
-            }
-        }
-        return EngineManager.isEnterHttp()
-                || SCOPE_TRACKER.isFirstLevelDubbo()
-                || SCOPE_TRACKER.get().isFirstLevelGrpc()
-                || !SCOPE_TRACKER.get().isExitedKafka();
+        // @TODO: scope
+        return false;
     }
 }

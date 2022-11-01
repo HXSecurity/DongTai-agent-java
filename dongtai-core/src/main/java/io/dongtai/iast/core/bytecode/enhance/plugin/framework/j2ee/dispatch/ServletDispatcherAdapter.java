@@ -1,12 +1,10 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.framework.j2ee.dispatch;
 
-import io.dongtai.iast.core.bytecode.enhance.IastContext;
+import io.dongtai.iast.core.bytecode.enhance.ClassContext;
 import io.dongtai.iast.core.bytecode.enhance.plugin.AbstractClassVisitor;
 import io.dongtai.iast.core.utils.AsmUtils;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Type;
 import io.dongtai.log.DongTaiLog;
+import org.objectweb.asm.*;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -26,7 +24,7 @@ public class ServletDispatcherAdapter extends AbstractClassVisitor {
     private final boolean isFaces;
     private final boolean isJakarta;
 
-    ServletDispatcherAdapter(ClassVisitor classVisitor, IastContext context) {
+    ServletDispatcherAdapter(ClassVisitor classVisitor, ClassContext context) {
         super(classVisitor, context);
         this.isFaces = " javax.faces.webapp.FacesServlet".substring(1).equals(context.getClassName());
         this.isJakarta = " jakarta.servlet.http.HttpServlet".substring(1).equals(context.getClassName());
@@ -45,8 +43,8 @@ public class ServletDispatcherAdapter extends AbstractClassVisitor {
             mv = new ServletDispatcherAdviceAdapter(mv, access, name, desc, signCode, context, isJakarta);
             setTransformed();
         }
-        if (isTransformed()) {
-            DongTaiLog.trace("rewrite method {}.{} for listener[match={}]", context.getClassName(), name, context.getMatchClassName());
+        if (hasTransformed()) {
+            DongTaiLog.trace("rewrite method {}.{} for listener[match={}]", context.getClassName(), name, context.getMatchedClassName());
         }
 
         return mv;

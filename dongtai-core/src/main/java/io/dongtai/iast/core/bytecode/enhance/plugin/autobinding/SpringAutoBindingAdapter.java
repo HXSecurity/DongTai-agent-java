@@ -1,6 +1,6 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.autobinding;
 
-import io.dongtai.iast.core.bytecode.enhance.IastContext;
+import io.dongtai.iast.core.bytecode.enhance.ClassContext;
 import io.dongtai.iast.core.bytecode.enhance.plugin.AbstractClassVisitor;
 import io.dongtai.iast.core.utils.AsmUtils;
 import io.dongtai.iast.core.utils.ReflectUtils;
@@ -20,7 +20,7 @@ public class SpringAutoBindingAdapter extends AbstractClassVisitor {
     private static Method onbind;
     private static Type classtype;
 
-    public SpringAutoBindingAdapter(ClassVisitor classVisitor, IastContext context) {
+    public SpringAutoBindingAdapter(ClassVisitor classVisitor, ClassContext context) {
         super(classVisitor, context);
     }
 

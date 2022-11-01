@@ -1,43 +1,43 @@
 package io.dongtai.iast.core.handler.hookpoint.vulscan.normal;
 
-import io.dongtai.iast.core.handler.hookpoint.models.IastSinkModel;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
-import io.dongtai.iast.core.utils.Asserts;
+import io.dongtai.iast.core.handler.hookpoint.models.policy.SinkNode;
+import io.dongtai.iast.core.handler.hookpoint.models.policy.TaintPosition;
 import io.dongtai.log.DongTaiLog;
+
+import java.util.Set;
 
 /**
  * @author dongzhiyong@huoxian.cn
  */
 public class CookieFlagsMissingVulScan extends AbstractNormalVulScan {
     @Override
-    public void scan(IastSinkModel sink, MethodEvent event) {
-        int[] taintPos = sink.getPos();
+    public void scan(MethodEvent event, SinkNode sinkNode) {
+        Set<TaintPosition> sources = sinkNode.getSources();
         Object[] arguments = event.argumentArray;
-        Asserts.NOT_NULL("sink.params.position", sink.getPos());
-        Asserts.NOT_NULL("sink.params.value", event.argumentArray);
+        if (!TaintPosition.hasParameter(sources)) {
+            return;
+        }
 
-        for (int pos : taintPos) {
+        for (TaintPosition position : sources) {
             try {
-                Boolean flag = (Boolean) arguments[pos];
+                if (position.isObject() || position.isReturn()) {
+                    continue;
+                }
+                int parameterIndex = position.getParameterIndex();
+                if (parameterIndex >= arguments.length) {
+                    continue;
+                }
+
+                Boolean flag = (Boolean) arguments[parameterIndex];
                 if (flag) {
                     continue;
                 }
-                sendReport(getLatestStack(), sink.getType());
+                sendReport(getLatestStack(), sinkNode.getVulType());
                 break;
             } catch (Exception e) {
-                DongTaiLog.error("io.dongtai.iast.core.handler.hookpoint.vulscan.normal.CookieFlagsMissingVulScan.scan(io.dongtai.iast.core.handler.hookpoint.models.IastSinkModel,io.dongtai.iast.core.handler.hookpoint.models.MethodEvent)",e);
+                DongTaiLog.error("CookieFlagsMissingVulScan scan failed", e);
             }
         }
-    }
-
-    /**
-     * 执行sql语句扫描
-     *
-     * @param sql    待扫描的sql语句
-     * @param params sql语句对应的查询参数
-     */
-    @Override
-    public void scan(String sql, Object[] params) {
-
     }
 }

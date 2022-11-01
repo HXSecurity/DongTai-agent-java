@@ -1,5 +1,6 @@
 package io.dongtai.iast.core.service;
 
+import io.dongtai.iast.core.scope.ScopeManager;
 import io.dongtai.iast.core.utils.HttpClientUtils;
 import io.dongtai.log.DongTaiLog;
 
@@ -31,9 +32,12 @@ public class ReportThread implements Runnable {
     @Override
     public void run() {
         try {
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
             HttpClientUtils.sendPost(uri, report);
         } catch (Exception e) {
             DongTaiLog.error("send report to {} error, report: {}, reason: {}", uri, report, e);
+        } finally {
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
         }
     }
 }

@@ -1,13 +1,15 @@
 package io.dongtai.iast.core.bytecode;
 
 import io.dongtai.iast.core.EngineManager;
+import io.dongtai.iast.core.bytecode.enhance.ClassContext;
 import io.dongtai.iast.core.bytecode.enhance.IastClassDiagram;
-import io.dongtai.iast.core.bytecode.enhance.IastContext;
 import io.dongtai.iast.core.bytecode.enhance.plugin.AbstractClassVisitor;
 import io.dongtai.iast.core.bytecode.enhance.plugin.PluginRegister;
 import io.dongtai.iast.core.bytecode.sca.ScaScanner;
 import io.dongtai.iast.core.handler.hookpoint.SpyDispatcherImpl;
 import io.dongtai.iast.core.handler.hookpoint.models.IastHookRuleModel;
+import io.dongtai.iast.core.handler.hookpoint.models.policy.PolicyManager;
+import io.dongtai.iast.core.scope.ScopeManager;
 import io.dongtai.iast.core.utils.AsmUtils;
 import io.dongtai.iast.core.utils.PropertyUtils;
 import io.dongtai.iast.core.utils.matcher.ConfigMatcher;
@@ -43,6 +45,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
     private final PluginRegister plugins;
     private static IastClassFileTransformer INSTANCE;
     private final IastHookRuleModel hookRuleModel;
+    private final PolicyManager policyManager;
     private final static HashMap<Object, byte[]> transformMap = new HashMap<Object, byte[]>();
 
     /**
@@ -52,14 +55,14 @@ public class IastClassFileTransformer implements ClassFileTransformer {
      * @return ClassFileTransformer object
      * @since 1.3.1
      */
-    public static IastClassFileTransformer getInstance(Instrumentation inst) {
+    public static IastClassFileTransformer getInstance(Instrumentation inst, PolicyManager policyManager) {
         if (null == INSTANCE) {
-            INSTANCE = new IastClassFileTransformer(inst);
+            INSTANCE = new IastClassFileTransformer(inst, policyManager);
         }
         return INSTANCE;
     }
 
-    IastClassFileTransformer(Instrumentation inst) {
+    IastClassFileTransformer(Instrumentation inst, PolicyManager policyManager) {
         this.inst = inst;
         this.isDumpClass = EngineManager.getInstance().isEnableDumpClass();
         this.properties = PropertyUtils.getInstance();
@@ -68,6 +71,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
         this.configMatcher = ConfigMatcher.getInstance();
         this.configMatcher.setInst(inst);
         this.hookRuleModel = IastHookRuleModel.getInstance();
+        this.policyManager = policyManager;
 
         SpyDispatcherHandler.setDispatcher(new SpyDispatcherImpl());
     }
@@ -109,15 +113,17 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                             final Class<?> classBeingRedefined,
                             final ProtectionDomain protectionDomain,
                             final byte[] srcByteCodeArray) {
-        if (internalClassName == null || internalClassName.startsWith("io/dongtai/") || internalClassName.startsWith("com/secnium/iast/") || internalClassName.startsWith("java/lang/iast/") || internalClassName.startsWith("cn/huoxian/iast/")) {
-            return null;
-        }
-        boolean isRunning = EngineManager.isDongTaiRunning();
-        if (isRunning) {
-            EngineManager.turnOffDongTai();
-        }
-
         try {
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
+
+            if (internalClassName == null
+                    || internalClassName.startsWith("io/dongtai/")
+                    || internalClassName.startsWith("com/secnium/iast/")
+                    || internalClassName.startsWith("java/lang/iast/")
+                    || internalClassName.startsWith("cn/huoxian/iast/")) {
+                return null;
+            }
+
             if (loader != null && protectionDomain != null) {
                 final CodeSource codeSource = protectionDomain.getCodeSource();
                 if (codeSource == null) {
@@ -129,33 +135,34 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                 }
             }
 
-            if (null != classBeingRedefined || configMatcher.isHookPoint(internalClassName)) {
+            if (null != classBeingRedefined || configMatcher.canHook(internalClassName)) {
                 byte[] sourceCodeBak = new byte[srcByteCodeArray.length];
                 System.arraycopy(srcByteCodeArray, 0, sourceCodeBak, 0, srcByteCodeArray.length);
                 final ClassReader cr = new ClassReader(sourceCodeBak);
-                final int flags = cr.getAccess();
 
-                final String className = cr.getClassName().replace("/", ".");
-                final String[] interfaces = cr.getInterfaces();
-                final String superName = cr.getSuperName();
-                Set<String> diagram = classDiagram.getDiagram(className);
-                if (diagram == null) {
-                    // todo: 解决 / 与 . 不一致的问题
+                ClassContext classContext = new ClassContext(cr, loader);
+                final String className = classContext.getClassName();
+
+                Set<String> ancestors = classDiagram.getDiagram(className);
+                if (ancestors == null) {
                     classDiagram.setLoader(loader);
-                    classDiagram.saveAncestors(className, superName, interfaces);
-                    diagram = classDiagram.getAncestors(className, superName, interfaces);
+                    classDiagram.saveAncestors(className, classContext.getSuperClassName(), classContext.getInterfaces());
+                    ancestors = classDiagram.getAncestors(className, classContext.getSuperClassName(),
+                            classContext.getInterfaces());
                 }
+                classContext.setAncestors(ancestors);
+
                 final ClassWriter cw = createClassWriter(loader, cr);
-                ClassVisitor cv = plugins.initial(cw, IastContext.build(className, diagram, interfaces, flags, loader == null));
+                ClassVisitor cv = plugins.initial(cw, classContext, policyManager);
 
                 if (cv instanceof AbstractClassVisitor) {
                     cr.accept(cv, ClassReader.EXPAND_FRAMES);
                     AbstractClassVisitor dumpClassVisitor = (AbstractClassVisitor) cv;
                     if (dumpClassVisitor.hasTransformed()) {
-                        if (null == classBeingRedefined){
-                            transformMap.put(className,srcByteCodeArray);
-                        }else {
-                            transformMap.put(classBeingRedefined,srcByteCodeArray);
+                        if (null == classBeingRedefined) {
+                            transformMap.put(className, srcByteCodeArray);
+                        } else {
+                            transformMap.put(classBeingRedefined, srcByteCodeArray);
                         }
                         transformCount++;
                         return dumpClassIfNecessary(cr.getClassName(), cw.toByteArray(), srcByteCodeArray);
@@ -163,14 +170,11 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                 }
                 sourceCodeBak = null;
             }
-        } catch (
-                Throwable throwable) {
-            DongTaiLog.debug(throwable);
+        } catch (Throwable throwable) {
+            DongTaiLog.warn("transform class " + internalClassName + " failed", throwable);
         } finally {
             classDiagram.setLoader(null);
-            if (isRunning) {
-                EngineManager.turnOnDongTai();
-            }
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
         }
 
         return null;
@@ -231,7 +235,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
 
             writeByteArrayToFile(enhancedClass, data);
             writeByteArrayToFile(originalClass, originalData);
-            DongTaiLog.trace("dump class {} to {} success.", className, enhancedClass);
+            DongTaiLog.info("dump class {} to {} success.", className, enhancedClass);
         } catch (IOException e) {
             DongTaiLog.error("dump class {} failed. reason: {}", className, e);
         }
@@ -242,7 +246,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
     /**
      * 找到需要修改字节码的类
      *
-     * @return
+     * @return classes need to retransform
      */
     public Class<?>[] findForRetransform() {
         final Class<?>[] loaded = inst.getAllLoadedClasses();
@@ -254,32 +258,33 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                 continue;
             }
             try {
-                if (configMatcher.isHookClassPoint(clazz)) {
-                    String className = clazz.getName();
-                    Set<String> diagram = classDiagram.getDiagram(className);
-                    if (diagram == null) {
-                        diagram = new HashSet<String>();
-                        Queue<Class<?>> classQueue = new LinkedList<Class<?>>();
+                if (!configMatcher.canHook(clazz)) {
+                    continue;
+                }
+                String className = clazz.getName();
+                Set<String> diagram = classDiagram.getDiagram(className);
+                if (diagram == null) {
+                    diagram = new HashSet<String>();
+                    Queue<Class<?>> classQueue = new LinkedList<Class<?>>();
 
-                        classQueue.add(clazz);
-                        while (classQueue.size() > 0) {
-                            Class<?> currentClazz = classQueue.poll();
-                            diagram.add(currentClazz.getName());
+                    classQueue.add(clazz);
+                    while (classQueue.size() > 0) {
+                        Class<?> currentClazz = classQueue.poll();
+                        diagram.add(currentClazz.getName());
 
-                            Class<?> superClazz = currentClazz.getSuperclass();
-                            if (null != superClazz && superClazz != Object.class) {
-                                classQueue.add(superClazz);
-                            }
-                            Class<?>[] interfaces = currentClazz.getInterfaces();
-                            Collections.addAll(classQueue, interfaces);
+                        Class<?> superClazz = currentClazz.getSuperclass();
+                        if (null != superClazz && superClazz != Object.class) {
+                            classQueue.add(superClazz);
                         }
-                        classDiagram.setDiagram(className, diagram);
+                        Class<?>[] interfaces = currentClazz.getInterfaces();
+                        Collections.addAll(classQueue, interfaces);
                     }
-                    for (String clazzName : diagram) {
-                        if (hookRuleModel.isHookClass(clazzName)) {
-                            enhanceClasses[enhanceClassSize++] = clazz;
-                            break;
-                        }
+                    classDiagram.setDiagram(className, diagram);
+                }
+                for (String clazzName : diagram) {
+                    if (this.policyManager.getPolicy() != null && this.policyManager.getPolicy().isMatchClass(clazzName)) {
+                        enhanceClasses[enhanceClassSize++] = clazz;
+                        break;
                     }
                 }
             } catch (Throwable cause) {

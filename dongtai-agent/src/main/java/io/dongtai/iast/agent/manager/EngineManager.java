@@ -370,17 +370,29 @@ public class EngineManager {
      * @question: 通过 inst.appendToBootstrapClassLoaderSearch() 方法加入的jar包无法直接卸载；
      */
     public synchronized boolean uninstall() {
-        if (null == IAST_CLASS_LOADER) {
-            setRunningStatus(1);
-            setCoreStop(true);
-            return true;
-        }
-
         try {
+            if (null == IAST_CLASS_LOADER) {
+                setRunningStatus(1);
+                setCoreStop(true);
+                return true;
+            }
+
             if (classOfEngine != null) {
                 classOfEngine.getMethod("destroy", String.class, String.class, Instrumentation.class)
                         .invoke(null, launchMode, this.properties.getPropertiesFilePath(), inst);
             }
+
+            // 关闭SandboxClassLoader
+            classOfEngine = null;
+            IAST_CLASS_LOADER.closeIfPossible();
+            IAST_CLASS_LOADER = null;
+            setRunningStatus(1);
+            setCoreStop(true);
+            if (EngineMonitor.getIsUninstallHeart()) {
+                uninstallObject();
+                MonitorDaemonThread.isExit = true;
+            }
+            LogCollector.stopFluent();
         } catch (NoSuchMethodException e) {
             DongTaiLog.error("DongTai engine can not found destroy method", e);
         } catch (IllegalAccessException e) {
@@ -388,18 +400,6 @@ public class EngineManager {
         } catch (InvocationTargetException e) {
             DongTaiLog.error("DongTai engine destroy failed", e);
         }
-
-        // 关闭SandboxClassLoader
-        classOfEngine = null;
-        IAST_CLASS_LOADER.closeIfPossible();
-        IAST_CLASS_LOADER = null;
-        setRunningStatus(1);
-        setCoreStop(true);
-        if (EngineMonitor.getIsUninstallHeart()){
-            uninstallObject();
-            MonitorDaemonThread.isExit = true;
-        }
-        LogCollector.stopFluent();
         return true;
     }
 

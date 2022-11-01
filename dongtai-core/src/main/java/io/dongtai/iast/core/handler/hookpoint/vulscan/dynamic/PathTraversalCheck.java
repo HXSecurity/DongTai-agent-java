@@ -1,8 +1,9 @@
 package io.dongtai.iast.core.handler.hookpoint.vulscan.dynamic;
 
 import io.dongtai.iast.core.EngineManager;
-import io.dongtai.iast.core.handler.hookpoint.models.IastSinkModel;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
+import io.dongtai.iast.core.handler.hookpoint.models.policy.SignatureMethodMatcher;
+import io.dongtai.iast.core.handler.hookpoint.models.policy.SinkNode;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.taintrange.TaintRange;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.taintrange.TaintRanges;
 import io.dongtai.iast.core.utils.TaintPoolUtils;
@@ -30,28 +31,34 @@ public class PathTraversalCheck implements SinkSourceChecker {
             "java.io.File.<init>(java.net.URI)"
     ));
 
+    private String policySignature;
+
     @Override
-    public boolean match(IastSinkModel sink) {
-        return SINK_TYPE.equals(sink.getType()) && (
-                SIGNATURES.contains(sink.getSignature())
-                        || URI_SIGNATURES.contains(sink.getSignature())
-                        || NIO_FS_GET_PATH.equals(sink.getSignature())
+    public boolean match(MethodEvent event, SinkNode sinkNode) {
+        if (sinkNode.getMethodMatcher() instanceof SignatureMethodMatcher) {
+            this.policySignature = ((SignatureMethodMatcher) sinkNode.getMethodMatcher()).getSignature().toString();
+        }
+
+        return SINK_TYPE.equals(sinkNode.getVulType()) && (
+                SIGNATURES.contains(this.policySignature)
+                        || URI_SIGNATURES.contains(this.policySignature)
+                        || NIO_FS_GET_PATH.equals(this.policySignature)
         );
     }
 
     @Override
-    public boolean checkSource(MethodEvent event, IastSinkModel sink) {
-        if (SIGNATURES.contains(sink.getSignature())) {
-            return checkPathArgument(event, sink);
-        } else if (URI_SIGNATURES.contains(sink.getSignature())) {
-            return checkURI(event, sink);
+    public boolean checkSource(MethodEvent event, SinkNode sinkNode) {
+        if (SIGNATURES.contains(this.policySignature)) {
+            return checkPathArgument(event, sinkNode);
+        } else if (URI_SIGNATURES.contains(this.policySignature)) {
+            return checkURI(event, sinkNode);
         }
         return false;
     }
 
-    private boolean checkPathArgument(MethodEvent event, IastSinkModel sink) {
+    private boolean checkPathArgument(MethodEvent event, SinkNode sinkNode) {
         try {
-            if (NIO_FS_GET_PATH.equals(sink.getSignature())) {
+            if (NIO_FS_GET_PATH.equals(this.policySignature)) {
                 if (event.argumentArray.length < 2) {
                     return false;
                 }
@@ -69,7 +76,7 @@ public class PathTraversalCheck implements SinkSourceChecker {
         }
     }
 
-    private boolean checkURI(MethodEvent event, IastSinkModel sink) {
+    private boolean checkURI(MethodEvent event, SinkNode sinkNode) {
         if (event.argumentArray.length == 0 || !(event.argumentArray[0] instanceof URI)) {
             return false;
         }

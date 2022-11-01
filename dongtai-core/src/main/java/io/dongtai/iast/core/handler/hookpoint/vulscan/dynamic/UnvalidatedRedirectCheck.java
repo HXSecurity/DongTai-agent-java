@@ -1,8 +1,9 @@
 package io.dongtai.iast.core.handler.hookpoint.vulscan.dynamic;
 
 import io.dongtai.iast.core.EngineManager;
-import io.dongtai.iast.core.handler.hookpoint.models.IastSinkModel;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
+import io.dongtai.iast.core.handler.hookpoint.models.policy.SignatureMethodMatcher;
+import io.dongtai.iast.core.handler.hookpoint.models.policy.SinkNode;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.taintrange.TaintRange;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.taintrange.TaintRanges;
 import io.dongtai.iast.core.utils.TaintPoolUtils;
@@ -40,35 +41,41 @@ public class UnvalidatedRedirectCheck implements SinkSourceChecker {
             NETTY_ADD_HEADER
     ));
 
+    private String policySignature;
+
     @Override
-    public boolean match(IastSinkModel sink) {
-        return SINK_TYPE.equals(sink.getType()) && (
-                REDIRECT_SIGNATURES.contains(sink.getSignature())
-                        || REDIRECT_URI_SIGNATURES.contains(sink.getSignature())
-                        || HEADER_SIGNATURES.contains(sink.getSignature())
+    public boolean match(MethodEvent event, SinkNode sinkNode) {
+        if (sinkNode.getMethodMatcher() instanceof SignatureMethodMatcher) {
+            this.policySignature = ((SignatureMethodMatcher) sinkNode.getMethodMatcher()).getSignature().toString();
+        }
+
+        return SINK_TYPE.equals(sinkNode.getVulType()) && (
+                REDIRECT_SIGNATURES.contains(this.policySignature)
+                        || REDIRECT_URI_SIGNATURES.contains(this.policySignature)
+                        || HEADER_SIGNATURES.contains(this.policySignature)
         );
     }
 
     @Override
-    public boolean checkSource(MethodEvent event, IastSinkModel sink) {
-        if (REDIRECT_SIGNATURES.contains(sink.getSignature())) {
-            return checkRedirect(event, sink);
-        } else if (REDIRECT_URI_SIGNATURES.contains(sink.getSignature())) {
-            return checkRedirectURI(event, sink);
-        } else if (HEADER_SIGNATURES.contains(sink.getSignature())) {
-            return checkHeader(event, sink);
+    public boolean checkSource(MethodEvent event, SinkNode sinkNode) {
+        if (REDIRECT_SIGNATURES.contains(this.policySignature)) {
+            return checkRedirect(event, sinkNode);
+        } else if (REDIRECT_URI_SIGNATURES.contains(this.policySignature)) {
+            return checkRedirectURI(event, sinkNode);
+        } else if (HEADER_SIGNATURES.contains(this.policySignature)) {
+            return checkHeader(event, sinkNode);
         }
         return false;
     }
 
-    private boolean checkRedirect(MethodEvent event, IastSinkModel sink) {
+    private boolean checkRedirect(MethodEvent event, SinkNode sinkNode) {
         if (event.argumentArray.length == 0) {
             return false;
         }
         return checkValue(event.argumentArray[0], event);
     }
 
-    private boolean checkRedirectURI(MethodEvent event, IastSinkModel sink) {
+    private boolean checkRedirectURI(MethodEvent event, SinkNode sinkNode) {
         if (event.argumentArray.length == 0 || !(event.argumentArray[0] instanceof URI)) {
             return false;
         }
@@ -77,10 +84,10 @@ public class UnvalidatedRedirectCheck implements SinkSourceChecker {
         return checkValue(schema, event);
     }
 
-    private boolean checkHeader(MethodEvent event, IastSinkModel sink) {
+    private boolean checkHeader(MethodEvent event, SinkNode sinkNode) {
         int keyPos = 0;
         int valPos = 1;
-        if (NETTY_ADD_HEADER.equals(sink.getSignature())) {
+        if (NETTY_ADD_HEADER.equals(this.policySignature)) {
             keyPos = 2;
             valPos = 3;
         }

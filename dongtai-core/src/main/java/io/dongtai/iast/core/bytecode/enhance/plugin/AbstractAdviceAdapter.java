@@ -1,14 +1,15 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin;
 
-import io.dongtai.iast.core.bytecode.enhance.IastContext;
+import io.dongtai.iast.core.bytecode.enhance.ClassContext;
+import io.dongtai.iast.core.bytecode.enhance.MethodContext;
 import io.dongtai.iast.core.bytecode.enhance.asm.AsmMethods;
 import io.dongtai.iast.core.bytecode.enhance.asm.AsmTypes;
+import io.dongtai.iast.core.handler.hookpoint.models.policy.PolicyNode;
 import io.dongtai.iast.core.utils.AsmUtils;
-import java.lang.reflect.Modifier;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Type;
+import org.objectweb.asm.*;
 import org.objectweb.asm.commons.AdviceAdapter;
+
+import java.lang.reflect.Modifier;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -19,30 +20,45 @@ public abstract class AbstractAdviceAdapter extends AdviceAdapter implements Asm
     protected int access;
     protected Label tryLabel;
     protected Label catchLabel;
-    protected IastContext context;
+    protected ClassContext classContext;
+    protected MethodContext context;
     protected String type;
     protected String signature;
     protected Type returnType;
     protected boolean hasException;
 
     public AbstractAdviceAdapter(MethodVisitor mv,
-            int access,
-            String name,
-            String desc,
-            IastContext context,
-            String type,
-            String signCode) {
+                                 int access,
+                                 String name,
+                                 String desc,
+                                 ClassContext context,
+                                 String type,
+                                 String signCode) {
         super(AsmUtils.api, mv, access, name, desc);
         this.access = access;
         this.name = name;
         this.desc = desc;
-        this.context = context;
+        this.classContext = context;
 
         this.returnType = Type.getReturnType(desc);
         this.tryLabel = new Label();
         this.catchLabel = new Label();
         this.type = type;
         this.signature = signCode;
+        this.hasException = false;
+    }
+
+    public AbstractAdviceAdapter(MethodVisitor mv, int access, String name, String descriptor, String signature,
+                                 MethodContext context) {
+        super(AsmUtils.api, mv, access, name, descriptor);
+        this.access = access;
+        this.name = name;
+        this.desc = descriptor;
+        this.signature = signature;
+
+        this.context = context;
+
+        this.returnType = Type.getReturnType(descriptor);
         this.hasException = false;
     }
 
@@ -92,15 +108,45 @@ public abstract class AbstractAdviceAdapter extends AdviceAdapter implements Asm
         super.visitMaxs(maxStack, maxLocals);
     }
 
+    public void visitMaxsNew(int maxStack, int maxLocals) {
+        super.visitMaxs(maxStack, maxLocals);
+    }
+
 
     /**
      * 捕获当前方法的状态及数据
      *
      * @param opcode     当前操作码
-     * @param hookValue  hook点数据类型
+     * @param policyNode hook点数据类型
      * @param captureRet 捕获返回值
      */
-    protected void captureMethodState(
+    public void trackMethod(
+            final int opcode,
+            final PolicyNode policyNode,
+            final boolean captureRet
+    ) {
+        newLocal(ASM_TYPE_OBJECT);
+        if (captureRet && !isThrow(opcode)) {
+            loadReturn(opcode);
+        } else {
+            pushNull();
+        }
+        storeLocal(this.nextLocal - 1);
+        invokeStatic(ASM_TYPE_SPY_HANDLER, SPY_HANDLER$getDispatcher);
+        loadThisOrPushNullIfIsStatic();
+        loadArgArray();
+        loadLocal(this.nextLocal - 1);
+        push(policyNode.getMethodMatcher().toString());
+        push(this.context.getClassName());
+        push(this.context.getMatchedClassName());
+        push(this.name);
+        push(this.signature);
+        push(Modifier.isStatic(this.access));
+        invokeInterface(ASM_TYPE_SPY_DISPATCHER, SPY$collectMethod);
+        pop();
+    }
+
+    public void captureMethodState(
             final int opcode,
             final int hookValue,
             final boolean captureRet
@@ -117,8 +163,8 @@ public abstract class AbstractAdviceAdapter extends AdviceAdapter implements Asm
         loadArgArray();
         loadLocal(nextLocal - 1);
         push(type);
-        push(context.getClassName());
-        push(context.getMatchClassName());
+        push(classContext.getClassName());
+        push(classContext.getMatchedClassName());
         push(name);
         push(signature);
         push(Modifier.isStatic(access));

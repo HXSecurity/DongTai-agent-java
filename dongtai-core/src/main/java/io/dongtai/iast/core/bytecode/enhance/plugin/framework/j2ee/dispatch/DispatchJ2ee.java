@@ -1,13 +1,13 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.framework.j2ee.dispatch;
 
-import io.dongtai.iast.core.bytecode.enhance.IastContext;
+import io.dongtai.iast.core.bytecode.enhance.ClassContext;
 import io.dongtai.iast.core.bytecode.enhance.plugin.DispatchPlugin;
+import io.dongtai.iast.core.handler.hookpoint.models.policy.Policy;
+import io.dongtai.log.DongTaiLog;
+import org.objectweb.asm.ClassVisitor;
 
 import java.lang.reflect.Modifier;
 import java.util.Set;
-
-import org.objectweb.asm.ClassVisitor;
-import io.dongtai.log.DongTaiLog;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -22,13 +22,13 @@ public class DispatchJ2ee implements DispatchPlugin {
 
 
     @Override
-    public ClassVisitor dispatch(ClassVisitor classVisitor, IastContext context) {
+    public ClassVisitor dispatch(ClassVisitor classVisitor, ClassContext context, Policy policy) {
         String className = context.getClassName();
-        Set<String> diagram = context.getAncestors();
+        Set<String> ancestors = context.getAncestors();
 
-        if (Modifier.isInterface(context.getFlags())) {
+        if (Modifier.isInterface(context.getModifier())) {
             DongTaiLog.trace("Ignoring interface " + className);
-        } else if (isServletDispatch(className, diagram) || isJakartaServlet(className)) {
+        } else if (isServletDispatch(className, ancestors) || isJakartaServlet(className)) {
             classVisitor = new ServletDispatcherAdapter(classVisitor, context);
         }
         return classVisitor;

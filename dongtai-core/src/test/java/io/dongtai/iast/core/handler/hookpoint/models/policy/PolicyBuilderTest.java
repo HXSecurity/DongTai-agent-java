@@ -63,8 +63,8 @@ public class PolicyBuilderTest {
     @Test
     public void testBuild() throws PolicyException {
         Map<String, List<Integer>> tests = new HashMap<String, List<Integer>>() {{
-            put("policy-node-count-src1-p2-sink1-hc4.json", Arrays.asList(1, 2, 1, 4));
-            put("policy-node-count-src0-p2-sink2-hc2.json", Arrays.asList(0, 2, 2, 2));
+            put("policy-node-count-src1-p3-sink1-cls5.json", Arrays.asList(1, 3, 1, 5));
+            put("policy-node-count-src0-p2-sink2-cls2.json", Arrays.asList(0, 2, 2, 2));
         }};
         for (Map.Entry<String, List<Integer>> entry : tests.entrySet()) {
             JSONArray policyConfig = PolicyBuilder.fetchFromFile(POLICY_DIR + entry.getKey());
@@ -76,7 +76,7 @@ public class PolicyBuilderTest {
             Assert.assertEquals("build sink count " + entry.getKey(), entry.getValue().get(2).intValue(),
                     policy.getSinks().size());
             Assert.assertEquals("build hook class count" + entry.getKey(), entry.getValue().get(3).intValue(),
-                    policy.getHookClasses().size());
+                    policy.getPolicyNodesMap().size());
         }
 
         PolicyException exception;
@@ -102,8 +102,8 @@ public class PolicyBuilderTest {
     public void testBuildSource() {
         PolicyException exception;
         Map<String, String> exceptionTest = new HashMap<String, String>() {{
-            put("policy-source-node-no-target.json", PolicyException.ERR_POLICY_SOURCE_NODE_INVALID);
-            put("policy-source-node-target-invalid.json", PolicyException.ERR_POLICY_SOURCE_NODE_TARGET_INVALID);
+            put("policy-source-node-no-target.json", PolicyException.ERR_POLICY_NODE_TARGET_INVALID);
+            put("policy-source-node-target-invalid.json", PolicyException.ERR_POLICY_NODE_TARGET_INVALID);
         }};
         for (Map.Entry<String, String> entry : exceptionTest.entrySet()) {
             exception = Assert.assertThrows("buildSource exception " + entry.getKey(), PolicyException.class,
@@ -123,16 +123,16 @@ public class PolicyBuilderTest {
     public void testBuildPropagator() {
         PolicyException exception;
         Map<String, String> exceptionTest = new HashMap<String, String>() {{
-            put("policy-node-no-signature.json", PolicyException.ERR_POLICY_NODE_SIGNATURE_NOT_EXISTS);
-            put("policy-node-signature-empty.json", PolicyException.ERR_POLICY_NODE_SIGNATURE_EMPTY);
+            put("policy-node-no-signature.json", PolicyException.ERR_POLICY_NODE_SIGNATURE_INVALID);
+            put("policy-node-signature-empty.json", PolicyException.ERR_POLICY_NODE_SIGNATURE_INVALID);
             put("policy-node-signature-invalid.json", PolicyException.ERR_POLICY_NODE_SIGNATURE_INVALID);
-            put("policy-node-no-inherit.json", PolicyException.ERR_POLICY_PROPAGATOR_NODE_INVALID);
+            put("policy-node-no-inherit.json", PolicyException.ERR_POLICY_NODE_INHERITABLE_INVALID);
             put("policy-node-inherit-empty.json", PolicyException.ERR_POLICY_NODE_INHERITABLE_INVALID);
             put("policy-node-inherit-invalid.json", PolicyException.ERR_POLICY_NODE_INHERITABLE_INVALID);
-            put("policy-propagator-node-no-source.json", PolicyException.ERR_POLICY_PROPAGATOR_NODE_INVALID);
-            put("policy-propagator-node-no-target.json", PolicyException.ERR_POLICY_PROPAGATOR_NODE_INVALID);
-            put("policy-propagator-node-source-invalid.json", PolicyException.ERR_POLICY_PROPAGATOR_NODE_SOURCE_INVALID);
-            put("policy-propagator-node-target-invalid.json", PolicyException.ERR_POLICY_PROPAGATOR_NODE_TARGET_INVALID);
+            put("policy-propagator-node-no-source.json", PolicyException.ERR_POLICY_NODE_SOURCE_INVALID);
+            put("policy-propagator-node-no-target.json", PolicyException.ERR_POLICY_NODE_TARGET_INVALID);
+            put("policy-propagator-node-source-invalid.json", PolicyException.ERR_POLICY_NODE_SOURCE_INVALID);
+            put("policy-propagator-node-target-invalid.json", PolicyException.ERR_POLICY_NODE_TARGET_INVALID);
         }};
         for (Map.Entry<String, String> entry : exceptionTest.entrySet()) {
             exception = Assert.assertThrows("buildPropagator exception " + entry.getKey(), PolicyException.class,
@@ -153,8 +153,10 @@ public class PolicyBuilderTest {
     public void testBuildSink() {
         PolicyException exception;
         Map<String, String> exceptionTest = new HashMap<String, String>() {{
-            put("policy-sink-node-no-source.json", PolicyException.ERR_POLICY_SINK_NODE_INVALID);
-            put("policy-sink-node-source-invalid.json", PolicyException.ERR_POLICY_SINK_NODE_SOURCE_INVALID);
+            put("policy-sink-node-no-source.json", PolicyException.ERR_POLICY_NODE_SOURCE_INVALID);
+            put("policy-sink-node-source-invalid.json", PolicyException.ERR_POLICY_NODE_SOURCE_INVALID);
+            put("policy-sink-node-no-vul-type.json", PolicyException.ERR_POLICY_SINK_NODE_VUL_TYPE_INVALID);
+            put("policy-sink-node-vul-type-invalid.json", PolicyException.ERR_POLICY_SINK_NODE_VUL_TYPE_INVALID);
         }};
         for (Map.Entry<String, String> entry : exceptionTest.entrySet()) {
             exception = Assert.assertThrows("buildSink exception " + entry.getKey(), PolicyException.class,

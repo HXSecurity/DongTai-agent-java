@@ -451,4 +451,9 @@ public class MethodEvent {
         this.outValue = outValue;
         this.outValueString = properties.isLocal() ? obj2String(outValue) : "";
     }
+
+    public void setOutValue(Object outValue, String outValueString) {
+        this.outValue = outValue;
+        this.outValueString = outValueString;
+    }
 }
