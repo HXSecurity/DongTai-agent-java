@@ -1,6 +1,4 @@
-package io.dongtai.iast.core.scope;
-
-import io.dongtai.iast.core.EngineManager;
+package io.dongtai.iast.common.scope;
 
 public class PolicyScope {
     private int agentLevel;
@@ -20,10 +18,6 @@ public class PolicyScope {
     /* renamed from: d */
     public void leaveAgent() {
         this.agentLevel = decrement(this.agentLevel);
-        // clean thread if not in entry
-        if (!ScopeManager.SCOPE_TRACKER.isEnterEntry()) {
-            EngineManager.cleanThreadState();
-        }
     }
 
     public void enterSource() {

@@ -1,4 +1,4 @@
-package io.dongtai.iast.core.scope;
+package io.dongtai.iast.common.scope;
 
 public class ScopeAggregator {
     private final GeneralScope httpRequestScope = new GeneralScope();

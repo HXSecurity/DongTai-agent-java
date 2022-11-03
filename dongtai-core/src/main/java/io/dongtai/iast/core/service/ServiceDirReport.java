@@ -2,7 +2,6 @@ package io.dongtai.iast.core.service;
 
 import io.dongtai.iast.common.constants.*;
 import io.dongtai.iast.core.EngineManager;
-import io.dongtai.iast.core.scope.ScopeManager;
 import io.dongtai.log.DongTaiLog;
 import org.json.JSONObject;
 
@@ -40,13 +39,10 @@ public class ServiceDirReport {
 
     public void send() {
         try {
-            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
             serviceDir = genDirTree(getWebServerPath(), 0, "");
             ThreadPools.sendReport(ApiPath.REPORT_UPLOAD, this.getServereAddressMsg());
         } catch (Exception e) {
             DongTaiLog.error("send ServiceDir to {} error, reason: {}", ApiPath.REPORT_UPLOAD, e);
-        } finally {
-            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
         }
     }
 

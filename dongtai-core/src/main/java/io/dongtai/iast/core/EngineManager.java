@@ -1,11 +1,12 @@
 package io.dongtai.iast.core;
 
+import io.dongtai.iast.common.scope.ScopeManager;
 import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.FallbackManager;
 import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.FallbackSwitch;
 import io.dongtai.iast.core.handler.context.ContextManager;
 import io.dongtai.iast.core.handler.hookpoint.IastServer;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
-import io.dongtai.iast.core.scope.ScopeManager;
+import io.dongtai.iast.core.handler.hookpoint.vulscan.taintrange.TaintRanges;
 import io.dongtai.iast.core.service.ServerAddressReport;
 import io.dongtai.iast.core.service.ServiceFactory;
 import io.dongtai.iast.core.utils.PropertyUtils;
@@ -31,7 +32,6 @@ public class EngineManager {
     public static final IastTrackMap TRACK_MAP = new IastTrackMap();
     public static final IastTaintHashCodes TAINT_HASH_CODES = new IastTaintHashCodes();
     public static final TaintRangesPool TAINT_RANGES_POOL = new TaintRangesPool();
-    private static final IastServerPort LOGIN_LOGIC_WEIGHT = new IastServerPort();
     /**
      * 限制器统一管理器
      */
@@ -103,16 +103,15 @@ public class EngineManager {
      * 清除当前线程的状态，避免线程重用导致的ThreadLocal产生内存泄漏的问题
      */
     public static void cleanThreadState() {
-        EngineManager.LOGIN_LOGIC_WEIGHT.remove();
         EngineManager.REQUEST_CONTEXT.remove();
         EngineManager.TRACK_MAP.remove();
         EngineManager.TAINT_HASH_CODES.remove();
         EngineManager.TAINT_RANGES_POOL.remove();
-        ScopeManager.SCOPE_TRACKER.remove();
         EngineManager.ENTER_REPLAY_ENTRYPOINT.remove();
         FallbackSwitch.clearHeavyHookFallback();
         EngineManager.getFallbackManager().getHookRateLimiter().remove();
         ContextManager.getCONTEXT().remove();
+        ScopeManager.SCOPE_TRACKER.remove();
     }
 
     public static void maintainRequestCount() {
@@ -204,6 +203,7 @@ public class EngineManager {
         REQUEST_CONTEXT.set(requestMeta);
         TRACK_MAP.set(new HashMap<Integer, MethodEvent>(1024));
         TAINT_HASH_CODES.set(new HashSet<Integer>());
+        TAINT_RANGES_POOL.set(new HashMap<Integer, TaintRanges>());
         ScopeManager.SCOPE_TRACKER.getHttpEntryScope().enter();
     }
 

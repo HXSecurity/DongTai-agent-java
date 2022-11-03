@@ -1,8 +1,8 @@
 package io.dongtai.iast.core.handler.hookpoint;
 
 import com.secnium.iast.core.AgentEngine;
+import io.dongtai.iast.common.scope.ScopeManager;
 import io.dongtai.iast.core.EngineManager;
-import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.FallbackSwitch;
 import io.dongtai.iast.core.bytecode.enhance.plugin.spring.SpringApplicationImpl;
 import io.dongtai.iast.core.handler.hookpoint.controller.HookType;
 import io.dongtai.iast.core.handler.hookpoint.controller.impl.*;
@@ -11,9 +11,6 @@ import io.dongtai.iast.core.handler.hookpoint.framework.grpc.GrpcHandler;
 import io.dongtai.iast.core.handler.hookpoint.graphy.GraphBuilder;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.*;
-import io.dongtai.iast.core.scope.ScopeManager;
-import io.dongtai.iast.core.utils.config.RemoteConfigUtils;
-import io.dongtai.iast.core.utils.matcher.ConfigMatcher;
 import io.dongtai.log.DongTaiLog;
 
 import java.lang.dongtai.SpyDispatcher;
@@ -25,7 +22,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class SpyDispatcherImpl implements SpyDispatcher {
 
     public static final AtomicInteger INVOKE_ID_SEQUENCER = new AtomicInteger(1);
-    private static final ThreadLocal<Long> RESPONSE_TIME = new ThreadLocal<Long>();
 
     /**
      * mark for enter Http Entry Point
@@ -34,13 +30,12 @@ public class SpyDispatcherImpl implements SpyDispatcher {
      */
     @Override
     public void enterHttp() {
+        if (!EngineManager.isEngineRunning()) {
+            return;
+        }
         try {
-            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
             ScopeManager.SCOPE_TRACKER.getHttpRequestScope().enter();
-        } catch (Exception e) {
-            DongTaiLog.error("enter http failed", e);
-        } finally {
-            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
+        } catch (Exception ignore) {
         }
     }
 
@@ -52,30 +47,20 @@ public class SpyDispatcherImpl implements SpyDispatcher {
      */
     @Override
     public void leaveHttp(Object request, Object response) {
+        if (!EngineManager.isEngineRunning()) {
+            return;
+        }
         try {
-            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
             ScopeManager.SCOPE_TRACKER.getHttpRequestScope().leave();
             if (!ScopeManager.SCOPE_TRACKER.getHttpRequestScope().in()
                     && ScopeManager.SCOPE_TRACKER.getHttpEntryScope().in()) {
                 EngineManager.maintainRequestCount();
                 GraphBuilder.buildAndReport(request, response);
                 EngineManager.cleanThreadState();
-                long responseTimeEnd = System.currentTimeMillis() - RESPONSE_TIME.get() + 8;
-                DongTaiLog.debug("url {} response time: {} ms", GraphBuilder.getURL(), responseTimeEnd);
-                if (RemoteConfigUtils.enableAutoFallback() && responseTimeEnd > RemoteConfigUtils.getApiResponseTime(null)) {
-                    RemoteConfigUtils.fallbackReqCount++;
-                    DongTaiLog.warn("url {} response time: {} ms, greater than {} ms", GraphBuilder.getURL(), responseTimeEnd, RemoteConfigUtils.getApiResponseTime(null));
-                    if (!"/".equals(GraphBuilder.getURL())) {
-                        ConfigMatcher.getInstance().FALLBACK_URL.add(GraphBuilder.getURI());
-                    }
-                }
             }
         } catch (Exception e) {
             DongTaiLog.error("leave http failed", e);
             EngineManager.cleanThreadState();
-        } finally {
-            FallbackSwitch.clearHeavyHookFallback();
-            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
         }
     }
 
@@ -86,16 +71,14 @@ public class SpyDispatcherImpl implements SpyDispatcher {
      */
     @Override
     public boolean isFirstLevelHttp() {
-        try {
-            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
-            RESPONSE_TIME.set(System.currentTimeMillis());
-            return ScopeManager.SCOPE_TRACKER.getHttpRequestScope().isFirst();
-        } catch (Exception e) {
-            DongTaiLog.error("check first level http failed", e);
-        } finally {
-            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
+        if (!EngineManager.isEngineRunning()) {
+            return false;
         }
-        return false;
+        try {
+            return ScopeManager.SCOPE_TRACKER.getHttpRequestScope().isFirst();
+        } catch (Exception ignore) {
+            return false;
+        }
     }
 
     /**
@@ -107,11 +90,13 @@ public class SpyDispatcherImpl implements SpyDispatcher {
      */
     @Override
     public Object cloneRequest(Object req, boolean isJakarta) {
+        if (!EngineManager.isEngineRunning()) {
+            return req;
+        }
         try {
-            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
             return HttpImpl.cloneRequest(req, isJakarta);
-        } finally {
-            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
+        } catch (Exception ignore) {
+            return req;
         }
     }
 
@@ -121,11 +106,13 @@ public class SpyDispatcherImpl implements SpyDispatcher {
      */
     @Override
     public Object cloneResponse(Object response, boolean isJakarta) {
+        if (!EngineManager.isEngineRunning()) {
+            return response;
+        }
         try {
-            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
             return HttpImpl.cloneResponse(response, isJakarta);
-        } finally {
-            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
+        } catch (Exception ignore) {
+            return response;
         }
     }
 
@@ -189,12 +176,14 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public void enterSource() {
         try {
-            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
+            if (!EngineManager.isEngineRunning()) {
+                return;
+            }
+            if (ScopeManager.SCOPE_TRACKER.inAgent() || !ScopeManager.SCOPE_TRACKER.inEnterEntry()) {
+                return;
+            }
             ScopeManager.SCOPE_TRACKER.getPolicyScope().enterSource();
-        } catch (Exception e) {
-            DongTaiLog.error("enter source failed", e);
-        } finally {
-            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
+        } catch (Exception ignore) {
         }
     }
 
@@ -206,12 +195,14 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public void leaveSource() {
         try {
-            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
+            if (!EngineManager.isEngineRunning()) {
+                return;
+            }
+            if (ScopeManager.SCOPE_TRACKER.inAgent() || !ScopeManager.SCOPE_TRACKER.inEnterEntry()) {
+                return;
+            }
             ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveSource();
-        } catch (Exception e) {
-            DongTaiLog.error("leave source failed", e);
-        } finally {
-            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
+        } catch (Exception ignore) {
         }
     }
 
@@ -224,7 +215,10 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public boolean isFirstLevelSource() {
         try {
-            return ScopeManager.SCOPE_TRACKER.isEnterEntry()
+            if (!EngineManager.isEngineRunning()) {
+                return false;
+            }
+            return ScopeManager.SCOPE_TRACKER.inEnterEntry()
                     && ScopeManager.SCOPE_TRACKER.getPolicyScope().isValidSource();
         } catch (Exception ignore) {
             return false;
@@ -239,12 +233,14 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public void enterPropagator(boolean skipScope) {
         try {
-            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
+            if (!EngineManager.isEngineRunning()) {
+                return;
+            }
+            if (ScopeManager.SCOPE_TRACKER.inAgent() || !ScopeManager.SCOPE_TRACKER.inEnterEntry()) {
+                return;
+            }
             ScopeManager.SCOPE_TRACKER.getPolicyScope().enterPropagator(skipScope);
-        } catch (Exception e) {
-            DongTaiLog.error("enter propagator failed", e);
-        } finally {
-            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
+        } catch (Exception ignore) {
         }
     }
 
@@ -256,12 +252,14 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public void leavePropagator(boolean skipScope) {
         try {
-            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
+            if (!EngineManager.isEngineRunning()) {
+                return;
+            }
+            if (ScopeManager.SCOPE_TRACKER.inAgent() || !ScopeManager.SCOPE_TRACKER.inEnterEntry()) {
+                return;
+            }
             ScopeManager.SCOPE_TRACKER.getPolicyScope().leavePropagator(skipScope);
-        } catch (Exception e) {
-            DongTaiLog.error("leave propagator failed", e);
-        } finally {
-            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
+        } catch (Exception ignore) {
         }
     }
 
@@ -274,7 +272,10 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public boolean isFirstLevelPropagator() {
         try {
-            return ScopeManager.SCOPE_TRACKER.isEnterEntry()
+            if (!EngineManager.isEngineRunning()) {
+                return false;
+            }
+            return ScopeManager.SCOPE_TRACKER.inEnterEntry()
                     && ScopeManager.SCOPE_TRACKER.getPolicyScope().isValidPropagator();
         } catch (Exception ignore) {
             return false;
@@ -289,12 +290,14 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public void enterSink() {
         try {
-            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
+            if (!EngineManager.isEngineRunning()) {
+                return;
+            }
+            if (ScopeManager.SCOPE_TRACKER.inAgent() || !ScopeManager.SCOPE_TRACKER.inEnterEntry()) {
+                return;
+            }
             ScopeManager.SCOPE_TRACKER.getPolicyScope().enterSink();
-        } catch (Exception e) {
-            DongTaiLog.error("enter sink failed", e);
-        } finally {
-            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
+        } catch (Exception ignore) {
         }
     }
 
@@ -306,12 +309,14 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public void leaveSink() {
         try {
-            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
+            if (!EngineManager.isEngineRunning()) {
+                return;
+            }
+            if (ScopeManager.SCOPE_TRACKER.inAgent() || !ScopeManager.SCOPE_TRACKER.inEnterEntry()) {
+                return;
+            }
             ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveSink();
-        } catch (Exception e) {
-            DongTaiLog.error("leave sink failed", e);
-        } finally {
-            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
+        } catch (Exception ignore) {
         }
     }
 
@@ -323,9 +328,12 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public boolean isFirstLevelSink() {
         try {
-            return ScopeManager.SCOPE_TRACKER.isEnterEntry()
+            if (!EngineManager.isEngineRunning()) {
+                return false;
+            }
+            return ScopeManager.SCOPE_TRACKER.inEnterEntry()
                     && ScopeManager.SCOPE_TRACKER.getPolicyScope().isValidSink();
-        } catch (Exception e) {
+        } catch (Exception ignore) {
             return false;
         }
     }
@@ -396,9 +404,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
             }
 
             if (HookType.SPRINGAPPLICATION.equals(hookType)) {
-                MethodEvent event = new MethodEvent(0, -1, className, matchClassName, methodName,
-                        methodSign, methodSign, instance, argumentArray, retValue, framework, isStatic, null);
-                SpringApplicationImpl.getWebApplicationContext(event);
+                SpringApplicationImpl.getWebApplicationContext(retValue);
             } else {
                 MethodEvent event = new MethodEvent(0, -1, className, matchClassName, methodName,
                         methodSign, methodSign, instance, argumentArray, retValue, framework, isStatic, null);
@@ -461,9 +467,9 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     }
 
     private boolean isCollectAllowed(String className, String methodName, String signature,
-                                     int policyNodeType, boolean isEntry) {
-        if (!isEntry) {
-            if (!ScopeManager.SCOPE_TRACKER.isEnterEntry()) {
+                                     int policyNodeType, boolean isEnterEntry) {
+        if (!isEnterEntry) {
+            if (!ScopeManager.SCOPE_TRACKER.inEnterEntry()) {
                 return false;
             }
         }

@@ -2,7 +2,6 @@ package io.dongtai.iast.core.service;
 
 import io.dongtai.iast.common.constants.*;
 import io.dongtai.iast.core.EngineManager;
-import io.dongtai.iast.core.scope.ScopeManager;
 import io.dongtai.log.DongTaiLog;
 import org.json.JSONObject;
 
@@ -25,18 +24,12 @@ public class ErrorLogReport {
     }
 
     public static void sendErrorLog(Throwable t) {
-        try {
-            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
-            DongTaiLog.error(t);
-            if (ENABLE_UPLOAD) {
-                StringWriter sw = new StringWriter();
-                PrintWriter pw = new PrintWriter(sw);
-                DongTaiLog.error(sw.toString());
-                sendErrorLog(sw.toString());
-            }
-        } catch (Exception ignore) {
-        } finally {
-            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
+        DongTaiLog.error(t);
+        if (ENABLE_UPLOAD) {
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            DongTaiLog.error(sw.toString());
+            sendErrorLog(sw.toString());
         }
     }
 

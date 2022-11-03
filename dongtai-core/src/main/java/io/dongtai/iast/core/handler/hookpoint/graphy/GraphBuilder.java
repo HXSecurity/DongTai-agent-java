@@ -1,6 +1,7 @@
 package io.dongtai.iast.core.handler.hookpoint.graphy;
 
 import io.dongtai.iast.common.constants.*;
+import io.dongtai.iast.common.scope.ScopeManager;
 import io.dongtai.iast.common.utils.base64.Base64Encoder;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.bytecode.enhance.IastClassDiagram;
@@ -24,9 +25,16 @@ public class GraphBuilder {
     private static String URI;
 
     public static void buildAndReport(Object request, Object response) {
-        List<GraphNode> nodeList = build();
-        String report = convertToReport(nodeList, request, response);
-        ThreadPools.sendPriorityReport(ApiPath.REPORT_UPLOAD, report);
+        try {
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
+            List<GraphNode> nodeList = build();
+            String report = convertToReport(nodeList, request, response);
+            ThreadPools.sendPriorityReport(ApiPath.REPORT_UPLOAD, report);
+        } catch (Exception e) {
+            DongTaiLog.error("report request failed", e);
+        } finally {
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
+        }
     }
 
     /**

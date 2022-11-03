@@ -7,7 +7,6 @@ import io.dongtai.iast.core.handler.hookpoint.models.policy.PolicyManager;
 import io.dongtai.iast.core.init.IEngine;
 import io.dongtai.iast.core.init.impl.ConfigEngine;
 import io.dongtai.iast.core.init.impl.TransformEngine;
-import io.dongtai.iast.core.scope.ScopeManager;
 import io.dongtai.iast.core.service.*;
 import io.dongtai.iast.core.utils.PropertyUtils;
 import io.dongtai.log.DongTaiLog;
@@ -51,7 +50,6 @@ public class AgentEngine {
     public static void install(String mode, String propertiesFilePath, Integer agentId, Instrumentation inst,
                                String agentFile) {
         try {
-            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
             if ("true".equals(System.getProperty("DongTai.IAST.Status"))) {
                 DongTaiLog.info("DongTai IAST has Installed.");
                 return;
@@ -79,40 +77,24 @@ public class AgentEngine {
             new ServiceDirReport().send();
         } catch (Exception e) {
             DongTaiLog.error("engine install failed", e);
-        } finally {
-            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
         }
     }
 
     public static void start() {
-        try {
-            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
-            DongTaiLog.info("Turn on the engine");
-            EngineManager.turnOnEngine();
-            DongTaiLog.debug("Engine opened successfully");
-        } catch (Exception e) {
-            DongTaiLog.error("engine start failed", e);
-        } finally {
-            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
-        }
+        DongTaiLog.info("Turn on the engine");
+        EngineManager.turnOnEngine();
+        DongTaiLog.debug("Engine opened successfully");
     }
 
     public static void stop() {
-        try {
-            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
-            DongTaiLog.info("Turn off the engine");
-            EngineManager.turnOffEngine();
-            DongTaiLog.info("Engine shut down successfully");
-        } catch (Exception e) {
-            DongTaiLog.error("engine stop failed", e);
-        } finally {
-            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
-        }
+        DongTaiLog.info("Turn off the engine");
+        EngineManager.turnOffEngine();
+        DongTaiLog.info("Engine shut down successfully");
     }
 
     public static void destroy(String mode, String propertiesFilePath, Instrumentation inst) {
         try {
-            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
+            EngineManager.turnOffEngine();
             DongTaiLog.info("Uninstall engine");
             AgentEngine agentEngine = AgentEngine.getInstance();
             assert agentEngine != null;
@@ -122,10 +104,9 @@ public class AgentEngine {
             SpyDispatcherHandler.destroy();
             System.clearProperty("DongTai.IAST.Status");
             DongTaiLog.info("Engine uninstallation succeeded");
+            EngineManager.cleanThreadState();
         } catch (Exception e) {
             DongTaiLog.error("engine destroy failed", e);
-        } finally {
-            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
         }
     }
 

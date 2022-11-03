@@ -3,7 +3,6 @@ package io.dongtai.iast.core.bytecode.enhance.plugin.spring;
 import io.dongtai.iast.core.handler.hookpoint.IastClassLoader;
 import io.dongtai.iast.core.handler.hookpoint.api.GetApiThread;
 import io.dongtai.iast.core.handler.hookpoint.controller.impl.HttpImpl;
-import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.log.DongTaiLog;
 
 import java.lang.reflect.Method;
@@ -17,19 +16,17 @@ public class SpringApplicationImpl {
     public static Method getAPI;
     public static boolean isSend;
 
-    public static void getWebApplicationContext(MethodEvent event) {
-        if (!isSend) {
-            SpringApplicationImpl.isSend = true;
-            Object applicationContext = event.returnValue;
-            createClassLoader();
+    public static void getWebApplicationContext(Object applicationContext) {
+        if (!isSend && getClassLoader() != null) {
             loadApplicationContext();
             GetApiThread getApiThread = new GetApiThread(applicationContext);
             getApiThread.start();
         }
     }
 
-    private static void createClassLoader() {
+    private static IastClassLoader getClassLoader() {
         iastClassLoader = HttpImpl.getClassLoader();
+        return iastClassLoader;
     }
 
     private static void loadApplicationContext() {
@@ -39,10 +36,9 @@ public class SpringApplicationImpl {
                 proxyClass = iastClassLoader.loadClass("cn.huoxian.iast.spring.SpringApplicationContext");
                 getAPI = proxyClass.getDeclaredMethod("getAPI", Object.class);
             } catch (NoSuchMethodException e) {
-                DongTaiLog.error("io.dongtai.iast.core.bytecode.enhance.plugin.spring.SpringApplicationImpl.loadApplicationContext()",e);
-            }finally {
+                DongTaiLog.error("SpringApplicationImpl.loadApplicationContext failed", e);
+            } finally {
                 iastClassLoader = null;
-                getAPI = null;
             }
         }
     }

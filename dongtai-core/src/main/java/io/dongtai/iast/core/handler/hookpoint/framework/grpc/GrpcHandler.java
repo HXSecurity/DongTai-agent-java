@@ -7,7 +7,6 @@ import io.dongtai.iast.core.handler.hookpoint.SpyDispatcherImpl;
 import io.dongtai.iast.core.handler.hookpoint.controller.impl.SourceImpl;
 import io.dongtai.iast.core.handler.hookpoint.graphy.GraphBuilder;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
-import io.dongtai.iast.core.scope.ScopeManager;
 import io.dongtai.iast.core.service.ErrorLogReport;
 import io.dongtai.iast.core.utils.*;
 import io.dongtai.log.DongTaiLog;
@@ -139,7 +138,6 @@ public class GrpcHandler {
      */
     public static void closeGrpcCall() {
         try {
-            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
             if (EngineManager.isEnterEntry(null)) {
                 // @TODO: scope leave grpc
                 EngineManager.maintainRequestCount();
@@ -149,8 +147,6 @@ public class GrpcHandler {
         } catch (Exception e) {
             ErrorLogReport.sendErrorLog(e);
             EngineManager.cleanThreadState();
-        } finally {
-            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
         }
     }
 

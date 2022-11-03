@@ -1,4 +1,4 @@
-package io.dongtai.iast.core.scope;
+package io.dongtai.iast.common.scope;
 
 public class ScopeTracker extends ThreadLocal<ScopeAggregator> {
     @Override
@@ -14,11 +14,15 @@ public class ScopeTracker extends ThreadLocal<ScopeAggregator> {
         return this.get().getHttpEntryScope();
     }
 
-    public boolean isEnterEntry() {
+    public boolean inEnterEntry() {
         return this.get().getHttpEntryScope().in();
     }
 
     public PolicyScope getPolicyScope() {
         return this.get().getPolicyScope();
+    }
+
+    public boolean inAgent() {
+        return this.get().getPolicyScope().inAgent();
     }
 }

@@ -1,5 +1,6 @@
 package io.dongtai.iast.core.bytecode;
 
+import io.dongtai.iast.common.scope.ScopeManager;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.bytecode.enhance.ClassContext;
 import io.dongtai.iast.core.bytecode.enhance.IastClassDiagram;
@@ -9,7 +10,6 @@ import io.dongtai.iast.core.bytecode.sca.ScaScanner;
 import io.dongtai.iast.core.handler.hookpoint.SpyDispatcherImpl;
 import io.dongtai.iast.core.handler.hookpoint.models.IastHookRuleModel;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.PolicyManager;
-import io.dongtai.iast.core.scope.ScopeManager;
 import io.dongtai.iast.core.utils.AsmUtils;
 import io.dongtai.iast.core.utils.PropertyUtils;
 import io.dongtai.iast.core.utils.matcher.ConfigMatcher;
