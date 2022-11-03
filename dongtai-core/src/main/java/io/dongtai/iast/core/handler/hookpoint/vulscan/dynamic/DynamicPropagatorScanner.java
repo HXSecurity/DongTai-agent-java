@@ -105,7 +105,7 @@ public class DynamicPropagatorScanner implements IVulScan {
             } else if (position.isParameter()) {
                 int parameterIndex = position.getParameterIndex();
                 if (parameterIndex >= event.argumentArray.length
-                        || TaintPoolUtils.poolContains(event.argumentArray[parameterIndex], event)) {
+                        || !TaintPoolUtils.poolContains(event.argumentArray[parameterIndex], event)) {
                     continue;
                 }
                 inValues.add(event.argumentArray[parameterIndex]);
