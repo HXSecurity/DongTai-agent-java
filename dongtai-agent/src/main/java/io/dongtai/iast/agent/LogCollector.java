@@ -12,6 +12,7 @@ public class LogCollector {
     private static String FLUENT_FILE;
     private static String FLUENT_FILE_CONF;
     private static Process fluent;
+    private static Thread shutdownHook;
 
     public static void extractFluent() {
         if (IastProperties.getInstance().getLogDisableCollector()) {
@@ -48,11 +49,12 @@ public class LogCollector {
         try {
             fluent = Runtime.getRuntime().exec(execution);
             DongTaiLog.info("fluent process started");
-            Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+            shutdownHook = new Thread(new Runnable() {
                 public void run() {
                     stopFluent();
                 }
-            }));
+            });
+            Runtime.getRuntime().addShutdownHook(shutdownHook);
         } catch (IOException e) {
             DongTaiLog.error("fluent process start failed", e);
         }
@@ -64,10 +66,14 @@ public class LogCollector {
         }
         try {
             fluent.destroy();
+            if (shutdownHook != null) {
+                Runtime.getRuntime().removeShutdownHook(shutdownHook);
+            }
             DongTaiLog.info("fluent process stopped");
         } catch (Exception ignored) {
         } finally {
             fluent = null;
+            shutdownHook = null;
         }
     }
 }
