@@ -11,11 +11,10 @@ import java.util.regex.Matcher;
  * @author niuerzhuang@huoxian.cn
  */
 public class DongTaiLog {
-
     public static boolean enablePrintLog;
-    static String filePath;
+    private static final String logDir;
+    private static String logPath = "";
     public static boolean enableColor;
-    static boolean isCreateLog = false;
     public static LogLevel LEVEL = getCurrentLevel();
 
     private static final String RESET = "\033[0m";
@@ -33,22 +32,38 @@ public class DongTaiLog {
         }
 
         enablePrintLog = !"false".equalsIgnoreCase(IastProperties.enablePrintLog());
-        filePath = IastProperties.getLogPath();
-        if (enablePrintLog && !isCreateLog && !filePath.isEmpty()) {
-            File f = new File(filePath);
+        logDir = IastProperties.getLogDir();
+    }
+
+    public static void init(int id) {
+        if (!enablePrintLog || logDir.isEmpty()) {
+            return;
+        }
+
+        try {
+            File f = new File(logDir);
             if (!f.exists()) {
                 f.mkdirs();
             }
-            File file = new File(filePath, File.separator + "dongtai_javaagent.log");
-            if (!file.exists()) {
-                try {
-                    file.createNewFile();
-                } catch (IOException ignore) {
-                } finally {
-                    isCreateLog = true;
-                }
-            }
+        } catch (Exception e) {
+            System.out.println("init log dir " + logDir + "failed: " + e.getMessage());
+            return;
         }
+
+        String path = logDir + File.separator + "dongtai_javaagent-" + String.valueOf(id) + ".log";
+        try {
+            File file = new File(path);
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+            logPath = path;
+        } catch (Exception e) {
+            System.out.println("init log file " + logPath + "failed: " + e.getMessage());
+        }
+    }
+
+    public static String getLogPath() {
+        return logPath;
     }
 
     public enum LogLevel {
@@ -253,11 +268,11 @@ public class DongTaiLog {
     }
 
     private static void writeLogToFile(String msg, Throwable t) {
-        if (filePath.isEmpty()) {
+        if (logPath.isEmpty()) {
             return;
         }
         FileOutputStream o = null;
-        File file = new File(filePath + File.separator + "dongtai_javaagent.log");
+        File file = new File(logPath);
         try {
             if (t != null) {
                 StringWriter stringWriter = new StringWriter();

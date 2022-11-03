@@ -58,7 +58,7 @@ public class FileUtils {
                     temp = temp.replace("${AGENT_ID}", AgentRegisterReport.getAgentFlag().toString());
                 } else if (temp.contains("${OPENAPI}")) {
                     String logAddress = IastProperties.getInstance().getLogAddress();
-                    if (null == logAddress) {
+                    if (null == logAddress || logAddress.isEmpty()) {
                         String s = IastProperties.getInstance().getBaseUrl();
                         try {
                             String openApiDomain = new URI(s).getHost();
@@ -75,7 +75,7 @@ public class FileUtils {
                     }
                 } else if (temp.contains("${LOG_PORT}")) {
                     String logPort = IastProperties.getInstance().getLogPort();
-                    if (null == logPort) {
+                    if (null == logPort || logPort.isEmpty()) {
                         String s = IastProperties.getInstance().getBaseUrl();
                         try {
                             int openApiPort = new URI(s).getPort();
@@ -93,8 +93,7 @@ public class FileUtils {
                         temp = temp.replace("${LOG_PORT}", logPort);
                     }
                 } else if (temp.contains("${LOG_PATH}")) {
-                    temp = temp.replace("${LOG_PATH}", IastProperties.getInstance().getTmpDir()
-                            + File.separator + "logs" + File.separator + "dongtai_javaagent.log");
+                    temp = temp.replace("${LOG_PATH}", DongTaiLog.getLogPath());
                 }
                 buf = buf.append(temp);
                 buf = buf.append(System.getProperty("line.separator"));

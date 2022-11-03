@@ -49,7 +49,7 @@ public class AgentLauncher {
             IastProperties.getInstance();
             install(inst);
         } catch (Exception e) {
-            System.out.println("agent premain failed: " + e.toString());
+            System.out.println("[io.dongtai.iast.agent] agent premain failed: " + e.toString());
         }
     }
 
@@ -69,10 +69,10 @@ public class AgentLauncher {
             }
 
             IastProperties.getInstance();
-            DongTaiLog.info("Protect By DongTai IAST: " + System.getProperty("protect.by.dongtai", "false"));
+            System.out.println("[io.dongtai.iast.agent] Protect By DongTai IAST: " + System.getProperty("protect.by.dongtai", "false"));
             if ("uninstall".equals(argsMap.get("mode"))) {
                 if (System.getProperty("protect.by.dongtai", null) == null) {
-                    DongTaiLog.info("DongTai wasn't installed.");
+                    System.out.println("[io.dongtai.iast.agent] DongTai wasn't installed.");
                     return;
                 }
                 EngineMonitor.setIsUninstallHeart(true);
@@ -96,7 +96,7 @@ public class AgentLauncher {
                 install(inst);
             }
         } catch (Exception e) {
-            System.out.println("agent agentmain failed: " + e.toString());
+            System.out.println("[io.dongtai.iast.agent] agent agentmain failed: " + e.toString());
         }
     }
 
@@ -118,6 +118,7 @@ public class AgentLauncher {
     private static void install(final Instrumentation inst) {
         Boolean send = AgentRegisterReport.send();
         if (send) {
+            DongTaiLog.init(AgentRegisterReport.getAgentFlag());
             LogCollector.extractFluent();
             DongTaiLog.info("Agent registered successfully.");
             Boolean agentStat = AgentRegisterReport.agentStat();

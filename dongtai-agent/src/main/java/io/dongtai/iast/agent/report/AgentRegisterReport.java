@@ -214,10 +214,10 @@ public class AgentRegisterReport {
     public void register(){
         try {
             if (server == null) {
-                DongTaiLog.warn("Can't Recognize Web Service");
+                System.out.println("[io.dongtai.iast.agent] Can't Recognize Web Service");
                 return;
             } else {
-                DongTaiLog.debug("DongTai will install for {} Service", server.getName());
+                System.out.println("[io.dongtai.iast.agent] DongTai will install for " + server.getName() + " Service");
             }
             String msg = generateAgentRegisterMsg();
             StringBuilder responseRaw = HttpClientUtils.sendPost(ApiPath.AGENT_REGISTER, msg);
