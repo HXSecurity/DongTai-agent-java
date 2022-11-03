@@ -1,5 +1,6 @@
 package io.dongtai.iast.agent;
 
+import io.dongtai.iast.agent.report.AgentRegisterReport;
 import io.dongtai.iast.agent.util.FileUtils;
 import io.dongtai.log.DongTaiLog;
 
@@ -15,7 +16,7 @@ public class LogCollector {
     private static Thread shutdownHook;
 
     public static void extractFluent() {
-        if (IastProperties.getInstance().getLogDisableCollector()) {
+        if (IastProperties.getInstance().getLogDisableCollector() || DongTaiLog.getLogPath().isEmpty()) {
             return;
         }
         try {
@@ -23,7 +24,8 @@ public class LogCollector {
                 FLUENT_FILE = IastProperties.getInstance().getTmpDir() + "fluent";
                 FileUtils.getResourceToFile("bin/fluent", FLUENT_FILE);
 
-                FLUENT_FILE_CONF = IastProperties.getInstance().getTmpDir() + "fluent.conf";
+                String agentId = String.valueOf(AgentRegisterReport.getAgentFlag());
+                FLUENT_FILE_CONF = IastProperties.getInstance().getTmpDir() + "fluent-" + agentId + ".conf";
                 FileUtils.getResourceToFile("bin/fluent.conf", FLUENT_FILE_CONF);
                 FileUtils.confReplace(FLUENT_FILE_CONF);
                 if (!(new File(FLUENT_FILE)).setExecutable(true)) {
@@ -37,9 +39,6 @@ public class LogCollector {
     }
 
     public static void doFluent() {
-        if (IastProperties.getInstance().getLogDisableCollector()) {
-            return;
-        }
         String[] execution = {
                 "nohup",
                 FLUENT_FILE,

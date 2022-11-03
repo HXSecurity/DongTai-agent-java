@@ -27,27 +27,27 @@ public class IastPropertiesTest {
     private void clear() {
         System.clearProperty("java.io.tmpdir.dongtai");
         System.clearProperty("dongtai.log.path");
-        IastProperties.setLogPath(null);
+        IastProperties.setLogDir(null);
     }
 
     @Test
     public void getLogPathTest() {
         String path;
-        path = IastProperties.getLogPath();
+        path = IastProperties.getLogDir();
         Assert.assertEquals("", path);
 
         System.setProperty("java.io.tmpdir.dongtai", File.separator + "foo");
-        path = IastProperties.getLogPath();
+        path = IastProperties.getLogDir();
         Assert.assertEquals(File.separator + "foo" + File.separator + "logs", path);
 
         clear();
         System.setProperty("java.io.tmpdir.dongtai", File.separator + "foo" + File.separator);
-        path = IastProperties.getLogPath();
+        path = IastProperties.getLogDir();
         Assert.assertEquals(File.separator + "foo" + File.separator + "logs", path);
 
         clear();
         System.setProperty("dongtai.log.path", File.separator + "foo" + File.separator);
-        path = IastProperties.getLogPath();
+        path = IastProperties.getLogDir();
         Assert.assertEquals(File.separator + "foo", path);
     }
 }

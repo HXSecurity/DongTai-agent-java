@@ -8,7 +8,7 @@ import java.io.File;
 public class IastProperties {
 
     private static String dongtaiLog;
-    private static String dongtaiLogPath;
+    private static String dongtaiLogDir;
     private static String dongtaiLogLevel;
 
     public static String enablePrintLog() {
@@ -18,15 +18,15 @@ public class IastProperties {
         return dongtaiLog;
     }
 
-    public static String getLogPath() {
-        if (dongtaiLogPath == null || dongtaiLogPath.isEmpty()) {
+    public static String getLogDir() {
+        if (dongtaiLogDir == null || dongtaiLogDir.isEmpty()) {
             String path = System.getProperty("dongtai.log.path");
             if (path != null && path.endsWith(File.separator)) {
                 path = path.substring(0, path.length() - 1);
             }
             if (path != null && !path.isEmpty()) {
-                dongtaiLogPath = path;
-                return dongtaiLogPath;
+                dongtaiLogDir = path;
+                return dongtaiLogDir;
             }
 
             String tmpDir = System.getProperty("java.io.tmpdir.dongtai");
@@ -36,13 +36,13 @@ public class IastProperties {
             if (null == tmpDir || tmpDir.isEmpty()) {
                 return "";
             }
-            dongtaiLogPath = tmpDir + File.separator + "logs";
+            dongtaiLogDir = tmpDir + File.separator + "logs";
         }
-        return dongtaiLogPath;
+        return dongtaiLogDir;
     }
 
-    public static void setLogPath(String path) {
-        dongtaiLogPath = path;
+    public static void setLogDir(String path) {
+        dongtaiLogDir = path;
     }
 
     public static String getLogLevel() {

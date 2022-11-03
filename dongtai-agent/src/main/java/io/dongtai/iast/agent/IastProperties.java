@@ -3,7 +3,6 @@ package io.dongtai.iast.agent;
 import io.dongtai.iast.agent.util.FileUtils;
 import io.dongtai.iast.common.constants.AgentConstant;
 import io.dongtai.iast.common.constants.PropertyConstant;
-import io.dongtai.log.DongTaiLog;
 
 import java.io.*;
 import java.util.*;
@@ -72,7 +71,7 @@ public class IastProperties {
         try {
             init();
         } catch (ClassNotFoundException e) {
-            DongTaiLog.error("IastProperties initialization failed", e);
+            System.out.println("IastProperties initialization failed: " + e.getMessage());
         }
     }
 
@@ -106,9 +105,9 @@ public class IastProperties {
             InputStream is = IastProperties.class.getClassLoader().getResourceAsStream("iast.properties");
             cfg.load(is);
 
-            DongTaiLog.info("DongTai Config: " + propertiesFilePath);
+            System.out.println("[io.dongtai.iast.agent] DongTai Config: " + propertiesFilePath);
         } catch (IOException e) {
-            DongTaiLog.error("read iast.properties failed", e);
+            System.out.println("[io.dongtai.iast.agent] read iast.properties failed: " + e.getMessage());
         }
     }
 
