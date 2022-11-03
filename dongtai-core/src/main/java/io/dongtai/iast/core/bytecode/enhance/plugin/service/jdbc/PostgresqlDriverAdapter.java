@@ -1,13 +1,13 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.service.jdbc;
 
-import io.dongtai.iast.core.bytecode.enhance.IastContext;
+import io.dongtai.iast.core.bytecode.enhance.ClassContext;
 import io.dongtai.iast.core.bytecode.enhance.plugin.AbstractClassVisitor;
 import io.dongtai.log.DongTaiLog;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 
 public class PostgresqlDriverAdapter extends AbstractClassVisitor {
-    public PostgresqlDriverAdapter(ClassVisitor classVisitor, IastContext context) {
+    public PostgresqlDriverAdapter(ClassVisitor classVisitor, ClassContext context) {
         super(classVisitor, context);
     }
 

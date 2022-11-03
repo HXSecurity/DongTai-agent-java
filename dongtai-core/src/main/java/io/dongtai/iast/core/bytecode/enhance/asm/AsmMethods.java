@@ -104,17 +104,16 @@ public interface AsmMethods {
     Method SPY$enterPropagator = InnerHelper.getAsmMethod(
             SpyDispatcher.class,
             "enterPropagator",
-            String.class
+            boolean.class
     );
     Method SPY$leavePropagator = InnerHelper.getAsmMethod(
             SpyDispatcher.class,
             "leavePropagator",
-            String.class
+            boolean.class
     );
     Method SPY$isFirstLevelPropagator = InnerHelper.getAsmMethod(
             SpyDispatcher.class,
-            "isFirstLevelPropagator",
-            String.class
+            "isFirstLevelPropagator"
     );
     Method SPY$enterSink = InnerHelper.getAsmMethod(
             SpyDispatcher.class,
@@ -142,6 +141,21 @@ public interface AsmMethods {
             boolean.class,
             int.class
     );
+
+    Method SPY$collectMethod = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "collectMethod",
+            Object.class,
+            Object[].class,
+            Object.class,
+            String.class,
+            String.class,
+            String.class,
+            String.class,
+            String.class,
+            boolean.class
+    );
+
     Method SPY$clientInterceptor = InnerHelper.getAsmMethod(
             SpyDispatcher.class,
             "clientInterceptor",

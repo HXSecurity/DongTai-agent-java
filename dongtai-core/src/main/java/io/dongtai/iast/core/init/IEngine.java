@@ -1,5 +1,6 @@
 package io.dongtai.iast.core.init;
 
+import io.dongtai.iast.core.handler.hookpoint.models.policy.PolicyManager;
 import io.dongtai.iast.core.utils.PropertyUtils;
 
 import java.lang.instrument.Instrumentation;
@@ -14,7 +15,7 @@ public interface IEngine {
      * @param cfg  IAST检测引擎启动配置
      * @param inst JVM Instrumentation实例化对象
      */
-    void init(PropertyUtils cfg, Instrumentation inst);
+    void init(PropertyUtils cfg, Instrumentation inst, PolicyManager policyManager);
 
     /**
      * IAST 检测引擎启动

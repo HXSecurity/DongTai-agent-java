@@ -197,24 +197,26 @@ public class ScaScanner {
          */
         @Override
         public void run() {
-            switch (scaType) {
-                case 1:
-                    scanWarLib(packagePath);
-                    break;
-                case 2:
-                    scanJarLib(packagePath);
-                    break;
-                case 3:
-                    scan(new File(packagePath));
-                    break;
-                case 4:
-                    scanClassPath(packagePath);
-                    break;
-                default:
-                    break;
+            try {
+                switch (scaType) {
+                    case 1:
+                        scanWarLib(packagePath);
+                        break;
+                    case 2:
+                        scanJarLib(packagePath);
+                        break;
+                    case 3:
+                        scan(new File(packagePath));
+                        break;
+                    case 4:
+                        scanClassPath(packagePath);
+                        break;
+                    default:
+                        break;
+                }
+                ScaReport.sendReport(this.scaReport.toString());
+            } catch (Exception ignore) {
             }
-            ScaReport.sendReport(this.scaReport.toString());
-
         }
     }
 }

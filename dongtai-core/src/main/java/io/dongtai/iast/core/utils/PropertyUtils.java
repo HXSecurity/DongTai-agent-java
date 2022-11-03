@@ -1,5 +1,6 @@
 package io.dongtai.iast.core.utils;
 
+import io.dongtai.iast.common.constants.PropertyConstant;
 import io.dongtai.iast.core.utils.json.GsonUtils;
 import io.dongtai.log.DongTaiLog;
 
@@ -15,19 +16,17 @@ public class PropertyUtils {
     public Properties cfg = null;
     private String iastName;
     private String iastServerToken;
-    private String allHookState;
     private String dumpClassState;
     private String iastDumpPath;
     private Long heartBeatInterval = -1L;
-    private Long replayInterval = -1L;
     private String serverUrl;
-    private String mode;
     private String serverMode;
     private String proxyEnableStatus;
     private String proxyHost;
     private int proxyPort = -1;
     private String debugFlag;
     private Integer responseLength;
+    private String policyPath;
 
     private final String propertiesFilePath;
 
@@ -40,6 +39,10 @@ public class PropertyUtils {
 
     public static PropertyUtils getInstance() {
         return instance;
+    }
+
+    public static void clear() {
+        instance = null;
     }
 
     private PropertyUtils(String propertiesFilePath) {
@@ -60,7 +63,7 @@ public class PropertyUtils {
                 fis.close();
             }
         } catch (IOException e) {
-            DongTaiLog.error("io.dongtai.iast.core.utils.PropertyUtils.init()", e);
+            DongTaiLog.error("PropertyUtils initialization failed", e);
         }
     }
 
@@ -75,9 +78,22 @@ public class PropertyUtils {
         return iastName;
     }
 
-    public String getIastServerToken() {
+    /**
+     * get OpenAPI Service Address
+     *
+     * @return OpenAPI Service Address
+     */
+    public String getBaseUrl() {
+        if (null == serverUrl) {
+            serverUrl = System.getProperty(PropertyConstant.PROPERTY_SERVER_URL, cfg.getProperty("iast.server.url"));
+        }
+        return serverUrl;
+    }
+
+    public String getServerToken() {
         if (null == iastServerToken) {
-            iastServerToken = System.getProperty("dongtai.server.token", cfg.getProperty("iast.server.token"));
+            iastServerToken = System.getProperty(PropertyConstant.PROPERTY_SERVER_TOKEN,
+                    cfg.getProperty("iast.server.token"));
         }
         return iastServerToken;
     }
@@ -86,19 +102,8 @@ public class PropertyUtils {
     public String toString() {
         return "[IastName=" + getIastName() +
                 "，IastServerUrl=" + getBaseUrl() +
-                "，IastServerToken=" + getIastServerToken() +
+                "，IastServerToken=" + getServerToken() +
                 "]";
-    }
-
-    private String getAllHookState() {
-        if (null == allHookState) {
-            allHookState = System.getProperty("iast.allhook.enable", cfg.getProperty("iast.allhook.enable"));
-        }
-        return allHookState;
-    }
-
-    public boolean isEnableAllHook() {
-        return "true".equals(getAllHookState());
     }
 
     public String getBlackFunctionFilePath() {
@@ -119,64 +124,30 @@ public class PropertyUtils {
 
     public String getDumpClassPath() {
         if (null == iastDumpPath) {
-            iastDumpPath = System.getProperty("iast.dump.class.path", cfg.getProperty("iast.dump.class.path"));
+            iastDumpPath = System.getProperty(PropertyConstant.PROPERTY_DUMP_CLASS_PATH,
+                    cfg.getProperty(PropertyConstant.PROPERTY_DUMP_CLASS_PATH));
         }
         return iastDumpPath;
     }
 
     private String getDumpClassState() {
         if (null == dumpClassState) {
-            dumpClassState = System.getProperty("iast.dump.class.enable", cfg.getProperty("iast.dump.class.enable"));
+            dumpClassState = System.getProperty(PropertyConstant.PROPERTY_DUMP_CLASS_ENABLE,
+                    cfg.getProperty(PropertyConstant.PROPERTY_DUMP_CLASS_ENABLE));
         }
         return dumpClassState;
     }
 
     public boolean isEnableDumpClass() {
-        return "true".equals(getDumpClassState());
-    }
-
-    /**
-     * get agent replay http request time
-     *
-     * @return
-     */
-    public long getReplayInterval() {
-        if (replayInterval == -1L) {
-            replayInterval = Long.valueOf(System.getProperty("iast.service.replay.interval",
-                    cfg.getProperty("iast.service.replay.interval", "5000")));
-        }
-        return replayInterval;
+        return "true".equalsIgnoreCase(getDumpClassState());
     }
 
     public long getHeartBeatInterval() {
         if (heartBeatInterval == -1L) {
-            heartBeatInterval = Long.valueOf(System.getProperty("iast.service.heartbeat.interval",
-                    cfg.getProperty("iast.service.heartbeat.interval", "60")));
+            heartBeatInterval = Long.valueOf(System.getProperty(PropertyConstant.PROPERTY_SERVICE_HEARTBEAT_INTERVAL,
+                    cfg.getProperty(PropertyConstant.PROPERTY_SERVICE_HEARTBEAT_INTERVAL, "60")));
         }
         return heartBeatInterval;
-    }
-
-    /**
-     * get OpenAPI Service Address
-     *
-     * @return OpenAPI Service Address
-     */
-    public String getBaseUrl() {
-        if (null == serverUrl) {
-            serverUrl = System.getProperty("dongtai.server.url", cfg.getProperty("iast.server.url"));
-        }
-        return serverUrl;
-    }
-
-    private String getMode() {
-        if (null == mode) {
-            mode = System.getProperty("iast.mode", cfg.getProperty("iast.mode", "normal"));
-        }
-        return mode;
-    }
-
-    public boolean isNormalMode() {
-        return "normal".equals(getMode());
     }
 
     /**
@@ -184,6 +155,7 @@ public class PropertyUtils {
      *
      * @return server mode
      */
+    @Deprecated
     private String getServerMode() {
         if (null == serverMode) {
             serverMode = System.getProperty("iast.server.mode", cfg.getProperty("iast.server.mode", "local"));
@@ -191,13 +163,15 @@ public class PropertyUtils {
         return serverMode;
     }
 
+    @Deprecated
     public boolean isLocal() {
         return "local".equals(getServerMode());
     }
 
     private String getProxyEnableStatus() {
         if (null == proxyEnableStatus) {
-            proxyEnableStatus = System.getProperty("iast.proxy.enable", cfg.getProperty("iast.proxy.enable", "false"));
+            proxyEnableStatus = System.getProperty(PropertyConstant.PROPERTY_PROXY_ENABLE,
+                    cfg.getProperty(PropertyConstant.PROPERTY_PROXY_ENABLE, "false"));
         }
         return proxyEnableStatus;
     }
@@ -208,7 +182,8 @@ public class PropertyUtils {
 
     public String getProxyHost() {
         if (null == proxyHost) {
-            proxyHost = System.getProperty("iast.proxy.host", cfg.getProperty("iast.proxy.host", "false"));
+            proxyHost = System.getProperty(PropertyConstant.PROPERTY_PROXY_HOST,
+                    cfg.getProperty(PropertyConstant.PROPERTY_PROXY_HOST, ""));
         }
         return proxyHost;
     }
@@ -216,23 +191,33 @@ public class PropertyUtils {
     public int getProxyPort() {
         if (-1 == proxyPort) {
             proxyPort = Integer
-                    .parseInt(System.getProperty("iast.proxy.port", cfg.getProperty("iast.proxy.port", "80")));
+                    .parseInt(System.getProperty(PropertyConstant.PROPERTY_PROXY_PORT,
+                            cfg.getProperty(PropertyConstant.PROPERTY_PROXY_PORT, "80")));
         }
         return proxyPort;
     }
 
     private String getDebugFlag() {
         if (debugFlag == null) {
-            debugFlag = System.getProperty("dongtai.debug", "false");
+            debugFlag = System.getProperty(PropertyConstant.PROPERTY_DEBUG, "false");
         }
         return debugFlag;
     }
 
     public Integer getResponseLength() {
-        if(responseLength == null){
-            responseLength = Integer.parseInt(System.getProperty("dongtai.response.length", cfg.getProperty("dongtai.response.length","-1")));
+        if (responseLength == null) {
+            responseLength = Integer.parseInt(System.getProperty(PropertyConstant.PROPERTY_RESPONSE_LENGTH,
+                    cfg.getProperty(PropertyConstant.PROPERTY_RESPONSE_LENGTH, "-1")));
         }
         return responseLength;
+    }
+
+    public String getPolicyPath() {
+        if (null == this.policyPath) {
+            this.policyPath = System.getProperty(PropertyConstant.PROPERTY_POLICY_PATH,
+                    cfg.getProperty(PropertyConstant.PROPERTY_POLICY_PATH, ""));
+        }
+        return this.policyPath;
     }
 
     /**

@@ -1,7 +1,8 @@
 package io.dongtai.iast.core.handler.hookpoint.controller.impl;
 
 import io.dongtai.iast.core.EngineManager;
-import io.dongtai.iast.core.handler.hookpoint.models.*;
+import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
+import io.dongtai.iast.core.handler.hookpoint.models.policy.SinkNode;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.VulnType;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.dynamic.DynamicPropagatorScanner;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.normal.*;
@@ -18,25 +19,22 @@ public class SinkImpl {
      *
      * @param event sink点事件
      */
-    public static void solveSink(MethodEvent event) {
-        if (null == event){
+    public static void solveSink(MethodEvent event, SinkNode sinkNode) {
+        if (null == event) {
             return;
         }
-        IastSinkModel sink = IastHookRuleModel.getSinkByMethodSignature(event.signature);
-        if (null == sink){
-            return;
-        }
-        String sinkType = sink.getType();
-        if (VulnType.CRYPTO_WEEK_RANDOMNESS.equals(sinkType)) {
-            new CryptoWeakRandomnessVulScan().scan(sink, event);
-        } else if (VulnType.CRYPTO_BAD_MAC.equals(sinkType)) {
-            new CryptoBadMacVulScan().scan(sink, event);
-        } else if (VulnType.CRYPTO_BAC_CIPHERS.equals(sinkType)) {
-            new CryptoBacCiphersVulScan().scan(sink, event);
-        } else if (VulnType.COOKIE_FLAGS_MISSING.equals(sinkType)) {
-            new CookieFlagsMissingVulScan().scan(sink, event);
+
+        String vulType = sinkNode.getVulType();
+        if (VulnType.CRYPTO_WEEK_RANDOMNESS.equals(vulType)) {
+            new CryptoWeakRandomnessVulScan().scan(event, sinkNode);
+        } else if (VulnType.CRYPTO_BAD_MAC.equals(vulType)) {
+            new CryptoBadMacVulScan().scan(event, sinkNode);
+        } else if (VulnType.CRYPTO_BAC_CIPHERS.equals(vulType)) {
+            new CryptoBacCiphersVulScan().scan(event, sinkNode);
+        } else if (VulnType.COOKIE_FLAGS_MISSING.equals(vulType)) {
+            new CookieFlagsMissingVulScan().scan(event, sinkNode);
         } else if (!EngineManager.TAINT_HASH_CODES.isEmpty()) {
-            new DynamicPropagatorScanner().scan(sink, event);
+            new DynamicPropagatorScanner().scan(event, sinkNode);
         }
     }
 

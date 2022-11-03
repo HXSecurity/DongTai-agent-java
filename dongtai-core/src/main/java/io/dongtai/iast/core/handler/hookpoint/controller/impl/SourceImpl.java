@@ -2,6 +2,7 @@ package io.dongtai.iast.core.handler.hookpoint.controller.impl;
 
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
+import io.dongtai.iast.core.handler.hookpoint.models.policy.SourceNode;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.taintrange.*;
 import io.dongtai.iast.core.utils.StackUtils;
 import io.dongtai.iast.core.utils.TaintPoolUtils;
@@ -27,7 +28,7 @@ public class SourceImpl {
     private static final String VALUES_ENUMERATOR = " org.apache.tomcat.util.http.ValuesEnumerator".substring(1);
     private static final String SPRING_OBJECT = " org.springframework.".substring(1);
 
-    public static void solveSource(MethodEvent event, AtomicInteger invokeIdSequencer) {
+    public static void solveSource(MethodEvent event, SourceNode sourceNode, AtomicInteger invokeIdSequencer) {
         if (!TaintPoolUtils.isNotEmpty(event.returnValue)
                 || !TaintPoolUtils.isAllowTaintType(event.returnValue)
                 || !allowCall(event)) {

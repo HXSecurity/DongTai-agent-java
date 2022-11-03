@@ -1,7 +1,9 @@
 package io.dongtai.iast.core.handler.hookpoint.controller.impl;
 
 import io.dongtai.iast.core.EngineManager;
-import io.dongtai.iast.core.handler.hookpoint.models.*;
+import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
+import io.dongtai.iast.core.handler.hookpoint.models.policy.PropagatorNode;
+import io.dongtai.iast.core.handler.hookpoint.models.policy.TaintPosition;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.taintrange.*;
 import io.dongtai.iast.core.utils.StackUtils;
 import io.dongtai.iast.core.utils.TaintPoolUtils;
@@ -15,14 +17,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author dongzhiyong@huoxian.cn
  */
 public class PropagatorImpl {
-    private static final String PARAMS_OBJECT = "O";
-    private static final String PARAMS_PARAM = "P";
-    private static final String PARAMS_RETURN = "R";
-    private static final String CONDITION_AND = "&";
-    private static final String CONDITION_OR = "|";
-    private static final String CONDITION_AND_RE_PATTERN = "[\\|&]";
-    private static final int STACK_DEPTH = 11;
-
     private final static Set<String> SKIP_SCOPE_METHODS = new HashSet<String>(Arrays.asList(
             "java.net.URI.<init>(java.lang.String)",
             "java.net.URI.<init>(java.lang.String,java.lang.String,java.lang.String)",
@@ -37,23 +31,24 @@ public class PropagatorImpl {
             "java.net.URL.<init>(java.lang.String,java.lang.String,int,java.lang.String,java.net.URLStreamHandler)"
     ));
 
-    public static void solvePropagator(MethodEvent event, AtomicInteger invokeIdSequencer) {
+    public static void solvePropagator(MethodEvent event, PropagatorNode propagatorNode, AtomicInteger invokeIdSequencer) {
         if (EngineManager.TAINT_HASH_CODES.isEmpty()) {
             return;
         }
+        auxiliaryPropagator(event, propagatorNode, invokeIdSequencer);
 
-        IastPropagatorModel propagator = IastHookRuleModel.getPropagatorByMethodSignature(event.signature);
-        if (propagator != null) {
-            auxiliaryPropagator(propagator, invokeIdSequencer, event);
-        }
     }
 
-    private static void addPropagator(IastPropagatorModel propagator, MethodEvent event, AtomicInteger invokeIdSequencer) {
+    private static void addPropagator(PropagatorNode propagatorNode, MethodEvent event, AtomicInteger invokeIdSequencer) {
         // skip same source and target
+        Set<TaintPosition> sources = propagatorNode.getSources();
+        Set<TaintPosition> targets = propagatorNode.getTargets();
+
         if (event.getSourceHashes().size() == event.getTargetHashes().size()
                 && event.getSourceHashes().equals(event.getTargetHashes())
-                && propagator != null
-                && !(PARAMS_OBJECT.equals(propagator.getSource()) && PARAMS_OBJECT.equals(propagator.getTarget()))) {
+                && !(sources.size() == 1 && TaintPosition.hasObject(sources)
+                && targets.size() == 1 && TaintPosition.hasObject(targets))
+        ) {
             return;
         }
 
@@ -64,113 +59,87 @@ public class PropagatorImpl {
         EngineManager.TRACK_MAP.get().put(invokeId, event);
     }
 
-    private static void auxiliaryPropagator(IastPropagatorModel propagator, AtomicInteger invokeIdSequencer, MethodEvent event) {
-        String sourceString = propagator.getSource();
-        boolean conditionSource = contains(sourceString);
-        if (!conditionSource) {
-            if (PARAMS_OBJECT.equals(sourceString)) {
+    private static void auxiliaryPropagator(MethodEvent event, PropagatorNode propagatorNode, AtomicInteger invokeIdSequencer) {
+        Set<TaintPosition> sources = propagatorNode.getSources();
+        if (sources.isEmpty() || propagatorNode.getTargets().isEmpty()) {
+            return;
+        }
+
+        List<Object> inValues = new ArrayList<Object>();
+        List<String> inValueStrings = new ArrayList<String>();
+        for (TaintPosition position : sources) {
+            if (position.isObject()) {
                 if (!TaintPoolUtils.isNotEmpty(event.object)
                         || !TaintPoolUtils.isAllowTaintType(event.object)
                         || !TaintPoolUtils.poolContains(event.object, event)) {
-                    return;
+                    continue;
                 }
 
-                event.setInValue(event.object);
-                setTarget(propagator, event);
-                addPropagator(propagator, event, invokeIdSequencer);
-            } else if (sourceString.startsWith(PARAMS_PARAM)) {
-                ArrayList<Object> inValues = new ArrayList<Object>();
-                ArrayList<String> inValuesString = new ArrayList<String>();
-                int[] positions = (int[]) propagator.getSourcePosition();
-                for (int pos : positions) {
-                    if (pos >= event.argumentArray.length) {
-                        continue;
-                    }
+                inValues.add(event.object);
+                inValueStrings.add(event.obj2String(event.object));
+            } else if (position.isParameter()) {
+                int parameterIndex = position.getParameterIndex();
+                if (parameterIndex >= event.argumentArray.length) {
+                    continue;
+                }
 
-                    Object tempObj = event.argumentArray[pos];
-                    if (!TaintPoolUtils.isNotEmpty(tempObj)
-                            || !TaintPoolUtils.isAllowTaintType(tempObj)
-                            || !TaintPoolUtils.poolContains(tempObj, event)) {
-                        continue;
-                    }
-                    inValues.add(tempObj);
-                    inValuesString.add(event.obj2String(tempObj));
+                Object tempObj = event.argumentArray[parameterIndex];
+                if (!TaintPoolUtils.isNotEmpty(tempObj)
+                        || !TaintPoolUtils.isAllowTaintType(tempObj)
+                        || !TaintPoolUtils.poolContains(tempObj, event)) {
+                    continue;
                 }
-                if (!inValues.isEmpty()) {
-                    event.setInValue(inValues.toArray(), inValuesString.toString());
-                    setTarget(propagator, event);
-                    addPropagator(propagator, event, invokeIdSequencer);
-                }
+                inValues.add(tempObj);
+                inValueStrings.add(event.obj2String(tempObj));
             }
-        } else {
-            // o&r 解决
-            // @TODO: R has been tainted, so we not need to propagate it
-            boolean andCondition = sourceString.contains(CONDITION_AND);
-            String[] conditionSources = sourceString.split(CONDITION_AND_RE_PATTERN);
-            ArrayList<Object> inValues = new ArrayList<Object>();
-            for (String source : conditionSources) {
-                if (PARAMS_OBJECT.equals(source)) {
-                    if (event.object == null) {
-                        break;
-                    }
-                    inValues.add(event.object);
-                } else if (PARAMS_RETURN.equals(source)) {
-                    if (event.returnValue == null) {
-                        break;
-                    }
-                    event.setInValue(event.returnValue);
-                } else if (source.startsWith(PARAMS_PARAM)) {
-                    int[] positions = (int[]) propagator.getSourcePosition();
-                    for (int pos : positions) {
-                        Object tempObj = event.argumentArray[pos];
-                        if (tempObj != null) {
-                            inValues.add(tempObj);
-                        }
-                    }
-                }
-            }
-            if (!inValues.isEmpty()) {
-                int condition = 0;
-                for (Object obj : inValues) {
-                    if (TaintPoolUtils.isNotEmpty(obj)
-                            && TaintPoolUtils.isAllowTaintType(obj)
-                            && TaintPoolUtils.poolContains(obj, event)) {
-                        condition++;
-                    }
-                }
-                if (condition > 0 && (!andCondition || conditionSources.length == condition)) {
-                    event.setInValue(inValues.toArray());
-                    setTarget(propagator, event);
-                    addPropagator(propagator, event, invokeIdSequencer);
-                }
-            }
+        }
+
+        if (!inValues.isEmpty()) {
+            event.setInValue(inValues.toArray(), inValueStrings.toString());
+            setTarget(propagatorNode, event);
+            addPropagator(propagatorNode, event, invokeIdSequencer);
         }
     }
 
-    private static void setTarget(IastPropagatorModel propagator, MethodEvent event) {
-        String target = propagator.getTarget();
-        if (PARAMS_OBJECT.equals(target)) {
-            event.setOutValue(event.object);
-            trackTaintRange(propagator, event);
-        } else if (PARAMS_RETURN.equals(target)) {
-            event.setOutValue(event.returnValue);
-            trackTaintRange(propagator, event);
-        } else if (target.startsWith(PARAMS_PARAM)) {
-            ArrayList<Object> outValues = new ArrayList<Object>();
-            Object tempPositions = propagator.getTargetPosition();
-            int[] positions = (int[]) tempPositions;
-            if (positions.length == 1) {
-                event.setOutValue(event.argumentArray[positions[0]]);
-                trackTaintRange(propagator, event);
-            } else {
-                for (int pos : positions) {
-                    outValues.add(event.argumentArray[pos]);
-                    trackTaintRange(propagator, event);
+    private static void setTarget(PropagatorNode propagatorNode, MethodEvent event) {
+        Set<TaintPosition> targets = propagatorNode.getTargets();
+        if (targets == null || targets.isEmpty()) {
+            return;
+        }
+
+        List<Object> outValues = new ArrayList<Object>();
+        List<String> outValueStrings = new ArrayList<String>();
+        for (TaintPosition position : targets) {
+            if (position.isObject()) {
+                outValues.add(event.object);
+                if (targets.size() > 1) {
+                    outValueStrings.add(event.obj2String(event.object));
                 }
-                if (!outValues.isEmpty()) {
-                    event.setOutValue(outValues.toArray());
+                trackTaintRange(propagatorNode, event);
+            } else if (position.isReturn()) {
+                outValues.add(event.returnValue);
+                if (targets.size() > 1) {
+                    outValueStrings.add(event.obj2String(event.returnValue));
+                }
+                trackTaintRange(propagatorNode, event);
+            } else if (position.isParameter()) {
+                int parameterIndex = position.getParameterIndex();
+                if (event.argumentArray.length > parameterIndex) {
+                    outValues.add(event.argumentArray[parameterIndex]);
+                    if (targets.size() > 1) {
+                        outValueStrings.add(event.obj2String(event.argumentArray[parameterIndex]));
+                    }
+                    trackTaintRange(propagatorNode, event);
                 }
             }
+        }
+
+        if (outValues.isEmpty()) {
+            return;
+        } else if (outValues.size() == 1) {
+            event.setOutValue(outValues.get(0));
+        } else {
+            event.setOutValue(outValues.toArray(), outValueStrings.toString());
         }
 
         EngineManager.TAINT_HASH_CODES.addObject(event.outValue, event, false);
@@ -187,7 +156,7 @@ public class PropagatorImpl {
         return tr;
     }
 
-    private static void trackTaintRange(IastPropagatorModel propagator, MethodEvent event) {
+    private static void trackTaintRange(PropagatorNode propagatorNode, MethodEvent event) {
         TaintCommandRunner r = TaintCommandRunner.getCommandRunner(event.signature);
 
         TaintRanges oldTaintRanges = new TaintRanges();
@@ -195,59 +164,59 @@ public class PropagatorImpl {
 
         Object src = null;
         if (r != null) {
-            String srcLoc = propagator.getSource();
-            if (PARAMS_OBJECT.equals(srcLoc)) {
+            Set<TaintPosition> sourceLocs = propagatorNode.getSources();
+            if (sourceLocs.size() == 1 && TaintPosition.hasObject(sourceLocs)) {
                 src = event.object;
                 srcTaintRanges = getTaintRanges(src);
-            } else if (srcLoc.startsWith("O|P")) {
+            } else if (sourceLocs.size() == 2 && TaintPosition.hasObject(sourceLocs)
+                    && TaintPosition.hasParameter(sourceLocs)) {
                 oldTaintRanges = getTaintRanges(event.object);
-                int[] positions = (int[]) propagator.getSourcePosition();
-                if (positions.length == 1 && event.argumentArray.length >= positions[0]) {
-                    src = event.argumentArray[positions[0]];
-                    srcTaintRanges = getTaintRanges(src);
+                for (TaintPosition sourceLoc : sourceLocs) {
+                    if (sourceLoc.isParameter()) {
+                        int parameterIndex = sourceLoc.getParameterIndex();
+                        if (event.argumentArray.length > parameterIndex) {
+                            src = event.argumentArray[parameterIndex];
+                            srcTaintRanges = getTaintRanges(src);
+                        }
+                        break;
+                    }
                 }
-            } else if (srcLoc.startsWith(PARAMS_PARAM)) {
-                // invalid policy
-                if (srcLoc.contains(CONDITION_OR) || srcLoc.contains(CONDITION_AND)) {
-                    return;
-                }
-                int[] positions = (int[]) propagator.getSourcePosition();
-                if (positions.length == 1 && event.argumentArray.length >= positions[0]) {
-                    src = event.argumentArray[positions[0]];
-                    srcTaintRanges = getTaintRanges(src);
+            } else if (sourceLocs.size() == 1 && TaintPosition.hasParameter(sourceLocs)) {
+                for (TaintPosition sourceLoc : sourceLocs) {
+                    int parameterIndex = sourceLoc.getParameterIndex();
+                    if (event.argumentArray.length > parameterIndex) {
+                        src = event.argumentArray[parameterIndex];
+                        srcTaintRanges = getTaintRanges(src);
+                    }
                 }
             }
         }
 
-        int tgtHash;
-        Object tgt;
-        String tgtLoc = propagator.getTarget();
-        if (PARAMS_OBJECT.equals(tgtLoc)) {
+        int tgtHash = 0;
+        Object tgt = null;
+        Set<TaintPosition> targetLocs = propagatorNode.getTargets();
+        if (targetLocs.size() == 1 && TaintPosition.hasObject(targetLocs)) {
             tgt = event.object;
             tgtHash = System.identityHashCode(tgt);
             oldTaintRanges = getTaintRanges(tgt);
-        } else if (PARAMS_RETURN.equals(tgtLoc)) {
+        } else if (targetLocs.size() == 1 && TaintPosition.hasReturn(targetLocs)) {
             tgt = event.returnValue;
             tgtHash = System.identityHashCode(tgt);
-        } else if (tgtLoc.startsWith(PARAMS_PARAM)) {
-            // invalid policy
-            if (tgtLoc.contains(CONDITION_OR) || tgtLoc.contains(CONDITION_AND)) {
-                return;
+        } else if (targetLocs.size() == 1 && TaintPosition.hasParameter(targetLocs)) {
+            for (TaintPosition targetLoc : targetLocs) {
+                int parameterIndex = targetLoc.getParameterIndex();
+                if (event.argumentArray.length > parameterIndex) {
+                    tgt = event.argumentArray[parameterIndex];
+                    tgtHash = System.identityHashCode(tgt);
+                    oldTaintRanges = getTaintRanges(tgt);
+                }
             }
-            int[] positions = (int[]) propagator.getTargetPosition();
-            if (positions.length != 1 || event.argumentArray.length < positions[0]) {
-                // target can only have one parameter
-                return;
-            }
-            tgt = event.argumentArray[positions[0]];
-            tgtHash = System.identityHashCode(tgt);
-            oldTaintRanges = getTaintRanges(tgt);
         } else {
             // invalid policy
             return;
         }
 
-        if (!TaintPoolUtils.isNotEmpty(tgt)) {
+        if (!TaintPoolUtils.isNotEmpty(tgt) || tgtHash == 0) {
             return;
         }
 
@@ -263,9 +232,5 @@ public class PropagatorImpl {
 
     public static boolean isSkipScope(String signature) {
         return SKIP_SCOPE_METHODS.contains(signature);
-    }
-
-    private static boolean contains(String obj) {
-        return obj.contains(CONDITION_AND) || obj.contains(CONDITION_OR);
     }
 }

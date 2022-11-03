@@ -1,170 +1,135 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.core;
 
-import io.dongtai.iast.core.EngineManager;
-import io.dongtai.iast.core.bytecode.enhance.IastContext;
+import io.dongtai.iast.core.bytecode.enhance.ClassContext;
+import io.dongtai.iast.core.bytecode.enhance.MethodContext;
 import io.dongtai.iast.core.bytecode.enhance.plugin.AbstractClassVisitor;
 import io.dongtai.iast.core.bytecode.enhance.plugin.DispatchPlugin;
-import io.dongtai.iast.core.bytecode.enhance.plugin.core.adapter.PropagateAdviceAdapter;
-import io.dongtai.iast.core.bytecode.enhance.plugin.core.adapter.SinkAdviceAdapter;
-import io.dongtai.iast.core.bytecode.enhance.plugin.core.adapter.SourceAdviceAdapter;
-import io.dongtai.iast.core.handler.hookpoint.controller.HookType;
-import io.dongtai.iast.core.handler.hookpoint.models.IastHookRuleModel;
-import io.dongtai.iast.core.handler.hookpoint.models.IastSinkModel;
-import io.dongtai.iast.core.handler.hookpoint.vulscan.VulnType;
+import io.dongtai.iast.core.bytecode.enhance.plugin.core.adapter.*;
+import io.dongtai.iast.core.handler.hookpoint.models.policy.*;
 import io.dongtai.iast.core.utils.AsmUtils;
-import io.dongtai.iast.core.utils.matcher.Method;
 import io.dongtai.log.DongTaiLog;
-
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.Set;
-
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.commons.JSRInlinerAdapter;
+
+import java.lang.reflect.Modifier;
+import java.util.*;
 
 /**
  * @author dongzhiyong@huoxian.cn
  */
 public class DispatchClassPlugin implements DispatchPlugin {
-
-    private final boolean enableAllHook;
     private Set<String> ancestors;
     private String className;
 
     public DispatchClassPlugin() {
-        this.enableAllHook = EngineManager.getInstance().supportLazyHook();
     }
 
     @Override
-    public ClassVisitor dispatch(ClassVisitor classVisitor, IastContext context) {
-        ClassVisit modifiedClassVisitor = null;
-        ancestors = context.getAncestors();
-        className = context.getClassName();
-        String matchClassName = isMatch();
+    public ClassVisitor dispatch(ClassVisitor classVisitor, ClassContext classContext, Policy policy) {
+        ancestors = classContext.getAncestors();
+        className = classContext.getClassName();
+        String matchedClassName = policy.getMatchedClass(className, ancestors);
 
-        if (null != matchClassName) {
-            DongTaiLog.trace("class {} hit rule {}, class diagrams: {}", className, matchClassName,
-                    Arrays.toString(ancestors.toArray()));
-            context.setMatchClassName(matchClassName);
-            modifiedClassVisitor = new ClassVisit(classVisitor, context);
-        } else if (enableAllHook && !context.isBootstrapClassLoader()) {
-            context.setMatchClassName(className);
-            modifiedClassVisitor = new ClassVisit(classVisitor, context);
+        if (null == matchedClassName) {
+            return classVisitor;
         }
 
-        return modifiedClassVisitor == null ? classVisitor : modifiedClassVisitor;
-    }
-
-    @Override
-    public String isMatch() {
-        if (IastHookRuleModel.hookByName(className)) {
-            return className;
-        }
-
-        for (String superClassName : ancestors) {
-            if (IastHookRuleModel.hookBySuperClass(superClassName)) {
-                return superClassName;
-            }
-        }
-        return null;
+        DongTaiLog.trace("class {} hit rule {}, class diagrams: {}", className, matchedClassName,
+                Arrays.toString(ancestors.toArray()));
+        classContext.setMatchedClassName(matchedClassName);
+        return new ClassVisit(classVisitor, classContext, policy);
     }
 
     public class ClassVisit extends AbstractClassVisitor {
-
-        private final boolean isAppClass;
         private int classVersion;
+        private final MethodAdapter[] methodAdapters;
 
-        ClassVisit(ClassVisitor classVisitor, IastContext context) {
-            super(classVisitor, context);
-            this.isAppClass = false;
+        ClassVisit(ClassVisitor classVisitor, ClassContext classContext, Policy policy) {
+            super(classVisitor, classContext, policy);
+            this.methodAdapters = new MethodAdapter[]{
+                    new SourceAdapter(),
+                    new PropagatorAdapter(),
+                    new SinkAdapter(),
+            };
         }
 
         @Override
-        public MethodVisitor visitMethod(final int access, final String name, final String desc, final String signature,
-                                         final String[] exceptions) {
-            MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
-
-            if (!Modifier.isInterface(access) && !Modifier.isAbstract(access) && !"<clinit>".equals(name)) {
-                String iastMethodSignature = AsmUtils.buildSignature(context.getMatchClassName(), name, desc);
-                String framework = IastHookRuleModel.getFrameworkByMethodSignature(iastMethodSignature);
-
-                mv = context.isEnableAllHook() ? greedyAop(mv, access, name, desc,
-                        framework == null ? "none" : framework, iastMethodSignature)
-                        : (framework == null ? mv : lazyAop(mv, access, name, desc, framework, iastMethodSignature));
-
-                if (isTransformed() && this.classVersion < 50) {
-                    mv = new JSRInlinerAdapter(mv, access, name, desc, signature, exceptions);
-                }
-
-                if (isTransformed() && null != framework) {
-                    DongTaiLog.trace("rewrite method {} for listener[framework={},class={}]", iastMethodSignature,
-                            framework, context.getClassName());
-                }
+        public MethodVisitor visitMethod(final int access, final String name, final String descriptor,
+                                         final String signature, final String[] exceptions) {
+            MethodVisitor mv = super.visitMethod(access, name, descriptor, signature, exceptions);
+            if (Modifier.isInterface(access) || Modifier.isAbstract(access) || "<clinit>".equals(name)) {
+                return mv;
             }
-            return mv;
-        }
 
-        @Override
-        public void visit(int version, int access, String name, String signature, String superName,
-                          String[] interfaces) {
-            this.classVersion = version;
-            super.visit(version, access, name, signature, superName, interfaces);
-        }
+            MethodContext methodContext = new MethodContext(this.context, name);
+            methodContext.setModifier(access);
+            methodContext.setDescriptor(descriptor);
+            methodContext.setParameters(AsmUtils.buildParameterTypes(descriptor));
 
-        /**
-         * 贪婪AOP，用于处理全量HOOK
-         *
-         * @param mv        方法访问器
-         * @param access    方法访问控制符
-         * @param name      方法名
-         * @param desc      方法描述符
-         * @param framework 框架名称
-         * @param signature 方法签名
-         * @return 修改后的方法访问器
-         */
-        private MethodVisitor greedyAop(MethodVisitor mv, int access, String name, String desc, String framework,
-                                        String signature) {
-            if (null != framework) {
-                mv = new PropagateAdviceAdapter(mv, access, name, desc, context, framework, signature);
-            } else if (isAppClass && Method.hook(access, name, desc, signature)) {
-                mv = new PropagateAdviceAdapter(mv, access, name, desc, context, null, signature);
+            String matchedSignature = AsmUtils.buildSignature(context.getMatchedClassName(), name, descriptor);
+
+            mv = lazyAop(mv, access, name, descriptor, matchedSignature, methodContext);
+            boolean methodIsTransformed = mv instanceof MethodAdviceAdapter;
+
+            if (methodIsTransformed && this.classVersion < 50) {
+                mv = new JSRInlinerAdapter(mv, access, name, descriptor, signature, exceptions);
             }
-            setTransformed();
+
+            if (methodIsTransformed) {
+                DongTaiLog.trace("rewrite method {} for listener[class={}]", matchedSignature, context.getClassName());
+            }
+
             return mv;
         }
 
         /**
          * 懒惰AOP，用于处理预定义HOOK点
          *
-         * @param mv        方法访问器
-         * @param access    方法访问控制符
-         * @param name      方法名
-         * @param desc      方法描述符
-         * @param framework 框架名称
-         * @param signature 方法签名
+         * @param mv         方法访问器
+         * @param access     方法访问控制符
+         * @param name       方法名
+         * @param descriptor 方法描述符
+         * @param signature  方法签名
          * @return 修改后的方法访问器
          */
-        private MethodVisitor lazyAop(MethodVisitor mv, int access, String name, String desc, String framework,
-                                      String signature) {
-            int hookValue = IastHookRuleModel.getRuleTypeValueByFramework(framework);
-            if (HookType.PROPAGATOR.equals(hookValue)) {
-                mv = new PropagateAdviceAdapter(mv, access, name, desc, context, framework, signature);
-                setTransformed();
-            } else if (HookType.SINK.equals(hookValue)) {
-                // fixme 针对越权类，overpower为true，否则为false
-                IastSinkModel sinkModel = IastHookRuleModel.getSinkByMethodSignature(signature);
-                if (sinkModel != null) {
-                    boolean isOverPower = VulnType.SQL_OVER_POWER.equals(sinkModel.getType());
-                    mv = new SinkAdviceAdapter(mv, access, name, desc, context, framework, signature, isOverPower);
-                    setTransformed();
-                } else {
-                    DongTaiLog.error("framework[{}], method[{}] doesn't find sink model", framework, name);
+        private MethodVisitor lazyAop(MethodVisitor mv, int access, String name, String descriptor, String signature,
+                                      MethodContext methodContext) {
+            Set<PolicyNode> matchedNodes = new HashSet<PolicyNode>();
+
+            List<SourceNode> sourceNodes = this.policy.getSources();
+            if (sourceNodes != null && sourceNodes.size() != 0) {
+                for (SourceNode sourceNode : sourceNodes) {
+                    if (sourceNode.getMethodMatcher().match(methodContext)) {
+                        matchedNodes.add(sourceNode);
+                    }
                 }
-            } else if (HookType.SOURCE.equals(hookValue)) {
-                mv = new SourceAdviceAdapter(mv, access, name, desc, context, framework, signature);
+            }
+
+            List<PropagatorNode> propagatorNodes = this.policy.getPropagators();
+            if (sourceNodes != null && sourceNodes.size() != 0) {
+                for (PropagatorNode propagatorNode : propagatorNodes) {
+                    if (propagatorNode.getMethodMatcher().match(methodContext)) {
+                        matchedNodes.add(propagatorNode);
+                    }
+                }
+            }
+
+            List<SinkNode> sinkNodes = this.policy.getSinks();
+            if (sourceNodes != null && sourceNodes.size() != 0) {
+                for (SinkNode sinkNode : sinkNodes) {
+                    if (sinkNode.getMethodMatcher().match(methodContext)) {
+                        matchedNodes.add(sinkNode);
+                    }
+                }
+            }
+
+            if (matchedNodes.size() > 0) {
+                mv = new MethodAdviceAdapter(mv, access, name, descriptor, signature,
+                        matchedNodes, methodContext, this.methodAdapters);
                 setTransformed();
             }
+
             return mv;
         }
     }

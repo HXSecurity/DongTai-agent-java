@@ -131,7 +131,7 @@ public class ConfigMatcher {
      * @return
      * @since 1.4.0
      */
-    public boolean isHookClassPoint(Class<?> clazz) {
+    public boolean canHook(Class<?> clazz) {
         if (!inst.isModifiableClass(clazz)) {
             return false;
         }
@@ -139,7 +139,7 @@ public class ConfigMatcher {
             return false;
         }
         String className = clazz.getName().replace('.', '/');
-        return isHookPoint(className);
+        return canHook(className);
     }
 
     /**
@@ -148,7 +148,7 @@ public class ConfigMatcher {
      * @param className jvm内部类名，如：java/lang/Runtime
      * @return 是否支持hook
      */
-    public boolean isHookPoint(String className) {
+    public boolean canHook(String className) {
         if (className.startsWith("[")) {
             DongTaiLog.trace("ignore transform {}. Reason: class is a Array Type", className);
             return false;

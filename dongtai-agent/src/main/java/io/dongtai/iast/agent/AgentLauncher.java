@@ -6,6 +6,7 @@ import io.dongtai.iast.agent.monitor.impl.EngineMonitor;
 import io.dongtai.iast.agent.report.AgentRegisterReport;
 import io.dongtai.iast.agent.util.ThreadUtils;
 import io.dongtai.iast.common.constants.AgentConstant;
+import io.dongtai.iast.common.scope.ScopeManager;
 import io.dongtai.log.DongTaiLog;
 
 import java.lang.instrument.Instrumentation;
@@ -20,6 +21,7 @@ public class AgentLauncher {
     public static final String LAUNCH_MODE_AGENT = "agent";
     public static final String LAUNCH_MODE_ATTACH = "attach";
     public static String LAUNCH_MODE;
+    private static Thread shutdownHook;
 
     static {
         /**
@@ -78,6 +80,11 @@ public class AgentLauncher {
                 uninstall();
                 // attach手动卸载后停止守护线程
                 ThreadUtils.killAllDongTaiThreads();
+                if (shutdownHook != null) {
+                    Runtime.getRuntime().removeShutdownHook(shutdownHook);
+                    shutdownHook = null;
+                }
+                ScopeManager.SCOPE_TRACKER.remove();
                 System.clearProperty("protect.by.dongtai");
             } else {
                 if (System.getProperty("protect.by.dongtai", null) != null) {
@@ -120,7 +127,8 @@ public class AgentLauncher {
             } else {
                 EngineMonitor.isCoreRegisterStart = true;
             }
-            Runtime.getRuntime().addShutdownHook(new ShutdownThread());
+            shutdownHook = new ShutdownThread();
+            Runtime.getRuntime().addShutdownHook(shutdownHook);
             loadEngine(inst);
             System.setProperty("protect.by.dongtai", "true");
         } else {

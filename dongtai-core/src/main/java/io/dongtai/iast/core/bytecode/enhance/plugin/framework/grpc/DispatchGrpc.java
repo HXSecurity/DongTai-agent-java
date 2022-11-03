@@ -1,7 +1,8 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.framework.grpc;
 
-import io.dongtai.iast.core.bytecode.enhance.IastContext;
+import io.dongtai.iast.core.bytecode.enhance.ClassContext;
 import io.dongtai.iast.core.bytecode.enhance.plugin.DispatchPlugin;
+import io.dongtai.iast.core.handler.hookpoint.models.policy.Policy;
 import org.objectweb.asm.ClassVisitor;
 
 public class DispatchGrpc implements DispatchPlugin {
@@ -14,7 +15,7 @@ public class DispatchGrpc implements DispatchPlugin {
     private static final String classOfByteString = "com.google.protobuf.ByteString";
 
     @Override
-    public ClassVisitor dispatch(ClassVisitor classVisitor, IastContext context) {
+    public ClassVisitor dispatch(ClassVisitor classVisitor, ClassContext context, Policy policy) {
         String className = context.getClassName();
         if (classOfAbstractStub.equals(className)) {
             classVisitor = new AbstractStubAdapter(classVisitor, null);
@@ -32,10 +33,5 @@ public class DispatchGrpc implements DispatchPlugin {
             classVisitor = new ByteStringAdapter(classVisitor, null);
         }
         return classVisitor;
-    }
-
-    @Override
-    public String isMatch() {
-        return null;
     }
 }

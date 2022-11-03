@@ -127,8 +127,7 @@ public class GrpcHandler {
             EngineManager.REQUEST_CONTEXT.set(requestMeta);
             EngineManager.TRACK_MAP.set(new HashMap<Integer, MethodEvent>(1024));
             EngineManager.TAINT_HASH_CODES.set(new HashSet<Integer>());
-            EngineManager.SCOPE_TRACKER.get().enterGrpc();
-            EngineManager.turnOnDongTai();
+            // @TODO: scope enter grpc
         } catch (Exception e) {
             DongTaiLog.error(e);
         }
@@ -140,8 +139,7 @@ public class GrpcHandler {
     public static void closeGrpcCall() {
         try {
             if (EngineManager.isEnterEntry(null)) {
-                EngineManager.turnOffDongTai();
-                EngineManager.SCOPE_TRACKER.get().leaveGrpc();
+                // @TODO: scope leave grpc
                 EngineManager.maintainRequestCount();
                 GraphBuilder.buildAndReport(null, null);
                 EngineManager.cleanThreadState();
@@ -149,8 +147,6 @@ public class GrpcHandler {
         } catch (Exception e) {
             ErrorLogReport.sendErrorLog(e);
             EngineManager.cleanThreadState();
-        } finally {
-            EngineManager.turnOnDongTai();
         }
     }
 

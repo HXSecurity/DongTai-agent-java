@@ -1,12 +1,12 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.framework.grpc;
 
-import io.dongtai.iast.core.bytecode.enhance.IastContext;
+import io.dongtai.iast.core.bytecode.enhance.ClassContext;
 import io.dongtai.iast.core.bytecode.enhance.plugin.AbstractClassVisitor;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 
 public class ServerStreamListenerImplAdapter extends AbstractClassVisitor {
-    public ServerStreamListenerImplAdapter(ClassVisitor classVisitor, IastContext context) {
+    public ServerStreamListenerImplAdapter(ClassVisitor classVisitor, ClassContext context) {
         super(classVisitor, context);
     }
 

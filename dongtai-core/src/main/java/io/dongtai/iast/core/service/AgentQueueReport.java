@@ -35,7 +35,7 @@ public class AgentQueueReport implements Runnable {
         if (EngineManager.isEngineRunning()){
             try {
                 StringBuilder replayRequestRaw = HttpClientUtils.sendPost(ApiPath.REPORT_UPLOAD, generateHeartBeatMsg());
-                if (EngineManager.isEngineRunning()){
+                if (EngineManager.isEngineRunning()) {
                     ThreadPools.submitReplayTask(replayRequestRaw);
                 }
             } catch (Exception e) {

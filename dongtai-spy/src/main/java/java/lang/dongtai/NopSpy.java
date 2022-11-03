@@ -150,7 +150,7 @@ public class NopSpy implements SpyDispatcher {
      * @since 1.3.1
      */
     @Override
-    public void enterPropagator(String signature) {
+    public void enterPropagator(boolean skipScope) {
 
     }
 
@@ -160,7 +160,7 @@ public class NopSpy implements SpyDispatcher {
      * @since 1.3.1
      */
     @Override
-    public void leavePropagator(String signature) {
+    public void leavePropagator(boolean skipScope) {
 
     }
 
@@ -171,7 +171,7 @@ public class NopSpy implements SpyDispatcher {
      * @since 1.3.1
      */
     @Override
-    public boolean isFirstLevelPropagator(String signature) {
+    public boolean isFirstLevelPropagator() {
         return false;
     }
 
@@ -278,6 +278,13 @@ public class NopSpy implements SpyDispatcher {
      */
     @Override
     public boolean collectMethodPool(Object instance, Object[] argumentArray, Object retValue, String framework, String className, String matchClassName, String methodName, String signCode, boolean isStatic, int handlerType) {
+        return false;
+    }
+
+    @Override
+    public boolean collectMethod(Object instance, Object[] parameters, Object retObject, String methodMatcher,
+                                 String className, String matchedClassName, String methodName, String signature,
+                                 boolean isStatic) {
         return false;
     }
 }

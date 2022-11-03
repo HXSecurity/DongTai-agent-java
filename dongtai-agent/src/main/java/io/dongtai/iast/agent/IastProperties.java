@@ -2,6 +2,7 @@ package io.dongtai.iast.agent;
 
 import io.dongtai.iast.agent.util.FileUtils;
 import io.dongtai.iast.common.constants.AgentConstant;
+import io.dongtai.iast.common.constants.PropertyConstant;
 import io.dongtai.log.DongTaiLog;
 
 import java.io.*;
@@ -11,46 +12,22 @@ import java.util.*;
  * @author dongzhiyong@huoxian.cn
  */
 public class IastProperties {
-    public final static String PROPERTY_DEBUG = "dongtai.debug";
-    public final static String PROPERTY_APP_CREATE = "dongtai.app.create";
-    public final static String PROPERTY_APP_NAME = "dongtai.app.name";
-    public final static String PROPERTY_APP_VERSION = "dongtai.app.version";
-    public final static String PROPERTY_ENGINE_NAME = "dongtai.engine.name";
-    public final static String PROPERTY_CLUSTER_NAME = "dongtai.cluster.name";
-    public final static String PROPERTY_CLUSTER_VERSION = "dongtai.cluster.version";
-    public final static String PROPERTY_SERVER_URL = "dongtai.server.url";
-    public final static String PROPERTY_SERVER_TOKEN = "dongtai.server.token";
-    public final static String PROPERTY_SERVER_PACKAGE = "dongtai.server.package";
-    public final static String PROPERTY_LOG = "dongtai.log";
-    public final static String PROPERTY_LOG_LEVEL = "dongtai.log.level";
-    public final static String PROPERTY_LOG_PATH = "dongtai.log.path";
-    public final static String PROPERTY_LOG_DISABLE_COLLECTOR = "dongtai.log.disable-collector";
-    public final static String PROPERTY_ENGINE_DELAY_TIME = "iast.engine.delay.time";
-    public final static String PROPERTY_PROXY_ENABLE = "iast.proxy.enable";
-    public final static String PROPERTY_PROXY_HOST = "iast.proxy.host";
-    public final static String PROPERTY_PROXY_PORT = "iast.proxy.port";
-    public final static String PROPERTY_JAR_SPY_URL = "iast.jar.spy.url";
-    public final static String PROPERTY_JAR_CORE_URL = "iast.jar.core.url";
-    public final static String PROPERTY_JAR_API_URL = "iast.jar.api.url";
-    public final static String PROPERTY_LOG_ADDRESS = "dongtai.log.address";
-    public final static String PROPERTY_LOG_PORT = "dongtai.log.port";
-    public final static String PROPERTY_FALLBACK_VERSION = "dongtai.fallback.version";
-
     public final static Map<String, String> ATTACH_ARG_MAP = new HashMap<String, String>() {{
-        put("debug", IastProperties.PROPERTY_DEBUG);
-        put("app_create", IastProperties.PROPERTY_APP_CREATE);
-        put("app_name", IastProperties.PROPERTY_APP_NAME);
-        put("app_version", IastProperties.PROPERTY_APP_VERSION);
-        put("engine_name", IastProperties.PROPERTY_ENGINE_NAME);
-        put("cluster_name", IastProperties.PROPERTY_CLUSTER_NAME);
-        put("cluster_version", IastProperties.PROPERTY_CLUSTER_VERSION);
-        put("dongtai_server", IastProperties.PROPERTY_SERVER_URL);
-        put("dongtai_token", IastProperties.PROPERTY_SERVER_TOKEN);
-        put("server_package", IastProperties.PROPERTY_SERVER_PACKAGE);
-        put("log", IastProperties.PROPERTY_LOG);
-        put("log_level", IastProperties.PROPERTY_LOG_LEVEL);
-        put("log_path", IastProperties.PROPERTY_LOG_PATH);
-        put("log_disable_collector", IastProperties.PROPERTY_LOG_DISABLE_COLLECTOR);
+        put("debug", PropertyConstant.PROPERTY_DEBUG);
+        put("app_create", PropertyConstant.PROPERTY_APP_CREATE);
+        put("app_name", PropertyConstant.PROPERTY_APP_NAME);
+        put("app_version", PropertyConstant.PROPERTY_APP_VERSION);
+        put("engine_name", PropertyConstant.PROPERTY_ENGINE_NAME);
+        put("cluster_name", PropertyConstant.PROPERTY_CLUSTER_NAME);
+        put("cluster_version", PropertyConstant.PROPERTY_CLUSTER_VERSION);
+        put("dongtai_server", PropertyConstant.PROPERTY_SERVER_URL);
+        put("dongtai_token", PropertyConstant.PROPERTY_SERVER_TOKEN);
+        put("server_package", PropertyConstant.PROPERTY_SERVER_PACKAGE);
+        put("policy_path", PropertyConstant.PROPERTY_POLICY_PATH);
+        put("log", PropertyConstant.PROPERTY_LOG);
+        put("log_level", PropertyConstant.PROPERTY_LOG_LEVEL);
+        put("log_path", PropertyConstant.PROPERTY_LOG_PATH);
+        put("log_disable_collector", PropertyConstant.PROPERTY_LOG_DISABLE_COLLECTOR);
     }};
 
     private static IastProperties instance;
@@ -141,7 +118,7 @@ public class IastProperties {
 
     private String getDebugFlag() {
         if (debugFlag == null) {
-            debugFlag = System.getProperty(PROPERTY_DEBUG, "false");
+            debugFlag = System.getProperty(PropertyConstant.PROPERTY_DEBUG, "false");
         }
         return debugFlag;
     }
@@ -152,7 +129,7 @@ public class IastProperties {
 
     public Integer isAutoCreateProject() {
         if (null == isAutoCreateProject) {
-            String result = System.getProperty(PROPERTY_APP_CREATE,
+            String result = System.getProperty(PropertyConstant.PROPERTY_APP_CREATE,
                     System.getProperty("project.create", cfg.getProperty("project.create", "false"))
             );
             if ("true".equalsIgnoreCase(result)) {
@@ -167,7 +144,8 @@ public class IastProperties {
     public String getProjectName() {
         if (null == projectName) {
             String[] names = new String[]{
-                    PROPERTY_APP_NAME, "mse.appName", "arms.appName", "service.name", "app.name", "project.name",
+                    PropertyConstant.PROPERTY_APP_NAME, "mse.appName", "arms.appName",
+                    "service.name", "app.name", "project.name",
             };
             for (String name : names) {
                 projectName = System.getProperty(name);
@@ -181,57 +159,63 @@ public class IastProperties {
     }
 
     public String getProjectVersion() {
-        return System.getProperty(PROPERTY_APP_VERSION,
+        return System.getProperty(PropertyConstant.PROPERTY_APP_VERSION,
                 System.getProperty("project.version", cfg.getProperty("project.version", "V1.0"))
         );
     }
 
     public String getEngineName() {
         if (null == engineName) {
-            engineName = System.getProperty(PROPERTY_ENGINE_NAME, cfg.getProperty("engine.name", "agent"));
+            engineName = System.getProperty(PropertyConstant.PROPERTY_ENGINE_NAME,
+                    cfg.getProperty("engine.name", "agent"));
         }
         return engineName;
     }
 
     public String getClusterName() {
         if (clusterName == null) {
-            clusterName = System.getProperty(PROPERTY_CLUSTER_NAME, cfg.getProperty(PROPERTY_CLUSTER_NAME, ""));
+            clusterName = System.getProperty(PropertyConstant.PROPERTY_CLUSTER_NAME,
+                    cfg.getProperty(PropertyConstant.PROPERTY_CLUSTER_NAME, ""));
         }
         return clusterName;
     }
 
     public String getClusterVersion() {
         if (clusterVersion == null) {
-            clusterVersion = System.getProperty(PROPERTY_CLUSTER_VERSION, cfg.getProperty(PROPERTY_CLUSTER_VERSION, ""));
+            clusterVersion = System.getProperty(PropertyConstant.PROPERTY_CLUSTER_VERSION,
+                    cfg.getProperty(PropertyConstant.PROPERTY_CLUSTER_VERSION, ""));
         }
         return clusterVersion;
     }
 
     public String getBaseUrl() {
         if (null == serverUrl) {
-            serverUrl = System.getProperty(PROPERTY_SERVER_URL, cfg.getProperty("iast.server.url"));
+            serverUrl = System.getProperty(PropertyConstant.PROPERTY_SERVER_URL,
+                    cfg.getProperty("iast.server.url"));
         }
         return serverUrl;
     }
 
     public String getServerToken() {
         if (null == serverToken) {
-            serverToken = System.getProperty(PROPERTY_SERVER_TOKEN, cfg.getProperty("iast.server.token"));
+            serverToken = System.getProperty(PropertyConstant.PROPERTY_SERVER_TOKEN,
+                    cfg.getProperty("iast.server.token"));
         }
         return serverToken;
     }
 
     public String getIsDownloadPackage() {
         if (null == isDownloadPackage) {
-            isDownloadPackage = System.getProperty(PROPERTY_SERVER_PACKAGE, cfg.getProperty(PROPERTY_SERVER_PACKAGE, "true"));
+            isDownloadPackage = System.getProperty(PropertyConstant.PROPERTY_SERVER_PACKAGE,
+                    cfg.getProperty(PropertyConstant.PROPERTY_SERVER_PACKAGE, "true"));
         }
         return isDownloadPackage;
     }
 
     public Boolean getLogDisableCollector() {
         if (logDisableCollector == null) {
-            String disable = System.getProperty(PROPERTY_LOG_DISABLE_COLLECTOR,
-                    cfg.getProperty(PROPERTY_LOG_DISABLE_COLLECTOR, "false"));
+            String disable = System.getProperty(PropertyConstant.PROPERTY_LOG_DISABLE_COLLECTOR,
+                    cfg.getProperty(PropertyConstant.PROPERTY_LOG_DISABLE_COLLECTOR, "false"));
             logDisableCollector = "true".equalsIgnoreCase(disable);
         }
         return logDisableCollector;
@@ -239,15 +223,16 @@ public class IastProperties {
 
     public Integer getDelayTime() {
         if (delayTime == null) {
-            delayTime = Integer.parseInt(System.getProperty(PROPERTY_ENGINE_DELAY_TIME,
-                    cfg.getProperty(PROPERTY_ENGINE_DELAY_TIME, "0")));
+            delayTime = Integer.parseInt(System.getProperty(PropertyConstant.PROPERTY_ENGINE_DELAY_TIME,
+                    cfg.getProperty(PropertyConstant.PROPERTY_ENGINE_DELAY_TIME, "0")));
         }
         return delayTime;
     }
 
     private String getProxyEnableStatus() {
         if (null == proxyEnableStatus) {
-            proxyEnableStatus = System.getProperty(PROPERTY_PROXY_ENABLE, cfg.getProperty(PROPERTY_PROXY_ENABLE, "false"));
+            proxyEnableStatus = System.getProperty(PropertyConstant.PROPERTY_PROXY_ENABLE,
+                    cfg.getProperty(PropertyConstant.PROPERTY_PROXY_ENABLE, "false"));
         }
         return proxyEnableStatus;
     }
@@ -258,57 +243,61 @@ public class IastProperties {
 
     public String getProxyHost() {
         if (null == proxyHost) {
-            proxyHost = System.getProperty(PROPERTY_PROXY_HOST, cfg.getProperty(PROPERTY_PROXY_HOST, ""));
+            proxyHost = System.getProperty(PropertyConstant.PROPERTY_PROXY_HOST,
+                    cfg.getProperty(PropertyConstant.PROPERTY_PROXY_HOST, ""));
         }
         return proxyHost;
     }
 
     public int getProxyPort() {
         if (-1 == proxyPort) {
-            proxyPort = Integer.parseInt(System.getProperty(PROPERTY_PROXY_PORT,
-                    cfg.getProperty(PROPERTY_PROXY_PORT, "")));
+            proxyPort = Integer.parseInt(System.getProperty(PropertyConstant.PROPERTY_PROXY_PORT,
+                    cfg.getProperty(PropertyConstant.PROPERTY_PROXY_PORT, "")));
         }
         return proxyPort;
     }
 
     public String getCustomSpyJarUrl() {
         if (null == customSpyJarUrl) {
-            customSpyJarUrl = System.getProperty(PROPERTY_JAR_SPY_URL, cfg.getProperty(PROPERTY_JAR_SPY_URL, ""));
+            customSpyJarUrl = System.getProperty(PropertyConstant.PROPERTY_JAR_SPY_URL,
+                    cfg.getProperty(PropertyConstant.PROPERTY_JAR_SPY_URL, ""));
         }
         return customSpyJarUrl;
     }
 
     public String getCustomCoreJarUrl() {
         if (null == customCoreJarUrl) {
-            customCoreJarUrl = System.getProperty(PROPERTY_JAR_CORE_URL, cfg.getProperty(PROPERTY_JAR_CORE_URL, ""));
+            customCoreJarUrl = System.getProperty(PropertyConstant.PROPERTY_JAR_CORE_URL,
+                    cfg.getProperty(PropertyConstant.PROPERTY_JAR_CORE_URL, ""));
         }
         return customCoreJarUrl;
     }
 
     public String getCustomApiJarUrl() {
         if (null == customApiJarUrl) {
-            customApiJarUrl = System.getProperty(PROPERTY_JAR_API_URL, cfg.getProperty(PROPERTY_JAR_API_URL, ""));
+            customApiJarUrl = System.getProperty(PropertyConstant.PROPERTY_JAR_API_URL,
+                    cfg.getProperty(PropertyConstant.PROPERTY_JAR_API_URL, ""));
         }
         return customApiJarUrl;
     }
 
     public String getLogAddress() {
         if (logAddress == null) {
-            logAddress = System.getProperty(PROPERTY_LOG_ADDRESS, "");
+            logAddress = System.getProperty(PropertyConstant.PROPERTY_LOG_ADDRESS, "");
         }
         return logAddress;
     }
 
     public String getLogPort() {
         if (logPort == null) {
-            logPort = System.getProperty(PROPERTY_LOG_PORT, "");
+            logPort = System.getProperty(PropertyConstant.PROPERTY_LOG_PORT, "");
         }
         return logPort;
     }
 
     public String getFallbackVersion() {
         if (fallbackVersion == null) {
-            fallbackVersion = System.getProperty(PROPERTY_FALLBACK_VERSION, "v2");
+            fallbackVersion = System.getProperty(PropertyConstant.PROPERTY_FALLBACK_VERSION, "v2");
         }
         return fallbackVersion;
     }

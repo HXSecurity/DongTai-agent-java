@@ -2,7 +2,6 @@ package io.dongtai.iast.core.utils;
 
 import io.dongtai.iast.common.enums.HttpMethods;
 import io.dongtai.iast.common.utils.AbstractHttpClientUtils;
-import io.dongtai.iast.core.EngineManager;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,13 +15,6 @@ public class HttpClientUtils extends AbstractHttpClientUtils {
     private static final PropertyUtils PROPERTIES = PropertyUtils.getInstance();
     private static String proxyHost = "";
     private static int proxyPort = -1;
-
-    private static final HttpClientExceptionHandler EXCEPTION_HANDLER = new HttpClientExceptionHandler() {
-        @Override
-        public void run() {
-            EngineManager.turnOffEngine();
-        }
-    };
 
     static {
         if (PROPERTIES.isProxyEnable()) {
@@ -46,7 +38,7 @@ public class HttpClientUtils extends AbstractHttpClientUtils {
         setToken(headers);
 
         return sendRequest(HttpMethods.GET, PROPERTIES.getBaseUrl() + uri, null, headers, MAX_RETRIES,
-                proxyHost, proxyPort, EXCEPTION_HANDLER);
+                proxyHost, proxyPort, null);
     }
 
     public static StringBuilder sendPost(String uri, String value) {
@@ -56,7 +48,7 @@ public class HttpClientUtils extends AbstractHttpClientUtils {
         headers.put(HEADER_CONTENT_ENCODING, REQUEST_ENCODING_TYPE);
 
         return sendRequest(HttpMethods.POST, PROPERTIES.getBaseUrl() + uri, value, headers, MAX_RETRIES,
-                proxyHost, proxyPort, EXCEPTION_HANDLER);
+                proxyHost, proxyPort, null);
     }
 
     public static boolean downloadRemoteJar(String fileURI, String fileName) {
@@ -67,6 +59,6 @@ public class HttpClientUtils extends AbstractHttpClientUtils {
     }
 
     private static void setToken(Map<String, String> headers) {
-        headers.put(REQUEST_HEADER_TOKEN_KEY, "Token " + PROPERTIES.getIastServerToken());
+        headers.put(REQUEST_HEADER_TOKEN_KEY, "Token " + PROPERTIES.getServerToken());
     }
 }

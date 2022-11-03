@@ -1,12 +1,12 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.framework.grpc;
 
-import io.dongtai.iast.core.bytecode.enhance.IastContext;
+import io.dongtai.iast.core.bytecode.enhance.ClassContext;
 import io.dongtai.iast.core.bytecode.enhance.plugin.AbstractClassVisitor;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 
 public class ByteStringAdapter extends AbstractClassVisitor {
-    public ByteStringAdapter(ClassVisitor classVisitor, IastContext context) {
+    public ByteStringAdapter(ClassVisitor classVisitor, ClassContext context) {
         super(classVisitor, context);
     }
 

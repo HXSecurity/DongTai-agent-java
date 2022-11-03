@@ -16,11 +16,12 @@ public class GetApiThread extends Thread {
 
     @Override
     public void run() {
-        if (SpringApplicationImpl.getAPI == null) {
-            return;
-        }
-        Map<String, Object> invoke = null;
         try {
+            if (SpringApplicationImpl.getAPI == null) {
+                return;
+            }
+            Map<String, Object> invoke = null;
+
             invoke = (Map<String, Object>) SpringApplicationImpl.getAPI.invoke(null, applicationContext);
             ApiReport.sendReport(invoke);
         } catch (IllegalAccessException e) {
@@ -29,6 +30,7 @@ public class GetApiThread extends Thread {
             DongTaiLog.error("GetApiThread failed: " + e.toString(), e);
         } finally {
             SpringApplicationImpl.isSend = true;
+            SpringApplicationImpl.getAPI = null;
         }
     }
 

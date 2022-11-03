@@ -2,14 +2,9 @@
 iast.name=dongtai-Enterprise
 iast.server.url=https://iast.io/openapi
 iast.server.token=39133a96f5735c253edd908078846c1051824edc
-iast.allhook.enable=false
 iast.dump.class.enable=false
 iast.dump.class.path=/tmp/iast-class-dump/
-iast.service.report.interval=6000
-app.name=DongTai
 engine.name=java.action.github.com
-engine.status=start
-jdk.version=1
 project.name=ExampleApplication
 project.create=
 project.version=

@@ -1,13 +1,13 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.service.jdbc;
 
-import io.dongtai.iast.core.bytecode.enhance.IastContext;
+import io.dongtai.iast.core.bytecode.enhance.ClassContext;
 import io.dongtai.iast.core.bytecode.enhance.plugin.AbstractClassVisitor;
 import io.dongtai.log.DongTaiLog;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 
 public class MysqlJdbcDriverAdapter extends AbstractClassVisitor {
-    public MysqlJdbcDriverAdapter(ClassVisitor classVisitor, IastContext context) {
+    public MysqlJdbcDriverAdapter(ClassVisitor classVisitor, ClassContext context) {
         super(classVisitor, context);
     }
 

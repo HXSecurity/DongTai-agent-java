@@ -1,0 +1,13 @@
+{
+  "status": 201,
+  "msg": "success",
+  "data": [
+    {
+      "type": 4,
+      "signature": "A.b()",
+      "source": "invalid",
+      "inherit": "false",
+      "vul_type": "ssrf"
+    }
+  ]
+}

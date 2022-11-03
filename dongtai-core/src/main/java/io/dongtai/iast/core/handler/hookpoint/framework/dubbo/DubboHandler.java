@@ -1,6 +1,7 @@
 package io.dongtai.iast.core.handler.hookpoint.framework.dubbo;
 
 
+import io.dongtai.iast.common.scope.ScopeManager;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.context.ContextManager;
 import io.dongtai.iast.core.handler.hookpoint.IastServer;
@@ -79,7 +80,7 @@ public class DubboHandler {
         Map<String, String> attachments = getAttachments(invocation);
         enterDubboEntry(dubboService, attachments);
 
-        if (EngineManager.isEnterHttp()) {
+        if (ScopeManager.SCOPE_TRACKER.getHttpEntryScope().in()) {
             return;
         }
 

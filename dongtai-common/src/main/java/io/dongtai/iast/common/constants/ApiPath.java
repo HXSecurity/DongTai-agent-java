@@ -7,7 +7,7 @@ public class ApiPath {
     public static final String REPORT_UPLOAD = "/api/v1/report/upload";
     public static final String AGENT_UPDATE = "/api/v1/agent/update";
     public static final String STARTUP_TIME = "/api/v1/agent/gzipstartuptime";
-    public static final String HOOK_PROFILE = "/api/v1/profiles";
+    public static final String HOOK_PROFILE = "/api/v1/profilesv2";
     public static final String SERVER_CONFIG = "/api/v1/agent/threshold";
     public static final String SERVER_CONFIG_V2 = "/api/v1/agent/thresholdv2";
 }

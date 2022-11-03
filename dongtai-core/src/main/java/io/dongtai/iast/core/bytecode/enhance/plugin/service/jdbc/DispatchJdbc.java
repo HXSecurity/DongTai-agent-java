@@ -1,7 +1,8 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.service.jdbc;
 
-import io.dongtai.iast.core.bytecode.enhance.IastContext;
+import io.dongtai.iast.core.bytecode.enhance.ClassContext;
 import io.dongtai.iast.core.bytecode.enhance.plugin.DispatchPlugin;
+import io.dongtai.iast.core.handler.hookpoint.models.policy.Policy;
 import org.objectweb.asm.ClassVisitor;
 
 public class DispatchJdbc implements DispatchPlugin {
@@ -13,7 +14,7 @@ public class DispatchJdbc implements DispatchPlugin {
     private final String classOfPostgresqlDriver = " org.postgresql.Driver".substring(1);
 
     @Override
-    public ClassVisitor dispatch(ClassVisitor classVisitor, IastContext context) {
+    public ClassVisitor dispatch(ClassVisitor classVisitor, ClassContext context, Policy policy) {
         String className = context.getClassName();
 
         if (classOfMysqlJdbcDriver.equals(className)) {
@@ -25,10 +26,5 @@ public class DispatchJdbc implements DispatchPlugin {
         }
 
         return classVisitor;
-    }
-
-    @Override
-    public String isMatch() {
-        return null;
     }
 }

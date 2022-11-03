@@ -1,6 +1,6 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.framework.dubbo;
 
-import io.dongtai.iast.core.bytecode.enhance.IastContext;
+import io.dongtai.iast.core.bytecode.enhance.ClassContext;
 import io.dongtai.iast.core.bytecode.enhance.plugin.AbstractAdviceAdapter;
 import io.dongtai.iast.core.handler.hookpoint.controller.HookType;
 import org.objectweb.asm.Label;
@@ -14,7 +14,7 @@ public class DubboAdviceAdapter extends AbstractAdviceAdapter {
     private int athrowCounts = 0;
 
     public DubboAdviceAdapter(MethodVisitor mv, int access, String name, String desc, String signCode,
-            IastContext context) {
+                              ClassContext context) {
         super(mv, access, name, desc, context, "dubbo", signCode);
     }
 
