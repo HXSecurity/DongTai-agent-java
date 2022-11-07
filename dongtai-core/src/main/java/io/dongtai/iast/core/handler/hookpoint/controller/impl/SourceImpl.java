@@ -3,6 +3,7 @@ package io.dongtai.iast.core.handler.hookpoint.controller.impl;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.SourceNode;
+import io.dongtai.iast.core.handler.hookpoint.models.policy.TaintPosition;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.taintrange.*;
 import io.dongtai.iast.core.utils.StackUtils;
 import io.dongtai.iast.core.utils.TaintPoolUtils;
@@ -29,8 +30,8 @@ public class SourceImpl {
     private static final String SPRING_OBJECT = " org.springframework.".substring(1);
 
     public static void solveSource(MethodEvent event, SourceNode sourceNode, AtomicInteger invokeIdSequencer) {
-        if (!TaintPoolUtils.isNotEmpty(event.returnValue)
-                || !TaintPoolUtils.isAllowTaintType(event.returnValue)
+        if (!TaintPoolUtils.isNotEmpty(event.returnInstance)
+                || !TaintPoolUtils.isAllowTaintType(event.returnInstance)
                 || !allowCall(event)) {
             return;
         }
@@ -40,23 +41,49 @@ public class SourceImpl {
 
         int invokeId = invokeIdSequencer.getAndIncrement();
         event.setInvokeId(invokeId);
-        // @TODO: use source/target
-        event.setInValue(event.argumentArray);
-        event.setOutValue(event.returnValue);
 
-        EngineManager.TRACK_MAP.addTrackMethod(invokeId, event);
-        trackTarget(event);
-    }
-
-    private static void trackTarget(MethodEvent event) {
-        int length = TaintRangesBuilder.getLength(event.returnValue);
-        if (length == 0) {
+        boolean valid = trackTarget(event);
+        if (!valid) {
             return;
         }
 
-        trackObject(event, event.returnValue, 0);
+        for (TaintPosition src : sourceNode.getSources()) {
+            if (src.isObject()) {
+                event.setObjectValue(event.returnInstance, true);
+            } else if (src.isParameter()) {
+                if (event.parameterInstances.length > src.getParameterIndex()) {
+                    event.addParameterValue(src.getParameterIndex(), event.parameterInstances[src.getParameterIndex()], true);
+                }
+            }
+        }
+
+        for (TaintPosition tgt : sourceNode.getTargets()) {
+            if (tgt.isObject()) {
+                event.setObjectValue(event.returnInstance, true);
+            } else if (tgt.isParameter()) {
+                if (event.parameterInstances.length > tgt.getParameterIndex()) {
+                    event.addParameterValue(tgt.getParameterIndex(), event.parameterInstances[tgt.getParameterIndex()], true);
+                }
+            } else if (tgt.isReturn()) {
+                event.setReturnValue(event.returnInstance, true);
+
+            }
+        }
+        event.setTaintPositions(sourceNode.getSources(), sourceNode.getTargets());
+
+        EngineManager.TRACK_MAP.addTrackMethod(invokeId, event);
+    }
+
+    private static boolean trackTarget(MethodEvent event) {
+        int length = TaintRangesBuilder.getLength(event.returnInstance);
+        if (length == 0) {
+            return false;
+        }
+
+        trackObject(event, event.returnInstance, 0);
         // @TODO: hook json serializer for custom model
         handlerCustomModel(event);
+        return true;
     }
 
     private static void trackObject(MethodEvent event, Object obj, int depth) {
@@ -147,7 +174,7 @@ public class SourceImpl {
      */
     public static void handlerCustomModel(MethodEvent event) {
         if (!event.getMethodName().equals("getSession")) {
-            Set<Object> modelValues = parseCustomModel(event.returnValue);
+            Set<Object> modelValues = parseCustomModel(event.returnInstance);
             for (Object modelValue : modelValues) {
                 trackObject(event, modelValue, 0);
             }
@@ -217,7 +244,7 @@ public class SourceImpl {
     private static boolean allowCall(MethodEvent event) {
         boolean allowed = true;
         if (METHOD_OF_GETATTRIBUTE.equals(event.getMethodName())) {
-            return allowAttribute((String) event.argumentArray[0]);
+            return allowAttribute((String) event.parameterInstances[0]);
         }
         return allowed;
     }

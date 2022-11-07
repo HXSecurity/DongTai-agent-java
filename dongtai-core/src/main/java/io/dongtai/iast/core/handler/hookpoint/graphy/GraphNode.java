@@ -1,6 +1,8 @@
 package io.dongtai.iast.core.handler.hookpoint.graphy;
 
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
+import io.dongtai.iast.core.handler.hookpoint.models.policy.TaintPosition;
+import io.dongtai.iast.core.utils.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -13,61 +15,32 @@ import java.util.*;
  */
 public class GraphNode {
     /**
-     * 标记是否为source方法
+     * is source policy
      */
     private final boolean isSource;
     /**
-     * 方法调用ID
+     * method invoke id
      */
     private final int invokeId;
+    private List<String> sourcePositions = new ArrayList<String>();
+    private List<String> targetPositions = new ArrayList<String>();
     /**
-     * 当前方法被调用方法的类名
+     * current method caller class name
      */
     private final String callerClass;
     /**
-     * 当前方法被调用方法的名称
+     * current method caller method name
      */
     private final String callerMethod;
     /**
-     * 当前方法在被调用方法中的行号
+     * current method caller file line number
      */
     private final int callerLineNumber;
-
-    private final String sourceValues;
-
-    private final boolean sourceIsReference;
-
-    private final String targetValues;
-
-    private final boolean targetIsReference;
-
-    /**
-     * 当前方法所在类继承的类名称
-     */
-    public void setInterfaceNames(Set<String> interfaceNames) {
-        if (interfaceNames == null) {
-            this.interfaceNames = null;
-        } else {
-            int totals = interfaceNames.size();
-            int index = 0;
-            String[] interfaces = new String[totals];
-
-            for (String interfaceName : interfaceNames) {
-                interfaces[index++] = interfaceName;
-            }
-            this.interfaceNames = interfaces;
-        }
-    }
-
-    /**
-     * 当前方法所在类实现的接口列表
-     */
-    private String[] interfaceNames;
 
     /**
      * 方法所在类的原始名称
      */
-    private final String matchClassName;
+    private final String matchedClassName;
     /**
      * 当前方法所在类的名称
      */
@@ -80,14 +53,9 @@ public class GraphNode {
      * 当前方法的方法签名
      */
     private final String signature;
-    /**
-     * 当前方法的参数列表
-     */
-    private final String args;
-    /**
-     * 当前方法的返回值对应的类名称
-     */
-    private final String retClassName;
+    private final String objectValue;
+    private final List<MethodEvent.Parameter> parameterValues;
+    private final String returnValue;
     /**
      * 来源污点hash
      */
@@ -97,122 +65,78 @@ public class GraphNode {
      */
     private final Set<Integer> targetHash;
 
-    /**
-     * 增加一组hashcode，用于处理rpc请求中，污点断链的情况
-     *
-     * @issue: http://
-     */
-    private final Set<Integer> sourceHashForRpc;
-
-    /**
-     * 增加一组hashcode，用于处理rpc请求中，污点断链的情况
-     *
-     * @issue: http://
-     */
-    private final Set<Integer> targetHashForRpc;
-
-    private final String traceId;
-    private final String serviceName;
-    private final String plugin;
-    private final Boolean projectPropagatorClose;
-
     private List<MethodEvent.MethodEventTargetRange> targetRanges = new ArrayList<MethodEvent.MethodEventTargetRange>();
 
     public List<MethodEvent.MethodEventSourceType> sourceTypes;
 
-    public GraphNode(boolean isSource,
-                     int invokeId,
-                     String callerClass,
-                     String callerMethod,
-                     int callerLineNumber,
-                     Set<String> interfaceNames,
-                     String matchClassName,
-                     String originClassName,
-                     String methodName,
-                     String signature,
-                     String args,
-                     String retClassName,
-                     Set<Integer> sourceHash,
-                     Set<Integer> targetHash,
-                     String sourceValues,
-                     boolean sourceIsReference,
-                     String targetValues,
-                     boolean targetIsReference,
-                     Set<Integer> sourceHashForRpc,
-                     Set<Integer> targetHashForRpc,
-                     String traceId,
-                     String serviceName,
-                     String plugin,
-                     Boolean projectPropagatorClose,
-                     List<MethodEvent.MethodEventTargetRange> targetRanges,
-                     List<MethodEvent.MethodEventSourceType> sourceTypes
-    ) {
-        this.isSource = isSource;
-        this.invokeId = invokeId;
-        this.callerClass = callerClass;
-        this.callerMethod = callerMethod;
-        this.callerLineNumber = callerLineNumber;
-        this.setInterfaceNames(interfaceNames);
-        this.matchClassName = matchClassName;
-        this.originClassName = originClassName;
-        this.methodName = methodName;
-        this.signature = signature;
-        this.args = args;
-        this.retClassName = retClassName;
-        this.sourceHash = sourceHash;
-        this.targetHash = targetHash;
-        this.sourceValues = sourceValues;
-        this.sourceIsReference = sourceIsReference;
-        this.targetValues = targetValues;
-        this.targetIsReference = targetIsReference;
-        this.sourceHashForRpc = sourceHashForRpc;
-        this.targetHashForRpc = targetHashForRpc;
-        this.traceId = traceId;
-        this.serviceName = serviceName;
-        this.plugin = plugin;
-        this.projectPropagatorClose = projectPropagatorClose;
-        this.targetRanges = targetRanges;
-        this.sourceTypes = sourceTypes;
+    public GraphNode(MethodEvent event) {
+        this.isSource = event.isSource();
+        this.invokeId = event.getInvokeId();
+        if (event.getSourcePositions() != null && event.getSourcePositions().size() > 0) {
+            for (TaintPosition src : event.getSourcePositions()) {
+                this.sourcePositions.add(src.toString());
+            }
+        }
+        if (event.getTargetPositions() != null && event.getTargetPositions().size() > 0) {
+            for (TaintPosition tgt : event.getTargetPositions()) {
+                this.targetPositions.add(tgt.toString());
+            }
+        }
+
+        this.matchedClassName = event.getMatchedClassName();
+        this.originClassName = event.getOriginClassName();
+        this.methodName = event.getMethodName();
+        this.signature = event.getSignature();
+        this.objectValue = event.objectValue;
+        this.parameterValues = event.parameterValues;
+        this.returnValue = event.returnValue;
+        this.callerClass = event.getCallerClass();
+        this.callerMethod = event.getCallerMethod();
+        this.callerLineNumber = event.getCallerLine();
+        this.sourceHash = event.getSourceHashes();
+        this.targetHash = event.getTargetHashes();
+        this.targetRanges = event.targetRanges;
+        this.sourceTypes = event.sourceTypes;
     }
 
     public JSONObject toJson() {
         JSONObject value = new JSONObject();
-        JSONArray interfaceArray = new JSONArray();
+        JSONArray parameterArray = new JSONArray();
         JSONArray sourceHashArray = new JSONArray();
         JSONArray targetHashArray = new JSONArray();
-        JSONArray sourceHashForRpcArray = new JSONArray();
-        JSONArray targetHashForRpcArray = new JSONArray();
+        JSONObject taintPosition = new JSONObject();
 
-        value.put("source", isSource);
         value.put("invokeId", invokeId);
+        value.put("source", isSource);
+        value.put("originClassName", originClassName);
+        value.put("className", matchedClassName);
+        value.put("methodName", methodName);
+        value.put("signature", signature);
         value.put("callerClass", callerClass);
         value.put("callerMethod", callerMethod);
         value.put("callerLineNumber", callerLineNumber);
-        value.put("interfaces", interfaceArray);
-        value.put("originClassName", originClassName);
-        value.put("className", matchClassName);
-        value.put("methodName", methodName);
-        value.put("signature", signature);
-        value.put("args", args);
-        value.put("retClassName", retClassName);
         value.put("sourceHash", sourceHashArray);
-        value.put("sourceValues", sourceValues);
-        value.put("sourceIsReference",sourceIsReference);
         value.put("targetHash", targetHashArray);
-        value.put("targetIsReference", targetIsReference);
-        value.put("targetValues", targetValues);
-        value.put("sourceHashForRpc", sourceHashForRpcArray);
-        value.put("targetHashForRpc", targetHashForRpcArray);
-        value.put("traceId", traceId);
-        value.put("serviceName", serviceName);
-        value.put("plugin", plugin);
-        value.put("projectPropagatorClose", projectPropagatorClose);
 
+        value.put("taintPosition", taintPosition);
+        if (this.sourcePositions.size() > 0) {
+            taintPosition.put("source", this.sourcePositions);
+        }
+        if (this.targetPositions.size() > 0) {
+            taintPosition.put("target", this.targetPositions);
+        }
 
-        if (interfaceNames != null) {
-            for (String interfaceName : interfaceNames) {
-                interfaceArray.put(interfaceName);
+        if (!StringUtils.isEmpty(this.objectValue)) {
+            value.put("objValue", objectValue);
+        }
+        if (this.parameterValues != null && this.parameterValues.size() > 0) {
+            for (MethodEvent.Parameter parameter : this.parameterValues) {
+                parameterArray.put(parameter.toJson());
             }
+            value.put("parameterValues", parameterArray);
+        }
+        if (!StringUtils.isEmpty(this.returnValue)) {
+            value.put("retValue", returnValue);
         }
 
         for (Integer hash : sourceHash) {
@@ -223,18 +147,12 @@ public class GraphNode {
             targetHashArray.put(hash);
         }
 
-        for (Integer hash : this.sourceHashForRpc) {
-            sourceHashForRpcArray.put(hash);
-        }
-
-        for (Integer hash : this.targetHashForRpc) {
-            targetHashForRpcArray.put(hash);
-        }
-
-        JSONArray tr = new JSONArray();
-        value.put("targetRange", tr);
-        for (MethodEvent.MethodEventTargetRange range : targetRanges) {
-            tr.put(range.toJson());
+        if (targetRanges.size() > 0) {
+            JSONArray tr = new JSONArray();
+            value.put("targetRange", tr);
+            for (MethodEvent.MethodEventTargetRange range : targetRanges) {
+                tr.put(range.toJson());
+            }
         }
 
         if (sourceTypes != null && sourceTypes.size() > 0) {

@@ -55,10 +55,6 @@ public class TaintPosition {
         this.parameterIndex = index;
     }
 
-    public String getValue() {
-        return this.value;
-    }
-
     public boolean isObject() {
         return this.equals(POS_OBJECT);
     }
@@ -153,6 +149,11 @@ public class TaintPosition {
         }
 
         return false;
+    }
+
+    @Override
+    public String toString() {
+        return this.value;
     }
 
     @Override

@@ -40,7 +40,8 @@ public class PolicyScope {
     }
 
     public boolean isValidPropagator() {
-        return this.agentLevel == 0 && (this.propagatorLevel == 1 || this.propagatorSkipDepth > 0);
+        return this.agentLevel == 0 && this.sourceLevel == 0
+                && (this.propagatorLevel == 1 || this.propagatorSkipDepth > 0);
     }
 
     public void leavePropagator(boolean skipScope) {
@@ -55,7 +56,7 @@ public class PolicyScope {
     }
 
     public boolean isValidSink() {
-        return this.agentLevel == 0;
+        return this.agentLevel == 0 && this.sourceLevel == 0 && this.sinkLevel == 1;
     }
 
     public void leaveSink() {

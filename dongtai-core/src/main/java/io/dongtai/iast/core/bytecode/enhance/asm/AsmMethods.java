@@ -56,39 +56,7 @@ public interface AsmMethods {
             Object.class,
             boolean.class
     );
-    Method SPY$enterDubbo = InnerHelper.getAsmMethod(
-            SpyDispatcher.class,
-            "enterDubbo"
-    );
-    Method SPY$leaveDubbo = InnerHelper.getAsmMethod(
-            SpyDispatcher.class,
-            "leaveDubbo",
-            Object.class,
-            Object.class
-    );
-    Method SPY$isFirstLevelDubbo = InnerHelper.getAsmMethod(
-            SpyDispatcher.class,
-            "isFirstLevelDubbo"
-    );
-    Method SPY$enterKafka = InnerHelper.getAsmMethod(
-            SpyDispatcher.class,
-            "enterKafka",
-            Object.class
-    );
-    Method SPY$kafkaBeforeSend = InnerHelper.getAsmMethod(
-            SpyDispatcher.class,
-            "kafkaBeforeSend",
-            Object.class
-    );
-    Method SPY$kafkaAfterPoll = InnerHelper.getAsmMethod(
-            SpyDispatcher.class,
-            "kafkaAfterPoll",
-            Object.class
-    );
-    Method SPY$leaveKafka = InnerHelper.getAsmMethod(
-            SpyDispatcher.class,
-            "leaveKafka"
-    );
+
     Method SPY$enterSource = InnerHelper.getAsmMethod(
             SpyDispatcher.class,
             "enterSource"
@@ -156,40 +124,6 @@ public interface AsmMethods {
             boolean.class
     );
 
-    Method SPY$clientInterceptor = InnerHelper.getAsmMethod(
-            SpyDispatcher.class,
-            "clientInterceptor",
-            Object.class
-    );
-    Method SPY$serverInterceptor = InnerHelper.getAsmMethod(
-            SpyDispatcher.class,
-            "serverInterceptor",
-            Object.class
-    );
-    Method SPY$startGrpcCall = InnerHelper.getAsmMethod(
-            SpyDispatcher.class,
-            "startGrpcCall"
-    );
-    Method SPY$closeGrpcCall = InnerHelper.getAsmMethod(
-            SpyDispatcher.class,
-            "closeGrpcCall"
-    );
-    Method SPY$blockingUnaryCall = InnerHelper.getAsmMethod(
-            SpyDispatcher.class,
-            "blockingUnaryCall",
-            Object.class,
-            Object.class
-    );
-    Method SPY$sendMessage = InnerHelper.getAsmMethod(
-            SpyDispatcher.class,
-            "sendMessage",
-            Object.class
-    );
-    Method SPY$toStringUtf8 = InnerHelper.getAsmMethod(
-            SpyDispatcher.class,
-            "toStringUtf8",
-            Object.class
-    );
     Method SPY$reportService = InnerHelper.getAsmMethod(
             SpyDispatcher.class,
             "reportService",

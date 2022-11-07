@@ -1,7 +1,7 @@
 package io.dongtai.iast.core.handler.hookpoint.models;
 
+import io.dongtai.iast.core.handler.hookpoint.models.policy.TaintPosition;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.taintrange.TaintRanges;
-import io.dongtai.iast.core.utils.PropertyUtils;
 import io.dongtai.log.DongTaiLog;
 import org.json.JSONObject;
 
@@ -14,200 +14,95 @@ import java.util.*;
  * @author dongzhiyong@huoxian.cn
  */
 public class MethodEvent {
-
     /**
-     * 调用过程ID
-     */
-    private final int processId;
-
-    public int getInvokeId() {
-        return invokeId;
-    }
-
-    /**
-     * 调用ID
+     * method invoke id
      */
     private int invokeId;
 
-    private final boolean isStatic;
+    /**
+     * is source policy node
+     */
+    public boolean source;
 
-    public String getOriginClassName() {
-        return originClassName;
-    }
+    private Set<TaintPosition> sourcePositions;
+    private Set<TaintPosition> targetPositions;
 
+    /**
+     * current class name
+     */
     private final String originClassName;
 
-    public String getMatchClassName() {
-        return matchClassName;
-    }
-
     /**
-     * 获取触发调用事件的类名称
+     * current event matched class name
      */
-    private final String matchClassName;
-
-    public String getMethodName() {
-        return methodName;
-    }
+    private final String matchedClassName;
 
     /**
-     * 获取触发调用事件的方法名称
+     * method name
      */
     private final String methodName;
 
-    public String getMethodDesc() {
-        return methodDesc;
-    }
-
     /**
-     * 获取触发调用事件的方法签名
-     */
-    private final String methodDesc;
-
-    /**
-     * 获取触发调用事件的对象
-     */
-    public final Object object;
-
-    /**
-     * 获取触发调用事件的方法参数
-     */
-    public final Object[] argumentArray;
-
-    /**
-     * 构造方法返回值
-     */
-    public Object returnValue;
-
-    /**
-     * 方法的污点进入值
-     */
-    public Object inValue;
-
-    public String inValueString = "";
-
-    public Set<Integer> getSourceHashes() {
-        return sourceHashes;
-    }
-
-    private final Set<Integer> sourceHashes = new HashSet<Integer>();
-
-
-    public Set<Integer> getSourceHashForRpc() {
-        return sourceHashForRpc;
-    }
-
-    private final Set<Integer> sourceHashForRpc = new HashSet<Integer>();
-
-    public Set<Integer> getTargetHashes() {
-        return targetHashes;
-    }
-
-    private final Set<Integer> targetHashes = new HashSet<Integer>();
-
-    public Set<Integer> getTargetHashForRpc() {
-        return targetHashForRpc;
-    }
-
-    private final Set<Integer> targetHashForRpc = new HashSet<Integer>();
-
-    public void addSourceHash(int hashcode) {
-        this.sourceHashes.add(hashcode);
-    }
-
-    public void addSourceHashForRpc(int hash) {
-        this.sourceHashForRpc.add(hash);
-    }
-
-    public void addTargetHash(int hashCode) {
-        this.targetHashes.add(hashCode);
-    }
-
-    public void addTargetHashForRpc(int hash) {
-        this.targetHashForRpc.add(hash);
-    }
-
-    /**
-     * 方法的传出值
-     */
-    public Object outValue;
-
-    public String outValueString = "";
-
-    /**
-     * 方法的签名
+     * method signature
      */
     public String signature;
 
     /**
-     * 构建事件的子事件
+     * method object instance
      */
-    public List<MethodEvent> subEvent;
+    public Object objectInstance;
 
     /**
-     * 构造方法的离开标志
+     * method object string value
      */
-    public boolean leave;
-
-    public boolean isSource() {
-        return source;
-    }
+    public String objectValue;
 
     /**
-     * 构造方法的类型标志
+     * method all parameters instances
      */
-    public boolean source;
+    public Object[] parameterInstances;
 
     /**
-     * 是否是 辅助方法
+     * method all parameters string value
      */
-    public boolean auxiliary;
+    public List<Parameter> parameterValues = new ArrayList<Parameter>();
 
     /**
-     * 多条件匹配时的条件
+     * method return instance
      */
-    public String condition;
+    public Object returnInstance;
 
     /**
-     * 方法的调用栈
+     * method return string value
      */
-    public StackTraceElement[] callStacks;
+    public String returnValue;
 
-    private StackTraceElement callStack;
+    private final Set<Integer> sourceHashes = new HashSet<Integer>();
 
-    /**
-     * 方法的框架
-     */
-    public String framework;
-
-    /**
-     * 当前服务的 traceId
-     */
-    public String traceId;
-
-    /**
-     * 当前服务的名称
-     */
-    public String serviceName;
-
-    /**
-     * 当前服务使用的rpc框架
-     */
-    public String plugin;
-
-    public Boolean getProjectPropagatorClose() {
-        return projectPropagatorClose;
-    }
-
-    public void setProjectPropagatorClose(Boolean projectPropagatorClose) {
-        this.projectPropagatorClose = projectPropagatorClose;
-    }
-
-    public Boolean projectPropagatorClose = false;
+    private final Set<Integer> targetHashes = new HashSet<Integer>();
 
     public List<MethodEventTargetRange> targetRanges = new ArrayList<MethodEventTargetRange>();
 
     public List<MethodEventSourceType> sourceTypes;
+
+    private StackTraceElement callStack;
+
+    public static class Parameter {
+        private final String index;
+        private final String value;
+
+        public Parameter(String index, String value) {
+            this.index = index;
+            this.value = value;
+        }
+
+        public JSONObject toJson() {
+            JSONObject json = new JSONObject();
+            json.put("index", this.index);
+            json.put("value", this.value);
+            return json;
+        }
+    }
 
     public static class MethodEventSourceType {
         private final Integer hash;
@@ -243,76 +138,121 @@ public class MethodEvent {
         }
     }
 
-    /**
-     * 构造调用事件
-     *
-     * @param processId      调用者ID
-     * @param invokeId       方法调用ID
-     * @param matchClassName 方法所在类的名称
-     * @param methodName     方法名称
-     * @param methodDesc     方法描述符
-     * @param object         方法对应的实例化对象
-     * @param argumentArray  方法参数
-     * @param isStatic       方法是否为静态方法，true-静态方法；false-实例方法
-     */
-    public MethodEvent(final int processId,
-                       final int invokeId,
-                       final String originClassName,
-                       final String matchClassName,
-                       final String methodName,
-                       final String methodDesc,
-                       final String signature,
-                       final Object object,
-                       final Object[] argumentArray,
-                       final Object returnValue,
-                       final String framework,
-                       final boolean isStatic,
-                       final StackTraceElement[] callStack) {
-        this.processId = processId;
-        this.invokeId = invokeId;
-        this.matchClassName = matchClassName;
+    public MethodEvent(final String originClassName, final String matchedClassName,
+                       final String methodName, final String signature,
+                       final Object objectInstance, final Object[] parameterInstances, Object returnInstance) {
+        this.matchedClassName = matchedClassName;
         this.originClassName = originClassName;
         this.methodName = methodName;
-        this.methodDesc = methodDesc;
         this.signature = signature;
-        this.object = object;
-        this.argumentArray = argumentArray;
-        this.returnValue = returnValue;
-        this.leave = false;
+        this.objectInstance = objectInstance;
+        this.parameterInstances = parameterInstances;
+        this.returnInstance = returnInstance;
         this.source = false;
-        this.auxiliary = false;
-        this.condition = "";
-        this.isStatic = isStatic;
-        this.callStacks = callStack;
-        this.framework = framework;
     }
 
-    /**
-     * 改变方法入参
-     *
-     * @param index       方法入参编号(从0开始)
-     * @param changeValue 改变的值
-     * @return this
-     * @since {@code sandbox-api:1.0.10}
-     */
-    public MethodEvent changeParameter(final int index,
-                                       final Object changeValue) {
-        argumentArray[index] = changeValue;
-        return this;
+    public int getInvokeId() {
+        return invokeId;
     }
-
-    public void setCallStacks(StackTraceElement[] callStacks) {
-        this.callStacks = callStacks;
-        this.setCallStack(callStacks[1]);
-    }
-
-    public Object getObject() {
-        return this.object;
-    }
-
 
     public void setInvokeId(int invokeId) {
         this.invokeId = invokeId;
+    }
+
+    public boolean isSource() {
+        return source;
+    }
+
+    public void setTaintPositions(Set<TaintPosition> sourcePositions, Set<TaintPosition> targetPositions) {
+        this.sourcePositions = sourcePositions;
+        this.targetPositions = targetPositions;
+    }
+
+    public Set<TaintPosition> getSourcePositions() {
+        return this.sourcePositions;
+    }
+
+    public Set<TaintPosition> getTargetPositions() {
+        return this.targetPositions;
+    }
+
+    public String getOriginClassName() {
+        return originClassName;
+    }
+
+    public String getMatchedClassName() {
+        return matchedClassName;
+    }
+
+    public String getMethodName() {
+        return methodName;
+    }
+
+    public String getSignature() {
+        return this.signature;
+    }
+
+    public void setObjectValue(Object obj, boolean hasTaint) {
+        if (obj == null) {
+            return;
+        }
+        this.objectValue = formatValue(obj, hasTaint);
+    }
+
+    public void addParameterValue(int index, Object param, boolean hasTaint) {
+        if (param == null) {
+            return;
+        }
+        String indexString = "P" + String.valueOf(index + 1);
+        Parameter parameter = new Parameter(indexString, formatValue(param, hasTaint));
+        this.parameterValues.add(parameter);
+    }
+
+    public void setReturnValue(Object ret, boolean hasTaint) {
+        if (ret == null) {
+            return;
+        }
+        this.returnValue = formatValue(ret, hasTaint);
+    }
+
+    private String formatValue(Object val, boolean hasTaint) {
+        return "[" + obj2String(val) + "]" + (hasTaint ? "*" : "");
+    }
+
+    public Set<Integer> getSourceHashes() {
+        return sourceHashes;
+    }
+
+    public void addSourceHash(int hashcode) {
+        this.sourceHashes.add(hashcode);
+    }
+
+    public Set<Integer> getTargetHashes() {
+        return targetHashes;
+    }
+
+    public void addTargetHash(int hashCode) {
+        this.targetHashes.add(hashCode);
+    }
+
+    public String getCallerClass() {
+        return callStack.getClassName();
+    }
+
+    public String getCallerMethod() {
+        return callStack.getMethodName();
+    }
+
+    public int getCallerLine() {
+        return callStack.getLineNumber();
+    }
+
+    public void setCallStacks(StackTraceElement[] callStacks) {
+        this.setCallStack(callStacks[1]);
+    }
+
+    public void setCallStack(StackTraceElement callStack) {
+        this.callStack = callStack;
     }
 
     public String obj2String(Object value) {
@@ -342,118 +282,8 @@ public class MethodEvent {
                 sb.append(value.toString());
             }
         } catch (Exception e) {
-            sb.append("CustomObjectValue");
+            DongTaiLog.warn("convert object " + value.toString() + " to string failed", e);
         }
         return sb.toString().trim();
-    }
-
-    public boolean objIsReference(Object value) {
-        if (null == value) {
-            return false;
-        }
-        try {
-            String valueToString = value.toString();
-            String classObjectToString = value.getClass().getName() + "@" + Integer.toHexString(hashCode());
-            return valueToString.contains(classObjectToString);
-        } catch (Exception e) {
-            DongTaiLog.error(e);
-            return false;
-        }
-    }
-
-    @Override
-    public String toString() {
-        return "MethodEvent{" +
-                "processId=" + processId +
-                ", invokeId=" + invokeId +
-                ", isStatic=" + isStatic +
-                ", originClassName='" + originClassName + '\'' +
-                ", matchClassName='" + matchClassName + '\'' +
-                ", methodName='" + methodName + '\'' +
-                ", methodDesc='" + methodDesc + '\'' +
-                ", object=" + object +
-                ", argumentArray=" + Arrays.toString(argumentArray) +
-                ", returnValue=" + returnValue +
-                ", inValue=" + inValue +
-                ", sourceHashes=" + sourceHashes +
-                ", sourceHashForRpc=" + sourceHashForRpc +
-                ", targetHashes=" + targetHashes +
-                ", targetHashForRpc=" + targetHashForRpc +
-                ", outValue=" + outValue +
-                ", signature='" + signature + '\'' +
-                ", subEvent=" + subEvent +
-                ", leave=" + leave +
-                ", source=" + source +
-                ", auxiliary=" + auxiliary +
-                ", condition='" + condition + '\'' +
-                ", callStacks=" + Arrays.toString(callStacks) +
-                ", callStack=" + callStack +
-                ", framework='" + framework + '\'' +
-                ", traceId='" + traceId + '\'' +
-                ", serviceName='" + serviceName + '\'' +
-                ", plugin='" + plugin + '\'' +
-                ", projectPropagatorClose=" + projectPropagatorClose +
-                '}';
-    }
-
-    public String getCallerClass() {
-        return callStack.getClassName();
-    }
-
-    public String getCallerMethod() {
-        return callStack.getMethodName();
-    }
-
-    public int getCallerLine() {
-        return callStack.getLineNumber();
-    }
-
-    public void setCallStack(StackTraceElement callStack) {
-        this.callStack = callStack;
-    }
-
-    public String getTraceId() {
-        return traceId;
-    }
-
-    public void setTraceId(String traceId) {
-        this.traceId = traceId;
-    }
-
-    public String getServiceName() {
-        return serviceName;
-    }
-
-    public void setServiceName(String serviceName) {
-        this.serviceName = serviceName;
-    }
-
-    public String getPlugin() {
-        return plugin;
-    }
-
-    public void setPlugin(String plugin) {
-        this.plugin = plugin;
-    }
-
-    public void setInValue(Object inValue) {
-        PropertyUtils properties = PropertyUtils.getInstance();
-        this.setInValue(inValue, properties.isLocal() ? obj2String(inValue) : "");
-    }
-
-    public void setInValue(Object inValue, String inValueString) {
-        this.inValue = inValue;
-        this.inValueString = inValueString;
-    }
-
-    public void setOutValue(Object outValue) {
-        PropertyUtils properties = PropertyUtils.getInstance();
-        this.outValue = outValue;
-        this.outValueString = properties.isLocal() ? obj2String(outValue) : "";
-    }
-
-    public void setOutValue(Object outValue, String outValueString) {
-        this.outValue = outValue;
-        this.outValueString = outValueString;
     }
 }

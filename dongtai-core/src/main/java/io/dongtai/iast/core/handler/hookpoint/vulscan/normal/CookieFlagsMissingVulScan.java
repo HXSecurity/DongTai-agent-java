@@ -14,7 +14,7 @@ public class CookieFlagsMissingVulScan extends AbstractNormalVulScan {
     @Override
     public void scan(MethodEvent event, SinkNode sinkNode) {
         Set<TaintPosition> sources = sinkNode.getSources();
-        Object[] arguments = event.argumentArray;
+        Object[] arguments = event.parameterInstances;
         if (!TaintPosition.hasParameter(sources)) {
             return;
         }

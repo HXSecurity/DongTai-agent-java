@@ -6,8 +6,6 @@ import io.dongtai.log.DongTaiLog;
 import org.objectweb.asm.*;
 
 public class KafkaAbstractConfigAdapter extends AbstractClassVisitor {
-    private String classDesc;
-
     public KafkaAbstractConfigAdapter(ClassVisitor classVisitor, ClassContext context) {
         super(classVisitor, context);
     }

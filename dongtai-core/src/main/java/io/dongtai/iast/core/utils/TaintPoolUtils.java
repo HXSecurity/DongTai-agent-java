@@ -134,6 +134,9 @@ public class TaintPoolUtils {
     }
 
     public static boolean isAllowTaintType(Object obj) {
+        if (obj == null) {
+            return false;
+        }
         return isAllowTaintType(obj.getClass());
     }
 

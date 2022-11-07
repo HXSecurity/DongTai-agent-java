@@ -4,7 +4,8 @@ import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.utils.TaintPoolUtils;
 import io.dongtai.log.DongTaiLog;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Map;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -33,8 +34,8 @@ public class IastTaintHashCodes extends ThreadLocal<HashSet<Integer>> {
         this.get().add(hashCode);
     }
 
-    public void addObject(Object obj, MethodEvent event, boolean isSource) {
-        if (!TaintPoolUtils.isNotEmpty(event.outValue)) {
+    public void addObject(Object obj, MethodEvent event) {
+        if (!TaintPoolUtils.isNotEmpty(obj) || !TaintPoolUtils.isAllowTaintType(obj)) {
             return;
         }
 
@@ -51,21 +52,11 @@ public class IastTaintHashCodes extends ThreadLocal<HashSet<Integer>> {
                 int hashCode = System.identityHashCode(obj);
                 this.add(hashCode);
                 event.addTargetHash(hashCode);
-                if (isSource) {
-                    Map<String, String[]> tempMap = (Map<String, String[]>) obj;
-                    Set<Map.Entry<String, String[]>> entries = tempMap.entrySet();
-                    for (Map.Entry<String, String[]> entry : entries) {
-                        Object key = entry.getKey();
-                        Object value = entry.getValue();
-                        this.addObject(key, event, true);
-                        this.addObject(value, event, true);
-                    }
-                }
             } else if (obj.getClass().isArray() && !obj.getClass().getComponentType().isPrimitive()) {
                 Object[] tempObjs = (Object[]) obj;
                 if (tempObjs.length != 0) {
                     for (Object tempObj : tempObjs) {
-                        this.addObject(tempObj, event, isSource);
+                        this.addObject(tempObj, event);
                     }
                 }
             } else {
