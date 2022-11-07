@@ -13,6 +13,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.net.*;
+import java.nio.charset.Charset;
 import java.util.Enumeration;
 
 /**
@@ -48,8 +49,9 @@ public class AgentRegisterReport {
         object.put("hostname", AgentRegisterReport.getInternalHostName());
         object.put("language", AgentConstant.LANGUAGE);
         object.put("network", readIpInfo());
-        object.put("serverEnv",
-                Base64Encoder.encodeBase64String(System.getProperties().toString().getBytes()).replaceAll("\n", ""));
+        object.put("serverEnv", Base64Encoder
+                .encodeBase64String(System.getProperties().toString().getBytes(Charset.forName("UTF-8")))
+                .replaceAll("\n", ""));
         object.put("containerName", null == server ? "" : server.getName());
         object.put("containerVersion", null == server ? "" : server.getVersion());
         object.put("serverPath", ServerDetect.getWebServerPath());
@@ -195,12 +197,12 @@ public class AgentRegisterReport {
                     JSONObject jsonObject = new JSONObject();
                     String displayName = networkInterface.getDisplayName();
                     String hostAddress = inetAddress.getHostAddress();
-                    jsonObject.put("name",displayName);
-                    jsonObject.put("ip",hostAddress);
-                    if (displayName.startsWith("en")){
-                        jsonObject.put("isAddress","1");
-                    }else {
-                        jsonObject.put("isAddress","0");
+                    jsonObject.put("name", displayName);
+                    jsonObject.put("ip", hostAddress);
+                    if (displayName.startsWith("en")) {
+                        jsonObject.put("isAddress", "1");
+                    } else {
+                        jsonObject.put("isAddress", "0");
                     }
                     network.put(jsonObject);
                 }
@@ -211,7 +213,7 @@ public class AgentRegisterReport {
         }
     }
 
-    public void register(){
+    public void register() {
         try {
             if (server == null) {
                 System.out.println("[io.dongtai.iast.agent] Can't Recognize Web Service");
