@@ -136,7 +136,7 @@ public abstract class AbstractAdviceAdapter extends AdviceAdapter implements Asm
         loadThisOrPushNullIfIsStatic();
         loadArgArray();
         loadLocal(this.nextLocal - 1);
-        push(policyNode.getMethodMatcher().toString());
+        push(policyNode.toString());
         push(this.context.getClassName());
         push(this.context.getMatchedClassName());
         push(this.name);

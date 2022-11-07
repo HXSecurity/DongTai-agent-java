@@ -63,8 +63,8 @@ public class PolicyBuilderTest {
     @Test
     public void testBuild() throws PolicyException {
         Map<String, List<Integer>> tests = new HashMap<String, List<Integer>>() {{
-            put("policy-node-count-src1-p3-sink1-cls5.json", Arrays.asList(1, 3, 1, 5));
-            put("policy-node-count-src0-p2-sink2-cls2.json", Arrays.asList(0, 2, 2, 2));
+            put("policy-node-count-src0-p2-sink2-policy4-cls2.json", Arrays.asList(0, 2, 2, 4, 2));
+            put("policy-node-count-src1-p3-sink1-policy5-cls4.json", Arrays.asList(1, 3, 1, 5, 4));
         }};
         for (Map.Entry<String, List<Integer>> entry : tests.entrySet()) {
             JSONArray policyConfig = PolicyBuilder.fetchFromFile(POLICY_DIR + entry.getKey());
@@ -75,8 +75,12 @@ public class PolicyBuilderTest {
                     policy.getPropagators().size());
             Assert.assertEquals("build sink count " + entry.getKey(), entry.getValue().get(2).intValue(),
                     policy.getSinks().size());
-            Assert.assertEquals("build hook class count" + entry.getKey(), entry.getValue().get(3).intValue(),
+            Assert.assertEquals("build hook policy count" + entry.getKey(), entry.getValue().get(3).intValue(),
                     policy.getPolicyNodesMap().size());
+            Set<String> classes = policy.getClassHooks();
+            classes.addAll(policy.getAncestorClassHooks());
+            Assert.assertEquals("build hook class count" + entry.getKey(), entry.getValue().get(4).intValue(),
+                    classes.size());
         }
 
         PolicyException exception;
