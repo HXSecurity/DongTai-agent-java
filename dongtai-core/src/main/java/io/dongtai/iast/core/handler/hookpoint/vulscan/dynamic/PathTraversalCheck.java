@@ -59,17 +59,17 @@ public class PathTraversalCheck implements SinkSourceChecker {
     private boolean checkPathArgument(MethodEvent event, SinkNode sinkNode) {
         try {
             if (NIO_FS_GET_PATH.equals(this.policySignature)) {
-                if (event.argumentArray.length < 2) {
+                if (event.parameterInstances.length < 2) {
                     return false;
                 }
-                String[] paths = (String[]) event.argumentArray[1];
+                String[] paths = (String[]) event.parameterInstances[1];
                 if (paths.length == 0) {
-                    return checkPath((String) event.argumentArray[0], event);
+                    return checkPath((String) event.parameterInstances[0], event);
                 }
                 return checkPath(paths[paths.length - 1], event);
             }
 
-            return checkPath((String) event.argumentArray[event.argumentArray.length - 1], event);
+            return checkPath((String) event.parameterInstances[event.parameterInstances.length - 1], event);
         } catch (Throwable e) {
             DongTaiLog.warn(SINK_TYPE + " check path failed", e);
             return false;
@@ -77,11 +77,11 @@ public class PathTraversalCheck implements SinkSourceChecker {
     }
 
     private boolean checkURI(MethodEvent event, SinkNode sinkNode) {
-        if (event.argumentArray.length == 0 || !(event.argumentArray[0] instanceof URI)) {
+        if (event.parameterInstances.length == 0 || !(event.parameterInstances[0] instanceof URI)) {
             return false;
         }
 
-        URI uri = (URI) event.argumentArray[0];
+        URI uri = (URI) event.parameterInstances[0];
         return checkPath(uri.getPath(), event);
     }
 

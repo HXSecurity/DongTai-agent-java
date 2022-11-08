@@ -6,8 +6,6 @@ import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.bytecode.enhance.plugin.spring.SpringApplicationImpl;
 import io.dongtai.iast.core.handler.hookpoint.controller.HookType;
 import io.dongtai.iast.core.handler.hookpoint.controller.impl.*;
-import io.dongtai.iast.core.handler.hookpoint.framework.dubbo.DubboHandler;
-import io.dongtai.iast.core.handler.hookpoint.framework.grpc.GrpcHandler;
 import io.dongtai.iast.core.handler.hookpoint.graphy.GraphBuilder;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.*;
@@ -114,58 +112,6 @@ public class SpyDispatcherImpl implements SpyDispatcher {
         } catch (Exception ignore) {
             return response;
         }
-    }
-
-    /**
-     * mark for enter Dubbo Entry Point
-     *
-     * @since 1.3.1
-     */
-    @Override
-    public void enterDubbo() {
-        // @TODO: refactor
-    }
-
-    /**
-     * mark for leave Dubbo Entry Point
-     *
-     * @since 1.3.1
-     */
-    @Override
-    public void leaveDubbo(Object invocation, Object rpcResult) {
-        // @TODO: refactor
-    }
-
-    /**
-     * Determines whether it is a layer 1 Dubbo entry
-     *
-     * @return true if is a layer 1 Dubbo entry; else false
-     * @since 1.3.1
-     */
-    @Override
-    public boolean isFirstLevelDubbo() {
-        // @TODO: refactor
-        return false;
-    }
-
-    @Override
-    public void enterKafka(Object record) {
-        // @TODO: refactor
-    }
-
-    @Override
-    public void kafkaBeforeSend(Object record) {
-        // @TODO: refactor
-    }
-
-    @Override
-    public void kafkaAfterPoll(Object record) {
-        // @TODO: refactor
-    }
-
-    @Override
-    public void leaveKafka() {
-        // @TODO: refactor
     }
 
     /**
@@ -339,41 +285,6 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     }
 
     @Override
-    public Object clientInterceptor(Object channel) {
-        return GrpcHandler.interceptChannel(channel);
-    }
-
-    @Override
-    public Object serverInterceptor(Object serverServiceDefinition) {
-        return GrpcHandler.interceptService(serverServiceDefinition);
-    }
-
-    @Override
-    public void startGrpcCall() {
-        // @TODO: refactor
-    }
-
-    @Override
-    public void closeGrpcCall() {
-        // @TODO: refactor
-    }
-
-    @Override
-    public void blockingUnaryCall(Object req, Object res) {
-        // @TODO: refactor
-    }
-
-    @Override
-    public void sendMessage(Object message) {
-        // @TODO: refactor
-    }
-
-    @Override
-    public void toStringUtf8(Object value) {
-        // @TODO: refactor
-    }
-
-    @Override
     public void reportService(String category, String type, String host, String port, String handler) {
         // @TODO: refactor
     }
@@ -406,12 +317,10 @@ public class SpyDispatcherImpl implements SpyDispatcher {
             if (HookType.SPRINGAPPLICATION.equals(hookType)) {
                 SpringApplicationImpl.getWebApplicationContext(retValue);
             } else {
-                MethodEvent event = new MethodEvent(0, -1, className, matchClassName, methodName,
-                        methodSign, methodSign, instance, argumentArray, retValue, framework, isStatic, null);
+                MethodEvent event = new MethodEvent(className, matchClassName, methodName,
+                        methodSign, instance, argumentArray, retValue);
                 if (HookType.HTTP.equals(hookType)) {
                     HttpImpl.solveHttp(event);
-                } else if (HookType.RPC.equals(hookType)) {
-                    solveRPC(framework, event);
                 }
             }
         } catch (Exception e) {
@@ -420,12 +329,6 @@ public class SpyDispatcherImpl implements SpyDispatcher {
             ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
         }
         return false;
-    }
-
-    private void solveRPC(String framework, MethodEvent event) {
-        if ("dubbo".equals(framework)) {
-            DubboHandler.solveDubbo(event, SpyDispatcherImpl.INVOKE_ID_SEQUENCER);
-        }
     }
 
     @Override
@@ -443,8 +346,8 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                 return false;
             }
 
-            MethodEvent event = new MethodEvent(0, -1, className, matchedClassName, methodName,
-                    signature, signature, instance, parameters, retObject, "", isStatic, null);
+            MethodEvent event = new MethodEvent(className, matchedClassName, methodName,
+                    signature, instance, parameters, retObject);
 
             if ((policyNode instanceof SourceNode) && PolicyNodeType.SOURCE.equals(policyNode.getType())) {
                 SourceImpl.solveSource(event, (SourceNode) policyNode, INVOKE_ID_SEQUENCER);

@@ -170,7 +170,7 @@ public class HttpImpl {
      */
     public static void solveHttp(MethodEvent event)
             throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        REQUEST_META.set(getRequestMeta(event.argumentArray[0]));
+        REQUEST_META.set(getRequestMeta(event.parameterInstances[0]));
         Boolean isReplay = (Boolean) REQUEST_META.get().get("replay-request");
         if (isReplay){
             EngineManager.ENTER_REPLAY_ENTRYPOINT.enterEntry();

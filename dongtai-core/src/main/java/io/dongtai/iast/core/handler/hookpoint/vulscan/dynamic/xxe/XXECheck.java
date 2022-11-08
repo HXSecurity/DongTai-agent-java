@@ -28,12 +28,12 @@ public class XXECheck implements SinkSafeChecker {
 
     @Override
     public boolean isSafe(MethodEvent event, SinkNode sinkNode) {
-        if (event.object == null) {
+        if (event.objectInstance == null) {
             return false;
         }
 
         for (XXEChecker chk : CHECKS) {
-            chk.setSourceObjectAndParameters(event.object, event.argumentArray);
+            chk.setSourceObjectAndParameters(event.objectInstance, event.parameterInstances);
             List<Object> objs = chk.getCheckObjects();
             for (Object obj : objs) {
                 if (chk.match(obj)) {

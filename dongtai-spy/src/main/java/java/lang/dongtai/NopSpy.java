@@ -61,59 +61,6 @@ public class NopSpy implements SpyDispatcher {
     }
 
     /**
-     * mark for enter Dubbo Entry Point
-     *
-     * @since 1.3.1
-     */
-    @Override
-    public void enterDubbo() {
-
-    }
-
-    /**
-     * mark for leave Dubbo Entry Point
-     *
-     * @param invocation
-     * @param rpcResult
-     * @since 1.3.1
-     */
-    @Override
-    public void leaveDubbo(Object invocation, Object rpcResult) {
-
-    }
-
-    /**
-     * Determines whether it is a layer 1 Dubbo entry
-     *
-     * @return true if is a layer 1 Dubbo entry; else false
-     * @since 1.3.1
-     */
-    @Override
-    public boolean isFirstLevelDubbo() {
-        return false;
-    }
-
-    @Override
-    public void enterKafka(Object record) {
-
-    }
-
-    @Override
-    public void kafkaBeforeSend(Object record) {
-
-    }
-
-    @Override
-    public void kafkaAfterPoll(Object record) {
-
-    }
-
-    @Override
-    public void leaveKafka() {
-
-    }
-
-    /**
      * mark for enter Source Entry Point
      *
      * @since 1.3.1
@@ -204,45 +151,6 @@ public class NopSpy implements SpyDispatcher {
     @Override
     public boolean isFirstLevelSink() {
         return false;
-    }
-
-    /**
-     * @param channel
-     * @since 1.4.0
-     */
-    @Override
-    public Object clientInterceptor(Object channel) {
-        return null;
-    }
-
-    @Override
-    public Object serverInterceptor(Object serverServiceDefinition) {
-        return null;
-    }
-
-    @Override
-    public void startGrpcCall() {
-
-    }
-
-    @Override
-    public void closeGrpcCall() {
-
-    }
-
-    @Override
-    public void blockingUnaryCall(Object req, Object res) {
-
-    }
-
-    @Override
-    public void sendMessage(Object message) {
-
-    }
-
-    @Override
-    public void toStringUtf8(Object value) {
-
     }
 
     @Override

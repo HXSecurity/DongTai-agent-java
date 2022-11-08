@@ -46,36 +46,6 @@ public interface SpyDispatcher {
     Object cloneResponse(Object res, boolean isJakarta);
 
     /**
-     * mark for enter Dubbo Entry Point
-     *
-     * @since 1.3.1
-     */
-    void enterDubbo();
-
-    /**
-     * mark for leave Dubbo Entry Point
-     *
-     * @since 1.3.1
-     */
-    void leaveDubbo(Object invocation, Object rpcResult);
-
-    /**
-     * Determines whether it is a layer 1 Dubbo entry
-     *
-     * @return true if is a layer 1 Dubbo entry; else false
-     * @since 1.3.1
-     */
-    boolean isFirstLevelDubbo();
-
-    void enterKafka(Object record);
-
-    void kafkaBeforeSend(Object record);
-
-    void kafkaAfterPoll(Object record);
-
-    void leaveKafka();
-
-    /**
      * mark for enter Source Entry Point
      *
      * @since 1.3.1
@@ -140,23 +110,6 @@ public interface SpyDispatcher {
      * @since 1.3.1
      */
     boolean isFirstLevelSink();
-
-    /**
-     * @since 1.4.0
-     */
-    Object clientInterceptor(Object channel);
-
-    Object serverInterceptor(Object serverServiceDefinition);
-
-    void startGrpcCall();
-
-    void closeGrpcCall();
-
-    void blockingUnaryCall(Object req, Object res);
-
-    void sendMessage(Object message);
-
-    void toStringUtf8(Object value);
 
     void reportService(String category, String type, String host, String port, String handler);
 

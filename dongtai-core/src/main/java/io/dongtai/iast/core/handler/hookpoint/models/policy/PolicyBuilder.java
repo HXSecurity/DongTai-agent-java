@@ -74,8 +74,10 @@ public class PolicyBuilder {
             return;
         }
 
+        Set<TaintPosition> sources = parseSource(node, type);
+        Set<TaintPosition> targets = parseTarget(node, type);
         MethodMatcher methodMatcher = buildMethodMatcher(node);
-        SourceNode sourceNode = new SourceNode(parseTarget(node, type), methodMatcher);
+        SourceNode sourceNode = new SourceNode(sources, targets, methodMatcher);
         setInheritable(node, sourceNode);
         policy.addSource(sourceNode);
     }
@@ -124,11 +126,11 @@ public class PolicyBuilder {
         try {
             return TaintPosition.parse(node.getString(KEY_SOURCE));
         } catch (JSONException e) {
-            if (!PolicyNodeType.FILTER.equals(type)) {
+            if (!PolicyNodeType.SOURCE.equals(type) && !PolicyNodeType.FILTER.equals(type)) {
                 throw new PolicyException(PolicyException.ERR_POLICY_NODE_SOURCE_INVALID + ": " + node.toString(), e);
             }
         } catch (TaintPositionException e) {
-            if (!PolicyNodeType.FILTER.equals(type)) {
+            if (!PolicyNodeType.SOURCE.equals(type) && !PolicyNodeType.FILTER.equals(type)) {
                 throw new PolicyException(PolicyException.ERR_POLICY_NODE_SOURCE_INVALID + ": " + node.toString(), e);
             }
         }

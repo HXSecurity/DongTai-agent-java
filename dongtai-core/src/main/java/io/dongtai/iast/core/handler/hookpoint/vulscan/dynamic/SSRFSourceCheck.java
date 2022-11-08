@@ -93,7 +93,7 @@ public class SSRFSourceCheck implements SinkSourceChecker {
                 put("QUERY", url.getQuery());
             }};
 
-            event.setInValue(url.toString());
+            event.setObjectValue(url, true);
             return addSourceType(event, sourceMap);
         } catch (Exception e) {
             DongTaiLog.warn("java.net.URL get source failed: " + e.getMessage());
@@ -116,7 +116,7 @@ public class SSRFSourceCheck implements SinkSourceChecker {
                 put("QUERY", uri.getQuery());
             }};
 
-            event.setInValue(uri.toString());
+            event.setObjectValue(uri, true);
             return addSourceType(event, sourceMap);
         } catch (Exception e) {
             DongTaiLog.warn("java.net.URI get source failed: " + e.getMessage());
@@ -125,16 +125,16 @@ public class SSRFSourceCheck implements SinkSourceChecker {
     }
 
     private boolean checkJavaNetURL(MethodEvent event, SinkNode sinkNode) {
-        return processJavaNetUrl(event, event.object);
+        return processJavaNetUrl(event, event.objectInstance);
     }
 
     private boolean checkApacheHttpClient(MethodEvent event, SinkNode sinkNode) {
         try {
-            if (event.argumentArray.length < 1 || event.argumentArray[0] == null) {
+            if (event.parameterInstances.length < 1 || event.parameterInstances[0] == null) {
                 return false;
             }
 
-            final Object obj = event.argumentArray[0];
+            final Object obj = event.parameterInstances[0];
             if (obj instanceof URI) {
                 return processJavaNetUri(event, obj);
             } else if (APACHE_LEGACY_HTTP_CLIENT_URI.equals(obj.getClass().getName())) {
@@ -146,7 +146,7 @@ public class SSRFSourceCheck implements SinkSourceChecker {
                     put("QUERY", obj.getClass().getMethod("getRawQuery").invoke(obj));
                 }};
 
-                event.setInValue((String) obj.getClass().getMethod("toString").invoke(obj));
+                event.addParameterValue(0, obj, true);
                 return addSourceType(event, sourceMap);
             }
 
@@ -159,11 +159,11 @@ public class SSRFSourceCheck implements SinkSourceChecker {
 
     private boolean checkApacheHttpClient5(MethodEvent event, SinkNode sinkNode) {
         try {
-            if (event.argumentArray.length < 2 || event.argumentArray[1] == null) {
+            if (event.parameterInstances.length < 2 || event.parameterInstances[1] == null) {
                 return false;
             }
 
-            final Object reqObj = event.argumentArray[1];
+            final Object reqObj = event.parameterInstances[1];
             if (APACHE_HTTP_CLIENT5_HTTP_REQUEST.equals(reqObj.getClass().getName())
                     || APACHE_HTTP_CLIENT5_HTTP_REQUEST.equals(reqObj.getClass().getSuperclass().getName())) {
                 final Object authorityObj = reqObj.getClass().getMethod("getAuthority").invoke(reqObj);
@@ -176,7 +176,7 @@ public class SSRFSourceCheck implements SinkSourceChecker {
                 }};
 
                 Object uriObj = reqObj.getClass().getMethod("getUri").invoke(reqObj);
-                event.setInValue((String) uriObj.getClass().getMethod("toString").invoke(uriObj));
+                event.addParameterValue(1, uriObj, true);
                 return addSourceType(event, sourceMap);
             }
 
@@ -189,7 +189,7 @@ public class SSRFSourceCheck implements SinkSourceChecker {
 
     private boolean CheckOkhttp(MethodEvent event, SinkNode sinkNode) {
         try {
-            Class<?> cls = event.object.getClass();
+            Class<?> cls = event.objectInstance.getClass();
             if (OKHTTP3_REAL_CALL.equals(cls.getName()) || OKHTTP3_INTERNAL_REAL_CALL.equals(cls.getName())
                     || OKHTTP_CALL.equals(cls.getName())) {
                 Object url;
@@ -197,12 +197,12 @@ public class SSRFSourceCheck implements SinkSourceChecker {
                 if (OKHTTP_CALL.equals(cls.getName())) {
                     Field reqField = cls.getDeclaredField("originalRequest");
                     reqField.setAccessible(true);
-                    Object req = reqField.get(event.object);
+                    Object req = reqField.get(event.objectInstance);
                     url = req.getClass().getMethod("httpUrl").invoke(req);
                 } else {
                     Method reqMethod = cls.getDeclaredMethod("request");
                     reqMethod.setAccessible(true);
-                    Object req = reqMethod.invoke(event.object);
+                    Object req = reqMethod.invoke(event.objectInstance);
                     url = req.getClass().getMethod("url").invoke(req);
                 }
 
@@ -220,7 +220,7 @@ public class SSRFSourceCheck implements SinkSourceChecker {
                     put("QUERY", fUrl.getClass().getMethod("query").invoke(fUrl));
                 }};
 
-                event.setInValue((String) fUrl.getClass().getMethod("toString").invoke(fUrl));
+                event.setObjectValue(fUrl, true);
                 return addSourceType(event, sourceMap);
             }
 

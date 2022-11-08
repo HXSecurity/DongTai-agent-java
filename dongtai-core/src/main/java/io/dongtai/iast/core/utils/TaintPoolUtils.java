@@ -42,9 +42,7 @@ public class TaintPoolUtils {
         if (obj instanceof String[]) {
             String[] stringArray = (String[]) obj;
             for (String stringItem : stringArray) {
-                isContains = contains(stringItem);
-                if (isContains) {
-                    event.addSourceHash(System.identityHashCode(stringItem));
+                if (poolContains(stringItem, event)) {
                     return true;
                 }
             }
@@ -134,6 +132,9 @@ public class TaintPoolUtils {
     }
 
     public static boolean isAllowTaintType(Object obj) {
+        if (obj == null) {
+            return false;
+        }
         return isAllowTaintType(obj.getClass());
     }
 

@@ -4,7 +4,6 @@ import io.dongtai.iast.common.constants.*;
 import io.dongtai.iast.common.scope.ScopeManager;
 import io.dongtai.iast.common.utils.base64.Base64Encoder;
 import io.dongtai.iast.core.EngineManager;
-import io.dongtai.iast.core.bytecode.enhance.IastClassDiagram;
 import io.dongtai.iast.core.handler.hookpoint.controller.impl.HttpImpl;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.normal.AbstractNormalVulScan;
@@ -43,48 +42,11 @@ public class GraphBuilder {
      * @return 污点方法列表
      */
     public static List<GraphNode> build() {
-        PropertyUtils properties = PropertyUtils.getInstance();
         List<GraphNode> nodeList = new ArrayList<GraphNode>();
-        Map<Integer, MethodEvent> taintMethodPool = EngineManager.TRACK_MAP.get();
+        Map<Integer, MethodEvent> events = EngineManager.TRACK_MAP.get();
 
-        MethodEvent event = null;
-        for (Map.Entry<Integer, MethodEvent> entry : taintMethodPool.entrySet()) {
-            try {
-                event = entry.getValue();
-                nodeList.add(
-                        new GraphNode(
-                                event.isSource(),
-                                event.getInvokeId(),
-                                event.getCallerClass(),
-                                event.getCallerMethod(),
-                                event.getCallerLine(),
-                                event.object != null ? IastClassDiagram
-                                        .getFamilyFromClass(event.object.getClass().getName().replace("\\.", "/")) : null,
-                                event.getMatchClassName(),
-                                event.getOriginClassName(),
-                                event.getMethodName(),
-                                event.getMethodDesc(),
-                                "",
-                                "",
-                                event.getSourceHashes(),
-                                event.getTargetHashes(),
-                                event.inValueString,
-                                properties.isLocal() && event.objIsReference(event.inValue),
-                                event.outValueString,
-                                properties.isLocal() && event.objIsReference(event.outValue),
-                                event.getSourceHashForRpc(),
-                                event.getTargetHashForRpc(),
-                                event.getTraceId(),
-                                event.getServiceName(),
-                                event.getPlugin(),
-                                event.getProjectPropagatorClose(),
-                                event.targetRanges,
-                                event.sourceTypes
-                        )
-                );
-            } catch (Exception e) {
-                DongTaiLog.debug(e);
-            }
+        for (Map.Entry<Integer, MethodEvent> entry : events.entrySet()) {
+            nodeList.add(new GraphNode(entry.getValue()));
         }
         return nodeList;
     }
@@ -97,7 +59,7 @@ public class GraphBuilder {
         JSONArray methodPool = new JSONArray();
 
         report.put(ReportKey.TYPE, ReportType.VULN_SAAS_POOL);
-        report.put(ReportKey.VERSION, "v2");
+        report.put(ReportKey.VERSION, "v3");
         report.put(ReportKey.DETAIL, detail);
 
         detail.put(ReportKey.AGENT_ID, EngineManager.getAgentId());
@@ -119,8 +81,8 @@ public class GraphBuilder {
         setURI(requestURI);
         detail.put(ReportKey.CLIENT_IP, requestMeta.getOrDefault("remoteAddr", ""));
         detail.put(ReportKey.QUERY_STRING, requestMeta.getOrDefault("queryString", ""));
-        detail.put(ReportKey.REQ_HEADER,
-                AbstractNormalVulScan.getEncodedHeader((Map<String, String>) requestMeta.getOrDefault("headers", new HashMap<String, String>())));
+        detail.put(ReportKey.REQ_HEADER, AbstractNormalVulScan.getEncodedHeader(
+                (Map<String, String>) requestMeta.getOrDefault("headers", new HashMap<String, String>())));
         // 设置请求体
         detail.put(ReportKey.REQ_BODY, request == null ? "" : HttpImpl.getPostBody(request));
         detail.put(ReportKey.RES_HEADER, responseMeta == null ? ""

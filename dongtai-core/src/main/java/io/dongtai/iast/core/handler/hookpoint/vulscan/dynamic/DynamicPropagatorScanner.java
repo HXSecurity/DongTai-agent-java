@@ -1,17 +1,15 @@
 package io.dongtai.iast.core.handler.hookpoint.vulscan.dynamic;
 
 import io.dongtai.iast.core.EngineManager;
-import io.dongtai.iast.core.handler.context.ContextManager;
 import io.dongtai.iast.core.handler.hookpoint.SpyDispatcherImpl;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
-import io.dongtai.iast.core.handler.hookpoint.models.policy.*;
+import io.dongtai.iast.core.handler.hookpoint.models.policy.SinkNode;
+import io.dongtai.iast.core.handler.hookpoint.models.policy.TaintPosition;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.IVulScan;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.dynamic.xxe.XXECheck;
 import io.dongtai.iast.core.utils.StackUtils;
 import io.dongtai.iast.core.utils.TaintPoolUtils;
-import io.dongtai.log.DongTaiLog;
 
-import java.lang.reflect.Method;
 import java.util.*;
 
 /**
@@ -37,30 +35,7 @@ public class DynamicPropagatorScanner implements IVulScan {
 
     @Override
     public void scan(MethodEvent event, SinkNode sinkNode) {
-        String policySignature = null;
-        if (sinkNode.getMethodMatcher() instanceof SignatureMethodMatcher) {
-            policySignature = ((SignatureMethodMatcher) sinkNode.getMethodMatcher()).getSignature().toString();
-        }
-        // todo: 判断是否为 ssrf，如果是，增加 header 头
-        if (HTTP_CLIENT_5.equals(policySignature)) {
-            Object obj = event.argumentArray[1];
-            try {
-                Method method = obj.getClass().getMethod("addHeader", String.class, Object.class);
-                method.invoke(obj, ContextManager.getHeaderKey(), ContextManager.getSegmentId());
-            } catch (Exception e) {
-                // fixme: solve exception
-                DongTaiLog.error(e);
-            }
-        } else if (HTTP_CLIENT_4.equals(policySignature)) {
-            Object obj = event.argumentArray[1];
-            try {
-                Method method = obj.getClass().getMethod("setRequestHeader", String.class, String.class);
-                method.invoke(obj, ContextManager.getHeaderKey(), ContextManager.getSegmentId());
-            } catch (Exception e) {
-                // fixme: solve exception
-                DongTaiLog.error(e);
-            }
-        }
+        // @TODO: add traceId header to outgoing http request
 
         for (SinkSafeChecker chk : SAFE_CHECKERS) {
             if (chk.match(event, sinkNode) && chk.isSafe(event, sinkNode)) {
@@ -72,6 +47,8 @@ public class DynamicPropagatorScanner implements IVulScan {
             event.setCallStacks(StackUtils.createCallStack(5));
             int invokeId = SpyDispatcherImpl.INVOKE_ID_SEQUENCER.getAndIncrement();
             event.setInvokeId(invokeId);
+            event.setTaintPositions(sinkNode.getSources(), null);
+
             EngineManager.TRACK_MAP.addTrackMethod(invokeId, event);
         }
     }
@@ -90,34 +67,38 @@ public class DynamicPropagatorScanner implements IVulScan {
             }
         }
 
-        List<Object> inValues = new ArrayList<Object>();
-        List<String> inValueStrings = new ArrayList<String>();
-
+        boolean hasTaint = false;
+        boolean objHasTaint = false;
         Set<TaintPosition> sources = sinkNode.getSources();
-
         for (TaintPosition position : sources) {
             if (position.isObject()) {
-                if (!TaintPoolUtils.poolContains(event.object, event)) {
-                    continue;
+                if (TaintPoolUtils.isNotEmpty(event.objectInstance)
+                        && TaintPoolUtils.isAllowTaintType(event.objectInstance)
+                        && TaintPoolUtils.poolContains(event.objectInstance, event)) {
+                    objHasTaint = true;
+                    hasTaint = true;
                 }
-                inValues.add(event.object);
-                inValueStrings.add(event.obj2String(event.object));
             } else if (position.isParameter()) {
                 int parameterIndex = position.getParameterIndex();
-                if (parameterIndex >= event.argumentArray.length
-                        || !TaintPoolUtils.poolContains(event.argumentArray[parameterIndex], event)) {
+                if (parameterIndex >= event.parameterInstances.length) {
                     continue;
                 }
-                inValues.add(event.argumentArray[parameterIndex]);
-                inValueStrings.add(event.obj2String(event.argumentArray[parameterIndex]));
+                boolean paramHasTaint = false;
+                Object parameter = event.parameterInstances[parameterIndex];
+                if (TaintPoolUtils.isNotEmpty(parameter)
+                        && TaintPoolUtils.isAllowTaintType(parameter)
+                        && TaintPoolUtils.poolContains(parameter, event)) {
+                    paramHasTaint = true;
+                    hasTaint = true;
+                }
+                event.addParameterValue(parameterIndex, parameter, paramHasTaint);
             }
         }
 
-        if (inValues.isEmpty()) {
-            return false;
+        if (hasTaint) {
+            event.setObjectValue(event.objectInstance, objHasTaint);
         }
 
-        event.setInValue(inValues.toArray(), inValueStrings.toString());
-        return true;
+        return hasTaint;
     }
 }
