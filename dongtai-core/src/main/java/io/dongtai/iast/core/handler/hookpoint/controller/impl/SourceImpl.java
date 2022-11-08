@@ -69,6 +69,11 @@ public class SourceImpl {
 
             }
         }
+
+        if (!TaintPosition.hasObject(sourceNode.getSources()) && !TaintPosition.hasObject(sourceNode.getTargets())) {
+            event.setObjectValue(event.objectInstance, false);
+        }
+
         event.setTaintPositions(sourceNode.getSources(), sourceNode.getTargets());
 
         EngineManager.TRACK_MAP.addTrackMethod(invokeId, event);

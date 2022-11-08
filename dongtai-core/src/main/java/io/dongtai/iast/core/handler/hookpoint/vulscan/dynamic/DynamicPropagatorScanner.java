@@ -83,13 +83,15 @@ public class DynamicPropagatorScanner implements IVulScan {
                 if (parameterIndex >= event.parameterInstances.length) {
                     continue;
                 }
+                boolean paramHasTaint = false;
                 Object parameter = event.parameterInstances[parameterIndex];
                 if (TaintPoolUtils.isNotEmpty(parameter)
                         && TaintPoolUtils.isAllowTaintType(parameter)
                         && TaintPoolUtils.poolContains(parameter, event)) {
-                    event.addParameterValue(parameterIndex, parameter, true);
+                    paramHasTaint = true;
                     hasTaint = true;
                 }
+                event.addParameterValue(parameterIndex, parameter, paramHasTaint);
             }
         }
 

@@ -120,15 +120,24 @@ public class TaintPosition {
     }
 
     public static boolean hasObject(Set<TaintPosition> positions) {
+        if (positions == null) {
+            return false;
+        }
         return positions.contains(POS_OBJECT);
     }
 
     public static boolean hasReturn(Set<TaintPosition> positions) {
+        if (positions == null) {
+            return false;
+        }
         return positions.contains(POS_RETURN);
 
     }
 
     public static boolean hasParameter(Set<TaintPosition> positions) {
+        if (positions == null) {
+            return false;
+        }
         for (TaintPosition position : positions) {
             if (position.isParameter()) {
                 return true;
@@ -139,7 +148,7 @@ public class TaintPosition {
     }
 
     public static boolean hasParameterIndex(Set<TaintPosition> positions, int index) {
-        if (index < 0) {
+        if (positions == null || index < 0) {
             return false;
         }
         for (TaintPosition position : positions) {

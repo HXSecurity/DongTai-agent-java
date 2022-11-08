@@ -128,6 +128,8 @@ public class GraphNode {
 
         if (!StringUtils.isEmpty(this.objectValue)) {
             value.put("objValue", objectValue);
+        } else {
+            value.put("objValue", "");
         }
         if (this.parameterValues != null && this.parameterValues.size() > 0) {
             for (MethodEvent.Parameter parameter : this.parameterValues) {
