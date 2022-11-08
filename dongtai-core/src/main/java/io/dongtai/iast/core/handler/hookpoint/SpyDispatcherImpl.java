@@ -429,12 +429,12 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     }
 
     @Override
-    public boolean collectMethod(Object instance, Object[] parameters, Object retObject, String methodMatcher,
+    public boolean collectMethod(Object instance, Object[] parameters, Object retObject, String policyKey,
                                  String className, String matchedClassName, String methodName, String signature,
                                  boolean isStatic) {
         try {
             ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
-            PolicyNode policyNode = getPolicyNode(methodMatcher);
+            PolicyNode policyNode = getPolicyNode(policyKey);
             if (policyNode == null) {
                 return false;
             }
@@ -488,7 +488,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
         return true;
     }
 
-    private PolicyNode getPolicyNode(String methodMatcher) {
+    private PolicyNode getPolicyNode(String policyKey) {
         AgentEngine agentEngine = AgentEngine.getInstance();
         PolicyManager policyManager = agentEngine.getPolicyManager();
         if (policyManager == null) {
@@ -499,6 +499,6 @@ public class SpyDispatcherImpl implements SpyDispatcher {
             return null;
         }
 
-        return policy.getPolicyNode(methodMatcher);
+        return policy.getPolicyNode(policyKey);
     }
 }

@@ -16,7 +16,7 @@ public class Policy {
 
     public void addSource(SourceNode source) {
         this.sources.add(source);
-        addHooks(source);
+        addPolicyNode(source);
     }
 
     public List<PropagatorNode> getPropagators() {
@@ -25,7 +25,7 @@ public class Policy {
 
     public void addPropagator(PropagatorNode propagator) {
         this.propagators.add(propagator);
-        addHooks(propagator);
+        addPolicyNode(propagator);
     }
 
     public List<SinkNode> getSinks() {
@@ -34,22 +34,22 @@ public class Policy {
 
     public void addSink(SinkNode sink) {
         this.sinks.add(sink);
-        addHooks(sink);
+        addPolicyNode(sink);
     }
 
-    public PolicyNode getPolicyNode(String methodMatcher) {
-        return this.policyNodesMap.get(methodMatcher);
+    public PolicyNode getPolicyNode(String policyKey) {
+        return this.policyNodesMap.get(policyKey);
     }
 
     public Map<String, PolicyNode> getPolicyNodesMap() {
         return this.policyNodesMap;
     }
 
-    public void addHooks(PolicyNode node) {
+    public void addPolicyNode(PolicyNode node) {
         SignatureMethodMatcher methodMatcher;
         if (node.getMethodMatcher() instanceof SignatureMethodMatcher) {
             methodMatcher = (SignatureMethodMatcher) node.getMethodMatcher();
-            this.policyNodesMap.put(methodMatcher.toString(), node);
+            this.policyNodesMap.put(node.toString(), node);
             addHooks(methodMatcher.getSignature().getClassName(), node.getInheritable());
         }
     }
@@ -77,5 +77,13 @@ public class Policy {
 
     public boolean isMatchClass(String className) {
         return this.classHooks.contains(className) || this.ancestorClassHooks.contains(className);
+    }
+
+    public Set<String> getClassHooks() {
+        return this.classHooks;
+    }
+
+    public Set<String> getAncestorClassHooks() {
+        return this.ancestorClassHooks;
     }
 }

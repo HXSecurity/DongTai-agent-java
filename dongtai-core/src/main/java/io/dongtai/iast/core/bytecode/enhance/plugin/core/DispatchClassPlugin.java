@@ -5,7 +5,8 @@ import io.dongtai.iast.core.bytecode.enhance.MethodContext;
 import io.dongtai.iast.core.bytecode.enhance.plugin.AbstractClassVisitor;
 import io.dongtai.iast.core.bytecode.enhance.plugin.DispatchPlugin;
 import io.dongtai.iast.core.bytecode.enhance.plugin.core.adapter.*;
-import io.dongtai.iast.core.handler.hookpoint.models.policy.*;
+import io.dongtai.iast.core.handler.hookpoint.models.policy.Policy;
+import io.dongtai.iast.core.handler.hookpoint.models.policy.PolicyNode;
 import io.dongtai.iast.core.utils.AsmUtils;
 import io.dongtai.log.DongTaiLog;
 import org.objectweb.asm.ClassVisitor;
@@ -97,29 +98,11 @@ public class DispatchClassPlugin implements DispatchPlugin {
                                       MethodContext methodContext) {
             Set<PolicyNode> matchedNodes = new HashSet<PolicyNode>();
 
-            List<SourceNode> sourceNodes = this.policy.getSources();
-            if (sourceNodes != null && sourceNodes.size() != 0) {
-                for (SourceNode sourceNode : sourceNodes) {
-                    if (sourceNode.getMethodMatcher().match(methodContext)) {
-                        matchedNodes.add(sourceNode);
-                    }
-                }
-            }
-
-            List<PropagatorNode> propagatorNodes = this.policy.getPropagators();
-            if (sourceNodes != null && sourceNodes.size() != 0) {
-                for (PropagatorNode propagatorNode : propagatorNodes) {
-                    if (propagatorNode.getMethodMatcher().match(methodContext)) {
-                        matchedNodes.add(propagatorNode);
-                    }
-                }
-            }
-
-            List<SinkNode> sinkNodes = this.policy.getSinks();
-            if (sourceNodes != null && sourceNodes.size() != 0) {
-                for (SinkNode sinkNode : sinkNodes) {
-                    if (sinkNode.getMethodMatcher().match(methodContext)) {
-                        matchedNodes.add(sinkNode);
+            Map<String, PolicyNode> policyNodesMap = this.policy.getPolicyNodesMap();
+            if (policyNodesMap != null && policyNodesMap.size() != 0) {
+                for (Map.Entry<String, PolicyNode> entry : policyNodesMap.entrySet()) {
+                    if (entry.getValue().getMethodMatcher().match(methodContext)) {
+                        matchedNodes.add(entry.getValue());
                     }
                 }
             }
