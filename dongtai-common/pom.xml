@@ -31,7 +31,6 @@
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>${json.version}</version>
-            <scope>test</scope>
         </dependency>
 
         <dependency>
@@ -42,7 +41,6 @@
     </dependencies>
 
     <build>
-        <finalName>dongtai-log</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

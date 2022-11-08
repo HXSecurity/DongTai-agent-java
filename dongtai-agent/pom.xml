@@ -99,7 +99,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>2.4</version>
+                <version>3.1.0</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -126,8 +126,12 @@
                             </filters>
                             <relocations>
                                 <relocation>
-                                    <pattern>org.</pattern>
-                                    <shadedPattern>${shade-prefix}.org.</shadedPattern>
+                                    <pattern>org.apache</pattern>
+                                    <shadedPattern>${shade-prefix}.org.apache</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.json</pattern>
+                                    <shadedPattern>${shade-prefix}.org.json</shadedPattern>
                                 </relocation>
                                 <relocation>
                                     <pattern>oshi.</pattern>
