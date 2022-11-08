@@ -9,6 +9,7 @@ import io.dongtai.iast.agent.util.ThreadUtils;
 import io.dongtai.iast.common.constants.AgentConstant;
 import io.dongtai.log.DongTaiLog;
 
+@Deprecated
 public class ServerConfigMonitor implements IMonitor {
     private static final String NAME = "ServerConfigMonitor";
 
