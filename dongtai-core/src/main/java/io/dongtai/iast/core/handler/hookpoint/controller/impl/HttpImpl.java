@@ -1,5 +1,6 @@
 package io.dongtai.iast.core.handler.hookpoint.controller.impl;
 
+import io.dongtai.iast.common.config.*;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.hookpoint.IastClassLoader;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
@@ -148,11 +149,13 @@ public class HttpImpl {
         return null;
     }
 
+    @SuppressWarnings("unchecked")
     public static Map<String, Object> getResponseMeta(Object response) {
         Method methodOfRequestMeta = null;
         try {
-            methodOfRequestMeta = response.getClass().getDeclaredMethod("getResponseMeta");
-            return (Map<String, Object>) methodOfRequestMeta.invoke(response);
+            methodOfRequestMeta = response.getClass().getDeclaredMethod("getResponseMeta", new Class[]{boolean.class});
+            boolean getBody = ((Config<Boolean>) ConfigBuilder.getInstance().getConfig(ConfigKey.REPORT_RESPONSE_BODY)).get();
+            return (Map<String, Object>) methodOfRequestMeta.invoke(response, getBody);
         } catch (NoSuchMethodException e) {
             DongTaiLog.error("HttpImpl getResponseMeta failed", e);
         } catch (IllegalAccessException e) {

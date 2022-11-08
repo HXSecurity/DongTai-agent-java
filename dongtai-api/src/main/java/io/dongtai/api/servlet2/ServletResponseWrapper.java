@@ -59,10 +59,12 @@ public class ServletResponseWrapper extends HttpServletResponseWrapper implement
     }
 
     @Override
-    public Map<String, Object> getResponseMeta() {
+    public Map<String, Object> getResponseMeta(boolean getBody) {
         Map<String, Object> responseMeta = new HashMap<String, Object>(2);
         responseMeta.put("headers", getHeaders());
-        responseMeta.put("body", getResponseData());
+        if (getBody) {
+            responseMeta.put("body", getResponseData());
+        }
         return responseMeta;
     }
 

@@ -102,16 +102,20 @@ public class GraphBuilder {
     }
 
     private static byte[] getResponseBody(Map<String, Object> responseMeta) {
-        Integer responseLength = PropertyUtils.getInstance().getResponseLength();
-        byte[] responseBody = (byte[]) responseMeta.getOrDefault("body", "");
-        if (responseLength > 0) {
-            byte[] newResponseBody = new byte[responseLength];
-            newResponseBody = Arrays.copyOfRange(responseBody, 0, responseLength);
-            return newResponseBody;
-        } else if (responseLength == 0) {
+        try {
+            Integer responseLength = PropertyUtils.getInstance().getResponseLength();
+            byte[] responseBody = (byte[]) responseMeta.getOrDefault("body", new byte[0]);
+            if (responseLength > 0) {
+                byte[] newResponseBody = new byte[responseLength];
+                newResponseBody = Arrays.copyOfRange(responseBody, 0, responseLength);
+                return newResponseBody;
+            } else if (responseLength == 0) {
+                return new byte[0];
+            } else {
+                return responseBody;
+            }
+        } catch (Exception ignore) {
             return new byte[0];
-        } else {
-            return responseBody;
         }
     }
 
