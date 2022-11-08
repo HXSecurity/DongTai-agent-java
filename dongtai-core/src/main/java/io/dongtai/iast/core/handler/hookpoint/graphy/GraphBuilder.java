@@ -59,7 +59,7 @@ public class GraphBuilder {
         JSONArray methodPool = new JSONArray();
 
         report.put(ReportKey.TYPE, ReportType.VULN_SAAS_POOL);
-        report.put(ReportKey.VERSION, "v2");
+        report.put(ReportKey.VERSION, "v3");
         report.put(ReportKey.DETAIL, detail);
 
         detail.put(ReportKey.AGENT_ID, EngineManager.getAgentId());
