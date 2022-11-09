@@ -5,7 +5,7 @@ import java.util.Map;
 
 public interface DongTaiResponse {
 
-    public Map<String, Object> getResponseMeta();
+    public Map<String, Object> getResponseMeta(boolean getBody);
 
     public byte[] getResponseData() throws IOException;
 }
