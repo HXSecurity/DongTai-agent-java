@@ -378,11 +378,16 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                 return false;
             }
 
+            if (ScopeManager.SCOPE_TRACKER.getPolicyScope().isOverCapacity()) {
+                return false;
+            }
+
             try {
                 int methodPoolMaxSize = ((Config<Integer>) ConfigBuilder.getInstance()
                         .getConfig(ConfigKey.REPORT_MAX_METHOD_POOL_SIZE)).get();
                 if (methodPoolMaxSize > 0 && EngineManager.TRACK_MAP.get().size() >= methodPoolMaxSize) {
                     ScopeManager.SCOPE_TRACKER.getPolicyScope().setOverCapacity(true);
+                    DongTaiLog.debug("current request method pool size over capacity: {}", methodPoolMaxSize);
                     return false;
                 }
             } catch (Exception ignore) {
