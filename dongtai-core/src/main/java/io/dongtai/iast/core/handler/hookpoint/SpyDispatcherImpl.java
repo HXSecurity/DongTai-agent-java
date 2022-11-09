@@ -380,7 +380,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
 
             try {
                 int methodPoolMaxSize = ((Config<Integer>) ConfigBuilder.getInstance()
-                        .getConfig(ConfigKey.REPORT_METHOD_POOL_MAX_SIZE)).get();
+                        .getConfig(ConfigKey.REPORT_MAX_METHOD_POOL_SIZE)).get();
                 if (methodPoolMaxSize > 0 && EngineManager.TRACK_MAP.get().size() >= methodPoolMaxSize) {
                     ScopeManager.SCOPE_TRACKER.getPolicyScope().setOverCapacity(true);
                     return false;
