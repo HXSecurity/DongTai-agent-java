@@ -2,8 +2,7 @@ package io.dongtai.iast.common.utils;
 
 import io.dongtai.iast.common.enums.HttpMethods;
 import io.dongtai.log.DongTaiLog;
-import org.apache.http.HttpHost;
-import org.apache.http.HttpStatus;
+import org.apache.http.*;
 import org.apache.http.client.entity.GzipCompressingEntity;
 import org.apache.http.client.methods.*;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
@@ -32,7 +31,18 @@ public class AbstractHttpClientUtils {
                                                HttpClientExceptionHandler handler) {
         CloseableHttpClient client = getClient(maxRetries, proxyHost, proxyPort);
 
-        return sendRequest(client, method, url, data, headers, handler);
+        HttpEntity reqBody = null;
+        try {
+            if (HttpMethods.POST.equals(method) && data != null) {
+                reqBody = new GzipCompressingEntity(new StringEntity(data));
+            }
+        } catch (Exception e) {
+            DongTaiLog.error("prepare request " + url + " body failed", e);
+        }
+        StringBuilder response = sendRequest(client, method, url, reqBody, headers, handler);
+        DongTaiLog.trace("dongtai request url is {}, request is {}, response is {}",
+                url, data, response.toString());
+        return response;
     }
 
     public static StringBuilder sendReplayRequest(String method, String url, String data, Map<String, String> headers) {
@@ -47,10 +57,21 @@ public class AbstractHttpClientUtils {
             return response;
         }
 
-        return sendRequest(client, m, url, data, headers, null);
+        HttpEntity reqBody = null;
+        try {
+            if (HttpMethods.POST.equals(method) && data != null) {
+                reqBody = new StringEntity(data);
+            }
+        } catch (Exception e) {
+            DongTaiLog.error("prepare request " + url + " body failed", e);
+        }
+        response = sendRequest(client, m, url, reqBody, headers, null);
+        DongTaiLog.trace("dongtai replay request url is {}, request is {}, response is {}",
+                url, data, response.toString());
+        return response;
     }
 
-    protected static StringBuilder sendRequest(CloseableHttpClient client, HttpMethods method, String url, String data,
+    protected static StringBuilder sendRequest(CloseableHttpClient client, HttpMethods method, String url, HttpEntity reqBody,
                                                Map<String, String> headers, HttpClientExceptionHandler handler) {
         StringBuilder response = new StringBuilder();
         CloseableHttpResponse resp = null;
@@ -58,10 +79,10 @@ public class AbstractHttpClientUtils {
         try {
             if (method.equals(HttpMethods.GET)) {
                 HttpGet req = new HttpGet(url);
-                resp = sendRequestInternal(client, req, data, headers, handler);
+                resp = sendRequestInternal(client, req, reqBody, headers, handler);
             } else {
                 HttpPost req = new HttpPost(url);
-                resp = sendRequestInternal(client, req, data, headers, handler);
+                resp = sendRequestInternal(client, req, reqBody, headers, handler);
             }
             if (resp != null) {
                 if (resp.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
@@ -70,8 +91,6 @@ public class AbstractHttpClientUtils {
                 }
 
                 response.append(EntityUtils.toString(resp.getEntity(), "UTF-8"));
-                DongTaiLog.trace("dongtai request url is {}, request is {}, response is {}",
-                        url, data, response.toString());
                 return response;
             }
         } catch (Exception e) {
@@ -99,7 +118,7 @@ public class AbstractHttpClientUtils {
 
     /**
      * @param req     HttpRequestBase
-     * @param data    post data
+     * @param reqBody post data
      * @param headers headers map
      * @return StringBuilder
      * <p>
@@ -107,7 +126,7 @@ public class AbstractHttpClientUtils {
      * https://stackoverflow.com/questions/33849053/how-to-stop-a-url-connection-upon-thread-interruption-java
      */
     private static CloseableHttpResponse sendRequestInternal(CloseableHttpClient client, HttpRequestBase req,
-                                                             String data, Map<String, String> headers,
+                                                             HttpEntity reqBody, Map<String, String> headers,
                                                              HttpClientExceptionHandler func) {
         try {
             if (headers != null) {
@@ -116,9 +135,8 @@ public class AbstractHttpClientUtils {
                 }
             }
 
-            if (req instanceof HttpPost && data != null) {
-                GzipCompressingEntity entity = new GzipCompressingEntity(new StringEntity(data));
-                ((HttpPost) req).setEntity(entity);
+            if (req instanceof HttpPost && reqBody != null) {
+                ((HttpPost) req).setEntity(reqBody);
             }
             return client.execute(req);
         } catch (IOException e) {

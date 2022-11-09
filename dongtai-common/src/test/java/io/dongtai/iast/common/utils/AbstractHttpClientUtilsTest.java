@@ -18,7 +18,7 @@ public class AbstractHttpClientUtilsTest {
     private final ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
     private final boolean oldEnableColor = DongTaiLog.enableColor;
 
-    private static final String BASE_URL = "https://iast-test.huoxian.cn";
+    private static final String BASE_URL = "https://iast.io";
 
     private void clear() {
         outputStreamCaptor.reset();
