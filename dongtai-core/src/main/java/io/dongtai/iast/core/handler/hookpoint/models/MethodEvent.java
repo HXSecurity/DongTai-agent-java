@@ -2,6 +2,7 @@ package io.dongtai.iast.core.handler.hookpoint.models;
 
 import io.dongtai.iast.core.handler.hookpoint.models.policy.TaintPosition;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.taintrange.TaintRanges;
+import io.dongtai.iast.core.utils.StringUtils;
 import io.dongtai.log.DongTaiLog;
 import org.json.JSONObject;
 
@@ -14,6 +15,11 @@ import java.util.*;
  * @author dongzhiyong@huoxian.cn
  */
 public class MethodEvent {
+    /**
+     * max display value size for object/return/parameters
+     */
+    private static final int MAX_VALUE_LENGTH = 1024;
+
     /**
      * method invoke id
      */
@@ -216,7 +222,9 @@ public class MethodEvent {
     }
 
     private String formatValue(Object val, boolean hasTaint) {
-        return "[" + obj2String(val) + "]" + (hasTaint ? "*" : "");
+        String str = obj2String(val);
+        return "[" + StringUtils.normalize(str, MAX_VALUE_LENGTH) + "]"
+                + (hasTaint ? "*" : "") + String.valueOf(str.length());
     }
 
     public Set<Integer> getSourceHashes() {
@@ -284,6 +292,6 @@ public class MethodEvent {
         } catch (Exception e) {
             DongTaiLog.warn("convert object " + value.toString() + " to string failed", e);
         }
-        return sb.toString().trim();
+        return sb.toString();
     }
 }
