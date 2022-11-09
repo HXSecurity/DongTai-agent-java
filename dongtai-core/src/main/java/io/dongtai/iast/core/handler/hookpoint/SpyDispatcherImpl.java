@@ -1,6 +1,7 @@
 package io.dongtai.iast.core.handler.hookpoint;
 
 import com.secnium.iast.core.AgentEngine;
+import io.dongtai.iast.common.config.*;
 import io.dongtai.iast.common.scope.ScopeManager;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.bytecode.enhance.plugin.spring.SpringApplicationImpl;
@@ -369,11 +370,27 @@ public class SpyDispatcherImpl implements SpyDispatcher {
         return false;
     }
 
+    @SuppressWarnings("unchecked")
     private boolean isCollectAllowed(String className, String methodName, String signature,
                                      int policyNodeType, boolean isEnterEntry) {
         if (!isEnterEntry) {
             if (!ScopeManager.SCOPE_TRACKER.inEnterEntry()) {
                 return false;
+            }
+
+            if (ScopeManager.SCOPE_TRACKER.getPolicyScope().isOverCapacity()) {
+                return false;
+            }
+
+            try {
+                int methodPoolMaxSize = ((Config<Integer>) ConfigBuilder.getInstance()
+                        .getConfig(ConfigKey.REPORT_MAX_METHOD_POOL_SIZE)).get();
+                if (methodPoolMaxSize > 0 && EngineManager.TRACK_MAP.get().size() >= methodPoolMaxSize) {
+                    ScopeManager.SCOPE_TRACKER.getPolicyScope().setOverCapacity(true);
+                    DongTaiLog.debug("current request method pool size over capacity: {}", methodPoolMaxSize);
+                    return false;
+                }
+            } catch (Exception ignore) {
             }
         }
 

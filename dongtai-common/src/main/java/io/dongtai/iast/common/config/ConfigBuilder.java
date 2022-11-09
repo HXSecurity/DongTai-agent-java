@@ -10,8 +10,8 @@ public class ConfigBuilder {
     private final Map<ConfigKey, Config<?>> configMap = new HashMap<ConfigKey, Config<?>>();
 
     private ConfigBuilder() {
-        this.configMap.put(ConfigKey.REPORT_METHOD_POOL_MAX_SIZE,
-                Config.<Integer>create(ConfigKey.REPORT_METHOD_POOL_MAX_SIZE).setDefaultValue(0));
+        this.configMap.put(ConfigKey.REPORT_MAX_METHOD_POOL_SIZE,
+                Config.<Integer>create(ConfigKey.REPORT_MAX_METHOD_POOL_SIZE).setDefaultValue(5000));
         this.configMap.put(ConfigKey.REPORT_RESPONSE_BODY,
                 Config.<Boolean>create(ConfigKey.REPORT_RESPONSE_BODY).setDefaultValue(true));
         this.configMap.put(ConfigKey.REQUEST_DENY_LIST,
@@ -45,7 +45,7 @@ public class ConfigBuilder {
             return;
         }
         updateBool(config, ConfigKey.JsonKey.JSON_REPORT_RESPONSE_BODY);
-        updateInt(config, ConfigKey.JsonKey.JSON_REPORT_METHOD_POOL_MAX_SIZE);
+        updateInt(config, ConfigKey.JsonKey.JSON_REPORT_MAX_METHOD_POOL_SIZE);
         updateRequestDenyList(config);
     }
 
