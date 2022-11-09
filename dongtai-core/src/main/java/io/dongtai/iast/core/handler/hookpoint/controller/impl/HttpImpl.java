@@ -1,6 +1,7 @@
 package io.dongtai.iast.core.handler.hookpoint.controller.impl;
 
 import io.dongtai.iast.common.config.*;
+import io.dongtai.iast.common.scope.ScopeManager;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.hookpoint.IastClassLoader;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
@@ -110,6 +111,9 @@ public class HttpImpl {
             if (response == null) {
                 return null;
             }
+            if (!ScopeManager.SCOPE_TRACKER.getHttpEntryScope().in()) {
+                return response;
+            }
             if (ConfigMatcher.getInstance().disableExtension((String) REQUEST_META.get().get("requestURI"))) {
                 return response;
             }
@@ -171,11 +175,28 @@ public class HttpImpl {
      *
      * @param event method call event
      */
+    @SuppressWarnings("unchecked")
     public static void solveHttp(MethodEvent event)
             throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         REQUEST_META.set(getRequestMeta(event.parameterInstances[0]));
+
+        try {
+            Config<RequestDenyList> config = (Config<RequestDenyList>) ConfigBuilder.getInstance()
+                    .getConfig(ConfigKey.REQUEST_DENY_LIST);
+            RequestDenyList requestDenyList = config.get();
+            if (requestDenyList != null) {
+                String requestURL = ((StringBuffer) REQUEST_META.get().get("requestURL")).toString();
+                Map<String, String> headers = (Map<String, String>) REQUEST_META.get().get("headers");
+                if (requestDenyList.match(requestURL, headers)) {
+                    DongTaiLog.trace("HTTP Request {} deny to collect {}", requestURL, requestDenyList);
+                    return;
+                }
+            }
+        } catch (Exception ignore) {
+        }
+
         Boolean isReplay = (Boolean) REQUEST_META.get().get("replay-request");
-        if (isReplay){
+        if (isReplay) {
             EngineManager.ENTER_REPLAY_ENTRYPOINT.enterEntry();
         }
         // todo Consider increasing the capture of html request responses

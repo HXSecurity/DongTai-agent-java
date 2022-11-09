@@ -73,6 +73,7 @@ public class ConfigMatcher {
         return StringUtils.endsWithAny(uri, DISABLE_EXT);
     }
 
+    @Deprecated
     public boolean getBlackUrl(Map<String, Object> request) {
         try {
             if (request == null || request.isEmpty()) {
