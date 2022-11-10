@@ -2,11 +2,10 @@ package io.dongtai.iast.common.config;
 
 import org.json.JSONArray;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class RequestDenyList {
-    private List<List<RequestDeny>> denies = new ArrayList<List<RequestDeny>>();
+    private final List<List<RequestDeny>> denies = new ArrayList<List<RequestDeny>>();
 
     public static RequestDenyList parse(JSONArray config) {
         if (config == null || config.length() == 0) {
@@ -38,5 +37,33 @@ public class RequestDenyList {
             return null;
         }
         return denyList;
+    }
+
+    public void addRule(List<RequestDeny> requestDenies) {
+        this.denies.add(requestDenies);
+    }
+
+    public boolean match(String url, Map<String, String> headers) {
+        boolean matched = false;
+        for (List<RequestDeny> denyList : this.denies) {
+            boolean subHasNoMatch = false;
+            for (RequestDeny deny : denyList) {
+                if (!deny.match(url, headers)) {
+                    subHasNoMatch = true;
+                    break;
+                }
+            }
+
+            if (!subHasNoMatch) {
+                matched = true;
+                break;
+            }
+        }
+        return matched;
+    }
+
+    @Override
+    public String toString() {
+        return denies.toString();
     }
 }
