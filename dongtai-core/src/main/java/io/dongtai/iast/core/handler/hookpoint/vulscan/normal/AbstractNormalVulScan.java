@@ -55,7 +55,7 @@ public abstract class AbstractNormalVulScan implements IVulScan {
     }
 
     protected StackTraceElement[] getLatestStack() {
-        return StackUtils.createCallStack(0);
+        return StackUtils.createCallStack(6);
     }
 
     public static String getEncodedHeader(Map<String, String> headers) {

@@ -10,7 +10,7 @@ public enum VulnType {
      * 漏洞
      */
     SQL_OVER_POWER("sql-over-power", "info", false),
-    CRYPTO_WEEK_RANDOMNESS("crypto-weak-randomness", "low", false),
+    CRYPTO_WEAK_RANDOMNESS("crypto-weak-randomness", "low", false),
     CRYPTO_BAC_CIPHERS("crypto-bad-ciphers", "high", false),
     CRYPTO_BAD_MAC("crypto-bad-mac", "high", false),
     COOKIE_FLAGS_MISSING("cookie-flags-missing", "high", true);
