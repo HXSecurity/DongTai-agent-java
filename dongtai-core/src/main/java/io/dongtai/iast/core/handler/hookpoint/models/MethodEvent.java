@@ -3,7 +3,6 @@ package io.dongtai.iast.core.handler.hookpoint.models;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.TaintPosition;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.taintrange.TaintRanges;
 import io.dongtai.iast.core.utils.StringUtils;
-import io.dongtai.log.DongTaiLog;
 import org.json.JSONObject;
 
 import java.io.StringWriter;
@@ -290,7 +289,10 @@ public class MethodEvent {
                 sb.append(value.toString());
             }
         } catch (Exception e) {
-            DongTaiLog.warn("convert object " + value.toString() + " to string failed", e);
+            // org.jruby.RubyBasicObject.hashCode() may cause NullPointerException when RubyBasicObject.metaClass is null
+            sb.append(value.getClass().getName())
+                    .append("@")
+                    .append(Integer.toHexString(System.identityHashCode(value)));
         }
         return sb.toString();
     }
