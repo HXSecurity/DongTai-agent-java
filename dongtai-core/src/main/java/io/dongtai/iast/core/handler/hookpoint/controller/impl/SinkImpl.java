@@ -25,7 +25,7 @@ public class SinkImpl {
         }
 
         String vulType = sinkNode.getVulType();
-        if (VulnType.CRYPTO_WEEK_RANDOMNESS.equals(vulType)) {
+        if (VulnType.CRYPTO_WEAK_RANDOMNESS.equals(vulType)) {
             new CryptoWeakRandomnessVulScan().scan(event, sinkNode);
         } else if (VulnType.CRYPTO_BAD_MAC.equals(vulType)) {
             new CryptoBadMacVulScan().scan(event, sinkNode);

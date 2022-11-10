@@ -1,6 +1,7 @@
 package io.dongtai.iast.core.handler.hookpoint.models.policy;
 
 import io.dongtai.iast.common.constants.ApiPath;
+import io.dongtai.iast.core.handler.hookpoint.vulscan.VulnType;
 import io.dongtai.iast.core.utils.HttpClientUtils;
 import io.dongtai.iast.core.utils.StringUtils;
 import io.dongtai.log.DongTaiLog;
@@ -103,9 +104,15 @@ public class PolicyBuilder {
         }
 
         MethodMatcher methodMatcher = buildMethodMatcher(node);
-        SinkNode sinkNode = new SinkNode(parseSource(node, type), methodMatcher);
+        String vulType = parseVulType(node);
+        SinkNode sinkNode;
+        if (VulnType.CRYPTO_WEAK_RANDOMNESS.equals(vulType)) {
+            sinkNode = new SinkNode(new HashSet<TaintPosition>(), methodMatcher);
+        } else {
+            sinkNode = new SinkNode(parseSource(node, type), methodMatcher);
+        }
         setInheritable(node, sinkNode);
-        setVulType(node, sinkNode);
+        sinkNode.setVulType(vulType);
         policy.addSink(sinkNode);
     }
 
@@ -150,7 +157,6 @@ public class PolicyBuilder {
             }
         }
         return new HashSet<TaintPosition>();
-
     }
 
     private static void setInheritable(JSONObject node, PolicyNode policyNode) throws PolicyException {
@@ -162,13 +168,13 @@ public class PolicyBuilder {
         }
     }
 
-    private static void setVulType(JSONObject node, SinkNode sinkNode) throws PolicyException {
+    private static String parseVulType(JSONObject node) throws PolicyException {
         try {
             String vulType = node.getString(KEY_VUL_TYPE);
             if (vulType == null || vulType.isEmpty()) {
                 throw new PolicyException(PolicyException.ERR_POLICY_SINK_NODE_VUL_TYPE_INVALID + ": " + node.toString());
             }
-            sinkNode.setVulType(vulType);
+            return vulType;
         } catch (JSONException e) {
             throw new PolicyException(PolicyException.ERR_POLICY_SINK_NODE_VUL_TYPE_INVALID + ": " + node.toString(), e);
         }
