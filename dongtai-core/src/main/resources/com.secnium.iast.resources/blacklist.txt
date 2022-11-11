@@ -4,6 +4,10 @@ com/navercorp/pinpoint/*
 # arthas
 com/taobao/*
 com/alibaba/arthas/*
+# rasp
+com/meituan/*
+com/sankuai/*
+com/dianping/*
 # jrebel
 com/zeroturnaround/*
 # ehcache - cache need't hook
