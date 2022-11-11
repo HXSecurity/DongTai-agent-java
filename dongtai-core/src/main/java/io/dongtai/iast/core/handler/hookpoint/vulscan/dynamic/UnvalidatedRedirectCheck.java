@@ -72,7 +72,11 @@ public class UnvalidatedRedirectCheck implements SinkSourceChecker {
         if (event.parameterInstances.length == 0) {
             return false;
         }
-        return checkValue(event.parameterInstances[0], event);
+        boolean paramHasTaint = checkValue(event.parameterInstances[0], event);
+        if (paramHasTaint) {
+            event.addParameterValue(0, event.parameterInstances[0], true);
+        }
+        return paramHasTaint;
     }
 
     private boolean checkRedirectURI(MethodEvent event, SinkNode sinkNode) {
@@ -81,7 +85,11 @@ public class UnvalidatedRedirectCheck implements SinkSourceChecker {
         }
         URI uri = (URI) event.parameterInstances[0];
         String schema = uri.getScheme();
-        return checkValue(schema, event);
+        boolean paramHasTaint = checkValue(schema, event);
+        if (paramHasTaint) {
+            event.addParameterValue(0, event.parameterInstances[0], true);
+        }
+        return paramHasTaint;
     }
 
     private boolean checkHeader(MethodEvent event, SinkNode sinkNode) {
@@ -101,7 +109,11 @@ public class UnvalidatedRedirectCheck implements SinkSourceChecker {
             if (!REDIRECT_KEY.equals(key) && !REDIRECT_LOWER_KEY.equals(key)) {
                 return false;
             }
-            return checkValue(event.parameterInstances[valPos], event);
+            boolean paramHasTaint = checkValue(event.parameterInstances[valPos], event);
+            if (paramHasTaint) {
+                event.addParameterValue(valPos, event.parameterInstances[valPos], true);
+            }
+            return paramHasTaint;
         } catch (Throwable e) {
             DongTaiLog.warn(SINK_TYPE + " check header failed", e);
             return false;

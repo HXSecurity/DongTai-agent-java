@@ -58,18 +58,34 @@ public class PathTraversalCheck implements SinkSourceChecker {
 
     private boolean checkPathArgument(MethodEvent event, SinkNode sinkNode) {
         try {
+            int parameterIndex;
+            boolean paramHasTaint;
             if (NIO_FS_GET_PATH.equals(this.policySignature)) {
-                if (event.parameterInstances.length < 2) {
+                if (event.parameterInstances.length < 1) {
                     return false;
                 }
-                String[] paths = (String[]) event.parameterInstances[1];
-                if (paths.length == 0) {
-                    return checkPath((String) event.parameterInstances[0], event);
+                if (event.parameterInstances.length == 1) {
+                    parameterIndex = 0;
+                    paramHasTaint = checkPath((String) event.parameterInstances[0], event);
+                } else {
+                    String[] paths = (String[]) event.parameterInstances[1];
+                    if (paths.length == 0) {
+                        parameterIndex = 0;
+                        paramHasTaint = checkPath((String) event.parameterInstances[0], event);
+                    } else {
+                        parameterIndex = 1;
+                        paramHasTaint = checkPath(paths[paths.length - 1], event);
+                    }
                 }
-                return checkPath(paths[paths.length - 1], event);
+            } else {
+                parameterIndex = event.parameterInstances.length - 1;
+                paramHasTaint = checkPath((String) event.parameterInstances[parameterIndex], event);
             }
 
-            return checkPath((String) event.parameterInstances[event.parameterInstances.length - 1], event);
+            if (paramHasTaint) {
+                event.addParameterValue(parameterIndex, event.parameterInstances[parameterIndex], true);
+            }
+            return paramHasTaint;
         } catch (Throwable e) {
             DongTaiLog.warn(SINK_TYPE + " check path failed", e);
             return false;
@@ -82,7 +98,12 @@ public class PathTraversalCheck implements SinkSourceChecker {
         }
 
         URI uri = (URI) event.parameterInstances[0];
-        return checkPath(uri.getPath(), event);
+        boolean paramHasTaint = checkPath(uri.getPath(), event);
+        if (paramHasTaint) {
+            event.addParameterValue(0, event.parameterInstances[0], true);
+        }
+        return paramHasTaint;
+
     }
 
     private boolean checkPath(String path, MethodEvent event) {
