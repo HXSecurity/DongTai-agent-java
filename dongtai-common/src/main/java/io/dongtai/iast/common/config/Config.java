@@ -1,7 +1,7 @@
 package io.dongtai.iast.common.config;
 
 public class Config<T> {
-    private ConfigKey key;
+    private final ConfigKey key;
     private T defaultValue;
     private T value;
 
