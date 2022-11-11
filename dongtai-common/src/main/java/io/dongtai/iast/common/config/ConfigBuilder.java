@@ -25,6 +25,10 @@ public class ConfigBuilder {
         return instance;
     }
 
+    public static void clear() {
+        instance = null;
+    }
+
     public Config<?> getConfig(ConfigKey key) {
         return this.configMap.get(key);
     }
@@ -85,6 +89,7 @@ public class ConfigBuilder {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void updateRequestDenyList(JSONObject config) {
         try {
             ConfigKey.JsonKey jsonKey = ConfigKey.JsonKey.JSON_REQUEST_DENY_LIST;
