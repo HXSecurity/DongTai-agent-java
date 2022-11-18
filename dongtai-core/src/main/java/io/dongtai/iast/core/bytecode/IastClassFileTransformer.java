@@ -8,7 +8,6 @@ import io.dongtai.iast.core.bytecode.enhance.plugin.AbstractClassVisitor;
 import io.dongtai.iast.core.bytecode.enhance.plugin.PluginRegister;
 import io.dongtai.iast.core.bytecode.sca.ScaScanner;
 import io.dongtai.iast.core.handler.hookpoint.SpyDispatcherImpl;
-import io.dongtai.iast.core.handler.hookpoint.models.IastHookRuleModel;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.PolicyManager;
 import io.dongtai.iast.core.utils.AsmUtils;
 import io.dongtai.iast.core.utils.PropertyUtils;
@@ -44,7 +43,6 @@ public class IastClassFileTransformer implements ClassFileTransformer {
     private final PropertyUtils properties;
     private final PluginRegister plugins;
     private static IastClassFileTransformer INSTANCE;
-    private final IastHookRuleModel hookRuleModel;
     private final PolicyManager policyManager;
     private final static HashMap<Object, byte[]> transformMap = new HashMap<Object, byte[]>();
 
@@ -70,7 +68,6 @@ public class IastClassFileTransformer implements ClassFileTransformer {
         this.plugins = new PluginRegister();
         this.configMatcher = ConfigMatcher.getInstance();
         this.configMatcher.setInst(inst);
-        this.hookRuleModel = IastHookRuleModel.getInstance();
         this.policyManager = policyManager;
 
         SpyDispatcherHandler.setDispatcher(new SpyDispatcherImpl());
@@ -282,7 +279,8 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                     classDiagram.setDiagram(className, diagram);
                 }
                 for (String clazzName : diagram) {
-                    if (this.policyManager.getPolicy() != null && this.policyManager.getPolicy().isMatchClass(clazzName)) {
+                    if (PolicyManager.isHookClass(clazzName) ||
+                            (this.policyManager.getPolicy() != null && this.policyManager.getPolicy().isMatchClass(clazzName))) {
                         enhanceClasses[enhanceClassSize++] = clazz;
                         break;
                     }
