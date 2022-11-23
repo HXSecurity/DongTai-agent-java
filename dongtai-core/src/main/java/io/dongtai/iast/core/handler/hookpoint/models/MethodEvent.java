@@ -1,7 +1,7 @@
 package io.dongtai.iast.core.handler.hookpoint.models;
 
 import io.dongtai.iast.core.handler.hookpoint.models.policy.TaintPosition;
-import io.dongtai.iast.core.handler.hookpoint.vulscan.taintrange.TaintRanges;
+import io.dongtai.iast.core.handler.hookpoint.models.taint.range.TaintRanges;
 import io.dongtai.iast.core.utils.StringUtils;
 import org.json.JSONObject;
 

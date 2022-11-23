@@ -1,6 +1,6 @@
 package io.dongtai.iast.core.handler.hookpoint.models.policy;
 
-import io.dongtai.iast.core.handler.hookpoint.vulscan.taintrange.TaintCommand;
+import io.dongtai.iast.core.handler.hookpoint.models.taint.range.TaintCommand;
 
 import java.util.Set;
 

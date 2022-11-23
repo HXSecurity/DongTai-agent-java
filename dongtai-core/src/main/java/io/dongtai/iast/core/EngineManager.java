@@ -6,7 +6,7 @@ import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.FallbackSwitch;
 import io.dongtai.iast.core.handler.context.ContextManager;
 import io.dongtai.iast.core.handler.hookpoint.IastServer;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
-import io.dongtai.iast.core.handler.hookpoint.vulscan.taintrange.TaintRanges;
+import io.dongtai.iast.core.handler.hookpoint.models.taint.range.TaintRanges;
 import io.dongtai.iast.core.service.ServerAddressReport;
 import io.dongtai.iast.core.service.ServiceFactory;
 import io.dongtai.iast.core.utils.PropertyUtils;

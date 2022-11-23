@@ -1,6 +1,6 @@
 package io.dongtai.iast.core.utils.threadlocal;
 
-import io.dongtai.iast.core.handler.hookpoint.vulscan.taintrange.TaintRanges;
+import io.dongtai.iast.core.handler.hookpoint.models.taint.range.TaintRanges;
 
 import java.util.Map;
 

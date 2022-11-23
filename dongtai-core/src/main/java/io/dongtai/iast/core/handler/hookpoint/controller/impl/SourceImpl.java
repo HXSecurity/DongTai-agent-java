@@ -4,7 +4,7 @@ import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.SourceNode;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.TaintPosition;
-import io.dongtai.iast.core.handler.hookpoint.vulscan.taintrange.*;
+import io.dongtai.iast.core.handler.hookpoint.models.taint.range.*;
 import io.dongtai.iast.core.utils.StackUtils;
 import io.dongtai.iast.core.utils.TaintPoolUtils;
 import io.dongtai.log.DongTaiLog;
