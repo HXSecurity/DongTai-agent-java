@@ -113,6 +113,7 @@ public class PolicyBuilder {
         }
         setInheritable(node, sinkNode);
         sinkNode.setVulType(vulType);
+        sinkNode.setStackDenyList(parseStackDenyList(sinkNode));
         policy.addSink(sinkNode);
     }
 
@@ -195,5 +196,24 @@ public class PolicyBuilder {
         } catch (IllegalArgumentException e) {
             throw new PolicyException(PolicyException.ERR_POLICY_NODE_SIGNATURE_INVALID + ": " + node.toString(), e);
         }
+    }
+
+    /**
+     * stack deny list for sink node
+     * TODO: parse stack deny list from policy
+     */
+    private static String[] parseStackDenyList(SinkNode node) {
+        if (!(node.getMethodMatcher() instanceof SignatureMethodMatcher)) {
+            return new String[0];
+        }
+
+        String signature = ((SignatureMethodMatcher) node.getMethodMatcher()).getSignature().toString();
+        if ("java.lang.Class.forName(java.lang.String)".equals(signature)) {
+            return new String[]{"java.net.URL.getURLStreamHandler"};
+        } else if ("java.lang.Class.forName(java.lang.String,boolean,java.lang.ClassLoader)".equals(signature)) {
+            return new String[]{"org.jruby.javasupport.JavaSupport.loadJavaClass"};
+        }
+
+        return new String[0];
     }
 }
