@@ -23,8 +23,7 @@ public class DynamicPropagatorScanner implements IVulScan {
 
     private final static Set<SinkSafeChecker> SAFE_CHECKERS = new HashSet<SinkSafeChecker>(Arrays.asList(
             new FastjsonCheck(),
-            new XXECheck(),
-            new ReflectionInjectionCheck()
+            new XXECheck()
     ));
 
     private final static Set<SinkSourceChecker> SOURCE_CHECKERS = new HashSet<SinkSourceChecker>(Arrays.asList(
@@ -44,7 +43,11 @@ public class DynamicPropagatorScanner implements IVulScan {
         }
 
         if (sinkSourceHitTaintPool(event, sinkNode)) {
-            event.setCallStacks(StackUtils.createCallStack(5));
+            StackTraceElement[] stackTraceElements = StackUtils.createCallStack(5);
+            if (sinkNode.hasDenyStack(stackTraceElements)) {
+                return;
+            }
+            event.setCallStacks(stackTraceElements);
             int invokeId = SpyDispatcherImpl.INVOKE_ID_SEQUENCER.getAndIncrement();
             event.setInvokeId(invokeId);
             event.setTaintPositions(sinkNode.getSources(), null);
