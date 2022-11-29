@@ -4,7 +4,6 @@ package io.dongtai.iast.core.bytecode.enhance.plugin.fallback;
 import io.dongtai.iast.common.utils.version.JavaVersionUtils;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.breaker.AbstractBreaker;
-import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.limiter.HeavyTrafficRateLimiter;
 import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.limiter.FallbackSwitchFrequencyLimiter;
 import io.dongtai.iast.core.utils.config.RemoteConfigUtils;
 import io.dongtai.iast.core.utils.threadlocal.RateLimiterThreadLocal;
@@ -45,11 +44,6 @@ public class FallbackManager {
     private final RateLimiterThreadLocal hookRateLimiter;
 
     /**
-     * 高频流量限速器
-     */
-    private final HeavyTrafficRateLimiter heavyTrafficRateLimiter;
-
-    /**
      * 降级开关限速器
      */
     private final FallbackSwitchFrequencyLimiter fallbackSwitchFrequencyLimiter;
@@ -77,7 +71,6 @@ public class FallbackManager {
         }
         // 创建限速器实例
         this.hookRateLimiter = new RateLimiterThreadLocal(cfg);
-        this.heavyTrafficRateLimiter = new HeavyTrafficRateLimiter(cfg);
         this.fallbackSwitchFrequencyLimiter = new FallbackSwitchFrequencyLimiter(cfg);
     }
 
@@ -101,10 +94,6 @@ public class FallbackManager {
 
     public RateLimiterThreadLocal getHookRateLimiter() {
         return hookRateLimiter;
-    }
-
-    public HeavyTrafficRateLimiter getHeavyTrafficRateLimiter() {
-        return heavyTrafficRateLimiter;
     }
 
     public AbstractBreaker getHeavyTrafficBreaker() {
@@ -139,17 +128,5 @@ public class FallbackManager {
             return;
         }
         instance.performanceBreaker.switchBreaker(turnOn);
-    }
-
-    /**
-     * 判断是否需要二次降级(由agent监控线程触发)
-     *
-     * @return boolean
-     */
-    public static boolean isNeedSecondFallback() {
-        if (EngineManager.enableDongTai == 0 || !RemoteConfigUtils.enableAutoFallback()){
-            return false;
-        }
-        return FallbackSwitch.isNeedSecondFallback();
     }
 }

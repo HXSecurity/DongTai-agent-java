@@ -44,25 +44,6 @@ public class EngineManager {
 
     public static final BooleanThreadLocal ENTER_REPLAY_ENTRYPOINT = new BooleanThreadLocal(false);
 
-    /**
-     * hook点是否降级
-     */
-    public static boolean isHookPointFallback() {
-        return FallbackSwitch.isRequestFallback();
-    }
-
-    /**
-     * 打开hook点降级开关
-     * 该开关打开后，在当前请求生命周期内，逻辑短路hook点
-     */
-    public static void openHookPointFallback(String className, String method, String methodSign, int hookType) {
-        final double limitRate = EngineManager.getFallbackManager().getHookRateLimiter().getRate();
-        DongTaiLog.debug("HookPoint rate limit! hookType: " + hookType + ", method:" + className + "." + method
-                + ", sign:" + methodSign + " ,rate:" + limitRate);
-//        HookPointRateLimitReport.sendReport(className, method, methodSign, hookType, limitRate);
-        FallbackSwitch.setHeavyHookFallback(true);
-    }
-
     public static EngineManager getInstance() {
         return instance;
     }
@@ -108,7 +89,6 @@ public class EngineManager {
         EngineManager.TAINT_HASH_CODES.remove();
         EngineManager.TAINT_RANGES_POOL.remove();
         EngineManager.ENTER_REPLAY_ENTRYPOINT.remove();
-        FallbackSwitch.clearHeavyHookFallback();
         EngineManager.getFallbackManager().getHookRateLimiter().remove();
         ContextManager.getCONTEXT().remove();
         ScopeManager.SCOPE_TRACKER.remove();
@@ -133,7 +113,6 @@ public class EngineManager {
     public static void turnOnEngine() {
         EngineManager.enableDongTai = 1;
         FallbackSwitch.setPERFORMANCE_FALLBACK(false);
-        FallbackSwitch.setHEAVY_TRAFFIC_LIMIT_FALLBACK(false);
     }
 
     /**
@@ -161,11 +140,6 @@ public class EngineManager {
     }
 
     public static void enterHttpEntry(Map<String, Object> requestMeta) {
-        // 尝试获取请求限速令牌，耗尽时调用断路器方法
-        if (!EngineManager.getFallbackManager().getHeavyTrafficRateLimiter().acquire()) {
-            EngineManager.getFallbackManager().getHeavyTrafficBreaker().breakCheck(null);
-        }
-
         ServiceFactory.startService();
         if (null == SERVER) {
             // todo: read server addr and send to OpenAPI Service
