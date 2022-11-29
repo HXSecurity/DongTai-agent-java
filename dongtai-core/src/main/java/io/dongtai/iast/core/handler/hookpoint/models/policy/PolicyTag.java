@@ -15,7 +15,7 @@ public class PolicyTag {
         sign = "javax.servlet.http.HttpServletRequest.getReader()";
         put(sign, Arrays.asList(new TaintTag[]{TaintTag.CROSS_SITE}, new TaintTag[0]));
         sign = "javax.servlet.http.HttpServletRequest.getQueryString()";
-        put(sign, Arrays.asList(new TaintTag[]{TaintTag.CROSS_SITE}, new TaintTag[0]));
+        put(sign, Arrays.asList(new TaintTag[]{TaintTag.CROSS_SITE, TaintTag.XSS_ENCODED}, new TaintTag[0]));
         sign = "javax.servlet.http.HttpServletRequest.getParts()";
         put(sign, Arrays.asList(new TaintTag[]{TaintTag.CROSS_SITE}, new TaintTag[0]));
         sign = "javax.servlet.http.HttpServletRequest.getPart(java.lang.String)";
@@ -26,17 +26,54 @@ public class PolicyTag {
         put(sign, Arrays.asList(new TaintTag[]{TaintTag.CROSS_SITE}, new TaintTag[0]));
         sign = "javax.servlet.http.HttpServletRequest.getParameterMap()";
         put(sign, Arrays.asList(new TaintTag[]{TaintTag.CROSS_SITE}, new TaintTag[0]));
-        sign = "javax.servlet.ServletRequest.getParameter(java.lang.String)";
-        put(sign, Arrays.asList(new TaintTag[]{TaintTag.CROSS_SITE}, new TaintTag[0]));
         sign = "javax.servlet.http.HttpServletRequest.getInputStream()";
         put(sign, Arrays.asList(new TaintTag[]{TaintTag.CROSS_SITE}, new TaintTag[0]));
         sign = "javax.servlet.http.HttpServletRequest.getHeaders(java.lang.String)";
         put(sign, Arrays.asList(new TaintTag[]{TaintTag.CROSS_SITE}, new TaintTag[0]));
-        sign = "javax.servlet.http.HttpServletRequest.getHeaderNames()";
-        put(sign, Arrays.asList(new TaintTag[]{TaintTag.CROSS_SITE}, new TaintTag[0]));
+        // sign = "javax.servlet.http.HttpServletRequest.getHeaderNames()";
+        // put(sign, Arrays.asList(new TaintTag[0], new TaintTag[0]));
         sign = "javax.servlet.http.HttpServletRequest.getHeader(java.lang.String)";
         put(sign, Arrays.asList(new TaintTag[]{TaintTag.CROSS_SITE}, new TaintTag[0]));
-        sign = "javax.servlet.http.HttpServletRequest.getCookies()";
+        // sign = "javax.servlet.http.HttpServletRequest.getCookies()";
+        // put(sign, Arrays.asList(new TaintTag[0], new TaintTag[0]));
+
+        sign = "jakarta.servlet.http.HttpServletRequest.getQueryString()";
+        put(sign, Arrays.asList(new TaintTag[]{TaintTag.CROSS_SITE, TaintTag.XSS_ENCODED}, new TaintTag[0]));
+        sign = "jakarta.servlet.http.HttpServletRequest.getParts()";
+        put(sign, Arrays.asList(new TaintTag[]{TaintTag.CROSS_SITE}, new TaintTag[0]));
+        sign = "jakarta.servlet.http.HttpServletRequest.getPart(java.lang.String)";
+        put(sign, Arrays.asList(new TaintTag[]{TaintTag.CROSS_SITE}, new TaintTag[0]));
+        sign = "jakarta.servlet.http.HttpServletRequest.getHeaders(java.lang.String)";
+        put(sign, Arrays.asList(new TaintTag[]{TaintTag.CROSS_SITE}, new TaintTag[0]));
+        // sign = "jakarta.servlet.http.HttpServletRequest.getHeaderNames()";
+        // put(sign, Arrays.asList(new TaintTag[0], new TaintTag[0]));
+        sign = "jakarta.servlet.http.HttpServletRequest.getHeader(java.lang.String)";
+        put(sign, Arrays.asList(new TaintTag[]{TaintTag.CROSS_SITE}, new TaintTag[0]));
+        // sign = "jakarta.servlet.http.HttpServletRequest.getCookies()";
+        // put(sign, Arrays.asList(new TaintTag[0], new TaintTag[0]));
+
+        sign = "javax.servlet.ServletRequest.getReader()";
+        put(sign, Arrays.asList(new TaintTag[]{TaintTag.CROSS_SITE}, new TaintTag[0]));
+        sign = "javax.servlet.ServletRequest.getParameterValues(java.lang.String)";
+        put(sign, Arrays.asList(new TaintTag[]{TaintTag.CROSS_SITE}, new TaintTag[0]));
+        sign = "javax.servlet.ServletRequest.getParameterNames()";
+        put(sign, Arrays.asList(new TaintTag[]{TaintTag.CROSS_SITE}, new TaintTag[0]));
+        sign = "javax.servlet.ServletRequest.getParameterMap()";
+        put(sign, Arrays.asList(new TaintTag[]{TaintTag.CROSS_SITE}, new TaintTag[0]));
+        sign = "javax.servlet.ServletRequest.getParameter(java.lang.String)";
+        put(sign, Arrays.asList(new TaintTag[]{TaintTag.CROSS_SITE}, new TaintTag[0]));
+        sign = "javax.servlet.ServletRequest.getInputStream()";
+        put(sign, Arrays.asList(new TaintTag[]{TaintTag.CROSS_SITE}, new TaintTag[0]));
+
+        sign = "jakarta.servlet.ServletRequest.getReader()";
+        put(sign, Arrays.asList(new TaintTag[]{TaintTag.CROSS_SITE}, new TaintTag[0]));
+        sign = "jakarta.servlet.ServletRequest.getParameterValues(java.lang.String)";
+        put(sign, Arrays.asList(new TaintTag[]{TaintTag.CROSS_SITE}, new TaintTag[0]));
+        sign = "jakarta.servlet.ServletRequest.getParameterNames()";
+        put(sign, Arrays.asList(new TaintTag[]{TaintTag.CROSS_SITE}, new TaintTag[0]));
+        sign = "jakarta.servlet.ServletRequest.getParameter(java.lang.String)";
+        put(sign, Arrays.asList(new TaintTag[]{TaintTag.CROSS_SITE}, new TaintTag[0]));
+        sign = "jakarta.servlet.ServletRequest.getInputStream()";
         put(sign, Arrays.asList(new TaintTag[]{TaintTag.CROSS_SITE}, new TaintTag[0]));
 
         sign = "org.springframework.web.util.pattern.PathPattern.getPatternString()";

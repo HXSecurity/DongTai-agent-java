@@ -5,6 +5,7 @@ public enum TaintTag {
     CROSS_SITE("cross-site"),
     HTML_ENCODED("html-encoded"),
     HTML_DECODED("html-decoded"),
+    XSS_ENCODED("xss-encoded"),
     ;
 
     private final String key;
