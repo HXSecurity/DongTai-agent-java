@@ -18,7 +18,7 @@ public class TaintRange {
     }
 
     public TaintRange(int start, int stop) {
-        this(TaintTag.UNTRUSTED, start, stop);
+        this(TaintTag.UNTRUSTED.getKey(), start, stop);
     }
 
     public TaintRange(String name, int start, int stop) {

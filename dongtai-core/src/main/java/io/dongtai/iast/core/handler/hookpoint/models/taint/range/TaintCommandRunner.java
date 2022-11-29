@@ -1,5 +1,6 @@
 package io.dongtai.iast.core.handler.hookpoint.models.taint.range;
 
+import io.dongtai.iast.core.handler.hookpoint.models.policy.PropagatorNode;
 import io.dongtai.log.DongTaiLog;
 
 import java.util.*;
@@ -66,7 +67,8 @@ public class TaintCommandRunner {
         return this.builder;
     }
 
-    public TaintRanges run(Object source, Object target, Object[] params, TaintRanges oldTaintRanges, TaintRanges srcTaintRanges) {
+    public TaintRanges run(PropagatorNode propagatorNode, Object source, Object target, Object[] params,
+                           TaintRanges oldTaintRanges, TaintRanges srcTaintRanges) {
         int p1 = 0;
         int p2 = 0;
         int p3 = 0;
@@ -85,6 +87,14 @@ public class TaintCommandRunner {
         } catch (Exception e) {
             DongTaiLog.error(this.signature + " taint command parameters fetch failed: " + e.getMessage());
             return tr;
+        }
+
+        if (propagatorNode.hasTags()) {
+            String[] tags = propagatorNode.getTags();
+            int len = TaintRangesBuilder.getLength(target);
+            for (String tag : tags) {
+                tr.add(new TaintRange(tag, 0, len));
+            }
         }
 
         switch (this.command) {
@@ -117,6 +127,8 @@ public class TaintCommandRunner {
             default:
                 break;
         }
+
+        tr.untag(propagatorNode.getUntags());
 
         return tr;
     }

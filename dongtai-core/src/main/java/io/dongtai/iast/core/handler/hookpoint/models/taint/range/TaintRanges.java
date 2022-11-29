@@ -1,5 +1,6 @@
 package io.dongtai.iast.core.handler.hookpoint.models.taint.range;
 
+import io.dongtai.iast.core.utils.StringUtils;
 import org.json.JSONArray;
 
 import java.util.*;
@@ -39,6 +40,22 @@ public class TaintRanges {
         }
     }
 
+    public void untag(String[] untags) {
+        if (untags == null || untags.length == 0 || this.taintRanges.size() == 0) {
+            return;
+        }
+        for (String str : untags) {
+            if (StringUtils.isEmpty(str)) {
+                continue;
+            }
+            for (Iterator<TaintRange> it = this.taintRanges.listIterator(); it.hasNext(); ) {
+                if (it.next().getName().equals(str)) {
+                    it.remove();
+                }
+            }
+        }
+    }
+
     public TaintRanges clone() {
         TaintRanges taintRanges = new TaintRanges();
         int size = this.taintRanges.size();
@@ -50,6 +67,17 @@ public class TaintRanges {
 
     public boolean isEmpty() {
         return this.taintRanges.isEmpty();
+    }
+
+    public TaintRanges explode(int i) {
+        if (i < 0) {
+            throw new RuntimeException("taint range explode to a negative value: " + i);
+        }
+        for (TaintRange taintRange : this.taintRanges) {
+            taintRange.start = 0;
+            taintRange.stop = i;
+        }
+        return this;
     }
 
     public void shift(int i) {

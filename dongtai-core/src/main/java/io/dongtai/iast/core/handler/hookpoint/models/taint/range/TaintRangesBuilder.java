@@ -175,6 +175,7 @@ public class TaintRangesBuilder {
                     taintRanges.add(new TaintRange(taintRange.getName(), max, min));
                 }
             }
+            taintRanges.merge();
         }
     }
 

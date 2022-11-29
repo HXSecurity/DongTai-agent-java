@@ -3,9 +3,8 @@ package io.dongtai.iast.core.handler.hookpoint.models.policy;
 import java.util.Set;
 
 public class SourceNode extends TaintFlowNode {
-    private final PolicyNodeType type = PolicyNodeType.SOURCE;
-
     private Set<TaintPosition> sources;
+    private String[] tags;
 
     public SourceNode(Set<TaintPosition> sources, Set<TaintPosition> targets, MethodMatcher methodMatcher) {
         super(targets, methodMatcher);
@@ -13,7 +12,7 @@ public class SourceNode extends TaintFlowNode {
     }
 
     public PolicyNodeType getType() {
-        return this.type;
+        return PolicyNodeType.SOURCE;
     }
 
     public Set<TaintPosition> getSources() {
@@ -22,5 +21,17 @@ public class SourceNode extends TaintFlowNode {
 
     public void setSources(Set<TaintPosition> sources) {
         this.sources = sources;
+    }
+
+    public String[] getTags() {
+        return this.tags;
+    }
+
+    public boolean hasTags() {
+        return this.tags != null && this.tags.length > 0;
+    }
+
+    public void setTags(String[] tags) {
+        this.tags = tags;
     }
 }

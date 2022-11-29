@@ -36,14 +36,14 @@
       "inherit": "false"
     },
     {
-      "type": 3,
+      "type": 1,
       "signature": "A3.b1()",
       "source": "P1",
       "target": "",
       "inherit": "false"
     },
     {
-      "type": 3,
+      "type": 1,
       "signature": "A3.b2()",
       "source": "P1",
       "target": "R",

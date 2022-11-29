@@ -3,7 +3,6 @@ package io.dongtai.iast.core.handler.hookpoint.models.policy;
 import java.util.Set;
 
 public class SinkNode extends PolicyNode {
-    private final PolicyNodeType type = PolicyNodeType.SINK;
     private Set<TaintPosition> sources;
     private String vulType;
     private String[] stackDenyList;
@@ -14,7 +13,7 @@ public class SinkNode extends PolicyNode {
     }
 
     public PolicyNodeType getType() {
-        return this.type;
+        return PolicyNodeType.SINK;
     }
 
     public Set<TaintPosition> getSources() {

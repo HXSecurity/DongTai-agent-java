@@ -1,5 +1,19 @@
 package io.dongtai.iast.core.handler.hookpoint.models.taint.tag;
 
-public class TaintTag {
-    public static final String UNTRUSTED = "untrusted";
+public enum TaintTag {
+    UNTRUSTED("untrusted"),
+    CROSS_SITE("cross-site"),
+    HTML_ENCODED("html-encoded"),
+    HTML_DECODED("html-decoded"),
+    ;
+
+    private final String key;
+
+    TaintTag(String key) {
+        this.key = key;
+    }
+
+    public String getKey() {
+        return this.key;
+    }
 }

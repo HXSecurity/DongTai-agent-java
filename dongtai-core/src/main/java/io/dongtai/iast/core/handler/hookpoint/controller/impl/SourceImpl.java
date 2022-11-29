@@ -42,7 +42,7 @@ public class SourceImpl {
         int invokeId = invokeIdSequencer.getAndIncrement();
         event.setInvokeId(invokeId);
 
-        boolean valid = trackTarget(event);
+        boolean valid = trackTarget(event, sourceNode);
         if (!valid) {
             return;
         }
@@ -79,19 +79,19 @@ public class SourceImpl {
         EngineManager.TRACK_MAP.addTrackMethod(invokeId, event);
     }
 
-    private static boolean trackTarget(MethodEvent event) {
+    private static boolean trackTarget(MethodEvent event, SourceNode sourceNode) {
         int length = TaintRangesBuilder.getLength(event.returnInstance);
         if (length == 0) {
             return false;
         }
 
-        trackObject(event, event.returnInstance, 0);
+        trackObject(event, sourceNode, event.returnInstance, 0);
         // @TODO: hook json serializer for custom model
-        handlerCustomModel(event);
+        handlerCustomModel(event, sourceNode);
         return true;
     }
 
-    private static void trackObject(MethodEvent event, Object obj, int depth) {
+    private static void trackObject(MethodEvent event, SourceNode sourceNode, Object obj, int depth) {
         if (depth >= 10 || !TaintPoolUtils.isNotEmpty(obj) || !TaintPoolUtils.isAllowTaintType(obj)) {
             return;
         }
@@ -103,21 +103,21 @@ public class SourceImpl {
 
         Class<?> cls = obj.getClass();
         if (cls.isArray() && !cls.getComponentType().isPrimitive()) {
-            trackArray(event, obj, depth);
+            trackArray(event, sourceNode, obj, depth);
         } else if (obj instanceof Iterator) {
-            trackIterator(event, (Iterator<?>) obj, depth);
+            trackIterator(event, sourceNode, (Iterator<?>) obj, depth);
         } else if (obj instanceof Map) {
-            trackMap(event, (Map<?, ?>) obj, depth);
+            trackMap(event, sourceNode, (Map<?, ?>) obj, depth);
         } else if (obj instanceof Map.Entry) {
-            trackMapEntry(event, (Map.Entry<?, ?>) obj, depth);
+            trackMapEntry(event, sourceNode, (Map.Entry<?, ?>) obj, depth);
         } else if (obj instanceof Collection) {
             if (obj instanceof List) {
-                trackList(event, (List<?>) obj, depth);
+                trackList(event, sourceNode, (List<?>) obj, depth);
             } else {
-                trackIterator(event, ((Collection<?>) obj).iterator(), depth);
+                trackIterator(event, sourceNode, ((Collection<?>) obj).iterator(), depth);
             }
         } else if ("java.util.Optional".equals(obj.getClass().getName())) {
-            trackOptional(event, obj, depth);
+            trackOptional(event, sourceNode, obj, depth);
         } else {
             int len = TaintRangesBuilder.getLength(obj);
             if (len == 0) {
@@ -125,48 +125,55 @@ public class SourceImpl {
             }
 
             TaintRanges tr = new TaintRanges(new TaintRange(0, len));
+            if (sourceNode.hasTags()) {
+                String[] tags = sourceNode.getTags();
+                for (String tag : tags) {
+                    tr.add(new TaintRange(tag, 0, len));
+                }
+            }
             event.targetRanges.add(new MethodEvent.MethodEventTargetRange(hash, tr));
+
             EngineManager.TAINT_HASH_CODES.add(hash);
             event.addTargetHash(hash);
             EngineManager.TAINT_RANGES_POOL.add(hash, tr);
         }
     }
 
-    private static void trackArray(MethodEvent event, Object arr, int depth) {
+    private static void trackArray(MethodEvent event, SourceNode sourceNode, Object arr, int depth) {
         int length = Array.getLength(arr);
         for (int i = 0; i < length; i++) {
-            trackObject(event, Array.get(arr, i), depth);
+            trackObject(event, sourceNode, Array.get(arr, i), depth);
         }
     }
 
-    private static void trackIterator(MethodEvent event, Iterator<?> it, int depth) {
+    private static void trackIterator(MethodEvent event, SourceNode sourceNode, Iterator<?> it, int depth) {
         while (it.hasNext()) {
-            trackObject(event, it.next(), depth + 1);
+            trackObject(event, sourceNode, it.next(), depth + 1);
         }
     }
 
-    private static void trackMap(MethodEvent event, Map<?, ?> map, int depth) {
+    private static void trackMap(MethodEvent event, SourceNode sourceNode, Map<?, ?> map, int depth) {
         for (Object key : map.keySet()) {
-            trackObject(event, key, depth);
-            trackObject(event, map.get(key), depth);
+            trackObject(event, sourceNode, key, depth);
+            trackObject(event, sourceNode, map.get(key), depth);
         }
     }
 
-    private static void trackMapEntry(MethodEvent event, Map.Entry<?, ?> entry, int depth) {
-        trackObject(event, entry.getKey(), depth + 1);
-        trackObject(event, entry.getValue(), depth + 1);
+    private static void trackMapEntry(MethodEvent event, SourceNode sourceNode, Map.Entry<?, ?> entry, int depth) {
+        trackObject(event, sourceNode, entry.getKey(), depth + 1);
+        trackObject(event, sourceNode, entry.getValue(), depth + 1);
     }
 
-    private static void trackList(MethodEvent event, List<?> list, int depth) {
+    private static void trackList(MethodEvent event, SourceNode sourceNode, List<?> list, int depth) {
         for (Object obj : list) {
-            trackObject(event, obj, depth);
+            trackObject(event, sourceNode, obj, depth);
         }
     }
 
-    private static void trackOptional(MethodEvent event, Object obj, int depth) {
+    private static void trackOptional(MethodEvent event, SourceNode sourceNode, Object obj, int depth) {
         try {
             Object v = ((Optional<?>) obj).orElse(null);
-            trackObject(event, v, depth);
+            trackObject(event, sourceNode, v, depth);
         } catch (Exception e) {
             DongTaiLog.warn("track optional object failed: " + e.getMessage());
         }
@@ -177,11 +184,11 @@ public class SourceImpl {
      *
      * @param event MethodEvent
      */
-    public static void handlerCustomModel(MethodEvent event) {
+    public static void handlerCustomModel(MethodEvent event, SourceNode sourceNode) {
         if (!event.getMethodName().equals("getSession")) {
             Set<Object> modelValues = parseCustomModel(event.returnInstance);
             for (Object modelValue : modelValues) {
-                trackObject(event, modelValue, 0);
+                trackObject(event, sourceNode, modelValue, 0);
             }
         }
     }
