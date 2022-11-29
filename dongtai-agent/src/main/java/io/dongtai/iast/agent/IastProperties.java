@@ -27,6 +27,7 @@ public class IastProperties {
         put("log_level", PropertyConstant.PROPERTY_LOG_LEVEL);
         put("log_path", PropertyConstant.PROPERTY_LOG_PATH);
         put("log_disable_collector", PropertyConstant.PROPERTY_LOG_DISABLE_COLLECTOR);
+        put("uuid_path", PropertyConstant.PROPERTY_UUID_PATH);
     }};
 
     private static IastProperties instance;
@@ -45,6 +46,7 @@ public class IastProperties {
     private String logPort;
     private String logAddress;
     private Boolean logDisableCollector;
+    private String uuidPath;
 
     private Integer delayTime;
     private String proxyEnableStatus;
@@ -292,6 +294,13 @@ public class IastProperties {
             logPort = System.getProperty(PropertyConstant.PROPERTY_LOG_PORT, "");
         }
         return logPort;
+    }
+
+    public String getUUIDPath() {
+        if (uuidPath == null) {
+            uuidPath = System.getProperty(PropertyConstant.PROPERTY_UUID_PATH, "");
+        }
+        return uuidPath;
     }
 
     public String getFallbackVersion() {
