@@ -394,17 +394,6 @@ public class SpyDispatcherImpl implements SpyDispatcher {
             }
         }
 
-        // check hook point fallback
-        if (EngineManager.isHookPointFallback()) {
-            return false;
-        }
-
-        // 尝试获取hook限速令牌, 耗尽时降级
-        if (!EngineManager.getFallbackManager().getHookRateLimiter().acquire()) {
-            EngineManager.openHookPointFallback(className, methodName, signature, policyNodeType);
-            return false;
-        }
-
         return true;
     }
 

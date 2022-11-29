@@ -25,9 +25,6 @@ public class PerformanceLimitReport extends AbstractLimitReport {
         try {
             PERFORMANCE_BREAK_REPORT_BODY.getDetail().setAgentId(EngineManager.getAgentId());
             PERFORMANCE_BREAK_REPORT_BODY.getDetail().setBreakDate(new Date());
-/*        String report = GsonUtils.toJson(PERFORMANCE_BREAK_REPORT_BODY);
-        sendReport(report);*/
-            sendReport(new JSONObject(PERFORMANCE_BREAK_REPORT_BODY).toString());
             PERFORMANCE_BREAK_REPORT_BODY.clearAllPerformanceBreakLog();
         } catch (Throwable e) {
             DongTaiLog.error("sendReport failed. report: PerformanceLimitReport, reason: {}", e);
