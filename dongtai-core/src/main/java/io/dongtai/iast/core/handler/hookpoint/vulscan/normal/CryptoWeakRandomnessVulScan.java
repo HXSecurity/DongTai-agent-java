@@ -18,10 +18,7 @@ public class CryptoWeakRandomnessVulScan extends AbstractNormalVulScan {
      */
     @Override
     public void scan(MethodEvent event, SinkNode sinkNode) {
-        if (event.objectInstance == null) {
-            return;
-        }
-        if (SECURE_RANDOM.equals(event.objectInstance.getClass().getName())) {
+        if (event.objectInstance != null && SECURE_RANDOM.equals(event.objectInstance.getClass().getName())) {
             return;
         }
         sendReport(getLatestStack(), sinkNode.getVulType());
