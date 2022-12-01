@@ -135,7 +135,15 @@ public class PolicyTag {
         // html unbescape
         sign = "org.unbescape.html.HtmlEscapeUtil.escape(java.lang.String,org.unbescape.html.HtmlEscapeType,org.unbescape.html.HtmlEscapeLevel)";
         put(sign, Arrays.asList(new TaintTag[]{TaintTag.HTML_ENCODED}, new TaintTag[]{TaintTag.HTML_DECODED}));
-        sign = "org.unbescape.html.HtmlEscapeUtil.escape(java.lang.String)";
+        sign = "org.unbescape.html.HtmlEscapeUtil.escape(java.io.Reader,java.io.Writer,org.unbescape.html.HtmlEscapeType,org.unbescape.html.HtmlEscapeLevel)";
+        put(sign, Arrays.asList(new TaintTag[]{TaintTag.HTML_ENCODED}, new TaintTag[]{TaintTag.HTML_DECODED}));
+        sign = "org.unbescape.html.HtmlEscapeUtil.escape(char[],int,int,java.io.Writer,org.unbescape.html.HtmlEscapeType,org.unbescape.html.HtmlEscapeLevel)";
+        put(sign, Arrays.asList(new TaintTag[]{TaintTag.HTML_ENCODED}, new TaintTag[]{TaintTag.HTML_DECODED}));
+        sign = "org.unbescape.html.HtmlEscapeUtil.unescape(java.lang.String)";
+        put(sign, Arrays.asList(new TaintTag[]{TaintTag.HTML_DECODED}, new TaintTag[]{TaintTag.HTML_ENCODED}));
+        sign = "org.unbescape.html.HtmlEscapeUtil.unescape(java.io.Reader,java.io.Writer)";
+        put(sign, Arrays.asList(new TaintTag[]{TaintTag.HTML_DECODED}, new TaintTag[]{TaintTag.HTML_ENCODED}));
+        sign = "org.unbescape.html.HtmlEscapeUtil.unescape(char[],int,int,java.io.Writer)";
         put(sign, Arrays.asList(new TaintTag[]{TaintTag.HTML_DECODED}, new TaintTag[]{TaintTag.HTML_ENCODED}));
 
         // url
