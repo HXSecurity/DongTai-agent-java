@@ -84,7 +84,7 @@ public class DynamicPropagatorScanner implements IVulScan {
                         && TaintPoolUtils.poolContains(event.objectInstance, event)) {
                     objHasTaint = true;
                     hasTaint = true;
-                    sourceInstances.add(event.objectInstance);
+                    addSourceInstance(sourceInstances, event.objectInstance);
                 }
             } else if (position.isParameter()) {
                 int parameterIndex = position.getParameterIndex();
@@ -98,7 +98,7 @@ public class DynamicPropagatorScanner implements IVulScan {
                         && TaintPoolUtils.poolContains(parameter, event)) {
                     paramHasTaint = true;
                     hasTaint = true;
-                    sourceInstances.add(parameter);
+                    addSourceInstance(sourceInstances, parameter);
                 }
                 event.addParameterValue(parameterIndex, parameter, paramHasTaint);
             }
@@ -135,5 +135,21 @@ public class DynamicPropagatorScanner implements IVulScan {
         }
 
         return hasTaint;
+    }
+
+    private void addSourceInstance(List<Object> sourceInstances, Object obj) {
+        if (obj instanceof String[]) {
+            String[] stringArray = (String[]) obj;
+            for (String stringItem : stringArray) {
+                addSourceInstance(sourceInstances, stringItem);
+            }
+        } else if (obj instanceof Object[]) {
+            Object[] objArray = (Object[]) obj;
+            for (Object objItem : objArray) {
+                addSourceInstance(sourceInstances, objItem);
+            }
+        } else {
+            sourceInstances.add(obj);
+        }
     }
 }
