@@ -21,4 +21,8 @@ public enum TaintTag {
     public String getKey() {
         return this.key;
     }
+
+    public boolean equals(String key) {
+        return this.key.equals(key);
+    }
 }

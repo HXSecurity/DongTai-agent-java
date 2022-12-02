@@ -1,5 +1,6 @@
 package io.dongtai.iast.core.handler.hookpoint.models.taint.range;
 
+import io.dongtai.iast.core.handler.hookpoint.models.taint.tag.TaintTag;
 import io.dongtai.iast.core.utils.StringUtils;
 import org.json.JSONArray;
 
@@ -54,6 +55,30 @@ public class TaintRanges {
                 }
             }
         }
+    }
+
+    public boolean hasRequiredTaintTags(TaintTag[] tags) {
+        int total = tags.length;
+        Map<String, Boolean> found = new HashMap<String, Boolean>();
+        for (TaintTag tag : tags) {
+            for (TaintRange taintRange : this.taintRanges) {
+                if (tag.equals(taintRange.getName())) {
+                    found.put(tag.getKey(), true);
+                }
+            }
+        }
+        return total == found.size();
+    }
+
+    public boolean hasDisallowedTaintTags(TaintTag[] tags) {
+        for (TaintTag tag : tags) {
+            for (TaintRange taintRange : this.taintRanges) {
+                if (tag.equals(taintRange.getName())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public TaintRanges clone() {

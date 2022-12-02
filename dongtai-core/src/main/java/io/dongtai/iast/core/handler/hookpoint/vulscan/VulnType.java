@@ -13,7 +13,9 @@ public enum VulnType {
     CRYPTO_WEAK_RANDOMNESS("crypto-weak-randomness", "low", false),
     CRYPTO_BAC_CIPHERS("crypto-bad-ciphers", "high", false),
     CRYPTO_BAD_MAC("crypto-bad-mac", "high", false),
-    COOKIE_FLAGS_MISSING("cookie-flags-missing", "high", true);
+    COOKIE_FLAGS_MISSING("cookie-flags-missing", "high", true),
+    REFLECTED_XSS("reflected-xss", "medium", true),
+    ;
 
     public String getName() {
         return name;

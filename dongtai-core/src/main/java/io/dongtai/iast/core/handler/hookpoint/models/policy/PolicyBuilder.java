@@ -1,7 +1,6 @@
 package io.dongtai.iast.core.handler.hookpoint.models.policy;
 
 import io.dongtai.iast.common.constants.ApiPath;
-import io.dongtai.iast.core.handler.hookpoint.models.taint.tag.TaintTag;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.VulnType;
 import io.dongtai.iast.core.utils.HttpClientUtils;
 import io.dongtai.iast.core.utils.StringUtils;
@@ -229,15 +228,11 @@ public class PolicyBuilder {
         String signature = ((SignatureMethodMatcher) policyNode.getMethodMatcher()).getSignature().toString();
 
         // TODO: parse tags/untags from policy
-        List<TaintTag[]> taintTags = PolicyTag.TAGS.get(signature);
+        List<String[]> taintTags = PolicyTag.TAGS.get(signature);
         if (taintTags == null || taintTags.size() != 2) {
             return empty;
         }
 
-        List<String[]> tags = new ArrayList<String[]>();
-        for (TaintTag[] ts : taintTags) {
-            tags.add(new String[]{ts[0].getKey(), ts[1].getKey()});
-        }
-        return tags;
+        return taintTags;
     }
 }
