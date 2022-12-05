@@ -1,4 +1,4 @@
-package io.dongtai.iast.core.handler.hookpoint.vulscan.taintrange;
+package io.dongtai.iast.core.handler.hookpoint.models.taint.range;
 
 import java.io.ByteArrayOutputStream;
 import java.io.StringWriter;
@@ -175,6 +175,7 @@ public class TaintRangesBuilder {
                     taintRanges.add(new TaintRange(taintRange.getName(), max, min));
                 }
             }
+            taintRanges.merge();
         }
     }
 

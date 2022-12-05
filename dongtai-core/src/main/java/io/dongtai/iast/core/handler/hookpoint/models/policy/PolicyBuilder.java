@@ -10,8 +10,7 @@ import org.json.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class PolicyBuilder {
     private static final String KEY_DATA = "data";
@@ -80,12 +79,13 @@ public class PolicyBuilder {
         MethodMatcher methodMatcher = buildMethodMatcher(node);
         SourceNode sourceNode = new SourceNode(sources, targets, methodMatcher);
         setInheritable(node, sourceNode);
+        List<String[]> tags = parseTags(node, sourceNode);
+        sourceNode.setTags(tags.get(0));
         policy.addSource(sourceNode);
     }
 
     public static void buildPropagator(Policy policy, PolicyNodeType type, JSONObject node) throws PolicyException {
-        // @TODO: FILTER to tag list
-        if (!PolicyNodeType.PROPAGATOR.equals(type) && !PolicyNodeType.FILTER.equals(type)) {
+        if (!PolicyNodeType.PROPAGATOR.equals(type)) {
             return;
         }
 
@@ -95,6 +95,9 @@ public class PolicyBuilder {
         // @TODO: command
         PropagatorNode propagatorNode = new PropagatorNode(sources, targets, null, new String[]{}, methodMatcher);
         setInheritable(node, propagatorNode);
+        List<String[]> tags = parseTags(node, propagatorNode);
+        propagatorNode.setTags(tags.get(0));
+        propagatorNode.setUntags(tags.get(1));
         policy.addPropagator(propagatorNode);
     }
 
@@ -215,5 +218,21 @@ public class PolicyBuilder {
         }
 
         return new String[0];
+    }
+
+    private static List<String[]> parseTags(JSONObject node, PolicyNode policyNode) {
+        List<String[]> empty = Arrays.asList(new String[0], new String[0]);
+        if (!(policyNode.getMethodMatcher() instanceof SignatureMethodMatcher)) {
+            return empty;
+        }
+        String signature = ((SignatureMethodMatcher) policyNode.getMethodMatcher()).getSignature().toString();
+
+        // TODO: parse tags/untags from policy
+        List<String[]> taintTags = PolicyTag.TAGS.get(signature);
+        if (taintTags == null || taintTags.size() != 2) {
+            return empty;
+        }
+
+        return taintTags;
     }
 }

@@ -4,8 +4,8 @@ import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.SignatureMethodMatcher;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.SinkNode;
-import io.dongtai.iast.core.handler.hookpoint.vulscan.taintrange.TaintRange;
-import io.dongtai.iast.core.handler.hookpoint.vulscan.taintrange.TaintRanges;
+import io.dongtai.iast.core.handler.hookpoint.models.taint.range.TaintRange;
+import io.dongtai.iast.core.handler.hookpoint.models.taint.range.TaintRanges;
 import io.dongtai.iast.core.utils.TaintPoolUtils;
 import io.dongtai.log.DongTaiLog;
 

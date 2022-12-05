@@ -73636,7 +73636,7 @@ org/owasp/esapi/reference/DefaultSecurityConfiguration$DefaultSearchPath
 org/owasp/esapi/reference/DefaultSecurityConfiguration
 org/owasp/esapi/errors/*
 org/owasp/esapi/util/ObjFactory*
-org/owasp/esapi/codecs/*
+#org/owasp/esapi/codecs/*
 org/owasp/esapi/LogFactory
 org/owasp/esapi/Logger*
 org/yaml/snakeyaml/representer/BaseRepresenter$1

@@ -1,10 +1,9 @@
-package io.dongtai.iast.core.handler.hookpoint.vulscan.taintrange;
+package io.dongtai.iast.core.handler.hookpoint.models.taint.range;
 
+import io.dongtai.iast.core.handler.hookpoint.models.taint.tag.TaintTag;
 import org.json.JSONObject;
 
 public class TaintRange {
-    public static final String UNTRUSTED = "untrusted";
-
     private String name;
     public int start;
     public int stop;
@@ -19,7 +18,7 @@ public class TaintRange {
     }
 
     public TaintRange(int start, int stop) {
-        this(UNTRUSTED, start, stop);
+        this(TaintTag.UNTRUSTED.getKey(), start, stop);
     }
 
     public TaintRange(String name, int start, int stop) {

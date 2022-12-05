@@ -5,7 +5,10 @@ import io.dongtai.iast.core.handler.hookpoint.SpyDispatcherImpl;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.SinkNode;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.TaintPosition;
+import io.dongtai.iast.core.handler.hookpoint.models.taint.range.TaintRanges;
+import io.dongtai.iast.core.handler.hookpoint.models.taint.tag.TaintTag;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.IVulScan;
+import io.dongtai.iast.core.handler.hookpoint.vulscan.VulnType;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.dynamic.xxe.XXECheck;
 import io.dongtai.iast.core.utils.StackUtils;
 import io.dongtai.iast.core.utils.TaintPoolUtils;
@@ -70,6 +73,7 @@ public class DynamicPropagatorScanner implements IVulScan {
             }
         }
 
+        List<Object> sourceInstances = new ArrayList<Object>();
         boolean hasTaint = false;
         boolean objHasTaint = false;
         Set<TaintPosition> sources = sinkNode.getSources();
@@ -80,6 +84,7 @@ public class DynamicPropagatorScanner implements IVulScan {
                         && TaintPoolUtils.poolContains(event.objectInstance, event)) {
                     objHasTaint = true;
                     hasTaint = true;
+                    addSourceInstance(sourceInstances, event.objectInstance);
                 }
             } else if (position.isParameter()) {
                 int parameterIndex = position.getParameterIndex();
@@ -93,8 +98,35 @@ public class DynamicPropagatorScanner implements IVulScan {
                         && TaintPoolUtils.poolContains(parameter, event)) {
                     paramHasTaint = true;
                     hasTaint = true;
+                    addSourceInstance(sourceInstances, parameter);
                 }
                 event.addParameterValue(parameterIndex, parameter, paramHasTaint);
+            }
+        }
+
+
+        // TODO: check taint tags at server
+        if (VulnType.REFLECTED_XSS.equals(sinkNode.getVulType()) && !sourceInstances.isEmpty()) {
+            boolean tagsHit = false;
+            for (Object sourceInstance : sourceInstances) {
+                int hash = System.identityHashCode(sourceInstance);
+                TaintRanges tr = EngineManager.TAINT_RANGES_POOL.get(hash);
+                if (tr == null || tr.isEmpty()) {
+                    continue;
+                }
+                TaintTag[] required = new TaintTag[]{
+                        TaintTag.UNTRUSTED, TaintTag.CROSS_SITE
+                };
+                TaintTag[] disallowed = new TaintTag[]{
+                        TaintTag.XSS_ENCODED, TaintTag.URL_ENCODED,
+                        TaintTag.HTML_ENCODED, TaintTag.BASE64_ENCODED
+                };
+                if (tr.hasRequiredTaintTags(required) && !tr.hasDisallowedTaintTags(disallowed)) {
+                    tagsHit = true;
+                }
+            }
+            if (!tagsHit) {
+                return false;
             }
         }
 
@@ -103,5 +135,21 @@ public class DynamicPropagatorScanner implements IVulScan {
         }
 
         return hasTaint;
+    }
+
+    private void addSourceInstance(List<Object> sourceInstances, Object obj) {
+        if (obj instanceof String[]) {
+            String[] stringArray = (String[]) obj;
+            for (String stringItem : stringArray) {
+                addSourceInstance(sourceInstances, stringItem);
+            }
+        } else if (obj instanceof Object[]) {
+            Object[] objArray = (Object[]) obj;
+            for (Object objItem : objArray) {
+                addSourceInstance(sourceInstances, objItem);
+            }
+        } else {
+            sourceInstances.add(obj);
+        }
     }
 }

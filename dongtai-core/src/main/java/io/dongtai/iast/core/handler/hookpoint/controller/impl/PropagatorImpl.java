@@ -4,7 +4,7 @@ import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.PropagatorNode;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.TaintPosition;
-import io.dongtai.iast.core.handler.hookpoint.vulscan.taintrange.*;
+import io.dongtai.iast.core.handler.hookpoint.models.taint.range.*;
 import io.dongtai.iast.core.utils.StackUtils;
 import io.dongtai.iast.core.utils.TaintPoolUtils;
 
@@ -178,31 +178,29 @@ public class PropagatorImpl {
         TaintRanges srcTaintRanges = new TaintRanges();
 
         Object src = null;
-        if (r != null) {
-            Set<TaintPosition> sourceLocs = propagatorNode.getSources();
-            if (sourceLocs.size() == 1 && TaintPosition.hasObject(sourceLocs)) {
-                src = event.objectInstance;
-                srcTaintRanges = getTaintRanges(src);
-            } else if (sourceLocs.size() == 2 && TaintPosition.hasObject(sourceLocs)
-                    && TaintPosition.hasParameter(sourceLocs)) {
-                oldTaintRanges = getTaintRanges(event.objectInstance);
-                for (TaintPosition sourceLoc : sourceLocs) {
-                    if (sourceLoc.isParameter()) {
-                        int parameterIndex = sourceLoc.getParameterIndex();
-                        if (event.parameterInstances.length > parameterIndex) {
-                            src = event.parameterInstances[parameterIndex];
-                            srcTaintRanges = getTaintRanges(src);
-                        }
-                        break;
-                    }
-                }
-            } else if (sourceLocs.size() == 1 && TaintPosition.hasParameter(sourceLocs)) {
-                for (TaintPosition sourceLoc : sourceLocs) {
+        Set<TaintPosition> sourceLocs = propagatorNode.getSources();
+        if (sourceLocs.size() == 1 && TaintPosition.hasObject(sourceLocs)) {
+            src = event.objectInstance;
+            srcTaintRanges = getTaintRanges(src);
+        } else if (sourceLocs.size() == 2 && TaintPosition.hasObject(sourceLocs)
+                && TaintPosition.hasParameter(sourceLocs)) {
+            oldTaintRanges = getTaintRanges(event.objectInstance);
+            for (TaintPosition sourceLoc : sourceLocs) {
+                if (sourceLoc.isParameter()) {
                     int parameterIndex = sourceLoc.getParameterIndex();
                     if (event.parameterInstances.length > parameterIndex) {
                         src = event.parameterInstances[parameterIndex];
                         srcTaintRanges = getTaintRanges(src);
                     }
+                    break;
+                }
+            }
+        } else if (sourceLocs.size() == 1 && TaintPosition.hasParameter(sourceLocs)) {
+            for (TaintPosition sourceLoc : sourceLocs) {
+                int parameterIndex = sourceLoc.getParameterIndex();
+                if (event.parameterInstances.length > parameterIndex) {
+                    src = event.parameterInstances[parameterIndex];
+                    srcTaintRanges = getTaintRanges(src);
                 }
             }
         }
@@ -241,9 +239,20 @@ public class PropagatorImpl {
 
         TaintRanges tr;
         if (r != null && src != null) {
-            tr = r.run(src, tgt, event.parameterInstances, oldTaintRanges, srcTaintRanges);
+            tr = r.run(propagatorNode, src, tgt, event.parameterInstances, oldTaintRanges, srcTaintRanges);
         } else {
-            tr = new TaintRanges(new TaintRange(0, TaintRangesBuilder.getLength(tgt)));
+            int len = TaintRangesBuilder.getLength(tgt);
+            tr = new TaintRanges(new TaintRange(0, len));
+            if (propagatorNode.hasTags()) {
+                String[] tags = propagatorNode.getTags();
+                for (String tag : tags) {
+                    tr.add(new TaintRange(tag, 0, len));
+                }
+            }
+            tr.addAll(srcTaintRanges.explode(len));
+            tr.addAll(oldTaintRanges);
+            tr.merge();
+            tr.untag(propagatorNode.getUntags());
         }
         event.targetRanges.add(new MethodEvent.MethodEventTargetRange(tgtHash, tr));
         EngineManager.TAINT_RANGES_POOL.add(tgtHash, tr);

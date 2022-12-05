@@ -1,4 +1,4 @@
-package io.dongtai.iast.core.handler.hookpoint.vulscan.taintrange;
+package io.dongtai.iast.core.handler.hookpoint.models.taint.range;
 
 public enum TaintCommand {
     KEEP,

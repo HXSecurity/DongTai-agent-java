@@ -64,7 +64,7 @@ public class PolicyBuilderTest {
     public void testBuild() throws PolicyException {
         Map<String, List<Integer>> tests = new HashMap<String, List<Integer>>() {{
             put("policy-node-count-src0-p2-sink2-policy4-cls2.json", Arrays.asList(0, 2, 2, 4, 2));
-            put("policy-node-count-src1-p3-sink1-policy5-cls4.json", Arrays.asList(1, 3, 1, 5, 4));
+            put("policy-node-count-src1-p2-sink1-policy4-cls4.json", Arrays.asList(1, 2, 1, 4, 4));
         }};
         for (Map.Entry<String, List<Integer>> entry : tests.entrySet()) {
             JSONArray policyConfig = PolicyBuilder.fetchFromFile(POLICY_DIR + entry.getKey());

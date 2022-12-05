@@ -350,13 +350,13 @@ public class SpyDispatcherImpl implements SpyDispatcher {
             MethodEvent event = new MethodEvent(className, matchedClassName, methodName,
                     signature, instance, parameters, retObject);
 
-            if ((policyNode instanceof SourceNode) && PolicyNodeType.SOURCE.equals(policyNode.getType())) {
+            if ((policyNode instanceof SourceNode)) {
                 SourceImpl.solveSource(event, (SourceNode) policyNode, INVOKE_ID_SEQUENCER);
                 return true;
-            } else if ((policyNode instanceof PropagatorNode) && PolicyNodeType.PROPAGATOR.equals(policyNode.getType())) {
+            } else if ((policyNode instanceof PropagatorNode)) {
                 PropagatorImpl.solvePropagator(event, (PropagatorNode) policyNode, INVOKE_ID_SEQUENCER);
                 return true;
-            } else if ((policyNode instanceof SinkNode) && PolicyNodeType.SINK.equals(policyNode.getType())) {
+            } else if ((policyNode instanceof SinkNode)) {
                 SinkImpl.solveSink(event, (SinkNode) policyNode);
                 return true;
             }
