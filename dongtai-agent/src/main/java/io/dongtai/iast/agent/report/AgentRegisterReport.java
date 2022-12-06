@@ -12,9 +12,11 @@ import io.dongtai.log.DongTaiLog;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.*;
 import java.net.*;
 import java.nio.charset.Charset;
 import java.util.Enumeration;
+import java.util.UUID;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -40,6 +42,10 @@ public class AgentRegisterReport {
      */
     private String generateAgentRegisterMsg() {
         JSONObject object = new JSONObject();
+        String uuid = generateUUID();
+        if (uuid != null) {
+            object.put("uuid", uuid);
+        }
         object.put("name", AgentRegisterReport.getAgentToken());
         object.put("version", AgentConstant.VERSION_VALUE);
         object.put("projectName", getProjectName());
@@ -267,4 +273,43 @@ public class AgentRegisterReport {
         return coreRegisterStart == 1;
     }
 
+    private static String generateUUID() {
+        String uuidPath = IastProperties.getInstance().getUUIDPath();
+        if (uuidPath == null || uuidPath.isEmpty()) {
+            return null;
+        }
+        BufferedWriter bw = null;
+        BufferedReader br = null;
+        String uuid = null;
+        try {
+            File uuidFile = new File(uuidPath);
+            if (!uuidFile.exists()) {
+                uuid = UUID.randomUUID().toString();
+                bw = new BufferedWriter(new FileWriter(uuidFile));
+                bw.write(uuid);
+            } else {
+                br = new BufferedReader(new FileReader(uuidFile));
+                uuid = br.readLine();
+            }
+        } catch (Exception e) {
+            System.out.println("read/write agent uuid file failed: " + e.toString());
+        } finally {
+            if (bw != null) {
+                try {
+                    bw.close();
+                } catch (IOException e) {
+                    System.out.println("close agent uuid file writer failed: " + e.toString());
+                }
+            }
+
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    System.out.println("close agent uuid file reader failed: " + e.toString());
+                }
+            }
+        }
+        return uuid;
+    }
 }

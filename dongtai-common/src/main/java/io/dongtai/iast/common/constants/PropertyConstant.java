@@ -30,4 +30,5 @@ public class PropertyConstant {
     public static final String PROPERTY_SERVICE_HEARTBEAT_INTERVAL = "iast.service.heartbeat.interval";
     public static final String PROPERTY_RESPONSE_LENGTH = "dongtai.response.length";
     public static final String PROPERTY_POLICY_PATH = "dongtai.policy.path";
+    public static final String PROPERTY_UUID_PATH = "dongtai.uuid.path";
 }
