@@ -232,6 +232,7 @@ public class SourceImpl {
                 }
 
                 try {
+                    method.setAccessible(true);
                     itemValue = method.invoke(model);
                     if (!TaintPoolUtils.isNotEmpty(itemValue)) {
                         continue;
@@ -244,7 +245,7 @@ public class SourceImpl {
                         }
                     }
                 } catch (Exception e) {
-                    DongTaiLog.error(e);
+                    DongTaiLog.error("parse source custom model getter" + className + "." + method.getName() + " failed", e);
                 }
             }
             return modelValues;
