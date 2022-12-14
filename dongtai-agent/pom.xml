@@ -19,6 +19,11 @@
             <artifactId>commons-cli</artifactId>
             <version>${commons.cli.versin}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${commons-lang3.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>junit</groupId>
@@ -62,6 +67,23 @@
             <version>${oshi-core-slf.version}</version>
         </dependency>
 
+        <!-- 限流熔断依赖begin -->
+        <dependency>
+            <groupId>io.github.resilience4j</groupId>
+            <artifactId>resilience4j-circuitbreaker</artifactId>
+            <version>${resilience4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
+        </dependency>
+        <!-- 限流熔断依赖end -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>${gson.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -141,6 +163,18 @@
                                     <pattern>oshi.</pattern>
                                     <shadedPattern>${shade-prefix}.oshi.</shadedPattern>
                                 </relocation>
+                                <relocation>
+                                    <pattern>io.github</pattern>
+                                    <shadedPattern>${shade-prefix}.io.github</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>io.vavr</pattern>
+                                    <shadedPattern>${shade-prefix}.io.vavr</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>com.google</pattern>
+                                    <shadedPattern>${shade-prefix}.com.google</shadedPattern>
+                                </relocation>
                             </relocations>
                         </configuration>
                     </execution>
@@ -150,8 +184,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>6</source>
-                    <target>6</target>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
                 </configuration>
             </plugin>
         </plugins>

@@ -31,9 +31,8 @@ public class TransformEngine implements IEngine {
             inst.addTransformer(classFileTransformer, true);
             classFileTransformer.reTransform();
             DongTaiLog.debug("The sub-module of data acquisition and analysis is successfully installed");
-        } catch (Throwable cause) {
-            DongTaiLog.error("Failed to install the sub-module of data collection and analysis");
-            DongTaiLog.error(cause);
+        } catch (Throwable e) {
+            DongTaiLog.error("Failed to install the sub-module of data collection and analysis", e);
         }
     }
 
@@ -55,23 +54,22 @@ public class TransformEngine implements IEngine {
         ArrayList<ClassDefinition> classDefinitionArrayList = new ArrayList<ClassDefinition>();
         Set<Object> classes = transformMap.keySet();
         for (Object aClass:classes){
-            if(aClass instanceof String){
+            if (aClass instanceof String) {
                 try {
                     Class<?> transformClass = Class.forName((String) aClass);
-                    classDefinitionArrayList.add(new ClassDefinition(transformClass,transformMap.get(aClass)));
-                } catch (ClassNotFoundException e) {
-                    DongTaiLog.debug(e);
+                    classDefinitionArrayList.add(new ClassDefinition(transformClass, transformMap.get(aClass)));
+                } catch (ClassNotFoundException ignore) {
                 }
-            }else if (aClass instanceof Class<?>){
-                classDefinitionArrayList.add(new ClassDefinition((Class<?>) aClass,transformMap.get(aClass)));
+            } else if (aClass instanceof Class<?>) {
+                classDefinitionArrayList.add(new ClassDefinition((Class<?>) aClass, transformMap.get(aClass)));
             }
         }
         classDefinitionArrayList.toArray(classDefinitions);
         for (ClassDefinition classDefinition:classDefinitionArrayList){
             try {
                 inst.redefineClasses(classDefinition);
-            }catch (Exception e){
-                DongTaiLog.error(e);
+            } catch (Throwable e) {
+                DongTaiLog.error("engine destroy redefineClasses failed", e);
             }
         }
         inst = null;

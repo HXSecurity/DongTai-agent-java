@@ -192,7 +192,7 @@ public class HttpImpl {
                     return;
                 }
             }
-        } catch (Exception ignore) {
+        } catch (Throwable ignore) {
         }
 
         Boolean isReplay = (Boolean) REQUEST_META.get().get("replay-request");

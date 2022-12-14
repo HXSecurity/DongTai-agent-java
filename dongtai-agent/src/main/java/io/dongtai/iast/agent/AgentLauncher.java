@@ -2,11 +2,11 @@ package io.dongtai.iast.agent;
 
 import io.dongtai.iast.agent.manager.EngineManager;
 import io.dongtai.iast.agent.monitor.MonitorDaemonThread;
-import io.dongtai.iast.agent.monitor.impl.EngineMonitor;
+import io.dongtai.iast.agent.monitor.impl.AgentStateMonitor;
 import io.dongtai.iast.agent.report.AgentRegisterReport;
-import io.dongtai.iast.agent.util.ThreadUtils;
 import io.dongtai.iast.common.constants.AgentConstant;
 import io.dongtai.iast.common.scope.ScopeManager;
+import io.dongtai.iast.common.state.*;
 import io.dongtai.log.DongTaiLog;
 
 import java.lang.instrument.Instrumentation;
@@ -22,6 +22,8 @@ public class AgentLauncher {
     public static final String LAUNCH_MODE_ATTACH = "attach";
     public static String LAUNCH_MODE;
     private static Thread shutdownHook;
+    private static Thread agentMonitorDaemonThread = null;
+    private static final AgentState AGENT_STATE = AgentState.getInstance();
 
     static {
         /**
@@ -46,10 +48,13 @@ public class AgentLauncher {
         }
         LAUNCH_MODE = LAUNCH_MODE_AGENT;
         try {
+            AGENT_STATE.setPendingState(State.RUNNING);
             IastProperties.getInstance();
             install(inst);
         } catch (Exception e) {
             System.out.println("[io.dongtai.iast.agent] agent premain failed: " + e.toString());
+        } finally {
+            AGENT_STATE.setPendingState(null);
         }
     }
 
@@ -60,8 +65,10 @@ public class AgentLauncher {
      * @param inst inst
      */
     public static void agentmain(String args, Instrumentation inst) {
+        String mode;
         try {
             Map<String, String> argsMap = parseArgs(args);
+            mode = argsMap.get("mode");
             for (String prop : IastProperties.ATTACH_ARG_MAP.values()) {
                 if (argsMap.containsKey(prop)) {
                     System.setProperty(prop, argsMap.get(prop));
@@ -70,33 +77,75 @@ public class AgentLauncher {
 
             IastProperties.getInstance();
             System.out.println("[io.dongtai.iast.agent] Protect By DongTai IAST: " + System.getProperty("protect.by.dongtai", "false"));
-            if ("uninstall".equals(argsMap.get("mode"))) {
-                if (System.getProperty("protect.by.dongtai", null) == null) {
-                    System.out.println("[io.dongtai.iast.agent] DongTai wasn't installed.");
-                    return;
-                }
-                EngineMonitor.setIsUninstallHeart(true);
+        } catch (Exception e) {
+            AGENT_STATE.setState(State.EXCEPTION);
+            System.out.println("[io.dongtai.iast.agent] agent agentmain parse args failed: " + e.toString());
+            return;
+        }
+
+        StateCause cause = null;
+
+        if ("uninstall".equals(mode)) {
+            cause = StateCause.UNINSTALL_BY_CLI;
+            if (AGENT_STATE.getPendingState() != null) {
+                System.out.println("[io.dongtai.iast.agent] DongTai agent uninstall: "
+                        + AGENT_STATE.getPendingStateInfo());
+                return;
+            }
+            if (AGENT_STATE.isUninstalled()) {
+                System.out.println("[io.dongtai.iast.agent] DongTai wasn't installed.");
+                return;
+            }
+
+            try {
+                AGENT_STATE.setPendingState(State.UNINSTALLED);
+
                 DongTaiLog.info("Engine is about to be uninstalled");
                 uninstall();
                 // attach手动卸载后停止守护线程
-                ThreadUtils.killAllDongTaiThreads();
                 if (shutdownHook != null) {
                     Runtime.getRuntime().removeShutdownHook(shutdownHook);
                     shutdownHook = null;
                 }
                 ScopeManager.SCOPE_TRACKER.remove();
-                System.clearProperty("protect.by.dongtai");
-            } else {
-                if (System.getProperty("protect.by.dongtai", null) != null) {
-                    DongTaiLog.info("DongTai already installed.");
-                    return;
+
+                if (!AGENT_STATE.isException()) {
+                    AGENT_STATE.setState(State.UNINSTALLED);
                 }
-                MonitorDaemonThread.isExit = false;
-                LAUNCH_MODE = LAUNCH_MODE_ATTACH;
-                install(inst);
+                AGENT_STATE.setCause(cause);
+            } catch (Exception e) {
+                AGENT_STATE.setState(State.EXCEPTION).setCause(cause);
+                System.out.println("[io.dongtai.iast.agent] agent agentmain uninstall failed: " + e.toString());
+            } finally {
+                AGENT_STATE.setPendingState(null);
             }
+
+            return;
+        }
+
+        // install
+        cause = StateCause.RUNNING_BY_CLI;
+        if (AGENT_STATE.getPendingState() != null) {
+            System.out.println("[io.dongtai.iast.agent] DongTai agent uninstall: "
+                    + AGENT_STATE.getPendingStateInfo());
+            return;
+        }
+        if (AGENT_STATE.isRunning()) {
+            DongTaiLog.info("DongTai already installed.");
+            return;
+        }
+
+        try {
+            AGENT_STATE.setPendingState(State.RUNNING);
+
+            MonitorDaemonThread.isExit = false;
+            LAUNCH_MODE = LAUNCH_MODE_ATTACH;
+            install(inst);
         } catch (Exception e) {
-            System.out.println("[io.dongtai.iast.agent] agent agentmain failed: " + e.toString());
+            AGENT_STATE.setState(State.EXCEPTION).setCause(cause);
+            System.out.println("[io.dongtai.iast.agent] agent agentmain install failed: " + e.toString());
+        } finally {
+            AGENT_STATE.setPendingState(null);
         }
     }
 
@@ -118,37 +167,43 @@ public class AgentLauncher {
     private static void install(final Instrumentation inst) {
         Boolean send = AgentRegisterReport.send();
         if (send) {
-            DongTaiLog.init(AgentRegisterReport.getAgentFlag());
+            DongTaiLog.init(AgentRegisterReport.getAgentId());
             LogCollector.extractFluent();
             DongTaiLog.info("Agent registered successfully.");
             Boolean agentStat = AgentRegisterReport.agentStat();
             if (!agentStat) {
-                EngineMonitor.isCoreRegisterStart = false;
+                AgentStateMonitor.isCoreRegisterStart = false;
                 DongTaiLog.info("Detection engine not started, agent waiting to be audited.");
             } else {
-                EngineMonitor.isCoreRegisterStart = true;
+                AgentStateMonitor.isCoreRegisterStart = true;
             }
             shutdownHook = new ShutdownThread();
             Runtime.getRuntime().addShutdownHook(shutdownHook);
             loadEngine(inst);
-            System.setProperty("protect.by.dongtai", "true");
+            if (!AGENT_STATE.isException()) {
+                AGENT_STATE.setState(State.RUNNING);
+            }
         } else {
             DongTaiLog.error("Agent registered failed. Start without DongTai IAST.");
+            AGENT_STATE.setState(State.EXCEPTION);
         }
+        AGENT_STATE.setCause(StateCause.RUNNING_BY_CLI);
     }
 
     private static void loadEngine(final Instrumentation inst) {
-        EngineManager engineManager = EngineManager.getInstance(inst, LAUNCH_MODE, EngineManager.getPID());
-        MonitorDaemonThread daemonThread = new MonitorDaemonThread(engineManager);
-        Thread agentMonitorDaemonThread = new Thread(daemonThread);
-        if (MonitorDaemonThread.delayTime <= 0 && EngineMonitor.isCoreRegisterStart) {
+        EngineManager engineManager = EngineManager.getInstance(inst, LAUNCH_MODE, EngineManager.getPID(), AGENT_STATE);
+        MonitorDaemonThread daemonThread = MonitorDaemonThread.getInstance(engineManager);
+        if (MonitorDaemonThread.delayTime <= 0 && AgentStateMonitor.isCoreRegisterStart) {
             daemonThread.startEngine();
         }
 
-        agentMonitorDaemonThread.setDaemon(true);
-        agentMonitorDaemonThread.setPriority(1);
-        agentMonitorDaemonThread.setName(AgentConstant.THREAD_NAME_PREFIX + "MonitorDaemon");
-        agentMonitorDaemonThread.start();
+        if (agentMonitorDaemonThread == null) {
+            agentMonitorDaemonThread = new Thread(daemonThread);
+            agentMonitorDaemonThread.setDaemon(true);
+            agentMonitorDaemonThread.setPriority(1);
+            agentMonitorDaemonThread.setName(AgentConstant.THREAD_NAME_PREFIX + "MonitorDaemon");
+            agentMonitorDaemonThread.start();
+        }
     }
 
     private static Map<String, String> parseArgs(String args) {

@@ -29,7 +29,7 @@ public class GraphBuilder {
             List<GraphNode> nodeList = build();
             String report = convertToReport(nodeList, request, response);
             ThreadPools.sendPriorityReport(ApiPath.REPORT_UPLOAD, report);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             DongTaiLog.error("report request failed", e);
         } finally {
             ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
@@ -114,7 +114,7 @@ public class GraphBuilder {
             } else {
                 return responseBody;
             }
-        } catch (Exception ignore) {
+        } catch (Throwable ignore) {
             return new byte[0];
         }
     }

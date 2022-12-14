@@ -24,7 +24,9 @@ public class FileUtils {
         }
         if (AgentLauncher.LAUNCH_MODE_AGENT.equals("agent")) {
             InputStream is = FileUtils.class.getClassLoader().getResourceAsStream(resourceName);
-            if (is == null) return false;
+            if (is == null) {
+                return false;
+            }
             FileOutputStream fos = new FileOutputStream(targetFile);
             int length = 0;
             byte[] data = new byte[1024];
@@ -51,11 +53,11 @@ public class FileUtils {
             // 保存该行前面的内容
             while ((temp = br.readLine()) != null) {
                 if (temp.contains("${HOSTNAME_AGENT_ID}")) {
-                    temp = temp.replace("${HOSTNAME_AGENT_ID}", AgentRegisterReport.getInternalHostName() + "-" + AgentRegisterReport.getAgentFlag().toString());
+                    temp = temp.replace("${HOSTNAME_AGENT_ID}", AgentRegisterReport.getInternalHostName() + "-" + AgentRegisterReport.getAgentId().toString());
                 } else if (temp.contains("${HOSTNAME}")) {
                     temp = temp.replace("${HOSTNAME}", AgentRegisterReport.getInternalHostName());
                 } else if (temp.contains("${AGENT_ID}")) {
-                    temp = temp.replace("${AGENT_ID}", AgentRegisterReport.getAgentFlag().toString());
+                    temp = temp.replace("${AGENT_ID}", AgentRegisterReport.getAgentId().toString());
                 } else if (temp.contains("${OPENAPI}")) {
                     String logAddress = IastProperties.getInstance().getLogAddress();
                     if (null == logAddress || logAddress.isEmpty()) {

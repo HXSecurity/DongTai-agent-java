@@ -24,7 +24,7 @@ public class LogCollector {
                 FLUENT_FILE = IastProperties.getInstance().getTmpDir() + "fluent";
                 FileUtils.getResourceToFile("bin/fluent", FLUENT_FILE);
 
-                String agentId = String.valueOf(AgentRegisterReport.getAgentFlag());
+                String agentId = String.valueOf(AgentRegisterReport.getAgentId());
                 FLUENT_FILE_CONF = IastProperties.getInstance().getTmpDir() + "fluent-" + agentId + ".conf";
                 FileUtils.getResourceToFile("bin/fluent.conf", FLUENT_FILE_CONF);
                 FileUtils.confReplace(FLUENT_FILE_CONF);

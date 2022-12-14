@@ -97,7 +97,7 @@ public class AbstractHttpClientUtilsTest {
     public void testDownloadFile() {
         Map<String, String> headers = new HashMap<String, String>();
         headers.put("Authorization", "Token foo");
-        String url = "https://iast-test.huoxian.cn/openapi/api/v1/engine/download?engineName=dongtai-api";
+        String url = BASE_URL + "/openapi/api/v1/engine/download?engineName=dongtai-api";
         boolean ok = AbstractHttpClientUtils.downloadFile(url, "/tmp/agent.jar", headers, "", -1);
         Assert.assertFalse("invalid token download", ok);
         String log = outputStreamCaptor.toString();

@@ -12,6 +12,7 @@ import java.util.ArrayList;
  * @author dongzhiyong@huoxian.cn
  */
 public class MonitorDaemonThread implements Runnable {
+    private static MonitorDaemonThread instance;
 
     public static ArrayList<IMonitor> monitorTasks;
     public static boolean isExit = false;
@@ -24,17 +25,15 @@ public class MonitorDaemonThread implements Runnable {
 
     public MonitorDaemonThread(EngineManager engineManager) {
         monitorTasks = new ArrayList<IMonitor>();
-        monitorTasks.add(new ServerConfigMonitor());
+        monitorTasks.add(new FallbackConfigMonitor());
         monitorTasks.add(new ConfigMonitor());
         monitorTasks.add(new PerformanceMonitor(engineManager));
-        monitorTasks.add(new EngineMonitor(engineManager));
+        monitorTasks.add(new AgentStateMonitor(engineManager));
         monitorTasks.add(new HeartBeatMonitor());
-        monitorTasks.add(new SecondFallbackMonitor(engineManager));
-        monitorTasks.add(new DongTaiThreadMonitor());
         this.engineManager = engineManager;
         try {
             delayTime = IastProperties.getInstance().getDelayTime();
-            if (delayTime != 0){
+            if (delayTime != 0) {
                 DongTaiLog.info("dongtai engine delay time is " + delayTime + " s");
                 delayTime = delayTime * 1000;
             }
@@ -44,8 +43,11 @@ public class MonitorDaemonThread implements Runnable {
         }
     }
 
-    public static void setMonitorTasks(ArrayList<IMonitor> monitorTasks) {
-        MonitorDaemonThread.monitorTasks = monitorTasks;
+    public static MonitorDaemonThread getInstance(EngineManager engineManager) {
+        if (instance == null) {
+            instance = new MonitorDaemonThread(engineManager);
+        }
+        return instance;
     }
 
     @Override
@@ -56,12 +58,12 @@ public class MonitorDaemonThread implements Runnable {
             } catch (InterruptedException e) {
                 DongTaiLog.error(e);
             }
-            if (EngineMonitor.isCoreRegisterStart) {
+            if (AgentStateMonitor.isCoreRegisterStart) {
                 startEngine();
             }
         }
         // 引擎启动成功后，创建子线程执行monitor任务
-        if(engineStartSuccess){
+        if (engineStartSuccess) {
             for (IMonitor monitor : monitorTasks) {
                 Thread monitorThread = new Thread(monitor, monitor.getName());
                 monitorThread.setDaemon(true);
@@ -75,15 +77,10 @@ public class MonitorDaemonThread implements Runnable {
 
 
     public void startEngine() {
-        boolean status = true;
-        if(couldInstallEngine()){
+        boolean status = false;
+        if (couldInstallEngine()) {
             // jdk8以上
-            status = status && engineManager.extractPackage();
-            status = status && engineManager.install();
-            status = status && engineManager.start();
-        }else {
-            // jdk6-7
-            status = status && engineManager.extractPackageJdk6();
+            status = engineManager.extractPackage();
             status = status && engineManager.install();
             status = status && engineManager.start();
         }

@@ -20,12 +20,6 @@ public enum MetricsBindCollectorEnum {
 
     MEM_USAGE_COLLECTOR(MEM_USAGE, MemUsageCollector.class, "绑定内存使用率收集器"),
 
-    MEM_NO_HEAP_USAGE_COLLECTOR(MEM_NO_HEAP_USAGE, SystemMemUsageCollector.class, "绑定系统内存使用率收集器"),
-
-    GARBAGE_INFO_COLLECTOR(GARBAGE_INFO, GarbageInfoCollector.class, "绑定垃圾回收信息收集器"),
-
-    THREAD_INFO_COLLECTOR(THREAD_INFO, ThreadInfoCollector.class, "绑定线程信息收集器"),
-
     ;
 
 

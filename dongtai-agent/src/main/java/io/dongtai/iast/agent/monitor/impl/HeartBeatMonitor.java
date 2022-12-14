@@ -20,19 +20,19 @@ public class HeartBeatMonitor implements IMonitor {
 
 
     @Override
-    public void check() throws Exception {
-        HttpClientUtils.sendPost(ApiPath.REPORT_UPLOAD, HeartBeatReport.generateHeartBeatMsg());
+    public void check() {
+        try {
+            HttpClientUtils.sendPost(ApiPath.REPORT_UPLOAD, HeartBeatReport.generateHeartBeatMsg());
+        } catch (Throwable t) {
+            DongTaiLog.warn("Monitor thread checked error, monitor:{}, msg:{}, err:{}", getName(), t.getMessage(), t.getCause());
+        }
     }
 
     @Override
     public void run() {
         try {
             while (!MonitorDaemonThread.isExit) {
-                try {
-                    this.check();
-                } catch (Throwable t) {
-                    DongTaiLog.warn("Monitor thread checked error, monitor:{}, msg:{}, err:{}", getName(), t.getMessage(), t.getCause());
-                }
+                this.check();
                 ThreadUtils.threadSleep(30);
             }
         } catch (Throwable t) {

@@ -1,7 +1,6 @@
 package io.dongtai.iast.core.utils;
 
 import io.dongtai.iast.common.constants.PropertyConstant;
-import io.dongtai.iast.core.utils.json.GsonUtils;
 import io.dongtai.log.DongTaiLog;
 
 import java.io.*;
@@ -219,40 +218,4 @@ public class PropertyUtils {
         }
         return this.policyPath;
     }
-
-    /**
-     * 获取远端同步的本地配置项
-     *
-     * @param configKey    配置项
-     * @param valueType    值类型
-     * @param defaultValue 默认值
-     * @param cfg          本地properties配置(为空使用PropertyUtils的配置)
-     * @return {@link T} 值类型泛型
-     */
-    public static <T> T getRemoteSyncLocalConfig(String configKey, Class<T> valueType, T defaultValue, Properties cfg) {
-        if (configKey == null || valueType == null) {
-            return defaultValue;
-        }
-        final String config = String.format("iast.remoteSync.%s", configKey);
-        final Properties localConfig = cfg != null ? cfg : PropertyUtils.getInstance().cfg;
-        final String property = System.getProperty(config, localConfig == null ? null : localConfig.getProperty(config, null));
-        if (property == null) {
-            return defaultValue;
-        }
-        try {
-            if (valueType.isInstance(valueType)) {
-                return valueType.cast(property);
-            } else {
-                return GsonUtils.castBaseTypeString2Obj(property, valueType);
-            }
-        } catch (Exception e) {
-            DongTaiLog.warn("cast remoteSyncConfig failed!key:{}, valueType:{}, property:{}, err:{}", config, valueType, property, e.getMessage());
-            return defaultValue;
-        }
-    }
-
-    public static <T> T getRemoteSyncLocalConfig(String configKey, Class<T> valueType, T defaultValue) {
-        return getRemoteSyncLocalConfig(configKey, valueType, defaultValue, null);
-    }
-
 }

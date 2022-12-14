@@ -22,10 +22,10 @@ public class ConfigMonitor implements IMonitor {
     }
 
     @Override
-    public void check() throws Exception {
+    public void check() {
         try {
             Map<String, String> parameters = new HashMap<String, String>();
-            parameters.put("agent_id", String.valueOf(AgentRegisterReport.getAgentFlag()));
+            parameters.put("agent_id", String.valueOf(AgentRegisterReport.getAgentId()));
 
             StringBuilder response = HttpClientUtils.sendGet(ApiPath.AGENT_CONFIG, parameters);
             ConfigBuilder.getInstance().updateFromRemote(response.toString());

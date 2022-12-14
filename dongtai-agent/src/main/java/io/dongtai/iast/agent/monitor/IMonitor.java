@@ -6,10 +6,8 @@ package io.dongtai.iast.agent.monitor;
 public interface IMonitor extends Runnable {
     /**
      * 监控器检查
-     *
-     * @throws Exception 异常
      */
-    void check() throws Exception;
+    void check();
 
     /**
      * 获取监控器线程名称

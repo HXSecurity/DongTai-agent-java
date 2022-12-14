@@ -20,13 +20,13 @@ public class CpuUsageCollector extends AbstractPerformanceCollector {
 
     @Override
     public PerformanceMetrics getMetrics() {
-        if (JavaVersionUtils.isJava6()){
+        if (JavaVersionUtils.isJava6()) {
             com.sun.management.OperatingSystemMXBean osmxb = (com.sun.management.OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
-            double systemCpuLoad = osmxb.getSystemCpuLoad()*100;
+            double systemCpuLoad = osmxb.getSystemCpuLoad() * 100;
             CpuInfoMetrics metricsValue = new CpuInfoMetrics();
             metricsValue.setCpuUsagePercentage(systemCpuLoad);
             return buildMetricsData(MetricsKey.CPU_USAGE, metricsValue);
-        }else {
+        } else {
             SystemInfo systemInfo = new SystemInfo();
             CentralProcessor processor = systemInfo.getHardware().getProcessor();
             long[] prevTicks = processor.getSystemCpuLoadTicks();

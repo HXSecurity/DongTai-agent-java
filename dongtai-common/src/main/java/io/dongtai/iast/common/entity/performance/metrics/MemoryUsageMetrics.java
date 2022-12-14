@@ -26,9 +26,7 @@ max	表示可用于内存管理的最大内存量（以字节为单位）。它�
 package io.dongtai.iast.common.entity.performance.metrics;
 
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.Serializable;
+import java.io.*;
 import java.lang.management.MemoryUsage;
 
 /**
@@ -86,7 +84,7 @@ public class MemoryUsageMetrics implements Serializable {
      * 获取真实可用的最大内存
      * 取jvm配置内存和系统内存中(大于0的)更小者
      */
-    private Long getTrulyMaxMem() {
+    public Long getTrulyMaxMem() {
         if (this.max <= this.systemMaxLimit) {
             return this.max > 0 ? this.max : this.systemMaxLimit;
         } else {
@@ -125,7 +123,8 @@ public class MemoryUsageMetrics implements Serializable {
     }
 
     public static MemoryUsageMetrics clone(MemoryUsage memoryUsage) {
-        return new MemoryUsageMetrics(memoryUsage.getInit(), memoryUsage.getUsed(), memoryUsage.getCommitted(), memoryUsage.getMax());
+        return new MemoryUsageMetrics(memoryUsage.getInit(), memoryUsage.getUsed(),
+                memoryUsage.getCommitted(), memoryUsage.getMax());
     }
 
     public Long getInit() {
