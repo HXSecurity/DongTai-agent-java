@@ -164,7 +164,7 @@ public class IastClassDiagram {
                         queue.offer(tempInterface);
                     }
                 }
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 DongTaiLog.error(e);
             }
         }

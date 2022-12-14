@@ -174,7 +174,7 @@ public class SourceImpl {
         try {
             Object v = ((Optional<?>) obj).orElse(null);
             trackObject(event, sourceNode, v, depth);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             DongTaiLog.warn("track optional object failed: " + e.getMessage());
         }
     }
@@ -244,12 +244,12 @@ public class SourceImpl {
                             modelValues.addAll(parseCustomModel(listValue));
                         }
                     }
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     DongTaiLog.error("parse source custom model getter" + className + "." + method.getName() + " failed", e);
                 }
             }
             return modelValues;
-        }catch (Exception e){
+        } catch (Throwable e) {
             return new HashSet<Object>();
         }
     }

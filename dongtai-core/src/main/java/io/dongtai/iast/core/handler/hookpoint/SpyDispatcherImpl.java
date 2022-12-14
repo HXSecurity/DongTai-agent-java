@@ -34,7 +34,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
         }
         try {
             ScopeManager.SCOPE_TRACKER.getHttpRequestScope().enter();
-        } catch (Exception ignore) {
+        } catch (Throwable ignore) {
         }
     }
 
@@ -57,7 +57,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                 GraphBuilder.buildAndReport(request, response);
                 EngineManager.cleanThreadState();
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             DongTaiLog.error("leave http failed", e);
             EngineManager.cleanThreadState();
         }
@@ -75,7 +75,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
         }
         try {
             return ScopeManager.SCOPE_TRACKER.getHttpRequestScope().isFirst();
-        } catch (Exception ignore) {
+        } catch (Throwable ignore) {
             return false;
         }
     }
@@ -94,7 +94,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
         }
         try {
             return HttpImpl.cloneRequest(req, isJakarta);
-        } catch (Exception ignore) {
+        } catch (Throwable ignore) {
             return req;
         }
     }
@@ -110,7 +110,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
         }
         try {
             return HttpImpl.cloneResponse(response, isJakarta);
-        } catch (Exception ignore) {
+        } catch (Throwable ignore) {
             return response;
         }
     }
@@ -130,7 +130,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                 return;
             }
             ScopeManager.SCOPE_TRACKER.getPolicyScope().enterSource();
-        } catch (Exception ignore) {
+        } catch (Throwable ignore) {
         }
     }
 
@@ -149,7 +149,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                 return;
             }
             ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveSource();
-        } catch (Exception ignore) {
+        } catch (Throwable ignore) {
         }
     }
 
@@ -167,7 +167,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
             }
             return ScopeManager.SCOPE_TRACKER.inEnterEntry()
                     && ScopeManager.SCOPE_TRACKER.getPolicyScope().isValidSource();
-        } catch (Exception ignore) {
+        } catch (Throwable ignore) {
             return false;
         }
     }
@@ -187,7 +187,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                 return;
             }
             ScopeManager.SCOPE_TRACKER.getPolicyScope().enterPropagator(skipScope);
-        } catch (Exception ignore) {
+        } catch (Throwable ignore) {
         }
     }
 
@@ -206,7 +206,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                 return;
             }
             ScopeManager.SCOPE_TRACKER.getPolicyScope().leavePropagator(skipScope);
-        } catch (Exception ignore) {
+        } catch (Throwable ignore) {
         }
     }
 
@@ -224,7 +224,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
             }
             return ScopeManager.SCOPE_TRACKER.inEnterEntry()
                     && ScopeManager.SCOPE_TRACKER.getPolicyScope().isValidPropagator();
-        } catch (Exception ignore) {
+        } catch (Throwable ignore) {
             return false;
         }
     }
@@ -244,7 +244,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                 return;
             }
             ScopeManager.SCOPE_TRACKER.getPolicyScope().enterSink();
-        } catch (Exception ignore) {
+        } catch (Throwable ignore) {
         }
     }
 
@@ -263,7 +263,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                 return;
             }
             ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveSink();
-        } catch (Exception ignore) {
+        } catch (Throwable ignore) {
         }
     }
 
@@ -280,7 +280,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
             }
             return ScopeManager.SCOPE_TRACKER.inEnterEntry()
                     && ScopeManager.SCOPE_TRACKER.getPolicyScope().isValidSink();
-        } catch (Exception ignore) {
+        } catch (Throwable ignore) {
             return false;
         }
     }
@@ -324,7 +324,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                     HttpImpl.solveHttp(event);
                 }
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             DongTaiLog.error("collect method pool failed: " + e.toString(), e);
         } finally {
             ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
@@ -390,7 +390,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                     DongTaiLog.debug("current request method pool size over capacity: {}", methodPoolMaxSize);
                     return false;
                 }
-            } catch (Exception ignore) {
+            } catch (Throwable ignore) {
             }
         }
 

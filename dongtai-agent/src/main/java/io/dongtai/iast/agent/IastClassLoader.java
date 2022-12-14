@@ -61,7 +61,7 @@ public class IastClassLoader extends URLClassLoader {
                 resolveClass(aClass);
             }
             return aClass;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             return super.loadClass(name, resolve);
         }
     }

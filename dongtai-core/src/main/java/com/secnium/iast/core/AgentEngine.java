@@ -71,7 +71,7 @@ public class AgentEngine {
                     stopWatch.getTime() / 1000);
             DongTaiLog.info("DongTai Agent Version: {}, DongTai Server: {}", AgentConstant.VERSION_VALUE, cfg.getBaseUrl());
             new ServiceDirReport().send();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             DongTaiLog.error("engine install failed", e);
             AGENT_STATE.setState(State.EXCEPTION);
         }
@@ -96,7 +96,7 @@ public class AgentEngine {
             SpyDispatcherHandler.destroy();
             DongTaiLog.info("Engine uninstallation succeeded");
             EngineManager.cleanThreadState();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             DongTaiLog.error("engine destroy failed", e);
             AGENT_STATE.setState(State.EXCEPTION);
         }
