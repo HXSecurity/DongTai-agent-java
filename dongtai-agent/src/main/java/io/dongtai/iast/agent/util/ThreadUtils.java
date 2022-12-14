@@ -19,19 +19,20 @@ public class ThreadUtils {
     /**
      * 获取所有名称中包含DongTai字样的线程
      */
-    public static List<ThreadInfoMetrics.ThreadInfo> getDongTaiThreads() {
+    public static List<ThreadInfoMetrics.ThreadInfo> getDongTaiCoreThreads() {
         List<ThreadInfoMetrics.ThreadInfo> dongTaiThreadInfoList = new ArrayList<ThreadInfoMetrics.ThreadInfo>();
         try {
             Thread[] threads = getCurrentActiveThreads();
             for (Thread thread : threads) {
                 // 匹配DongTai线程
-                if (thread.getName() != null && thread.getName().startsWith(AgentConstant.THREAD_NAME_PREFIX)) {
-                    ThreadInfoMetrics.ThreadInfo dongTaiThread = new ThreadInfoMetrics.ThreadInfo();
-                    dongTaiThread.setId(thread.getId());
-                    dongTaiThread.setName(thread.getName());
-                    dongTaiThread.setCpuTime(getThreadCpuTime(thread.getId()));
-                    dongTaiThreadInfoList.add(dongTaiThread);
+                if (thread.getName() == null || !thread.getName().startsWith(AgentConstant.THREAD_NAME_PREFIX_CORE)) {
+                    continue;
                 }
+                ThreadInfoMetrics.ThreadInfo dongTaiThread = new ThreadInfoMetrics.ThreadInfo();
+                dongTaiThread.setId(thread.getId());
+                dongTaiThread.setName(thread.getName());
+                dongTaiThread.setCpuTime(getThreadCpuTime(thread.getId()));
+                dongTaiThreadInfoList.add(dongTaiThread);
             }
             // 停顿时间间隔,用于收集cpu使用率变化
             try {
@@ -55,7 +56,7 @@ public class ThreadUtils {
      * @param threadId 线程id
      * @return boolean
      */
-    public static boolean killDongTaiThread(Long threadId) {
+    public static boolean killDongTaiCoreThread(Long threadId) {
         try {
             if (threadId == null || threadId <= 0) {
                 return false;
@@ -63,13 +64,13 @@ public class ThreadUtils {
             final Thread[] threads = getCurrentActiveThreads();
             for (Thread thread : threads) {
                 if (thread.getId() == threadId && thread.getName() != null
-                        && thread.getName().startsWith(AgentConstant.THREAD_NAME_PREFIX)) {
+                        && thread.getName().startsWith(AgentConstant.THREAD_NAME_PREFIX_CORE)) {
                     thread.interrupt();
                     return true;
                 }
             }
         } catch (Throwable t) {
-            DongTaiLog.warn("kill DongTai thread failed, msg: {} , error: {}", t.getMessage(), t.getCause());
+            DongTaiLog.warn("kill DongTai core thread failed, msg: {} , error: {}", t.getMessage(), t.getCause());
         }
         return false;
     }
@@ -77,10 +78,10 @@ public class ThreadUtils {
     /**
      * 杀死所有的洞态线程
      */
-    public static void killAllDongTaiThreads() {
-        List<ThreadInfoMetrics.ThreadInfo> dongTaiThreads = ThreadUtils.getDongTaiThreads();
+    public static void killAllDongTaiCoreThreads() {
+        List<ThreadInfoMetrics.ThreadInfo> dongTaiThreads = ThreadUtils.getDongTaiCoreThreads();
         for (ThreadInfoMetrics.ThreadInfo each : dongTaiThreads) {
-            ThreadUtils.killDongTaiThread(each.getId());
+            ThreadUtils.killDongTaiCoreThread(each.getId());
         }
     }
 

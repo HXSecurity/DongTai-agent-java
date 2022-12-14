@@ -8,12 +8,13 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <shade-prefix>io.dongtai.iast.thirdparty</shade-prefix>
 
-        <maven.compiler.source>1.6</maven.compiler.source>
-        <maven.compiler.target>1.6</maven.compiler.target>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
 
         <maven.compiler.version>2.3.2</maven.compiler.version>
         <maven.flatten.plugin.version>1.3.0</maven.flatten.plugin.version>
         <commons.cli.versin>1.4</commons.cli.versin>
+        <lombok.version>1.18.20</lombok.version>
         <sun.tools.version>1.6</sun.tools.version>
         <!--docker环境下配置-->
         <sun.tools.systempath>${java.home}/../lib/tools.jar</sun.tools.systempath>

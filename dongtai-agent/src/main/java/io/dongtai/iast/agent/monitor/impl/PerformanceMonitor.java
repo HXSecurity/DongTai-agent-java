@@ -1,6 +1,6 @@
 package io.dongtai.iast.agent.monitor.impl;
 
-import io.dongtai.iast.agent.IastProperties;
+import io.dongtai.iast.agent.fallback.FallbackManager;
 import io.dongtai.iast.agent.manager.EngineManager;
 import io.dongtai.iast.agent.monitor.IMonitor;
 import io.dongtai.iast.agent.monitor.MonitorDaemonThread;
@@ -10,6 +10,7 @@ import io.dongtai.iast.agent.util.ThreadUtils;
 import io.dongtai.iast.common.constants.AgentConstant;
 import io.dongtai.iast.common.entity.performance.PerformanceMetrics;
 import io.dongtai.iast.common.entity.performance.metrics.CpuInfoMetrics;
+import io.dongtai.iast.common.entity.performance.metrics.MemoryUsageMetrics;
 import io.dongtai.iast.common.enums.MetricsKey;
 import io.dongtai.iast.common.utils.serialize.SerializeUtils;
 import io.dongtai.log.DongTaiLog;
@@ -24,8 +25,8 @@ import java.util.List;
  * @author dongzhiyong@huoxian.cn
  */
 public class PerformanceMonitor implements IMonitor {
-    private final static IastProperties PROPERTIES = IastProperties.getInstance();
     private static Integer CPU_USAGE = 0;
+    private static MemoryUsageMetrics MEMORY_USAGE = null;
     private static List<PerformanceMetrics> PERFORMANCE_METRICS = new ArrayList<PerformanceMetrics>();
 
     private static final String NAME = "PerformanceMonitor";
@@ -52,24 +53,25 @@ public class PerformanceMonitor implements IMonitor {
     private void configCollectMetrics() {
         needCollectMetrics.add(MetricsKey.CPU_USAGE);
         needCollectMetrics.add(MetricsKey.MEM_USAGE);
-        needCollectMetrics.add(MetricsKey.MEM_NO_HEAP_USAGE);
-        needCollectMetrics.add(MetricsKey.GARBAGE_INFO);
-        needCollectMetrics.add(MetricsKey.THREAD_INFO);
     }
 
     public static Integer getCpuUsage() {
         return CPU_USAGE;
     }
 
+    public static MemoryUsageMetrics getMemoryUsage() {
+        return MEMORY_USAGE;
+    }
+
     public static Integer getDiskUsage() {
         try {
             File[] files = File.listRoots();
             for (File file : files) {
-                double rate = ((file.getTotalSpace()-file.getUsableSpace())*1.0/file.getTotalSpace())*100;
+                double rate = ((file.getTotalSpace() - file.getUsableSpace()) * 1.0 / file.getTotalSpace()) * 100;
                 return (int) rate;
             }
-        }catch (Exception e){
-            DongTaiLog.error(e);
+        } catch (Exception e) {
+            DongTaiLog.error("get disk usage failed", e);
         }
         return 0;
     }
@@ -88,13 +90,17 @@ public class PerformanceMonitor implements IMonitor {
      * 0 -> 1 -> 0
      */
     @Override
-    public void check() throws Exception {
-        // 收集性能指标数据
-        final List<PerformanceMetrics> performanceMetrics = collectPerformanceMetrics();
-        // 更新本地性能指标记录(用于定期上报)
-        updatePerformanceMetrics(performanceMetrics);
-        // 检查性能指标(用于熔断降级)
-        checkPerformanceMetrics(performanceMetrics);
+    public void check() {
+        try {
+            // collect performance metrics
+            final List<PerformanceMetrics> performanceMetrics = collectPerformanceMetrics();
+            // update local performance metrics for scheduled reporting
+            updatePerformanceMetrics(performanceMetrics);
+            // check performance metrics for fallback
+            checkPerformanceMetrics(performanceMetrics);
+        } catch (Throwable t) {
+            DongTaiLog.warn("Monitor thread checked error, monitor:{}, msg:{}, err:{}", getName(), t.getMessage(), t.getCause());
+        }
     }
 
     private void updatePerformanceMetrics(List<PerformanceMetrics> performanceMetrics) {
@@ -102,6 +108,8 @@ public class PerformanceMonitor implements IMonitor {
             if (metrics.getMetricsKey() == MetricsKey.CPU_USAGE) {
                 final CpuInfoMetrics cpuInfoMetrics = metrics.getMetricsValue(CpuInfoMetrics.class);
                 CPU_USAGE = cpuInfoMetrics.getCpuUsagePercentage().intValue();
+            } else if (metrics.getMetricsKey() == MetricsKey.MEM_USAGE) {
+                MEMORY_USAGE = metrics.getMetricsValue(MemoryUsageMetrics.class);
             }
         }
         PERFORMANCE_METRICS = performanceMetrics;
@@ -117,13 +125,14 @@ public class PerformanceMonitor implements IMonitor {
         final List<PerformanceMetrics> metricsList = new ArrayList<PerformanceMetrics>();
         for (MetricsKey metricsKey : needCollectMetrics) {
             final MetricsBindCollectorEnum collectorEnum = MetricsBindCollectorEnum.getEnum(metricsKey);
-            if (collectorEnum != null) {
-                try {
-                    IPerformanceCollector collector = collectorEnum.getCollector().newInstance();
-                    metricsList.add(collector.getMetrics());
-                } catch (Throwable t) {
-                    DongTaiLog.error("getPerformanceMetrics failed, collector:{}, err:{}", collectorEnum, t.getMessage());
-                }
+            if (collectorEnum == null) {
+                continue;
+            }
+            try {
+                IPerformanceCollector collector = collectorEnum.getCollector().newInstance();
+                metricsList.add(collector.getMetrics());
+            } catch (Throwable t) {
+                DongTaiLog.error("getPerformanceMetrics failed, collector:{}, err:{}", collectorEnum, t.getMessage());
             }
         }
         return metricsList;
@@ -134,12 +143,7 @@ public class PerformanceMonitor implements IMonitor {
      */
     private void checkPerformanceMetrics(List<PerformanceMetrics> performanceMetrics) {
         try {
-            final Class<?> fallbackManagerClass = EngineManager.getFallbackManagerClass();
-            if (fallbackManagerClass == null) {
-                return;
-            }
-            fallbackManagerClass.getMethod("invokePerformanceBreakerCheck", String.class)
-                    .invoke(null, SerializeUtils.serializeByList(performanceMetrics));
+            FallbackManager.invokePerformanceBreakerCheck(SerializeUtils.serializeByList(performanceMetrics));
         } catch (Throwable t) {
             DongTaiLog.error("checkPerformanceMetrics failed, msg:{}, err:{}", t.getMessage(), t.getCause());
         }
@@ -149,11 +153,7 @@ public class PerformanceMonitor implements IMonitor {
     public void run() {
         try {
             while (!MonitorDaemonThread.isExit) {
-                try {
-                    this.check();
-                } catch (Throwable t) {
-                    DongTaiLog.warn("Monitor thread checked error, monitor:{}, msg:{}, err:{}", getName(), t.getMessage(), t.getCause());
-                }
+                this.check();
                 ThreadUtils.threadSleep(30);
             }
         } catch (Throwable t) {

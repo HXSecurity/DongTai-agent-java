@@ -34,7 +34,7 @@ public class ServiceFactory {
     public ServiceFactory() {
         this.queueService = Executors
                 .newSingleThreadScheduledExecutor(
-                        new ThreadFactoryBuilder().setNameFormat(AgentConstant.THREAD_NAME_PREFIX + "HeartBeat").build());
+                        new ThreadFactoryBuilder().setNameFormat(AgentConstant.THREAD_NAME_PREFIX_CORE + "HeartBeat").build());
     }
 
     public void start() {

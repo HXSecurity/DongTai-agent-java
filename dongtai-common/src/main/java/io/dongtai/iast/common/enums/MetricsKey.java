@@ -1,6 +1,7 @@
 package io.dongtai.iast.common.enums;
 
-import io.dongtai.iast.common.entity.performance.metrics.*;
+import io.dongtai.iast.common.entity.performance.metrics.CpuInfoMetrics;
+import io.dongtai.iast.common.entity.performance.metrics.MemoryUsageMetrics;
 
 
 /**
@@ -17,13 +18,6 @@ public enum MetricsKey {
     CPU_USAGE("cpuUsage", CpuInfoMetrics.class, "cpu使用率"),
 
     MEM_USAGE("memoryUsage", MemoryUsageMetrics.class, "内存使用率"),
-
-    MEM_NO_HEAP_USAGE("memoryNoHeapUsage", MemoryUsageMetrics.class, "堆外内存使用率"),
-
-    GARBAGE_INFO("garbageInfo", GarbageInfoMetrics.class, "垃圾回收信息"),
-
-    THREAD_INFO("threadInfo", ThreadInfoMetrics.class, "线程信息"),
-
     ;
 
 

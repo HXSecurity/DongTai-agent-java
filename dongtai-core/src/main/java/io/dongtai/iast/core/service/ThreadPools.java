@@ -14,7 +14,7 @@ public class ThreadPools {
             new LinkedBlockingQueue<Runnable>(5120), new ThreadFactory() {
         @Override
         public Thread newThread(Runnable r) {
-            return new Thread(r, AgentConstant.THREAD_NAME_PREFIX + "VulReport-" + r.hashCode());
+            return new Thread(r, AgentConstant.THREAD_NAME_PREFIX_CORE + "VulReport-" + r.hashCode());
         }
     });
 
@@ -22,7 +22,7 @@ public class ThreadPools {
             new LinkedBlockingQueue<Runnable>(10000), new ThreadFactory() {
         @Override
         public Thread newThread(Runnable r) {
-            return new Thread(r, AgentConstant.THREAD_NAME_PREFIX + "Report-" + r.hashCode());
+            return new Thread(r, AgentConstant.THREAD_NAME_PREFIX_CORE + "Report-" + r.hashCode());
         }
     });
 
@@ -30,7 +30,7 @@ public class ThreadPools {
             new LinkedBlockingQueue<Runnable>(1024), new ThreadFactory() {
         @Override
         public Thread newThread(Runnable r) {
-            return new Thread(r, AgentConstant.THREAD_NAME_PREFIX + "VulReplay-" + r.hashCode());
+            return new Thread(r, AgentConstant.THREAD_NAME_PREFIX_CORE + "VulReplay-" + r.hashCode());
         }
 
     });
@@ -39,7 +39,7 @@ public class ThreadPools {
             new LinkedBlockingQueue<Runnable>(5120), new ThreadFactory() {
         @Override
         public Thread newThread(Runnable r) {
-            return new Thread(r, AgentConstant.THREAD_NAME_PREFIX + "LimitReport-" + r.hashCode());
+            return new Thread(r, AgentConstant.THREAD_NAME_PREFIX_CORE + "LimitReport-" + r.hashCode());
         }
     });
 

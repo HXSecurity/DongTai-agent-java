@@ -17,7 +17,6 @@ import org.apache.commons.lang3.time.StopWatch;
 import org.objectweb.asm.*;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.dongtai.SpyDispatcherHandler;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
@@ -233,7 +232,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
             writeByteArrayToFile(enhancedClass, data);
             writeByteArrayToFile(originalClass, originalData);
             DongTaiLog.trace("dump class {} to {} success.", className, enhancedClass);
-        } catch (IOException e) {
+        } catch (Throwable e) {
             DongTaiLog.error("dump class {} failed. reason: {}", className, e);
         }
 
@@ -313,9 +312,8 @@ public class IastClassFileTransformer implements ClassFileTransformer {
             try {
                 inst.retransformClasses(clazz);
             } catch (InternalError ignored) {
-            } catch (Exception e) {
-                DongTaiLog.error("transform class failure, class: {}, reason: {}", clazz.getCanonicalName(), e.getMessage());
-                DongTaiLog.error(e);
+            } catch (Throwable e) {
+                DongTaiLog.error("retransform class " + clazz.getCanonicalName() + " failure", e);
             }
         }
         stopWatch.stop();

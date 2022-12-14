@@ -1,8 +1,9 @@
 package com.secnium.iast.core;
 
 import io.dongtai.iast.common.constants.AgentConstant;
+import io.dongtai.iast.common.state.AgentState;
+import io.dongtai.iast.common.state.State;
 import io.dongtai.iast.core.EngineManager;
-import io.dongtai.iast.core.bytecode.IastClassFileTransformer;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.PolicyManager;
 import io.dongtai.iast.core.init.IEngine;
 import io.dongtai.iast.core.init.impl.ConfigEngine;
@@ -24,6 +25,7 @@ public class AgentEngine {
 
     private static AgentEngine instance;
     private PolicyManager policyManager;
+    private static final AgentState AGENT_STATE = AgentState.getInstance();
 
     ArrayList<IEngine> engines = new ArrayList<IEngine>();
 
@@ -50,10 +52,6 @@ public class AgentEngine {
     public static void install(String mode, String propertiesFilePath, Integer agentId, Instrumentation inst,
                                String agentFile) {
         try {
-            if ("true".equals(System.getProperty("DongTai.IAST.Status"))) {
-                DongTaiLog.info("DongTai IAST has Installed.");
-                return;
-            }
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
             DongTaiLog.debug("DongTai Engine is about to be installed, the installation mode is {}", mode);
@@ -66,35 +64,29 @@ public class AgentEngine {
             agentEngine.init(mode, cfg, inst, policyManager);
             // Time-consuming location
             agentEngine.run();
-            System.setProperty("DongTai.IAST.Status", "true");
 
             stopWatch.stop();
             StartUpTimeReport.sendReport(EngineManager.getAgentId(), (int) stopWatch.getTime());
-            IastClassFileTransformer transformer = IastClassFileTransformer.getInstance(inst, policyManager);
             DongTaiLog.info("DongTai Engine is successfully installed to the JVM, and it takes {} s",
                     stopWatch.getTime() / 1000);
             DongTaiLog.info("DongTai Agent Version: {}, DongTai Server: {}", AgentConstant.VERSION_VALUE, cfg.getBaseUrl());
             new ServiceDirReport().send();
         } catch (Exception e) {
             DongTaiLog.error("engine install failed", e);
+            AGENT_STATE.setState(State.EXCEPTION);
         }
     }
 
     public static void start() {
-        DongTaiLog.info("Turn on the engine");
-        EngineManager.turnOnEngine();
-        DongTaiLog.debug("Engine opened successfully");
+        DongTaiLog.info("Turn on the engine successfully");
     }
 
     public static void stop() {
-        DongTaiLog.info("Turn off the engine");
-        EngineManager.turnOffEngine();
-        DongTaiLog.info("Engine shut down successfully");
+        DongTaiLog.info("Turn off the engine successfully");
     }
 
     public static void destroy(String mode, String propertiesFilePath, Instrumentation inst) {
         try {
-            EngineManager.turnOffEngine();
             DongTaiLog.info("Uninstall engine");
             AgentEngine agentEngine = AgentEngine.getInstance();
             assert agentEngine != null;
@@ -102,11 +94,11 @@ public class AgentEngine {
             ThreadPools.destroy();
             ServiceFactory.getInstance().destroy();
             SpyDispatcherHandler.destroy();
-            System.clearProperty("DongTai.IAST.Status");
             DongTaiLog.info("Engine uninstallation succeeded");
             EngineManager.cleanThreadState();
         } catch (Exception e) {
             DongTaiLog.error("engine destroy failed", e);
+            AGENT_STATE.setState(State.EXCEPTION);
         }
     }
 

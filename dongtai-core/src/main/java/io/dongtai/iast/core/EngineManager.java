@@ -1,8 +1,7 @@
 package io.dongtai.iast.core;
 
 import io.dongtai.iast.common.scope.ScopeManager;
-import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.FallbackManager;
-import io.dongtai.iast.core.bytecode.enhance.plugin.fallback.FallbackSwitch;
+import io.dongtai.iast.common.state.AgentState;
 import io.dongtai.iast.core.handler.context.ContextManager;
 import io.dongtai.iast.core.handler.hookpoint.IastServer;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
@@ -10,9 +9,7 @@ import io.dongtai.iast.core.handler.hookpoint.models.taint.range.TaintRanges;
 import io.dongtai.iast.core.service.ServerAddressReport;
 import io.dongtai.iast.core.service.ServiceFactory;
 import io.dongtai.iast.core.utils.PropertyUtils;
-import io.dongtai.iast.core.utils.config.RemoteConfigUtils;
 import io.dongtai.iast.core.utils.threadlocal.*;
-import io.dongtai.log.DongTaiLog;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -32,15 +29,10 @@ public class EngineManager {
     public static final IastTrackMap TRACK_MAP = new IastTrackMap();
     public static final IastTaintHashCodes TAINT_HASH_CODES = new IastTaintHashCodes();
     public static final TaintRangesPool TAINT_RANGES_POOL = new TaintRangesPool();
-    /**
-     * 限制器统一管理器
-     */
-    private FallbackManager fallbackManager;
-
     public static IastServer SERVER;
+    public static final AgentState AGENT_STATE = AgentState.getInstance();
 
     private static final AtomicInteger reqCounts = new AtomicInteger(0);
-    public static int enableDongTai = 0;
 
     public static final BooleanThreadLocal ENTER_REPLAY_ENTRYPOINT = new BooleanThreadLocal(false);
 
@@ -55,29 +47,10 @@ public class EngineManager {
         return instance;
     }
 
-    public static void setInstance() {
-        instance = null;
-    }
-
     private EngineManager(int agentId) {
         PropertyUtils cfg = PropertyUtils.getInstance();
         this.saveBytecode = cfg.isEnableDumpClass();
         this.agentId = agentId;
-        String fallbackVersion = System.getProperty("dongtai.fallback.version", "v2");
-        if ("v2".equals(fallbackVersion)){
-            RemoteConfigUtils.syncRemoteConfigV2(agentId);
-        }else {
-            RemoteConfigUtils.syncRemoteConfig(agentId);
-        }
-        this.fallbackManager = FallbackManager.newInstance(cfg.cfg);
-    }
-
-    public static FallbackManager getFallbackManager() {
-        return instance.fallbackManager;
-    }
-
-    public static void setFallbackManager() {
-        instance.fallbackManager = FallbackManager.updateInstance(PropertyUtils.getInstance().cfg);
     }
 
     /**
@@ -89,7 +62,6 @@ public class EngineManager {
         EngineManager.TAINT_HASH_CODES.remove();
         EngineManager.TAINT_RANGES_POOL.remove();
         EngineManager.ENTER_REPLAY_ENTRYPOINT.remove();
-        EngineManager.getFallbackManager().getHookRateLimiter().remove();
         ContextManager.getCONTEXT().remove();
         ScopeManager.SCOPE_TRACKER.remove();
     }
@@ -108,27 +80,12 @@ public class EngineManager {
     }
 
     /**
-     * 打开检测引擎
-     */
-    public static void turnOnEngine() {
-        EngineManager.enableDongTai = 1;
-        FallbackSwitch.setPERFORMANCE_FALLBACK(false);
-    }
-
-    /**
-     * 关闭检测引擎
-     */
-    public static void turnOffEngine() {
-        EngineManager.enableDongTai = 0;
-    }
-
-    /**
      * 检查灵芝引擎是否被开启
      *
      * @return true - 引擎已启动；false - 引擎未启动
      */
     public static boolean isEngineRunning() {
-        return !FallbackSwitch.isEngineFallback() && EngineManager.enableDongTai == 1;
+        return AGENT_STATE.isRunning();
     }
 
     public boolean isEnableDumpClass() {

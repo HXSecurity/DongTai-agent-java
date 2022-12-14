@@ -142,7 +142,7 @@ public class AgentRegisterReport {
      *
      * @return agent唯一标识，当前使用agentId
      */
-    public static Integer getAgentFlag() {
+    public static Integer getAgentId() {
         AgentRegisterReport registerReport = AgentRegisterReport.getInstance();
         return registerReport.agentId;
     }

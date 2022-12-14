@@ -3,9 +3,7 @@ package io.dongtai.iast.agent;
 import java.io.Closeable;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
+import java.net.*;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.jar.JarFile;
@@ -50,6 +48,11 @@ public class IastClassLoader extends URLClassLoader {
         final Class<?> loadedClass = findLoadedClass(name);
         if (loadedClass != null) {
             return loadedClass;
+        }
+
+        if (!name.startsWith("io.dongtai") && !name.startsWith("com.secnium")
+                && !name.startsWith("cn.huoxian") && !name.startsWith("java.lang.iast")) {
+            return super.loadClass(name, resolve);
         }
 
         try {
