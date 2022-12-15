@@ -22,7 +22,16 @@ public class LogCollector {
         try {
             if (!isMacOs() && !isWindows()) {
                 FLUENT_FILE = IastProperties.getInstance().getTmpDir() + "fluent";
-                FileUtils.getResourceToFile("bin/fluent", FLUENT_FILE);
+                File f = new File(FLUENT_FILE);
+                if (f.exists()) {
+                    DongTaiLog.info("fluent already exists {}", FLUENT_FILE);
+                    return;
+                }
+                if (isArm()) {
+                    FileUtils.getResourceToFile("bin/fluent-arm", FLUENT_FILE);
+                } else {
+                    FileUtils.getResourceToFile("bin/fluent", FLUENT_FILE);
+                }
 
                 String agentId = String.valueOf(AgentRegisterReport.getAgentId());
                 FLUENT_FILE_CONF = IastProperties.getInstance().getTmpDir() + "fluent-" + agentId + ".conf";
