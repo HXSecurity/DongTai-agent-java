@@ -90,7 +90,7 @@ public class Agent {
         }
     }
 
-    private static boolean isArm() {
+    public static boolean isArm() {
         return System.getProperty("os.arch").toLowerCase().contains("arm") || System.getProperty("os.arch").toLowerCase().contains("aarch");
     }
 
