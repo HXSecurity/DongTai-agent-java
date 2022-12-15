@@ -16,6 +16,10 @@ public class ConfigBuilder {
                 Config.<Boolean>create(ConfigKey.REPORT_RESPONSE_BODY).setDefaultValue(true));
         this.configMap.put(ConfigKey.REQUEST_DENY_LIST,
                 Config.<RequestDenyList>create(ConfigKey.REQUEST_DENY_LIST).setDefaultValue(null));
+        this.configMap.put(ConfigKey.ENABLE_VERSION_HEADER,
+                Config.<Boolean>create(ConfigKey.VERSION_HEADER_KEY).setDefaultValue(true));
+        this.configMap.put(ConfigKey.VERSION_HEADER_KEY,
+                Config.<String>create(ConfigKey.VERSION_HEADER_KEY).setDefaultValue("DongTai"));
     }
 
     public static ConfigBuilder getInstance() {
@@ -50,6 +54,8 @@ public class ConfigBuilder {
         }
         updateBool(config, ConfigKey.JsonKey.JSON_REPORT_RESPONSE_BODY);
         updateInt(config, ConfigKey.JsonKey.JSON_REPORT_MAX_METHOD_POOL_SIZE);
+        updateBool(config, ConfigKey.JsonKey.JSON_ENABLE_VERSION_HEADER);
+        updateString(config, ConfigKey.JsonKey.JSON_VERSION_HEADER_KEY);
         updateRequestDenyList(config);
     }
 
@@ -83,7 +89,9 @@ public class ConfigBuilder {
             Config<String> conf = (Config<String>) getConfig(jsonKey.getConfigKey());
             if (conf != null) {
                 String value = config.getString(jsonKey.getKey());
-                conf.setValue(value);
+                if (value != null || !value.isEmpty()) {
+                    conf.setValue(value);
+                }
             }
         } catch (Throwable ignore) {
         }

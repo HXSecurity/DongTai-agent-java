@@ -1,6 +1,7 @@
 package io.dongtai.api.servlet2;
 
 import io.dongtai.api.DongTaiResponse;
+import io.dongtai.iast.common.config.*;
 import io.dongtai.iast.common.constants.AgentConstant;
 import io.dongtai.log.DongTaiLog;
 
@@ -16,9 +17,19 @@ public class ServletResponseWrapper extends HttpServletResponseWrapper implement
     private PrintWriter writer = null;
     private ServletWrapperOutputStreamCopier copier = null;
 
+    @SuppressWarnings("unchecked")
     public ServletResponseWrapper(HttpServletResponse response) {
         super(response);
-        response.addHeader("DongTai", AgentConstant.VERSION_VALUE);
+        try {
+            boolean enableVersionHeader = ((Config<Boolean>) ConfigBuilder.getInstance()
+                    .getConfig(ConfigKey.ENABLE_VERSION_HEADER)).get();
+            if (enableVersionHeader) {
+                String versionHeaderKey = ((Config<String>) ConfigBuilder.getInstance()
+                        .getConfig(ConfigKey.VERSION_HEADER_KEY)).get();
+                response.addHeader(versionHeaderKey, AgentConstant.VERSION_VALUE);
+            }
+        } catch (Throwable ignore) {
+        }
     }
 
     private String getLine() {

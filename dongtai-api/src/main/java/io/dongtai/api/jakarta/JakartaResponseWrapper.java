@@ -2,6 +2,7 @@ package io.dongtai.api.jakarta;
 
 
 import io.dongtai.api.DongTaiResponse;
+import io.dongtai.iast.common.config.*;
 import io.dongtai.iast.common.constants.AgentConstant;
 import io.dongtai.log.DongTaiLog;
 import jakarta.servlet.ServletOutputStream;
@@ -20,9 +21,19 @@ public class JakartaResponseWrapper extends HttpServletResponseWrapper implement
     private ServletOutputStream outputStream;
     private JakartaWrapperOutputStreamCopier copier;
 
+    @SuppressWarnings("unchecked")
     public JakartaResponseWrapper(HttpServletResponse response) {
         super(response);
-        response.addHeader("DongTai", AgentConstant.VERSION_VALUE);
+        try {
+            boolean enableVersionHeader = ((Config<Boolean>) ConfigBuilder.getInstance()
+                    .getConfig(ConfigKey.ENABLE_VERSION_HEADER)).get();
+            if (enableVersionHeader) {
+                String versionHeaderKey = ((Config<String>) ConfigBuilder.getInstance()
+                        .getConfig(ConfigKey.VERSION_HEADER_KEY)).get();
+                response.addHeader(versionHeaderKey, AgentConstant.VERSION_VALUE);
+            }
+        } catch (Throwable ignore) {
+        }
     }
 
     @Override
