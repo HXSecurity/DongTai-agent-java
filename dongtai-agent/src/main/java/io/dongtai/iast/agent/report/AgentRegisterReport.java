@@ -57,7 +57,7 @@ public class AgentRegisterReport {
         object.put("network", readIpInfo());
         object.put("serverEnv", Base64Encoder
                 .encodeBase64String(System.getProperties().toString().getBytes(Charset.forName("UTF-8")))
-                .replaceAll("\n", ""));
+                .replaceAll("\n", "").replaceAll("\r", ""));
         object.put("containerName", null == server ? "" : server.getName());
         object.put("containerVersion", null == server ? "" : server.getVersion());
         object.put("serverPath", ServerDetect.getWebServerPath());
