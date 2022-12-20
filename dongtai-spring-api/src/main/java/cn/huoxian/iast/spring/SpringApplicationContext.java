@@ -119,8 +119,9 @@ public class SpringApplicationContext {
                     returnType = declaredMethod.getReturnType().toString().substring(6);
                 }
                 apiDataModel.setReturnType(returnType);
-            } catch (NoSuchMethodException e) {
+            } catch (Throwable e) {
                 DongTaiLog.warn("get spring api model failed: {}", e.toString());
+                continue;
             }
 
             PatternsRequestCondition patternsCondition = info.getPatternsCondition();
@@ -157,12 +158,14 @@ public class SpringApplicationContext {
             List<Map<String, String>> parameters = apiDataModel.getParameters();
             List<Object> parametersJson = new ArrayList<>();
             api.put("parameters", parametersJson);
-            for (Map<String, String> parameter : parameters) {
-                Map<String, Object> parameterjson = new HashMap<>();
-                parametersJson.add(parameterjson);
-                parameterjson.put("name", parameter.get("name"));
-                parameterjson.put("type", parameter.get("type"));
-                parameterjson.put("annotation", parameter.get("annotation"));
+            if (parameters != null) {
+                for (Map<String, String> parameter : parameters) {
+                    Map<String, Object> parameterjson = new HashMap<>();
+                    parametersJson.add(parameterjson);
+                    parameterjson.put("name", parameter.get("name"));
+                    parameterjson.put("type", parameter.get("type"));
+                    parameterjson.put("annotation", parameter.get("annotation"));
+                }
             }
             api.put("returnType", apiDataModel.getReturnType());
             api.put("file", apiDataModel.getFile());
