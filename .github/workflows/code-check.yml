@@ -70,12 +70,10 @@ jobs:
           key: ${{ runner.os }}-mvn-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-mvn-
-
       - name: Build DongTai-Java-Agent With Maven
         run: |
           mvn -version
-          mvn -B compile -Dmaven.test.skip=true
-
+          mvn -B package -Dmaven.test.skip=true
       - uses: shogo82148/actions-setup-mysql@v1
         with:
           mysql-version: '8.0'
@@ -115,11 +113,10 @@ jobs:
           key: ${{ runner.os }}-mvn-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-mvn-
-
       - name: Build DongTai-Java-Agent With Maven
         run: |
           mvn -version
-          mvn -B compile -Dmaven.test.skip=true
+          mvn -B package -Dmaven.test.skip=true
 
       - name: Upload Assets
         uses: actions/upload-artifact@v3
