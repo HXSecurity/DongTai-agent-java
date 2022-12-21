@@ -85,7 +85,7 @@ public class EngineManager {
      * @return true - 引擎已启动；false - 引擎未启动
      */
     public static boolean isEngineRunning() {
-        return AGENT_STATE.isRunning();
+        return AGENT_STATE.isRunning() && AGENT_STATE.getPendingState() != null;
     }
 
     public boolean isEnableDumpClass() {

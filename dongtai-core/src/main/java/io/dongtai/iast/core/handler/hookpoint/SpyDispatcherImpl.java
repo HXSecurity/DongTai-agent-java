@@ -373,6 +373,10 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @SuppressWarnings("unchecked")
     private boolean isCollectAllowed(String className, String methodName, String signature,
                                      int policyNodeType, boolean isEnterEntry) {
+        if (!EngineManager.isEngineRunning()) {
+            return false;
+        }
+        
         if (!isEnterEntry) {
             if (!ScopeManager.SCOPE_TRACKER.inEnterEntry()) {
                 return false;
