@@ -4,6 +4,10 @@ com/navercorp/pinpoint/*
 # arthas
 com/taobao/*
 com/alibaba/arthas/*
+# ziroom
+com/ziroom/*
+# swagger/openapi
+com/github/xiaoymin/knife4j/spring/filter/*
 # rasp
 com/meituan/*
 com/sankuai/*

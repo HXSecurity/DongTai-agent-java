@@ -132,9 +132,9 @@
         <module>dongtai-spring-api</module>
         <module>dongtai-log</module>
         <module>dongtai-api</module>
-        <module>dongtai-agent</module>
         <module>dongtai-common</module>
         <module>dongtai-plugins</module>
+        <module>dongtai-agent</module>
     </modules>
 
     <dependencyManagement>
