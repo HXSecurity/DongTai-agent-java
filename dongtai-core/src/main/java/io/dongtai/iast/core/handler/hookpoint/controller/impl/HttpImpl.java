@@ -15,6 +15,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -59,9 +60,9 @@ public class HttpImpl {
                         .getDeclaredMethod("cloneResponse", Object.class, boolean.class);
             }
         } catch (MalformedURLException e) {
-            DongTaiLog.error("HttpImpl createClassLoader failed", e);
+            DongTaiLog.warn("HttpImpl createClassLoader failed", e);
         } catch (NoSuchMethodException e) {
-            DongTaiLog.error("HttpImpl createClassLoader failed", e);
+            DongTaiLog.warn("HttpImpl createClassLoader failed", e);
         }
     }
 
@@ -91,6 +92,9 @@ public class HttpImpl {
         try {
             if (cloneRequestMethod == null) {
                 createClassLoader(req);
+            }
+            if (cloneRequestMethod == null) {
+                return req;
             }
             return cloneRequestMethod.invoke(null, req, isJakarta);
         } catch (IllegalAccessException e) {
@@ -123,6 +127,9 @@ public class HttpImpl {
             if (cloneResponseMethod == null) {
                 loadCloneResponseMethod();
             }
+            if (cloneResponseMethod == null) {
+                return response;
+            }
             return cloneResponseMethod.invoke(null, response, isJakarta);
         } catch (IllegalAccessException e) {
             return response;
@@ -133,10 +140,18 @@ public class HttpImpl {
         }
     }
 
-    public static Map<String, Object> getRequestMeta(Object request)
-            throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        Method methodOfRequestMeta = request.getClass().getDeclaredMethod("getRequestMeta");
-        return (Map<String, Object>) methodOfRequestMeta.invoke(request);
+    public static Map<String, Object> getRequestMeta(Object request) {
+        try {
+            Method methodOfRequestMeta = request.getClass().getDeclaredMethod("getRequestMeta");
+            return (Map<String, Object>) methodOfRequestMeta.invoke(request);
+        } catch (NoSuchMethodException e) {
+            DongTaiLog.warn("HttpImpl getRequestMeta failed", e);
+        } catch (IllegalAccessException e) {
+            DongTaiLog.warn("HttpImpl getRequestMeta failed", e);
+        } catch (InvocationTargetException e) {
+            DongTaiLog.warn("HttpImpl getRequestMeta failed", e);
+        }
+        return new HashMap<String, Object>();
     }
 
     public static String getPostBody(Object request) {
@@ -144,11 +159,11 @@ public class HttpImpl {
             Method methodOfRequestMeta = request.getClass().getDeclaredMethod("getPostBody");
             return (String) methodOfRequestMeta.invoke(request);
         } catch (NoSuchMethodException e) {
-            DongTaiLog.error("HttpImpl getPostBody failed", e);
+            DongTaiLog.warn("HttpImpl getPostBody failed", e);
         } catch (IllegalAccessException e) {
-            DongTaiLog.error("HttpImpl getPostBody failed", e);
+            DongTaiLog.warn("HttpImpl getPostBody failed", e);
         } catch (InvocationTargetException e) {
-            DongTaiLog.error("HttpImpl getPostBody failed", e);
+            DongTaiLog.warn("HttpImpl getPostBody failed", e);
         }
         return null;
     }
@@ -161,11 +176,11 @@ public class HttpImpl {
             boolean getBody = ((Config<Boolean>) ConfigBuilder.getInstance().getConfig(ConfigKey.REPORT_RESPONSE_BODY)).get();
             return (Map<String, Object>) methodOfRequestMeta.invoke(response, getBody);
         } catch (NoSuchMethodException e) {
-            DongTaiLog.error("HttpImpl getResponseMeta failed", e);
+            DongTaiLog.warn("HttpImpl getResponseMeta failed", e);
         } catch (IllegalAccessException e) {
-            DongTaiLog.error("HttpImpl getResponseMeta failed", e);
+            DongTaiLog.warn("HttpImpl getResponseMeta failed", e);
         } catch (InvocationTargetException e) {
-            DongTaiLog.error("HttpImpl getResponseMeta failed", e);
+            DongTaiLog.warn("HttpImpl getResponseMeta failed", e);
         }
         return null;
     }
@@ -176,9 +191,12 @@ public class HttpImpl {
      * @param event method call event
      */
     @SuppressWarnings("unchecked")
-    public static void solveHttp(MethodEvent event)
-            throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        REQUEST_META.set(getRequestMeta(event.parameterInstances[0]));
+    public static void solveHttp(MethodEvent event) {
+        Map<String, Object> requestMeta = getRequestMeta(event.parameterInstances[0]);
+        if (requestMeta == null || requestMeta.size() == 0) {
+            return;
+        }
+        REQUEST_META.set(requestMeta);
 
         try {
             Config<RequestDenyList> config = (Config<RequestDenyList>) ConfigBuilder.getInstance()
