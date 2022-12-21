@@ -35,15 +35,15 @@ jobs:
         uses: stCarolas/setup-maven@v4
         with:
           maven-version: 3.2.5
-      # - uses: actions/cache@v2
-      #   id: mvn-cache # use this to check for `cache-hit` (`steps.mvn-cache.outputs.cache-hit != 'true'`)
-      #   with:
-      #     path: ~/.m2 # !WARN does not work if running multiple node versions, instead use https://github.com/actions/cache/blob/master/examples.md#node---yarn
-      #     key: ${{ runner.os }}-mvn-${{ hashFiles('**/pom.xml') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-mvn-
+      - uses: actions/cache@v2
+        id: mvn-cache # use this to check for `cache-hit` (`steps.mvn-cache.outputs.cache-hit != 'true'`)
+        with:
+          path: ~/.m2 # !WARN does not work if running multiple node versions, instead use https://github.com/actions/cache/blob/master/examples.md#node---yarn
+          key: ${{ runner.os }}-mvn-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-mvn-
       - name: Mvn Install
-        # if: steps.mvn-cache.outputs.cache-hit != 'true'
+        if: steps.mvn-cache.outputs.cache-hit != 'true'
         run: mvn -B compile -Dmaven.test.skip=true
 
   Build-Agent:
@@ -63,18 +63,18 @@ jobs:
         with:
           maven-version: 3.2.5
 
-      # - name: Restore dependencies from cache
-      #   uses: actions/cache@v2
-      #   with:
-      #     path: ~/.m2
-      #     key: ${{ runner.os }}-mvn-${{ hashFiles('**/pom.xml') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-mvn-
+      - name: Restore dependencies from cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-mvn-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-mvn-
 
       - name: Build DongTai-Java-Agent With Maven
         run: |
           mvn -version
-          mvn -U clean package -Dmaven.test.skip=true
+          mvn -B compile -Dmaven.test.skip=true
 
       - uses: shogo82148/actions-setup-mysql@v1
         with:
@@ -108,18 +108,26 @@ jobs:
         with:
           maven-version: 3.2.5
 
-      # - name: Restore dependencies from cache
-      #   uses: actions/cache@v2
-      #   with:
-      #     path: ~/.m2
-      #     key: ${{ runner.os }}-mvn-${{ hashFiles('**/pom.xml') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-mvn-
+      - name: Restore dependencies from cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-mvn-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-mvn-
 
       - name: Build DongTai-Java-Agent With Maven
         run: |
           mvn -version
-          mvn -U clean package -Dmaven.test.skip=true
+          mvn -B compile -Dmaven.test.skip=true
+
+      - name: Upload Assets
+        uses: actions/upload-artifact@v3
+        with:
+          name: dongtai-agent
+          path: |
+            dongtai-agent/target/dongtai-agent.jar
+            dongtai-agent/src/main/resources/bin/*
 
       - uses: manyuanrong/setup-ossutil@v2.0
         with:
