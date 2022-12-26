@@ -10,6 +10,6 @@ public class TraceManager implements TraceIdHandler {
 
     @Override
     public String getTraceId() {
-        return ContextManager.getSegmentId();
+        return ContextManager.currentTraceId();
     }
 }
