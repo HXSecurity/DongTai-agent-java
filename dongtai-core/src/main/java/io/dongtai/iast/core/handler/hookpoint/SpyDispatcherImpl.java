@@ -47,6 +47,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public void leaveHttp(Object request, Object response) {
         if (!EngineManager.isEngineRunning()) {
+            EngineManager.cleanThreadState();
             return;
         }
         try {
