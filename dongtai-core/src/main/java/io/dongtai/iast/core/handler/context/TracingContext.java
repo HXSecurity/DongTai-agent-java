@@ -88,4 +88,25 @@ public class TracingContext {
         }
         return this.cachedTraceId = this.globalId + "." + this.level + "." + this.parentId + "." + this.spanId;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+
+        if (this == obj) {
+            return true;
+        }
+
+        if (getClass() == obj.getClass()) {
+            return toString().equals(obj.toString());
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return toString().hashCode();
+    }
 }

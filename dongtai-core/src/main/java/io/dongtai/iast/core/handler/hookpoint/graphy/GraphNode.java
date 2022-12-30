@@ -69,6 +69,8 @@ public class GraphNode {
 
     public List<MethodEvent.MethodEventSourceType> sourceTypes;
 
+    private String traceId = null;
+
     public GraphNode(MethodEvent event) {
         this.isSource = event.isSource();
         this.invokeId = event.getInvokeId();
@@ -97,6 +99,9 @@ public class GraphNode {
         this.targetHash = event.getTargetHashes();
         this.targetRanges = event.targetRanges;
         this.sourceTypes = event.sourceTypes;
+        if (event.traceId != null && !event.traceId.isEmpty()) {
+            this.traceId = event.traceId;
+        }
     }
 
     public JSONObject toJson() {
@@ -163,6 +168,10 @@ public class GraphNode {
             for (MethodEvent.MethodEventSourceType s : sourceTypes) {
                 st.put(s.toJson());
             }
+        }
+
+        if (this.traceId != null && !this.traceId.isEmpty()) {
+            value.put("traceId", this.traceId);
         }
 
         return value;

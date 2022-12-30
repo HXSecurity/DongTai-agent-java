@@ -3,6 +3,7 @@ package io.dongtai.iast.core.handler.hookpoint.vulscan.dynamic;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.SignatureMethodMatcher;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.SinkNode;
+import io.dongtai.iast.core.utils.ReflectUtils;
 import io.dongtai.iast.core.utils.TaintPoolUtils;
 import io.dongtai.log.DongTaiLog;
 
@@ -18,7 +19,6 @@ public class SSRFSourceCheck implements SinkSourceChecker {
     private static final String JAVA_NET_URL_OPEN_CONNECTION = "java.net.URL.openConnection()";
     private static final String JAVA_NET_URL_OPEN_CONNECTION_PROXY = "java.net.URL.openConnection(java.net.Proxy)";
     private static final String JAVA_NET_URL_OPEN_STREAM = "java.net.URL.openStream()";
-    // TODO: use method execute for sink
     private static final String APACHE_HTTP_CLIENT_REQUEST_SET_URI = " org.apache.http.client.methods.HttpRequestBase.setURI(java.net.URI)".substring(1);
     private static final String APACHE_LEGACY_HTTP_CLIENT_REQUEST_SET_URI = " org.apache.commons.httpclient.HttpMethodBase.setURI(org.apache.commons.httpclient.URI)".substring(1);
     private static final String APACHE_HTTP_CLIENT5_EXECUTE = " org.apache.hc.client5.http.impl.classic.CloseableHttpClient.doExecute(org.apache.hc.core5.http.HttpHost,org.apache.hc.core5.http.ClassicHttpRequest,org.apache.hc.core5.http.protocol.HttpContext)".substring(1);
@@ -28,7 +28,7 @@ public class SSRFSourceCheck implements SinkSourceChecker {
     private static final String OKHTTP_CALL_ENQUEUE = "com.squareup.okhttp.Call.enqueue(com.squareup.okhttp.Callback)";
 
     private static final String APACHE_LEGACY_HTTP_CLIENT_URI = " org.apache.commons.httpclient.URI".substring(1);
-    private static final String APACHE_HTTP_CLIENT5_HTTP_REQUEST = " org.apache.hc.client5.http.classic.methods.HttpUriRequestBase".substring(1);
+    private static final String APACHE_HTTP_CLIENT5_REQUEST_INTERFACE = " org.apache.hc.core5.http.HttpRequest".substring(1);
     private static final String OKHTTP3_INTERNAL_REAL_CALL = "okhttp3.internal.connection.RealCall";
     private static final String OKHTTP3_REAL_CALL = "okhttp3.RealCall";
     private static final String OKHTTP_CALL = "com.squareup.okhttp.Call";
@@ -164,8 +164,7 @@ public class SSRFSourceCheck implements SinkSourceChecker {
             }
 
             final Object reqObj = event.parameterInstances[1];
-            if (APACHE_HTTP_CLIENT5_HTTP_REQUEST.equals(reqObj.getClass().getName())
-                    || APACHE_HTTP_CLIENT5_HTTP_REQUEST.equals(reqObj.getClass().getSuperclass().getName())) {
+            if (ReflectUtils.isImplementsInterface(reqObj.getClass(), APACHE_HTTP_CLIENT5_REQUEST_INTERFACE)) {
                 final Object authorityObj = reqObj.getClass().getMethod("getAuthority").invoke(reqObj);
                 Map<String, Object> sourceMap = new HashMap<String, Object>() {{
                     put("PROTOCOL", reqObj.getClass().getMethod("getScheme").invoke(reqObj));

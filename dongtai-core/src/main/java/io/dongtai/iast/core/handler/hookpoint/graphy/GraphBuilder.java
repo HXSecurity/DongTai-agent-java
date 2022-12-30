@@ -4,6 +4,7 @@ import io.dongtai.iast.common.constants.*;
 import io.dongtai.iast.common.scope.ScopeManager;
 import io.dongtai.iast.common.utils.base64.Base64Encoder;
 import io.dongtai.iast.core.EngineManager;
+import io.dongtai.iast.core.handler.context.ContextManager;
 import io.dongtai.iast.core.handler.hookpoint.controller.impl.HttpImpl;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.normal.AbstractNormalVulScan;
@@ -94,6 +95,7 @@ public class GraphBuilder {
         detail.put(ReportKey.REPLAY_REQUEST, requestMeta.getOrDefault("replay-request", false));
 
         detail.put(ReportKey.METHOD_POOL, methodPool);
+        detail.put(ReportKey.TRACE_ID, ContextManager.currentTraceId());
 
         for (GraphNode node : nodeList) {
             methodPool.put(node.toJson());

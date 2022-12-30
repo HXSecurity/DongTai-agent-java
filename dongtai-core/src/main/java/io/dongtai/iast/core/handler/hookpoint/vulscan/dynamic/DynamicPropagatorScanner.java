@@ -7,6 +7,8 @@ import io.dongtai.iast.core.handler.hookpoint.models.policy.SinkNode;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.TaintPosition;
 import io.dongtai.iast.core.handler.hookpoint.models.taint.range.TaintRanges;
 import io.dongtai.iast.core.handler.hookpoint.models.taint.tag.TaintTag;
+import io.dongtai.iast.core.handler.hookpoint.service.trace.HttpService;
+import io.dongtai.iast.core.handler.hookpoint.service.trace.ServiceTrace;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.IVulScan;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.VulnType;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.dynamic.xxe.XXECheck;
@@ -19,11 +21,6 @@ import java.util.*;
  * @author dongzhiyong@huoxian.cn
  */
 public class DynamicPropagatorScanner implements IVulScan {
-    private final static String HTTP_CLIENT_5 = " org.apache.hc.client5.http.impl.classic.CloseableHttpClient.doExecute(org.apache.hc.core5.http.HttpHost,org.apache.hc.core5.http.ClassicHttpRequest,org.apache.hc.core5.http.protocol.HttpContext)"
-            .substring(1);
-    private final static String HTTP_CLIENT_4 = " org.apache.commons.httpclient.HttpClient.executeMethod(org.apache.commons.httpclient.HostConfiguration,org.apache.commons.httpclient.HttpMethod,org.apache.commons.httpclient.HttpState)"
-            .substring(1);
-
     private final static Set<SinkSafeChecker> SAFE_CHECKERS = new HashSet<SinkSafeChecker>(Arrays.asList(
             new FastjsonCheck(),
             new XXECheck()
@@ -33,6 +30,10 @@ public class DynamicPropagatorScanner implements IVulScan {
             new PathTraversalCheck(),
             new SSRFSourceCheck(),
             new UnvalidatedRedirectCheck()
+    ));
+
+    private static final Set<ServiceTrace> SERVICE_TRACES = new HashSet<ServiceTrace>(Arrays.asList(
+            new HttpService()
     ));
 
     @Override
@@ -45,7 +46,16 @@ public class DynamicPropagatorScanner implements IVulScan {
             }
         }
 
-        if (sinkSourceHitTaintPool(event, sinkNode)) {
+        boolean serviceCall = false;
+        for (ServiceTrace serviceTrace : SERVICE_TRACES) {
+            if (serviceTrace.match(event, sinkNode)) {
+                serviceCall = true;
+                serviceTrace.addTrace(event);
+            }
+        }
+
+        boolean hit = sinkSourceHitTaintPool(event, sinkNode);
+        if (serviceCall || hit) {
             StackTraceElement[] stackTraceElements = StackUtils.createCallStack(5);
             if (sinkNode.hasDenyStack(stackTraceElements)) {
                 return;

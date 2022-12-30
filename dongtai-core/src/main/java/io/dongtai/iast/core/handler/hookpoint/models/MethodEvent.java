@@ -92,6 +92,8 @@ public class MethodEvent {
 
     private StackTraceElement callStack;
 
+    public String traceId = null;
+
     public static class Parameter {
         private final String index;
         private final String value;

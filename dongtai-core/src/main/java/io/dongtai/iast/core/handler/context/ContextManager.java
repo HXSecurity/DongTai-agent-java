@@ -10,6 +10,14 @@ public class ContextManager {
         return CONTEXT;
     }
 
+    public static void initContext() {
+        TracingContext context = CONTEXT.get();
+        if (context == null) {
+            context = new TracingContext();
+            CONTEXT.set(context);
+        }
+    }
+
     public static String getHeaderKey() {
         return "dt-traceid";
     }
@@ -20,11 +28,12 @@ public class ContextManager {
     }
 
     public static String currentTraceId() {
-        TracingContext context = CONTEXT.get();
-        if (context == null) {
-            context = new TracingContext();
-            CONTEXT.set(context);
-        }
+        initContext();
         return CONTEXT.get().toString();
+    }
+
+    public static String nextTraceId() {
+        initContext();
+        return CONTEXT.get().newOutgoing();
     }
 }
