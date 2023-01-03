@@ -38,19 +38,21 @@ public class DynamicPropagatorScanner implements IVulScan {
 
     @Override
     public void scan(MethodEvent event, SinkNode sinkNode) {
-        // @TODO: add traceId header to outgoing http request
-
         for (SinkSafeChecker chk : SAFE_CHECKERS) {
             if (chk.match(event, sinkNode) && chk.isSafe(event, sinkNode)) {
                 return;
             }
         }
 
+        if (!HttpService.validateURLConnection(event)) {
+            return;
+        }
+
         boolean serviceCall = false;
         for (ServiceTrace serviceTrace : SERVICE_TRACES) {
             if (serviceTrace.match(event, sinkNode)) {
                 serviceCall = true;
-                serviceTrace.addTrace(event);
+                serviceTrace.addTrace(event, sinkNode);
             }
         }
 

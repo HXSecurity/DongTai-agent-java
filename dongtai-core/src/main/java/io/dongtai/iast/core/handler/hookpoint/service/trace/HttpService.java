@@ -14,16 +14,14 @@ import java.net.HttpURLConnection;
 import java.util.*;
 
 public class HttpService implements ServiceTrace {
-    private static final String JAVA_NET_URL_OPEN_CONNECTION = "java.net.URL.openConnection()";
-    private static final String JAVA_NET_URL_OPEN_CONNECTION_PROXY = "java.net.URL.openConnection(java.net.Proxy)";
+    private static final String JAVA_NET_URL_CONN_GET_INPUT_STREAM = "sun.net.www.protocol.http.HttpURLConnection.getInputStream()";
     private static final String APACHE_LEGACY_HTTP_CLIENT_REQUEST_SET_URI = " org.apache.commons.httpclient.HttpMethodBase.setURI(org.apache.commons.httpclient.URI)".substring(1);
     private static final String APACHE_HTTP_CLIENT_REQUEST_SET_URI = " org.apache.http.client.methods.HttpRequestBase.setURI(java.net.URI)".substring(1);
     private static final String APACHE_HTTP_CLIENT5_EXECUTE = " org.apache.hc.client5.http.impl.classic.CloseableHttpClient.doExecute(org.apache.hc.core5.http.HttpHost,org.apache.hc.core5.http.ClassicHttpRequest,org.apache.hc.core5.http.protocol.HttpContext)".substring(1);
     private static final String OKHTTP_CALL_EXECUTE = "com.squareup.okhttp.Call.execute()";
 
     private static final Set<String> SIGNATURE = new HashSet<String>(Arrays.asList(
-            JAVA_NET_URL_OPEN_CONNECTION,
-            JAVA_NET_URL_OPEN_CONNECTION_PROXY,
+            JAVA_NET_URL_CONN_GET_INPUT_STREAM,
             APACHE_LEGACY_HTTP_CLIENT_REQUEST_SET_URI,
             APACHE_HTTP_CLIENT_REQUEST_SET_URI,
             APACHE_HTTP_CLIENT5_EXECUTE,
@@ -42,10 +40,9 @@ public class HttpService implements ServiceTrace {
     }
 
     @Override
-    public void addTrace(MethodEvent event) {
+    public void addTrace(MethodEvent event, PolicyNode policyNode) {
         String traceId = null;
-        if (JAVA_NET_URL_OPEN_CONNECTION.equals(this.matchedSignature)
-                || JAVA_NET_URL_OPEN_CONNECTION_PROXY.equals(this.matchedSignature)) {
+        if (JAVA_NET_URL_CONN_GET_INPUT_STREAM.equals(this.matchedSignature)) {
             traceId = addTraceToJavaNetURL(event);
         } else if (APACHE_HTTP_CLIENT5_EXECUTE.equals(this.matchedSignature)
                 || APACHE_HTTP_CLIENT_REQUEST_SET_URI.equals(this.matchedSignature)) {
@@ -62,24 +59,24 @@ public class HttpService implements ServiceTrace {
     }
 
     private String addTraceToJavaNetURL(MethodEvent event) {
-        if (event.returnInstance == null) {
+        if (event.objectInstance == null) {
             return null;
         }
         try {
-            if (event.returnInstance instanceof HttpURLConnection) {
-                final HttpURLConnection connection = (HttpURLConnection) event.returnInstance;
+            if (event.objectInstance instanceof HttpURLConnection) {
+                final HttpURLConnection connection = (HttpURLConnection) event.objectInstance;
                 final String traceId = ContextManager.nextTraceId();
                 connection.setRequestProperty(ContextManager.getHeaderKey(), traceId);
                 return traceId;
-            } else if (event.returnInstance instanceof HttpsURLConnection) {
-                final HttpsURLConnection connection = (HttpsURLConnection) event.returnInstance;
+            } else if (event.objectInstance instanceof HttpsURLConnection) {
+                final HttpsURLConnection connection = (HttpsURLConnection) event.objectInstance;
                 final String traceId = ContextManager.nextTraceId();
                 connection.setRequestProperty(ContextManager.getHeaderKey(), traceId);
                 return traceId;
             }
         } catch (IllegalStateException ignore) {
         } catch (Throwable e) {
-            DongTaiLog.warn("add traceId header to java.net.URL failed", e);
+            DongTaiLog.warn("add traceId header to java.net.URLConnection failed", e);
         }
         return null;
     }
@@ -153,5 +150,35 @@ public class HttpService implements ServiceTrace {
             DongTaiLog.warn("add traceId header to okhttp client failed", e);
         }
         return null;
+    }
+
+    public static boolean validateURLConnection(MethodEvent event) {
+        if (!JAVA_NET_URL_CONN_GET_INPUT_STREAM.equals(event.signature)) {
+            return true;
+        }
+
+        Object obj = event.objectInstance;
+        if (obj == null) {
+            return false;
+        }
+
+        try {
+            Field inputStreamField = ReflectUtils.getDeclaredFieldFromSuperClassByName(obj.getClass(), "inputStream");
+            if (inputStreamField == null) {
+                return false;
+            }
+            boolean accessible = inputStreamField.isAccessible();
+            inputStreamField.setAccessible(true);
+            Object inputStream = inputStreamField.get(obj);
+            inputStreamField.setAccessible(accessible);
+
+            // inputStream has cache, only first invoke getInputStream() need to collect
+            if (inputStream == null) {
+                return true;
+            }
+        } catch (Throwable e) {
+            DongTaiLog.warn("validate URLConnection failed", e);
+        }
+        return false;
     }
 }

@@ -62926,7 +62926,7 @@ sun/net/www/protocol/http/DigestAuthentication
 sun/net/www/protocol/http/EmptyInputStream
 sun/net/www/protocol/http/Handler
 sun/net/www/protocol/http/HttpCallerInfo
-sun/net/www/protocol/http/HttpURLConnection
+#sun/net/www/protocol/http/HttpURLConnection
 sun/net/www/protocol/http/HttpURLConnection$1
 sun/net/www/protocol/http/HttpURLConnection$2
 sun/net/www/protocol/http/HttpURLConnection$3
@@ -62941,6 +62941,7 @@ sun/net/www/protocol/http/NTLMAuthenticationCallback
 sun/net/www/protocol/http/NTLMAuthenticationCallback$DefaultNTLMAuthenticationCallback
 sun/net/www/protocol/http/NegotiateAuthentication
 sun/net/www/protocol/https/Handler
+sun/net/www/protocol/https/HttpsURLConnectionImpl
 sun/net/www/protocol/jar/Handler
 sun/net/www/protocol/jar/JarFileFactory
 sun/net/www/protocol/jar/JarURLConnection
