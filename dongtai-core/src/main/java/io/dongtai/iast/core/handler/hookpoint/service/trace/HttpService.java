@@ -7,7 +7,6 @@ import io.dongtai.iast.core.handler.hookpoint.models.policy.SignatureMethodMatch
 import io.dongtai.iast.core.utils.ReflectUtils;
 import io.dongtai.log.DongTaiLog;
 
-import javax.net.ssl.HttpsURLConnection;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
@@ -48,7 +47,7 @@ public class HttpService implements ServiceTrace {
                 || APACHE_HTTP_CLIENT_REQUEST_SET_URI.equals(this.matchedSignature)) {
             traceId = addTraceToApacheHttpClient(event);
         } else if (APACHE_LEGACY_HTTP_CLIENT_REQUEST_SET_URI.equals(this.matchedSignature)) {
-            traceId = addTraceToApacheLegacyHttpClient(event);
+            traceId = addTraceToApacheHttpClientLegacy(event);
         } else if (OKHTTP_CALL_EXECUTE.equals(this.matchedSignature)) {
             traceId = addTraceToOkhttp(event);
         }
@@ -65,11 +64,6 @@ public class HttpService implements ServiceTrace {
         try {
             if (event.objectInstance instanceof HttpURLConnection) {
                 final HttpURLConnection connection = (HttpURLConnection) event.objectInstance;
-                final String traceId = ContextManager.nextTraceId();
-                connection.setRequestProperty(ContextManager.getHeaderKey(), traceId);
-                return traceId;
-            } else if (event.objectInstance instanceof HttpsURLConnection) {
-                final HttpsURLConnection connection = (HttpsURLConnection) event.objectInstance;
                 final String traceId = ContextManager.nextTraceId();
                 connection.setRequestProperty(ContextManager.getHeaderKey(), traceId);
                 return traceId;
@@ -92,8 +86,14 @@ public class HttpService implements ServiceTrace {
             return null;
         }
         try {
-            Method method = ReflectUtils.getDeclaredMethodFromSuperClass(obj.getClass(),
-                    "addHeader", new Class[]{String.class, String.class});
+            Method method;
+            if (APACHE_HTTP_CLIENT5_EXECUTE.equals(this.matchedSignature)) {
+                method = ReflectUtils.getDeclaredMethodFromSuperClass(obj.getClass(),
+                        "addHeader", new Class[]{String.class, Object.class});
+            } else {
+                method = ReflectUtils.getDeclaredMethodFromSuperClass(obj.getClass(),
+                        "addHeader", new Class[]{String.class, String.class});
+            }
             if (method == null) {
                 return null;
             }
@@ -106,7 +106,7 @@ public class HttpService implements ServiceTrace {
         return null;
     }
 
-    private String addTraceToApacheLegacyHttpClient(MethodEvent event) {
+    private String addTraceToApacheHttpClientLegacy(MethodEvent event) {
         Object obj = event.objectInstance;
         if (obj == null) {
             return null;
