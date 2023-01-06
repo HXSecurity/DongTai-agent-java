@@ -142,7 +142,7 @@ public class SourceImpl {
     private static void trackArray(MethodEvent event, SourceNode sourceNode, Object arr, int depth) {
         int length = Array.getLength(arr);
         for (int i = 0; i < length; i++) {
-            trackObject(event, sourceNode, Array.get(arr, i), depth);
+            trackObject(event, sourceNode, Array.get(arr, i), depth + 1);
         }
     }
 
@@ -154,8 +154,8 @@ public class SourceImpl {
 
     private static void trackMap(MethodEvent event, SourceNode sourceNode, Map<?, ?> map, int depth) {
         for (Object key : map.keySet()) {
-            trackObject(event, sourceNode, key, depth);
-            trackObject(event, sourceNode, map.get(key), depth);
+            trackObject(event, sourceNode, key, depth + 1);
+            trackObject(event, sourceNode, map.get(key), depth + 1);
         }
     }
 
@@ -166,14 +166,14 @@ public class SourceImpl {
 
     private static void trackList(MethodEvent event, SourceNode sourceNode, List<?> list, int depth) {
         for (Object obj : list) {
-            trackObject(event, sourceNode, obj, depth);
+            trackObject(event, sourceNode, obj, depth + 1);
         }
     }
 
     private static void trackOptional(MethodEvent event, SourceNode sourceNode, Object obj, int depth) {
         try {
             Object v = ((Optional<?>) obj).orElse(null);
-            trackObject(event, sourceNode, v, depth);
+            trackObject(event, sourceNode, v, depth + 1);
         } catch (Throwable e) {
             DongTaiLog.warn("track optional object failed: " + e.getMessage());
         }

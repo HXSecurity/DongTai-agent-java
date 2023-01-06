@@ -163,14 +163,26 @@ public class HttpService implements ServiceTrace {
         }
 
         try {
+            // check if the traceId header has been set (by spring cloud etc...)
+            Field userHeadersField = ReflectUtils.getDeclaredFieldFromSuperClassByName(obj.getClass(), "userHeaders");
+            if (userHeadersField == null) {
+                return false;
+            }
+            userHeadersField.setAccessible(true);
+            Object userHeaders = userHeadersField.get(obj);
+            Method getKeyMethod = userHeaders.getClass().getMethod("getKey", String.class);
+            int hasKey = (int) getKeyMethod.invoke(userHeaders, ContextManager.getHeaderKey());
+            // already has traceId header
+            if (hasKey != -1) {
+                return false;
+            }
+
             Field inputStreamField = ReflectUtils.getDeclaredFieldFromSuperClassByName(obj.getClass(), "inputStream");
             if (inputStreamField == null) {
                 return false;
             }
-            boolean accessible = inputStreamField.isAccessible();
             inputStreamField.setAccessible(true);
             Object inputStream = inputStreamField.get(obj);
-            inputStreamField.setAccessible(accessible);
 
             // inputStream has cache, only first invoke getInputStream() need to collect
             if (inputStream == null) {

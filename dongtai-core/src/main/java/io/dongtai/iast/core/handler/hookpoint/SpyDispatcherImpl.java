@@ -10,6 +10,7 @@ import io.dongtai.iast.core.handler.hookpoint.controller.impl.*;
 import io.dongtai.iast.core.handler.hookpoint.graphy.GraphBuilder;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.*;
+import io.dongtai.iast.core.handler.hookpoint.service.trace.FeignService;
 import io.dongtai.log.DongTaiLog;
 
 import java.lang.dongtai.SpyDispatcher;
@@ -312,7 +313,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
         try {
             ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
 
-            if (!isCollectAllowed(className, methodName, methodSign, hookType, true)) {
+            if (!isCollectAllowed(true)) {
                 return false;
             }
 
@@ -344,7 +345,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                 return false;
             }
 
-            if (!isCollectAllowed(className, methodName, signature, policyNode.getType().getType(), false)) {
+            if (!isCollectAllowed(false)) {
                 return false;
             }
 
@@ -371,13 +372,33 @@ public class SpyDispatcherImpl implements SpyDispatcher {
         return false;
     }
 
+    @Override
+    public boolean traceFeignInvoke(Object instance, Object[] parameters,
+                                    String className, String methodName, String signature) {
+        try {
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
+            if (!isCollectAllowed(false)) {
+                return false;
+            }
+
+            MethodEvent event = new MethodEvent(className, className, methodName,
+                    signature, instance, parameters, null);
+
+            FeignService.solveSyncInvoke(event, INVOKE_ID_SEQUENCER);
+        } catch (Throwable e) {
+            DongTaiLog.error("trace feign invoke failed", e);
+        } finally {
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
+        }
+        return false;
+    }
+
     @SuppressWarnings("unchecked")
-    private boolean isCollectAllowed(String className, String methodName, String signature,
-                                     int policyNodeType, boolean isEnterEntry) {
+    private boolean isCollectAllowed(boolean isEnterEntry) {
         if (!EngineManager.isEngineRunning()) {
             return false;
         }
-        
+
         if (!isEnterEntry) {
             if (!ScopeManager.SCOPE_TRACKER.inEnterEntry()) {
                 return false;
