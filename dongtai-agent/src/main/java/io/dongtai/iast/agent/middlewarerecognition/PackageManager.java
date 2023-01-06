@@ -15,7 +15,7 @@ public final class PackageManager {
         try {
             Class<?> clazz = Thread.currentThread().getContextClassLoader().loadClass(this.classname);
             return clazz.getPackage();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             return null;
         }
     }

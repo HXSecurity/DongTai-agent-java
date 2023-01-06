@@ -60,7 +60,7 @@ public class XXECheckTest {
         public void characters(char[] ch, int start, int length) throws SAXException {
             try {
                 this.tmp.append(ch, start, length);
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 e.printStackTrace();
             }
         }

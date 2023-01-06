@@ -45,7 +45,7 @@ public class DongTaiLog {
             if (!f.exists()) {
                 f.mkdirs();
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             System.out.println("init log dir " + logDir + "failed: " + e.getMessage());
             return;
         }
@@ -57,7 +57,7 @@ public class DongTaiLog {
                 file.createNewFile();
             }
             logPath = path;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             System.out.println("init log file " + logPath + "failed: " + e.getMessage());
         }
     }
@@ -285,7 +285,7 @@ public class DongTaiLog {
             o.write(System.getProperty("line.separator").getBytes());
             o.flush();
             o.close();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             System.out.println("the log file " + file.getPath() + " is not writable: " + e.toString());
         }
     }

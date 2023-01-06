@@ -27,7 +27,7 @@ public class ServiceHandler {
             for (ServiceUrl srv : srvList) {
                 reportSingleService(category, type, srv.getHost(), srv.getPort());
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             ErrorLogReport.sendErrorLog(e);
         }
     }

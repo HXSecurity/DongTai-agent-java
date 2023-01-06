@@ -78,7 +78,7 @@ public class LogCollector {
                 Runtime.getRuntime().removeShutdownHook(shutdownHook);
             }
             DongTaiLog.info("fluent process stopped");
-        } catch (Exception ignored) {
+        } catch (Throwable ignored) {
         } finally {
             fluent = null;
             shutdownHook = null;

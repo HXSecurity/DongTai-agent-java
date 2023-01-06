@@ -58,7 +58,7 @@ public class TaintCommandRunner {
                 }
             }
             return r;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             return null;
         }
     }
@@ -84,7 +84,7 @@ public class TaintCommandRunner {
             if (this.paramsCount > 2) {
                 p3 = this.params.get(2).getParam(params);
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             DongTaiLog.error(this.signature + " taint command parameters fetch failed: " + e.getMessage());
             return tr;
         }

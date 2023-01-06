@@ -189,7 +189,7 @@ public class FallbackConfig {
             final Field field = threshold.getClass().getDeclaredField(metricsKey.getKey());
             field.setAccessible(true);
             return field.get(threshold);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             return null;
         }
     }
@@ -290,7 +290,7 @@ public class FallbackConfig {
                         metrics.setMetricsValue(bean);
                         performanceMetricsList.add(metrics);
                     }
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     DongTaiLog.warn("invalid metrics value config,msg:{}", e.getMessage());
                 }
             }

@@ -37,7 +37,7 @@ public class MonitorDaemonThread implements Runnable {
                 DongTaiLog.info("dongtai engine delay time is " + delayTime + " s");
                 delayTime = delayTime * 1000;
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             DongTaiLog.error("engine delay time must be int,eg: 10、20");
             delayTime = 0;
         }

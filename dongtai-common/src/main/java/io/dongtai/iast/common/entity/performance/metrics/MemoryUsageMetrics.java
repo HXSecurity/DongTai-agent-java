@@ -117,7 +117,7 @@ public class MemoryUsageMetrics implements Serializable {
                     fr.close();
                 }
             }
-        } catch (Exception ignored) {
+        } catch (Throwable ignored) {
         }
         return dockerMaxLimit;
     }

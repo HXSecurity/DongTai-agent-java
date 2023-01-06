@@ -41,7 +41,7 @@ public class ServiceDirReport {
         try {
             serviceDir = genDirTree(getWebServerPath(), 0, "");
             ThreadPools.sendReport(ApiPath.REPORT_UPLOAD, this.getServereAddressMsg());
-        } catch (Exception e) {
+        } catch (Throwable e) {
             DongTaiLog.error("send ServiceDir to {} error, reason: {}", ApiPath.REPORT_UPLOAD, e);
         }
     }

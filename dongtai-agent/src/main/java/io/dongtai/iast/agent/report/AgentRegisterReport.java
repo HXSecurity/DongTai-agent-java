@@ -235,7 +235,7 @@ public class AgentRegisterReport {
         } catch (NullPointerException e) {
             DongTaiLog.error("Agent registration to {} failed, Token: {}, Reason: {}",
                     IastProperties.getInstance().getBaseUrl(), IastProperties.getInstance().getServerToken(), e.getMessage());
-        } catch (Exception e) {
+        } catch (Throwable e) {
             DongTaiLog.error("Agent registration to {} failed 10 seconds later, cause: {}, token: {}",
                     IastProperties.getInstance().getBaseUrl(), e.toString(), IastProperties.getInstance().getServerToken());
         }
@@ -263,7 +263,7 @@ public class AgentRegisterReport {
             } else {
                 DongTaiLog.error("Register msg: " + responseRaw);
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             DongTaiLog.error("Parse {} register response failed: {}",
                     IastProperties.getInstance().getBaseUrl(), e.toString());
         }
@@ -291,7 +291,7 @@ public class AgentRegisterReport {
                 br = new BufferedReader(new FileReader(uuidFile));
                 uuid = br.readLine();
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             System.out.println("read/write agent uuid file failed: " + e.toString());
         } finally {
             if (bw != null) {

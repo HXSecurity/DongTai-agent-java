@@ -179,8 +179,8 @@ public class ScaScanner {
                         packages.put(packageObj);
                     }
                 }
-            } catch (Exception e) {
-                DongTaiLog.error(e.getMessage());
+            } catch (Throwable e) {
+                DongTaiLog.error("sca scan jar lib failed", e.getMessage());
             }
         }
 
@@ -215,7 +215,7 @@ public class ScaScanner {
                         break;
                 }
                 ScaReport.sendReport(this.scaReport.toString());
-            } catch (Exception ignore) {
+            } catch (Throwable ignore) {
             }
         }
     }

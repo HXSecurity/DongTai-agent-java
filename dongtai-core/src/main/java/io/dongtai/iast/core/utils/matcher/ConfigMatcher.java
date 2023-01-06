@@ -96,11 +96,11 @@ public class ConfigMatcher {
                 }
             }
             for (String string : FALLBACK_URL) {
-                if (uri.endsWith(string)){
+                if (uri.endsWith(string)) {
                     return true;
                 }
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             DongTaiLog.info("dongtai getBalckurl error");
             DongTaiLog.error(e);
         }

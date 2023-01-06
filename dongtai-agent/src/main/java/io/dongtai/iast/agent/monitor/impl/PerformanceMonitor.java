@@ -70,7 +70,7 @@ public class PerformanceMonitor implements IMonitor {
                 double rate = ((file.getTotalSpace() - file.getUsableSpace()) * 1.0 / file.getTotalSpace()) * 100;
                 return (int) rate;
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             DongTaiLog.error("get disk usage failed", e);
         }
         return 0;

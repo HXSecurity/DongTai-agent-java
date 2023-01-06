@@ -28,7 +28,7 @@ public class DongTaiClientCall<REQUEST, RESPONSE> extends ForwardingClientCall.S
             Metadata.Key<String> dtTraceId = Metadata.Key.of(traceKey, Metadata.ASCII_STRING_MARSHALLER);
             headers.discardAll(dtTraceId);
             headers.put(dtTraceId, traceId);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             // fixme: solve exception
         }
         super.start(responseListener, headers);

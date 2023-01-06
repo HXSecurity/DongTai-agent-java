@@ -32,7 +32,7 @@ public class ReportThread implements Runnable {
     public void run() {
         try {
             HttpClientUtils.sendPost(uri, report);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             DongTaiLog.error("send report to {} error, report: {}, reason: {}", uri, report, e);
         }
     }

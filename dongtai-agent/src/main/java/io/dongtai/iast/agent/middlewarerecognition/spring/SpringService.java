@@ -10,7 +10,7 @@ public class SpringService implements IServer {
         try {
             loader.loadClass("org.springframework.web.context.ConfigurableWebApplicationContext");
             return true;
-        } catch (Exception e) {
+        } catch (Throwable e) {
 
         }
         return false;

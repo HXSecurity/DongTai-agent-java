@@ -20,7 +20,7 @@ public class DocumentBuilderCheck extends AbstractCheck {
                 return true;
             }
             return obj.getClass().getName().contains(".DocumentBuilderImpl");
-        } catch (Exception e) {
+        } catch (Throwable e) {
             return false;
         }
     }

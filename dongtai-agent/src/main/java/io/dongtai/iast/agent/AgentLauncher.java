@@ -51,7 +51,7 @@ public class AgentLauncher {
             AGENT_STATE.setPendingState(State.RUNNING);
             IastProperties.getInstance();
             install(inst);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             System.out.println("[io.dongtai.iast.agent] agent premain failed: " + e.toString());
         } finally {
             AGENT_STATE.setPendingState(null);
@@ -77,7 +77,7 @@ public class AgentLauncher {
 
             IastProperties.getInstance();
             System.out.println("[io.dongtai.iast.agent] Protect By DongTai IAST: " + System.getProperty("protect.by.dongtai", "false"));
-        } catch (Exception e) {
+        } catch (Throwable e) {
             AGENT_STATE.setState(State.EXCEPTION);
             System.out.println("[io.dongtai.iast.agent] agent agentmain parse args failed: " + e.toString());
             return;
@@ -113,7 +113,7 @@ public class AgentLauncher {
                     AGENT_STATE.setState(State.UNINSTALLED);
                 }
                 AGENT_STATE.setCause(cause);
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 AGENT_STATE.setState(State.EXCEPTION).setCause(cause);
                 System.out.println("[io.dongtai.iast.agent] agent agentmain uninstall failed: " + e.toString());
             } finally {
@@ -141,7 +141,7 @@ public class AgentLauncher {
             MonitorDaemonThread.isExit = false;
             LAUNCH_MODE = LAUNCH_MODE_ATTACH;
             install(inst);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             AGENT_STATE.setState(State.EXCEPTION).setCause(cause);
             System.out.println("[io.dongtai.iast.agent] agent agentmain install failed: " + e.toString());
         } finally {

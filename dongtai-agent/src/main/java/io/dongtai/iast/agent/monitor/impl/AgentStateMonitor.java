@@ -70,7 +70,7 @@ public class AgentStateMonitor implements IMonitor {
                 JSONObject data = (JSONObject) resp.get("data");
                 return data.get("exceptRunningStatus").toString();
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             return "other";
         }
         return "other";

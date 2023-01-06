@@ -14,7 +14,7 @@ public class GrpcProxy {
             Channel interceptedChannel = (Channel) channel;
             TraceIdHandler h = (TraceIdHandler) traceIdHandler;
             return ClientInterceptors.intercept(interceptedChannel, new DongTaiClientInterceptor(h));
-        } catch (Exception e) {
+        } catch (Throwable e) {
             // fixme: remove throw exception
             e.printStackTrace();
         }
@@ -27,7 +27,7 @@ public class GrpcProxy {
             metadata = new HashMap<String, Object>(32);
             ServerServiceDefinition interceptedService = (ServerServiceDefinition) service;
             return ServerInterceptors.intercept(interceptedService, new DongTaiServerInterceptor());
-        } catch (Exception e) {
+        } catch (Throwable e) {
             // fixme: remove throw exception
             e.printStackTrace();
         }
