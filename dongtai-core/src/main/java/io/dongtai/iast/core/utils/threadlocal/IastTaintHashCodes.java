@@ -64,7 +64,7 @@ public class IastTaintHashCodes extends ThreadLocal<HashSet<Integer>> {
                 this.add(subHashCode);
                 event.addTargetHash(subHashCode);
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             DongTaiLog.error("add object to taint pool failed", e);
         }
     }

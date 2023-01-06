@@ -49,7 +49,7 @@ public class CryptoBadMacVulScan extends AbstractNormalVulScan {
                 }
                 sendReport(latestStack, sinkNode.getVulType());
                 break;
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 DongTaiLog.error("CryptoBadMacVulScan scan failed", e);
             }
         }

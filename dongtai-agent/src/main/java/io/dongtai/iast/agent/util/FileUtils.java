@@ -65,7 +65,7 @@ public class FileUtils {
                         try {
                             String openApiDomain = new URI(s).getHost();
                             temp = temp.replace("${OPENAPI}", openApiDomain);
-                        } catch (Exception e) {
+                        } catch (Throwable e) {
                             s = s.substring(s.indexOf("://") + 3, s.indexOf("/openapi"));
                             if (s.contains(":")) {
                                 s = s.substring(0, s.indexOf(":"));
@@ -82,7 +82,7 @@ public class FileUtils {
                         try {
                             int openApiPort = new URI(s).getPort();
                             temp = temp.replace("${LOG_PORT}", openApiPort > 0 ? Integer.toString(openApiPort) : "80");
-                        } catch (Exception e) {
+                        } catch (Throwable e) {
                             s = s.substring(s.indexOf("://") + 3, s.indexOf("/openapi"));
                             if (s.contains(":")) {
                                 s = s.substring(s.indexOf(":") + 1);

@@ -25,7 +25,7 @@ public enum State {
         try {
             int c = Integer.valueOf(state);
             return c == this.code;
-        } catch (Exception ignore) {
+        } catch (Throwable ignore) {
             return false;
         }
     }

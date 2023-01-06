@@ -36,7 +36,7 @@ public class AbstractHttpClientUtils {
             if (HttpMethods.POST.equals(method) && data != null) {
                 reqBody = new GzipCompressingEntity(new StringEntity(data));
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             DongTaiLog.error("prepare request " + url + " body failed", e);
         }
         StringBuilder response = sendRequest(client, method, url, reqBody, headers, handler);
@@ -62,7 +62,7 @@ public class AbstractHttpClientUtils {
             if (HttpMethods.POST.equals(method) && data != null) {
                 reqBody = new StringEntity(data);
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             DongTaiLog.error("prepare request " + url + " body failed", e);
         }
         response = sendRequest(client, m, url, reqBody, headers, null);
@@ -93,7 +93,7 @@ public class AbstractHttpClientUtils {
                 response.append(EntityUtils.toString(resp.getEntity(), "UTF-8"));
                 return response;
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             DongTaiLog.error("request " + url + " parse response failed", e);
             if (handler != null) {
                 handler.run();
@@ -223,7 +223,7 @@ public class AbstractHttpClientUtils {
             fileOutputStream.close();
             DongTaiLog.info("The remote file {} was successfully written to the local file {}", fileURL, fileName);
             return true;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             DongTaiLog.error("The remote file " + fileURL + " download failure", e);
         } finally {
             if (resp != null) {

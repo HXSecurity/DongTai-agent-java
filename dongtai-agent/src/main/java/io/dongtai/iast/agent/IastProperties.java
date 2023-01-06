@@ -330,7 +330,7 @@ public class IastProperties {
             } else {
                 return GsonUtils.castBaseTypeString2Obj(property, valueType);
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             DongTaiLog.warn("cast remoteSyncConfig failed!key:{}, valueType:{}, property:{}, err:{}", config, valueType, property, e.getMessage());
             return defaultValue;
         }

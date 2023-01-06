@@ -95,7 +95,7 @@ public class SSRFSourceCheck implements SinkSourceChecker {
 
             event.setObjectValue(url, true);
             return addSourceType(event, sourceMap);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             DongTaiLog.warn("java.net.URL get source failed: " + e.getMessage());
             return false;
         }
@@ -118,7 +118,7 @@ public class SSRFSourceCheck implements SinkSourceChecker {
 
             event.setObjectValue(uri, true);
             return addSourceType(event, sourceMap);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             DongTaiLog.warn("java.net.URI get source failed: " + e.getMessage());
             return false;
         }
@@ -151,7 +151,7 @@ public class SSRFSourceCheck implements SinkSourceChecker {
             }
 
             return false;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             DongTaiLog.warn("apache http client get source failed: " + e.getMessage());
             return false;
         }
@@ -181,7 +181,7 @@ public class SSRFSourceCheck implements SinkSourceChecker {
             }
 
             return false;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             DongTaiLog.warn("apache http client5 get source failed: " + e.getMessage());
             return false;
         }
@@ -225,7 +225,7 @@ public class SSRFSourceCheck implements SinkSourceChecker {
             }
 
             return false;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             DongTaiLog.warn("okhttp get source failed: " + e.getMessage());
             return false;
         }

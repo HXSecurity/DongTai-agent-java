@@ -288,7 +288,7 @@ public class MethodEvent {
             } else {
                 sb.append(value.toString());
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             // org.jruby.RubyBasicObject.hashCode() may cause NullPointerException when RubyBasicObject.metaClass is null
             sb.append(value.getClass().getName())
                     .append("@")

@@ -31,7 +31,7 @@ public class Tomcat implements IServer {
             return false;
         } catch (InvocationTargetException e) {
             return false;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             return false;
         }
     }

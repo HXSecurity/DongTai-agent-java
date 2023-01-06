@@ -241,7 +241,7 @@ public abstract class AbstractCheck implements XXEChecker {
                     return Support.DISALLOWED;
                 }
                 return Support.ALLOWED;
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 return Support.ALLOWED;
             }
         }

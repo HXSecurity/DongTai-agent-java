@@ -38,7 +38,7 @@ public class AgentQueueReport implements Runnable {
                 if (EngineManager.isEngineRunning()) {
                     ThreadPools.submitReplayTask(replayRequestRaw);
                 }
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 DongTaiLog.debug("send API Queue to {} error, reason: {}", ApiPath.REPORT_UPLOAD, e);
             }
         }

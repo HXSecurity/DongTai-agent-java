@@ -27,8 +27,8 @@ public class ScaReport {
     public static void sendReport(String report) {
         try {
             HttpClientUtils.sendPost(ApiPath.REPORT_UPLOAD, report);
-        } catch (Exception e) {
-            DongTaiLog.error(e);
+        } catch (Throwable e) {
+            DongTaiLog.error("send sca report failed", e);
         }
     }
 

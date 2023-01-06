@@ -28,7 +28,7 @@ public class IastReplayModel {
             this.relationId = (Integer) relationId;
             this.replayType = (Integer) replayType;
             this.valid = true;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             this.valid = false;
         }
     }

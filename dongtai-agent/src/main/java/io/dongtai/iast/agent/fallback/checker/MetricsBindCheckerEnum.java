@@ -55,7 +55,7 @@ public enum MetricsBindCheckerEnum {
         }
         try {
             return anEnum.getChecker().newInstance();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             DongTaiLog.warn("create metrics bind checker error");
             return null;
         }

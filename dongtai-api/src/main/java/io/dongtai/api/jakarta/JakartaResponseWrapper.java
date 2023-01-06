@@ -88,8 +88,8 @@ public class JakartaResponseWrapper extends HttpServletResponseWrapper implement
             if (copier != null) {
                 return copier.getCopy();
             }
-        } catch (Exception e) {
-            DongTaiLog.error(e);
+        } catch (Throwable e) {
+            DongTaiLog.error("get jakarta response data failed", e);
         }
         return new byte[0];
     }

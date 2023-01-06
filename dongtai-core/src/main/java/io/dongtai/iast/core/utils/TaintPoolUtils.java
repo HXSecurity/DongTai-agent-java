@@ -97,7 +97,7 @@ public class TaintPoolUtils {
                 return !taintValue.isEmpty();
             }
             return true;
-        }catch (Exception e){
+        } catch (Throwable e) {
             return false;
         }
     }

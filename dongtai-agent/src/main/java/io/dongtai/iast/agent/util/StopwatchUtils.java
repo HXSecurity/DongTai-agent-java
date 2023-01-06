@@ -13,7 +13,7 @@ public class StopwatchUtils {
     public static void start(StopWatch stopWatch) {
         try {
             stopWatch.start();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             // DongTaiLog.info("Stopwatch.start() method invoke exception.", Arrays.toString(e.getStackTrace()));
         }
     }
@@ -21,7 +21,7 @@ public class StopwatchUtils {
     public static void stop(StopWatch stopWatch) {
         try {
             stopWatch.stop();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             // DongTaiLog.info("Stopwatch.stop() method invoke exception.", Arrays.toString(e.getStackTrace()));
         }
     }
@@ -32,7 +32,7 @@ public class StopwatchUtils {
     public static Long getTime(StopWatch stopWatch) {
         try {
             return stopWatch.getTime();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             // DongTaiLog.info("Stopwatch.getTime() method invoke exception.", Arrays.toString(e.getStackTrace()));
             return 0L;
         }
@@ -44,7 +44,7 @@ public class StopwatchUtils {
     public static Long getStartTime(StopWatch stopWatch) {
         try {
             return stopWatch.getStartTime();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             // DongTaiLog.info("Stopwatch.getStartTime() method invoke exception.", Arrays.toString(e.getStackTrace()));
             return null;
         }
