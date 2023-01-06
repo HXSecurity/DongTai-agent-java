@@ -2,6 +2,7 @@ package io.dongtai.iast.core.utils;
 
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
+import io.dongtai.log.DongTaiLog;
 
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
@@ -15,6 +16,8 @@ import java.util.*;
  * @author dongzhiyong@huoxian.cn
  */
 public class TaintPoolUtils {
+    private static final String VALUES_ENUMERATOR = " org.apache.tomcat.util.http.ValuesEnumerator".substring(1);
+    private static final String SPRING_OBJECT = " org.springframework.".substring(1);
 
     /**
      * 判断 obj 对象是否为 java 的内置数据类型，包括：string、array、list、map、enum 等
@@ -138,28 +141,92 @@ public class TaintPoolUtils {
         return isAllowTaintType(obj.getClass());
     }
 
+    public static Set<Object> parseCustomModel(Object model) {
+        Set<Object> modelValues = new HashSet<Object>();
+        try {
+            if (!TaintPoolUtils.isAllowTaintGetterModel(model)) {
+                return modelValues;
+            }
+
+            // getter methods
+            Method[] methods = model.getClass().getMethods();
+            Object itemValue = null;
+            for (Method method : methods) {
+                if (!TaintPoolUtils.isAllowTaintGetterMethod(method)) {
+                    continue;
+                }
+
+                try {
+                    method.setAccessible(true);
+                    itemValue = method.invoke(model);
+                    if (!TaintPoolUtils.isNotEmpty(itemValue) || !TaintPoolUtils.isAllowTaintType(itemValue)) {
+                        continue;
+                    }
+                    modelValues.add(itemValue);
+                } catch (Throwable e) {
+                    DongTaiLog.error("parse custom model getter " +
+                            model.getClass().getName() + "." + method.getName() + " failed", e);
+                }
+            }
+        } catch (Throwable ignore) {
+        }
+        return modelValues;
+    }
+
+    public static boolean isAllowTaintGetterModel(Object model) {
+        if (!TaintPoolUtils.isNotEmpty(model)) {
+            return false;
+        }
+        Class<?> sourceClass = model.getClass();
+        if (sourceClass.getClassLoader() == null) {
+            return false;
+        }
+        String className = sourceClass.getName();
+        if (!TaintPoolUtils.isAllowTaintGetterClass(className)) {
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean isAllowTaintGetterClass(String className) {
+        if (className.startsWith("cn.huoxian.iast.api.") ||
+                className.startsWith("io.dongtai.api.") ||
+                className.startsWith(" org.apache.tomcat".substring(1)) ||
+                className.startsWith(" org.apache.catalina".substring(1)) ||
+                className.startsWith(" org.apache.shiro.web.servlet".substring(1)) ||
+                VALUES_ENUMERATOR.equals(className) ||
+                className.startsWith(SPRING_OBJECT) ||
+                className.contains("RequestWrapper") ||
+                className.contains("ResponseWrapper")
+
+        ) {
+            return false;
+        }
+        return true;
+    }
+
     public static boolean isAllowTaintGetterMethod(Method method) {
         String methodName = method.getName();
         if (!methodName.startsWith("get")
-                || methodName.equals("getClass")
-                || methodName.equals("getParserForType")
-                || methodName.equals("getDefaultInstance")
-                || methodName.equals("getDefaultInstanceForType")
-                || methodName.equals("getDescriptor")
-                || methodName.equals("getDescriptorForType")
-                || methodName.equals("getAllFields")
-                || methodName.equals("getInitializationErrorString")
-                || methodName.equals("getUnknownFields")
-                || methodName.equals("getDetailOrBuilderList")
-                || methodName.equals("getAllFieldsMutable")
-                || methodName.equals("getAllFieldsRaw")
-                || methodName.equals("getOneofFieldDescriptor")
-                || methodName.equals("getField")
-                || methodName.equals("getFieldRaw")
-                || methodName.equals("getRepeatedFieldCount")
-                || methodName.equals("getRepeatedField")
-                || methodName.equals("getSerializedSize")
-                || methodName.equals("getMethodOrDie")
+                || "getClass".equals(methodName)
+                || "getParserForType".equals(methodName)
+                || "getDefaultInstance".equals(methodName)
+                || "getDefaultInstanceForType".equals(methodName)
+                || "getDescriptor".equals(methodName)
+                || "getDescriptorForType".equals(methodName)
+                || "getAllFields".equals(methodName)
+                || "getInitializationErrorString".equals(methodName)
+                || "getUnknownFields".equals(methodName)
+                || "getDetailOrBuilderList".equals(methodName)
+                || "getAllFieldsMutable".equals(methodName)
+                || "getAllFieldsRaw".equals(methodName)
+                || "getOneofFieldDescriptor".equals(methodName)
+                || "getField".equals(methodName)
+                || "getFieldRaw".equals(methodName)
+                || "getRepeatedFieldCount".equals(methodName)
+                || "getRepeatedField".equals(methodName)
+                || "getSerializedSize".equals(methodName)
+                || "getMethodOrDie".equals(methodName)
                 || methodName.endsWith("Bytes")
                 || method.getParameterCount() != 0) {
             return false;

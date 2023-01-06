@@ -33,7 +33,7 @@ public class FeignService {
             if (!event.getSourceHashes().isEmpty()) {
                 hasTaint = true;
             }
-            event.addParameterValue(1, args, hasTaint);
+            event.addParameterValue(0, args, hasTaint);
 
             Method addHeaderMethod = template.getClass().getDeclaredMethod("header", String.class, String[].class);
             addHeaderMethod.setAccessible(true);
@@ -80,9 +80,9 @@ public class FeignService {
             trackOptional(event, obj, depth);
         } else {
             if (!(obj instanceof String)) {
-                Object[] getterValues = parseCustomModel(event, obj);
-                if (getterValues != null && getterValues.length > 0) {
-                    trackArray(event, getterValues, depth);
+                Set<Object> modelValues = TaintPoolUtils.parseCustomModel(obj);
+                for (Object modelValue : modelValues) {
+                    trackObject(event, modelValue, depth + 1);
                 }
             }
 
