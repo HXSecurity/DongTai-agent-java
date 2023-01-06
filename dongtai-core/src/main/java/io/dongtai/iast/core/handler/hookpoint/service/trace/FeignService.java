@@ -132,8 +132,4 @@ public class FeignService {
             DongTaiLog.warn("feign track optional object failed: " + e.getMessage());
         }
     }
-
-    private static Object[] parseCustomModel(MethodEvent event, Object obj) {
-        return null;
-    }
 }

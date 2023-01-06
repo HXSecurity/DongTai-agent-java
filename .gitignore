@@ -1,6 +1,7 @@
 ## for IDEA
 .idea
 .idea/*
+.fleet
 *.iml
 *.DS_Store
 
