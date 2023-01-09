@@ -139,4 +139,7 @@ public interface SpyDispatcher {
     public boolean collectMethod(Object instance, Object[] parameters, Object retObject, String methodMatcher,
                                  String className, String matchedClassName, String methodName, String signature,
                                  boolean isStatic);
+
+    boolean traceFeignInvoke(Object instance, Object[] parameters,
+                             String className, String methodName, String signature);
 }

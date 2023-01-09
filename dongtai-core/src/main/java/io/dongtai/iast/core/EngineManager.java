@@ -62,7 +62,7 @@ public class EngineManager {
         EngineManager.TAINT_HASH_CODES.remove();
         EngineManager.TAINT_RANGES_POOL.remove();
         EngineManager.ENTER_REPLAY_ENTRYPOINT.remove();
-        ContextManager.getCONTEXT().remove();
+        ContextManager.getContext().remove();
         ScopeManager.SCOPE_TRACKER.remove();
     }
 
@@ -119,17 +119,16 @@ public class EngineManager {
                     protocol,
                     true
             );
-            ServerAddressReport serverAddressReport = new ServerAddressReport(EngineManager.SERVER.getServerAddr(),EngineManager.SERVER.getServerPort(),EngineManager.SERVER.getProtocol());
+            ServerAddressReport serverAddressReport = new ServerAddressReport(EngineManager.SERVER.getServerAddr(), EngineManager.SERVER.getServerPort(), EngineManager.SERVER.getProtocol());
             serverAddressReport.run();
         }
         Map<String, String> headers = (Map<String, String>) requestMeta.get("headers");
-        if (headers.containsKey("dt-traceid")) {
-            ContextManager.getOrCreateGlobalTraceId(headers.get("dt-traceid"), EngineManager.getAgentId());
+        String traceIdKey = ContextManager.getHeaderKey();
+        if (headers.containsKey(traceIdKey)) {
+            ContextManager.parseTraceId(headers.get(traceIdKey));
         } else {
-            String newTraceId = ContextManager.getOrCreateGlobalTraceId(null, EngineManager.getAgentId());
-            String spanId = ContextManager.getSpanId(newTraceId, EngineManager.getAgentId());
-            headers.put("dt-traceid", newTraceId);
-            headers.put("dt-spandid", spanId);
+            String newTraceId = ContextManager.currentTraceId();
+            headers.put(traceIdKey, newTraceId);
         }
         REQUEST_CONTEXT.set(requestMeta);
         TRACK_MAP.set(new HashMap<Integer, MethodEvent>(1024));

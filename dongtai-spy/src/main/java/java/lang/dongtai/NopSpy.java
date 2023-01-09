@@ -195,4 +195,10 @@ public class NopSpy implements SpyDispatcher {
                                  boolean isStatic) {
         return false;
     }
+
+    @Override
+    public boolean traceFeignInvoke(Object instance, Object[] parameters,
+                                    String className, String methodName, String signature) {
+        return false;
+    }
 }

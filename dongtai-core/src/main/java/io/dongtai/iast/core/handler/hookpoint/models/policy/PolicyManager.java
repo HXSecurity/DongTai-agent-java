@@ -21,7 +21,8 @@ public class PolicyManager {
             " org.apache.jasper.runtime.HttpJspBase".substring(1),
             " org.springframework.web.servlet.FrameworkServlet".substring(1),
             " javax.servlet.http.Cookie".substring(1),
-            " org/springframework/web/servlet/mvc/annotation/AnnotationMethodHandlerAdapter$ServletHandlerMethodInvoker".substring(1)
+            " org/springframework/web/servlet/mvc/annotation/AnnotationMethodHandlerAdapter$ServletHandlerMethodInvoker".substring(1),
+            " feign.SynchronousMethodHandler.invoke".substring(1)
     ));
     private static final Set<String> HOOK_CLASS_SUFFIX_NAMES = new HashSet<String>(Collections.singletonList(
             ".dubbo.monitor.support.MonitorFilter"

@@ -1,48 +1,39 @@
 package io.dongtai.iast.core.handler.context;
 
-import io.dongtai.iast.core.EngineManager;
-
 /**
  * @author owefsad
  */
 public class ContextManager {
-
     private static ThreadLocal<TracingContext> CONTEXT = new ThreadLocal<TracingContext>();
 
-    public static ThreadLocal<TracingContext> getCONTEXT() {
+    public static ThreadLocal<TracingContext> getContext() {
         return CONTEXT;
     }
 
-    private static TracingContext getOrCreate() {
+    public static void initContext() {
         TracingContext context = CONTEXT.get();
         if (context == null) {
             context = new TracingContext();
             CONTEXT.set(context);
         }
-        return context;
-    }
-
-    public static String getOrCreateGlobalTraceId(String traceId, int agentId) {
-        TracingContext context = getOrCreate();
-        context.parseOrCreateTraceId(traceId, agentId);
-        return context.getTraceId();
-    }
-
-    public static String getSpanId(String traceId, int agentId) {
-        TracingContext context = getOrCreate();
-        context.parseOrCreateTraceId(traceId, agentId);
-        return String.valueOf(context.getSpanId());
-    }
-
-    public static String getSegmentId() {
-        TracingContext context = CONTEXT.get();
-        if (context != null) {
-            return context.createSegmentId();
-        }
-        return getOrCreateGlobalTraceId(null, EngineManager.getAgentId());
     }
 
     public static String getHeaderKey() {
-        return TracingContext.getHeaderKey();
+        return "dt-traceid";
+    }
+
+    public static void parseTraceId(String traceId) {
+        TracingContext context = TracingContext.getIncoming(traceId);
+        CONTEXT.set(context);
+    }
+
+    public static String currentTraceId() {
+        initContext();
+        return CONTEXT.get().toString();
+    }
+
+    public static String nextTraceId() {
+        initContext();
+        return CONTEXT.get().newOutgoing();
     }
 }

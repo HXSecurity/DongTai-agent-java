@@ -10,7 +10,6 @@ import io.dongtai.iast.core.utils.TaintPoolUtils;
 import io.dongtai.log.DongTaiLog;
 
 import java.lang.reflect.Array;
-import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -26,8 +25,6 @@ public class SourceImpl {
      */
     private static final ArrayList<String> WHITE_ATTRIBUTES = new ArrayList<String>();
     private static final String METHOD_OF_GETATTRIBUTE = "getAttribute";
-    private static final String VALUES_ENUMERATOR = " org.apache.tomcat.util.http.ValuesEnumerator".substring(1);
-    private static final String SPRING_OBJECT = " org.springframework.".substring(1);
 
     public static void solveSource(MethodEvent event, SourceNode sourceNode, AtomicInteger invokeIdSequencer) {
         if (!TaintPoolUtils.isNotEmpty(event.returnInstance)
@@ -142,7 +139,7 @@ public class SourceImpl {
     private static void trackArray(MethodEvent event, SourceNode sourceNode, Object arr, int depth) {
         int length = Array.getLength(arr);
         for (int i = 0; i < length; i++) {
-            trackObject(event, sourceNode, Array.get(arr, i), depth);
+            trackObject(event, sourceNode, Array.get(arr, i), depth + 1);
         }
     }
 
@@ -154,8 +151,8 @@ public class SourceImpl {
 
     private static void trackMap(MethodEvent event, SourceNode sourceNode, Map<?, ?> map, int depth) {
         for (Object key : map.keySet()) {
-            trackObject(event, sourceNode, key, depth);
-            trackObject(event, sourceNode, map.get(key), depth);
+            trackObject(event, sourceNode, key, depth + 1);
+            trackObject(event, sourceNode, map.get(key), depth + 1);
         }
     }
 
@@ -166,14 +163,14 @@ public class SourceImpl {
 
     private static void trackList(MethodEvent event, SourceNode sourceNode, List<?> list, int depth) {
         for (Object obj : list) {
-            trackObject(event, sourceNode, obj, depth);
+            trackObject(event, sourceNode, obj, depth + 1);
         }
     }
 
     private static void trackOptional(MethodEvent event, SourceNode sourceNode, Object obj, int depth) {
         try {
             Object v = ((Optional<?>) obj).orElse(null);
-            trackObject(event, sourceNode, v, depth);
+            trackObject(event, sourceNode, v, depth + 1);
         } catch (Throwable e) {
             DongTaiLog.warn("track optional object failed: " + e.getMessage());
         }
@@ -185,72 +182,11 @@ public class SourceImpl {
      * @param event MethodEvent
      */
     public static void handlerCustomModel(MethodEvent event, SourceNode sourceNode) {
-        if (!event.getMethodName().equals("getSession")) {
-            Set<Object> modelValues = parseCustomModel(event.returnInstance);
+        if (!"getSession".equals(event.getMethodName())) {
+            Set<Object> modelValues = TaintPoolUtils.parseCustomModel(event.returnInstance);
             for (Object modelValue : modelValues) {
                 trackObject(event, sourceNode, modelValue, 0);
             }
-        }
-    }
-
-    /**
-     * fixme: 解析自定义对象中的可疑数据，当前只解析第一层，可能导致部分变异数据无法跟踪到，不考虑性能的情况下，可疑逐级遍历
-     *
-     * @param model Object
-     * @return Set<Object>
-     */
-    public static Set<Object> parseCustomModel(Object model) {
-        try{
-            Set<Object> modelValues = new HashSet<Object>();
-            if (!TaintPoolUtils.isNotEmpty(model)) {
-                return modelValues;
-            }
-            Class<?> sourceClass = model.getClass();
-            if (sourceClass.getClassLoader() == null) {
-                return modelValues;
-            }
-            String className = sourceClass.getName();
-            if (className.startsWith("cn.huoxian.iast.api.") ||
-                    className.startsWith("io.dongtai.api.") ||
-                    className.startsWith(" org.apache.tomcat".substring(1)) ||
-                    className.startsWith(" org.apache.catalina".substring(1)) ||
-                    className.startsWith(" org.apache.shiro.web.servlet".substring(1)) ||
-                    VALUES_ENUMERATOR.equals(className) ||
-                    className.startsWith(SPRING_OBJECT) ||
-                    className.contains("RequestWrapper") ||
-                    className.contains("ResponseWrapper")
-
-            ) {
-                return modelValues;
-            }
-            // getter methods
-            Method[] methods = sourceClass.getMethods();
-            Object itemValue = null;
-            for (Method method : methods) {
-                if (!TaintPoolUtils.isAllowTaintGetterMethod(method)) {
-                    continue;
-                }
-
-                try {
-                    method.setAccessible(true);
-                    itemValue = method.invoke(model);
-                    if (!TaintPoolUtils.isNotEmpty(itemValue)) {
-                        continue;
-                    }
-                    modelValues.add(itemValue);
-                    if (itemValue instanceof List) {
-                        List<?> itemValueList = (List<?>) itemValue;
-                        for (Object listValue : itemValueList) {
-                            modelValues.addAll(parseCustomModel(listValue));
-                        }
-                    }
-                } catch (Throwable e) {
-                    DongTaiLog.error("parse source custom model getter" + className + "." + method.getName() + " failed", e);
-                }
-            }
-            return modelValues;
-        } catch (Throwable e) {
-            return new HashSet<Object>();
         }
     }
 

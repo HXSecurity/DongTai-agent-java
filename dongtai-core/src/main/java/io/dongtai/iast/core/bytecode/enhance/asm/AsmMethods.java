@@ -124,6 +124,16 @@ public interface AsmMethods {
             boolean.class
     );
 
+    Method SPY$traceFeignInvoke = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "traceFeignInvoke",
+            Object.class,
+            Object[].class,
+            String.class,
+            String.class,
+            String.class
+    );
+
     Method SPY$reportService = InnerHelper.getAsmMethod(
             SpyDispatcher.class,
             "reportService",
