@@ -14,6 +14,7 @@ import java.util.*;
 public class SSRFSourceCheck implements SinkSourceChecker {
     public final static String SINK_TYPE = "ssrf";
 
+    private static final String JAVA_NET_URL_CONN = "sun.net.www.protocol.http.HttpURLConnection.connect()";
     private static final String JAVA_NET_URL_CONN_GET_INPUT_STREAM = "sun.net.www.protocol.http.HttpURLConnection.getInputStream()";
     private static final String APACHE_HTTP_CLIENT_REQUEST_SET_URI = " org.apache.http.client.methods.HttpRequestBase.setURI(java.net.URI)".substring(1);
     private static final String APACHE_LEGACY_HTTP_CLIENT_REQUEST_SET_URI = " org.apache.commons.httpclient.HttpMethodBase.setURI(org.apache.commons.httpclient.URI)".substring(1);
@@ -30,6 +31,7 @@ public class SSRFSourceCheck implements SinkSourceChecker {
     private static final String OKHTTP_CALL = "com.squareup.okhttp.Call";
 
     private static final Set<String> SSRF_SINK_METHODS = new HashSet<String>(Arrays.asList(
+            JAVA_NET_URL_CONN,
             JAVA_NET_URL_CONN_GET_INPUT_STREAM,
             APACHE_HTTP_CLIENT_REQUEST_SET_URI,
             APACHE_LEGACY_HTTP_CLIENT_REQUEST_SET_URI,
@@ -54,7 +56,7 @@ public class SSRFSourceCheck implements SinkSourceChecker {
     @Override
     public boolean checkSource(MethodEvent event, SinkNode sinkNode) {
         boolean hitTaintPool = false;
-        if (JAVA_NET_URL_CONN_GET_INPUT_STREAM.equals(this.policySignature)) {
+        if (JAVA_NET_URL_CONN.equals(this.policySignature) || JAVA_NET_URL_CONN_GET_INPUT_STREAM.equals(this.policySignature)) {
             return checkJavaNetURL(event, sinkNode);
         } else if (APACHE_HTTP_CLIENT_REQUEST_SET_URI.equals(this.policySignature)
                 || APACHE_LEGACY_HTTP_CLIENT_REQUEST_SET_URI.equals(this.policySignature)) {

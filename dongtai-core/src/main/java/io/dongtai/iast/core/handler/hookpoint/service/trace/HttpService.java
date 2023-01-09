@@ -13,6 +13,7 @@ import java.net.HttpURLConnection;
 import java.util.*;
 
 public class HttpService implements ServiceTrace {
+    private static final String JAVA_NET_URL_CONN = "sun.net.www.protocol.http.HttpURLConnection.connect()";
     private static final String JAVA_NET_URL_CONN_GET_INPUT_STREAM = "sun.net.www.protocol.http.HttpURLConnection.getInputStream()";
     private static final String APACHE_LEGACY_HTTP_CLIENT_REQUEST_SET_URI = " org.apache.commons.httpclient.HttpMethodBase.setURI(org.apache.commons.httpclient.URI)".substring(1);
     private static final String APACHE_HTTP_CLIENT_REQUEST_SET_URI = " org.apache.http.client.methods.HttpRequestBase.setURI(java.net.URI)".substring(1);
@@ -20,6 +21,7 @@ public class HttpService implements ServiceTrace {
     private static final String OKHTTP_CALL_EXECUTE = "com.squareup.okhttp.Call.execute()";
 
     private static final Set<String> SIGNATURE = new HashSet<String>(Arrays.asList(
+            JAVA_NET_URL_CONN,
             JAVA_NET_URL_CONN_GET_INPUT_STREAM,
             APACHE_LEGACY_HTTP_CLIENT_REQUEST_SET_URI,
             APACHE_HTTP_CLIENT_REQUEST_SET_URI,
@@ -41,7 +43,8 @@ public class HttpService implements ServiceTrace {
     @Override
     public void addTrace(MethodEvent event, PolicyNode policyNode) {
         String traceId = null;
-        if (JAVA_NET_URL_CONN_GET_INPUT_STREAM.equals(this.matchedSignature)) {
+        if (JAVA_NET_URL_CONN.equals(this.matchedSignature)
+                || JAVA_NET_URL_CONN_GET_INPUT_STREAM.equals(this.matchedSignature)) {
             traceId = addTraceToJavaNetURL(event);
         } else if (APACHE_HTTP_CLIENT5_EXECUTE.equals(this.matchedSignature)
                 || APACHE_HTTP_CLIENT_REQUEST_SET_URI.equals(this.matchedSignature)) {
@@ -153,7 +156,8 @@ public class HttpService implements ServiceTrace {
     }
 
     public static boolean validateURLConnection(MethodEvent event) {
-        if (!JAVA_NET_URL_CONN_GET_INPUT_STREAM.equals(event.signature)) {
+        if (!JAVA_NET_URL_CONN_GET_INPUT_STREAM.equals(event.signature)
+                && !JAVA_NET_URL_CONN.equals(event.signature)) {
             return true;
         }
 
