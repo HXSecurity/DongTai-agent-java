@@ -26,6 +26,7 @@ public class SSRFSourceCheck implements SinkSourceChecker {
 
     private static final String APACHE_LEGACY_HTTP_CLIENT_URI = " org.apache.commons.httpclient.URI".substring(1);
     private static final String APACHE_HTTP_CLIENT5_REQUEST_INTERFACE = " org.apache.hc.core5.http.HttpRequest".substring(1);
+    // okhttp v4.x
     private static final String OKHTTP3_INTERNAL_REAL_CALL = "okhttp3.internal.connection.RealCall";
     private static final String OKHTTP3_REAL_CALL = "okhttp3.RealCall";
     private static final String OKHTTP_CALL = "com.squareup.okhttp.Call";
@@ -204,15 +205,12 @@ public class SSRFSourceCheck implements SinkSourceChecker {
                     || OKHTTP_CALL.equals(cls.getName())) {
                 Object url;
 
+                Field reqField = cls.getDeclaredField("originalRequest");
+                reqField.setAccessible(true);
+                Object req = reqField.get(event.objectInstance);
                 if (OKHTTP_CALL.equals(cls.getName())) {
-                    Field reqField = cls.getDeclaredField("originalRequest");
-                    reqField.setAccessible(true);
-                    Object req = reqField.get(event.objectInstance);
                     url = req.getClass().getMethod("httpUrl").invoke(req);
                 } else {
-                    Method reqMethod = cls.getDeclaredMethod("request");
-                    reqMethod.setAccessible(true);
-                    Object req = reqMethod.invoke(event.objectInstance);
                     url = req.getClass().getMethod("url").invoke(req);
                 }
 
@@ -221,13 +219,23 @@ public class SSRFSourceCheck implements SinkSourceChecker {
                 }
 
                 final Object fUrl = url;
+
+                Object queryList = null;
+                try {
+                    Field queryListField = fUrl.getClass().getDeclaredField("queryNamesAndValues");
+                    queryListField.setAccessible(true);
+                    queryList = queryListField.get(fUrl);
+                } catch (Throwable ignore) {
+                }
+
+                final Object query = queryList;
                 Map<String, Object> sourceMap = new HashMap<String, Object>() {{
                     put("PROTOCOL", fUrl.getClass().getMethod("scheme").invoke(fUrl));
                     put("USERNAME", fUrl.getClass().getMethod("username").invoke(fUrl));
                     put("PASSWORD", fUrl.getClass().getMethod("password").invoke(fUrl));
                     put("HOST", fUrl.getClass().getMethod("host").invoke(fUrl));
                     put("PATH", fUrl.getClass().getMethod("encodedPath").invoke(fUrl));
-                    put("QUERY", fUrl.getClass().getMethod("query").invoke(fUrl));
+                    put("QUERY", query);
                 }};
 
                 event.setObjectValue(fUrl, true);
@@ -245,9 +253,12 @@ public class SSRFSourceCheck implements SinkSourceChecker {
         boolean hit = false;
         event.sourceTypes = new ArrayList<MethodEvent.MethodEventSourceType>();
         for (Map.Entry<String, Object> entry : sourceMap.entrySet()) {
-            if (!"".equals(entry.getValue()) && TaintPoolUtils.poolContains(entry.getValue(), event)) {
-                event.sourceTypes.add(new MethodEvent.MethodEventSourceType(System.identityHashCode(entry.getValue()), entry.getKey()));
-                hit = true;
+            if (entry.getKey().equals("QUERY") && entry.getValue() instanceof List) {
+                for (Object q : (List) entry.getValue()) {
+                    checkTaintPool(event, entry.getKey(), q);
+                }
+            } else {
+                checkTaintPool(event, entry.getKey(), entry.getValue());
             }
         }
 
@@ -256,5 +267,13 @@ public class SSRFSourceCheck implements SinkSourceChecker {
         }
 
         return hit;
+    }
+
+    private boolean checkTaintPool(MethodEvent event, String key, Object value) {
+        if (!"".equals(value) && TaintPoolUtils.poolContains(value, event)) {
+            event.sourceTypes.add(new MethodEvent.MethodEventSourceType(System.identityHashCode(value), key));
+            return true;
+        }
+        return false;
     }
 }

@@ -19,6 +19,12 @@ public class HttpService implements ServiceTrace {
     private static final String APACHE_HTTP_CLIENT_REQUEST_SET_URI = " org.apache.http.client.methods.HttpRequestBase.setURI(java.net.URI)".substring(1);
     private static final String APACHE_HTTP_CLIENT5_EXECUTE = " org.apache.hc.client5.http.impl.classic.CloseableHttpClient.doExecute(org.apache.hc.core5.http.HttpHost,org.apache.hc.core5.http.ClassicHttpRequest,org.apache.hc.core5.http.protocol.HttpContext)".substring(1);
     private static final String OKHTTP_CALL_EXECUTE = "com.squareup.okhttp.Call.execute()";
+    private static final String OKHTTP3_CALL_EXECUTE = "okhttp3.Call.execute()";
+
+    // okhttp v4.x
+    private static final String OKHTTP3_INTERNAL_REAL_CALL = "okhttp3.internal.connection.RealCall";
+    private static final String OKHTTP3_REAL_CALL = "okhttp3.RealCall";
+    private static final String OKHTTP_CALL = "com.squareup.okhttp.Call";
 
     private static final Set<String> SIGNATURE = new HashSet<String>(Arrays.asList(
             JAVA_NET_URL_CONN,
@@ -26,7 +32,8 @@ public class HttpService implements ServiceTrace {
             APACHE_LEGACY_HTTP_CLIENT_REQUEST_SET_URI,
             APACHE_HTTP_CLIENT_REQUEST_SET_URI,
             APACHE_HTTP_CLIENT5_EXECUTE,
-            OKHTTP_CALL_EXECUTE
+            OKHTTP_CALL_EXECUTE,
+            OKHTTP3_CALL_EXECUTE
     ));
 
     private String matchedSignature;
@@ -51,7 +58,8 @@ public class HttpService implements ServiceTrace {
             traceId = addTraceToApacheHttpClient(event);
         } else if (APACHE_LEGACY_HTTP_CLIENT_REQUEST_SET_URI.equals(this.matchedSignature)) {
             traceId = addTraceToApacheHttpClientLegacy(event);
-        } else if (OKHTTP_CALL_EXECUTE.equals(this.matchedSignature)) {
+        } else if (OKHTTP_CALL_EXECUTE.equals(this.matchedSignature)
+                || OKHTTP3_CALL_EXECUTE.equals(this.matchedSignature)) {
             traceId = addTraceToOkhttp(event);
         }
 
@@ -135,16 +143,23 @@ public class HttpService implements ServiceTrace {
             return null;
         }
         try {
+            String className = obj.getClass().getName();
+            if (!OKHTTP3_REAL_CALL.equals(className) && !OKHTTP3_INTERNAL_REAL_CALL.equals(className)
+                    && !OKHTTP_CALL.equals(className)) {
+                return null;
+            }
+
             Field reqField = obj.getClass().getDeclaredField("originalRequest");
             boolean accessible = reqField.isAccessible();
             reqField.setAccessible(true);
-            Object req = reqField.get(event.objectInstance);
+            Object req = reqField.get(obj);
+
             Method methodNewBuilder = req.getClass().getMethod("newBuilder");
             Object reqBuilder = methodNewBuilder.invoke(req);
-            Method methodAddHeader = req.getClass().getMethod("addHeader", String.class, String.class);
+            Method methodAddHeader = reqBuilder.getClass().getMethod("addHeader", String.class, String.class);
             final String traceId = ContextManager.nextTraceId();
             methodAddHeader.invoke(reqBuilder, ContextManager.getHeaderKey(), traceId);
-            Method methodBuild = req.getClass().getMethod("build");
+            Method methodBuild = reqBuilder.getClass().getMethod("build");
             Object newReq = methodBuild.invoke(reqBuilder);
             reqField.set(obj, newReq);
             reqField.setAccessible(accessible);
