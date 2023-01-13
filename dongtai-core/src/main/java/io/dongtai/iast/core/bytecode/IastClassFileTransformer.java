@@ -120,6 +120,10 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                 return null;
             }
 
+            if (null != loader && loader.toString().toLowerCase().contains("rasp")) {
+                return null;
+            }
+
             if (loader != null && protectionDomain != null) {
                 final CodeSource codeSource = protectionDomain.getCodeSource();
                 if (codeSource == null) {

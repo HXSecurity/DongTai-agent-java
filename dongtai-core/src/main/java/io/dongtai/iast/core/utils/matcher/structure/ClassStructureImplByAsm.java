@@ -2,16 +2,13 @@ package io.dongtai.iast.core.utils.matcher.structure;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import io.dongtai.iast.core.utils.AsmUtils;
-import io.dongtai.iast.core.utils.BitUtils;
-import io.dongtai.iast.core.utils.LazyGet;
-import io.dongtai.iast.core.utils.SandboxStringUtils;
+import io.dongtai.iast.core.utils.*;
 import io.dongtai.iast.core.utils.collection.Pair;
 import io.dongtai.iast.core.utils.matcher.structure.PrimitiveClassStructure.Primitive;
+import io.dongtai.log.DongTaiLog;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.objectweb.asm.*;
-import io.dongtai.log.DongTaiLog;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -272,10 +269,25 @@ public class ClassStructureImplByAsm extends FamilyClassStructure {
     // 获取资源数据流
     // 一般而言可以从loader直接获取，如果获取不到那么这个类也会能加载成功
     // 但如果遇到来自BootstrapClassLoader的类就必须从java.lang.Object来获取
-    private InputStream getResourceAsStream(final String resourceName) {
-        return isBootstrapClassLoader()
-                ? Object.class.getResourceAsStream("/" + resourceName)
-                : loader.getResourceAsStream(resourceName);
+    private InputStream getResourceAsStream(final String javaClassName) {
+        final String resourceName = internalClassNameToResourceName(SandboxStringUtils.toInternalClassName(javaClassName));
+        InputStream is = null;
+        if (isBootstrapClassLoader()) {
+            try {
+                // jdk8
+                is = Object.class.getResourceAsStream("/" + resourceName);
+                if (null == is) {
+                    // jdk >= 9
+                    Class<?> clz = Class.forName(javaClassName, false, null);
+                    is = clz.getResourceAsStream("/" + resourceName);
+                }
+            } catch (Throwable ignore) {
+            }
+        } else {
+            is = loader.getResourceAsStream(resourceName);
+        }
+
+        return is;
     }
 
     // 将内部类名称转换为资源名称
@@ -306,26 +318,31 @@ public class ClassStructureImplByAsm extends FamilyClassStructure {
             return new PrimitiveClassStructure(primitive);
         }
 
-        final Pair pair = new Pair(loader, javaClassName);
-        final ClassStructure existClassStructure = classStructureCache.getIfPresent(pair);
-        if (null != existClassStructure) {
-            return existClassStructure;
-        } else {
+        Pair pair = new Pair(loader, javaClassName);
+        InputStream is = null;
+        try {
+            final ClassStructure existClassStructure = classStructureCache.getIfPresent(pair);
+            if (null != existClassStructure) {
+                return existClassStructure;
+            }
 
-            final InputStream is = getResourceAsStream(internalClassNameToResourceName(SandboxStringUtils.toInternalClassName(javaClassName)));
-            if (null != is) {
-                try {
-                    final ClassStructure classStructure = new ClassStructureImplByAsm(is, loader);
-                    classStructureCache.put(pair, classStructure);
-                    return classStructure;
-                } catch (Throwable cause) {
-                    // ignore
-                    DongTaiLog.warn("new instance class structure by using ASM failed, will return null. class=" + javaClassName + ";loader=" + loader + ";",
-                            cause);
-                    classStructureCache.put(pair, null);
-                } finally {
-                    IOUtils.closeQuietly(is);
-                }
+            is = getResourceAsStream(SandboxStringUtils.toJavaClassName(javaClassName));
+            if (null == is) {
+                return null;
+            }
+
+            final ClassStructure classStructure = new ClassStructureImplByAsm(is, loader);
+            classStructureCache.put(pair, classStructure);
+            return classStructure;
+        } catch (Throwable cause) {
+            // ignore
+            DongTaiLog.warn("new instance class structure by using ASM failed, will return null. class="
+                    + javaClassName + ";loader=" + loader + ";", cause);
+            classStructureCache.put(pair, null);
+        } finally {
+            pair = null;
+            if (is != null) {
+                IOUtils.closeQuietly(is);
             }
         }
 

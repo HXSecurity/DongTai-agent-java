@@ -16,16 +16,10 @@ import java.util.*;
 public class ConfigMatcher {
 
     private static ConfigMatcher INSTANCE;
-    private final Set<String> BLACKS;
-    private final String[] START_WITH_BLACKS;
-    private final String[] END_WITH_BLACKS;
     private final Set<String> BLACKS_SET;
     private final String[] START_ARRAY;
     private final String[] END_ARRAY;
     private final String[] DISABLE_EXT;
-    private final AbstractMatcher INTERNAL_CLASS = new InternalClass();
-    private final AbstractMatcher FRAMEWORK_CLASS = new FrameworkClass();
-    private final AbstractMatcher SERVER_CLASS = new ServerClass();
     private Instrumentation inst;
 
     private final Set<String> BLACK_URL;
@@ -40,19 +34,13 @@ public class ConfigMatcher {
 
     public ConfigMatcher() {
         PropertyUtils cfg = PropertyUtils.getInstance();
-        String blackListFuncFile = cfg.getBlackFunctionFilePath();
         String blackList = cfg.getBlackClassFilePath();
         String blackUrl = cfg.getBlackUrl();
         String disableExtList = cfg.getBlackExtFilePath();
 
-        Set<String>[] items = ConfigUtils.loadConfigFromFile(blackListFuncFile);
-        BLACKS = items[0];
-        END_WITH_BLACKS = items[2].toArray(new String[0]);
-        START_WITH_BLACKS = items[1].toArray(new String[0]);
-
         BLACK_URL = ConfigUtils.loadConfigFromFileByLine(blackUrl);
 
-        items = ConfigUtils.loadConfigFromFile(blackList);
+        Set<String>[] items = ConfigUtils.loadConfigFromFile(blackList);
         START_ARRAY = items[1].toArray(new String[0]);
         END_ARRAY = items[2].toArray(new String[0]);
         BLACKS_SET = items[0];
@@ -111,16 +99,6 @@ public class ConfigMatcher {
         return BLACKS_SET.contains(className)
                 || StringUtils.startsWithAny(className, START_ARRAY)
                 || StringUtils.endsWithAny(className, END_ARRAY);
-    }
-
-    public PropagatorType blackFunc(final String signature) {
-        if (BLACKS.contains(signature)
-                || StringUtils.startsWithAny(signature, START_WITH_BLACKS)
-                || StringUtils.endsWithAny(signature, END_WITH_BLACKS)) {
-            return PropagatorType.BLACK;
-        } else {
-            return PropagatorType.NONE;
-        }
     }
 
     public void setInst(Instrumentation inst) {
@@ -188,36 +166,5 @@ public class ConfigMatcher {
         }
         return true;
     }
-
-    public boolean isAppClass(String className) {
-        return !(INTERNAL_CLASS.match(className) || FRAMEWORK_CLASS.match(className) || SERVER_CLASS.match(className));
-    }
-
-    /**
-     * 事件枚举类型
-     */
-    public enum PropagatorType {
-
-        /**
-         * 方法类型:黑名单
-         */
-        BLACK,
-
-        /**
-         * 方法类型:污点源
-         */
-        SOURCE,
-
-        /**
-         * 方法类型:污点终点
-         */
-        SINK,
-
-        /**
-         * 方法类型:普通方法
-         */
-        NONE
-    }
-
 }
 

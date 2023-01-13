@@ -29,6 +29,9 @@ public class GraphBuilder {
             ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
             List<GraphNode> nodeList = build();
             String report = convertToReport(nodeList, request, response);
+            if (report == null) {
+                return;
+            }
             ThreadPools.sendPriorityReport(ApiPath.REPORT_UPLOAD, report);
         } catch (Throwable e) {
             DongTaiLog.error("report request failed", e);
@@ -88,7 +91,7 @@ public class GraphBuilder {
         detail.put(ReportKey.REQ_BODY, request == null ? "" : HttpImpl.getPostBody(request));
         detail.put(ReportKey.RES_HEADER, responseMeta == null ? ""
                 : Base64Encoder.encodeBase64String(responseMeta.getOrDefault("headers", "").toString().getBytes())
-                .replaceAll("\n", ""));
+                .replaceAll("\n", "").replaceAll("\r", ""));
         detail.put(ReportKey.RES_BODY, responseMeta == null ? "" : Base64Encoder.encodeBase64String(
                 getResponseBody(responseMeta)));
         detail.put(ReportKey.CONTEXT_PATH, requestMeta.getOrDefault("contextPath", ""));

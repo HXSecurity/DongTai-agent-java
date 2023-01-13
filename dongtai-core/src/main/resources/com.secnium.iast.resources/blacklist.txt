@@ -12,6 +12,7 @@ com/github/xiaoymin/knife4j/spring/filter/*
 com/meituan/*
 com/sankuai/*
 com/dianping/*
+org/hotswap/*
 # jrebel
 com/zeroturnaround/*
 # ehcache - cache need't hook
