@@ -4,38 +4,15 @@ import io.dongtai.iast.core.handler.context.ContextManager;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.PolicyNode;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.SignatureMethodMatcher;
+import io.dongtai.iast.core.handler.hookpoint.service.HttpClient;
 import io.dongtai.iast.core.utils.ReflectUtils;
 import io.dongtai.log.DongTaiLog;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
-import java.util.*;
 
 public class HttpService implements ServiceTrace {
-    private static final String JAVA_NET_URL_CONN = "sun.net.www.protocol.http.HttpURLConnection.connect()";
-    private static final String JAVA_NET_URL_CONN_GET_INPUT_STREAM = "sun.net.www.protocol.http.HttpURLConnection.getInputStream()";
-    private static final String APACHE_LEGACY_HTTP_CLIENT_REQUEST_SET_URI = " org.apache.commons.httpclient.HttpMethodBase.setURI(org.apache.commons.httpclient.URI)".substring(1);
-    private static final String APACHE_HTTP_CLIENT_REQUEST_SET_URI = " org.apache.http.client.methods.HttpRequestBase.setURI(java.net.URI)".substring(1);
-    private static final String APACHE_HTTP_CLIENT5_EXECUTE = " org.apache.hc.client5.http.impl.classic.CloseableHttpClient.doExecute(org.apache.hc.core5.http.HttpHost,org.apache.hc.core5.http.ClassicHttpRequest,org.apache.hc.core5.http.protocol.HttpContext)".substring(1);
-    private static final String OKHTTP_CALL_EXECUTE = "com.squareup.okhttp.Call.execute()";
-    private static final String OKHTTP3_CALL_EXECUTE = "okhttp3.Call.execute()";
-
-    // okhttp v4.x
-    private static final String OKHTTP3_INTERNAL_REAL_CALL = "okhttp3.internal.connection.RealCall";
-    private static final String OKHTTP3_REAL_CALL = "okhttp3.RealCall";
-    private static final String OKHTTP_CALL = "com.squareup.okhttp.Call";
-
-    private static final Set<String> SIGNATURE = new HashSet<String>(Arrays.asList(
-            JAVA_NET_URL_CONN,
-            JAVA_NET_URL_CONN_GET_INPUT_STREAM,
-            APACHE_LEGACY_HTTP_CLIENT_REQUEST_SET_URI,
-            APACHE_HTTP_CLIENT_REQUEST_SET_URI,
-            APACHE_HTTP_CLIENT5_EXECUTE,
-            OKHTTP_CALL_EXECUTE,
-            OKHTTP3_CALL_EXECUTE
-    ));
-
     private String matchedSignature;
 
     @Override
@@ -44,22 +21,20 @@ public class HttpService implements ServiceTrace {
             this.matchedSignature = ((SignatureMethodMatcher) policyNode.getMethodMatcher()).getSignature().toString();
         }
 
-        return SIGNATURE.contains(this.matchedSignature);
+        return HttpClient.match(this.matchedSignature);
     }
 
     @Override
     public void addTrace(MethodEvent event, PolicyNode policyNode) {
         String traceId = null;
-        if (JAVA_NET_URL_CONN.equals(this.matchedSignature)
-                || JAVA_NET_URL_CONN_GET_INPUT_STREAM.equals(this.matchedSignature)) {
+        if (HttpClient.matchJavaNetUrl(this.matchedSignature)) {
             traceId = addTraceToJavaNetURL(event);
-        } else if (APACHE_HTTP_CLIENT5_EXECUTE.equals(this.matchedSignature)
-                || APACHE_HTTP_CLIENT_REQUEST_SET_URI.equals(this.matchedSignature)) {
+        } else if (HttpClient.matchApacheHttp4(this.matchedSignature)
+                || HttpClient.matchApacheHttp5(this.matchedSignature)) {
             traceId = addTraceToApacheHttpClient(event);
-        } else if (APACHE_LEGACY_HTTP_CLIENT_REQUEST_SET_URI.equals(this.matchedSignature)) {
+        } else if (HttpClient.matchApacheHttp3(this.matchedSignature)) {
             traceId = addTraceToApacheHttpClientLegacy(event);
-        } else if (OKHTTP_CALL_EXECUTE.equals(this.matchedSignature)
-                || OKHTTP3_CALL_EXECUTE.equals(this.matchedSignature)) {
+        } else if (HttpClient.matchOkhttp(this.matchedSignature)) {
             traceId = addTraceToOkhttp(event);
         }
 
@@ -88,7 +63,7 @@ public class HttpService implements ServiceTrace {
 
     private String addTraceToApacheHttpClient(MethodEvent event) {
         Object obj;
-        if (APACHE_HTTP_CLIENT5_EXECUTE.equals(this.matchedSignature)) {
+        if (HttpClient.matchApacheHttp5(this.matchedSignature)) {
             obj = event.parameterInstances[1];
         } else {
             obj = event.objectInstance;
@@ -98,7 +73,7 @@ public class HttpService implements ServiceTrace {
         }
         try {
             Method method;
-            if (APACHE_HTTP_CLIENT5_EXECUTE.equals(this.matchedSignature)) {
+            if (HttpClient.matchApacheHttp5(this.matchedSignature)) {
                 method = ReflectUtils.getDeclaredMethodFromSuperClass(obj.getClass(),
                         "addHeader", new Class[]{String.class, Object.class});
             } else {
@@ -144,8 +119,7 @@ public class HttpService implements ServiceTrace {
         }
         try {
             String className = obj.getClass().getName();
-            if (!OKHTTP3_REAL_CALL.equals(className) && !OKHTTP3_INTERNAL_REAL_CALL.equals(className)
-                    && !OKHTTP_CALL.equals(className)) {
+            if (!HttpClient.matchAllOkhttpCallClass(className)) {
                 return null;
             }
 
@@ -171,8 +145,7 @@ public class HttpService implements ServiceTrace {
     }
 
     public static boolean validateURLConnection(MethodEvent event) {
-        if (!JAVA_NET_URL_CONN_GET_INPUT_STREAM.equals(event.signature)
-                && !JAVA_NET_URL_CONN.equals(event.signature)) {
+        if (!HttpClient.matchJavaNetUrl(event.signature)) {
             return true;
         }
 

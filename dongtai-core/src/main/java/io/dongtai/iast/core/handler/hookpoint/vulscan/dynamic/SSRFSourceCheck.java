@@ -1,10 +1,13 @@
 package io.dongtai.iast.core.handler.hookpoint.vulscan.dynamic;
 
+import io.dongtai.iast.core.handler.context.ContextManager;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.SignatureMethodMatcher;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.SinkNode;
+import io.dongtai.iast.core.handler.hookpoint.service.HttpClient;
 import io.dongtai.iast.core.utils.*;
 import io.dongtai.log.DongTaiLog;
+import sun.net.www.MessageHeader;
 
 import java.lang.reflect.*;
 import java.net.URI;
@@ -13,36 +16,6 @@ import java.util.*;
 
 public class SSRFSourceCheck implements SinkSourceChecker {
     public final static String SINK_TYPE = "ssrf";
-
-    private static final String JAVA_NET_URL_CONN = "sun.net.www.protocol.http.HttpURLConnection.connect()";
-    private static final String JAVA_NET_URL_CONN_GET_INPUT_STREAM = "sun.net.www.protocol.http.HttpURLConnection.getInputStream()";
-    private static final String APACHE_HTTP_CLIENT_REQUEST_SET_URI = " org.apache.http.client.methods.HttpRequestBase.setURI(java.net.URI)".substring(1);
-    private static final String APACHE_LEGACY_HTTP_CLIENT_REQUEST_SET_URI = " org.apache.commons.httpclient.HttpMethodBase.setURI(org.apache.commons.httpclient.URI)".substring(1);
-    private static final String APACHE_HTTP_CLIENT5_EXECUTE = " org.apache.hc.client5.http.impl.classic.CloseableHttpClient.doExecute(org.apache.hc.core5.http.HttpHost,org.apache.hc.core5.http.ClassicHttpRequest,org.apache.hc.core5.http.protocol.HttpContext)".substring(1);
-    private static final String OKHTTP3_CALL_EXECUTE = "okhttp3.Call.execute()";
-    private static final String OKHTTP3_CALL_ENQUEUE = "okhttp3.Call.enqueue(okhttp3.Callback)";
-    private static final String OKHTTP_CALL_EXECUTE = "com.squareup.okhttp.Call.execute()";
-    private static final String OKHTTP_CALL_ENQUEUE = "com.squareup.okhttp.Call.enqueue(com.squareup.okhttp.Callback)";
-
-    private static final String APACHE_LEGACY_HTTP_CLIENT_URI = " org.apache.commons.httpclient.URI".substring(1);
-    private static final String APACHE_HTTP_CLIENT5_REQUEST_INTERFACE = " org.apache.hc.core5.http.HttpRequest".substring(1);
-    // okhttp v4.x
-    private static final String OKHTTP3_INTERNAL_REAL_CALL = "okhttp3.internal.connection.RealCall";
-    private static final String OKHTTP3_REAL_CALL = "okhttp3.RealCall";
-    private static final String OKHTTP_CALL = "com.squareup.okhttp.Call";
-
-    private static final Set<String> SSRF_SINK_METHODS = new HashSet<String>(Arrays.asList(
-            JAVA_NET_URL_CONN,
-            JAVA_NET_URL_CONN_GET_INPUT_STREAM,
-            APACHE_HTTP_CLIENT_REQUEST_SET_URI,
-            APACHE_LEGACY_HTTP_CLIENT_REQUEST_SET_URI,
-            APACHE_HTTP_CLIENT5_EXECUTE,
-            OKHTTP3_CALL_EXECUTE,
-            OKHTTP3_CALL_ENQUEUE,
-            OKHTTP_CALL_EXECUTE,
-            OKHTTP_CALL_ENQUEUE
-    ));
-
     private String policySignature;
 
     @Override
@@ -51,32 +24,50 @@ public class SSRFSourceCheck implements SinkSourceChecker {
             this.policySignature = ((SignatureMethodMatcher) sinkNode.getMethodMatcher()).getSignature().toString();
         }
 
-        return SINK_TYPE.equals(sinkNode.getVulType()) && SSRF_SINK_METHODS.contains(this.policySignature);
+        return SINK_TYPE.equals(sinkNode.getVulType()) && HttpClient.match(this.policySignature);
     }
 
     @Override
     public boolean checkSource(MethodEvent event, SinkNode sinkNode) {
         boolean hitTaintPool = false;
-        if (JAVA_NET_URL_CONN.equals(this.policySignature) || JAVA_NET_URL_CONN_GET_INPUT_STREAM.equals(this.policySignature)) {
+        if (HttpClient.matchJavaNetUrl(this.policySignature)) {
             return checkJavaNetURL(event, sinkNode);
-        } else if (APACHE_HTTP_CLIENT_REQUEST_SET_URI.equals(this.policySignature)
-                || APACHE_LEGACY_HTTP_CLIENT_REQUEST_SET_URI.equals(this.policySignature)) {
+        } else if (HttpClient.matchApacheHttp3(this.policySignature)
+                || HttpClient.matchApacheHttp4(this.policySignature)) {
             return checkApacheHttpClient(event, sinkNode);
-        } else if (APACHE_HTTP_CLIENT5_EXECUTE.equals(this.policySignature)) {
+        } else if (HttpClient.matchApacheHttp5(this.policySignature)) {
             return checkApacheHttpClient5(event, sinkNode);
-        } else if (OKHTTP3_CALL_EXECUTE.equals(this.policySignature)
-                || OKHTTP3_CALL_ENQUEUE.equals(this.policySignature)
-                || OKHTTP_CALL_EXECUTE.equals(this.policySignature)
-                || OKHTTP_CALL_ENQUEUE.equals(this.policySignature)) {
+        } else if (HttpClient.matchOkhttp(this.policySignature)) {
             return CheckOkhttp(event, sinkNode);
         }
         return hitTaintPool;
     }
 
-    private boolean processJavaNetUrl(MethodEvent event, Object u) {
+    private boolean processJavaNetUrl(MethodEvent event, Object conn, Object u) {
         try {
             if (!(u instanceof URL)) {
                 return false;
+            }
+
+            List<String> headerList = new ArrayList<String>();
+            try {
+                Field userHeadersField = ReflectUtils.getDeclaredFieldFromSuperClassByName(conn.getClass(), "userHeaders");
+                if (userHeadersField == null) {
+                    return false;
+                }
+                userHeadersField.setAccessible(true);
+                Object userHeaders = userHeadersField.get(conn);
+                if (userHeaders instanceof MessageHeader) {
+                    Map<String, List<String>> headers = ((MessageHeader) userHeaders).getHeaders();
+                    for (Map.Entry<String, List<String>> header : headers.entrySet()) {
+                        if (header.getKey().equals(ContextManager.getHeaderKey())) {
+                            continue;
+                        }
+                        headerList.add(header.getKey());
+                        headerList.addAll(header.getValue());
+                    }
+                }
+            } catch (Throwable ignore) {
             }
 
             final URL url = (URL) u;
@@ -86,6 +77,7 @@ public class SSRFSourceCheck implements SinkSourceChecker {
                 put("HOST", url.getHost());
                 put("PATH", url.getPath());
                 put("QUERY", url.getQuery());
+                put("HEADER", headerList);
             }};
 
             event.setObjectValue(url, true);
@@ -133,7 +125,7 @@ public class SSRFSourceCheck implements SinkSourceChecker {
 
             Object u = getURLMethod.invoke(conn);
 
-            return processJavaNetUrl(event, u);
+            return processJavaNetUrl(event, conn, u);
         } catch (IllegalAccessException ignore) {
         } catch (InvocationTargetException ignore) {
         }
@@ -149,7 +141,7 @@ public class SSRFSourceCheck implements SinkSourceChecker {
             final Object obj = event.parameterInstances[0];
             if (obj instanceof URI) {
                 return processJavaNetUri(event, obj);
-            } else if (APACHE_LEGACY_HTTP_CLIENT_URI.equals(obj.getClass().getName())) {
+            } else if (HttpClient.APACHE_LEGACY_HTTP_CLIENT_URI.equals(obj.getClass().getName())) {
                 Map<String, Object> sourceMap = new HashMap<String, Object>() {{
                     put("PROTOCOL", obj.getClass().getMethod("getRawScheme").invoke(obj));
                     put("USERINFO", obj.getClass().getMethod("getRawUserinfo").invoke(obj));
@@ -176,7 +168,7 @@ public class SSRFSourceCheck implements SinkSourceChecker {
             }
 
             final Object reqObj = event.parameterInstances[1];
-            if (ReflectUtils.isImplementsInterface(reqObj.getClass(), APACHE_HTTP_CLIENT5_REQUEST_INTERFACE)) {
+            if (ReflectUtils.isImplementsInterface(reqObj.getClass(), HttpClient.APACHE_HTTP_CLIENT5_REQUEST_INTERFACE)) {
                 final Object authorityObj = reqObj.getClass().getMethod("getAuthority").invoke(reqObj);
                 Map<String, Object> sourceMap = new HashMap<String, Object>() {{
                     put("PROTOCOL", reqObj.getClass().getMethod("getScheme").invoke(reqObj));
@@ -201,14 +193,13 @@ public class SSRFSourceCheck implements SinkSourceChecker {
     private boolean CheckOkhttp(MethodEvent event, SinkNode sinkNode) {
         try {
             Class<?> cls = event.objectInstance.getClass();
-            if (OKHTTP3_REAL_CALL.equals(cls.getName()) || OKHTTP3_INTERNAL_REAL_CALL.equals(cls.getName())
-                    || OKHTTP_CALL.equals(cls.getName())) {
+            if (HttpClient.matchAllOkhttpCallClass(cls.getName())) {
                 Object url;
 
                 Field reqField = cls.getDeclaredField("originalRequest");
                 reqField.setAccessible(true);
                 Object req = reqField.get(event.objectInstance);
-                if (OKHTTP_CALL.equals(cls.getName())) {
+                if (HttpClient.matchLegacyOkhttpCallClass(cls.getName())) {
                     url = req.getClass().getMethod("httpUrl").invoke(req);
                 } else {
                     url = req.getClass().getMethod("url").invoke(req);
@@ -253,7 +244,8 @@ public class SSRFSourceCheck implements SinkSourceChecker {
         boolean hit = false;
         event.sourceTypes = new ArrayList<MethodEvent.MethodEventSourceType>();
         for (Map.Entry<String, Object> entry : sourceMap.entrySet()) {
-            if (entry.getKey().equals("QUERY") && entry.getValue() instanceof List) {
+            if (("QUERY".equals(entry.getKey()) || "HEADER".equals(entry.getKey()))
+                    && entry.getValue() != null && entry.getValue() instanceof List) {
                 for (Object q : (List) entry.getValue()) {
                     checkTaintPool(event, entry.getKey(), q);
                 }
