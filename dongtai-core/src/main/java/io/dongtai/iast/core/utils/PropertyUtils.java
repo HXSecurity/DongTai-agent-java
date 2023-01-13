@@ -105,10 +105,6 @@ public class PropertyUtils {
                 "]";
     }
 
-    public String getBlackFunctionFilePath() {
-        return "com.secnium.iast.resources/blacklistfunc.txt";
-    }
-
     public String getBlackClassFilePath() {
         return "com.secnium.iast.resources/blacklist.txt";
     }

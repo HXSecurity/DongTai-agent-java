@@ -30,7 +30,6 @@
                     <include>**/blackext.txt</include>
                     <include>**/blackurl.txt</include>
                     <include>**/blacklist.txt</include>
-                    <include>**/blacklistfunc.txt</include>
                     <include>**/sinks.txt</include>
                     <include>**/sources.txt</include>
                     <include>**/whitelist.txt</include>

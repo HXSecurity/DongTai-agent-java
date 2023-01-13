@@ -2,10 +2,7 @@ package io.dongtai.iast.core.utils.matcher.structure;
 
 import io.dongtai.iast.core.utils.LazyGet;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static org.apache.commons.lang3.StringUtils.join;
 
@@ -90,14 +87,12 @@ public class BehaviorStructure extends MemberStructure {
     private final LazyGet<String> signCodeLazyGet = new LazyGet<String>() {
         @Override
         protected String initialValue() {
-            return new StringBuilder(256)
-                    .append(getDeclaringClassStructure().getJavaClassName())
-                    .append("#")
-                    .append(getName())
-                    .append("(")
-                    .append(join(takeJavaClassNames(getParameterTypeClassStructures()), ","))
-                    .append(")")
-                    .toString();
+            return getDeclaringClassStructure().getJavaClassName() +
+                    "#" +
+                    getName() +
+                    "(" +
+                    join(takeJavaClassNames(getParameterTypeClassStructures()), ",") +
+                    ")";
         }
     };
 
@@ -116,15 +111,13 @@ public class BehaviorStructure extends MemberStructure {
     private final LazyGet<String> toStringLazyGet = new LazyGet<String>() {
         @Override
         protected String initialValue() {
-            return new StringBuilder(256)
-                    .append(getReturnTypeClassStructure().getJavaClassName())
-                    .append(":[")
-                    .append(join(takeJavaClassNames(getAnnotationTypeClassStructures()), ","))
-                    .append("]:")
-                    .append(getSignCode())
-                    .append(":")
-                    .append(join(takeJavaClassNames(getExceptionTypeClassStructures()), ","))
-                    .toString();
+            return getReturnTypeClassStructure().getJavaClassName() +
+                    ":[" +
+                    join(takeJavaClassNames(getAnnotationTypeClassStructures()), ",") +
+                    "]:" +
+                    getSignCode() +
+                    ":" +
+                    join(takeJavaClassNames(getExceptionTypeClassStructures()), ",");
         }
     };
 

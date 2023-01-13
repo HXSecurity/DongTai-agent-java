@@ -194,6 +194,7 @@ public class TaintPoolUtils {
                 className.startsWith(" org.apache.tomcat".substring(1)) ||
                 className.startsWith(" org.apache.catalina".substring(1)) ||
                 className.startsWith(" org.apache.shiro.web.servlet".substring(1)) ||
+                className.startsWith(" org.eclipse.jetty".substring(1)) ||
                 VALUES_ENUMERATOR.equals(className) ||
                 className.startsWith(SPRING_OBJECT) ||
                 className.contains("RequestWrapper") ||
