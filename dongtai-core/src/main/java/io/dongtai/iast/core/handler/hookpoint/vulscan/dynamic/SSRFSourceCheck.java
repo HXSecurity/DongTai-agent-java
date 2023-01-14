@@ -219,7 +219,28 @@ public class SSRFSourceCheck implements SinkSourceChecker {
                 } catch (Throwable ignore) {
                 }
 
+                List<String> headerList = new ArrayList<String>();
+                try {
+                    Object headersObj = req.getClass().getMethod("headers").invoke(req);
+                    Map<String, List<String>> headersMap = (Map<String, List<String>>) headersObj.getClass().getMethod("toMultimap").invoke(headersObj);
+                    for (Map.Entry<String, List<String>> header : headersMap.entrySet()) {
+                        if (header.getKey().equals(ContextManager.getHeaderKey())) {
+                            continue;
+                        }
+                        headerList.add(header.getKey());
+                        headerList.addAll(header.getValue());
+                    }
+                } catch (Throwable ignore) {
+                }
+
+                Object bodyObj = null;
+                try {
+                    bodyObj = req.getClass().getMethod("body").invoke(req);
+                } catch (Throwable ignore) {
+                }
+
                 final Object query = queryList;
+                final Object body = bodyObj;
                 Map<String, Object> sourceMap = new HashMap<String, Object>() {{
                     put("PROTOCOL", fUrl.getClass().getMethod("scheme").invoke(fUrl));
                     put("USERNAME", fUrl.getClass().getMethod("username").invoke(fUrl));
@@ -227,6 +248,8 @@ public class SSRFSourceCheck implements SinkSourceChecker {
                     put("HOST", fUrl.getClass().getMethod("host").invoke(fUrl));
                     put("PATH", fUrl.getClass().getMethod("encodedPath").invoke(fUrl));
                     put("QUERY", query);
+                    put("HEADER", headerList);
+                    put("BODY", body);
                 }};
 
                 event.setObjectValue(fUrl, true);
@@ -244,8 +267,11 @@ public class SSRFSourceCheck implements SinkSourceChecker {
         boolean hit = false;
         event.sourceTypes = new ArrayList<MethodEvent.MethodEventSourceType>();
         for (Map.Entry<String, Object> entry : sourceMap.entrySet()) {
+            if (entry.getValue() == null) {
+                continue;
+            }
             if (("QUERY".equals(entry.getKey()) || "HEADER".equals(entry.getKey()))
-                    && entry.getValue() != null && entry.getValue() instanceof List) {
+                    && entry.getValue() instanceof List) {
                 for (Object q : (List) entry.getValue()) {
                     checkTaintPool(event, entry.getKey(), q);
                 }
