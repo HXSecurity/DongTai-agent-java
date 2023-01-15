@@ -144,11 +144,16 @@ public class HttpService implements ServiceTrace {
         return null;
     }
 
-    public static boolean validateURLConnection(MethodEvent event) {
-        if (!HttpClient.matchJavaNetUrl(event.signature)) {
-            return true;
+    public static boolean validate(MethodEvent event) {
+        if (HttpClient.matchJavaNetUrl(event.signature)) {
+            return validateURLConnection(event);
+        } else if (HttpClient.matchOkhttp(event.signature)) {
+            return validateOkhttp(event);
         }
+        return true;
+    }
 
+    public static boolean validateURLConnection(MethodEvent event) {
         Object obj = event.objectInstance;
         if (obj == null) {
             return false;
@@ -182,6 +187,31 @@ public class HttpService implements ServiceTrace {
             }
         } catch (Throwable e) {
             DongTaiLog.warn("validate URLConnection failed", e);
+        }
+        return false;
+    }
+
+    public static boolean validateOkhttp(MethodEvent event) {
+        Object obj = event.objectInstance;
+        if (obj == null) {
+            return false;
+        }
+        try {
+            String className = obj.getClass().getName();
+            if (!HttpClient.matchAllOkhttpCallClass(className)) {
+                return false;
+            }
+
+            Field reqField = obj.getClass().getDeclaredField("originalRequest");
+            reqField.setAccessible(true);
+            Object req = reqField.get(obj);
+            Object header = req.getClass().getMethod("header", String.class).invoke(req, ContextManager.getHeaderKey());
+            // traceId header not exists
+            if (header == null) {
+                return true;
+            }
+        } catch (Throwable e) {
+            DongTaiLog.warn("validate okhttp failed", e);
         }
         return false;
     }

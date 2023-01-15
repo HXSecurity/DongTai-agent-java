@@ -44,7 +44,7 @@ public class DynamicPropagatorScanner implements IVulScan {
             }
         }
 
-        if (!HttpService.validateURLConnection(event)) {
+        if (!HttpService.validate(event)) {
             return;
         }
 
