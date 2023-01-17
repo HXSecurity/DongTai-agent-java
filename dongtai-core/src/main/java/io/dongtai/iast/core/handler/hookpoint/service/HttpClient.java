@@ -16,6 +16,8 @@ public class HttpClient {
 
     public static final String APACHE_LEGACY_HTTP_CLIENT_URI = " org.apache.commons.httpclient.URI".substring(1);
     public static final String APACHE_HTTP_CLIENT5_REQUEST_INTERFACE = " org.apache.hc.core5.http.HttpRequest".substring(1);
+    public static final String APACHE_HTTP_CLIENT5_REQUEST_HEADER_INTERFACE = " org.apache.hc.core5.http.MessageHeaders".substring(1);
+    public static final String APACHE_HTTP_CLIENT5_REQUEST_BODY_INTERFACE = " org.apache.hc.core5.http.HttpEntityContainer".substring(1);
 
     private static final String OKHTTP_CALL = "com.squareup.okhttp.Call";
     private static final String OKHTTP3_REAL_CALL = "okhttp3.RealCall";

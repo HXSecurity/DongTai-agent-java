@@ -168,22 +168,51 @@ public class SSRFSourceCheck implements SinkSourceChecker {
             }
 
             final Object reqObj = event.parameterInstances[1];
-            if (ReflectUtils.isImplementsInterface(reqObj.getClass(), HttpClient.APACHE_HTTP_CLIENT5_REQUEST_INTERFACE)) {
-                final Object authorityObj = reqObj.getClass().getMethod("getAuthority").invoke(reqObj);
-                Map<String, Object> sourceMap = new HashMap<String, Object>() {{
-                    put("PROTOCOL", reqObj.getClass().getMethod("getScheme").invoke(reqObj));
-                    put("USERINFO", authorityObj.getClass().getMethod("getUserInfo").invoke(authorityObj));
-                    put("HOST", authorityObj.getClass().getMethod("getHostName").invoke(authorityObj));
-                    // getPath = path + query
-                    put("PATHQUERY", reqObj.getClass().getMethod("getPath").invoke(reqObj));
-                }};
-
-                Object uriObj = reqObj.getClass().getMethod("getUri").invoke(reqObj);
-                event.addParameterValue(1, uriObj, true);
-                return addSourceType(event, sourceMap);
+            if (!ReflectUtils.isImplementsInterface(reqObj.getClass(), HttpClient.APACHE_HTTP_CLIENT5_REQUEST_INTERFACE)) {
+                return false;
             }
 
-            return false;
+            List<String> headerList = new ArrayList<String>();
+            if (ReflectUtils.isImplementsInterface(reqObj.getClass(), HttpClient.APACHE_HTTP_CLIENT5_REQUEST_HEADER_INTERFACE)) {
+                try {
+                    Object[] headersObj = (Object[]) reqObj.getClass().getMethod("getHeaders").invoke(reqObj);
+                    for (Object h : headersObj) {
+                        String headerName = (String) h.getClass().getMethod("getName").invoke(h);
+                        if (headerName == null || headerName.equals(ContextManager.getHeaderKey())) {
+                            continue;
+                        }
+                        String headerValue = (String) h.getClass().getMethod("getValue").invoke(h);
+
+                        headerList.add(headerName);
+                        headerList.add(headerValue);
+                    }
+                } catch (Throwable ignore) {
+                }
+            }
+
+            Object bodyObj = null;
+            if (ReflectUtils.isImplementsInterface(reqObj.getClass(), HttpClient.APACHE_HTTP_CLIENT5_REQUEST_BODY_INTERFACE)) {
+                try {
+                    bodyObj = reqObj.getClass().getMethod("getEntity").invoke(reqObj);
+                } catch (Throwable ignore) {
+                }
+            }
+            final Object body = bodyObj;
+
+            final Object authorityObj = reqObj.getClass().getMethod("getAuthority").invoke(reqObj);
+            Map<String, Object> sourceMap = new HashMap<String, Object>() {{
+                put("PROTOCOL", reqObj.getClass().getMethod("getScheme").invoke(reqObj));
+                put("USERINFO", authorityObj.getClass().getMethod("getUserInfo").invoke(authorityObj));
+                put("HOST", authorityObj.getClass().getMethod("getHostName").invoke(authorityObj));
+                // getPath = path + query
+                put("PATHQUERY", reqObj.getClass().getMethod("getPath").invoke(reqObj));
+                put("HEADER", headerList);
+                put("BODY", body);
+            }};
+
+            Object uriObj = reqObj.getClass().getMethod("getUri").invoke(reqObj);
+            event.addParameterValue(1, uriObj, true);
+            return addSourceType(event, sourceMap);
         } catch (Throwable e) {
             DongTaiLog.warn("apache http client5 get source failed: " + e.getMessage());
             return false;
