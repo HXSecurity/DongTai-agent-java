@@ -32,8 +32,9 @@ public class SSRFSourceCheck implements SinkSourceChecker {
         boolean hitTaintPool = false;
         if (HttpClient.matchJavaNetUrl(this.policySignature)) {
             return checkJavaNetURL(event, sinkNode);
-        } else if (HttpClient.matchApacheHttp3(this.policySignature)
-                || HttpClient.matchApacheHttp4(this.policySignature)) {
+        } else if (HttpClient.matchApacheHttp3(this.policySignature)) {
+            return checkApacheHttpClientLegacy(event, sinkNode);
+        } else if (HttpClient.matchApacheHttp4(this.policySignature)) {
             return checkApacheHttpClient(event, sinkNode);
         } else if (HttpClient.matchApacheHttp5(this.policySignature)) {
             return checkApacheHttpClient5(event, sinkNode);
@@ -88,29 +89,6 @@ public class SSRFSourceCheck implements SinkSourceChecker {
         }
     }
 
-    private boolean processJavaNetUri(MethodEvent event, Object u) {
-        try {
-            if (!(u instanceof URI)) {
-                return false;
-            }
-
-            final URI uri = (URI) u;
-            Map<String, Object> sourceMap = new HashMap<String, Object>() {{
-                put("PROTOCOL", uri.getScheme());
-                put("USERINFO", uri.getUserInfo());
-                put("HOST", uri.getHost());
-                put("PATH", uri.getPath());
-                put("QUERY", uri.getQuery());
-            }};
-
-            event.setObjectValue(uri, true);
-            return addSourceType(event, sourceMap);
-        } catch (Throwable e) {
-            DongTaiLog.warn("java.net.URI get source failed: " + e.getMessage());
-            return false;
-        }
-    }
-
     private boolean checkJavaNetURL(MethodEvent event, SinkNode sinkNode) {
         Object conn = event.objectInstance;
         if (conn == null) {
@@ -132,16 +110,14 @@ public class SSRFSourceCheck implements SinkSourceChecker {
         return false;
     }
 
-    private boolean checkApacheHttpClient(MethodEvent event, SinkNode sinkNode) {
+    private boolean checkApacheHttpClientLegacy(MethodEvent event, SinkNode sinkNode) {
         try {
             if (event.parameterInstances.length < 1 || event.parameterInstances[0] == null) {
                 return false;
             }
 
             final Object obj = event.parameterInstances[0];
-            if (obj instanceof URI) {
-                return processJavaNetUri(event, obj);
-            } else if (HttpClient.APACHE_LEGACY_HTTP_CLIENT_URI.equals(obj.getClass().getName())) {
+            if (HttpClient.APACHE_LEGACY_HTTP_CLIENT_URI.equals(obj.getClass().getName())) {
                 Map<String, Object> sourceMap = new HashMap<String, Object>() {{
                     put("PROTOCOL", obj.getClass().getMethod("getRawScheme").invoke(obj));
                     put("USERINFO", obj.getClass().getMethod("getRawUserinfo").invoke(obj));
@@ -155,6 +131,68 @@ public class SSRFSourceCheck implements SinkSourceChecker {
             }
 
             return false;
+        } catch (Throwable e) {
+            DongTaiLog.warn("apache http legacy client get source failed: " + e.getMessage());
+            return false;
+        }
+    }
+
+    private boolean checkApacheHttpClient(MethodEvent event, SinkNode sinkNode) {
+        try {
+            if (event.parameterInstances.length < 2 || event.parameterInstances[1] == null) {
+                return false;
+            }
+
+            final Object reqObj = event.parameterInstances[1];
+            if (!ReflectUtils.isImplementsInterface(reqObj.getClass(), HttpClient.APACHE_HTTP_CLIENT_REQUEST_INTERFACE)) {
+                return false;
+            }
+
+            List<String> headerList = new ArrayList<String>();
+            if (ReflectUtils.isImplementsInterface(reqObj.getClass(), HttpClient.APACHE_HTTP_CLIENT_REQUEST_HEADER_INTERFACE)) {
+                try {
+                    Object[] headersObj = (Object[]) reqObj.getClass().getMethod("getAllHeaders").invoke(reqObj);
+                    for (Object h : headersObj) {
+                        String headerName = (String) h.getClass().getMethod("getName").invoke(h);
+                        if (headerName == null || headerName.equals(ContextManager.getHeaderKey())) {
+                            continue;
+                        }
+                        String headerValue = (String) h.getClass().getMethod("getValue").invoke(h);
+
+                        headerList.add(headerName);
+                        headerList.add(headerValue);
+                    }
+                } catch (Throwable ignore) {
+                }
+            }
+
+            Object bodyObj = null;
+            if (ReflectUtils.isImplementsInterface(reqObj.getClass(), HttpClient.APACHE_HTTP_CLIENT_REQUEST_BODY_INTERFACE)) {
+                try {
+                    bodyObj = reqObj.getClass().getMethod("getEntity").invoke(reqObj);
+                } catch (Throwable ignore) {
+                }
+            }
+            final Object body = bodyObj;
+
+            Object uriObj = reqObj.getClass().getMethod("getURI").invoke(reqObj);
+            if (!(uriObj instanceof URI)) {
+                return false;
+            }
+
+            final URI uri = (URI) uriObj;
+            Map<String, Object> sourceMap = new HashMap<String, Object>() {{
+                put("PROTOCOL", uri.getScheme());
+                put("USERINFO", uri.getUserInfo());
+                put("HOST", uri.getHost());
+                put("PATH", uri.getPath());
+                put("QUERY", uri.getQuery());
+                put("HEADER", headerList);
+                put("BODY", body);
+            }};
+
+            event.setObjectValue(uri, true);
+            return addSourceType(event, sourceMap);
         } catch (Throwable e) {
             DongTaiLog.warn("apache http client get source failed: " + e.getMessage());
             return false;

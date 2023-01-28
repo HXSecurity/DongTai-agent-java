@@ -62,12 +62,7 @@ public class HttpService implements ServiceTrace {
     }
 
     private String addTraceToApacheHttpClient(MethodEvent event) {
-        Object obj;
-        if (HttpClient.matchApacheHttp5(this.matchedSignature)) {
-            obj = event.parameterInstances[1];
-        } else {
-            obj = event.objectInstance;
-        }
+        Object obj = event.parameterInstances[1];
         if (obj == null) {
             return null;
         }
