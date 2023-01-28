@@ -62,6 +62,9 @@ public class HttpService implements ServiceTrace {
     }
 
     private String addTraceToApacheHttpClient(MethodEvent event) {
+        if (event.parameterInstances.length < 2) {
+            return null;
+        }
         Object obj = event.parameterInstances[1];
         if (obj == null) {
             return null;
@@ -142,6 +145,8 @@ public class HttpService implements ServiceTrace {
     public static boolean validate(MethodEvent event) {
         if (HttpClient.matchJavaNetUrl(event.signature)) {
             return validateURLConnection(event);
+        } else if (HttpClient.matchApacheHttp4(event.signature) || HttpClient.matchApacheHttp5(event.signature)) {
+            return validateApacheHttpClient(event);
         } else if (HttpClient.matchOkhttp(event.signature)) {
             return validateOkhttp(event);
         }
@@ -182,6 +187,34 @@ public class HttpService implements ServiceTrace {
             }
         } catch (Throwable e) {
             DongTaiLog.warn("validate URLConnection failed", e);
+        }
+        return false;
+    }
+
+    public static boolean validateApacheHttpClient(MethodEvent event) {
+        if (event.parameterInstances.length < 2) {
+            return false;
+        }
+        Object obj = event.parameterInstances[1];
+        if (obj == null) {
+            return false;
+        }
+        try {
+            boolean v5 = false;
+            if (!ReflectUtils.isImplementsInterface(obj.getClass(), HttpClient.APACHE_HTTP_CLIENT_REQUEST_HEADER_INTERFACE)
+                    && !ReflectUtils.isImplementsInterface(obj.getClass(), HttpClient.APACHE_HTTP_CLIENT5_REQUEST_HEADER_INTERFACE)) {
+                return false;
+            }
+
+            Method containsHeaderMethod = obj.getClass().getMethod("containsHeader", String.class);
+            containsHeaderMethod.setAccessible(true);
+            boolean containsHeader = (boolean) containsHeaderMethod.invoke(obj, ContextManager.getHeaderKey());
+            // traceId header not exists
+            if (!containsHeader) {
+                return true;
+            }
+        } catch (Throwable e) {
+            DongTaiLog.warn("validate apache http client failed", e);
         }
         return false;
     }
