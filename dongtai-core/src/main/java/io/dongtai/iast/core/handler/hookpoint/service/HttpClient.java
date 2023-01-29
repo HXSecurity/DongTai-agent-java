@@ -7,7 +7,7 @@ public class HttpClient {
     private static final String JAVA_NET_URL_CONN_GET_INPUT_STREAM = "sun.net.www.protocol.http.HttpURLConnection.getInputStream()";
     private static final String JAVA_NET_URL_CONN_GET_OUTPUT_STREAM = "sun.net.www.protocol.http.HttpURLConnection.getOutputStream()";
     private static final String APACHE_LEGACY_HTTP_CLIENT_REQUEST_SET_URI = " org.apache.commons.httpclient.HttpMethodBase.setURI(org.apache.commons.httpclient.URI)".substring(1);
-    private static final String APACHE_HTTP_CLIENT_REQUEST_SET_URI = " org.apache.http.client.methods.HttpRequestBase.setURI(java.net.URI)".substring(1);
+    private static final String APACHE_HTTP_CLIENT_EXECUTE = " org.apache.http.impl.client.CloseableHttpClient.doExecute(org.apache.http.HttpHost,org.apache.http.HttpRequest,org.apache.http.protocol.HttpContext)".substring(1);
     private static final String APACHE_HTTP_CLIENT5_EXECUTE = " org.apache.hc.client5.http.impl.classic.CloseableHttpClient.doExecute(org.apache.hc.core5.http.HttpHost,org.apache.hc.core5.http.ClassicHttpRequest,org.apache.hc.core5.http.protocol.HttpContext)".substring(1);
     private static final String OKHTTP_CALL_EXECUTE = "com.squareup.okhttp.Call.execute()";
     private static final String OKHTTP_CALL_ENQUEUE = "com.squareup.okhttp.Call.enqueue(com.squareup.okhttp.Callback)";
@@ -15,7 +15,12 @@ public class HttpClient {
     private static final String OKHTTP3_CALL_ENQUEUE = "okhttp3.Call.enqueue(okhttp3.Callback)";
 
     public static final String APACHE_LEGACY_HTTP_CLIENT_URI = " org.apache.commons.httpclient.URI".substring(1);
+    public static final String APACHE_HTTP_CLIENT_REQUEST_INTERFACE = " org.apache.http.HttpRequest".substring(1);
     public static final String APACHE_HTTP_CLIENT5_REQUEST_INTERFACE = " org.apache.hc.core5.http.HttpRequest".substring(1);
+    public static final String APACHE_HTTP_CLIENT_REQUEST_HEADER_INTERFACE = " org.apache.http.HttpMessage".substring(1);
+    public static final String APACHE_HTTP_CLIENT5_REQUEST_HEADER_INTERFACE = " org.apache.hc.core5.http.MessageHeaders".substring(1);
+    public static final String APACHE_HTTP_CLIENT_REQUEST_BODY_INTERFACE = " org.apache.http.HttpEntityEnclosingRequest".substring(1);
+    public static final String APACHE_HTTP_CLIENT5_REQUEST_BODY_INTERFACE = " org.apache.hc.core5.http.HttpEntityContainer".substring(1);
 
     private static final String OKHTTP_CALL = "com.squareup.okhttp.Call";
     private static final String OKHTTP3_REAL_CALL = "okhttp3.RealCall";
@@ -27,7 +32,7 @@ public class HttpClient {
             JAVA_NET_URL_CONN_GET_INPUT_STREAM,
             JAVA_NET_URL_CONN_GET_OUTPUT_STREAM,
             APACHE_LEGACY_HTTP_CLIENT_REQUEST_SET_URI,
-            APACHE_HTTP_CLIENT_REQUEST_SET_URI,
+            APACHE_HTTP_CLIENT_EXECUTE,
             APACHE_HTTP_CLIENT5_EXECUTE,
             OKHTTP_CALL_EXECUTE,
             OKHTTP_CALL_ENQUEUE,
@@ -67,7 +72,7 @@ public class HttpClient {
     }
 
     public static boolean matchApacheHttp4(String signature) {
-        return APACHE_HTTP_CLIENT_REQUEST_SET_URI.equals(signature);
+        return APACHE_HTTP_CLIENT_EXECUTE.equals(signature);
     }
 
     public static boolean matchApacheHttp5(String signature) {
