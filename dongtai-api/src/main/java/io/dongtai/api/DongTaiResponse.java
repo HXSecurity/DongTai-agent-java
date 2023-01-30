@@ -7,5 +7,5 @@ public interface DongTaiResponse {
 
     public Map<String, Object> getResponseMeta(boolean getBody);
 
-    public byte[] getResponseData() throws IOException;
+    public byte[] getResponseData(boolean getBody) throws IOException;
 }

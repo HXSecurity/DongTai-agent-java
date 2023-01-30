@@ -65,9 +65,7 @@ public class JakartaResponseWrapper extends HttpServletResponseWrapper implement
     public Map<String, Object> getResponseMeta(boolean getBody) {
         Map<String, Object> responseMeta = new HashMap<String, Object>(2);
         responseMeta.put("headers", getHeaders());
-        if (getBody) {
-            responseMeta.put("body", getResponseData());
-        }
+        responseMeta.put("body", getResponseData(getBody));
         return responseMeta;
     }
 
@@ -82,10 +80,10 @@ public class JakartaResponseWrapper extends HttpServletResponseWrapper implement
     }
 
     @Override
-    public byte[] getResponseData() {
+    public byte[] getResponseData(boolean getBody) {
         try {
             flushBuffer();
-            if (copier != null) {
+            if (getBody && copier != null) {
                 return copier.getCopy();
             }
         } catch (Throwable e) {
