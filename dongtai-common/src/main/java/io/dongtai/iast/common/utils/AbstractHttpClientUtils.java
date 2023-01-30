@@ -34,7 +34,7 @@ public class AbstractHttpClientUtils {
         HttpEntity reqBody = null;
         try {
             if (HttpMethods.POST.equals(method) && data != null) {
-                reqBody = new GzipCompressingEntity(new StringEntity(data));
+                reqBody = new GzipCompressingEntity(new StringEntity(data, "UTF-8"));
             }
         } catch (Throwable e) {
             DongTaiLog.error("prepare request " + url + " body failed", e);
@@ -60,7 +60,7 @@ public class AbstractHttpClientUtils {
         HttpEntity reqBody = null;
         try {
             if (HttpMethods.POST.equals(method) && data != null) {
-                reqBody = new StringEntity(data);
+                reqBody = new StringEntity(data, "UTF-8");
             }
         } catch (Throwable e) {
             DongTaiLog.error("prepare request " + url + " body failed", e);
