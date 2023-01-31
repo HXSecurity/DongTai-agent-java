@@ -181,14 +181,14 @@ public class TaintPoolUtils {
         if (sourceClass.getClassLoader() == null) {
             return false;
         }
-        String className = sourceClass.getName();
-        if (!TaintPoolUtils.isAllowTaintGetterClass(className)) {
+        if (!TaintPoolUtils.isAllowTaintGetterClass(sourceClass)) {
             return false;
         }
         return true;
     }
 
-    public static boolean isAllowTaintGetterClass(String className) {
+    public static boolean isAllowTaintGetterClass(Class<?> clazz) {
+        String className = clazz.getName();
         if (className.startsWith("cn.huoxian.iast.api.") ||
                 className.startsWith("io.dongtai.api.") ||
                 className.startsWith(" org.apache.tomcat".substring(1)) ||
@@ -203,6 +203,15 @@ public class TaintPoolUtils {
         ) {
             return false;
         }
+
+        List<Class<?>> interfaces = ReflectUtils.getAllInterfaces(clazz);
+        for (Class<?> inter : interfaces) {
+            if (inter.getName().endsWith(".servlet.ServletRequest")
+                    || inter.getName().endsWith(".servlet.ServletResponse")) {
+                return false;
+            }
+        }
+
         return true;
     }
 
@@ -228,6 +237,8 @@ public class TaintPoolUtils {
                 || "getRepeatedField".equals(methodName)
                 || "getSerializedSize".equals(methodName)
                 || "getMethodOrDie".equals(methodName)
+                || "getWriter".equals(methodName)
+                || "getOutputStream".equals(methodName)
                 || methodName.endsWith("Bytes")
                 || method.getParameterCount() != 0) {
             return false;

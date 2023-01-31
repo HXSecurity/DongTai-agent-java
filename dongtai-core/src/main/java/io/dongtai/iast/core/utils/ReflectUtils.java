@@ -2,7 +2,7 @@ package io.dongtai.iast.core.utils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Arrays;
+import java.util.*;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -123,5 +123,27 @@ public class ReflectUtils {
             cls = cls.getSuperclass();
         }
         return false;
+    }
+
+    public static List<Class<?>> getAllInterfaces(Class<?> cls) {
+        ArrayList<Class<?>> interfaceList = new ArrayList<Class<?>>();
+        if (cls == null) {
+            return interfaceList;
+        }
+        getAllInterfaces(cls, interfaceList);
+        return interfaceList;
+    }
+
+    private static void getAllInterfaces(Class<?> cls, List<Class<?>> interfaceList) {
+        while (cls != null) {
+            Class<?>[] interfaces = cls.getInterfaces();
+            for (int i = 0; i < interfaces.length; i++) {
+                if (!interfaceList.contains(interfaces[i])) {
+                    interfaceList.add(interfaces[i]);
+                    getAllInterfaces(interfaces[i], interfaceList);
+                }
+            }
+            cls = cls.getSuperclass();
+        }
     }
 }
