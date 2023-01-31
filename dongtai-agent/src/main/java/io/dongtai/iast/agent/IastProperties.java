@@ -18,6 +18,7 @@ public class IastProperties {
         put("app_create", PropertyConstant.PROPERTY_APP_CREATE);
         put("app_name", PropertyConstant.PROPERTY_APP_NAME);
         put("app_version", PropertyConstant.PROPERTY_APP_VERSION);
+        put("app_template", PropertyConstant.PROPERTY_APP_TEMPLATE);
         put("engine_name", PropertyConstant.PROPERTY_ENGINE_NAME);
         put("cluster_name", PropertyConstant.PROPERTY_CLUSTER_NAME);
         put("cluster_version", PropertyConstant.PROPERTY_CLUSTER_VERSION);
@@ -39,6 +40,8 @@ public class IastProperties {
     private String debugFlag = null;
     private Integer isAutoCreateProject;
     private String projectName;
+    private String projectVersion;
+    private Integer projectTemplate;
     private String clusterName;
     private String clusterVersion;
     private String serverUrl;
@@ -54,7 +57,6 @@ public class IastProperties {
     private String proxyEnableStatus;
     private String proxyHost;
     private int proxyPort = -1;
-    private String fallbackVersion;
     private String customCoreJarUrl;
     private String customSpyJarUrl;
     private String customApiJarUrl;
@@ -162,9 +164,25 @@ public class IastProperties {
     }
 
     public String getProjectVersion() {
-        return System.getProperty(PropertyConstant.PROPERTY_APP_VERSION,
-                System.getProperty("project.version", cfg.getProperty("project.version", "V1.0"))
-        );
+        if (null == projectVersion) {
+            projectVersion = System.getProperty(PropertyConstant.PROPERTY_APP_VERSION,
+                    System.getProperty("project.version", cfg.getProperty("project.version", "V1.0"))
+            );
+        }
+        return projectVersion;
+    }
+
+    public Integer getProjectTemplate() {
+        if (null == projectTemplate) {
+            try {
+                projectTemplate = Integer.parseInt(System.getProperty(PropertyConstant.PROPERTY_APP_TEMPLATE,
+                        cfg.getProperty(PropertyConstant.PROPERTY_APP_TEMPLATE, "0"))
+                );
+            } catch (NumberFormatException e) {
+                projectTemplate = 0;
+            }
+        }
+        return projectTemplate;
     }
 
     public String getEngineName() {
