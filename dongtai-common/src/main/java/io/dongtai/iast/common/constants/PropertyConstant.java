@@ -5,6 +5,7 @@ public class PropertyConstant {
     public static final String PROPERTY_APP_CREATE = "dongtai.app.create";
     public static final String PROPERTY_APP_NAME = "dongtai.app.name";
     public static final String PROPERTY_APP_VERSION = "dongtai.app.version";
+    public static final String PROPERTY_APP_TEMPLATE = "dongtai.app.template";
     public static final String PROPERTY_ENGINE_NAME = "dongtai.engine.name";
     public static final String PROPERTY_CLUSTER_NAME = "dongtai.cluster.name";
     public static final String PROPERTY_CLUSTER_VERSION = "dongtai.cluster.version";

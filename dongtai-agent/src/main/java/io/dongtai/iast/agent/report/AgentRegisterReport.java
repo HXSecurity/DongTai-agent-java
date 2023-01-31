@@ -65,6 +65,7 @@ public class AgentRegisterReport {
         object.put("serverPort", "");
         object.put("autoCreateProject", IastProperties.getInstance().isAutoCreateProject());
         object.put("projectVersion", IastProperties.getInstance().getProjectVersion());
+        object.put("projectTemplateId", IastProperties.getInstance().getProjectTemplate());
 
         return object.toString();
     }
