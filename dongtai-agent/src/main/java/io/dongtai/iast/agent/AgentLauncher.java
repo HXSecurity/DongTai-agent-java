@@ -50,9 +50,10 @@ public class AgentLauncher {
         try {
             AGENT_STATE.setPendingState(State.RUNNING);
             IastProperties.getInstance();
+            DongTaiLog.init(0);
             install(inst);
         } catch (Throwable e) {
-            System.out.println("[io.dongtai.iast.agent] agent premain failed: " + e.toString());
+            DongTaiLog.error("agent premain failed", e);
         } finally {
             AGENT_STATE.setPendingState(null);
         }
@@ -76,7 +77,6 @@ public class AgentLauncher {
             }
 
             IastProperties.getInstance();
-            System.out.println("[io.dongtai.iast.agent] Protect By DongTai IAST: " + System.getProperty("protect.by.dongtai", "false"));
         } catch (Throwable e) {
             AGENT_STATE.setState(State.EXCEPTION);
             System.out.println("[io.dongtai.iast.agent] agent agentmain parse args failed: " + e.toString());
@@ -88,12 +88,11 @@ public class AgentLauncher {
         if ("uninstall".equals(mode)) {
             cause = StateCause.UNINSTALL_BY_CLI;
             if (AGENT_STATE.getPendingState() != null) {
-                System.out.println("[io.dongtai.iast.agent] DongTai agent uninstall: "
-                        + AGENT_STATE.getPendingStateInfo());
+                DongTaiLog.info("DongTai agent uninstall: " + AGENT_STATE.getPendingStateInfo());
                 return;
             }
-            if (AGENT_STATE.isUninstalled()) {
-                System.out.println("[io.dongtai.iast.agent] DongTai wasn't installed.");
+            if (!AgentState.getInstance().isInit() || AGENT_STATE.isUninstalled()) {
+                DongTaiLog.info("DongTai wasn't installed.");
                 return;
             }
 
@@ -115,7 +114,7 @@ public class AgentLauncher {
                 AGENT_STATE.setCause(cause);
             } catch (Throwable e) {
                 AGENT_STATE.setState(State.EXCEPTION).setCause(cause);
-                System.out.println("[io.dongtai.iast.agent] agent agentmain uninstall failed: " + e.toString());
+                DongTaiLog.error("agent agentmain uninstall failed", e);
             } finally {
                 AGENT_STATE.setPendingState(null);
             }
@@ -124,10 +123,10 @@ public class AgentLauncher {
         }
 
         // install
+        DongTaiLog.init(0);
         cause = StateCause.RUNNING_BY_CLI;
         if (AGENT_STATE.getPendingState() != null) {
-            System.out.println("[io.dongtai.iast.agent] DongTai agent uninstall: "
-                    + AGENT_STATE.getPendingStateInfo());
+            DongTaiLog.info("DongTai agent install: " + AGENT_STATE.getPendingStateInfo());
             return;
         }
         if (AGENT_STATE.isRunning()) {
@@ -143,7 +142,7 @@ public class AgentLauncher {
             install(inst);
         } catch (Throwable e) {
             AGENT_STATE.setState(State.EXCEPTION).setCause(cause);
-            System.out.println("[io.dongtai.iast.agent] agent agentmain install failed: " + e.toString());
+            DongTaiLog.error("agent agentmain install failed: " + e.toString());
         } finally {
             AGENT_STATE.setPendingState(null);
         }
@@ -167,7 +166,6 @@ public class AgentLauncher {
     private static void install(final Instrumentation inst) {
         Boolean send = AgentRegisterReport.send();
         if (send) {
-            DongTaiLog.init(AgentRegisterReport.getAgentId());
             LogCollector.extractFluent();
             DongTaiLog.info("Agent registered successfully.");
             Boolean agentStat = AgentRegisterReport.agentStat();

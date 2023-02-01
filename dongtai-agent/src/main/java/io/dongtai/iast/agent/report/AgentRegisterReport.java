@@ -223,16 +223,19 @@ public class AgentRegisterReport {
     public void register() {
         try {
             if (server == null) {
-                System.out.println("[io.dongtai.iast.agent] Can't Recognize Web Service");
+                DongTaiLog.error("Can't Recognize Web Service");
                 return;
-            } else {
-                System.out.println("[io.dongtai.iast.agent] DongTai will install for " + server.getName() + " Service");
             }
             String msg = generateAgentRegisterMsg();
             StringBuilder responseRaw = HttpClientUtils.sendPost(ApiPath.AGENT_REGISTER, msg);
             if (!isRegistered()) {
                 setAgentData(responseRaw);
             }
+            if (isRegistered()) {
+                DongTaiLog.init(getAgentId());
+            }
+            DongTaiLog.info("DongTai Config: " + IastProperties.getInstance().getPropertiesFilePath());
+            DongTaiLog.info("DongTai will install for " + server.getName() + " Service");
         } catch (NullPointerException e) {
             DongTaiLog.error("Agent registration to {} failed, Token: {}, Reason: {}",
                     IastProperties.getInstance().getBaseUrl(), IastProperties.getInstance().getServerToken(), e.getMessage());
@@ -293,13 +296,13 @@ public class AgentRegisterReport {
                 uuid = br.readLine();
             }
         } catch (Throwable e) {
-            System.out.println("read/write agent uuid file failed: " + e.toString());
+            DongTaiLog.error("read/write agent uuid file failed", e);
         } finally {
             if (bw != null) {
                 try {
                     bw.close();
                 } catch (IOException e) {
-                    System.out.println("close agent uuid file writer failed: " + e.toString());
+                    DongTaiLog.error("close agent uuid file writer failed", e);
                 }
             }
 
@@ -307,7 +310,7 @@ public class AgentRegisterReport {
                 try {
                     br.close();
                 } catch (IOException e) {
-                    System.out.println("close agent uuid file reader failed: " + e.toString());
+                    DongTaiLog.error("close agent uuid file reader failed", e);
                 }
             }
         }

@@ -129,11 +129,11 @@ public class ConfigMatcher {
      */
     public boolean canHook(String className) {
         if (className.startsWith("[")) {
-            DongTaiLog.trace("ignore transform {}. Reason: class is a Array Type", className);
+            // DongTaiLog.trace("ignore transform {}. Reason: class is a Array Type", className);
             return false;
         }
         if (className.contains("/$Proxy")) {
-            DongTaiLog.trace("ignore transform {}. Reason: classname is a aop class by Proxy", className);
+            // DongTaiLog.trace("ignore transform {}. Reason: classname is a aop class by Proxy", className);
             return false;
         }
         if (className.startsWith("com/secnium/iast/")
@@ -143,25 +143,25 @@ public class ConfigMatcher {
                 || className.startsWith("oshi/")
                 || className.startsWith("com/sun/jna/")
         ) {
-            DongTaiLog.trace("ignore transform {}. Reason: class is in blacklist", className);
+            // DongTaiLog.trace("ignore transform {}. Reason: class is in blacklist", className);
             return false;
         }
         if (inHookBlacklist(className)) {
-            DongTaiLog.trace("ignore transform {}. Reason: classname is startswith com/secnium/iast/", className);
+            // DongTaiLog.trace("ignore transform {}. Reason: classname is startswith com/secnium/iast/", className);
             return false;
         }
         if (className.contains("CGLIB$$")) {
-            DongTaiLog.trace("ignore transform {}. Reason: classname is a aop class by CGLIB", className);
+            // DongTaiLog.trace("ignore transform {}. Reason: classname is a aop class by CGLIB", className);
             return false;
         }
 
         if (className.contains("$$Lambda$")) {
-            DongTaiLog.trace("ignore transform {}. Reason: classname is a aop class by Lambda", className);
+            // DongTaiLog.trace("ignore transform {}. Reason: classname is a aop class by Lambda", className);
             return false;
         }
 
         if (className.contains("_$$_jvst")) {
-            DongTaiLog.trace("ignore transform {}. Reason: classname is a aop class", className);
+            // DongTaiLog.trace("ignore transform {}. Reason: classname is a aop class", className);
             return false;
         }
         return true;

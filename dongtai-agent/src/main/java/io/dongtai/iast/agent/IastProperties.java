@@ -110,8 +110,6 @@ public class IastProperties {
 
             InputStream is = IastProperties.class.getClassLoader().getResourceAsStream("iast.properties");
             cfg.load(is);
-
-            System.out.println("[io.dongtai.iast.agent] DongTai Config: " + propertiesFilePath);
         } catch (IOException e) {
             System.out.println("[io.dongtai.iast.agent] read iast.properties failed: " + e.getMessage());
         }

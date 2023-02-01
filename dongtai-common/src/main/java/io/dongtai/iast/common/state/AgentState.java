@@ -58,6 +58,10 @@ public class AgentState {
         return this.state == State.PAUSED;
     }
 
+    public boolean isInit() {
+        return this.state != null;
+    }
+
     public boolean isUninstalled() {
         return this.state == State.UNINSTALLED;
     }

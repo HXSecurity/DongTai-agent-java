@@ -12,7 +12,7 @@ import java.util.regex.Matcher;
  */
 public class DongTaiLog {
     public static boolean enablePrintLog;
-    private static final String logDir;
+    private static String logDir;
     private static String logPath = "";
     public static boolean enableColor;
     public static LogLevel LEVEL = getCurrentLevel();
@@ -36,6 +36,8 @@ public class DongTaiLog {
     }
 
     public static void init(int id) {
+        enablePrintLog = !"false".equalsIgnoreCase(IastProperties.enablePrintLog());
+        logDir = IastProperties.getLogDir();
         if (!enablePrintLog || logDir.isEmpty()) {
             return;
         }
@@ -60,6 +62,8 @@ public class DongTaiLog {
         } catch (Throwable e) {
             System.out.println("init log file " + logPath + "failed: " + e.getMessage());
         }
+
+        setLevel(getCurrentLevel());
     }
 
     public static String getLogPath() {
@@ -277,7 +281,7 @@ public class DongTaiLog {
             if (t != null) {
                 StringWriter stringWriter = new StringWriter();
                 t.printStackTrace(new PrintWriter(stringWriter));
-                msg = msg + stringWriter;
+                msg = msg + ", StackTrace: " + stringWriter;
             }
 
             o = new FileOutputStream(file, true);
