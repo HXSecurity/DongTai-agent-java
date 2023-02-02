@@ -6,8 +6,8 @@ import java.io.File;
  * @author dongzhiyong@huoxian.cn
  */
 public class IastProperties {
-    public static String enablePrintLog() {
-        return System.getProperty("dongtai.log", "true");
+    public static boolean isEnabled() {
+        return !"false".equalsIgnoreCase(System.getProperty("dongtai.log", "true"));
     }
 
     public static String getLogDir() {

@@ -8,22 +8,22 @@ import java.io.PrintStream;
 public class DongTaiLogTest {
     private final PrintStream standardOut = System.out;
     private final ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
-    private final boolean oldEnableColor = DongTaiLog.enableColor;
+    private final boolean oldEnableColor = DongTaiLog.ENABLE_COLOR;
     private final static String LS = System.getProperty("line.separator");
     private static final String TITLE = "[io.dongtai.iast.agent] ";
 
     @Before
     public void setUp() {
-        DongTaiLog.enablePrintLog = true;
-        DongTaiLog.enableColor = false;
+        DongTaiLog.ENABLED = true;
+        DongTaiLog.ENABLE_COLOR = false;
         clear();
         System.setOut(new PrintStream(outputStreamCaptor));
     }
 
     @After
     public void tearDown() {
-        DongTaiLog.enablePrintLog = false;
-        DongTaiLog.enableColor = oldEnableColor;
+        DongTaiLog.ENABLED = false;
+        DongTaiLog.ENABLE_COLOR = oldEnableColor;
         clear();
         System.setOut(standardOut);
     }
@@ -34,7 +34,7 @@ public class DongTaiLogTest {
 
     @Test
     public void canLogTest() {
-        DongTaiLog.enablePrintLog = true;
+        DongTaiLog.ENABLED = true;
         DongTaiLog.setLevel(DongTaiLog.LogLevel.ERROR);
         Assert.assertTrue(DongTaiLog.canLog(DongTaiLog.LogLevel.ERROR));
         Assert.assertFalse(DongTaiLog.canLog(DongTaiLog.LogLevel.WARN));
@@ -70,7 +70,7 @@ public class DongTaiLogTest {
         Assert.assertTrue(DongTaiLog.canLog(DongTaiLog.LogLevel.DEBUG));
         Assert.assertTrue(DongTaiLog.canLog(DongTaiLog.LogLevel.TRACE));
 
-        DongTaiLog.enablePrintLog = false;
+        DongTaiLog.ENABLED = false;
         DongTaiLog.setLevel(DongTaiLog.LogLevel.TRACE);
         Assert.assertFalse(DongTaiLog.canLog(DongTaiLog.LogLevel.ERROR));
         Assert.assertFalse(DongTaiLog.canLog(DongTaiLog.LogLevel.WARN));
@@ -81,94 +81,138 @@ public class DongTaiLogTest {
 
     @Test
     public void logTest() {
+        DongTaiLog.setLevel(DongTaiLog.LogLevel.DEBUG);
+        clear();
+        DongTaiLog.trace("foo");
+        Assert.assertEquals("DEBUG level ignore", outputStreamCaptor.toString(), "");
+
+        DongTaiLog.setLevel(DongTaiLog.LogLevel.INFO);
+        clear();
+        DongTaiLog.trace("foo");
+        Assert.assertEquals("INFO level ignore", outputStreamCaptor.toString(), "");
+        clear();
+        DongTaiLog.debug("foo");
+        Assert.assertEquals("INFO level ignore", outputStreamCaptor.toString(), "");
+
+        DongTaiLog.setLevel(DongTaiLog.LogLevel.WARN);
+        clear();
+        DongTaiLog.trace("foo");
+        Assert.assertEquals("WARN level ignore", outputStreamCaptor.toString(), "");
+        clear();
+        DongTaiLog.debug("foo");
+        Assert.assertEquals("WARN level ignore", outputStreamCaptor.toString(), "");
+        clear();
+        DongTaiLog.info("foo");
+        Assert.assertEquals("WARN level ignore", outputStreamCaptor.toString(), "");
+
+        DongTaiLog.setLevel(DongTaiLog.LogLevel.ERROR);
+        clear();
+        DongTaiLog.trace("foo");
+        Assert.assertEquals("ERROR level ignore", outputStreamCaptor.toString(), "");
+        clear();
+        DongTaiLog.debug("foo");
+        Assert.assertEquals("ERROR level ignore", outputStreamCaptor.toString(), "");
+        clear();
+        DongTaiLog.info("foo");
+        Assert.assertEquals("ERROR level ignore", outputStreamCaptor.toString(), "");
+        clear();
+        DongTaiLog.warn("foo");
+        Assert.assertEquals("ERROR level ignore", outputStreamCaptor.toString(), "");
+
         DongTaiLog.setLevel(DongTaiLog.LogLevel.TRACE);
         clear();
         DongTaiLog.trace("foo");
-        Assert.assertTrue("TRACE log", outputStreamCaptor.toString()
-                .endsWith(" " + TITLE + "[TRACE] foo" + LS));
+        Assert.assertEquals("TRACE log", outputStreamCaptor.toString().substring(20),
+                TITLE + "[TRACE] foo" + LS);
         clear();
         DongTaiLog.trace("foo {} {}", "bar", "baz");
-        Assert.assertTrue("TRACE log format", outputStreamCaptor.toString()
-                .endsWith(" " + TITLE + "[TRACE] foo bar baz" + LS));
+        Assert.assertEquals("TRACE log format", outputStreamCaptor.toString().substring(20),
+                TITLE + "[TRACE] foo bar baz" + LS);
         clear();
         DongTaiLog.trace("foo", new Exception("bar"));
-        Assert.assertTrue("TRACE log message with exception", outputStreamCaptor.toString()
-                .endsWith(" " + TITLE + "[TRACE] foo, Exception: java.lang.Exception: bar" + LS));
-        clear();
-        DongTaiLog.trace(new Exception("bar"));
-        Assert.assertTrue("TRACE log exception", outputStreamCaptor.toString()
-                .endsWith(" " + TITLE + "[TRACE] Exception: java.lang.Exception: bar" + LS));
+        Assert.assertEquals("TRACE log message with exception", outputStreamCaptor.toString().substring(20),
+                TITLE + "[TRACE] foo, Exception: java.lang.Exception: bar" + LS);
 
         DongTaiLog.setLevel(DongTaiLog.LogLevel.DEBUG);
         clear();
         DongTaiLog.debug("foo");
-        Assert.assertTrue("DEBUG log", outputStreamCaptor.toString()
-                .endsWith(" " + TITLE + "[DEBUG] foo" + LS));
+        Assert.assertEquals("DEBUG log", outputStreamCaptor.toString().substring(20),
+                TITLE + "[DEBUG] foo" + LS);
         clear();
         DongTaiLog.debug("foo {} {}", "bar", "baz");
-        Assert.assertTrue("DEBUG log format", outputStreamCaptor.toString()
-                .endsWith(" " + TITLE + "[DEBUG] foo bar baz" + LS));
+        Assert.assertEquals("DEBUG log format", outputStreamCaptor.toString().substring(20),
+                TITLE + "[DEBUG] foo bar baz" + LS);
         clear();
         DongTaiLog.debug("foo", new Exception("bar"));
-        Assert.assertTrue("DEBUG log message with exception", outputStreamCaptor.toString()
-                .endsWith(" " + TITLE + "[DEBUG] foo, Exception: java.lang.Exception: bar" + LS));
-        clear();
-        DongTaiLog.debug(new Exception("bar"));
-        Assert.assertTrue("DEBUG log exception", outputStreamCaptor.toString()
-                .endsWith(" " + TITLE + "[DEBUG] Exception: java.lang.Exception: bar" + LS));
+        Assert.assertEquals("DEBUG log message with exception", outputStreamCaptor.toString().substring(20),
+                TITLE + "[DEBUG] foo, Exception: java.lang.Exception: bar" + LS);
 
         DongTaiLog.setLevel(DongTaiLog.LogLevel.INFO);
         clear();
         DongTaiLog.info("foo");
-        Assert.assertTrue("INFO log", outputStreamCaptor.toString()
-                .endsWith(" " + TITLE + "[INFO] foo" + LS));
+        Assert.assertEquals("INFO log", outputStreamCaptor.toString().substring(20),
+                TITLE + "[INFO] foo" + LS);
         clear();
         DongTaiLog.info("foo {} {}", "bar", "baz");
-        Assert.assertTrue("INFO log format", outputStreamCaptor.toString()
-                .endsWith(" " + TITLE + "[INFO] foo bar baz" + LS));
+        Assert.assertEquals("INFO log format", outputStreamCaptor.toString().substring(20),
+                TITLE + "[INFO] foo bar baz" + LS);
         clear();
         DongTaiLog.info("foo", new Exception("bar"));
-        Assert.assertTrue("INFO log message with exception", outputStreamCaptor.toString()
-                .endsWith(" " + TITLE + "[INFO] foo, Exception: java.lang.Exception: bar" + LS));
-        clear();
-        DongTaiLog.info(new Exception("bar"));
-        Assert.assertTrue("INFO log exception", outputStreamCaptor.toString()
-                .endsWith(" " + TITLE + "[INFO] Exception: java.lang.Exception: bar" + LS));
+        Assert.assertEquals("INFO log message with exception", outputStreamCaptor.toString().substring(20),
+                TITLE + "[INFO] foo, Exception: java.lang.Exception: bar" + LS);
 
         DongTaiLog.setLevel(DongTaiLog.LogLevel.WARN);
         clear();
         DongTaiLog.warn("foo");
-        Assert.assertTrue("WARN log", outputStreamCaptor.toString()
-                .endsWith(" " + TITLE + "[WARN] foo" + LS));
+        Assert.assertEquals("WARN log", outputStreamCaptor.toString().substring(20),
+                TITLE + "[WARN] foo" + LS);
         clear();
         DongTaiLog.warn("foo {} {}", "bar", "baz");
-        Assert.assertTrue("WARN log format", outputStreamCaptor.toString()
-                .endsWith(" " + TITLE + "[WARN] foo bar baz" + LS));
+        Assert.assertEquals("WARN log format", outputStreamCaptor.toString().substring(20),
+                TITLE + "[WARN] foo bar baz" + LS);
         clear();
         DongTaiLog.warn("foo", new Exception("bar"));
-        Assert.assertTrue("WARN log message with exception", outputStreamCaptor.toString()
-                .endsWith(" " + TITLE + "[WARN] foo, Exception: java.lang.Exception: bar" + LS));
-        clear();
-        DongTaiLog.warn(new Exception("bar"));
-        Assert.assertTrue("WARN log exception", outputStreamCaptor.toString()
-                .endsWith(" " + TITLE + "[WARN] Exception: java.lang.Exception: bar" + LS));
+        Assert.assertEquals("WARN log message with exception", outputStreamCaptor.toString().substring(20),
+                TITLE + "[WARN] foo, Exception: java.lang.Exception: bar" + LS);
 
         DongTaiLog.setLevel(DongTaiLog.LogLevel.ERROR);
         clear();
         DongTaiLog.error("foo");
-        Assert.assertTrue("ERROR log", outputStreamCaptor.toString()
-                .endsWith(" " + TITLE + "[ERROR] foo" + LS));
+        Assert.assertEquals("ERROR log", outputStreamCaptor.toString().substring(20),
+                TITLE + "[ERROR] foo" + LS);
         clear();
         DongTaiLog.error("foo {} {}", "bar", "baz");
-        Assert.assertTrue("ERROR log format", outputStreamCaptor.toString()
-                .endsWith(" " + TITLE + "[ERROR] foo bar baz" + LS));
+        Assert.assertEquals("ERROR log format", outputStreamCaptor.toString().substring(20),
+                TITLE + "[ERROR] foo bar baz" + LS);
         clear();
         DongTaiLog.error("foo", new Exception("bar"));
-        Assert.assertTrue("ERROR log message with exception", outputStreamCaptor.toString()
-                .endsWith(" " + TITLE + "[ERROR] foo, Exception: java.lang.Exception: bar" + LS));
+        Assert.assertEquals("ERROR log message with exception", outputStreamCaptor.toString().substring(20),
+                TITLE + "[ERROR] foo, Exception: java.lang.Exception: bar" + LS);
         clear();
         DongTaiLog.error(new Exception("bar"));
-        Assert.assertTrue("ERROR log exception", outputStreamCaptor.toString()
-                .endsWith(" " + TITLE + "[ERROR] Exception: java.lang.Exception: bar" + LS));
+        Assert.assertEquals("ERROR log exception", outputStreamCaptor.toString().substring(20),
+                TITLE + "[ERROR] Exception: java.lang.Exception: bar" + LS);
+        clear();
+        DongTaiLog.error(110, "foo {} {}", "bar", "baz");
+        Assert.assertEquals("ERROR log format", outputStreamCaptor.toString().substring(20),
+                TITLE + "[ERROR] [110] foo bar baz" + LS);
+        clear();
+        DongTaiLog.error(110, "foo {} {}", "bar", "baz", new Exception("bar"));
+        Assert.assertEquals("ERROR log format with code and exception", outputStreamCaptor.toString().substring(20),
+                TITLE + "[ERROR] [110] foo bar baz, Exception: java.lang.Exception: bar" + LS);
+
+        clear();
+        DongTaiLog.error(110, "foo {}", "bar", "baz", new Exception("bar"));
+        Assert.assertEquals("ERROR log format less with code and exception", outputStreamCaptor.toString().substring(20),
+                TITLE + "[ERROR] [110] foo bar, Exception: java.lang.Exception: bar" + LS);
+        clear();
+        DongTaiLog.error(110, "foo {} {} {}", "bar", "baz", new Exception("bar"));
+        Assert.assertEquals("ERROR log format more with code and exception", outputStreamCaptor.toString().substring(20),
+                TITLE + "[ERROR] [110] foo bar baz {}, Exception: java.lang.Exception: bar" + LS);
+
+        clear();
+        DongTaiLog.error(ErrorCode.AGENT_PREMAIN_INVOKE_FAILED, new Exception("bar"));
+        Assert.assertEquals("ERROR log with ErrorCode and exception", outputStreamCaptor.toString().substring(20),
+                TITLE + "[ERROR] [10101] agent premain invoke failed, Exception: java.lang.Exception: bar" + LS);
     }
 }

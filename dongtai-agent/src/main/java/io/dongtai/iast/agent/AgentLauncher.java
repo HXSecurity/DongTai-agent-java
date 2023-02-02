@@ -73,7 +73,7 @@ public class AgentLauncher {
             }
         } catch (Throwable e) {
             AGENT_STATE.setState(State.EXCEPTION);
-            System.out.println("[io.dongtai.iast.agent] agent agentmain parse args failed: " + e.toString());
+            DongTaiLog.error("agent agentmain parse args failed", e);
             return;
         }
 
@@ -220,13 +220,9 @@ public class AgentLauncher {
     private static void initLogger() {
         try {
             IastProperties.initTmpDir();
-            Integer agentId = AgentRegisterReport.getAgentId();
-            if (agentId == null || agentId < 0) {
-                agentId = 0;
-            }
-            DongTaiLog.initialize(agentId);
+            DongTaiLog.configure(AgentRegisterReport.getAgentId());
         } catch (Throwable e) {
-            System.out.println("[io.dongtai.iast.agent] log initialize failed: " + e.getMessage());
+            DongTaiLog.error("log configure failed", e);
         }
     }
 }

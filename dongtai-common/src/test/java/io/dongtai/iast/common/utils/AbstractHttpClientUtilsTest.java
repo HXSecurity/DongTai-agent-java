@@ -16,7 +16,7 @@ import java.util.Map;
 public class AbstractHttpClientUtilsTest {
     private final PrintStream standardOut = System.out;
     private final ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
-    private final boolean oldEnableColor = DongTaiLog.enableColor;
+    private final boolean oldEnableColor = DongTaiLog.ENABLE_COLOR;
 
     private static final String BASE_URL = "https://iast.io";
 
@@ -26,16 +26,16 @@ public class AbstractHttpClientUtilsTest {
 
     @Before
     public void setUp() {
-        DongTaiLog.enablePrintLog = true;
-        DongTaiLog.enableColor = false;
+        DongTaiLog.ENABLED = true;
+        DongTaiLog.ENABLE_COLOR = false;
         clear();
         System.setOut(new PrintStream(outputStreamCaptor));
     }
 
     @After
     public void tearDown() {
-        DongTaiLog.enablePrintLog = false;
-        DongTaiLog.enableColor = oldEnableColor;
+        DongTaiLog.ENABLED = false;
+        DongTaiLog.ENABLE_COLOR = oldEnableColor;
         clear();
         System.setOut(standardOut);
     }

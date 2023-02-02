@@ -232,13 +232,13 @@ public class AgentRegisterReport {
             }
             if (isRegistered()) {
                 try {
-                    DongTaiLog.initialize(getAgentId());
+                    DongTaiLog.configure(getAgentId());
                 } catch (Throwable e) {
-                    DongTaiLog.error("log initialize failed", e);
+                    DongTaiLog.error("log configure failed", e);
                 }
+                DongTaiLog.info("DongTai Config: " + IastProperties.getInstance().getPropertiesFilePath());
+                DongTaiLog.info("DongTai will install for " + server.getName() + " Service");
             }
-            DongTaiLog.info("DongTai Config: " + IastProperties.getInstance().getPropertiesFilePath());
-            DongTaiLog.info("DongTai will install for " + server.getName() + " Service");
         } catch (NullPointerException e) {
             DongTaiLog.error("Agent registration to {} failed, Token: {}, Reason: {}",
                     IastProperties.getInstance().getBaseUrl(), IastProperties.getInstance().getServerToken(), e.getMessage());
