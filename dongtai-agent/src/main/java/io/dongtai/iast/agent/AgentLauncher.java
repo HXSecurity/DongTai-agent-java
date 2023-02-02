@@ -17,7 +17,6 @@ import java.util.Map;
  * @author dongzhiyong@huoxian.cn
  */
 public class AgentLauncher {
-
     public static final String LAUNCH_MODE_AGENT = "agent";
     public static final String LAUNCH_MODE_ATTACH = "attach";
     public static String LAUNCH_MODE;
@@ -43,14 +42,11 @@ public class AgentLauncher {
      * @param inst inst
      */
     public static void premain(String args, Instrumentation inst) {
-        if (System.getProperty("protect.by.dongtai", null) != null) {
-            return;
-        }
         LAUNCH_MODE = LAUNCH_MODE_AGENT;
+        AGENT_STATE.setPendingState(State.RUNNING);
+        initLogger();
         try {
-            AGENT_STATE.setPendingState(State.RUNNING);
             IastProperties.getInstance();
-            DongTaiLog.init(0);
             install(inst);
         } catch (Throwable e) {
             DongTaiLog.error("agent premain failed", e);
@@ -75,11 +71,19 @@ public class AgentLauncher {
                     System.setProperty(prop, argsMap.get(prop));
                 }
             }
-
-            IastProperties.getInstance();
         } catch (Throwable e) {
             AGENT_STATE.setState(State.EXCEPTION);
             System.out.println("[io.dongtai.iast.agent] agent agentmain parse args failed: " + e.toString());
+            return;
+        }
+
+        initLogger();
+
+        try {
+            IastProperties.getInstance();
+        } catch (Throwable e) {
+            AGENT_STATE.setState(State.EXCEPTION);
+            DongTaiLog.error("agent agentmain initialize properties failed", e);
             return;
         }
 
@@ -123,7 +127,6 @@ public class AgentLauncher {
         }
 
         // install
-        DongTaiLog.init(0);
         cause = StateCause.RUNNING_BY_CLI;
         if (AGENT_STATE.getPendingState() != null) {
             DongTaiLog.info("DongTai agent install: " + AGENT_STATE.getPendingStateInfo());
@@ -212,5 +215,18 @@ public class AgentLauncher {
             argsMap.put(argItems[0], argItems[1]);
         }
         return argsMap;
+    }
+
+    private static void initLogger() {
+        try {
+            IastProperties.initTmpDir();
+            Integer agentId = AgentRegisterReport.getAgentId();
+            if (agentId == null || agentId < 0) {
+                agentId = 0;
+            }
+            DongTaiLog.initialize(agentId);
+        } catch (Throwable e) {
+            System.out.println("[io.dongtai.iast.agent] log initialize failed: " + e.getMessage());
+        }
     }
 }

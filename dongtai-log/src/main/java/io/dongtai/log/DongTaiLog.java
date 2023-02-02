@@ -35,7 +35,7 @@ public class DongTaiLog {
         logDir = IastProperties.getLogDir();
     }
 
-    public static void init(int id) {
+    public static void initialize(int id) throws Exception {
         enablePrintLog = !"false".equalsIgnoreCase(IastProperties.enablePrintLog());
         logDir = IastProperties.getLogDir();
         if (!enablePrintLog || logDir.isEmpty()) {
@@ -48,8 +48,7 @@ public class DongTaiLog {
                 f.mkdirs();
             }
         } catch (Throwable e) {
-            System.out.println("init log dir " + logDir + "failed: " + e.getMessage());
-            return;
+            throw new Exception("init log dir " + logDir + " failed: " + e.getMessage());
         }
 
         String path = logDir + File.separator + "dongtai_javaagent-" + String.valueOf(id) + ".log";
@@ -60,7 +59,7 @@ public class DongTaiLog {
             }
             logPath = path;
         } catch (Throwable e) {
-            System.out.println("init log file " + logPath + "failed: " + e.getMessage());
+            System.out.println(TITLE + "init log file " + logPath + "failed: " + e.getMessage());
         }
 
         setLevel(getCurrentLevel());
@@ -290,7 +289,7 @@ public class DongTaiLog {
             o.flush();
             o.close();
         } catch (Throwable e) {
-            System.out.println("the log file " + file.getPath() + " is not writable: " + e.toString());
+            System.out.println(TITLE + "the log file " + file.getPath() + " is not writable: " + e.toString());
         }
     }
 }

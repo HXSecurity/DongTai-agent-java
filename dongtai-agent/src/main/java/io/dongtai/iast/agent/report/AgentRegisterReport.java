@@ -25,7 +25,7 @@ public class AgentRegisterReport {
 
     public static AgentRegisterReport INSTANCE;
     private String projectName = null;
-    private Integer agentId = -1;
+    private static Integer agentId = -1;
     private static Integer coreRegisterStart = 1;
     final IServer server = ServerDetect.getWebserver();
     private static String AGENT_NAME = null;
@@ -144,8 +144,7 @@ public class AgentRegisterReport {
      * @return agent唯一标识，当前使用agentId
      */
     public static Integer getAgentId() {
-        AgentRegisterReport registerReport = AgentRegisterReport.getInstance();
-        return registerReport.agentId;
+        return agentId;
     }
 
     /**
@@ -223,7 +222,7 @@ public class AgentRegisterReport {
     public void register() {
         try {
             if (server == null) {
-                DongTaiLog.error("Can't Recognize Web Service");
+                DongTaiLog.error("[io.dongtai.iast.agent] Can't Recognize Web Service");
                 return;
             }
             String msg = generateAgentRegisterMsg();
@@ -232,7 +231,11 @@ public class AgentRegisterReport {
                 setAgentData(responseRaw);
             }
             if (isRegistered()) {
-                DongTaiLog.init(getAgentId());
+                try {
+                    DongTaiLog.initialize(getAgentId());
+                } catch (Throwable e) {
+                    DongTaiLog.error("log initialize failed", e);
+                }
             }
             DongTaiLog.info("DongTai Config: " + IastProperties.getInstance().getPropertiesFilePath());
             DongTaiLog.info("DongTai will install for " + server.getName() + " Service");

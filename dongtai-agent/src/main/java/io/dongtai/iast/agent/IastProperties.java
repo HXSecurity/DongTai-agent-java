@@ -60,7 +60,7 @@ public class IastProperties {
     private String customCoreJarUrl;
     private String customSpyJarUrl;
     private String customApiJarUrl;
-    private String tmpDir;
+    private static String TMP_DIR;
 
     public static IastProperties getInstance() {
         if (null == instance) {
@@ -77,11 +77,14 @@ public class IastProperties {
         try {
             init();
         } catch (ClassNotFoundException e) {
-            System.out.println("IastProperties initialization failed: " + e.getMessage());
+            DongTaiLog.error("IastProperties initialization failed", e);
         }
     }
 
-    private void initTmpDir() {
+    public static String initTmpDir() {
+        if (TMP_DIR != null && !TMP_DIR.isEmpty()) {
+            return TMP_DIR;
+        }
         StringBuilder dir = new StringBuilder();
         String sysTmpDir = System.getProperty("java.io.tmpdir");
         if (sysTmpDir == null) {
@@ -91,27 +94,27 @@ public class IastProperties {
                 .append("dongtai-").append(System.getProperty("user.name")).append(File.separator)
                 .append(AgentConstant.VERSION_VALUE).append(File.separator);
 
-        this.tmpDir = dir.toString();
-        System.setProperty("java.io.tmpdir.dongtai", this.tmpDir);
+        TMP_DIR = dir.toString();
+        System.setProperty("java.io.tmpdir.dongtai", TMP_DIR);
+        return TMP_DIR;
     }
 
     public String getTmpDir() {
-        if (this.tmpDir.isEmpty()) {
+        if (TMP_DIR.isEmpty()) {
             initTmpDir();
         }
-        return this.tmpDir;
+        return TMP_DIR;
     }
 
     public void init() throws ClassNotFoundException {
         try {
-            initTmpDir();
             propertiesFilePath = getTmpDir() + "iast.properties";
             FileUtils.getResourceToFile("iast.properties", propertiesFilePath);
 
             InputStream is = IastProperties.class.getClassLoader().getResourceAsStream("iast.properties");
             cfg.load(is);
         } catch (IOException e) {
-            System.out.println("[io.dongtai.iast.agent] read iast.properties failed: " + e.getMessage());
+            DongTaiLog.error("[io.dongtai.iast.agent] read iast.properties failed: " + e.getMessage());
         }
     }
 

@@ -103,7 +103,7 @@ public class Agent {
     }
 
     private static void extractJattach() throws IOException {
-        String tmpDir = IastProperties.getInstance().getTmpDir();
+        String tmpDir = IastProperties.initTmpDir();
         if (isWindows()) {
             JATTACH_FILE = tmpDir + "jattach.exe";
             FileUtils.getResourceToFile("bin/jattach.exe", JATTACH_FILE);
