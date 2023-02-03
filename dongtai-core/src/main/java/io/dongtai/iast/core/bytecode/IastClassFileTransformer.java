@@ -20,6 +20,7 @@ import java.io.File;
 import java.lang.dongtai.SpyDispatcherHandler;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
+import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.security.CodeSource;
 import java.security.ProtectionDomain;
@@ -141,6 +142,10 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                 final ClassReader cr = new ClassReader(sourceCodeBak);
 
                 ClassContext classContext = new ClassContext(cr, loader);
+                if (Modifier.isInterface(classContext.getModifier())) {
+                    sourceCodeBak = null;
+                    return null;
+                }
                 final String className = classContext.getClassName();
 
                 Set<String> ancestors = classDiagram.getDiagram(className);

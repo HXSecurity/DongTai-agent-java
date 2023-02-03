@@ -3,10 +3,8 @@ package io.dongtai.iast.core.bytecode.enhance.plugin.framework.j2ee.dispatch;
 import io.dongtai.iast.core.bytecode.enhance.ClassContext;
 import io.dongtai.iast.core.bytecode.enhance.plugin.DispatchPlugin;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.Policy;
-import io.dongtai.log.DongTaiLog;
 import org.objectweb.asm.ClassVisitor;
 
-import java.lang.reflect.Modifier;
 import java.util.Set;
 
 /**
@@ -26,9 +24,7 @@ public class DispatchJ2ee implements DispatchPlugin {
         String className = context.getClassName();
         Set<String> ancestors = context.getAncestors();
 
-        if (Modifier.isInterface(context.getModifier())) {
-            DongTaiLog.trace("Ignoring interface " + className);
-        } else if (isServletDispatch(className, ancestors) || isJakartaServlet(className)) {
+        if (isServletDispatch(className, ancestors) || isJakartaServlet(className)) {
             classVisitor = new ServletDispatcherAdapter(classVisitor, context);
         }
         return classVisitor;
