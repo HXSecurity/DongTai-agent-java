@@ -2,6 +2,7 @@ package io.dongtai.iast.core.utils.matcher.structure;
 
 
 import io.dongtai.log.DongTaiLog;
+import io.dongtai.log.ErrorCode;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,7 +29,7 @@ public class ClassStructureFactory {
         try {
             return new ClassStructureImplByAsm(classInputStream, loader);
         } catch (IOException cause) {
-            DongTaiLog.warn("create class structure failed by using ASM, return null. loader=" + loader + ";", cause);
+            DongTaiLog.warn(ErrorCode.ASM_CREATE_CLASS_STRUCTURE_FAILED, loader, cause);
             return null;
         }
     }

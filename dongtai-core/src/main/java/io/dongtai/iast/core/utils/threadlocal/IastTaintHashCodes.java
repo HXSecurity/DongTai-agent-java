@@ -3,6 +3,7 @@ package io.dongtai.iast.core.utils.threadlocal;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.utils.TaintPoolUtils;
 import io.dongtai.log.DongTaiLog;
+import io.dongtai.log.ErrorCode;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -65,7 +66,7 @@ public class IastTaintHashCodes extends ThreadLocal<HashSet<Integer>> {
                 event.addTargetHash(subHashCode);
             }
         } catch (Throwable e) {
-            DongTaiLog.error("add object to taint pool failed", e);
+            DongTaiLog.warn(ErrorCode.UTIL_TAINT_ADD_OBJECT_TO_POOL_FAILED, e);
         }
     }
 }

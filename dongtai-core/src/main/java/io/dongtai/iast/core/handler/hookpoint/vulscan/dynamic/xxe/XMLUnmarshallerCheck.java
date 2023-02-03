@@ -48,7 +48,7 @@ public class XMLUnmarshallerCheck extends AbstractCheck {
         }
         Object fConfiguration = getXMLConfiguration(obj);
         if (fConfiguration == null) {
-            DongTaiLog.error("fConfiguration field was null", cls);
+            DongTaiLog.debug("fConfiguration field was null", cls);
             return Support.ALLOWED;
         }
 
@@ -108,7 +108,7 @@ public class XMLUnmarshallerCheck extends AbstractCheck {
     private Object getUnmarshallerXMLReader(Object obj, Class<?> cls) {
         Method method = ReflectUtils.getDeclaredMethodFromSuperClass(cls, "getXMLReader", ObjectShare.EMPTY_CLASS_ARRAY);
         if (method == null) {
-            DongTaiLog.error("Couldn't find getXMLReader method from {}", cls);
+            DongTaiLog.debug("Couldn't find getXMLReader method from {}", cls);
             return null;
         }
 

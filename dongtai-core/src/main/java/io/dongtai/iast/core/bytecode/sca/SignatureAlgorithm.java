@@ -1,11 +1,11 @@
 package io.dongtai.iast.core.bytecode.sca;
 
 import io.dongtai.log.DongTaiLog;
+import io.dongtai.log.ErrorCode;
 
 import java.io.*;
 import java.math.BigInteger;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 /**
  * 获取第三方组件的版本、SHA-1
@@ -27,10 +27,8 @@ public class SignatureAlgorithm {
             buffer = null;
             BigInteger bigInteger = new BigInteger(1, digest.digest());
             signature = String.format("%040x", bigInteger);
-        } catch (IOException e) {
-            DongTaiLog.error("calc jar signature error[IOException], msg: %s{}", e);
-        } catch (NoSuchAlgorithmException e) {
-            DongTaiLog.error("calc jar signature error[NoSuchAlgorithmException], msg: %s{}", e);
+        } catch (Throwable e) {
+            DongTaiLog.warn(ErrorCode.SCA_CALCULATE_JAR_SIGNATURE_FAILED, e.getMessage(), e.getCause().getMessage());
         }
         return signature;
     }
@@ -44,15 +42,14 @@ public class SignatureAlgorithm {
         try {
             in = new FileInputStream(file);
             signature = getSignature(in, algorithm);
-        } catch (IOException e) {
-            DongTaiLog.error("calc jar signature error[IOException], msg: %s{}", e);
+        } catch (Throwable e) {
+            DongTaiLog.warn(ErrorCode.SCA_CALCULATE_JAR_SIGNATURE_FAILED, e.getMessage(), e.getCause().getMessage());
         } finally {
             try {
                 if (in != null) {
                     in.close();
                 }
-            } catch (IOException e) {
-                DongTaiLog.error("calc jar signature error[IOException], msg: %s{}", e);
+            } catch (IOException ignore) {
             }
         }
         return signature;

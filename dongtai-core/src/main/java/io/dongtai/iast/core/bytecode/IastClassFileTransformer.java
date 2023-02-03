@@ -13,6 +13,7 @@ import io.dongtai.iast.core.utils.AsmUtils;
 import io.dongtai.iast.core.utils.PropertyUtils;
 import io.dongtai.iast.core.utils.matcher.ConfigMatcher;
 import io.dongtai.log.DongTaiLog;
+import io.dongtai.log.ErrorCode;
 import org.apache.commons.lang3.time.StopWatch;
 import org.objectweb.asm.*;
 
@@ -176,7 +177,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                 sourceCodeBak = null;
             }
         } catch (Throwable throwable) {
-            DongTaiLog.warn("transform class " + internalClassName + " failed", throwable);
+            DongTaiLog.warn(ErrorCode.TRANSFORM_CLASS_FAILED, internalClassName, throwable);
         } finally {
             classDiagram.setLoader(null);
             ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
@@ -234,7 +235,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
             final File classPath = new File(enhancedClass.getParent());
 
             if (!classPath.mkdirs() && !classPath.exists()) {
-                DongTaiLog.warn("create dump classpath={} failed.", classPath);
+                DongTaiLog.warn(ErrorCode.TRANSFORM_CREATE_CLASS_DUMP_DIR_FAILED, classPath);
                 return data;
             }
 
@@ -242,7 +243,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
             writeByteArrayToFile(originalClass, originalData);
             DongTaiLog.trace("dump class {} to {} success.", className, enhancedClass);
         } catch (Throwable e) {
-            DongTaiLog.error("dump class {} failed. reason: {}", className, e);
+            DongTaiLog.warn(ErrorCode.TRANSFORM_CLASS_DUMP_FAILED, className, e);
         }
 
         return data;
@@ -321,11 +322,11 @@ public class IastClassFileTransformer implements ClassFileTransformer {
             try {
                 inst.retransformClasses(clazz);
             } catch (ClassCircularityError e) {
-                DongTaiLog.error("retransform class " + clazz.getCanonicalName() + " ClassCircularityError {}",
-                        e.getCause().getMessage());
+                DongTaiLog.error(ErrorCode.RETRANSFORM_CLASS_CIRCULARITY_ERROR,
+                        clazz.getCanonicalName(), e.getCause().getMessage());
             } catch (InternalError ignored) {
             } catch (Throwable e) {
-                DongTaiLog.error("retransform class " + clazz.getCanonicalName() + " failure", e);
+                DongTaiLog.error(ErrorCode.RETRANSFORM_CLASS_FAILED, clazz.getCanonicalName(), e);
             }
         }
         stopWatch.stop();

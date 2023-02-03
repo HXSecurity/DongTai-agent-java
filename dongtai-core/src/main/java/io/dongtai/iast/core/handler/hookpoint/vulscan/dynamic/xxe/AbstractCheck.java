@@ -291,8 +291,7 @@ public abstract class AbstractCheck implements XXEChecker {
                 return (Boolean) invoke;
             }
         } catch (IllegalAccessException e) {
-            DongTaiLog.error("Failed to access method {} {}", method.getName(), e);
-
+            DongTaiLog.debug("Failed to access method {} {}", method.getName(), e);
         } catch (InvocationTargetException e) {
             DongTaiLog.debug("Failed to call {} {} {}", method.getName(), parameter, e);
         }

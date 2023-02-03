@@ -3,6 +3,7 @@ package io.dongtai.iast.core.utils;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.log.DongTaiLog;
+import io.dongtai.log.ErrorCode;
 
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
@@ -164,8 +165,8 @@ public class TaintPoolUtils {
                     }
                     modelValues.add(itemValue);
                 } catch (Throwable e) {
-                    DongTaiLog.error("parse custom model getter " +
-                            model.getClass().getName() + "." + method.getName() + " failed", e);
+                    DongTaiLog.error(ErrorCode.UTIL_TAINT_PARSE_CUSTOM_MODEL_FAILED,
+                            model.getClass().getName(), method.getName(), e);
                 }
             }
         } catch (Throwable ignore) {

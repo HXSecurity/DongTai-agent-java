@@ -189,10 +189,6 @@ public class DongTaiLogTest {
         Assert.assertEquals("ERROR log message with exception", outputStreamCaptor.toString().substring(20),
                 TITLE + "[ERROR] foo, Exception: java.lang.Exception: bar" + LS);
         clear();
-        DongTaiLog.error(new Exception("bar"));
-        Assert.assertEquals("ERROR log exception", outputStreamCaptor.toString().substring(20),
-                TITLE + "[ERROR] Exception: java.lang.Exception: bar" + LS);
-        clear();
         DongTaiLog.error(110, "foo {} {}", "bar", "baz");
         Assert.assertEquals("ERROR log format", outputStreamCaptor.toString().substring(20),
                 TITLE + "[ERROR] [110] foo bar baz" + LS);

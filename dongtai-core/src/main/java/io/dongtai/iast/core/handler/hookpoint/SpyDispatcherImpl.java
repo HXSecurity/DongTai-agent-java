@@ -12,6 +12,7 @@ import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.*;
 import io.dongtai.iast.core.handler.hookpoint.service.trace.FeignService;
 import io.dongtai.log.DongTaiLog;
+import io.dongtai.log.ErrorCode;
 
 import java.lang.dongtai.SpyDispatcher;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -60,7 +61,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                 EngineManager.cleanThreadState();
             }
         } catch (Throwable e) {
-            DongTaiLog.error("leave http failed", e);
+            DongTaiLog.error(ErrorCode.SPY_LEAVE_HTTP_FAILED, e);
             EngineManager.cleanThreadState();
         }
     }
@@ -327,7 +328,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                 }
             }
         } catch (Throwable e) {
-            DongTaiLog.error("collect method pool failed: " + e.toString(), e);
+            DongTaiLog.error(ErrorCode.SPY_COLLECT_HTTP_FAILED, e);
         } finally {
             ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
         }
@@ -365,7 +366,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
 
             return false;
         } catch (Throwable e) {
-            DongTaiLog.error("collect method failed", e);
+            DongTaiLog.error(ErrorCode.SPY_COLLECT_METHOD_FAILED, e);
         } finally {
             ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
         }
@@ -386,7 +387,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
 
             FeignService.solveSyncInvoke(event, INVOKE_ID_SEQUENCER);
         } catch (Throwable e) {
-            DongTaiLog.error("trace feign invoke failed", e);
+            DongTaiLog.error(ErrorCode.SPY_TRACE_FEIGN_INVOKE_FAILED, e);
         } finally {
             ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
         }
@@ -413,7 +414,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                         .getConfig(ConfigKey.REPORT_MAX_METHOD_POOL_SIZE)).get();
                 if (methodPoolMaxSize > 0 && EngineManager.TRACK_MAP.get().size() >= methodPoolMaxSize) {
                     ScopeManager.SCOPE_TRACKER.getPolicyScope().setOverCapacity(true);
-                    DongTaiLog.warn("current request method pool size over capacity: {}", methodPoolMaxSize);
+                    DongTaiLog.warn(ErrorCode.SPY_METHOD_POOL_OVER_CAPACITY, methodPoolMaxSize);
                     return false;
                 }
             } catch (Throwable ignore) {

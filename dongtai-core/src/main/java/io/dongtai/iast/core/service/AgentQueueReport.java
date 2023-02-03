@@ -39,7 +39,7 @@ public class AgentQueueReport implements Runnable {
                     ThreadPools.submitReplayTask(replayRequestRaw);
                 }
             } catch (Throwable e) {
-                DongTaiLog.debug("send API Queue to {} error, reason: {}", ApiPath.REPORT_UPLOAD, e);
+                DongTaiLog.debug("send API Queue to {} error, reason: {}", ApiPath.REPORT_UPLOAD, e.getMessage());
             }
         }
     }

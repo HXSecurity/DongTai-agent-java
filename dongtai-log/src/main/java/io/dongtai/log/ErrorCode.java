@@ -52,6 +52,49 @@ public enum ErrorCode {
     AGENT_FALLBACK_STATE_CHANGE_WITH_EXCEPTION(10503, "agent fallback state change to {}, but agent currently has exception"),
     AGENT_FALLBACK_CHECKER_CREATE_FAILED(10511, "agent fallback checker create failed: {}"),
     AGENT_FALLBACK_BREAKER_CONVERT_METRICS_FAILED(10521, "agent fallback breaker convert metrics failed: {}"),
+
+    // agent engine init
+    ENGINE_INSTALL_FAILED(20101, "engine install failed"),
+    ENGINE_DESTROY_FAILED(20102, "engine destroy failed"),
+    POLICY_LOAD_FAILED(20111, "load policy failed"),
+    POLICY_CONFIG_INVALID(20112, "policy config invalid"),
+    POLICY_TAINT_COMMAND_PARAMETERS_INVALID(20113, "{} taint command parameters failed"),
+    TRANSFORM_ENGINE_START_FAILED(20121, "transform engine start failed"),
+    TRANSFORM_ENGINE_DESTROY_REDEFINE_CLASSES_FAILED(20122, "transform engine failed to redefine classes when destroy"),
+    ENGINE_PROPERTIES_INITIALIZE_FAILED(20131, "engine properties initialize failed"),
+    CLASS_DIAGRAM_SCAN_JAR_ANCESTOR_FAILED(20141, "class diagram scan jar ancestor failed"),
+
+    // transform
+    TRANSFORM_CLASS_FAILED(20201, "transform class {} failed"),
+    TRANSFORM_CREATE_CLASS_DUMP_DIR_FAILED(20202, "transform create class dump dir {} failed"),
+    TRANSFORM_CLASS_DUMP_FAILED(20203, "transform class dump failed"),
+    RETRANSFORM_CLASS_CIRCULARITY_ERROR(20211, "retransform class {} ClassCircularityError: {}"),
+    RETRANSFORM_CLASS_FAILED(20212, "retransform class {} failed"),
+    ASM_CREATE_CLASS_STRUCTURE_FAILED(20221, "create class structure failed by using ASM, loader: {}"),
+    ASM_CREATE_CLASS_STRUCTURE_BY_NAME_FAILED(20222, "create class failed failed by using ASM, class: {}, loader: {}"),
+
+    // handler hookpoint
+    SPY_LEAVE_HTTP_FAILED(20301, "hookpoint leave http failed"),
+    SPY_COLLECT_HTTP_FAILED(20302, "hookpoint collect http failed"),
+    SPY_COLLECT_METHOD_FAILED(20303, "hookpoint collect method failed"),
+    SPY_TRACE_FEIGN_INVOKE_FAILED(20304, "hookpoint trace feign invoke failed"),
+    SPY_METHOD_POOL_OVER_CAPACITY(20305, "current request method pool size over capacity: {}"),
+    API_COLLECTOR_GET_API_THREAD_EXECUTE_FAILED(20311, "get api thread execute failed"),
+    GRAPH_BUILD_AND_REPORT_FAILED(20321, "build and report request graph failed"),
+
+    // report & replay
+    REPORT_SEND_FAILED(20401, "send report to {} error, report: {}"),
+    REPLAY_REQUEST_FAILED(20411, "replay request {} failed"),
+
+    // SCA
+    SCA_SCAN_JAR_LIB_FAILED(20501, "sca scan jar lib failed: {}, {}"),
+    SCA_REPORT_SEND_FAILED(20502, "send sca report failed: {}, {}"),
+    SCA_CALCULATE_JAR_SIGNATURE_FAILED(20503, "sca calculate jar signature failed: {}, {}"),
+
+    // util
+    UTIL_CONFIG_LOAD_FAILED(20601, "load config {} failed"),
+    UTIL_TAINT_ADD_OBJECT_TO_POOL_FAILED(20611, "add object to taint pool failed"),
+    UTIL_TAINT_PARSE_CUSTOM_MODEL_FAILED(20612, "parse custom model {} getter {} failed"),
     ;
 
     private final int code;

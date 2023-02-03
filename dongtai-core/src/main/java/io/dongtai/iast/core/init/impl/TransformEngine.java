@@ -5,6 +5,7 @@ import io.dongtai.iast.core.handler.hookpoint.models.policy.PolicyManager;
 import io.dongtai.iast.core.init.IEngine;
 import io.dongtai.iast.core.utils.PropertyUtils;
 import io.dongtai.log.DongTaiLog;
+import io.dongtai.log.ErrorCode;
 
 import java.lang.instrument.ClassDefinition;
 import java.lang.instrument.Instrumentation;
@@ -27,12 +28,12 @@ public class TransformEngine implements IEngine {
     @Override
     public void start() {
         try {
-            DongTaiLog.debug("Install data acquisition and analysis sub-modules");
+            DongTaiLog.debug("engine start to add transformer and retransform classes");
             inst.addTransformer(classFileTransformer, true);
             classFileTransformer.reTransform();
-            DongTaiLog.debug("The sub-module of data acquisition and analysis is successfully installed");
+            DongTaiLog.debug("transform engine is successfully started");
         } catch (Throwable e) {
-            DongTaiLog.error("Failed to install the sub-module of data collection and analysis", e);
+            DongTaiLog.error(ErrorCode.TRANSFORM_ENGINE_START_FAILED, e);
         }
     }
 
@@ -69,7 +70,7 @@ public class TransformEngine implements IEngine {
             try {
                 inst.redefineClasses(classDefinition);
             } catch (Throwable e) {
-                DongTaiLog.error("engine destroy redefineClasses failed", e);
+                DongTaiLog.error(ErrorCode.TRANSFORM_ENGINE_DESTROY_REDEFINE_CLASSES_FAILED, e);
             }
         }
         inst = null;

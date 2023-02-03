@@ -5,6 +5,7 @@ import io.dongtai.iast.core.handler.hookpoint.vulscan.VulnType;
 import io.dongtai.iast.core.utils.HttpClientUtils;
 import io.dongtai.iast.core.utils.StringUtils;
 import io.dongtai.log.DongTaiLog;
+import io.dongtai.log.ErrorCode;
 import org.apache.commons.io.FileUtils;
 import org.json.*;
 
@@ -63,7 +64,7 @@ public class PolicyBuilder {
                 buildPropagator(policy, nodeType, node);
                 buildSink(policy, nodeType, node);
             } catch (PolicyException e) {
-                DongTaiLog.error(e.getMessage());
+                DongTaiLog.warn(ErrorCode.POLICY_CONFIG_INVALID.getCode(), e.getMessage());
             }
         }
         return policy;

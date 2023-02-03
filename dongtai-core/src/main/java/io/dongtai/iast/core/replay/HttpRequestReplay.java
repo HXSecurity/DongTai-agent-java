@@ -4,6 +4,7 @@ import io.dongtai.iast.common.utils.base64.Base64Decoder;
 import io.dongtai.iast.core.handler.hookpoint.models.IastReplayModel;
 import io.dongtai.iast.core.utils.HttpClientUtils;
 import io.dongtai.log.DongTaiLog;
+import io.dongtai.log.ErrorCode;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -45,7 +46,7 @@ public class HttpRequestReplay implements Runnable {
                 HttpClientUtils.sendReplayRequest(replayModel.getRequestMethod(), url, replayModel.getRequestBody(), headers);
             }
         } catch (Throwable e) {
-            DongTaiLog.error("replay request " + replayModel.getFullUrl() + " failed", e);
+            DongTaiLog.warn(ErrorCode.REPLAY_REQUEST_FAILED, replayModel.getFullUrl(), e);
         }
     }
 

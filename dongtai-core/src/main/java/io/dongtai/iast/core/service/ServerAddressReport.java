@@ -36,7 +36,7 @@ public class ServerAddressReport implements Runnable {
         try {
             ThreadPools.sendReport(ApiPath.AGENT_UPDATE, this.getServereAddressMsg());
         } catch (Throwable e) {
-            DongTaiLog.error("send API Queue to {} error, reason: {}", ApiPath.REPORT_UPLOAD, e);
+            DongTaiLog.debug("send server address to {} error, reason: {}", ApiPath.REPORT_UPLOAD, e.getMessage());
         }
     }
 }

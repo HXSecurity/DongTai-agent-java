@@ -228,11 +228,6 @@ public class DongTaiLog {
         log(LogLevel.ERROR, 0, format, arguments);
     }
 
-    @Deprecated
-    public static void error(Throwable t) {
-        error("", t);
-    }
-
     private static String format(String from, Object... arguments) {
         if (from != null) {
             String computed = from;

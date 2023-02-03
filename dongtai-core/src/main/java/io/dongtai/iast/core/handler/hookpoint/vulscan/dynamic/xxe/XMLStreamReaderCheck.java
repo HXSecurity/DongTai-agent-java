@@ -39,7 +39,7 @@ public class XMLStreamReaderCheck extends AbstractCheck {
         try {
             return getPropertySupport(fPropertyManagerField.get(obj));
         } catch (IllegalAccessException e) {
-            DongTaiLog.error("Failed to access fPropertyManager {}", e);
+            DongTaiLog.debug("Failed to access fPropertyManager {}", e);
             return Support.ALLOWED;
         }
     }

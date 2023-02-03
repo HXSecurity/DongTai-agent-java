@@ -13,7 +13,6 @@ import io.dongtai.log.DongTaiLog;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -59,9 +58,7 @@ public class HttpImpl {
                 cloneResponseMethod = CLASS_OF_SERVLET_PROXY
                         .getDeclaredMethod("cloneResponse", Object.class, boolean.class);
             }
-        } catch (MalformedURLException e) {
-            DongTaiLog.warn("HttpImpl createClassLoader failed", e);
-        } catch (NoSuchMethodException e) {
+        } catch (Throwable e) {
             DongTaiLog.warn("HttpImpl createClassLoader failed", e);
         }
     }
@@ -75,7 +72,7 @@ public class HttpImpl {
                 cloneResponseMethod = CLASS_OF_SERVLET_PROXY
                         .getDeclaredMethod("cloneResponse", Object.class, boolean.class);
             } catch (NoSuchMethodException e) {
-                DongTaiLog.error(e);
+                DongTaiLog.warn("load cloneResponse method failed", e);
             }
         }
     }
@@ -144,11 +141,7 @@ public class HttpImpl {
         try {
             Method methodOfRequestMeta = request.getClass().getDeclaredMethod("getRequestMeta");
             return (Map<String, Object>) methodOfRequestMeta.invoke(request);
-        } catch (NoSuchMethodException e) {
-            DongTaiLog.warn("HttpImpl getRequestMeta failed", e);
-        } catch (IllegalAccessException e) {
-            DongTaiLog.warn("HttpImpl getRequestMeta failed", e);
-        } catch (InvocationTargetException e) {
+        } catch (Throwable e) {
             DongTaiLog.warn("HttpImpl getRequestMeta failed", e);
         }
         return new HashMap<String, Object>();
@@ -158,11 +151,7 @@ public class HttpImpl {
         try {
             Method methodOfRequestMeta = request.getClass().getDeclaredMethod("getPostBody");
             return (String) methodOfRequestMeta.invoke(request);
-        } catch (NoSuchMethodException e) {
-            DongTaiLog.warn("HttpImpl getPostBody failed", e);
-        } catch (IllegalAccessException e) {
-            DongTaiLog.warn("HttpImpl getPostBody failed", e);
-        } catch (InvocationTargetException e) {
+        } catch (Throwable e) {
             DongTaiLog.warn("HttpImpl getPostBody failed", e);
         }
         return null;
@@ -175,11 +164,7 @@ public class HttpImpl {
             methodOfRequestMeta = response.getClass().getDeclaredMethod("getResponseMeta", new Class[]{boolean.class});
             boolean getBody = ((Config<Boolean>) ConfigBuilder.getInstance().getConfig(ConfigKey.REPORT_RESPONSE_BODY)).get();
             return (Map<String, Object>) methodOfRequestMeta.invoke(response, getBody);
-        } catch (NoSuchMethodException e) {
-            DongTaiLog.warn("HttpImpl getResponseMeta failed", e);
-        } catch (IllegalAccessException e) {
-            DongTaiLog.warn("HttpImpl getResponseMeta failed", e);
-        } catch (InvocationTargetException e) {
+        } catch (Throwable e) {
             DongTaiLog.warn("HttpImpl getResponseMeta failed", e);
         }
         return null;

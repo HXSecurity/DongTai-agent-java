@@ -89,8 +89,7 @@ public class ConfigMatcher {
                 }
             }
         } catch (Throwable e) {
-            DongTaiLog.info("dongtai getBalckurl error");
-            DongTaiLog.error(e);
+            DongTaiLog.trace("config matcher getBlackUrl failed: {}, {}", e.getMessage(), e.getCause().getMessage());
         }
         return false;
     }

@@ -3,8 +3,8 @@ package io.dongtai.iast.core.handler.hookpoint.service;
 import io.dongtai.iast.common.constants.*;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.hookpoint.service.url.*;
-import io.dongtai.iast.core.service.ErrorLogReport;
 import io.dongtai.iast.core.service.ThreadPools;
+import io.dongtai.log.DongTaiLog;
 import org.json.JSONObject;
 
 import java.util.*;
@@ -28,7 +28,7 @@ public class ServiceHandler {
                 reportSingleService(category, type, srv.getHost(), srv.getPort());
             }
         } catch (Throwable e) {
-            ErrorLogReport.sendErrorLog(e);
+            DongTaiLog.trace("report service failed: {}, {}", e.getMessage(), e.getCause().getMessage());
         }
     }
 

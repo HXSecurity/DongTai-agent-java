@@ -2,6 +2,7 @@ package io.dongtai.iast.core.handler.hookpoint.models.taint.range;
 
 import io.dongtai.iast.core.handler.hookpoint.models.policy.PropagatorNode;
 import io.dongtai.log.DongTaiLog;
+import io.dongtai.log.ErrorCode;
 
 import java.util.*;
 
@@ -85,7 +86,7 @@ public class TaintCommandRunner {
                 p3 = this.params.get(2).getParam(params);
             }
         } catch (Throwable e) {
-            DongTaiLog.error(this.signature + " taint command parameters fetch failed: " + e.getMessage());
+            DongTaiLog.warn(ErrorCode.POLICY_TAINT_COMMAND_PARAMETERS_INVALID, this.signature, e.getMessage());
             return tr;
         }
 

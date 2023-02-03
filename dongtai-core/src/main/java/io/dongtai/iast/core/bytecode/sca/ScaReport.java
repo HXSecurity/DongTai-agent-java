@@ -4,6 +4,7 @@ import io.dongtai.iast.common.constants.*;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.utils.HttpClientUtils;
 import io.dongtai.log.DongTaiLog;
+import io.dongtai.log.ErrorCode;
 import org.json.JSONObject;
 
 
@@ -28,7 +29,7 @@ public class ScaReport {
         try {
             HttpClientUtils.sendPost(ApiPath.REPORT_UPLOAD, report);
         } catch (Throwable e) {
-            DongTaiLog.error("send sca report failed", e);
+            DongTaiLog.warn(ErrorCode.SCA_REPORT_SEND_FAILED, e.getMessage(), e.getCause().getMessage());
         }
     }
 

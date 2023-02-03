@@ -36,11 +36,12 @@ public class SpringApplicationImpl {
                 proxyClass = iastClassLoader.loadClass("cn.huoxian.iast.spring.SpringApplicationContext");
                 getAPI = proxyClass.getDeclaredMethod("getAPI", Object.class);
             } catch (NoSuchMethodException e) {
-                DongTaiLog.error("SpringApplicationImpl.loadApplicationContext failed", e);
+                DongTaiLog.debug("SpringApplicationImpl.loadApplicationContext failed", e);
+                isSend = true;
             } catch (NoClassDefFoundError e) {
                 // spring mvc has no class org/springframework/beans/factory/ListableBeanFactory
                 if (!e.getMessage().equals(" org/springframework/beans/factory/ListableBeanFactory".substring(1))) {
-                    DongTaiLog.warn("SpringApplicationImpl.loadApplicationContext failed", e);
+                    DongTaiLog.debug("SpringApplicationImpl.loadApplicationContext failed", e);
                 }
                 isSend = true;
             } finally {

@@ -1,6 +1,7 @@
 package io.dongtai.iast.core.bytecode.enhance;
 
 import io.dongtai.log.DongTaiLog;
+import io.dongtai.log.ErrorCode;
 import org.objectweb.asm.ClassReader;
 
 import java.io.InputStream;
@@ -165,7 +166,7 @@ public class IastClassDiagram {
                     }
                 }
             } catch (Throwable e) {
-                DongTaiLog.error(e);
+                DongTaiLog.warn(ErrorCode.CLASS_DIAGRAM_SCAN_JAR_ANCESTOR_FAILED, e);
             }
         }
     }

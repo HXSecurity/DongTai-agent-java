@@ -11,6 +11,7 @@ import io.dongtai.iast.core.init.impl.TransformEngine;
 import io.dongtai.iast.core.service.*;
 import io.dongtai.iast.core.utils.PropertyUtils;
 import io.dongtai.log.DongTaiLog;
+import io.dongtai.log.ErrorCode;
 import org.apache.commons.lang3.time.StopWatch;
 
 import java.lang.dongtai.SpyDispatcherHandler;
@@ -72,7 +73,7 @@ public class AgentEngine {
             DongTaiLog.info("DongTai Agent Version: {}, DongTai Server: {}", AgentConstant.VERSION_VALUE, cfg.getBaseUrl());
             new ServiceDirReport().send();
         } catch (Throwable e) {
-            DongTaiLog.error("engine install failed", e);
+            DongTaiLog.error(ErrorCode.ENGINE_INSTALL_FAILED, e);
             AGENT_STATE.setState(State.EXCEPTION);
         }
     }
@@ -97,7 +98,7 @@ public class AgentEngine {
             DongTaiLog.info("Engine uninstallation succeeded");
             EngineManager.cleanThreadState();
         } catch (Throwable e) {
-            DongTaiLog.error("engine destroy failed", e);
+            DongTaiLog.error(ErrorCode.ENGINE_DESTROY_FAILED, e);
             AGENT_STATE.setState(State.EXCEPTION);
         }
     }

@@ -7,7 +7,6 @@ import io.dongtai.iast.core.handler.hookpoint.models.policy.TaintPosition;
 import io.dongtai.iast.core.handler.hookpoint.models.taint.range.*;
 import io.dongtai.iast.core.utils.StackUtils;
 import io.dongtai.iast.core.utils.TaintPoolUtils;
-import io.dongtai.log.DongTaiLog;
 
 import java.lang.reflect.Array;
 import java.util.*;
@@ -171,8 +170,7 @@ public class SourceImpl {
         try {
             Object v = ((Optional<?>) obj).orElse(null);
             trackObject(event, sourceNode, v, depth + 1);
-        } catch (Throwable e) {
-            DongTaiLog.warn("track optional object failed: " + e.getMessage());
+        } catch (Throwable ignore) {
         }
     }
 
