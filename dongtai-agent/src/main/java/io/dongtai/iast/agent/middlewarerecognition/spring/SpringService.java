@@ -11,9 +11,8 @@ public class SpringService implements IServer {
             loader.loadClass("org.springframework.web.context.ConfigurableWebApplicationContext");
             return true;
         } catch (Throwable e) {
-
+            return false;
         }
-        return false;
     }
 
     @Override

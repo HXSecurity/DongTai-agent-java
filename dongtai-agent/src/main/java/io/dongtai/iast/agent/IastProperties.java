@@ -5,8 +5,10 @@ import io.dongtai.iast.agent.util.GsonUtils;
 import io.dongtai.iast.common.constants.AgentConstant;
 import io.dongtai.iast.common.constants.PropertyConstant;
 import io.dongtai.log.DongTaiLog;
+import io.dongtai.log.ErrorCode;
 
-import java.io.*;
+import java.io.File;
+import java.io.InputStream;
 import java.util.*;
 
 /**
@@ -75,9 +77,13 @@ public class IastProperties {
 
     private IastProperties() {
         try {
-            init();
-        } catch (ClassNotFoundException e) {
-            DongTaiLog.error("IastProperties initialization failed", e);
+            propertiesFilePath = getTmpDir() + "iast.properties";
+            FileUtils.getResourceToFile("iast.properties", propertiesFilePath);
+
+            InputStream is = IastProperties.class.getClassLoader().getResourceAsStream("iast.properties");
+            cfg.load(is);
+        } catch (Throwable e) {
+            DongTaiLog.error(ErrorCode.AGENT_PROPERTIES_INITIALIZE_FAILED, e);
         }
     }
 
@@ -104,18 +110,6 @@ public class IastProperties {
             initTmpDir();
         }
         return TMP_DIR;
-    }
-
-    public void init() throws ClassNotFoundException {
-        try {
-            propertiesFilePath = getTmpDir() + "iast.properties";
-            FileUtils.getResourceToFile("iast.properties", propertiesFilePath);
-
-            InputStream is = IastProperties.class.getClassLoader().getResourceAsStream("iast.properties");
-            cfg.load(is);
-        } catch (IOException e) {
-            DongTaiLog.error("[io.dongtai.iast.agent] read iast.properties failed: " + e.getMessage());
-        }
     }
 
     public String getPropertiesFilePath() {
@@ -333,7 +327,7 @@ public class IastProperties {
      * @param cfg          本地properties配置(为空使用PropertyUtils的配置)
      * @return {@link T} 值类型泛型
      */
-    public <T> T getRemoteSyncLocalConfig(String configKey, Class<T> valueType, T defaultValue, Properties cfg) {
+    public <T> T getRemoteFallbackConfig(String configKey, Class<T> valueType, T defaultValue, Properties cfg) {
         if (configKey == null || valueType == null) {
             return defaultValue;
         }
@@ -350,12 +344,12 @@ public class IastProperties {
                 return GsonUtils.castBaseTypeString2Obj(property, valueType);
             }
         } catch (Throwable e) {
-            DongTaiLog.warn("cast remoteSyncConfig failed!key:{}, valueType:{}, property:{}, err:{}", config, valueType, property, e.getMessage());
+            DongTaiLog.warn(ErrorCode.AGENT_PROCESS_REMOTE_FALLBACK_CONFIG_FAILED, config, valueType, e);
             return defaultValue;
         }
     }
 
-    public <T> T getRemoteSyncLocalConfig(String configKey, Class<T> valueType, T defaultValue) {
-        return getRemoteSyncLocalConfig(configKey, valueType, defaultValue, null);
+    public <T> T getRemoteFallbackConfig(String configKey, Class<T> valueType, T defaultValue) {
+        return getRemoteFallbackConfig(configKey, valueType, defaultValue, null);
     }
 }

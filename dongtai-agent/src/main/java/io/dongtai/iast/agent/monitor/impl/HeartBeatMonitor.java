@@ -8,6 +8,7 @@ import io.dongtai.iast.agent.util.ThreadUtils;
 import io.dongtai.iast.common.constants.AgentConstant;
 import io.dongtai.iast.common.constants.ApiPath;
 import io.dongtai.log.DongTaiLog;
+import io.dongtai.log.ErrorCode;
 
 public class HeartBeatMonitor implements IMonitor {
 
@@ -24,7 +25,7 @@ public class HeartBeatMonitor implements IMonitor {
         try {
             HttpClientUtils.sendPost(ApiPath.REPORT_UPLOAD, HeartBeatReport.generateHeartBeatMsg());
         } catch (Throwable t) {
-            DongTaiLog.warn("Monitor thread checked error, monitor:{}, msg:{}, err:{}", getName(), t.getMessage(), t.getCause());
+            DongTaiLog.warn(ErrorCode.AGENT_MONITOR_THREAD_CHECK_FAILED, getName(), t);
         }
     }
 
@@ -36,7 +37,7 @@ public class HeartBeatMonitor implements IMonitor {
                 ThreadUtils.threadSleep(30);
             }
         } catch (Throwable t) {
-            DongTaiLog.debug("HeartBeatMonitor interrupted, msg:{}", t.getMessage());
+            DongTaiLog.debug("{} interrupted: {}", getName(), t.getMessage());
         }
     }
 }

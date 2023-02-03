@@ -210,9 +210,19 @@ public class DongTaiLogTest {
         Assert.assertEquals("ERROR log format more with code and exception", outputStreamCaptor.toString().substring(20),
                 TITLE + "[ERROR] [110] foo bar baz {}, Exception: java.lang.Exception: bar" + LS);
 
+        int code;
+        String fmt;
         clear();
         DongTaiLog.error(ErrorCode.AGENT_PREMAIN_INVOKE_FAILED, new Exception("bar"));
+        code = ErrorCode.AGENT_PREMAIN_INVOKE_FAILED.getCode();
+        fmt = ErrorCode.AGENT_PREMAIN_INVOKE_FAILED.getMessage();
         Assert.assertEquals("ERROR log with ErrorCode and exception", outputStreamCaptor.toString().substring(20),
-                TITLE + "[ERROR] [10101] agent premain invoke failed, Exception: java.lang.Exception: bar" + LS);
+                TITLE + "[ERROR] [" + code + "] " + fmt + ", Exception: java.lang.Exception: bar" + LS);
+        clear();
+        DongTaiLog.error(ErrorCode.JATTACH_EXTRACT_FAILED, "/tmp/test");
+        code = ErrorCode.JATTACH_EXTRACT_FAILED.getCode();
+        fmt = String.format(ErrorCode.JATTACH_EXTRACT_FAILED.getMessage().replaceAll("\\{\\}", "%s"), "/tmp/test");
+        Assert.assertEquals("ERROR log with ErrorCode and exception", outputStreamCaptor.toString().substring(20),
+                TITLE + "[ERROR] [" + code + "] " + fmt + LS);
     }
 }

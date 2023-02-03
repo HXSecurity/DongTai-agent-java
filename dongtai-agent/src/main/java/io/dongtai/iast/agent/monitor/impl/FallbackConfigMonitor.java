@@ -7,6 +7,7 @@ import io.dongtai.iast.agent.report.AgentRegisterReport;
 import io.dongtai.iast.agent.util.ThreadUtils;
 import io.dongtai.iast.common.constants.AgentConstant;
 import io.dongtai.log.DongTaiLog;
+import io.dongtai.log.ErrorCode;
 
 public class FallbackConfigMonitor implements IMonitor {
     private static final String NAME = "FallbackConfigMonitor";
@@ -21,7 +22,7 @@ public class FallbackConfigMonitor implements IMonitor {
         try {
             FallbackConfig.syncRemoteConfigV2(AgentRegisterReport.getAgentId());
         } catch (Throwable t) {
-            DongTaiLog.warn("sync remote fallback config failed, msg:{}, err:{}", t.getMessage(), t.getCause());
+            DongTaiLog.warn(ErrorCode.AGENT_MONITOR_THREAD_CHECK_FAILED, getName(), t);
         }
     }
 
@@ -33,7 +34,7 @@ public class FallbackConfigMonitor implements IMonitor {
                 ThreadUtils.threadSleep(60);
             }
         } catch (Throwable t) {
-            DongTaiLog.debug("FallbackConfigMonitor interrupted, msg:{}", t.getMessage());
+            DongTaiLog.debug("{} interrupted: {}", getName(), t.getMessage());
         }
     }
 }

@@ -35,7 +35,7 @@ public class DongTaiLog {
         LOG_DIR = IastProperties.getLogDir();
     }
 
-    public static void configure(Integer agentId) {
+    public static void configure(Integer agentId) throws Exception {
         ENABLED = IastProperties.isEnabled();
         if (!ENABLED) {
             return;
@@ -57,7 +57,7 @@ public class DongTaiLog {
                 f.mkdirs();
             }
         } catch (Throwable e) {
-            System.out.println("init log dir " + LOG_DIR + " failed: " + e.getMessage());
+            throw new Exception("init log dir " + LOG_DIR + " failed: " + e.getMessage());
         }
 
         String path = LOG_DIR + File.separator + "dongtai_javaagent-" + String.valueOf(agentId) + ".log";
@@ -68,7 +68,7 @@ public class DongTaiLog {
             }
             LOG_PATH = path;
         } catch (Throwable e) {
-            System.out.println(TITLE + "init log file " + LOG_PATH + " failed: " + e.getMessage());
+            throw new Exception(TITLE + "init log file " + LOG_PATH + " failed: " + e.getMessage());
         }
     }
 

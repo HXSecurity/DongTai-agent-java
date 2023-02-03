@@ -3,18 +3,12 @@ package io.dongtai.api.servlet2;
 import io.dongtai.api.DongTaiRequest;
 import io.dongtai.log.DongTaiLog;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
 import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
+import java.io.*;
+import java.util.*;
 
 public class ServletRequestWrapper extends HttpServletRequestWrapper implements DongTaiRequest {
 
@@ -55,7 +49,7 @@ public class ServletRequestWrapper extends HttpServletRequestWrapper implements 
                     bufferedReader.close();
                 } catch (IOException e) {
                     // fixme: add logger for solve exception
-                    DongTaiLog.error("io.dongtai.api.servlet2.ServletRequestWrapper.getInputStream()",e);
+                    DongTaiLog.error("ServletRequestWrapper getInputStream() failed", e);
                 }
                 body = stringBuilder.toString();
                 isCachedBody = true;
@@ -167,7 +161,7 @@ public class ServletRequestWrapper extends HttpServletRequestWrapper implements 
                 }
             }
         } catch (IOException e) {
-            DongTaiLog.error(e);
+            DongTaiLog.warn("ServletRequestWrapper getPostBody failed", e);
         }
         return postBody.toString();
     }

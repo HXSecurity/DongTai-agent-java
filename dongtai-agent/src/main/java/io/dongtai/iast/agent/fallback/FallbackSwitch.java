@@ -3,6 +3,7 @@ package io.dongtai.iast.agent.fallback;
 import io.dongtai.iast.agent.manager.EngineManager;
 import io.dongtai.iast.common.state.State;
 import io.dongtai.log.DongTaiLog;
+import io.dongtai.log.ErrorCode;
 
 /**
  * 降级开关
@@ -23,7 +24,7 @@ public class FallbackSwitch {
         EngineManager engineManager = EngineManager.getInstance();
 
         if (engineManager.getAgentState().isException()) {
-            DongTaiLog.warn("performance fallback state change to {}, but agent currently has exception", state.name());
+            DongTaiLog.warn(ErrorCode.AGENT_FALLBACK_STATE_CHANGE_WITH_EXCEPTION, state.name());
             return;
         }
         DongTaiLog.info("performance fallback state change to {}", state.name());

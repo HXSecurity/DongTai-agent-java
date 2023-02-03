@@ -9,6 +9,7 @@ import io.dongtai.iast.common.config.ConfigBuilder;
 import io.dongtai.iast.common.constants.AgentConstant;
 import io.dongtai.iast.common.constants.ApiPath;
 import io.dongtai.log.DongTaiLog;
+import io.dongtai.log.ErrorCode;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,7 +31,7 @@ public class ConfigMonitor implements IMonitor {
             StringBuilder response = HttpClientUtils.sendGet(ApiPath.AGENT_CONFIG, parameters);
             ConfigBuilder.getInstance().updateFromRemote(response.toString());
         } catch (Throwable t) {
-            DongTaiLog.warn("request remote agent config failed", t);
+            DongTaiLog.warn(ErrorCode.AGENT_MONITOR_THREAD_CHECK_FAILED, t);
         }
     }
 
@@ -42,7 +43,7 @@ public class ConfigMonitor implements IMonitor {
                 ThreadUtils.threadSleep(60);
             }
         } catch (Throwable t) {
-            DongTaiLog.debug("ConfigMonitor interrupted, msg:{}", t.getMessage());
+            DongTaiLog.debug("{} interrupted: {}", getName(), t.getMessage());
         }
     }
 }

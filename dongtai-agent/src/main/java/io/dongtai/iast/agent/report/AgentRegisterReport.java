@@ -9,6 +9,7 @@ import io.dongtai.iast.common.constants.AgentConstant;
 import io.dongtai.iast.common.constants.ApiPath;
 import io.dongtai.iast.common.utils.base64.Base64Encoder;
 import io.dongtai.log.DongTaiLog;
+import io.dongtai.log.ErrorCode;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -222,7 +223,7 @@ public class AgentRegisterReport {
     public void register() {
         try {
             if (server == null) {
-                DongTaiLog.error("[io.dongtai.iast.agent] Can't Recognize Web Service");
+                DongTaiLog.error(ErrorCode.AGENT_CANNOT_RECOGNIZE_WEB_SERVICE);
                 return;
             }
             String msg = generateAgentRegisterMsg();
@@ -234,17 +235,13 @@ public class AgentRegisterReport {
                 try {
                     DongTaiLog.configure(getAgentId());
                 } catch (Throwable e) {
-                    DongTaiLog.error("log configure failed", e);
+                    DongTaiLog.error(ErrorCode.LOG_CONFIGURE_FAILED, e);
                 }
                 DongTaiLog.info("DongTai Config: " + IastProperties.getInstance().getPropertiesFilePath());
                 DongTaiLog.info("DongTai will install for " + server.getName() + " Service");
             }
-        } catch (NullPointerException e) {
-            DongTaiLog.error("Agent registration to {} failed, Token: {}, Reason: {}",
-                    IastProperties.getInstance().getBaseUrl(), IastProperties.getInstance().getServerToken(), e.getMessage());
         } catch (Throwable e) {
-            DongTaiLog.error("Agent registration to {} failed 10 seconds later, cause: {}, token: {}",
-                    IastProperties.getInstance().getBaseUrl(), e.toString(), IastProperties.getInstance().getServerToken());
+            DongTaiLog.error(ErrorCode.AGENT_REGISTER_REQUEST_FAILED, IastProperties.getInstance().getBaseUrl(), e);
         }
     }
 
@@ -268,11 +265,11 @@ public class AgentRegisterReport {
                 agentId = (Integer) data.get("id");
                 coreRegisterStart = (Integer) data.get("coreAutoStart");
             } else {
-                DongTaiLog.error("Register msg: " + responseRaw);
+                DongTaiLog.error(ErrorCode.AGENT_REGISTER_RESPONSE_CODE_INVALID, responseRaw);
             }
         } catch (Throwable e) {
-            DongTaiLog.error("Parse {} register response failed: {}",
-                    IastProperties.getInstance().getBaseUrl(), e.toString());
+            DongTaiLog.error(ErrorCode.AGENT_REGISTER_PARSE_RESPONSE_FAILED,
+                    IastProperties.getInstance().getBaseUrl(), e);
         }
     }
 
@@ -299,13 +296,13 @@ public class AgentRegisterReport {
                 uuid = br.readLine();
             }
         } catch (Throwable e) {
-            DongTaiLog.error("read/write agent uuid file failed", e);
+            DongTaiLog.trace("read/write agent uuid file failed: " + e.getMessage());
         } finally {
             if (bw != null) {
                 try {
                     bw.close();
                 } catch (IOException e) {
-                    DongTaiLog.error("close agent uuid file writer failed", e);
+                    DongTaiLog.trace("close agent uuid file writer failed: " + e.getMessage());
                 }
             }
 
@@ -313,7 +310,7 @@ public class AgentRegisterReport {
                 try {
                     br.close();
                 } catch (IOException e) {
-                    DongTaiLog.error("close agent uuid file reader failed", e);
+                    DongTaiLog.trace("close agent uuid file reader failed: " + e.getMessage());
                 }
             }
         }

@@ -4,7 +4,6 @@ package io.dongtai.iast.agent.middlewarerecognition.spring;
 import io.dongtai.iast.agent.middlewarerecognition.IServer;
 
 import java.lang.management.RuntimeMXBean;
-import java.lang.reflect.InvocationTargetException;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -23,14 +22,6 @@ public class Tomcat implements IServer {
             name = (String) serverInfo.getMethod("getServerInfo").invoke(null);
             version = (String) serverInfo.getMethod("getServerNumber").invoke(null);
             return true;
-        } catch (ClassNotFoundException e) {
-            return false;
-        } catch (NoSuchMethodException e) {
-            return false;
-        } catch (IllegalAccessException e) {
-            return false;
-        } catch (InvocationTargetException e) {
-            return false;
         } catch (Throwable e) {
             return false;
         }

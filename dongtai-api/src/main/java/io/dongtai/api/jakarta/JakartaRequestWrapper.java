@@ -6,14 +6,9 @@ import jakarta.servlet.ReadListener;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
+
+import java.io.*;
+import java.util.*;
 
 public class JakartaRequestWrapper extends HttpServletRequestWrapper implements DongTaiRequest {
 
@@ -53,7 +48,7 @@ public class JakartaRequestWrapper extends HttpServletRequestWrapper implements 
                     bufferedReader.close();
                 } catch (IOException e) {
                     // fixme: add logger for solve exception
-                    DongTaiLog.error(e);
+                    DongTaiLog.error("JakartaRequestWrapper getInputStream failed", e);
                 }
                 body = stringBuilder.toString();
                 isCachedBody = true;
@@ -162,7 +157,7 @@ public class JakartaRequestWrapper extends HttpServletRequestWrapper implements 
                 }
             }
         } catch (IOException e) {
-            DongTaiLog.error(e);
+            DongTaiLog.warn("JakartaRequestWrapper getPostBody failed", e);
         }
         return postBody.toString();
     }

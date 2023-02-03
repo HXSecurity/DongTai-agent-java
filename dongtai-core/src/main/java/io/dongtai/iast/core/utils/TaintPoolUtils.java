@@ -237,6 +237,8 @@ public class TaintPoolUtils {
                 || "getRepeatedField".equals(methodName)
                 || "getSerializedSize".equals(methodName)
                 || "getMethodOrDie".equals(methodName)
+                || "getReader".equals(methodName)
+                || "getInputStream".equals(methodName)
                 || "getWriter".equals(methodName)
                 || "getOutputStream".equals(methodName)
                 || methodName.endsWith("Bytes")

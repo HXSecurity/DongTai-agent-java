@@ -8,6 +8,7 @@ import io.dongtai.iast.common.constants.AgentConstant;
 import io.dongtai.iast.common.scope.ScopeManager;
 import io.dongtai.iast.common.state.*;
 import io.dongtai.log.DongTaiLog;
+import io.dongtai.log.ErrorCode;
 
 import java.lang.instrument.Instrumentation;
 import java.util.HashMap;
@@ -49,7 +50,7 @@ public class AgentLauncher {
             IastProperties.getInstance();
             install(inst);
         } catch (Throwable e) {
-            DongTaiLog.error("agent premain failed", e);
+            DongTaiLog.error(ErrorCode.AGENT_PREMAIN_INVOKE_FAILED, e);
         } finally {
             AGENT_STATE.setPendingState(null);
         }
@@ -73,20 +74,12 @@ public class AgentLauncher {
             }
         } catch (Throwable e) {
             AGENT_STATE.setState(State.EXCEPTION);
-            DongTaiLog.error("agent agentmain parse args failed", e);
+            DongTaiLog.error(ErrorCode.AGENT_ATTACH_PARSE_ARGS_FAILED, e);
             return;
         }
 
         initLogger();
-
-        try {
-            IastProperties.getInstance();
-        } catch (Throwable e) {
-            AGENT_STATE.setState(State.EXCEPTION);
-            DongTaiLog.error("agent agentmain initialize properties failed", e);
-            return;
-        }
-
+        IastProperties.getInstance();
         StateCause cause = null;
 
         if ("uninstall".equals(mode)) {
@@ -118,7 +111,7 @@ public class AgentLauncher {
                 AGENT_STATE.setCause(cause);
             } catch (Throwable e) {
                 AGENT_STATE.setState(State.EXCEPTION).setCause(cause);
-                DongTaiLog.error("agent agentmain uninstall failed", e);
+                DongTaiLog.error(ErrorCode.AGENT_ATTACH_UNINSTALL_FAILED, e);
             } finally {
                 AGENT_STATE.setPendingState(null);
             }
@@ -145,7 +138,7 @@ public class AgentLauncher {
             install(inst);
         } catch (Throwable e) {
             AGENT_STATE.setState(State.EXCEPTION).setCause(cause);
-            DongTaiLog.error("agent agentmain install failed: " + e.toString());
+            DongTaiLog.error(ErrorCode.AGENT_ATTACH_INSTALL_FAILED, e);
         } finally {
             AGENT_STATE.setPendingState(null);
         }
@@ -185,7 +178,7 @@ public class AgentLauncher {
                 AGENT_STATE.setState(State.RUNNING);
             }
         } else {
-            DongTaiLog.error("Agent registered failed. Start without DongTai IAST.");
+            DongTaiLog.error(ErrorCode.AGENT_REGISTER_INFO_INVALID);
             AGENT_STATE.setState(State.EXCEPTION);
         }
         AGENT_STATE.setCause(StateCause.RUNNING_BY_CLI);
@@ -222,7 +215,7 @@ public class AgentLauncher {
             IastProperties.initTmpDir();
             DongTaiLog.configure(AgentRegisterReport.getAgentId());
         } catch (Throwable e) {
-            DongTaiLog.error("log configure failed", e);
+            DongTaiLog.error(ErrorCode.LOG_INITIALIZE_FAILED, e);
         }
     }
 }

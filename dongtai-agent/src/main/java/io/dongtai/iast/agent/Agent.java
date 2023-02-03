@@ -2,6 +2,7 @@ package io.dongtai.iast.agent;
 
 import io.dongtai.iast.agent.util.FileUtils;
 import io.dongtai.log.DongTaiLog;
+import io.dongtai.log.ErrorCode;
 import org.apache.commons.cli.*;
 
 import java.io.File;
@@ -82,7 +83,7 @@ public class Agent {
             if (process.exitValue() == 0) {
                 DongTaiLog.info("attach to process " + pid + " success, command: " + Arrays.toString(execution));
             } else {
-                DongTaiLog.error("attach failure, please try again with command: " + Arrays.toString(execution));
+                DongTaiLog.error(ErrorCode.JATTACH_EXECUTE_FAILED, Arrays.toString(execution));
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -121,7 +122,7 @@ public class Agent {
         if ((new File(JATTACH_FILE)).setExecutable(true)) {
             DongTaiLog.info("jattach extract success. wait for attach");
         } else {
-            DongTaiLog.error("jattach extract failure. please set execute permission, file: " + JATTACH_FILE);
+            DongTaiLog.error(ErrorCode.JATTACH_EXTRACT_FAILED, JATTACH_FILE);
         }
     }
 

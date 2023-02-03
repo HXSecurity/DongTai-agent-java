@@ -120,7 +120,7 @@ public class SpringApplicationContext {
                 }
                 apiDataModel.setReturnType(returnType);
             } catch (Throwable e) {
-                DongTaiLog.warn("get spring api model failed: {}", e.toString());
+                DongTaiLog.debug("get spring api model failed: {}, {}", e.getMessage(), e.getCause().getMessage());
                 continue;
             }
 

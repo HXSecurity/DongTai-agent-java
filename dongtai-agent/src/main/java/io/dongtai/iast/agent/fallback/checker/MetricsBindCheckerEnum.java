@@ -4,6 +4,7 @@ import io.dongtai.iast.agent.fallback.checker.impl.CpuUsageChecker;
 import io.dongtai.iast.agent.fallback.checker.impl.MemUsageChecker;
 import io.dongtai.iast.common.enums.MetricsKey;
 import io.dongtai.log.DongTaiLog;
+import io.dongtai.log.ErrorCode;
 
 import static io.dongtai.iast.common.enums.MetricsKey.*;
 
@@ -56,7 +57,7 @@ public enum MetricsBindCheckerEnum {
         try {
             return anEnum.getChecker().newInstance();
         } catch (Throwable e) {
-            DongTaiLog.warn("create metrics bind checker error");
+            DongTaiLog.warn(ErrorCode.AGENT_FALLBACK_CHECKER_CREATE_FAILED, e.getMessage());
             return null;
         }
     }

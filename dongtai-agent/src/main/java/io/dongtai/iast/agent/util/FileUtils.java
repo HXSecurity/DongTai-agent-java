@@ -1,9 +1,9 @@
 package io.dongtai.iast.agent.util;
 
-import io.dongtai.iast.agent.AgentLauncher;
 import io.dongtai.iast.agent.IastProperties;
 import io.dongtai.iast.agent.report.AgentRegisterReport;
 import io.dongtai.log.DongTaiLog;
+import io.dongtai.log.ErrorCode;
 
 import java.io.*;
 import java.net.URI;
@@ -15,14 +15,15 @@ public class FileUtils {
         if (!targetFile.exists()) {
             if (!targetFile.getParentFile().exists()) {
                 if (!targetFile.getParentFile().mkdirs()) {
-                    DongTaiLog.error("用户权限不足，文件创建失败");
+                    DongTaiLog.error(ErrorCode.AGENT_GET_RESOURCE_TO_FILE_FAILED, resourceName, fileName, "mkdirs");
                 }
             }
             if (!targetFile.createNewFile()) {
-                DongTaiLog.error("用户权限不足，文件创建失败");
+                DongTaiLog.error(ErrorCode.AGENT_GET_RESOURCE_TO_FILE_FAILED, resourceName, fileName, "createNewFile");
             }
         }
-        if (AgentLauncher.LAUNCH_MODE_AGENT.equals("agent")) {
+
+        try {
             InputStream is = FileUtils.class.getClassLoader().getResourceAsStream(resourceName);
             if (is == null) {
                 return false;
@@ -37,8 +38,10 @@ public class FileUtils {
             is.close();
             fos.close();
             return true;
+        } catch (Throwable e) {
+            DongTaiLog.error(ErrorCode.AGENT_GET_RESOURCE_TO_FILE_FAILED, resourceName, fileName, "write", e);
+            return false;
         }
-        return false;
     }
 
     public static void confReplace(String path) {
