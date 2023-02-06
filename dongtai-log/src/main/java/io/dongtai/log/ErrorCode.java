@@ -58,7 +58,6 @@ public enum ErrorCode {
     ENGINE_DESTROY_FAILED(20102, "engine destroy failed"),
     POLICY_LOAD_FAILED(20111, "load policy failed"),
     POLICY_CONFIG_INVALID(20112, "policy config invalid"),
-    POLICY_TAINT_COMMAND_PARAMETERS_INVALID(20113, "{} taint command parameters failed"),
     TRANSFORM_ENGINE_START_FAILED(20121, "transform engine start failed"),
     TRANSFORM_ENGINE_DESTROY_REDEFINE_CLASSES_FAILED(20122, "transform engine failed to redefine classes when destroy"),
     ENGINE_PROPERTIES_INITIALIZE_FAILED(20131, "engine properties initialize failed"),
@@ -81,6 +80,8 @@ public enum ErrorCode {
     SPY_METHOD_POOL_OVER_CAPACITY(20305, "current request method pool size over capacity: {}"),
     API_COLLECTOR_GET_API_THREAD_EXECUTE_FAILED(20311, "get api thread execute failed"),
     GRAPH_BUILD_AND_REPORT_FAILED(20321, "build and report request graph failed"),
+    TAINT_COMMAND_GET_PARAMETERS_FAILED(20351, "taint command get {} parameters failed"),
+    TAINT_COMMAND_RANGE_PROCESS_FAILED(20352, "taint command range process failed"),
 
     // report & replay
     REPORT_SEND_FAILED(20401, "send report to {} error, report: {}"),
