@@ -2,6 +2,7 @@ package io.dongtai.iast.core.handler.hookpoint.models.policy;
 
 import io.dongtai.iast.core.utils.StringUtils;
 import io.dongtai.log.DongTaiLog;
+import io.dongtai.log.ErrorCode;
 import org.json.JSONArray;
 
 import java.util.*;
@@ -46,7 +47,7 @@ public class PolicyManager {
             }
             this.policy = PolicyBuilder.build(policyConfig);
         } catch (Throwable e) {
-            DongTaiLog.error("load policy failed", e);
+            DongTaiLog.error(ErrorCode.POLICY_LOAD_FAILED, e);
         }
     }
 

@@ -5,8 +5,10 @@ import io.dongtai.iast.agent.util.GsonUtils;
 import io.dongtai.iast.common.constants.AgentConstant;
 import io.dongtai.iast.common.constants.PropertyConstant;
 import io.dongtai.log.DongTaiLog;
+import io.dongtai.log.ErrorCode;
 
-import java.io.*;
+import java.io.File;
+import java.io.InputStream;
 import java.util.*;
 
 /**
@@ -60,7 +62,7 @@ public class IastProperties {
     private String customCoreJarUrl;
     private String customSpyJarUrl;
     private String customApiJarUrl;
-    private String tmpDir;
+    private static String TMP_DIR;
 
     public static IastProperties getInstance() {
         if (null == instance) {
@@ -75,13 +77,20 @@ public class IastProperties {
 
     private IastProperties() {
         try {
-            init();
-        } catch (ClassNotFoundException e) {
-            System.out.println("IastProperties initialization failed: " + e.getMessage());
+            propertiesFilePath = getTmpDir() + "iast.properties";
+            FileUtils.getResourceToFile("iast.properties", propertiesFilePath);
+
+            InputStream is = IastProperties.class.getClassLoader().getResourceAsStream("iast.properties");
+            cfg.load(is);
+        } catch (Throwable e) {
+            DongTaiLog.error(ErrorCode.AGENT_PROPERTIES_INITIALIZE_FAILED, e);
         }
     }
 
-    private void initTmpDir() {
+    public static String initTmpDir() {
+        if (TMP_DIR != null && !TMP_DIR.isEmpty()) {
+            return TMP_DIR;
+        }
         StringBuilder dir = new StringBuilder();
         String sysTmpDir = System.getProperty("java.io.tmpdir");
         if (sysTmpDir == null) {
@@ -91,30 +100,16 @@ public class IastProperties {
                 .append("dongtai-").append(System.getProperty("user.name")).append(File.separator)
                 .append(AgentConstant.VERSION_VALUE).append(File.separator);
 
-        this.tmpDir = dir.toString();
-        System.setProperty("java.io.tmpdir.dongtai", this.tmpDir);
+        TMP_DIR = dir.toString();
+        System.setProperty("java.io.tmpdir.dongtai", TMP_DIR);
+        return TMP_DIR;
     }
 
     public String getTmpDir() {
-        if (this.tmpDir.isEmpty()) {
+        if (TMP_DIR.isEmpty()) {
             initTmpDir();
         }
-        return this.tmpDir;
-    }
-
-    public void init() throws ClassNotFoundException {
-        try {
-            initTmpDir();
-            propertiesFilePath = getTmpDir() + "iast.properties";
-            FileUtils.getResourceToFile("iast.properties", propertiesFilePath);
-
-            InputStream is = IastProperties.class.getClassLoader().getResourceAsStream("iast.properties");
-            cfg.load(is);
-
-            System.out.println("[io.dongtai.iast.agent] DongTai Config: " + propertiesFilePath);
-        } catch (IOException e) {
-            System.out.println("[io.dongtai.iast.agent] read iast.properties failed: " + e.getMessage());
-        }
+        return TMP_DIR;
     }
 
     public String getPropertiesFilePath() {
@@ -332,7 +327,7 @@ public class IastProperties {
      * @param cfg          本地properties配置(为空使用PropertyUtils的配置)
      * @return {@link T} 值类型泛型
      */
-    public <T> T getRemoteSyncLocalConfig(String configKey, Class<T> valueType, T defaultValue, Properties cfg) {
+    public <T> T getRemoteFallbackConfig(String configKey, Class<T> valueType, T defaultValue, Properties cfg) {
         if (configKey == null || valueType == null) {
             return defaultValue;
         }
@@ -349,12 +344,12 @@ public class IastProperties {
                 return GsonUtils.castBaseTypeString2Obj(property, valueType);
             }
         } catch (Throwable e) {
-            DongTaiLog.warn("cast remoteSyncConfig failed!key:{}, valueType:{}, property:{}, err:{}", config, valueType, property, e.getMessage());
+            DongTaiLog.warn(ErrorCode.AGENT_PROCESS_REMOTE_FALLBACK_CONFIG_FAILED, config, valueType, e);
             return defaultValue;
         }
     }
 
-    public <T> T getRemoteSyncLocalConfig(String configKey, Class<T> valueType, T defaultValue) {
-        return getRemoteSyncLocalConfig(configKey, valueType, defaultValue, null);
+    public <T> T getRemoteFallbackConfig(String configKey, Class<T> valueType, T defaultValue) {
+        return getRemoteFallbackConfig(configKey, valueType, defaultValue, null);
     }
 }

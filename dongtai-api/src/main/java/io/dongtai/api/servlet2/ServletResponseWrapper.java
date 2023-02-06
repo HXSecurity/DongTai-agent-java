@@ -39,7 +39,7 @@ public class ServletResponseWrapper extends HttpServletResponseWrapper implement
     @Override
     public ServletOutputStream getOutputStream() throws IOException {
         if (writer != null) {
-            DongTaiLog.error("getOutputStream() has already been called over once");
+            DongTaiLog.warn("ServletResponseWrapper getOutputStream() has already been called over once");
         }
         if (outputStream == null) {
             outputStream = getResponse().getOutputStream();
@@ -51,7 +51,7 @@ public class ServletResponseWrapper extends HttpServletResponseWrapper implement
     @Override
     public PrintWriter getWriter() throws IOException {
         if (outputStream != null) {
-            DongTaiLog.error("getWriter() has already been called over once");
+            DongTaiLog.warn("ServletResponseWrapper getWriter() has already been called over once");
         }
         if (writer == null) {
             copier = new ServletWrapperOutputStreamCopier(getResponse().getOutputStream());
@@ -91,13 +91,12 @@ public class ServletResponseWrapper extends HttpServletResponseWrapper implement
     public byte[] getResponseData(boolean getBody) {
         try {
             flushBuffer();
-        } catch (IOException e) {
-            DongTaiLog.error(e);
+        } catch (Throwable e) {
+            DongTaiLog.error("ServletResponseWrapper flushBuffer failed", e);
         }
         if (getBody && copier != null) {
             return copier.getCopy();
-        } else {
-            return new byte[0];
         }
+        return new byte[0];
     }
 }

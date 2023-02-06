@@ -52,7 +52,7 @@ public class FeignService {
         } catch (NoSuchFieldException ignore) {
         } catch (NoSuchMethodException ignore) {
         } catch (Throwable e) {
-            DongTaiLog.error("solve feign invoke failed", e);
+            DongTaiLog.debug("solve feign invoke failed: {}, {}", e.getMessage(), e.getCause().getMessage());
         }
     }
 
@@ -128,8 +128,7 @@ public class FeignService {
         try {
             Object v = ((Optional<?>) obj).orElse(null);
             trackObject(event, v, depth + 1);
-        } catch (Throwable e) {
-            DongTaiLog.warn("feign track optional object failed: " + e.getMessage());
+        } catch (Throwable ignore) {
         }
     }
 }

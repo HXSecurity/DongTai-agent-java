@@ -14,6 +14,7 @@ import io.dongtai.iast.common.entity.performance.metrics.MemoryUsageMetrics;
 import io.dongtai.iast.common.enums.MetricsKey;
 import io.dongtai.iast.common.utils.serialize.SerializeUtils;
 import io.dongtai.log.DongTaiLog;
+import io.dongtai.log.ErrorCode;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -71,7 +72,7 @@ public class PerformanceMonitor implements IMonitor {
                 return (int) rate;
             }
         } catch (Throwable e) {
-            DongTaiLog.error("get disk usage failed", e);
+            DongTaiLog.warn(ErrorCode.AGENT_MONITOR_GET_DISK_USAGE_FAILED, e.getMessage(), e.getCause().getMessage());
         }
         return 0;
     }
@@ -99,7 +100,7 @@ public class PerformanceMonitor implements IMonitor {
             // check performance metrics for fallback
             checkPerformanceMetrics(performanceMetrics);
         } catch (Throwable t) {
-            DongTaiLog.warn("Monitor thread checked error, monitor:{}, msg:{}, err:{}", getName(), t.getMessage(), t.getCause());
+            DongTaiLog.warn(ErrorCode.AGENT_MONITOR_THREAD_CHECK_FAILED, getName(), t);
         }
     }
 
@@ -132,7 +133,7 @@ public class PerformanceMonitor implements IMonitor {
                 IPerformanceCollector collector = collectorEnum.getCollector().newInstance();
                 metricsList.add(collector.getMetrics());
             } catch (Throwable t) {
-                DongTaiLog.error("getPerformanceMetrics failed, collector:{}, err:{}", collectorEnum, t.getMessage());
+                DongTaiLog.warn(ErrorCode.AGENT_MONITOR_COLLECT_PERFORMANCE_METRICS_FAILED, collectorEnum, t.getMessage());
             }
         }
         return metricsList;
@@ -145,7 +146,8 @@ public class PerformanceMonitor implements IMonitor {
         try {
             FallbackManager.invokePerformanceBreakerCheck(SerializeUtils.serializeByList(performanceMetrics));
         } catch (Throwable t) {
-            DongTaiLog.error("checkPerformanceMetrics failed, msg:{}, err:{}", t.getMessage(), t.getCause());
+            DongTaiLog.warn(ErrorCode.AGENT_MONITOR_CHECK_PERFORMANCE_METRICS_FAILED,
+                    t.getMessage(), t.getCause().getMessage());
         }
     }
 
@@ -157,7 +159,7 @@ public class PerformanceMonitor implements IMonitor {
                 ThreadUtils.threadSleep(30);
             }
         } catch (Throwable t) {
-            DongTaiLog.debug("PerformanceMonitor interrupted, msg:{}", t.getMessage());
+            DongTaiLog.debug("{} interrupted: {}", getName(), t.getMessage());
         }
     }
 }

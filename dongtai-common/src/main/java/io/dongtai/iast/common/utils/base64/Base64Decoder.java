@@ -24,7 +24,7 @@ public class Base64Decoder extends CharacterDecoder {
         try {
             return instance.decodeBuffer(data);
         } catch (IOException e) {
-            DongTaiLog.error("base64 decode from string failed", e);
+            DongTaiLog.trace("base64 decode from string failed: {}, {}", e.getMessage(), e.getCause());
         }
         return null;
     }
@@ -46,7 +46,7 @@ public class Base64Decoder extends CharacterDecoder {
         byte var7 = -1;
         byte var8 = -1;
         if (var3 < 2) {
-            DongTaiLog.error("BASE64Decoder: Not enough bytes for an atom.");
+            DongTaiLog.trace("BASE64Decoder: Not enough bytes for an atom.");
         } else {
             int var4;
             do {

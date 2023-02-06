@@ -2,6 +2,7 @@ package io.dongtai.iast.common.utils;
 
 import io.dongtai.iast.common.enums.HttpMethods;
 import io.dongtai.log.DongTaiLog;
+import io.dongtai.log.ErrorCode;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -14,9 +15,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class AbstractHttpClientUtilsTest {
+    private final static String LS = System.getProperty("line.separator");
+    private static final String TITLE = "[io.dongtai.iast.agent] ";
     private final PrintStream standardOut = System.out;
     private final ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
-    private final boolean oldEnableColor = DongTaiLog.enableColor;
+    private final boolean oldEnableColor = DongTaiLog.ENABLE_COLOR;
 
     private static final String BASE_URL = "https://iast.io";
 
@@ -26,16 +29,16 @@ public class AbstractHttpClientUtilsTest {
 
     @Before
     public void setUp() {
-        DongTaiLog.enablePrintLog = true;
-        DongTaiLog.enableColor = false;
+        DongTaiLog.ENABLED = true;
+        DongTaiLog.ENABLE_COLOR = false;
         clear();
         System.setOut(new PrintStream(outputStreamCaptor));
     }
 
     @After
     public void tearDown() {
-        DongTaiLog.enablePrintLog = false;
-        DongTaiLog.enableColor = oldEnableColor;
+        DongTaiLog.ENABLED = false;
+        DongTaiLog.ENABLE_COLOR = oldEnableColor;
         clear();
         System.setOut(standardOut);
     }
@@ -68,8 +71,11 @@ public class AbstractHttpClientUtilsTest {
         url = BASE_URL + "/api/v1/profiles";
         AbstractHttpClientUtils.sendRequest(HttpMethods.GET, url, data, headers, 0, "", -1, null);
         log = outputStreamCaptor.toString();
-        Assert.assertTrue("invalid openapi token",
-                log.contains("[ERROR]") && log.contains("response status code invalid: 401"));
+        int code = ErrorCode.HTTP_CLIENT_REQUEST_RESPONSE_CODE_INVALID.getCode();
+        String fmt = String.format(ErrorCode.HTTP_CLIENT_REQUEST_RESPONSE_CODE_INVALID.getMessage().replaceAll("\\{\\}", "%s"),
+                url, "401");
+        Assert.assertEquals("invalid openapi token", log.substring(20),
+                TITLE + "[WARN] [" + code + "] " + fmt + LS);
         clear();
 
         url = BASE_URL + ":55555";
@@ -101,7 +107,11 @@ public class AbstractHttpClientUtilsTest {
         boolean ok = AbstractHttpClientUtils.downloadFile(url, "/tmp/agent.jar", headers, "", -1);
         Assert.assertFalse("invalid token download", ok);
         String log = outputStreamCaptor.toString();
+        int code = ErrorCode.HTTP_CLIENT_REMOTE_FILE_RESPONSE_INVALID.getCode();
+        String fmt = String.format(ErrorCode.HTTP_CLIENT_REMOTE_FILE_RESPONSE_INVALID.getMessage()
+                .replaceAll("\\{\\}", "%s"), url, "401", "");
         Assert.assertTrue("invalid token download error",
-                log.contains("[ERROR]") && log.contains("download failed") && log.contains("response code: 401"));
+                log.substring(20).startsWith(TITLE + "[ERROR] [" + code + "] " + fmt));
+        clear();
     }
 }

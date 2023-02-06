@@ -2,6 +2,7 @@ package io.dongtai.iast.core.handler.hookpoint.models.taint.range;
 
 import io.dongtai.iast.core.handler.hookpoint.models.policy.PropagatorNode;
 import io.dongtai.log.DongTaiLog;
+import io.dongtai.log.ErrorCode;
 
 import java.util.*;
 
@@ -85,7 +86,7 @@ public class TaintCommandRunner {
                 p3 = this.params.get(2).getParam(params);
             }
         } catch (Throwable e) {
-            DongTaiLog.error(this.signature + " taint command parameters fetch failed: " + e.getMessage());
+            DongTaiLog.warn(ErrorCode.TAINT_COMMAND_GET_PARAMETERS_FAILED, this.signature, e.getMessage());
             return tr;
         }
 
@@ -97,35 +98,39 @@ public class TaintCommandRunner {
             }
         }
 
-        switch (this.command) {
-            case KEEP:
-                this.builder.keep(tr, target, this.paramsCount, srcTaintRanges);
-                break;
-            case APPEND:
-                this.builder.append(tr, target, oldTaintRanges, source, srcTaintRanges, p1, p2, this.paramsCount);
-                break;
-            case SUBSET:
-                this.builder.subset(tr, oldTaintRanges, source, srcTaintRanges, p1, p2, p3, this.paramsCount);
-                break;
-            case INSERT:
-                this.builder.insert(tr, oldTaintRanges, source, srcTaintRanges, p1, p2, p3, this.paramsCount);
-                break;
-            case REPLACE:
-                this.builder.replace(tr, target, oldTaintRanges, source, srcTaintRanges, p1, p2, this.paramsCount);
-                break;
-            case REMOVE:
-                this.builder.remove(tr, source, srcTaintRanges, p1, p2, this.paramsCount);
-                break;
-            case CONCAT:
-                this.builder.concat(tr, target, oldTaintRanges, source, srcTaintRanges, params);
-                break;
-            case TRIM:
-            case TRIM_LEFT:
-            case TRIM_RIGHT:
-                this.builder.trim(this.command, tr, source, srcTaintRanges, this.paramsCount);
-                break;
-            default:
-                break;
+        try {
+            switch (this.command) {
+                case KEEP:
+                    this.builder.keep(tr, target, this.paramsCount, srcTaintRanges);
+                    break;
+                case APPEND:
+                    this.builder.append(tr, target, oldTaintRanges, source, srcTaintRanges, p1, p2, this.paramsCount);
+                    break;
+                case SUBSET:
+                    this.builder.subset(tr, oldTaintRanges, source, srcTaintRanges, p1, p2, p3, this.paramsCount);
+                    break;
+                case INSERT:
+                    this.builder.insert(tr, oldTaintRanges, source, srcTaintRanges, p1, p2, p3, this.paramsCount);
+                    break;
+                case REPLACE:
+                    this.builder.replace(tr, target, oldTaintRanges, source, srcTaintRanges, p1, p2, this.paramsCount);
+                    break;
+                case REMOVE:
+                    this.builder.remove(tr, source, srcTaintRanges, p1, p2, this.paramsCount);
+                    break;
+                case CONCAT:
+                    this.builder.concat(tr, target, oldTaintRanges, source, srcTaintRanges, params);
+                    break;
+                case TRIM:
+                case TRIM_LEFT:
+                case TRIM_RIGHT:
+                    this.builder.trim(this.command, tr, source, srcTaintRanges, this.paramsCount);
+                    break;
+                default:
+                    break;
+            }
+        } catch (Throwable e) {
+            DongTaiLog.warn(ErrorCode.TAINT_COMMAND_RANGE_PROCESS_FAILED, e);
         }
 
         tr.untag(propagatorNode.getUntags());

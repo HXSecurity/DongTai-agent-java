@@ -27,7 +27,6 @@ public class IastPropertiesTest {
     private void clear() {
         System.clearProperty("java.io.tmpdir.dongtai");
         System.clearProperty("dongtai.log.path");
-        IastProperties.setLogDir(null);
     }
 
     @Test

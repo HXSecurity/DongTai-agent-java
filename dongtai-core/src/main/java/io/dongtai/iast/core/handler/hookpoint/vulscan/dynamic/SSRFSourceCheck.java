@@ -84,7 +84,8 @@ public class SSRFSourceCheck implements SinkSourceChecker {
             event.setObjectValue(url, true);
             return addSourceType(event, sourceMap);
         } catch (Throwable e) {
-            DongTaiLog.warn("java.net.URL get source failed: " + e.getMessage());
+            DongTaiLog.debug("java.net.URL get source failed: {}, {}",
+                    e.getMessage(), e.getCause().getMessage());
             return false;
         }
     }
@@ -132,7 +133,8 @@ public class SSRFSourceCheck implements SinkSourceChecker {
 
             return false;
         } catch (Throwable e) {
-            DongTaiLog.warn("apache http legacy client get source failed: " + e.getMessage());
+            DongTaiLog.debug("apache http legacy client get source failed: {}, {}",
+                    e.getMessage(), e.getCause().getMessage());
             return false;
         }
     }
@@ -194,7 +196,8 @@ public class SSRFSourceCheck implements SinkSourceChecker {
             event.setObjectValue(uri, true);
             return addSourceType(event, sourceMap);
         } catch (Throwable e) {
-            DongTaiLog.warn("apache http client get source failed: " + e.getMessage());
+            DongTaiLog.debug("apache http client get source failed: {}, {}",
+                    e.getMessage(), e.getCause().getMessage());
             return false;
         }
     }
@@ -252,7 +255,8 @@ public class SSRFSourceCheck implements SinkSourceChecker {
             event.addParameterValue(1, uriObj, true);
             return addSourceType(event, sourceMap);
         } catch (Throwable e) {
-            DongTaiLog.warn("apache http client5 get source failed: " + e.getMessage());
+            DongTaiLog.debug("apache http client5 get source failed: {}, {}",
+                    e.getMessage(), e.getCause().getMessage());
             return false;
         }
     }
@@ -325,7 +329,8 @@ public class SSRFSourceCheck implements SinkSourceChecker {
 
             return false;
         } catch (Throwable e) {
-            DongTaiLog.warn("okhttp get source failed: " + e.getMessage());
+            DongTaiLog.debug("okhttp get source failed: {}, {}",
+                    e.getMessage(), e.getCause().getMessage());
             return false;
         }
     }

@@ -11,10 +11,10 @@ import java.util.regex.Matcher;
  * @author niuerzhuang@huoxian.cn
  */
 public class DongTaiLog {
-    public static boolean enablePrintLog;
-    private static final String logDir;
-    private static String logPath = "";
-    public static boolean enableColor;
+    public static boolean ENABLED;
+    private static String LOG_DIR;
+    private static String LOG_PATH;
+    public static boolean ENABLE_COLOR;
     public static LogLevel LEVEL = getCurrentLevel();
 
     private static final String RESET = "\033[0m";
@@ -28,42 +28,52 @@ public class DongTaiLog {
 
     static {
         if (System.console() != null && !System.getProperty("os.name").toLowerCase().contains("windows")) {
-            enableColor = true;
+            ENABLE_COLOR = true;
         }
 
-        enablePrintLog = !"false".equalsIgnoreCase(IastProperties.enablePrintLog());
-        logDir = IastProperties.getLogDir();
+        ENABLED = IastProperties.isEnabled();
+        LOG_DIR = IastProperties.getLogDir();
     }
 
-    public static void init(int id) {
-        if (!enablePrintLog || logDir.isEmpty()) {
+    public static void configure(Integer agentId) throws Exception {
+        ENABLED = IastProperties.isEnabled();
+        if (!ENABLED) {
+            return;
+        }
+        setLevel(getCurrentLevel());
+
+        LOG_DIR = IastProperties.getLogDir();
+        if (LOG_DIR.isEmpty()) {
             return;
         }
 
+        if (agentId == null || agentId < 0) {
+            agentId = 0;
+        }
+
         try {
-            File f = new File(logDir);
+            File f = new File(LOG_DIR);
             if (!f.exists()) {
                 f.mkdirs();
             }
         } catch (Throwable e) {
-            System.out.println("init log dir " + logDir + "failed: " + e.getMessage());
-            return;
+            throw new Exception("init log dir " + LOG_DIR + " failed: " + e.getMessage());
         }
 
-        String path = logDir + File.separator + "dongtai_javaagent-" + String.valueOf(id) + ".log";
+        String path = LOG_DIR + File.separator + "dongtai_javaagent-" + String.valueOf(agentId) + ".log";
         try {
             File file = new File(path);
             if (!file.exists()) {
                 file.createNewFile();
             }
-            logPath = path;
+            LOG_PATH = path;
         } catch (Throwable e) {
-            System.out.println("init log file " + logPath + "failed: " + e.getMessage());
+            throw new Exception(TITLE + "init log file " + LOG_PATH + " failed: " + e.getMessage());
         }
     }
 
     public static String getLogPath() {
-        return logPath;
+        return LOG_PATH;
     }
 
     public enum LogLevel {
@@ -100,15 +110,15 @@ public class DongTaiLog {
     private static LogLevel getCurrentLevel() {
         String logLevel = IastProperties.getLogLevel();
         LogLevel lvl;
-        if ("trace".equals(logLevel)) {
+        if ("trace".equalsIgnoreCase(logLevel)) {
             lvl = LogLevel.TRACE;
-        } else if ("info".equals(logLevel)) {
+        } else if ("info".equalsIgnoreCase(logLevel)) {
             lvl = LogLevel.INFO;
-        } else if ("debug".equals(logLevel)) {
+        } else if ("debug".equalsIgnoreCase(logLevel)) {
             lvl = LogLevel.DEBUG;
-        } else if ("warn".equals(logLevel)) {
+        } else if ("warn".equalsIgnoreCase(logLevel)) {
             lvl = LogLevel.WARN;
-        } else if ("error".equals(logLevel)) {
+        } else if ("error".equalsIgnoreCase(logLevel)) {
             lvl = LogLevel.ERROR;
         } else {
             lvl = LogLevel.INFO;
@@ -121,18 +131,26 @@ public class DongTaiLog {
     }
 
     public static boolean canLog(LogLevel lvl) {
-        return enablePrintLog && lvl.getLevel().intValue() >= LEVEL.getLevel().intValue();
+        return ENABLED && lvl.getLevel().intValue() >= LEVEL.getLevel().intValue();
     }
 
     private static String colorStr(String msg, int colorCode) {
         return "\033[" + colorCode + "m" + msg + RESET;
     }
 
-    private static String getPrefix(LogLevel lvl, boolean useColor) {
+    private static String getPrefix(LogLevel lvl, int code, boolean useColor) {
+        String prefix;
         if (useColor) {
-            return getTime() + TITLE_COLOR + lvl.getColorPrefix();
+            prefix = getTime() + TITLE_COLOR + lvl.getColorPrefix();
+        } else {
+            prefix = getTime() + TITLE + lvl.getPrefix();
         }
-        return getTime() + TITLE + lvl.getPrefix();
+
+        if (code > 0) {
+            prefix += "[" + String.valueOf(code) + "] ";
+        }
+
+        return prefix;
     }
 
     private static String getMessage(String msg, Throwable t) {
@@ -146,106 +164,68 @@ public class DongTaiLog {
         return msg;
     }
 
-    public static void log(LogLevel lvl, String msg, Throwable t) {
+    private static void log(LogLevel lvl, int code, String fmt, Object... arguments) {
         if (!canLog(lvl)) {
             return;
         }
+
+        Throwable t = null;
+        String msg = fmt;
+        if (arguments.length == 1 && arguments[0] instanceof Throwable) {
+            t = (Throwable) arguments[0];
+        } else if (arguments.length > 0) {
+            if (arguments[arguments.length - 1] instanceof Throwable) {
+                t = (Throwable) arguments[arguments.length - 1];
+                Object[] newArguments = new Object[arguments.length - 1];
+                System.arraycopy(arguments, 0, newArguments, 0, arguments.length - 1);
+                msg = format(fmt, newArguments);
+            } else {
+                msg = format(fmt, arguments);
+            }
+        }
+
         msg = getMessage(msg, t);
         if (msg.isEmpty()) {
             return;
         }
-        System.out.println(getPrefix(lvl, enableColor) + msg);
-        writeLogToFile(getPrefix(lvl, false) + msg, t);
+        System.out.println(getPrefix(lvl, code, ENABLE_COLOR) + msg);
+        writeLogToFile(getPrefix(lvl, code, false) + msg, t);
     }
 
-    public static void trace(String msg, Throwable t) {
-        log(LogLevel.TRACE, msg, t);
+    public static void trace(String fmt, Object... arguments) {
+        log(LogLevel.TRACE, 0, fmt, arguments);
     }
 
-    public static void trace(String msg) {
-        trace(msg, (Throwable) null);
+    public static void debug(String fmt, Object... arguments) {
+        log(LogLevel.DEBUG, 0, fmt, arguments);
     }
 
-    public static void trace(String format, Object... arguments) {
-        if (canLog(LogLevel.TRACE)) {
-            trace(format(format, arguments));
-        }
+    public static void info(String fmt, Object... arguments) {
+        log(LogLevel.INFO, 0, fmt, arguments);
     }
 
-    public static void trace(Throwable t) {
-        trace("", t);
+    public static void warn(int code, String fmt, Object... arguments) {
+        log(LogLevel.WARN, code, fmt, arguments);
     }
 
-    public static void debug(String msg, Throwable t) {
-        log(LogLevel.DEBUG, msg, t);
-    }
-
-    public static void debug(String msg) {
-        debug(msg, (Throwable) null);
-    }
-
-    public static void debug(String format, Object... arguments) {
-        if (canLog(LogLevel.DEBUG)) {
-            debug(format(format, arguments));
-        }
-    }
-
-    public static void debug(Throwable t) {
-        debug("", t);
-    }
-
-    public static void info(String msg, Throwable t) {
-        log(LogLevel.INFO, msg, t);
-    }
-
-    public static void info(String msg) {
-        info(msg, (Throwable) null);
-    }
-
-    public static void info(String format, Object... arguments) {
-        if (canLog(LogLevel.INFO)) {
-            info(format(format, arguments));
-        }
-    }
-
-    public static void info(Throwable t) {
-        info("", t);
-    }
-
-    public static void warn(String msg, Throwable t) {
-        log(LogLevel.WARN, msg, t);
-    }
-
-    public static void warn(String msg) {
-        warn(msg, (Throwable) null);
+    public static void warn(ErrorCode ec, Object... arguments) {
+        log(LogLevel.WARN, ec.getCode(), ec.getMessage(), arguments);
     }
 
     public static void warn(String format, Object... arguments) {
-        if (canLog(LogLevel.WARN)) {
-            warn(format(format, arguments));
-        }
+        log(LogLevel.WARN, 0, format, arguments);
     }
 
-    public static void warn(Throwable t) {
-        warn("", t);
+    public static void error(int code, String fmt, Object... arguments) {
+        log(LogLevel.ERROR, code, fmt, arguments);
     }
 
-    public static void error(String msg, Throwable t) {
-        log(LogLevel.ERROR, msg, t);
-    }
-
-    public static void error(String msg) {
-        error(msg, (Throwable) null);
+    public static void error(ErrorCode ec, Object... arguments) {
+        log(LogLevel.ERROR, ec.getCode(), ec.getMessage(), arguments);
     }
 
     public static void error(String format, Object... arguments) {
-        if (canLog(LogLevel.ERROR)) {
-            error(format(format, arguments));
-        }
-    }
-
-    public static void error(Throwable t) {
-        error("", t);
+        log(LogLevel.ERROR, 0, format, arguments);
     }
 
     private static String format(String from, Object... arguments) {
@@ -268,25 +248,30 @@ public class DongTaiLog {
     }
 
     private static void writeLogToFile(String msg, Throwable t) {
-        if (logPath.isEmpty()) {
+        if (LOG_PATH == null || LOG_PATH.isEmpty()) {
             return;
         }
         FileOutputStream o = null;
-        File file = new File(logPath);
         try {
             if (t != null) {
                 StringWriter stringWriter = new StringWriter();
                 t.printStackTrace(new PrintWriter(stringWriter));
-                msg = msg + stringWriter;
+                msg = msg + ", StackTrace: " + stringWriter;
             }
 
+            File file = new File(LOG_PATH);
             o = new FileOutputStream(file, true);
             o.write(msg.getBytes());
             o.write(System.getProperty("line.separator").getBytes());
             o.flush();
             o.close();
         } catch (Throwable e) {
-            System.out.println("the log file " + file.getPath() + " is not writable: " + e.toString());
+            if (o != null) {
+                try {
+                    o.close();
+                } catch (Throwable ignore) {
+                }
+            }
         }
     }
 }

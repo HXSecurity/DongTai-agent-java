@@ -5,6 +5,7 @@ import io.dongtai.iast.common.constants.ReportType;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.service.ThreadPools;
 import io.dongtai.log.DongTaiLog;
+import io.dongtai.log.ErrorCode;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -180,7 +181,7 @@ public class ScaScanner {
                     }
                 }
             } catch (Throwable e) {
-                DongTaiLog.error("sca scan jar lib failed", e.getMessage());
+                DongTaiLog.warn(ErrorCode.SCA_SCAN_JAR_LIB_FAILED, e.getMessage(), e.getCause().getMessage());
             }
         }
 

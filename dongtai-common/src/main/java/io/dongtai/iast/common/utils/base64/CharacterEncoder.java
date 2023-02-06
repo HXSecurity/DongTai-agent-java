@@ -93,7 +93,8 @@ public abstract class CharacterEncoder {
             var4 = var2.toString("8859_1");
             return var4;
         } catch (Throwable e) {
-            DongTaiLog.error("CharacterEncoder.encode internal error", e);
+            DongTaiLog.trace("CharacterEncoder.encode internal error: {}, {}",
+                    e.getMessage(), e.getCause().getMessage());
             return "";
         }
     }
@@ -166,7 +167,8 @@ public abstract class CharacterEncoder {
         try {
             this.encodeBuffer((InputStream) var3, var2);
         } catch (Throwable e) {
-            DongTaiLog.error("CharacterEncoder.encodeBuffer internal error", e);
+            DongTaiLog.trace("CharacterEncoder.encodeBuffer internal error: {}, {}",
+                    e.getMessage(), e.getCause().getMessage());
         }
 
         return var2.toString();

@@ -1,13 +1,14 @@
 package io.dongtai.iast.core.utils;
 
+import io.dongtai.log.DongTaiLog;
+import io.dongtai.log.ErrorCode;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.LineIterator;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.LineIterator;
-import io.dongtai.log.DongTaiLog;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -45,8 +46,7 @@ public class ConfigUtils {
                 }
             }
         } catch (IOException e) {
-            DongTaiLog.error("读取配置文件：{} 失败，错误信息：{}", filename, e);
-            DongTaiLog.error("io.dongtai.iast.core.utils.ConfigUtils.loadConfigFromFile(java.lang.String)",e);
+            DongTaiLog.error(ErrorCode.UTIL_CONFIG_LOAD_FAILED, filename, e);
         }
         return new HashSet[]{container, startWith, endWith};
     }
@@ -62,8 +62,7 @@ public class ConfigUtils {
                 extStringArray = exts.split(",");
             }
         } catch (IOException e) {
-            DongTaiLog.error("读取后缀配置文件：{} 失败，错误信息：{}", filename, e);
-            DongTaiLog.error(e);
+            DongTaiLog.error(ErrorCode.UTIL_CONFIG_LOAD_FAILED, filename, e);
         }
         return extStringArray;
     }
@@ -79,8 +78,8 @@ public class ConfigUtils {
                 container.add(line);
             }
         } catch (IOException e) {
-            DongTaiLog.error("读取配置文件：{} 失败，错误信息：{}", filename, e);
-            DongTaiLog.error(e);        }
+            DongTaiLog.error(ErrorCode.UTIL_CONFIG_LOAD_FAILED, filename, e);
+        }
         return container;
     }
 

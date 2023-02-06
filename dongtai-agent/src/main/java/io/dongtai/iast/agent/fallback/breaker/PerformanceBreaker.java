@@ -13,6 +13,7 @@ import io.dongtai.iast.common.state.AgentState;
 import io.dongtai.iast.common.state.State;
 import io.dongtai.iast.common.utils.serialize.SerializeUtils;
 import io.dongtai.log.DongTaiLog;
+import io.dongtai.log.ErrorCode;
 import io.github.resilience4j.circuitbreaker.*;
 import io.vavr.control.Try;
 
@@ -142,7 +143,7 @@ public class PerformanceBreaker extends AbstractBreaker {
                     CpuInfoMetrics.class, MemoryUsageMetrics.class);
             return SerializeUtils.deserialize2ArrayList(contextString, PerformanceMetrics.class, clazzWhiteList);
         } catch (Throwable e) {
-            DongTaiLog.warn("convert2MetricsList failed, err:{}", e.getMessage());
+            DongTaiLog.warn(ErrorCode.AGENT_FALLBACK_BREAKER_CONVERT_METRICS_FAILED, e.getMessage());
             return new ArrayList<PerformanceMetrics>();
         }
     }

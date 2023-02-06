@@ -6,6 +6,7 @@ import io.dongtai.iast.core.utils.*;
 import io.dongtai.iast.core.utils.collection.Pair;
 import io.dongtai.iast.core.utils.matcher.structure.PrimitiveClassStructure.Primitive;
 import io.dongtai.log.DongTaiLog;
+import io.dongtai.log.ErrorCode;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.objectweb.asm.*;
@@ -336,8 +337,7 @@ public class ClassStructureImplByAsm extends FamilyClassStructure {
             return classStructure;
         } catch (Throwable cause) {
             // ignore
-            DongTaiLog.warn("new instance class structure by using ASM failed, will return null. class="
-                    + javaClassName + ";loader=" + loader + ";", cause);
+            DongTaiLog.warn(ErrorCode.ASM_CREATE_CLASS_STRUCTURE_BY_NAME_FAILED, javaClassName, loader, cause);
             classStructureCache.put(pair, null);
         } finally {
             pair = null;

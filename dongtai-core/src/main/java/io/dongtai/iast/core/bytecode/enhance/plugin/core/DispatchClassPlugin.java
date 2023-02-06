@@ -36,8 +36,6 @@ public class DispatchClassPlugin implements DispatchPlugin {
             return classVisitor;
         }
 
-        // DongTaiLog.trace("class {} hit rule {}, class diagrams: {}", className, matchedClassName,
-        //         Arrays.toString(ancestors.toArray()));
         classContext.setMatchedClassName(matchedClassName);
         return new ClassVisit(classVisitor, classContext, policy);
     }

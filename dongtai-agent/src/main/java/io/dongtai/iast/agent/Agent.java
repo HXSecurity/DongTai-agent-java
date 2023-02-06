@@ -1,6 +1,8 @@
 package io.dongtai.iast.agent;
 
 import io.dongtai.iast.agent.util.FileUtils;
+import io.dongtai.log.DongTaiLog;
+import io.dongtai.log.ErrorCode;
 import org.apache.commons.cli.*;
 
 import java.io.File;
@@ -79,9 +81,9 @@ public class Agent {
             Process process = Runtime.getRuntime().exec(execution);
             process.waitFor();
             if (process.exitValue() == 0) {
-                System.out.println("[io.dongtai.iast.agent] [INFO] attach to process " + pid + " success, command: " + Arrays.toString(execution));
+                DongTaiLog.info("attach to process " + pid + " success, command: " + Arrays.toString(execution));
             } else {
-                System.out.println("[io.dongtai.iast.agent] [ERROR] attach failure, please try again with command: " + Arrays.toString(execution));
+                DongTaiLog.error(ErrorCode.JATTACH_EXECUTE_FAILED, Arrays.toString(execution));
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -103,7 +105,7 @@ public class Agent {
     }
 
     private static void extractJattach() throws IOException {
-        String tmpDir = IastProperties.getInstance().getTmpDir();
+        String tmpDir = IastProperties.initTmpDir();
         if (isWindows()) {
             JATTACH_FILE = tmpDir + "jattach.exe";
             FileUtils.getResourceToFile("bin/jattach.exe", JATTACH_FILE);
@@ -118,9 +120,9 @@ public class Agent {
             FileUtils.getResourceToFile("bin/jattach-linux", JATTACH_FILE);
         }
         if ((new File(JATTACH_FILE)).setExecutable(true)) {
-            System.out.println("[io.dongtai.iast.agent] [INFO] jattach extract success. wait for attach");
+            DongTaiLog.info("jattach extract success. wait for attach");
         } else {
-            System.out.println("[io.dongtai.iast.agent] [ERROR] jattach extract failure. please set execute permission, file: " + JATTACH_FILE);
+            DongTaiLog.error(ErrorCode.JATTACH_EXTRACT_FAILED, JATTACH_FILE);
         }
     }
 

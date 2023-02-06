@@ -43,7 +43,8 @@ public class CryptoBacCiphersVulScan extends AbstractNormalVulScan {
                 sendReport(getLatestStack(), sinkNode.getVulType());
                 break;
             } catch (Throwable e) {
-                DongTaiLog.error("CryptoBacCiphersVulScan scan failed", e);
+                DongTaiLog.trace("CryptoBacCiphersVulScan scan failed: {}, {}",
+                        e.getMessage(), e.getCause().getMessage());
             }
         }
     }

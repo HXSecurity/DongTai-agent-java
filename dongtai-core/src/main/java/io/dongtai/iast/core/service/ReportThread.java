@@ -2,6 +2,7 @@ package io.dongtai.iast.core.service;
 
 import io.dongtai.iast.core.utils.HttpClientUtils;
 import io.dongtai.log.DongTaiLog;
+import io.dongtai.log.ErrorCode;
 
 /**
  * @author owefsad
@@ -33,7 +34,7 @@ public class ReportThread implements Runnable {
         try {
             HttpClientUtils.sendPost(uri, report);
         } catch (Throwable e) {
-            DongTaiLog.error("send report to {} error, report: {}, reason: {}", uri, report, e);
+            DongTaiLog.error(ErrorCode.REPORT_SEND_FAILED, uri, report, e);
         }
     }
 }

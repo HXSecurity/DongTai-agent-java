@@ -2,8 +2,10 @@ package io.dongtai.iast.core.utils;
 
 import io.dongtai.iast.common.constants.PropertyConstant;
 import io.dongtai.log.DongTaiLog;
+import io.dongtai.log.ErrorCode;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.Properties;
 
 /**
@@ -61,8 +63,8 @@ public class PropertyUtils {
                 cfg.load(fis);
                 fis.close();
             }
-        } catch (IOException e) {
-            DongTaiLog.error("PropertyUtils initialization failed", e);
+        } catch (Throwable e) {
+            DongTaiLog.error(ErrorCode.ENGINE_PROPERTIES_INITIALIZE_FAILED, e);
         }
     }
 
@@ -143,24 +145,6 @@ public class PropertyUtils {
                     cfg.getProperty(PropertyConstant.PROPERTY_SERVICE_HEARTBEAT_INTERVAL, "60")));
         }
         return heartBeatInterval;
-    }
-
-    /**
-     * After version 1.2.0, change the default server mode to local.
-     *
-     * @return server mode
-     */
-    @Deprecated
-    private String getServerMode() {
-        if (null == serverMode) {
-            serverMode = System.getProperty("iast.server.mode", cfg.getProperty("iast.server.mode", "local"));
-        }
-        return serverMode;
-    }
-
-    @Deprecated
-    public boolean isLocal() {
-        return "local".equals(getServerMode());
     }
 
     private String getProxyEnableStatus() {

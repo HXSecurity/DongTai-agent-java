@@ -34,11 +34,11 @@ public class MonitorDaemonThread implements Runnable {
         try {
             delayTime = IastProperties.getInstance().getDelayTime();
             if (delayTime != 0) {
-                DongTaiLog.info("dongtai engine delay time is " + delayTime + " s");
+                DongTaiLog.info("dongtai engine delay time is " + delayTime + "s");
                 delayTime = delayTime * 1000;
             }
         } catch (Throwable e) {
-            DongTaiLog.error("engine delay time must be int,eg: 10、20");
+            DongTaiLog.info("engine delay time must be int, eg: 15");
             delayTime = 0;
         }
     }
@@ -55,8 +55,7 @@ public class MonitorDaemonThread implements Runnable {
         if (MonitorDaemonThread.delayTime > 0) {
             try {
                 Thread.sleep(delayTime);
-            } catch (InterruptedException e) {
-                DongTaiLog.error(e);
+            } catch (InterruptedException ignore) {
             }
             if (AgentStateMonitor.isCoreRegisterStart) {
                 startEngine();

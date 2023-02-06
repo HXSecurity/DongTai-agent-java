@@ -3,6 +3,7 @@ package io.dongtai.iast.agent;
 import io.dongtai.iast.agent.report.AgentRegisterReport;
 import io.dongtai.iast.agent.util.FileUtils;
 import io.dongtai.log.DongTaiLog;
+import io.dongtai.log.ErrorCode;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,7 +25,7 @@ public class LogCollector {
                 FLUENT_FILE = IastProperties.getInstance().getTmpDir() + "fluent";
                 File f = new File(FLUENT_FILE);
                 if (f.exists()) {
-                    DongTaiLog.info("fluent already exists {}", FLUENT_FILE);
+                    DongTaiLog.debug("fluent already exists {}", FLUENT_FILE);
                     return;
                 }
                 if (isArm()) {
@@ -38,12 +39,12 @@ public class LogCollector {
                 FileUtils.getResourceToFile("bin/fluent.conf", FLUENT_FILE_CONF);
                 FileUtils.confReplace(FLUENT_FILE_CONF);
                 if (!(new File(FLUENT_FILE)).setExecutable(true)) {
-                    DongTaiLog.info("fluent setExecutable failure. please set execute permission, file: {}", FLUENT_FILE);
+                    DongTaiLog.warn(ErrorCode.FLUENT_SET_EXECUTABLE_FAILED, FLUENT_FILE);
                 }
                 doFluent();
             }
         } catch (IOException e) {
-            DongTaiLog.error("fluent extract failure", e);
+            DongTaiLog.error(ErrorCode.FLUENT_EXTRACT_FAILED, e);
         }
     }
 
@@ -64,7 +65,7 @@ public class LogCollector {
             });
             Runtime.getRuntime().addShutdownHook(shutdownHook);
         } catch (IOException e) {
-            DongTaiLog.error("fluent process start failed", e);
+            DongTaiLog.warn(ErrorCode.FLUENT_PROCESS_START_FAILED, e);
         }
     }
 

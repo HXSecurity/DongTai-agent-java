@@ -3,6 +3,7 @@ package io.dongtai.iast.agent.util;
 import io.dongtai.iast.common.constants.AgentConstant;
 import io.dongtai.iast.common.entity.performance.metrics.ThreadInfoMetrics;
 import io.dongtai.log.DongTaiLog;
+import io.dongtai.log.ErrorCode;
 
 import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
@@ -37,15 +38,14 @@ public class ThreadUtils {
             // 停顿时间间隔,用于收集cpu使用率变化
             try {
                 Thread.sleep(200);
-            } catch (InterruptedException e) {
-                DongTaiLog.error(e);
+            } catch (InterruptedException ignore) {
             }
             // 收集洞态线程最新的cpu时间
             for (ThreadInfoMetrics.ThreadInfo dongTaiThread : dongTaiThreadInfoList) {
                 dongTaiThread.setCpuTime(getThreadCpuTime(dongTaiThread.getId()));
             }
-        } catch (Throwable t) {
-            DongTaiLog.warn("get DongTai thread failed, msg: {} , error: {}", t.getMessage(), t.getCause());
+        } catch (Throwable e) {
+            DongTaiLog.warn(ErrorCode.AGENT_GET_DONGTAI_THREAD_FAILED, e);
         }
         return dongTaiThreadInfoList;
     }
@@ -69,8 +69,8 @@ public class ThreadUtils {
                     return true;
                 }
             }
-        } catch (Throwable t) {
-            DongTaiLog.warn("kill DongTai core thread failed, msg: {} , error: {}", t.getMessage(), t.getCause());
+        } catch (Throwable e) {
+            DongTaiLog.warn(ErrorCode.AGENT_KILL_DONGTAI_CORE_THREAD_FAILED, e);
         }
         return false;
     }

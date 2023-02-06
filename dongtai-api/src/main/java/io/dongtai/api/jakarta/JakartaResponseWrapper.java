@@ -83,11 +83,11 @@ public class JakartaResponseWrapper extends HttpServletResponseWrapper implement
     public byte[] getResponseData(boolean getBody) {
         try {
             flushBuffer();
-            if (getBody && copier != null) {
-                return copier.getCopy();
-            }
         } catch (Throwable e) {
-            DongTaiLog.error("get jakarta response data failed", e);
+            DongTaiLog.error("JakartaResponseWrapper flushBuffer failed", e);
+        }
+        if (getBody && copier != null) {
+            return copier.getCopy();
         }
         return new byte[0];
     }

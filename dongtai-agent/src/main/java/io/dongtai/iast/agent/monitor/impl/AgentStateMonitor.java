@@ -12,6 +12,7 @@ import io.dongtai.iast.common.constants.ApiPath;
 import io.dongtai.iast.common.state.State;
 import io.dongtai.iast.common.state.StateCause;
 import io.dongtai.log.DongTaiLog;
+import io.dongtai.log.ErrorCode;
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -56,7 +57,7 @@ public class AgentStateMonitor implements IMonitor {
             HttpClientUtils.sendPost(ApiPath.ACTUAL_ACTION,
                     HeartBeatReport.generateAgentActualActionMsg(this.engineManager.getAgentState()));
         } catch (Throwable t) {
-            DongTaiLog.warn("Monitor thread checked error, monitor:{}, msg:{}, err:{}", getName(), t.getMessage(), t.getCause());
+            DongTaiLog.warn(ErrorCode.AGENT_MONITOR_THREAD_CHECK_FAILED, getName(), t);
         }
     }
 
@@ -84,7 +85,7 @@ public class AgentStateMonitor implements IMonitor {
                 ThreadUtils.threadSleep(30);
             }
         } catch (Throwable t) {
-            DongTaiLog.debug("AgentStateMonitor interrupted, msg:{}", t.getMessage());
+            DongTaiLog.debug("{} interrupted: {}", getName(), t.getMessage());
         }
     }
 }

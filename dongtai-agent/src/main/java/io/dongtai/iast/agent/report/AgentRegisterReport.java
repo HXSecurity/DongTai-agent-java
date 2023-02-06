@@ -9,6 +9,7 @@ import io.dongtai.iast.common.constants.AgentConstant;
 import io.dongtai.iast.common.constants.ApiPath;
 import io.dongtai.iast.common.utils.base64.Base64Encoder;
 import io.dongtai.log.DongTaiLog;
+import io.dongtai.log.ErrorCode;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -25,7 +26,7 @@ public class AgentRegisterReport {
 
     public static AgentRegisterReport INSTANCE;
     private String projectName = null;
-    private Integer agentId = -1;
+    private static Integer agentId = -1;
     private static Integer coreRegisterStart = 1;
     final IServer server = ServerDetect.getWebserver();
     private static String AGENT_NAME = null;
@@ -144,8 +145,7 @@ public class AgentRegisterReport {
      * @return agent唯一标识，当前使用agentId
      */
     public static Integer getAgentId() {
-        AgentRegisterReport registerReport = AgentRegisterReport.getInstance();
-        return registerReport.agentId;
+        return agentId;
     }
 
     /**
@@ -223,22 +223,25 @@ public class AgentRegisterReport {
     public void register() {
         try {
             if (server == null) {
-                System.out.println("[io.dongtai.iast.agent] Can't Recognize Web Service");
+                DongTaiLog.error(ErrorCode.AGENT_CANNOT_RECOGNIZE_WEB_SERVICE);
                 return;
-            } else {
-                System.out.println("[io.dongtai.iast.agent] DongTai will install for " + server.getName() + " Service");
             }
             String msg = generateAgentRegisterMsg();
             StringBuilder responseRaw = HttpClientUtils.sendPost(ApiPath.AGENT_REGISTER, msg);
             if (!isRegistered()) {
                 setAgentData(responseRaw);
             }
-        } catch (NullPointerException e) {
-            DongTaiLog.error("Agent registration to {} failed, Token: {}, Reason: {}",
-                    IastProperties.getInstance().getBaseUrl(), IastProperties.getInstance().getServerToken(), e.getMessage());
+            if (isRegistered()) {
+                try {
+                    DongTaiLog.configure(getAgentId());
+                } catch (Throwable e) {
+                    DongTaiLog.error(ErrorCode.LOG_CONFIGURE_FAILED, e);
+                }
+                DongTaiLog.info("DongTai Config: " + IastProperties.getInstance().getPropertiesFilePath());
+                DongTaiLog.info("DongTai will install for " + server.getName() + " Service");
+            }
         } catch (Throwable e) {
-            DongTaiLog.error("Agent registration to {} failed 10 seconds later, cause: {}, token: {}",
-                    IastProperties.getInstance().getBaseUrl(), e.toString(), IastProperties.getInstance().getServerToken());
+            DongTaiLog.error(ErrorCode.AGENT_REGISTER_REQUEST_FAILED, IastProperties.getInstance().getBaseUrl(), e);
         }
     }
 
@@ -262,11 +265,11 @@ public class AgentRegisterReport {
                 agentId = (Integer) data.get("id");
                 coreRegisterStart = (Integer) data.get("coreAutoStart");
             } else {
-                DongTaiLog.error("Register msg: " + responseRaw);
+                DongTaiLog.error(ErrorCode.AGENT_REGISTER_RESPONSE_CODE_INVALID, responseRaw);
             }
         } catch (Throwable e) {
-            DongTaiLog.error("Parse {} register response failed: {}",
-                    IastProperties.getInstance().getBaseUrl(), e.toString());
+            DongTaiLog.error(ErrorCode.AGENT_REGISTER_PARSE_RESPONSE_FAILED,
+                    IastProperties.getInstance().getBaseUrl(), e);
         }
     }
 
@@ -293,13 +296,13 @@ public class AgentRegisterReport {
                 uuid = br.readLine();
             }
         } catch (Throwable e) {
-            System.out.println("read/write agent uuid file failed: " + e.toString());
+            DongTaiLog.trace("read/write agent uuid file failed: " + e.getMessage());
         } finally {
             if (bw != null) {
                 try {
                     bw.close();
                 } catch (IOException e) {
-                    System.out.println("close agent uuid file writer failed: " + e.toString());
+                    DongTaiLog.trace("close agent uuid file writer failed: " + e.getMessage());
                 }
             }
 
@@ -307,7 +310,7 @@ public class AgentRegisterReport {
                 try {
                     br.close();
                 } catch (IOException e) {
-                    System.out.println("close agent uuid file reader failed: " + e.toString());
+                    DongTaiLog.trace("close agent uuid file reader failed: " + e.getMessage());
                 }
             }
         }

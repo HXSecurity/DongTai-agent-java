@@ -6,12 +6,12 @@ import io.dongtai.iast.agent.report.AgentRegisterReport;
 import io.dongtai.iast.agent.util.*;
 import io.dongtai.iast.common.state.AgentState;
 import io.dongtai.log.DongTaiLog;
+import io.dongtai.log.ErrorCode;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.instrument.Instrumentation;
 import java.lang.management.ManagementFactory;
-import java.lang.reflect.InvocationTargetException;
 import java.util.jar.JarFile;
 
 /**
@@ -135,7 +135,7 @@ public class EngineManager {
                     FileUtils.getResourceToFile("bin/dongtai-api.jar", getApiPackagePath()) &&
                     FileUtils.getResourceToFile("bin/dongtai-grpc.jar", getGrpcPackagePath());
         } catch (IOException e) {
-            DongTaiLog.error(e);
+            DongTaiLog.error(ErrorCode.AGENT_EXTRACT_PACKAGES_FAILED, e);
         }
         return false;
     }
@@ -176,16 +176,8 @@ public class EngineManager {
                     .invoke(null, launchMode, this.properties.getPropertiesFilePath(),
                             AgentRegisterReport.getAgentId(), inst, agentPath);
             return true;
-        } catch (IOException e) {
-            DongTaiLog.error("DongTai engine install failed, Reason: dongtai-spy.jar or dongtai-core.jar open failed. path: \n\tdongtai-core.jar: " + corePackage + "\n\tdongtai-spy.jar: " + spyPackage);
-        } catch (ClassNotFoundException e) {
-            DongTaiLog.error("DongTai engine can not found AgentEngine class", e);
-        } catch (NoSuchMethodException e) {
-            DongTaiLog.error("DongTai engine can not found install method", e);
-        } catch (IllegalAccessException e) {
-            DongTaiLog.error("DongTai engine call install method permission denied", e);
-        } catch (InvocationTargetException e) {
-            DongTaiLog.error("DongTai engine install failed", e);
+        } catch (Throwable e) {
+            DongTaiLog.error(ErrorCode.AGENT_REFLECTION_INSTALL_FAILED, e);
         }
         return false;
     }
@@ -202,12 +194,8 @@ public class EngineManager {
                 return true;
             }
             return false;
-        } catch (NoSuchMethodException e) {
-            DongTaiLog.error("DongTai engine can not found start method", e);
-        } catch (IllegalAccessException e) {
-            DongTaiLog.error("DongTai engine call start method permission denied", e);
-        } catch (InvocationTargetException e) {
-            DongTaiLog.error("DongTai engine start failed", e);
+        } catch (Throwable e) {
+            DongTaiLog.error(ErrorCode.AGENT_REFLECTION_START_FAILED, e);
         }
         return false;
     }
@@ -226,12 +214,8 @@ public class EngineManager {
                 return true;
             }
             return false;
-        } catch (NoSuchMethodException e) {
-            DongTaiLog.error("DongTai engine can not found stop method", e);
-        } catch (IllegalAccessException e) {
-            DongTaiLog.error("DongTai engine call stop method permission denied", e);
-        } catch (InvocationTargetException e) {
-            DongTaiLog.error("DongTai engine stop failed", e);
+        } catch (Throwable e) {
+            DongTaiLog.error(ErrorCode.AGENT_REFLECTION_STOP_FAILED, e);
         }
         return false;
     }
@@ -258,12 +242,8 @@ public class EngineManager {
             IAST_CLASS_LOADER.closeIfPossible();
             IAST_CLASS_LOADER = null;
             LogCollector.stopFluent();
-        } catch (NoSuchMethodException e) {
-            DongTaiLog.error("DongTai engine can not found destroy method", e);
-        } catch (IllegalAccessException e) {
-            DongTaiLog.error("DongTai engine call destroy method permission denied", e);
-        } catch (InvocationTargetException e) {
-            DongTaiLog.error("DongTai engine destroy failed", e);
+        } catch (Throwable e) {
+            DongTaiLog.error(ErrorCode.AGENT_REFLECTION_UNINSTALL_FAILED, e);
         } finally {
             ThreadUtils.killAllDongTaiCoreThreads();
         }

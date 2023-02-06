@@ -11,6 +11,7 @@ import io.dongtai.iast.core.handler.hookpoint.vulscan.normal.AbstractNormalVulSc
 import io.dongtai.iast.core.service.ThreadPools;
 import io.dongtai.iast.core.utils.PropertyUtils;
 import io.dongtai.log.DongTaiLog;
+import io.dongtai.log.ErrorCode;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -34,7 +35,7 @@ public class GraphBuilder {
             }
             ThreadPools.sendPriorityReport(ApiPath.REPORT_UPLOAD, report);
         } catch (Throwable e) {
-            DongTaiLog.error("report request failed", e);
+            DongTaiLog.error(ErrorCode.GRAPH_BUILD_AND_REPORT_FAILED, e);
         } finally {
             ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
         }

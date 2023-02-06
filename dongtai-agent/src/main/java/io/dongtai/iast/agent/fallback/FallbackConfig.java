@@ -14,6 +14,7 @@ import io.dongtai.iast.common.enums.MetricsKey;
 import io.dongtai.iast.common.state.AgentState;
 import io.dongtai.iast.common.state.State;
 import io.dongtai.log.DongTaiLog;
+import io.dongtai.log.ErrorCode;
 import org.json.JSONObject;
 
 import java.lang.reflect.Field;
@@ -88,7 +89,7 @@ public class FallbackConfig {
             existsRemoteConfigMeta = remoteResponse;
             DongTaiLog.debug("Sync remote fallback config successfully");
         } catch (Throwable t) {
-            DongTaiLog.warn("Sync remote fallback config failed, msg: {}, error: {}", t.getMessage(), t.getCause());
+            DongTaiLog.warn(ErrorCode.AGENT_FALLBACK_SYNC_REMOTE_CONFIG_FAILED, t.getMessage(), t.getCause().getMessage());
         }
     }
 
@@ -203,7 +204,7 @@ public class FallbackConfig {
      */
     public static Boolean enableAutoFallback() {
         if (enableAutoFallback == null) {
-            enableAutoFallback = IastProperties.getInstance().getRemoteSyncLocalConfig(
+            enableAutoFallback = IastProperties.getInstance().getRemoteFallbackConfig(
                     "global.autoFallback", Boolean.class, false);
         }
         return enableAutoFallback;
@@ -218,7 +219,7 @@ public class FallbackConfig {
      */
     public static Integer getPerformanceBreakerWindowSize(Properties cfg) {
         if (performanceBreakerWindowSize == null) {
-            performanceBreakerWindowSize = IastProperties.getInstance().getRemoteSyncLocalConfig(
+            performanceBreakerWindowSize = IastProperties.getInstance().getRemoteFallbackConfig(
                     "performanceLimit.performanceBreakerWindowSize", Integer.class, 2, cfg);
         }
         return performanceBreakerWindowSize;
@@ -233,7 +234,7 @@ public class FallbackConfig {
      */
     public static Double getPerformanceBreakerFailureRate(Properties cfg) {
         if (performanceBreakerFailureRate == null) {
-            performanceBreakerFailureRate = IastProperties.getInstance().getRemoteSyncLocalConfig(
+            performanceBreakerFailureRate = IastProperties.getInstance().getRemoteFallbackConfig(
                     "performanceLimit.performanceBreakerFailureRate", Double.class, 51.0, cfg);
         }
         return performanceBreakerFailureRate;
@@ -248,7 +249,7 @@ public class FallbackConfig {
      */
     public static Integer getPerformanceBreakerWaitDuration(Properties cfg) {
         if (performanceBreakerWaitDuration == null) {
-            performanceBreakerWaitDuration = IastProperties.getInstance().getRemoteSyncLocalConfig(
+            performanceBreakerWaitDuration = IastProperties.getInstance().getRemoteFallbackConfig(
                     "performanceLimit.performanceBreakerWaitDuration", Integer.class, 40, cfg);
         }
         return performanceBreakerWaitDuration;
@@ -278,7 +279,7 @@ public class FallbackConfig {
     private static List<PerformanceMetrics> buildPerformanceMetrics(String configPrefix, Properties cfg) {
         List<PerformanceMetrics> performanceMetricsList = new ArrayList<PerformanceMetrics>();
         for (MetricsKey each : MetricsKey.values()) {
-            final Object metricsValue = IastProperties.getInstance().getRemoteSyncLocalConfig(
+            final Object metricsValue = IastProperties.getInstance().getRemoteFallbackConfig(
                     String.format("%s.%s", configPrefix, each.getKey()),
                     Object.class, null, cfg);
             final PerformanceMetrics metrics = new PerformanceMetrics();
@@ -291,7 +292,7 @@ public class FallbackConfig {
                         performanceMetricsList.add(metrics);
                     }
                 } catch (Throwable e) {
-                    DongTaiLog.warn("invalid metrics value config,msg:{}", e.getMessage());
+                    DongTaiLog.warn(ErrorCode.AGENT_FALLBACK_METRICS_CONFIG_INVALID, metricsValue, e.getMessage());
                 }
             }
         }
