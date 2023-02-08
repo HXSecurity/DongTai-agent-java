@@ -11,10 +11,12 @@ import io.dongtai.iast.core.handler.hookpoint.graphy.GraphBuilder;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.*;
 import io.dongtai.iast.core.handler.hookpoint.service.trace.FeignService;
+import io.dongtai.iast.core.utils.StringUtils;
 import io.dongtai.log.DongTaiLog;
 import io.dongtai.log.ErrorCode;
 
 import java.lang.dongtai.SpyDispatcher;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -80,6 +82,41 @@ public class SpyDispatcherImpl implements SpyDispatcher {
             return ScopeManager.SCOPE_TRACKER.getHttpRequestScope().isFirst();
         } catch (Throwable ignore) {
             return false;
+        }
+    }
+
+    public void collectHttpRequest(Object obj, Object req, Object resp, StringBuffer requestURL, String requestURI,
+                                   String queryString, String method, String protocol, String scheme,
+                                   String serverName, String contextPath, String remoteAddr,
+                                   boolean isSecure, int serverPort, Enumeration<?> headerNames) {
+        try {
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
+
+            if (!EngineManager.isEngineRunning()) {
+                return;
+            }
+
+            Map<String, String> headers = HttpImpl.parseRequestHeaders(req, headerNames);
+            Map<String, Object> requestMeta = new HashMap<String, Object>() {{
+                put("requestURL", requestURL);
+                put("requestURI", requestURI);
+                put("queryString", queryString);
+                put("method", method);
+                put("protocol", protocol);
+                put("scheme", scheme);
+                put("serverName", serverName);
+                put("contextPath", contextPath);
+                put("remoteAddr", "0:0:0:0:0:0:0:1".equals(remoteAddr) ? "127.0.0.1" : remoteAddr);
+                put("secure", isSecure);
+                put("serverPort", serverPort);
+                put("headers", headers);
+                put("replay-request", !StringUtils.isEmpty(headers.get("dongtai-replay-id")));
+            }};
+            HttpImpl.solveHttpRequest(obj, req, resp, requestMeta);
+        } catch (Throwable e) {
+            DongTaiLog.warn(ErrorCode.SPY_COLLECT_HTTP_FAILED, "request", e);
+        } finally {
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
         }
     }
 
@@ -320,15 +357,9 @@ public class SpyDispatcherImpl implements SpyDispatcher {
 
             if (HookType.SPRINGAPPLICATION.equals(hookType)) {
                 SpringApplicationImpl.getWebApplicationContext(retValue);
-            } else {
-                MethodEvent event = new MethodEvent(className, matchClassName, methodName,
-                        methodSign, instance, argumentArray, retValue);
-                if (HookType.HTTP.equals(hookType)) {
-                    HttpImpl.solveHttp(event);
-                }
             }
         } catch (Throwable e) {
-            DongTaiLog.error(ErrorCode.SPY_COLLECT_HTTP_FAILED, e);
+            DongTaiLog.error(ErrorCode.SPY_COLLECT_HTTP_FAILED, "", e);
         } finally {
             ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
         }

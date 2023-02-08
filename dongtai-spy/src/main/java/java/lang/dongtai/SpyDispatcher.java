@@ -1,5 +1,7 @@
 package java.lang.dongtai;
 
+import java.util.Enumeration;
+
 public interface SpyDispatcher {
 
     /**
@@ -24,6 +26,11 @@ public interface SpyDispatcher {
      * @since 1.3.1
      */
     boolean isFirstLevelHttp();
+
+    void collectHttpRequest(Object obj, Object req, Object resp, StringBuffer requestURL, String requestURI,
+                            String queryString, String method, String protocol, String scheme,
+                            String serverName, String contextPath, String remoteAddr,
+                            boolean isSecure, int serverPort, Enumeration<?> headerNames);
 
     /**
      * clone request object for copy http post body.

@@ -74,7 +74,7 @@ public enum ErrorCode {
 
     // handler hookpoint
     SPY_LEAVE_HTTP_FAILED(20301, "hookpoint leave http failed"),
-    SPY_COLLECT_HTTP_FAILED(20302, "hookpoint collect http failed"),
+    SPY_COLLECT_HTTP_FAILED(20302, "hookpoint collect http {} failed"),
     SPY_COLLECT_METHOD_FAILED(20303, "hookpoint collect method failed"),
     SPY_TRACE_FEIGN_INVOKE_FAILED(20304, "hookpoint trace feign invoke failed"),
     SPY_METHOD_POOL_OVER_CAPACITY(20305, "current request method pool size over capacity: {}"),

@@ -2,22 +2,37 @@ package io.dongtai.iast.core.bytecode.enhance.plugin.framework.j2ee.dispatch;
 
 import io.dongtai.iast.core.bytecode.enhance.ClassContext;
 import io.dongtai.iast.core.bytecode.enhance.plugin.AbstractAdviceAdapter;
-import io.dongtai.iast.core.handler.hookpoint.controller.HookType;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
-
+import org.objectweb.asm.*;
+import org.objectweb.asm.commons.Method;
 
 /**
  * @author dongzhiyong@huoxian.cn
  */
 public class ServletDispatcherAdviceAdapter extends AbstractAdviceAdapter {
+    private static final Method GET_REQUEST_URL_METHOD = Method.getMethod("java.lang.StringBuffer getRequestURL()");
+    private static final Method GET_REQUEST_URI_METHOD = Method.getMethod("java.lang.String getRequestURI()");
+    private static final Method GET_QUERY_STRING_METHOD = Method.getMethod("java.lang.String getQueryString()");
+    private static final Method GET_METHOD_METHOD = Method.getMethod("java.lang.String getMethod()");
+    private static final Method GET_PROTOCOL_METHOD = Method.getMethod("java.lang.String getProtocol()");
+    private static final Method GET_SCHEME_METHOD = Method.getMethod("java.lang.String getScheme()");
+    private static final Method GET_SERVER_NAME_METHOD = Method.getMethod("java.lang.String getServerName()");
+    private static final Method GET_CONTEXT_PATH_METHOD = Method.getMethod("java.lang.String getContextPath()");
+    private static final Method GET_SERVLET_PATH_METHOD = Method.getMethod("java.lang.String getServletPath()");
+    private static final Method GET_REMOTE_ADDR_METHOD = Method.getMethod("java.lang.String getRemoteAddr()");
+    private static final Method IS_SECURE_METHOD = Method.getMethod("boolean isSecure()");
+    private static final Method GET_SERVER_PORT_METHOD = Method.getMethod("int getServerPort()");
+    private static final Method GET_HEADER_NAMES_METHOD = Method.getMethod("java.util.Enumeration getHeaderNames()");
 
-    boolean isJakarta;
+    private final Type servletRequestType;
+    private final int reqIndex;
+    private final int respIndex;
 
     public ServletDispatcherAdviceAdapter(MethodVisitor mv, int access, String name, String desc, String signature,
-                                          ClassContext context, boolean isJakarta) {
+                                          ClassContext context, String packageName) {
         super(mv, access, name, desc, context, "j2ee", signature);
-        this.isJakarta = isJakarta;
+        this.servletRequestType = Type.getObjectType(packageName + "/servlet/http/HttpServletRequest");
+        this.reqIndex = 0;
+        this.respIndex = 1;
     }
 
     @Override
@@ -29,9 +44,8 @@ public class ServletDispatcherAdviceAdapter extends AbstractAdviceAdapter {
         isFirstLevelHttp();
         mv.visitJumpInsn(EQ, elseLabel);
 
-        cloneHttpServletRequest();
-        captureMethodState(-1, HookType.HTTP.getValue(), false);
-        cloneHttpServletResponse();
+        collectHttpRequest();
+
         mark(elseLabel);
     }
 
@@ -62,29 +76,48 @@ public class ServletDispatcherAdviceAdapter extends AbstractAdviceAdapter {
         invokeInterface(ASM_TYPE_SPY_DISPATCHER, SPY$isFirstLevelHttp);
     }
 
-    /**
-     * 克隆Http请求中的HttpServletRequest对象，但是，实际使用中，遇到request对象为多层封装的结果，无法转换为基类：HttpServletRequest，故，此方法弃用
-     */
-    protected void cloneHttpServletRequest() {
-        invokeStatic(ASM_TYPE_SPY_HANDLER, SPY_HANDLER$getDispatcher);
-        loadArg(0);
-        push(isJakarta);
-        invokeInterface(ASM_TYPE_SPY_DISPATCHER, SPY$cloneRequest);
-        // todo: 增加类型转换
-        storeArg(0);
-    }
+    private void collectHttpRequest() {
+        Label tryL = new Label();
+        Label catchL = new Label();
+        Label exHandlerL = new Label();
+        visitTryCatchBlock(tryL, catchL, exHandlerL, ASM_TYPE_THROWABLE.getInternalName());
+        visitLabel(tryL);
 
-    /**
-     * 克隆Http请求中的HttpServletResponse对象，但是，实际使用中，遇到response对象为多层封装的结果，无法转换为基类：HttpServletRequest，故，此方法弃用
-     * DongTai-IAST-Agent
-     */
-    protected void cloneHttpServletResponse() {
         invokeStatic(ASM_TYPE_SPY_HANDLER, SPY_HANDLER$getDispatcher);
-        loadArg(1);
-        push(isJakarta);
-        invokeInterface(ASM_TYPE_SPY_DISPATCHER, SPY$cloneResponse);
-        // todo: 增加类型转换
-        storeArg(1);
-    }
+        loadThis();
+        loadArg(this.reqIndex);
+        loadArg(this.respIndex);
+        loadArg(this.reqIndex);
+        invokeInterface(this.servletRequestType, GET_REQUEST_URL_METHOD);
+        loadArg(this.reqIndex);
+        invokeInterface(this.servletRequestType, GET_REQUEST_URI_METHOD);
+        loadArg(this.reqIndex);
+        invokeInterface(this.servletRequestType, GET_QUERY_STRING_METHOD);
+        loadArg(this.reqIndex);
+        invokeInterface(this.servletRequestType, GET_METHOD_METHOD);
+        loadArg(this.reqIndex);
+        invokeInterface(this.servletRequestType, GET_PROTOCOL_METHOD);
+        loadArg(this.reqIndex);
+        invokeInterface(this.servletRequestType, GET_SCHEME_METHOD);
+        loadArg(this.reqIndex);
+        invokeInterface(this.servletRequestType, GET_SERVER_NAME_METHOD);
+        loadArg(this.reqIndex);
+        invokeInterface(this.servletRequestType, GET_CONTEXT_PATH_METHOD);
+        loadArg(this.reqIndex);
+        invokeInterface(this.servletRequestType, GET_REMOTE_ADDR_METHOD);
+        loadArg(this.reqIndex);
+        invokeInterface(this.servletRequestType, IS_SECURE_METHOD);
+        loadArg(this.reqIndex);
+        invokeInterface(this.servletRequestType, GET_SERVER_PORT_METHOD);
+        loadArg(this.reqIndex);
+        invokeInterface(this.servletRequestType, GET_HEADER_NAMES_METHOD);
+        invokeInterface(ASM_TYPE_SPY_DISPATCHER, SPY$collectHttpRequest);
 
+        visitLabel(catchL);
+        Label endL = new Label();
+        visitJumpInsn(GOTO, endL);
+        visitLabel(exHandlerL);
+        visitVarInsn(ASTORE, getArgumentTypes().length + 1);
+        visitLabel(endL);
+    }
 }

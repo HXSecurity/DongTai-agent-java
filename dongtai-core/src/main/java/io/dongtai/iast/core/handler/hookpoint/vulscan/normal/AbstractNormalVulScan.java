@@ -59,6 +59,9 @@ public abstract class AbstractNormalVulScan implements IVulScan {
     }
 
     public static String getEncodedHeader(Map<String, String> headers) {
+        if (headers == null || headers.isEmpty()) {
+            return "";
+        }
         StringBuilder sb = new StringBuilder();
         for (Map.Entry<String, String> headerItem : headers.entrySet()) {
             sb.append(headerItem.getKey());
@@ -66,6 +69,6 @@ public abstract class AbstractNormalVulScan implements IVulScan {
             sb.append(headerItem.getValue());
             sb.append("\n");
         }
-        return Base64Encoder.encodeBase64String(sb.toString().getBytes()).replaceAll("\n", "");
+        return Base64Encoder.encodeBase64String(sb.toString().getBytes()).replaceAll("\n", "").replaceAll("\r", "");
     }
 }

@@ -11,12 +11,12 @@ import java.util.Set;
  * @author dongzhiyong@huoxian.cn
  */
 public class DispatchJ2ee implements DispatchPlugin {
-
-    private final String FILTER = " javax.servlet.Filter".substring(1);
-    private final String FILTER_CHAIN = " javax.servlet.FilterChain".substring(1);
-    private final String HTTP_SERVLET = " javax.servlet.http.HttpServlet".substring(1);
-    private final String JAKARTA_SERVLET = " jakarta.servlet.http.HttpServlet".substring(1);
-    private final String FACES_SERVLET = " javax.faces.webapp.FacesServlet".substring(1);
+    public static final String JAVAX_HTTP_SERVLET = " javax.servlet.http.HttpServlet".substring(1);
+    public static final String JAKARTA_HTTP_SERVLET = " jakarta.servlet.http.HttpServlet".substring(1);
+    public static final String JAVAX_FILTER = " javax.servlet.Filter".substring(1);
+    public static final String JAKARTA_FILTER = " jakarta.servlet.Filter".substring(1);
+    public static final String JAVAX_FACES_SERVLET = " javax.faces.webapp.FacesServlet".substring(1);
+    public static final String JAKARTA_FACES_SERVLET = " jakarta.faces.webapp.FacesServlet".substring(1);
 
 
     @Override
@@ -24,19 +24,21 @@ public class DispatchJ2ee implements DispatchPlugin {
         String className = context.getClassName();
         Set<String> ancestors = context.getAncestors();
 
-        if (isServletDispatch(className, ancestors) || isJakartaServlet(className)) {
-            classVisitor = new ServletDispatcherAdapter(classVisitor, context);
+        if (isJavaxServlet(className, ancestors)) {
+            classVisitor = new ServletDispatcherAdapter(classVisitor, context, " javax".substring(1));
+        } else if (isJakartaServlet(className, ancestors)) {
+            classVisitor = new ServletDispatcherAdapter(classVisitor, context, " jakarta".substring(1));
         }
         return classVisitor;
     }
 
-    private boolean isServletDispatch(String className, Set<String> diagram) {
-        boolean isServlet = FACES_SERVLET.equals(className);
-        isServlet = (isServlet || HTTP_SERVLET.equals(className));
-        return (isServlet || diagram.contains(FILTER) || diagram.contains(FILTER_CHAIN));
+    private boolean isJavaxServlet(String className, Set<String> diagram) {
+        return JAVAX_FACES_SERVLET.equals(className) || JAVAX_HTTP_SERVLET.equals(className)
+                || diagram.contains(JAVAX_HTTP_SERVLET) || diagram.contains(JAVAX_FILTER);
     }
 
-    private boolean isJakartaServlet(String className) {
-        return JAKARTA_SERVLET.equals(className);
+    private boolean isJakartaServlet(String className, Set<String> diagram) {
+        return JAKARTA_FACES_SERVLET.equals(className) || JAKARTA_HTTP_SERVLET.equals(className)
+                || diagram.contains(JAKARTA_HTTP_SERVLET) || diagram.contains(JAKARTA_FILTER);
     }
 }

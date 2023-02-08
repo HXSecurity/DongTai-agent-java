@@ -1,5 +1,7 @@
 package java.lang.dongtai;
 
+import java.util.Enumeration;
+
 public class NopSpy implements SpyDispatcher {
     /**
      * mark for enter Http Entry Point
@@ -32,6 +34,12 @@ public class NopSpy implements SpyDispatcher {
     @Override
     public boolean isFirstLevelHttp() {
         return false;
+    }
+
+    public void collectHttpRequest(Object obj, Object req, Object resp, StringBuffer requestURL, String requestURI,
+                                   String queryString, String method, String protocol, String scheme,
+                                   String serverName, String contextPath, String remoteAddr,
+                                   boolean isSecure, int serverPort, Enumeration<?> headerNames) {
     }
 
     /**

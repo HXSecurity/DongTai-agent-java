@@ -4,6 +4,7 @@ import org.objectweb.asm.commons.Method;
 
 import java.lang.dongtai.SpyDispatcher;
 import java.lang.dongtai.SpyDispatcherHandler;
+import java.util.Enumeration;
 
 /**
  * 常用的ASM method 集合 省得我到处声明
@@ -44,6 +45,26 @@ public interface AsmMethods {
             SpyDispatcher.class,
             "isFirstLevelHttp"
     );
+    Method SPY$collectHttpRequest = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "collectHttpRequest",
+            Object.class,
+            Object.class,
+            Object.class,
+            StringBuffer.class,
+            String.class,
+            String.class,
+            String.class,
+            String.class,
+            String.class,
+            String.class,
+            String.class,
+            String.class,
+            boolean.class,
+            int.class,
+            Enumeration.class
+    );
+
     Method SPY$cloneRequest = InnerHelper.getAsmMethod(
             SpyDispatcher.class,
             "cloneRequest",

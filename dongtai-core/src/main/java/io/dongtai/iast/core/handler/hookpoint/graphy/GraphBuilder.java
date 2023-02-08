@@ -5,11 +5,11 @@ import io.dongtai.iast.common.scope.ScopeManager;
 import io.dongtai.iast.common.utils.base64.Base64Encoder;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.context.ContextManager;
-import io.dongtai.iast.core.handler.hookpoint.controller.impl.HttpImpl;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.normal.AbstractNormalVulScan;
 import io.dongtai.iast.core.service.ThreadPools;
 import io.dongtai.iast.core.utils.PropertyUtils;
+import io.dongtai.iast.core.utils.StringUtils;
 import io.dongtai.log.DongTaiLog;
 import io.dongtai.log.ErrorCode;
 import org.json.JSONArray;
@@ -58,7 +58,9 @@ public class GraphBuilder {
 
     public static String convertToReport(List<GraphNode> nodeList, Object request, Object response) {
         Map<String, Object> requestMeta = EngineManager.REQUEST_CONTEXT.get();
-        Map<String, Object> responseMeta = response == null ? null : HttpImpl.getResponseMeta(response);
+        // Map<String, Object> responseMeta = response == null ? null : HttpImpl.getResponseMeta(response);
+        // @TODO
+        Map<String, Object> responseMeta = null;
         JSONObject report = new JSONObject();
         JSONObject detail = new JSONObject();
         JSONArray methodPool = new JSONArray();
@@ -73,28 +75,26 @@ public class GraphBuilder {
         detail.put(ReportKey.METHOD, requestMeta.getOrDefault("method", ""));
         detail.put(ReportKey.SECURE, requestMeta.getOrDefault("secure", ""));
         String requestURL = requestMeta.getOrDefault("requestURL", "").toString();
-        if (null == requestURL) {
+        if (StringUtils.isEmpty(requestURL)) {
             return null;
         }
         detail.put(ReportKey.URL, requestURL);
         String requestURI = requestMeta.getOrDefault("requestURI", "").toString();
-        if (null == requestURI) {
+        if (StringUtils.isEmpty(requestURI)) {
             return null;
         }
         detail.put(ReportKey.URI, requestURI);
-        setURL(requestURL);
-        setURI(requestURI);
         detail.put(ReportKey.CLIENT_IP, requestMeta.getOrDefault("remoteAddr", ""));
         detail.put(ReportKey.QUERY_STRING, requestMeta.getOrDefault("queryString", ""));
         detail.put(ReportKey.REQ_HEADER, AbstractNormalVulScan.getEncodedHeader(
                 (Map<String, String>) requestMeta.getOrDefault("headers", new HashMap<String, String>())));
-        // 设置请求体
-        detail.put(ReportKey.REQ_BODY, request == null ? "" : HttpImpl.getPostBody(request));
+        // // @TODO
+        detail.put(ReportKey.REQ_BODY, ""); //request == null ? "" : HttpImpl.getPostBody(request));
         detail.put(ReportKey.RES_HEADER, responseMeta == null ? ""
                 : Base64Encoder.encodeBase64String(responseMeta.getOrDefault("headers", "").toString().getBytes())
                 .replaceAll("\n", "").replaceAll("\r", ""));
-        detail.put(ReportKey.RES_BODY, responseMeta == null ? "" : Base64Encoder.encodeBase64String(
-                getResponseBody(responseMeta)));
+        // @TODO
+        detail.put(ReportKey.RES_BODY, ""); //responseMeta == null ? "" : Base64Encoder.encodeBase64String(getResponseBody(responseMeta)));
         detail.put(ReportKey.CONTEXT_PATH, requestMeta.getOrDefault("contextPath", ""));
         detail.put(ReportKey.REPLAY_REQUEST, requestMeta.getOrDefault("replay-request", false));
 
@@ -123,21 +123,5 @@ public class GraphBuilder {
         } catch (Throwable ignore) {
             return new byte[0];
         }
-    }
-
-    public static String getURL() {
-        return URL;
-    }
-
-    public static void setURL(String URL) {
-        GraphBuilder.URL = URL;
-    }
-
-    public static String getURI() {
-        return URI;
-    }
-
-    public static void setURI(String URI) {
-        GraphBuilder.URI = URI;
     }
 }

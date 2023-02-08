@@ -4,9 +4,7 @@ import io.dongtai.iast.common.config.*;
 import io.dongtai.iast.common.scope.ScopeManager;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.hookpoint.IastClassLoader;
-import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
-import io.dongtai.iast.core.utils.HttpClientUtils;
-import io.dongtai.iast.core.utils.PropertyUtils;
+import io.dongtai.iast.core.utils.*;
 import io.dongtai.iast.core.utils.matcher.ConfigMatcher;
 import io.dongtai.log.DongTaiLog;
 
@@ -14,8 +12,7 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Http方法处理入口
@@ -170,14 +167,8 @@ public class HttpImpl {
         return null;
     }
 
-    /**
-     * solve http request
-     *
-     * @param event method call event
-     */
     @SuppressWarnings("unchecked")
-    public static void solveHttp(MethodEvent event) {
-        Map<String, Object> requestMeta = getRequestMeta(event.parameterInstances[0]);
+    public static void solveHttpRequest(Object obj, Object req, Object resp, Map<String, Object> requestMeta) {
         if (requestMeta == null || requestMeta.size() == 0) {
             return;
         }
@@ -188,32 +179,49 @@ public class HttpImpl {
                     .getConfig(ConfigKey.REQUEST_DENY_LIST);
             RequestDenyList requestDenyList = config.get();
             if (requestDenyList != null) {
-                String requestURL = ((StringBuffer) REQUEST_META.get().get("requestURL")).toString();
-                Map<String, String> headers = (Map<String, String>) REQUEST_META.get().get("headers");
+                String requestURL = ((StringBuffer) requestMeta.get("requestURL")).toString();
+                Map<String, String> headers = (Map<String, String>) requestMeta.get("headers");
                 if (requestDenyList.match(requestURL, headers)) {
-                    DongTaiLog.trace("HTTP Request {} deny to collect {}", requestURL, requestDenyList);
+                    DongTaiLog.trace("HTTP Request {} deny to collect", requestURL);
                     return;
                 }
             }
         } catch (Throwable ignore) {
         }
 
-        Boolean isReplay = (Boolean) REQUEST_META.get().get("replay-request");
+        Boolean isReplay = (Boolean) requestMeta.get("replay-request");
         if (isReplay) {
             EngineManager.ENTER_REPLAY_ENTRYPOINT.enterEntry();
         }
         // todo Consider increasing the capture of html request responses
-        if (ConfigMatcher.getInstance().disableExtension((String) REQUEST_META.get().get("requestURI"))) {
+        if (ConfigMatcher.getInstance().disableExtension((String) requestMeta.get("requestURI"))) {
             return;
         }
-        if (ConfigMatcher.getInstance().getBlackUrl(REQUEST_META.get())) {
+        if (ConfigMatcher.getInstance().getBlackUrl(requestMeta)) {
             return;
         }
 
-        // todo: add custom header escape
-        EngineManager.enterHttpEntry(REQUEST_META.get());
-        DongTaiLog.debug("HTTP Request:{} {} from: {}", REQUEST_META.get().get("method"), REQUEST_META.get().get("requestURI"),
-                event.signature);
+        EngineManager.enterHttpEntry(requestMeta);
+        DongTaiLog.debug("HTTP Request:{} {} from: {}", requestMeta.get("method"), requestMeta.get("requestURI"),
+                obj.getClass().getName());
+    }
+
+    public static Map<String, String> parseRequestHeaders(Object req, Enumeration<?> headerNames) {
+        Map<String, String> headers = new HashMap<String, String>(32);
+        Method getHeaderMethod = ReflectUtils.getDeclaredMethodFromSuperClass(req.getClass(),
+                "getHeader", new Class[]{String.class});
+        if (getHeaderMethod == null) {
+            return headers;
+        }
+        while (headerNames.hasMoreElements()) {
+            try {
+                String key = (String) headerNames.nextElement();
+                String val = (String) getHeaderMethod.invoke(req, key);
+                headers.put(key, val);
+            } catch (Throwable ignore) {
+            }
+        }
+        return headers;
     }
 
     public static IastClassLoader getClassLoader() {
