@@ -110,18 +110,11 @@ public class FallbackConfig {
     private static FallbackConfigEntity parseRemoteConfigResponseV2(String remoteResponse) {
         try {
             // 默认响应标识调用失败
-            if (REMOTE_CONFIG_DEFAULT_META.equals(remoteResponse)) {
+            if (REMOTE_CONFIG_DEFAULT_META.equals(remoteResponse)
+                    || REMOTE_CONFIG_DEFAULT_META.equals(new JSONObject(remoteResponse).get("data").toString())) {
                 FallbackConfig.enableAutoFallback = false;
                 if (AgentState.getInstance().isFallback()) {
                     DongTaiLog.info("fallback remote config empty, auto fallback closed, starting agent");
-                    FallbackSwitch.setPerformanceFallback(State.RUNNING);
-                }
-                return null;
-            }
-            if (REMOTE_CONFIG_DEFAULT_META.equals(new JSONObject(remoteResponse).get("data").toString())) {
-                FallbackConfig.enableAutoFallback = false;
-                if (AgentState.getInstance().isFallback()) {
-                    DongTaiLog.info("fallback remote config data empty, auto fallback closed, starting agent");
                     FallbackSwitch.setPerformanceFallback(State.RUNNING);
                 }
                 return null;

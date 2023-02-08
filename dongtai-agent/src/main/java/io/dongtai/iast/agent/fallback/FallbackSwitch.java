@@ -22,6 +22,9 @@ public class FallbackSwitch {
             return;
         }
         EngineManager engineManager = EngineManager.getInstance();
+        if (engineManager.getAgentState().isUninstalledByCli()) {
+            return;
+        }
 
         if (engineManager.getAgentState().isException()) {
             DongTaiLog.warn(ErrorCode.AGENT_FALLBACK_STATE_CHANGE_WITH_EXCEPTION, state.name());

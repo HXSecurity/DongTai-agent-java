@@ -42,6 +42,10 @@ public class AgentStateMonitor implements IMonitor {
                 return;
             }
 
+            if (this.engineManager.getAgentState().isUninstalledByCli()) {
+                return;
+            }
+
             if (!this.engineManager.getAgentState().isFallback() && !this.engineManager.getAgentState().isException()) {
                 String expectState = checkExpectState();
                 if (State.RUNNING.equals(expectState) && this.engineManager.getAgentState().isPaused()) {
