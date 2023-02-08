@@ -66,6 +66,10 @@ public class AgentState {
         return this.state == State.UNINSTALLED;
     }
 
+    public boolean isUninstalledByCli() {
+        return isUninstalled() && this.cause == StateCause.UNINSTALL_BY_CLI;
+    }
+
     public boolean isException() {
         return this.state == State.EXCEPTION;
     }
