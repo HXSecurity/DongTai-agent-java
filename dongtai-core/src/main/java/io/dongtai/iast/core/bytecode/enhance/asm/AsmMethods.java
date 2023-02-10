@@ -4,6 +4,7 @@ import org.objectweb.asm.commons.Method;
 
 import java.lang.dongtai.SpyDispatcher;
 import java.lang.dongtai.SpyDispatcherHandler;
+import java.util.Collection;
 import java.util.Enumeration;
 
 /**
@@ -31,6 +32,28 @@ public interface AsmMethods {
             SpyDispatcherHandler.class,
             "getDispatcher"
     );
+
+    Method SPY$enterScope = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "enterScope",
+            int.class
+    );
+    Method SPY$inScope = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "inScope",
+            int.class
+    );
+    Method SPY$isFirstLevelScope = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "isFirstLevelScope",
+            int.class
+    );
+    Method SPY$leaveScope = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "leaveScope",
+            int.class
+    );
+
     Method SPY$enterHttp = InnerHelper.getAsmMethod(
             SpyDispatcher.class,
             "enterHttp"
@@ -65,17 +88,14 @@ public interface AsmMethods {
             Enumeration.class
     );
 
-    Method SPY$cloneRequest = InnerHelper.getAsmMethod(
+    Method SPY$collectHttpResponse = InnerHelper.getAsmMethod(
             SpyDispatcher.class,
-            "cloneRequest",
+            "collectHttpResponse",
             Object.class,
-            boolean.class
-    );
-    Method SPY$cloneResponse = InnerHelper.getAsmMethod(
-            SpyDispatcher.class,
-            "cloneResponse",
             Object.class,
-            boolean.class
+            Object.class,
+            Collection.class,
+            int.class
     );
 
     Method SPY$enterSource = InnerHelper.getAsmMethod(

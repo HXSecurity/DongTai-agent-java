@@ -1,6 +1,7 @@
 package io.dongtai.iast.core.handler.hookpoint.controller.impl;
 
 import io.dongtai.iast.common.config.*;
+import io.dongtai.iast.common.scope.Scope;
 import io.dongtai.iast.common.scope.ScopeManager;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.hookpoint.IastClassLoader;
@@ -109,7 +110,7 @@ public class HttpImpl {
             if (response == null) {
                 return null;
             }
-            if (!ScopeManager.SCOPE_TRACKER.getHttpEntryScope().in()) {
+            if (!ScopeManager.SCOPE_TRACKER.getScope(Scope.HTTP_ENTRY).in()) {
                 return response;
             }
             if (ConfigMatcher.getInstance().disableExtension((String) REQUEST_META.get().get("requestURI"))) {
@@ -218,6 +219,29 @@ public class HttpImpl {
                 String key = (String) headerNames.nextElement();
                 String val = (String) getHeaderMethod.invoke(req, key);
                 headers.put(key, val);
+            } catch (Throwable ignore) {
+            }
+        }
+        return headers;
+    }
+
+    public static void solveHttpResponse(Object obj, Object req, Object resp, Collection<?> headerNames, int status) {
+        Map<String, Collection<String>> headers = parseResponseHeaders(resp, headerNames);
+        REQUEST_META.get().put("responseStatus", (String) REQUEST_META.get().get("protocol") + " " + status);
+        REQUEST_META.get().put("responseHeaders", headers);
+    }
+
+    public static Map<String, Collection<String>> parseResponseHeaders(Object resp, Collection<?> headerNames) {
+        Map<String, Collection<String>> headers = new HashMap<String, Collection<String>>(32);
+        Method getHeadersMethod = ReflectUtils.getDeclaredMethodFromSuperClass(resp.getClass(),
+                "getHeaders", new Class[]{String.class});
+        if (getHeadersMethod == null) {
+            return headers;
+        }
+        for (Object key : headerNames) {
+            try {
+                Collection<String> val = (Collection<String>) getHeadersMethod.invoke(resp, key);
+                headers.put((String) key, val);
             } catch (Throwable ignore) {
             }
         }

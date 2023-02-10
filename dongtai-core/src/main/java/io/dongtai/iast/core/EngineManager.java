@@ -1,5 +1,6 @@
 package io.dongtai.iast.core;
 
+import io.dongtai.iast.common.scope.Scope;
 import io.dongtai.iast.common.scope.ScopeManager;
 import io.dongtai.iast.common.state.AgentState;
 import io.dongtai.iast.core.handler.context.ContextManager;
@@ -134,6 +135,6 @@ public class EngineManager {
         TRACK_MAP.set(new HashMap<Integer, MethodEvent>(1024));
         TAINT_HASH_CODES.set(new HashSet<Integer>());
         TAINT_RANGES_POOL.set(new HashMap<Integer, TaintRanges>());
-        ScopeManager.SCOPE_TRACKER.getHttpEntryScope().enter();
+        ScopeManager.SCOPE_TRACKER.getScope(Scope.HTTP_ENTRY).enter();
     }
 }

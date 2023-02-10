@@ -6,12 +6,17 @@ public class ScopeTracker extends ThreadLocal<ScopeAggregator> {
         return new ScopeAggregator();
     }
 
-    public GeneralScope getHttpRequestScope() {
-        return this.get().getHttpRequestScope();
-    }
-
-    public GeneralScope getHttpEntryScope() {
-        return this.get().getHttpEntryScope();
+    public GeneralScope getScope(Scope scope) {
+        switch (scope) {
+            case HTTP_REQUEST:
+                return this.get().getHttpRequestScope();
+            case HTTP_ENTRY:
+                return this.get().getHttpEntryScope();
+            case HTTP_RESPONSE_HEADER:
+                return this.get().getHttpResponseHeaderScope();
+            default:
+                return null;
+        }
     }
 
     public boolean inEnterEntry() {

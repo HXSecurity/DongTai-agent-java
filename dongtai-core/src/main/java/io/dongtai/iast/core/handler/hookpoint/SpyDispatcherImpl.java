@@ -2,6 +2,7 @@ package io.dongtai.iast.core.handler.hookpoint;
 
 import com.secnium.iast.core.AgentEngine;
 import io.dongtai.iast.common.config.*;
+import io.dongtai.iast.common.scope.Scope;
 import io.dongtai.iast.common.scope.ScopeManager;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.bytecode.enhance.plugin.spring.SpringApplicationImpl;
@@ -26,6 +27,68 @@ public class SpyDispatcherImpl implements SpyDispatcher {
 
     public static final AtomicInteger INVOKE_ID_SEQUENCER = new AtomicInteger(1);
 
+    @Override
+    public void enterScope(int id) {
+        try {
+            if (!EngineManager.isEngineRunning()) {
+                return;
+            }
+            Scope scope = Scope.getScope(id);
+            if (scope == null) {
+                return;
+            }
+            ScopeManager.SCOPE_TRACKER.getScope(scope).enter();
+        } catch (Throwable ignore) {
+        }
+    }
+
+    @Override
+    public boolean inScope(int id) {
+        try {
+            if (!EngineManager.isEngineRunning()) {
+                return false;
+            }
+            Scope scope = Scope.getScope(id);
+            if (scope == null) {
+                return false;
+            }
+            return ScopeManager.SCOPE_TRACKER.getScope(scope).in();
+        } catch (Throwable ignore) {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean isFirstLevelScope(int id) {
+        try {
+            if (!EngineManager.isEngineRunning()) {
+                return false;
+            }
+            Scope scope = Scope.getScope(id);
+            if (scope == null) {
+                return false;
+            }
+            return ScopeManager.SCOPE_TRACKER.getScope(scope).isFirst();
+        } catch (Throwable ignore) {
+            return false;
+        }
+    }
+
+    @Override
+    public void leaveScope(int id) {
+        try {
+            if (!EngineManager.isEngineRunning()) {
+                return;
+            }
+            Scope scope = Scope.getScope(id);
+            if (scope == null) {
+                return;
+            }
+            ScopeManager.SCOPE_TRACKER.getScope(scope).leave();
+        } catch (Throwable ignore) {
+        }
+    }
+
     /**
      * mark for enter Http Entry Point
      *
@@ -37,7 +100,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
             return;
         }
         try {
-            ScopeManager.SCOPE_TRACKER.getHttpRequestScope().enter();
+            ScopeManager.SCOPE_TRACKER.getScope(Scope.HTTP_REQUEST).enter();
         } catch (Throwable ignore) {
         }
     }
@@ -55,9 +118,9 @@ public class SpyDispatcherImpl implements SpyDispatcher {
             return;
         }
         try {
-            ScopeManager.SCOPE_TRACKER.getHttpRequestScope().leave();
-            if (!ScopeManager.SCOPE_TRACKER.getHttpRequestScope().in()
-                    && ScopeManager.SCOPE_TRACKER.getHttpEntryScope().in()) {
+            ScopeManager.SCOPE_TRACKER.getScope(Scope.HTTP_REQUEST).leave();
+            if (!ScopeManager.SCOPE_TRACKER.getScope(Scope.HTTP_REQUEST).in()
+                    && ScopeManager.SCOPE_TRACKER.getScope(Scope.HTTP_ENTRY).in()) {
                 EngineManager.maintainRequestCount();
                 GraphBuilder.buildAndReport(request, response);
                 EngineManager.cleanThreadState();
@@ -79,7 +142,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
             return false;
         }
         try {
-            return ScopeManager.SCOPE_TRACKER.getHttpRequestScope().isFirst();
+            return ScopeManager.SCOPE_TRACKER.getScope(Scope.HTTP_REQUEST).isFirst();
         } catch (Throwable ignore) {
             return false;
         }
@@ -120,38 +183,20 @@ public class SpyDispatcherImpl implements SpyDispatcher {
         }
     }
 
-    /**
-     * clone request object for copy http post body.
-     *
-     * @param req       HttpRequest Object
-     * @param isJakarta true if jakarta-servlet-api else false
-     * @since 1.3.1
-     */
     @Override
-    public Object cloneRequest(Object req, boolean isJakarta) {
-        if (!EngineManager.isEngineRunning()) {
-            return req;
-        }
+    public void collectHttpResponse(Object obj, Object req, Object resp, Collection<?> headerNames, int status) {
         try {
-            return HttpImpl.cloneRequest(req, isJakarta);
-        } catch (Throwable ignore) {
-            return req;
-        }
-    }
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
 
-    /**
-     * clone response object for copy http response data.
-     * @since 1.3.1
-     */
-    @Override
-    public Object cloneResponse(Object response, boolean isJakarta) {
-        if (!EngineManager.isEngineRunning()) {
-            return response;
-        }
-        try {
-            return HttpImpl.cloneResponse(response, isJakarta);
-        } catch (Throwable ignore) {
-            return response;
+            if (!EngineManager.isEngineRunning()) {
+                return;
+            }
+
+            HttpImpl.solveHttpResponse(resp, req, resp, headerNames, status);
+        } catch (Throwable e) {
+            DongTaiLog.warn(ErrorCode.SPY_COLLECT_HTTP_FAILED, "response header", e);
+        } finally {
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
         }
     }
 

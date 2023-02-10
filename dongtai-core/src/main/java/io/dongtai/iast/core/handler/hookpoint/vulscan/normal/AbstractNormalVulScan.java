@@ -9,6 +9,7 @@ import io.dongtai.iast.core.utils.StackUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -68,6 +69,26 @@ public abstract class AbstractNormalVulScan implements IVulScan {
             sb.append(":");
             sb.append(headerItem.getValue());
             sb.append("\n");
+        }
+        return Base64Encoder.encodeBase64String(sb.toString().getBytes()).replaceAll("\n", "").replaceAll("\r", "");
+    }
+
+    public static String getEncodedResponseHeader(String status, Map<String, Collection<String>> headers) {
+        if (status == null) {
+            return "";
+        }
+        if (headers == null || headers.isEmpty()) {
+            return status;
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append(status).append("\n");
+        for (Map.Entry<String, Collection<String>> headerItem : headers.entrySet()) {
+            for (String v : headerItem.getValue()) {
+                sb.append(headerItem.getKey());
+                sb.append(":");
+                sb.append(v);
+                sb.append("\n");
+            }
         }
         return Base64Encoder.encodeBase64String(sb.toString().getBytes()).replaceAll("\n", "").replaceAll("\r", "");
     }

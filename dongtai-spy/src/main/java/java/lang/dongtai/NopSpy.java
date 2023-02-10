@@ -1,8 +1,27 @@
 package java.lang.dongtai;
 
+import java.util.Collection;
 import java.util.Enumeration;
 
 public class NopSpy implements SpyDispatcher {
+    @Override
+    public void enterScope(int id) {
+    }
+
+    @Override
+    public boolean inScope(int id) {
+        return false;
+    }
+
+    @Override
+    public boolean isFirstLevelScope(int id) {
+        return false;
+    }
+
+    @Override
+    public void leaveScope(int id) {
+    }
+
     /**
      * mark for enter Http Entry Point
      *
@@ -42,30 +61,8 @@ public class NopSpy implements SpyDispatcher {
                                    boolean isSecure, int serverPort, Enumeration<?> headerNames) {
     }
 
-    /**
-     * clone request object for copy http post body.
-     *
-     * @param req       HttpRequest Object
-     * @param isJakarta true if jakarta-servlet-api else false
-     * @return
-     * @since 1.3.1
-     */
     @Override
-    public Object cloneRequest(Object req, boolean isJakarta) {
-        return null;
-    }
-
-    /**
-     * clone response object for copy http response data.
-     *
-     * @param res
-     * @param isJakarta
-     * @return
-     * @since 1.3.1
-     */
-    @Override
-    public Object cloneResponse(Object res, boolean isJakarta) {
-        return null;
+    public void collectHttpResponse(Object obj, Object req, Object resp, Collection<?> headerNames, int status) {
     }
 
     /**

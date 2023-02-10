@@ -18,6 +18,9 @@ public class DispatchJ2ee implements DispatchPlugin {
     public static final String JAVAX_FACES_SERVLET = " javax.faces.webapp.FacesServlet".substring(1);
     public static final String JAKARTA_FACES_SERVLET = " jakarta.faces.webapp.FacesServlet".substring(1);
 
+    public static final String JAVAX_HTTP_SERVLET_RESPONSE = " javax.servlet.http.HttpServletResponse".substring(1);
+    public static final String JAKARTA_HTTP_SERVLET_RESPONSE = " jakarta.servlet.http.HttpServletResponse".substring(1);
+
 
     @Override
     public ClassVisitor dispatch(ClassVisitor classVisitor, ClassContext context, Policy policy) {
@@ -28,6 +31,10 @@ public class DispatchJ2ee implements DispatchPlugin {
             classVisitor = new ServletDispatcherAdapter(classVisitor, context, " javax".substring(1));
         } else if (isJakartaServlet(className, ancestors)) {
             classVisitor = new ServletDispatcherAdapter(classVisitor, context, " jakarta".substring(1));
+        } else if (ancestors.contains(JAVAX_HTTP_SERVLET_RESPONSE)) {
+            classVisitor = new ServletResponseAdapter(classVisitor, context);
+        } else if (ancestors.contains(JAKARTA_HTTP_SERVLET_RESPONSE)) {
+            classVisitor = new ServletResponseAdapter(classVisitor, context);
         }
         return classVisitor;
     }

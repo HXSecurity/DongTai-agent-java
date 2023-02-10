@@ -22,8 +22,11 @@ public class ServletDispatcherAdviceAdapter extends AbstractAdviceAdapter {
     private static final Method IS_SECURE_METHOD = Method.getMethod("boolean isSecure()");
     private static final Method GET_SERVER_PORT_METHOD = Method.getMethod("int getServerPort()");
     private static final Method GET_HEADER_NAMES_METHOD = Method.getMethod("java.util.Enumeration getHeaderNames()");
+    private static final Method GET_RESPONSE_HEADER_NAMES_METHOD = Method.getMethod("java.util.Collection getHeaderNames()");
+    private static final Method GET_STATUS_METHOD = Method.getMethod("int getStatus()");
 
     private final Type servletRequestType;
+    private final Type servletResponseType;
     private final int reqIndex;
     private final int respIndex;
 
@@ -31,6 +34,7 @@ public class ServletDispatcherAdviceAdapter extends AbstractAdviceAdapter {
                                           ClassContext context, String packageName) {
         super(mv, access, name, desc, context, "j2ee", signature);
         this.servletRequestType = Type.getObjectType(packageName + "/servlet/http/HttpServletRequest");
+        this.servletResponseType = Type.getObjectType(packageName + "/servlet/http/HttpServletResponse");
         this.reqIndex = 0;
         this.respIndex = 1;
     }
@@ -56,6 +60,14 @@ public class ServletDispatcherAdviceAdapter extends AbstractAdviceAdapter {
      */
     @Override
     protected void after(final int opcode) {
+        if (opcode != ATHROW) {
+            Label elseLabel = new Label();
+            isFirstLevelHttp();
+            mv.visitJumpInsn(EQ, elseLabel);
+            collectHttpResponse(opcode);
+            mark(elseLabel);
+        }
+
         leaveHttp();
     }
 
@@ -117,7 +129,32 @@ public class ServletDispatcherAdviceAdapter extends AbstractAdviceAdapter {
         Label endL = new Label();
         visitJumpInsn(GOTO, endL);
         visitLabel(exHandlerL);
-        visitVarInsn(ASTORE, getArgumentTypes().length + 1);
+        visitVarInsn(ASTORE, nextLocal);
+        visitLabel(endL);
+    }
+
+    private void collectHttpResponse(final int opcode) {
+        Label tryL = new Label();
+        Label catchL = new Label();
+        Label exHandlerL = new Label();
+        visitTryCatchBlock(tryL, catchL, exHandlerL, ASM_TYPE_THROWABLE.getInternalName());
+        visitLabel(tryL);
+
+        invokeStatic(ASM_TYPE_SPY_HANDLER, SPY_HANDLER$getDispatcher);
+        loadThis();
+        loadArg(this.reqIndex);
+        loadArg(this.respIndex);
+        loadArg(this.respIndex);
+        invokeInterface(this.servletResponseType, GET_RESPONSE_HEADER_NAMES_METHOD);
+        loadArg(this.respIndex);
+        invokeInterface(this.servletResponseType, GET_STATUS_METHOD);
+        invokeInterface(ASM_TYPE_SPY_DISPATCHER, SPY$collectHttpResponse);
+
+        visitLabel(catchL);
+        Label endL = new Label();
+        visitJumpInsn(GOTO, endL);
+        visitLabel(exHandlerL);
+        visitVarInsn(ASTORE, nextLocal);
         visitLabel(endL);
     }
 }

@@ -2,7 +2,6 @@ package io.dongtai.iast.core.handler.hookpoint.graphy;
 
 import io.dongtai.iast.common.constants.*;
 import io.dongtai.iast.common.scope.ScopeManager;
-import io.dongtai.iast.common.utils.base64.Base64Encoder;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.context.ContextManager;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
@@ -58,9 +57,7 @@ public class GraphBuilder {
 
     public static String convertToReport(List<GraphNode> nodeList, Object request, Object response) {
         Map<String, Object> requestMeta = EngineManager.REQUEST_CONTEXT.get();
-        // Map<String, Object> responseMeta = response == null ? null : HttpImpl.getResponseMeta(response);
-        // @TODO
-        Map<String, Object> responseMeta = null;
+
         JSONObject report = new JSONObject();
         JSONObject detail = new JSONObject();
         JSONArray methodPool = new JSONArray();
@@ -90,9 +87,9 @@ public class GraphBuilder {
                 (Map<String, String>) requestMeta.getOrDefault("headers", new HashMap<String, String>())));
         // // @TODO
         detail.put(ReportKey.REQ_BODY, ""); //request == null ? "" : HttpImpl.getPostBody(request));
-        detail.put(ReportKey.RES_HEADER, responseMeta == null ? ""
-                : Base64Encoder.encodeBase64String(responseMeta.getOrDefault("headers", "").toString().getBytes())
-                .replaceAll("\n", "").replaceAll("\r", ""));
+        detail.put(ReportKey.RES_HEADER, AbstractNormalVulScan.getEncodedResponseHeader(
+                (String) requestMeta.get("responseStatus"),
+                (Map<String, Collection<String>>) requestMeta.get("responseHeaders")));
         // @TODO
         detail.put(ReportKey.RES_BODY, ""); //responseMeta == null ? "" : Base64Encoder.encodeBase64String(getResponseBody(responseMeta)));
         detail.put(ReportKey.CONTEXT_PATH, requestMeta.getOrDefault("contextPath", ""));
