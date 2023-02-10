@@ -112,6 +112,7 @@
                             <Main-Class>io.dongtai.iast.agent.Agent</Main-Class>
                             <Can-Redefine-Classes>true</Can-Redefine-Classes>
                             <Can-Retransform-Classes>true</Can-Retransform-Classes>
+                            <Agent-Version>${revision}</Agent-Version>
                             <Built-By>DongTai</Built-By>
                         </manifestEntries>
                     </archive>
