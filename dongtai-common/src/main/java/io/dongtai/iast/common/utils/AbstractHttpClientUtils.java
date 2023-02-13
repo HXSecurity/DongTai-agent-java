@@ -7,6 +7,7 @@ import org.apache.http.*;
 import org.apache.http.client.entity.GzipCompressingEntity;
 import org.apache.http.client.methods.*;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.*;
 import org.apache.http.util.EntityUtils;
@@ -34,7 +35,7 @@ public class AbstractHttpClientUtils {
 
         HttpEntity reqBody = null;
         try {
-            if (HttpMethods.POST.equals(method) && data != null) {
+            if (HttpMethods.POST.equals(method) && data != null && !data.isEmpty()) {
                 reqBody = new GzipCompressingEntity(new StringEntity(data, "UTF-8"));
             }
         } catch (Throwable e) {
@@ -60,11 +61,19 @@ public class AbstractHttpClientUtils {
 
         HttpEntity reqBody = null;
         try {
-            if (HttpMethods.POST.equals(method) && data != null) {
-                reqBody = new StringEntity(data, "UTF-8");
+            if (HttpMethods.POST.equals(method) && data != null && !data.isEmpty()) {
+                String contentType = headers.get("content-type");
+                if (contentType == null || contentType.isEmpty()) {
+                    reqBody = new StringEntity(data, "UTF-8");
+                } else if (!contentType.contains(";")) {
+                    reqBody = new StringEntity(data, ContentType.create(contentType, "UTF-8"));
+                } else {
+                    reqBody = new StringEntity(data, ContentType.parse(contentType));
+                }
             }
         } catch (Throwable e) {
-            DongTaiLog.error(ErrorCode.HTTP_CLIENT_PREPARE_REQUEST_BODY_FAILED, url, e);
+            DongTaiLog.warn(ErrorCode.HTTP_CLIENT_PREPARE_REQUEST_BODY_FAILED, url, e);
+            return response;
         }
         response = sendRequest(client, m, url, reqBody, headers, null);
         DongTaiLog.trace("dongtai replay request url is {}, request is {}, response is {}",
