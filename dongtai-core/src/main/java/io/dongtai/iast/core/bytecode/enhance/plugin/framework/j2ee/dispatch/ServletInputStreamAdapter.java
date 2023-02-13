@@ -6,11 +6,15 @@ import io.dongtai.iast.core.utils.AsmUtils;
 import io.dongtai.log.DongTaiLog;
 import org.objectweb.asm.*;
 
+import java.util.*;
+
 /**
  * @author dongzhiyong@huoxian.cn
  */
-public class ServletResponseAdapter extends AbstractClassVisitor {
-    ServletResponseAdapter(ClassVisitor classVisitor, ClassContext context) {
+public class ServletInputStreamAdapter extends AbstractClassVisitor {
+    private static final Set<String> READ_DESC = new HashSet<>(Arrays.asList("()I", "([BII)I", "([B)I"));
+
+    ServletInputStreamAdapter(ClassVisitor classVisitor, ClassContext context) {
         super(classVisitor, context);
     }
 
@@ -19,7 +23,9 @@ public class ServletResponseAdapter extends AbstractClassVisitor {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
         Type[] typeOfArgs = Type.getArgumentTypes(desc);
         String signCode = AsmUtils.buildSignature(context.getClassName(), name, desc);
-        if (false) {
+        if (isRead(name, desc)) {
+            DongTaiLog.debug("Adding HTTP request reading to {}", signCode);
+            mv = new ServletInputStreamReadAdviceAdapter(mv, access, name, desc, signCode, context);
             setTransformed();
         }
         if (hasTransformed()) {
@@ -27,5 +33,12 @@ public class ServletResponseAdapter extends AbstractClassVisitor {
         }
 
         return mv;
+    }
+
+    private boolean isRead(String name, String desc) {
+        if ("read".equals(name) && READ_DESC.contains(desc)) {
+            return true;
+        }
+        return false;
     }
 }

@@ -85,8 +85,7 @@ public class GraphBuilder {
         detail.put(ReportKey.QUERY_STRING, requestMeta.getOrDefault("queryString", ""));
         detail.put(ReportKey.REQ_HEADER, AbstractNormalVulScan.getEncodedHeader(
                 (Map<String, String>) requestMeta.getOrDefault("headers", new HashMap<String, String>())));
-        // // @TODO
-        detail.put(ReportKey.REQ_BODY, ""); //request == null ? "" : HttpImpl.getPostBody(request));
+        detail.put(ReportKey.REQ_BODY, EngineManager.BODY_BUFFER.getRequest().toString());
         detail.put(ReportKey.RES_HEADER, AbstractNormalVulScan.getEncodedResponseHeader(
                 (String) requestMeta.get("responseStatus"),
                 (Map<String, Collection<String>>) requestMeta.get("responseHeaders")));

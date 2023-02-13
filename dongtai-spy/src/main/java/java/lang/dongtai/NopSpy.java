@@ -62,6 +62,10 @@ public class NopSpy implements SpyDispatcher {
     }
 
     @Override
+    public void onServletInputStreamRead(int ret, String desc, Object stream, byte[] bs, int offset, int len) {
+    }
+
+    @Override
     public void collectHttpResponse(Object obj, Object req, Object resp, Collection<?> headerNames, int status) {
     }
 

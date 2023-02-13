@@ -88,6 +88,17 @@ public interface AsmMethods {
             Enumeration.class
     );
 
+    Method SPY$onServletInputStreamRead = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "onServletInputStreamRead",
+            int.class,
+            String.class,
+            Object.class,
+            byte[].class,
+            int.class,
+            int.class
+    );
+
     Method SPY$collectHttpResponse = InnerHelper.getAsmMethod(
             SpyDispatcher.class,
             "collectHttpResponse",

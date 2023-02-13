@@ -9,6 +9,7 @@ import io.dongtai.iast.core.utils.*;
 import io.dongtai.iast.core.utils.matcher.ConfigMatcher;
 import io.dongtai.log.DongTaiLog;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -223,6 +224,33 @@ public class HttpImpl {
             }
         }
         return headers;
+    }
+
+    public static void onServletInputStreamRead(int ret, String desc, Object stream, byte[] bs, int offset, int len) {
+        if ("()I".equals(desc)) {
+            if (ret == -1) {
+                return;
+            }
+            ByteArrayOutputStream buff = EngineManager.BODY_BUFFER.getRequest();
+            if (buff.size() < 4096) {
+                buff.write(ret);
+            }
+        } else if ("([B)I".equals(desc)) {
+            if (ret == -1 || bs == null) {
+                return;
+            }
+            onServletInputStreamRead(ret, "([BII)I", stream, bs, 0, bs.length);
+        } else if ("([BII)I".equals(desc)) {
+            if (bs == null || offset < 0 || (len < 0 && ret == -1)) {
+                return;
+            }
+
+            ByteArrayOutputStream buff = EngineManager.BODY_BUFFER.getRequest();
+            int size = buff.size();
+            if (size < 4096) {
+                buff.write(bs, offset, Math.min(ret, 4096 - size));
+            }
+        }
     }
 
     public static void solveHttpResponse(Object obj, Object req, Object resp, Collection<?> headerNames, int status) {

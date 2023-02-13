@@ -41,6 +41,8 @@ public interface SpyDispatcher {
                             String serverName, String contextPath, String remoteAddr,
                             boolean isSecure, int serverPort, Enumeration<?> headerNames);
 
+    void onServletInputStreamRead(int ret, String desc, Object stream, byte[] bs, int offset, int len);
+
     void collectHttpResponse(Object obj, Object req, Object resp, Collection<?> headers, int status);
 
     /**

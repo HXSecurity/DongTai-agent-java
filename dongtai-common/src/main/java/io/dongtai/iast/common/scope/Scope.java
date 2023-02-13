@@ -3,7 +3,7 @@ package io.dongtai.iast.common.scope;
 public enum Scope {
     HTTP_REQUEST(1),
     HTTP_ENTRY(2),
-    HTTP_RESPONSE_HEADER(3),
+    SERVLET_INPUT_STREAM_READ(3),
     ;
 
     private final int id;

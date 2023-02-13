@@ -24,7 +24,9 @@ public class ServletDispatcherAdviceAdapter extends AbstractAdviceAdapter {
     private static final Method GET_HEADER_NAMES_METHOD = Method.getMethod("java.util.Enumeration getHeaderNames()");
     private static final Method GET_RESPONSE_HEADER_NAMES_METHOD = Method.getMethod("java.util.Collection getHeaderNames()");
     private static final Method GET_STATUS_METHOD = Method.getMethod("int getStatus()");
+    private static final String GET_INPUT_STREAM_METHOD = ".servlet.ServletInputStream getInputStream()";
 
+    private final String packageName;
     private final Type servletRequestType;
     private final Type servletResponseType;
     private final int reqIndex;
@@ -33,6 +35,7 @@ public class ServletDispatcherAdviceAdapter extends AbstractAdviceAdapter {
     public ServletDispatcherAdviceAdapter(MethodVisitor mv, int access, String name, String desc, String signature,
                                           ClassContext context, String packageName) {
         super(mv, access, name, desc, context, "j2ee", signature);
+        this.packageName = packageName;
         this.servletRequestType = Type.getObjectType(packageName + "/servlet/http/HttpServletRequest");
         this.servletResponseType = Type.getObjectType(packageName + "/servlet/http/HttpServletResponse");
         this.reqIndex = 0;

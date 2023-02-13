@@ -12,8 +12,8 @@ public class ScopeTracker extends ThreadLocal<ScopeAggregator> {
                 return this.get().getHttpRequestScope();
             case HTTP_ENTRY:
                 return this.get().getHttpEntryScope();
-            case HTTP_RESPONSE_HEADER:
-                return this.get().getHttpResponseHeaderScope();
+            case SERVLET_INPUT_STREAM_READ:
+                return this.get().getServletInputStreamReadScope();
             default:
                 return null;
         }

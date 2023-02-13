@@ -5,6 +5,7 @@ import io.dongtai.iast.common.scope.ScopeManager;
 import io.dongtai.iast.common.state.AgentState;
 import io.dongtai.iast.core.handler.context.ContextManager;
 import io.dongtai.iast.core.handler.hookpoint.IastServer;
+import io.dongtai.iast.core.handler.hookpoint.controller.BodyBuffer;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.handler.hookpoint.models.taint.range.TaintRanges;
 import io.dongtai.iast.core.service.ServerAddressReport;
@@ -30,6 +31,7 @@ public class EngineManager {
     public static final IastTrackMap TRACK_MAP = new IastTrackMap();
     public static final IastTaintHashCodes TAINT_HASH_CODES = new IastTaintHashCodes();
     public static final TaintRangesPool TAINT_RANGES_POOL = new TaintRangesPool();
+    public static final BodyBuffer BODY_BUFFER = new BodyBuffer();
     public static IastServer SERVER;
     public static final AgentState AGENT_STATE = AgentState.getInstance();
 
@@ -65,6 +67,7 @@ public class EngineManager {
         EngineManager.ENTER_REPLAY_ENTRYPOINT.remove();
         ContextManager.getContext().remove();
         ScopeManager.SCOPE_TRACKER.remove();
+        EngineManager.BODY_BUFFER.remove();
     }
 
     public static void maintainRequestCount() {

@@ -184,6 +184,26 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     }
 
     @Override
+    public void onServletInputStreamRead(int ret, String desc, Object stream, byte[] bs, int offset, int len) {
+        try {
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
+            if (!EngineManager.isEngineRunning()) {
+                return;
+            }
+
+            if (!ScopeManager.SCOPE_TRACKER.getScope(Scope.HTTP_ENTRY).in()) {
+                return;
+            }
+
+            HttpImpl.onServletInputStreamRead(ret, desc, stream, bs, offset, len);
+        } catch (Throwable e) {
+            DongTaiLog.warn(ErrorCode.SPY_COLLECT_HTTP_FAILED, "request body", e);
+        } finally {
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
+        }
+    }
+
+    @Override
     public void collectHttpResponse(Object obj, Object req, Object resp, Collection<?> headerNames, int status) {
         try {
             ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
