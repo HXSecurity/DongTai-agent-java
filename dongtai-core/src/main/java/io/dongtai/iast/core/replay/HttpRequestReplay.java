@@ -38,6 +38,8 @@ public class HttpRequestReplay implements Runnable {
             headers.put("dongtai-replay-id", String.valueOf(replayModel.getReplayId()));
             headers.put("dongtai-relation-id", String.valueOf(replayModel.getRelationId()));
             headers.put("dongtai-replay-type", String.valueOf(replayModel.getReplayType()));
+            headers.remove("content-length");
+            headers.remove("transfer-encoding");
 
             String url = replayModel.getFullUrl();
             if (url != null) {
