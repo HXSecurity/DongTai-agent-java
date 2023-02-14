@@ -45,6 +45,8 @@ public interface SpyDispatcher {
 
     void collectHttpResponse(Object obj, Object req, Object resp, Collection<?> headers, int status);
 
+    void onServletOutputStreamWrite(String desc, Object stream, int b, byte[] bs, int offset, int len);
+
     /**
      * mark for enter Source Entry Point
      *

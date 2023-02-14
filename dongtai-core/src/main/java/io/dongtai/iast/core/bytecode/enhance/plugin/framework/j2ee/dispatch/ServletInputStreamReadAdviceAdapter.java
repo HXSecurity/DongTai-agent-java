@@ -6,9 +6,6 @@ import io.dongtai.iast.core.bytecode.enhance.plugin.AbstractAdviceAdapter;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 
-/**
- * @author dongzhiyong@huoxian.cn
- */
 public class ServletInputStreamReadAdviceAdapter extends AbstractAdviceAdapter {
     public ServletInputStreamReadAdviceAdapter(MethodVisitor mv, int access, String name, String desc, String signature,
                                                ClassContext context) {

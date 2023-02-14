@@ -109,6 +109,17 @@ public interface AsmMethods {
             int.class
     );
 
+    Method SPY$onServletOutputStreamWrite = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "onServletOutputStreamWrite",
+            String.class,
+            Object.class,
+            int.class,
+            byte[].class,
+            int.class,
+            int.class
+    );
+
     Method SPY$enterSource = InnerHelper.getAsmMethod(
             SpyDispatcher.class,
             "enterSource"

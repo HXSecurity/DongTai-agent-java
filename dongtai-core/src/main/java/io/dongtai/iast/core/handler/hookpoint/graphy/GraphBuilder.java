@@ -2,18 +2,19 @@ package io.dongtai.iast.core.handler.hookpoint.graphy;
 
 import io.dongtai.iast.common.constants.*;
 import io.dongtai.iast.common.scope.ScopeManager;
+import io.dongtai.iast.common.utils.base64.Base64Encoder;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.context.ContextManager;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.normal.AbstractNormalVulScan;
 import io.dongtai.iast.core.service.ThreadPools;
-import io.dongtai.iast.core.utils.PropertyUtils;
 import io.dongtai.iast.core.utils.StringUtils;
 import io.dongtai.log.DongTaiLog;
 import io.dongtai.log.ErrorCode;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.nio.charset.Charset;
 import java.util.*;
 
 /**
@@ -89,8 +90,11 @@ public class GraphBuilder {
         detail.put(ReportKey.RES_HEADER, AbstractNormalVulScan.getEncodedResponseHeader(
                 (String) requestMeta.get("responseStatus"),
                 (Map<String, Collection<String>>) requestMeta.get("responseHeaders")));
-        // @TODO
-        detail.put(ReportKey.RES_BODY, ""); //responseMeta == null ? "" : Base64Encoder.encodeBase64String(getResponseBody(responseMeta)));
+        String responseBody = EngineManager.BODY_BUFFER.getResponse().toString();
+        if (responseBody != null && !responseBody.isEmpty()) {
+            responseBody = Base64Encoder.encodeBase64String(responseBody.getBytes(Charset.forName("UTF-8")));
+        }
+        detail.put(ReportKey.RES_BODY, responseBody);
         detail.put(ReportKey.CONTEXT_PATH, requestMeta.getOrDefault("contextPath", ""));
         detail.put(ReportKey.REPLAY_REQUEST, requestMeta.getOrDefault("replay-request", false));
 
@@ -101,23 +105,5 @@ public class GraphBuilder {
             methodPool.put(node.toJson());
         }
         return report.toString();
-    }
-
-    private static byte[] getResponseBody(Map<String, Object> responseMeta) {
-        try {
-            Integer responseLength = PropertyUtils.getInstance().getResponseLength();
-            byte[] responseBody = (byte[]) responseMeta.getOrDefault("body", new byte[0]);
-            if (responseLength > 0) {
-                byte[] newResponseBody = new byte[responseLength];
-                newResponseBody = Arrays.copyOfRange(responseBody, 0, responseLength);
-                return newResponseBody;
-            } else if (responseLength == 0) {
-                return new byte[0];
-            } else {
-                return responseBody;
-            }
-        } catch (Throwable ignore) {
-            return new byte[0];
-        }
     }
 }

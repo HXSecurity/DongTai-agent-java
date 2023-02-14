@@ -156,6 +156,49 @@ public class HttpImpl {
         return headers;
     }
 
+    public static void onServletOutputStreamWrite(String desc, Object stream, int b, byte[] bs, int offset, int len) {
+        try {
+            boolean getBody = ((Config<Boolean>) ConfigBuilder.getInstance().getConfig(ConfigKey.REPORT_RESPONSE_BODY)).get();
+            if (!getBody) {
+                return;
+            }
+        } catch (Throwable ignore) {
+            return;
+        }
+
+        Integer maxLength = PropertyUtils.getInstance().getResponseLength();
+        if (maxLength == 0) {
+            return;
+        } else if (maxLength < 0 || maxLength > 50000) {
+            maxLength = 50000;
+        }
+
+        if ("(I)V".equals(desc)) {
+            if (b == -1) {
+                return;
+            }
+            ByteArrayOutputStream buff = EngineManager.BODY_BUFFER.getResponse();
+            if (buff.size() < maxLength) {
+                buff.write(b);
+            }
+        } else if ("([B)V".equals(desc)) {
+            if (bs == null) {
+                return;
+            }
+            onServletOutputStreamWrite("([BII)V", stream, b, bs, 0, bs.length);
+        } else if ("([BII)V".equals(desc)) {
+            if (bs == null || offset < 0 || len < 0) {
+                return;
+            }
+
+            ByteArrayOutputStream buff = EngineManager.BODY_BUFFER.getResponse();
+            int size = buff.size();
+            if (size < maxLength) {
+                buff.write(bs, offset, Math.min(len, maxLength - size));
+            }
+        }
+    }
+
     public static IastClassLoader getClassLoader() {
         return iastClassLoader;
     }

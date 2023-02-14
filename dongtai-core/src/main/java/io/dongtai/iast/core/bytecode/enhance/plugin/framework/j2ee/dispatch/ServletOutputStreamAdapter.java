@@ -8,10 +8,10 @@ import org.objectweb.asm.*;
 
 import java.util.*;
 
-public class ServletInputStreamAdapter extends AbstractClassVisitor {
-    private static final Set<String> READ_DESC = new HashSet<>(Arrays.asList("()I", "([BII)I", "([B)I"));
+public class ServletOutputStreamAdapter extends AbstractClassVisitor {
+    private static final Set<String> WRITE_DESC = new HashSet<>(Arrays.asList("(I)V", "([B)V", "([BII)V"));
 
-    ServletInputStreamAdapter(ClassVisitor classVisitor, ClassContext context) {
+    ServletOutputStreamAdapter(ClassVisitor classVisitor, ClassContext context) {
         super(classVisitor, context);
     }
 
@@ -20,9 +20,9 @@ public class ServletInputStreamAdapter extends AbstractClassVisitor {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
         Type[] typeOfArgs = Type.getArgumentTypes(desc);
         String signCode = AsmUtils.buildSignature(context.getClassName(), name, desc);
-        if (isRead(name, desc)) {
-            DongTaiLog.debug("Adding HTTP request reading by {}", signCode);
-            mv = new ServletInputStreamReadAdviceAdapter(mv, access, name, desc, signCode, context);
+        if (isWrite(name, desc)) {
+            DongTaiLog.debug("Adding HTTP response writing by {}", signCode);
+            mv = new ServletOutputStreamWriteAdviceAdapter(mv, access, name, desc, signCode, context);
             setTransformed();
         }
         if (hasTransformed()) {
@@ -32,8 +32,8 @@ public class ServletInputStreamAdapter extends AbstractClassVisitor {
         return mv;
     }
 
-    private boolean isRead(String name, String desc) {
-        if ("read".equals(name) && READ_DESC.contains(desc)) {
+    private boolean isWrite(String name, String desc) {
+        if ("write".equals(name) && WRITE_DESC.contains(desc)) {
             return true;
         }
         return false;
