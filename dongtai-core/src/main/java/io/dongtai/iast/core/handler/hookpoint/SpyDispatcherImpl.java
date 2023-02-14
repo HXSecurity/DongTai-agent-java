@@ -159,6 +159,8 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                 return;
             }
 
+            HttpImpl.createClassLoader(req);
+
             Map<String, String> headers = HttpImpl.parseRequestHeaders(req, headerNames);
             Map<String, Object> requestMeta = new HashMap<String, Object>() {{
                 put("requestURL", requestURL);
@@ -209,6 +211,9 @@ public class SpyDispatcherImpl implements SpyDispatcher {
             ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
 
             if (!EngineManager.isEngineRunning()) {
+                return;
+            }
+            if (!ScopeManager.SCOPE_TRACKER.getScope(Scope.HTTP_ENTRY).in()) {
                 return;
             }
 
