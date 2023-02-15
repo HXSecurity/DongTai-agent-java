@@ -1,6 +1,7 @@
 package io.dongtai.iast.core.handler.hookpoint.controller.impl;
 
 import io.dongtai.iast.common.config.*;
+import io.dongtai.iast.common.constants.AgentConstant;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.hookpoint.IastClassLoader;
 import io.dongtai.iast.core.utils.*;
@@ -77,6 +78,21 @@ public class HttpImpl {
         }
         if (ConfigMatcher.getInstance().getBlackUrl(requestMeta)) {
             return;
+        }
+
+        try {
+            boolean enableVersionHeader = ((Config<Boolean>) ConfigBuilder.getInstance()
+                    .getConfig(ConfigKey.ENABLE_VERSION_HEADER)).get();
+            if (enableVersionHeader) {
+                String versionHeaderKey = ((Config<String>) ConfigBuilder.getInstance()
+                        .getConfig(ConfigKey.VERSION_HEADER_KEY)).get();
+                Method setHeaderMethod = ReflectUtils.getDeclaredMethodFromSuperClass(resp.getClass(),
+                        "setHeader", new Class[]{String.class, String.class});
+                if (setHeaderMethod != null) {
+                    setHeaderMethod.invoke(resp, versionHeaderKey, AgentConstant.VERSION_VALUE);
+                }
+            }
+        } catch (Throwable ignore) {
         }
 
         EngineManager.enterHttpEntry(requestMeta);
