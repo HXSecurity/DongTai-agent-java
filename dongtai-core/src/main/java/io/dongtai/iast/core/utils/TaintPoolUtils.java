@@ -242,6 +242,9 @@ public class TaintPoolUtils {
                 || "getInputStream".equals(methodName)
                 || "getWriter".equals(methodName)
                 || "getOutputStream".equals(methodName)
+                || "getParameterNames".equals(methodName)
+                || "getParameterMap".equals(methodName)
+                || "getHeaderNames".equals(methodName)
                 || methodName.endsWith("Bytes")
                 || method.getParameterCount() != 0) {
             return false;

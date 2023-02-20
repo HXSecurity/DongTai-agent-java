@@ -6,6 +6,8 @@ com/taobao/*
 com/alibaba/arthas/*
 # ziroom
 com/ziroom/*
+# icbc
+com/icbc/hmp/*
 # swagger/openapi
 com/github/xiaoymin/knife4j/spring/filter/*
 # rasp

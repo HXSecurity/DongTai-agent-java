@@ -100,7 +100,7 @@ public class SourceImpl {
         Class<?> cls = obj.getClass();
         if (cls.isArray() && !cls.getComponentType().isPrimitive()) {
             trackArray(event, sourceNode, obj, depth);
-        } else if (obj instanceof Iterator) {
+        } else if (obj instanceof Iterator && !(obj instanceof Enumeration)) {
             trackIterator(event, sourceNode, (Iterator<?>) obj, depth);
         } else if (obj instanceof Map) {
             trackMap(event, sourceNode, (Map<?, ?>) obj, depth);
