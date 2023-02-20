@@ -91,7 +91,7 @@ public class TaintRanges {
     }
 
     public boolean isEmpty() {
-        return this.taintRanges.isEmpty();
+        return this.taintRanges == null || this.taintRanges.isEmpty();
     }
 
     public TaintRanges explode(int i) {

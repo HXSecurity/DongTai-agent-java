@@ -5,6 +5,7 @@ import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.PropagatorNode;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.TaintPosition;
 import io.dongtai.iast.core.handler.hookpoint.models.taint.range.*;
+import io.dongtai.iast.core.handler.hookpoint.models.taint.tag.TaintTag;
 import io.dongtai.iast.core.utils.StackUtils;
 import io.dongtai.iast.core.utils.TaintPoolUtils;
 
@@ -241,18 +242,42 @@ public class PropagatorImpl {
         if (r != null && src != null) {
             tr = r.run(propagatorNode, src, tgt, event.parameterInstances, oldTaintRanges, srcTaintRanges);
         } else {
-            int len = TaintRangesBuilder.getLength(tgt);
-            tr = new TaintRanges(new TaintRange(0, len));
-            if (propagatorNode.hasTags()) {
-                String[] tags = propagatorNode.getTags();
-                for (String tag : tags) {
-                    tr.add(new TaintRange(tag, 0, len));
+            if (!srcTaintRanges.isEmpty() || !oldTaintRanges.isEmpty()) {
+                int len = TaintRangesBuilder.getLength(tgt);
+                tr = new TaintRanges(new TaintRange(0, len));
+
+                Set<String> existsTags = new HashSet<String>();
+                if (!oldTaintRanges.isEmpty()) {
+                    for (TaintRange t1 : oldTaintRanges.getTaintRanges()) {
+                        if (!TaintTag.UNTRUSTED.equals(t1.getName())) {
+                            existsTags.add(t1.getName());
+                        }
+                    }
                 }
+                if (!srcTaintRanges.isEmpty()) {
+                    for (TaintRange t2 : srcTaintRanges.getTaintRanges()) {
+                        if (!TaintTag.UNTRUSTED.equals(t2.getName())) {
+                            existsTags.add(t2.getName());
+                        }
+                    }
+                }
+                for (String t : existsTags) {
+                    tr.add(new TaintRange(t, 0, len));
+                }
+
+                if (propagatorNode.hasTags()) {
+                    String[] tags = propagatorNode.getTags();
+                    for (String tag : tags) {
+                        tr.add(new TaintRange(tag, 0, len));
+                    }
+                }
+                tr.addAll(srcTaintRanges.explode(len));
+                tr.addAll(oldTaintRanges);
+                tr.merge();
+                tr.untag(propagatorNode.getUntags());
+            } else {
+                tr = new TaintRanges();
             }
-            tr.addAll(srcTaintRanges.explode(len));
-            tr.addAll(oldTaintRanges);
-            tr.merge();
-            tr.untag(propagatorNode.getUntags());
         }
         event.targetRanges.add(new MethodEvent.MethodEventTargetRange(tgtHash, tr));
         EngineManager.TAINT_RANGES_POOL.add(tgtHash, tr);
