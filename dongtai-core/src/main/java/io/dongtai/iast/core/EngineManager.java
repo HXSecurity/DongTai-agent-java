@@ -1,9 +1,11 @@
 package io.dongtai.iast.core;
 
+import io.dongtai.iast.common.scope.Scope;
 import io.dongtai.iast.common.scope.ScopeManager;
 import io.dongtai.iast.common.state.AgentState;
 import io.dongtai.iast.core.handler.context.ContextManager;
 import io.dongtai.iast.core.handler.hookpoint.IastServer;
+import io.dongtai.iast.core.handler.hookpoint.controller.BodyBuffer;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.handler.hookpoint.models.taint.range.TaintRanges;
 import io.dongtai.iast.core.service.ServerAddressReport;
@@ -29,6 +31,7 @@ public class EngineManager {
     public static final IastTrackMap TRACK_MAP = new IastTrackMap();
     public static final IastTaintHashCodes TAINT_HASH_CODES = new IastTaintHashCodes();
     public static final TaintRangesPool TAINT_RANGES_POOL = new TaintRangesPool();
+    public static final BodyBuffer BODY_BUFFER = new BodyBuffer();
     public static IastServer SERVER;
     public static final AgentState AGENT_STATE = AgentState.getInstance();
 
@@ -64,6 +67,7 @@ public class EngineManager {
         EngineManager.ENTER_REPLAY_ENTRYPOINT.remove();
         ContextManager.getContext().remove();
         ScopeManager.SCOPE_TRACKER.remove();
+        EngineManager.BODY_BUFFER.remove();
     }
 
     public static void maintainRequestCount() {
@@ -134,6 +138,6 @@ public class EngineManager {
         TRACK_MAP.set(new HashMap<Integer, MethodEvent>(1024));
         TAINT_HASH_CODES.set(new HashSet<Integer>());
         TAINT_RANGES_POOL.set(new HashMap<Integer, TaintRanges>());
-        ScopeManager.SCOPE_TRACKER.getHttpEntryScope().enter();
+        ScopeManager.SCOPE_TRACKER.getScope(Scope.HTTP_ENTRY).enter();
     }
 }

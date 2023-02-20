@@ -1,6 +1,27 @@
 package java.lang.dongtai;
 
+import java.util.Collection;
+import java.util.Enumeration;
+
 public class NopSpy implements SpyDispatcher {
+    @Override
+    public void enterScope(int id) {
+    }
+
+    @Override
+    public boolean inScope(int id) {
+        return false;
+    }
+
+    @Override
+    public boolean isFirstLevelScope(int id) {
+        return false;
+    }
+
+    @Override
+    public void leaveScope(int id) {
+    }
+
     /**
      * mark for enter Http Entry Point
      *
@@ -34,30 +55,22 @@ public class NopSpy implements SpyDispatcher {
         return false;
     }
 
-    /**
-     * clone request object for copy http post body.
-     *
-     * @param req       HttpRequest Object
-     * @param isJakarta true if jakarta-servlet-api else false
-     * @return
-     * @since 1.3.1
-     */
-    @Override
-    public Object cloneRequest(Object req, boolean isJakarta) {
-        return null;
+    public void collectHttpRequest(Object obj, Object req, Object resp, StringBuffer requestURL, String requestURI,
+                                   String queryString, String method, String protocol, String scheme,
+                                   String serverName, String contextPath, String remoteAddr,
+                                   boolean isSecure, int serverPort, Enumeration<?> headerNames) {
     }
 
-    /**
-     * clone response object for copy http response data.
-     *
-     * @param res
-     * @param isJakarta
-     * @return
-     * @since 1.3.1
-     */
     @Override
-    public Object cloneResponse(Object res, boolean isJakarta) {
-        return null;
+    public void onServletInputStreamRead(int ret, String desc, Object stream, byte[] bs, int offset, int len) {
+    }
+
+    @Override
+    public void collectHttpResponse(Object obj, Object req, Object resp, Collection<?> headerNames, int status) {
+    }
+
+    @Override
+    public void onServletOutputStreamWrite(String desc, Object stream, int b, byte[] bs, int offset, int len) {
     }
 
     /**

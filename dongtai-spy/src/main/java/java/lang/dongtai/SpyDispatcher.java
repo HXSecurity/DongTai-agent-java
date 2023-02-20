@@ -1,6 +1,17 @@
 package java.lang.dongtai;
 
+import java.util.Collection;
+import java.util.Enumeration;
+
 public interface SpyDispatcher {
+
+    void enterScope(int id);
+
+    boolean inScope(int id);
+
+    boolean isFirstLevelScope(int id);
+
+    void leaveScope(int id);
 
     /**
      * mark for enter Http Entry Point
@@ -25,25 +36,16 @@ public interface SpyDispatcher {
      */
     boolean isFirstLevelHttp();
 
-    /**
-     * clone request object for copy http post body.
-     *
-     * @param req       HttpRequest Object
-     * @param isJakarta true if jakarta-servlet-api else false
-     * @return
-     * @since 1.3.1
-     */
-    Object cloneRequest(Object req, boolean isJakarta);
+    void collectHttpRequest(Object obj, Object req, Object resp, StringBuffer requestURL, String requestURI,
+                            String queryString, String method, String protocol, String scheme,
+                            String serverName, String contextPath, String remoteAddr,
+                            boolean isSecure, int serverPort, Enumeration<?> headerNames);
 
-    /**
-     * clone response object for copy http response data.
-     *
-     * @param res
-     * @param isJakarta
-     * @return
-     * @since 1.3.1
-     */
-    Object cloneResponse(Object res, boolean isJakarta);
+    void onServletInputStreamRead(int ret, String desc, Object stream, byte[] bs, int offset, int len);
+
+    void collectHttpResponse(Object obj, Object req, Object resp, Collection<?> headers, int status);
+
+    void onServletOutputStreamWrite(String desc, Object stream, int b, byte[] bs, int offset, int len);
 
     /**
      * mark for enter Source Entry Point

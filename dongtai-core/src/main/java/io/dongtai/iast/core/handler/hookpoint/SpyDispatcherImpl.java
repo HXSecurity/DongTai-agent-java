@@ -2,6 +2,7 @@ package io.dongtai.iast.core.handler.hookpoint;
 
 import com.secnium.iast.core.AgentEngine;
 import io.dongtai.iast.common.config.*;
+import io.dongtai.iast.common.scope.Scope;
 import io.dongtai.iast.common.scope.ScopeManager;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.bytecode.enhance.plugin.spring.SpringApplicationImpl;
@@ -11,10 +12,12 @@ import io.dongtai.iast.core.handler.hookpoint.graphy.GraphBuilder;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.*;
 import io.dongtai.iast.core.handler.hookpoint.service.trace.FeignService;
+import io.dongtai.iast.core.utils.StringUtils;
 import io.dongtai.log.DongTaiLog;
 import io.dongtai.log.ErrorCode;
 
 import java.lang.dongtai.SpyDispatcher;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -23,6 +26,68 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class SpyDispatcherImpl implements SpyDispatcher {
 
     public static final AtomicInteger INVOKE_ID_SEQUENCER = new AtomicInteger(1);
+
+    @Override
+    public void enterScope(int id) {
+        try {
+            if (!EngineManager.isEngineRunning()) {
+                return;
+            }
+            Scope scope = Scope.getScope(id);
+            if (scope == null) {
+                return;
+            }
+            ScopeManager.SCOPE_TRACKER.getScope(scope).enter();
+        } catch (Throwable ignore) {
+        }
+    }
+
+    @Override
+    public boolean inScope(int id) {
+        try {
+            if (!EngineManager.isEngineRunning()) {
+                return false;
+            }
+            Scope scope = Scope.getScope(id);
+            if (scope == null) {
+                return false;
+            }
+            return ScopeManager.SCOPE_TRACKER.getScope(scope).in();
+        } catch (Throwable ignore) {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean isFirstLevelScope(int id) {
+        try {
+            if (!EngineManager.isEngineRunning()) {
+                return false;
+            }
+            Scope scope = Scope.getScope(id);
+            if (scope == null) {
+                return false;
+            }
+            return ScopeManager.SCOPE_TRACKER.getScope(scope).isFirst();
+        } catch (Throwable ignore) {
+            return false;
+        }
+    }
+
+    @Override
+    public void leaveScope(int id) {
+        try {
+            if (!EngineManager.isEngineRunning()) {
+                return;
+            }
+            Scope scope = Scope.getScope(id);
+            if (scope == null) {
+                return;
+            }
+            ScopeManager.SCOPE_TRACKER.getScope(scope).leave();
+        } catch (Throwable ignore) {
+        }
+    }
 
     /**
      * mark for enter Http Entry Point
@@ -35,7 +100,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
             return;
         }
         try {
-            ScopeManager.SCOPE_TRACKER.getHttpRequestScope().enter();
+            ScopeManager.SCOPE_TRACKER.getScope(Scope.HTTP_REQUEST).enter();
         } catch (Throwable ignore) {
         }
     }
@@ -53,9 +118,9 @@ public class SpyDispatcherImpl implements SpyDispatcher {
             return;
         }
         try {
-            ScopeManager.SCOPE_TRACKER.getHttpRequestScope().leave();
-            if (!ScopeManager.SCOPE_TRACKER.getHttpRequestScope().in()
-                    && ScopeManager.SCOPE_TRACKER.getHttpEntryScope().in()) {
+            ScopeManager.SCOPE_TRACKER.getScope(Scope.HTTP_REQUEST).leave();
+            if (!ScopeManager.SCOPE_TRACKER.getScope(Scope.HTTP_REQUEST).in()
+                    && ScopeManager.SCOPE_TRACKER.getScope(Scope.HTTP_ENTRY).in()) {
                 EngineManager.maintainRequestCount();
                 GraphBuilder.buildAndReport(request, response);
                 EngineManager.cleanThreadState();
@@ -77,44 +142,106 @@ public class SpyDispatcherImpl implements SpyDispatcher {
             return false;
         }
         try {
-            return ScopeManager.SCOPE_TRACKER.getHttpRequestScope().isFirst();
+            return ScopeManager.SCOPE_TRACKER.getScope(Scope.HTTP_REQUEST).isFirst();
         } catch (Throwable ignore) {
             return false;
         }
     }
 
-    /**
-     * clone request object for copy http post body.
-     *
-     * @param req       HttpRequest Object
-     * @param isJakarta true if jakarta-servlet-api else false
-     * @since 1.3.1
-     */
-    @Override
-    public Object cloneRequest(Object req, boolean isJakarta) {
-        if (!EngineManager.isEngineRunning()) {
-            return req;
-        }
+    public void collectHttpRequest(Object obj, Object req, Object resp, StringBuffer requestURL, String requestURI,
+                                   String queryString, String method, String protocol, String scheme,
+                                   String serverName, String contextPath, String remoteAddr,
+                                   boolean isSecure, int serverPort, Enumeration<?> headerNames) {
         try {
-            return HttpImpl.cloneRequest(req, isJakarta);
-        } catch (Throwable ignore) {
-            return req;
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
+
+            if (!EngineManager.isEngineRunning()) {
+                return;
+            }
+
+            HttpImpl.createClassLoader(req);
+
+            Map<String, String> headers = HttpImpl.parseRequestHeaders(req, headerNames);
+            Map<String, Object> requestMeta = new HashMap<String, Object>() {{
+                put("requestURL", requestURL);
+                put("requestURI", requestURI);
+                put("queryString", queryString);
+                put("method", method);
+                put("protocol", protocol);
+                put("scheme", scheme);
+                put("serverName", serverName);
+                put("contextPath", contextPath);
+                put("remoteAddr", "0:0:0:0:0:0:0:1".equals(remoteAddr) ? "127.0.0.1" : remoteAddr);
+                put("secure", isSecure);
+                put("serverPort", serverPort);
+                put("headers", headers);
+                put("replay-request", !StringUtils.isEmpty(headers.get("dongtai-replay-id")));
+            }};
+            HttpImpl.solveHttpRequest(obj, req, resp, requestMeta);
+        } catch (Throwable e) {
+            DongTaiLog.warn(ErrorCode.SPY_COLLECT_HTTP_FAILED, "request", e);
+        } finally {
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
         }
     }
 
-    /**
-     * clone response object for copy http response data.
-     * @since 1.3.1
-     */
     @Override
-    public Object cloneResponse(Object response, boolean isJakarta) {
-        if (!EngineManager.isEngineRunning()) {
-            return response;
-        }
+    public void onServletInputStreamRead(int ret, String desc, Object stream, byte[] bs, int offset, int len) {
         try {
-            return HttpImpl.cloneResponse(response, isJakarta);
-        } catch (Throwable ignore) {
-            return response;
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
+            if (!EngineManager.isEngineRunning()) {
+                return;
+            }
+
+            if (!ScopeManager.SCOPE_TRACKER.getScope(Scope.HTTP_ENTRY).in()) {
+                return;
+            }
+
+            HttpImpl.onServletInputStreamRead(ret, desc, stream, bs, offset, len);
+        } catch (Throwable e) {
+            DongTaiLog.warn(ErrorCode.SPY_COLLECT_HTTP_FAILED, "request body", e);
+        } finally {
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
+        }
+    }
+
+    @Override
+    public void collectHttpResponse(Object obj, Object req, Object resp, Collection<?> headerNames, int status) {
+        try {
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
+
+            if (!EngineManager.isEngineRunning()) {
+                return;
+            }
+            if (!ScopeManager.SCOPE_TRACKER.getScope(Scope.HTTP_ENTRY).in()) {
+                return;
+            }
+
+            HttpImpl.solveHttpResponse(resp, req, resp, headerNames, status);
+        } catch (Throwable e) {
+            DongTaiLog.warn(ErrorCode.SPY_COLLECT_HTTP_FAILED, "response header", e);
+        } finally {
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
+        }
+    }
+
+    @Override
+    public void onServletOutputStreamWrite(String desc, Object stream, int b, byte[] bs, int offset, int len) {
+        try {
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
+            if (!EngineManager.isEngineRunning()) {
+                return;
+            }
+
+            if (!ScopeManager.SCOPE_TRACKER.getScope(Scope.HTTP_ENTRY).in()) {
+                return;
+            }
+
+            HttpImpl.onServletOutputStreamWrite(desc, stream, b, bs, offset, len);
+        } catch (Throwable e) {
+            DongTaiLog.warn(ErrorCode.SPY_COLLECT_HTTP_FAILED, "response body", e);
+        } finally {
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
         }
     }
 
@@ -320,15 +447,9 @@ public class SpyDispatcherImpl implements SpyDispatcher {
 
             if (HookType.SPRINGAPPLICATION.equals(hookType)) {
                 SpringApplicationImpl.getWebApplicationContext(retValue);
-            } else {
-                MethodEvent event = new MethodEvent(className, matchClassName, methodName,
-                        methodSign, instance, argumentArray, retValue);
-                if (HookType.HTTP.equals(hookType)) {
-                    HttpImpl.solveHttp(event);
-                }
             }
         } catch (Throwable e) {
-            DongTaiLog.error(ErrorCode.SPY_COLLECT_HTTP_FAILED, e);
+            DongTaiLog.error(ErrorCode.SPY_COLLECT_HTTP_FAILED, "", e);
         } finally {
             ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
         }

@@ -4,6 +4,8 @@ import org.objectweb.asm.commons.Method;
 
 import java.lang.dongtai.SpyDispatcher;
 import java.lang.dongtai.SpyDispatcherHandler;
+import java.util.Collection;
+import java.util.Enumeration;
 
 /**
  * 常用的ASM method 集合 省得我到处声明
@@ -30,6 +32,28 @@ public interface AsmMethods {
             SpyDispatcherHandler.class,
             "getDispatcher"
     );
+
+    Method SPY$enterScope = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "enterScope",
+            int.class
+    );
+    Method SPY$inScope = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "inScope",
+            int.class
+    );
+    Method SPY$isFirstLevelScope = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "isFirstLevelScope",
+            int.class
+    );
+    Method SPY$leaveScope = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "leaveScope",
+            int.class
+    );
+
     Method SPY$enterHttp = InnerHelper.getAsmMethod(
             SpyDispatcher.class,
             "enterHttp"
@@ -44,17 +68,56 @@ public interface AsmMethods {
             SpyDispatcher.class,
             "isFirstLevelHttp"
     );
-    Method SPY$cloneRequest = InnerHelper.getAsmMethod(
+    Method SPY$collectHttpRequest = InnerHelper.getAsmMethod(
             SpyDispatcher.class,
-            "cloneRequest",
+            "collectHttpRequest",
             Object.class,
-            boolean.class
+            Object.class,
+            Object.class,
+            StringBuffer.class,
+            String.class,
+            String.class,
+            String.class,
+            String.class,
+            String.class,
+            String.class,
+            String.class,
+            String.class,
+            boolean.class,
+            int.class,
+            Enumeration.class
     );
-    Method SPY$cloneResponse = InnerHelper.getAsmMethod(
+
+    Method SPY$onServletInputStreamRead = InnerHelper.getAsmMethod(
             SpyDispatcher.class,
-            "cloneResponse",
+            "onServletInputStreamRead",
+            int.class,
+            String.class,
             Object.class,
-            boolean.class
+            byte[].class,
+            int.class,
+            int.class
+    );
+
+    Method SPY$collectHttpResponse = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "collectHttpResponse",
+            Object.class,
+            Object.class,
+            Object.class,
+            Collection.class,
+            int.class
+    );
+
+    Method SPY$onServletOutputStreamWrite = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "onServletOutputStreamWrite",
+            String.class,
+            Object.class,
+            int.class,
+            byte[].class,
+            int.class,
+            int.class
     );
 
     Method SPY$enterSource = InnerHelper.getAsmMethod(

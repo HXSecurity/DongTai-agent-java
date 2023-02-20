@@ -1,6 +1,7 @@
 package io.dongtai.iast.core.replay;
 
 import io.dongtai.iast.common.utils.base64.Base64Decoder;
+import io.dongtai.iast.core.handler.context.ContextManager;
 import io.dongtai.iast.core.handler.hookpoint.models.IastReplayModel;
 import io.dongtai.iast.core.utils.HttpClientUtils;
 import io.dongtai.log.DongTaiLog;
@@ -40,6 +41,7 @@ public class HttpRequestReplay implements Runnable {
             headers.put("dongtai-replay-type", String.valueOf(replayModel.getReplayType()));
             headers.remove("content-length");
             headers.remove("transfer-encoding");
+            headers.remove(ContextManager.getHeaderKey());
 
             String url = replayModel.getFullUrl();
             if (url != null) {

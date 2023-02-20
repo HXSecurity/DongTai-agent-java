@@ -49,6 +49,7 @@ public class PluginRegister {
             ClassVisitor pluginVisitor = plugin.dispatch(classVisitor, context, policy);
             if (pluginVisitor != classVisitor) {
                 classVisitor = pluginVisitor;
+                // TODO: need transform multiple times?
                 break;
             }
         }

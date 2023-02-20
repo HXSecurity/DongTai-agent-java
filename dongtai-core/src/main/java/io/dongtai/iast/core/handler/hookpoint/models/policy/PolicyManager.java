@@ -1,5 +1,6 @@
 package io.dongtai.iast.core.handler.hookpoint.models.policy;
 
+import io.dongtai.iast.core.bytecode.enhance.plugin.framework.j2ee.dispatch.DispatchJ2ee;
 import io.dongtai.iast.core.utils.StringUtils;
 import io.dongtai.log.DongTaiLog;
 import io.dongtai.log.ErrorCode;
@@ -13,11 +14,12 @@ public class PolicyManager {
      * hook class names for no policy
      */
     private static final Set<String> HOOK_CLASS_NAMES = new HashSet<String>(Arrays.asList(
-            " javax.servlet.Filter".substring(1),
-            " javax.servlet.FilterChain".substring(1),
-            " javax.servlet.http.HttpServlet".substring(1),
-            " jakarta.servlet.http.HttpServlet".substring(1),
-            " javax.faces.webapp.FacesServlet".substring(1),
+            DispatchJ2ee.JAVAX_HTTP_SERVLET,
+            DispatchJ2ee.JAKARTA_HTTP_SERVLET,
+            DispatchJ2ee.JAVAX_FILTER,
+            DispatchJ2ee.JAKARTA_FILTER,
+            DispatchJ2ee.JAVAX_FACES_SERVLET,
+            DispatchJ2ee.JAKARTA_FACES_SERVLET,
             " javax.servlet.jsp.JspPage".substring(1),
             " org.apache.jasper.runtime.HttpJspBase".substring(1),
             " org.springframework.web.servlet.FrameworkServlet".substring(1),

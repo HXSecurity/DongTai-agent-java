@@ -16,7 +16,7 @@ public class RequestDenyTest {
         headers.put("key1", "value1");
         headers.put("key2", "value2");
 
-        Map<RequestDeny, Boolean> tests = new HashMap<RequestDeny, Boolean>(){{
+        Map<RequestDeny, Boolean> tests = new HashMap<RequestDeny, Boolean>() {{
             put(new RequestDeny(TargetType.URL, Operator.EQUAL, "https://foo.bar/baz"), true);
             put(new RequestDeny(TargetType.URL, Operator.EQUAL, "https://foo.bar/baz2"), false);
             put(new RequestDeny(TargetType.URL, Operator.NOT_EQUAL, "https://foo.bar/baz"), false);

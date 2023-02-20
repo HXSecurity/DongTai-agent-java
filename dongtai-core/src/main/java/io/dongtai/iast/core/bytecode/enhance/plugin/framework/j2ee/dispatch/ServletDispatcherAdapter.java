@@ -10,24 +10,25 @@ import org.objectweb.asm.*;
  * @author dongzhiyong@huoxian.cn
  */
 public class ServletDispatcherAdapter extends AbstractClassVisitor {
+    public static final String JAVAX_FACES_WEBAPP_FACES_SERVLET = " javax.faces.webapp.FacesServlet".substring(1);
 
-    private final String HTTP_SERVLET_REQUEST = " javax.servlet.http.HttpServletRequest".substring(1);
-    private final String HTTP_SERVLET_RESPONSE = " javax.servlet.http.HttpServletResponse".substring(1);
-    private final String SERVLET_REQUEST = " javax.servlet.ServletRequest".substring(1);
-    private final String SERVLET_RESPONSE = " javax.servlet.ServletResponse".substring(1);
-    private final String FILTER_CHAIN = " javax.servlet.FilterChain".substring(1);
-    private final String JAKARTA_SERVLET_REQUEST_HTTP = " jakarta.servlet.http.HttpServletRequest".substring(1);
-    private final String JAKARTA_SERVLET_REQUEST = " jakarta.servlet.ServletRequest".substring(1);
-    private final String JAKARTA_SERVLET_RESPONSE_HTTP = " jakarta.servlet.http.HttpServletResponse".substring(1);
-    private final String JAKARTA_SERVLET_RESPONSE = " jakarta.servlet.ServletResponse".substring(1);
+    private final String packageName;
+    private final String httpServletRequest;
+    private final String httpServletResponse;
+    private final String servletRequest;
+    private final String servletResponse;
+    private final String filterChain;
+    private final boolean isJavaxFacesServlet;
 
-    private final boolean isFaces;
-    private final boolean isJakarta;
-
-    ServletDispatcherAdapter(ClassVisitor classVisitor, ClassContext context) {
+    ServletDispatcherAdapter(ClassVisitor classVisitor, ClassContext context, String packageName) {
         super(classVisitor, context);
-        this.isFaces = " javax.faces.webapp.FacesServlet".substring(1).equals(context.getClassName());
-        this.isJakarta = " jakarta.servlet.http.HttpServlet".substring(1).equals(context.getClassName());
+        this.packageName = packageName;
+        this.httpServletRequest = packageName + ".servlet.http.HttpServletRequest";
+        this.httpServletResponse = packageName + ".servlet.http.HttpServletResponse";
+        this.servletRequest = packageName + ".servlet.ServletRequest";
+        this.servletResponse = packageName + ".servlet.ServletResponse";
+        this.filterChain = packageName + ".servlet.FilterChain";
+        this.isJavaxFacesServlet = JAVAX_FACES_WEBAPP_FACES_SERVLET.equals(context.getClassName());
     }
 
     @Override
@@ -35,12 +36,13 @@ public class ServletDispatcherAdapter extends AbstractClassVisitor {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
         Type[] typeOfArgs = Type.getArgumentTypes(desc);
         String signCode = AsmUtils.buildSignature(context.getClassName(), name, desc);
-        if (isService(name, typeOfArgs) ||
-                (this.isJakarta && isJakartaArgs(typeOfArgs)) ||
-                (this.isFaces && isFacesArgs(typeOfArgs))
-        ) {
-            DongTaiLog.debug("Adding HTTP tracking for type {}", context.getClassName());
-            mv = new ServletDispatcherAdviceAdapter(mv, access, name, desc, signCode, context, isJakarta);
+        if (isServiceOrFilter(name, typeOfArgs)) {
+            DongTaiLog.debug("Adding HTTP tracking for {}", signCode);
+            mv = new ServletDispatcherAdviceAdapter(mv, access, name, desc, signCode, context, packageName);
+            setTransformed();
+        } else if (this.isJavaxFacesServlet && isJavaxFacesServletArgs(typeOfArgs)) {
+            DongTaiLog.debug("Adding HTTP tracking (FacesServlet hook) for {}", signCode);
+            mv = new ServletDispatcherAdviceAdapter(mv, access, name, desc, signCode, context, packageName);
             setTransformed();
         }
         if (hasTransformed()) {
@@ -58,44 +60,37 @@ public class ServletDispatcherAdapter extends AbstractClassVisitor {
      * @param typeOfArgs 方法参数
      * @return true-是http入口方法，falst-非http入口方法
      */
-    private boolean isService(String name, Type[] typeOfArgs) {
-        if ("service".equals(name)) {
+    private boolean isServiceOrFilter(String name, Type[] typeOfArgs) {
+        if ("service".equals(name) && typeOfArgs.length == 2) {
             return isServiceArgs(typeOfArgs);
-        } else {
-            return "doFilter".equals(name) && (isFilterArg(typeOfArgs) || isFilterChainArg(typeOfArgs));
+        } else if ("doFilter".equals(name) && typeOfArgs.length == 3) {
+            return isDoFilterArg(typeOfArgs);
         }
-
+        return false;
     }
 
     private boolean isServiceArgs(Type[] typeOfArgs) {
-        return typeOfArgs.length == 2 &&
-                HTTP_SERVLET_REQUEST.equals(typeOfArgs[0].getClassName()) &&
-                HTTP_SERVLET_RESPONSE.equals(typeOfArgs[1].getClassName());
+        String reqClassName = typeOfArgs[0].getClassName();
+        String respClassName = typeOfArgs[1].getClassName();
+
+        if (!this.httpServletRequest.equals(reqClassName) || !this.httpServletResponse.equals(respClassName)) {
+            return this.servletRequest.equals(reqClassName) && this.servletResponse.equals(respClassName);
+        }
+        return true;
     }
 
-    private boolean isJakartaArgs(Type[] typeOfArgs) {
-        return typeOfArgs.length == 2 && ((JAKARTA_SERVLET_REQUEST_HTTP.equals(typeOfArgs[0].getClassName()) && JAKARTA_SERVLET_RESPONSE_HTTP.equals(typeOfArgs[1].getClassName())) || (JAKARTA_SERVLET_REQUEST.equals(typeOfArgs[0].getClassName()) && JAKARTA_SERVLET_RESPONSE.equals(typeOfArgs[1].getClassName())));
-    }
-
-    private boolean isFacesArgs(Type[] typeOfArgs) {
+    private boolean isJavaxFacesServletArgs(Type[] typeOfArgs) {
         if (typeOfArgs.length != 2) {
             return false;
         }
-        String arg1Classname = typeOfArgs[0].getClassName();
-        String arg2Classname = typeOfArgs[1].getClassName();
-        return SERVLET_REQUEST.equals(arg1Classname) && SERVLET_RESPONSE.equals(arg2Classname);
+        String reqClassName = typeOfArgs[0].getClassName();
+        String respClassName = typeOfArgs[1].getClassName();
+        return this.servletRequest.equals(reqClassName) && this.servletResponse.equals(respClassName);
     }
 
-    private boolean isFilterArg(Type[] typeOfArgs) {
-        return typeOfArgs.length == 3 &&
-                SERVLET_REQUEST.equals(typeOfArgs[0].getClassName()) &&
-                SERVLET_RESPONSE.equals(typeOfArgs[1].getClassName()) &&
-                FILTER_CHAIN.equals(typeOfArgs[2].getClassName());
-    }
-
-    private boolean isFilterChainArg(Type[] typeOfArgs) {
-        return typeOfArgs.length == 2 &&
-                SERVLET_REQUEST.equals(typeOfArgs[0].getClassName()) &&
-                SERVLET_RESPONSE.equals(typeOfArgs[1].getClassName());
+    private boolean isDoFilterArg(Type[] typeOfArgs) {
+        return this.servletRequest.equals(typeOfArgs[0].getClassName())
+                && this.servletResponse.equals(typeOfArgs[1].getClassName())
+                && this.filterChain.equals(typeOfArgs[2].getClassName());
     }
 }

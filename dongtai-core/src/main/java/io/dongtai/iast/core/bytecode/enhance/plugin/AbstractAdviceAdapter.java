@@ -1,5 +1,6 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin;
 
+import io.dongtai.iast.common.scope.Scope;
 import io.dongtai.iast.core.bytecode.enhance.ClassContext;
 import io.dongtai.iast.core.bytecode.enhance.MethodContext;
 import io.dongtai.iast.core.bytecode.enhance.asm.AsmMethods;
@@ -225,4 +226,27 @@ public abstract class AbstractAdviceAdapter extends AdviceAdapter implements Asm
         push((Type) null);
     }
 
+    protected void enterScope(Scope scope) {
+        invokeStatic(ASM_TYPE_SPY_HANDLER, SPY_HANDLER$getDispatcher);
+        push(scope.getId());
+        invokeInterface(ASM_TYPE_SPY_DISPATCHER, SPY$enterScope);
+    }
+
+    protected void leaveScope(Scope scope) {
+        invokeStatic(ASM_TYPE_SPY_HANDLER, SPY_HANDLER$getDispatcher);
+        push(scope.getId());
+        invokeInterface(ASM_TYPE_SPY_DISPATCHER, SPY$leaveScope);
+    }
+
+    protected void inScope(Scope scope) {
+        invokeStatic(ASM_TYPE_SPY_HANDLER, SPY_HANDLER$getDispatcher);
+        push(scope.getId());
+        invokeInterface(ASM_TYPE_SPY_DISPATCHER, SPY$inScope);
+    }
+
+    protected void isFirstLevelScope(Scope scope) {
+        invokeStatic(ASM_TYPE_SPY_HANDLER, SPY_HANDLER$getDispatcher);
+        push(scope.getId());
+        invokeInterface(ASM_TYPE_SPY_DISPATCHER, SPY$isFirstLevelScope);
+    }
 }
