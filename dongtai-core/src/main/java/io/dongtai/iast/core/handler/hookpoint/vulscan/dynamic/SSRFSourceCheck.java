@@ -85,7 +85,7 @@ public class SSRFSourceCheck implements SinkSourceChecker {
             return addSourceType(event, sourceMap);
         } catch (Throwable e) {
             DongTaiLog.debug("java.net.URL get source failed: {}, {}",
-                    e.getMessage(), e.getCause().getMessage());
+                    e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "");
             return false;
         }
     }
@@ -134,7 +134,7 @@ public class SSRFSourceCheck implements SinkSourceChecker {
             return false;
         } catch (Throwable e) {
             DongTaiLog.debug("apache http legacy client get source failed: {}, {}",
-                    e.getMessage(), e.getCause().getMessage());
+                    e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "");
             return false;
         }
     }
@@ -197,7 +197,7 @@ public class SSRFSourceCheck implements SinkSourceChecker {
             return addSourceType(event, sourceMap);
         } catch (Throwable e) {
             DongTaiLog.debug("apache http client get source failed: {}, {}",
-                    e.getMessage(), e.getCause().getMessage());
+                    e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "");
             return false;
         }
     }
@@ -256,7 +256,7 @@ public class SSRFSourceCheck implements SinkSourceChecker {
             return addSourceType(event, sourceMap);
         } catch (Throwable e) {
             DongTaiLog.debug("apache http client5 get source failed: {}, {}",
-                    e.getMessage(), e.getCause().getMessage());
+                    e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "");
             return false;
         }
     }
@@ -330,7 +330,7 @@ public class SSRFSourceCheck implements SinkSourceChecker {
             return false;
         } catch (Throwable e) {
             DongTaiLog.debug("okhttp get source failed: {}, {}",
-                    e.getMessage(), e.getCause().getMessage());
+                    e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "");
             return false;
         }
     }

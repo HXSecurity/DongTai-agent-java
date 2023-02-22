@@ -51,7 +51,7 @@ public class CryptoBadMacVulScan extends AbstractNormalVulScan {
                 break;
             } catch (Throwable e) {
                 DongTaiLog.trace("CryptoBadMacVulScan scan failed: {}, {}",
-                        e.getMessage(), e.getCause().getMessage());
+                        e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "");
             }
         }
     }

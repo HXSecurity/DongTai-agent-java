@@ -28,7 +28,8 @@ public class ServiceHandler {
                 reportSingleService(category, type, srv.getHost(), srv.getPort());
             }
         } catch (Throwable e) {
-            DongTaiLog.trace("report service failed: {}, {}", e.getMessage(), e.getCause().getMessage());
+            DongTaiLog.trace("report service failed: {}, {}",
+                    e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "");
         }
     }
 

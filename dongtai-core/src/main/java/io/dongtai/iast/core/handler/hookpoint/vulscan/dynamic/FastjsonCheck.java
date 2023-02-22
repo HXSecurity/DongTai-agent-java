@@ -57,7 +57,7 @@ public class FastjsonCheck implements SinkSafeChecker {
             return isSafeMode != null && (Boolean) isSafeMode;
         } catch (Throwable e) {
             DongTaiLog.debug("fastjson version and safe mode check failed: {}, {}",
-                    e.getMessage(), e.getCause().getMessage());
+                    e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "");
             return true;
         }
     }

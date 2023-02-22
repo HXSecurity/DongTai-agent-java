@@ -52,7 +52,8 @@ public class FeignService {
         } catch (NoSuchFieldException ignore) {
         } catch (NoSuchMethodException ignore) {
         } catch (Throwable e) {
-            DongTaiLog.debug("solve feign invoke failed: {}, {}", e.getMessage(), e.getCause().getMessage());
+            DongTaiLog.debug("solve feign invoke failed: {}, {}",
+                    e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "");
         }
     }
 

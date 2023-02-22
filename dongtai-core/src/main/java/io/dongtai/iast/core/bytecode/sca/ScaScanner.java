@@ -181,7 +181,8 @@ public class ScaScanner {
                     }
                 }
             } catch (Throwable e) {
-                DongTaiLog.warn(ErrorCode.SCA_SCAN_JAR_LIB_FAILED, e.getMessage(), e.getCause().getMessage());
+                DongTaiLog.warn(ErrorCode.SCA_SCAN_JAR_LIB_FAILED,
+                        e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "");
             }
         }
 

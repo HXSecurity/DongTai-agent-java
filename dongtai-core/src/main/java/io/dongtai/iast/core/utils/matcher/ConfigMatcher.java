@@ -89,7 +89,8 @@ public class ConfigMatcher {
                 }
             }
         } catch (Throwable e) {
-            DongTaiLog.trace("config matcher getBlackUrl failed: {}, {}", e.getMessage(), e.getCause().getMessage());
+            DongTaiLog.trace("config matcher getBlackUrl failed: {}, {}",
+                    e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "");
         }
         return false;
     }
