@@ -133,7 +133,7 @@ public class HttpImpl {
             }
             onServletInputStreamRead(ret, "([BII)I", stream, bs, 0, bs.length);
         } else if ("([BII)I".equals(desc)) {
-            if (bs == null || offset < 0 || (len < 0 && ret == -1)) {
+            if (bs == null || offset < 0 || len < 0 || ret == -1) {
                 return;
             }
 
