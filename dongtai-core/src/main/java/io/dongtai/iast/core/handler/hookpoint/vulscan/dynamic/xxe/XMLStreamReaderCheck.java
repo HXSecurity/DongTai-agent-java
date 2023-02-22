@@ -32,11 +32,13 @@ public class XMLStreamReaderCheck extends AbstractCheck {
                 return Support.DISALLOWED;
             }
         }
-        Field fPropertyManagerField = ReflectUtils.getDeclaredFieldFromClassByName(obj.getClass(), "fPropertyManager");
-        if (fPropertyManagerField == null) {
-            return Support.ALLOWED;
-        }
+
         try {
+            Field fPropertyManagerField = ReflectUtils.getDeclaredFieldFromClassByName(obj.getClass(), "fPropertyManager");
+            if (fPropertyManagerField == null) {
+                return Support.ALLOWED;
+            }
+
             return getPropertySupport(fPropertyManagerField.get(obj));
         } catch (IllegalAccessException e) {
             DongTaiLog.debug("Failed to access fPropertyManager {}", e);
