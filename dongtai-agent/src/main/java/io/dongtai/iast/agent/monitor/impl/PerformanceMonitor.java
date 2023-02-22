@@ -72,7 +72,8 @@ public class PerformanceMonitor implements IMonitor {
                 return (int) rate;
             }
         } catch (Throwable e) {
-            DongTaiLog.warn(ErrorCode.AGENT_MONITOR_GET_DISK_USAGE_FAILED, e.getMessage(), e.getCause().getMessage());
+            DongTaiLog.warn(ErrorCode.AGENT_MONITOR_GET_DISK_USAGE_FAILED,
+                    e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "");
         }
         return 0;
     }

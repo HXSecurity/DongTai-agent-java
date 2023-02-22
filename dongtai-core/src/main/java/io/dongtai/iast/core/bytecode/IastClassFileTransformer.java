@@ -322,8 +322,8 @@ public class IastClassFileTransformer implements ClassFileTransformer {
             try {
                 inst.retransformClasses(clazz);
             } catch (ClassCircularityError e) {
-                DongTaiLog.error(ErrorCode.RETRANSFORM_CLASS_CIRCULARITY_ERROR,
-                        clazz.getCanonicalName(), e.getCause().getMessage());
+                DongTaiLog.error(ErrorCode.RETRANSFORM_CLASS_CIRCULARITY_ERROR, clazz.getCanonicalName(),
+                        e.getCause() != null ? e.getCause().getMessage() : "");
             } catch (InternalError ignored) {
             } catch (Throwable e) {
                 DongTaiLog.error(ErrorCode.RETRANSFORM_CLASS_FAILED, clazz.getCanonicalName(), e);

@@ -88,7 +88,7 @@ public class PathTraversalCheck implements SinkSourceChecker {
             return paramHasTaint;
         } catch (Throwable e) {
             DongTaiLog.debug(SINK_TYPE + " check path failed: {}, {}",
-                    e.getMessage(), e.getCause().getMessage());
+                    e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "");
             return false;
         }
     }

@@ -57,7 +57,7 @@ public class HttpService implements ServiceTrace {
         } catch (IllegalStateException ignore) {
         } catch (Throwable e) {
             DongTaiLog.debug("add traceId header to java.net.URLConnection failed: {}, {}",
-                    e.getMessage(), e.getCause().getMessage());
+                    e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "");
         }
         return null;
     }
@@ -87,7 +87,7 @@ public class HttpService implements ServiceTrace {
             return traceId;
         } catch (Throwable e) {
             DongTaiLog.debug("add traceId header to apache http client failed: {}, {}",
-                    e.getMessage(), e.getCause().getMessage());
+                    e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "");
         }
         return null;
     }
@@ -108,7 +108,7 @@ public class HttpService implements ServiceTrace {
             return traceId;
         } catch (Throwable e) {
             DongTaiLog.debug("add traceId header to apache legacy http client failed: {}, {}",
-                    e.getMessage(), e.getCause().getMessage());
+                    e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "");
         }
         return null;
     }
@@ -141,7 +141,7 @@ public class HttpService implements ServiceTrace {
             return traceId;
         } catch (Throwable e) {
             DongTaiLog.debug("add traceId header to okhttp client failed: {}, {}",
-                    e.getMessage(), e.getCause().getMessage());
+                    e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "");
         }
         return null;
     }
@@ -191,7 +191,7 @@ public class HttpService implements ServiceTrace {
             }
         } catch (Throwable e) {
             DongTaiLog.debug("validate URLConnection failed: {}, {}",
-                    e.getMessage(), e.getCause().getMessage());
+                    e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "");
         }
         return false;
     }
@@ -220,7 +220,7 @@ public class HttpService implements ServiceTrace {
             }
         } catch (Throwable e) {
             DongTaiLog.debug("validate apache http client failed: {}, {}",
-                    e.getMessage(), e.getCause().getMessage());
+                    e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "");
         }
         return false;
     }
@@ -245,7 +245,8 @@ public class HttpService implements ServiceTrace {
                 return true;
             }
         } catch (Throwable e) {
-            DongTaiLog.debug("validate okhttp failed: {}, {}", e.getMessage(), e.getCause().getMessage());
+            DongTaiLog.debug("validate okhttp failed: {}, {}",
+                    e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "");
         }
         return false;
     }

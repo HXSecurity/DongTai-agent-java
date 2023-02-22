@@ -37,7 +37,7 @@ public class CookieFlagsMissingVulScan extends AbstractNormalVulScan {
                 break;
             } catch (Throwable e) {
                 DongTaiLog.trace("CookieFlagsMissingVulScan scan failed: {}, {}",
-                        e.getMessage(), e.getCause().getMessage());
+                        e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "");
             }
         }
     }
