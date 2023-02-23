@@ -22,9 +22,10 @@ public class XMLInputFactoryCheck extends AbstractCheck {
             }
             return Support.ALLOWED;
         }
-        Method isPropertySupportedMethod = ReflectUtils.getDeclaredMethodFromClass(cls, "isPropertySupported", new Class[]{String.class});
-        Method getPropertyMethod = ReflectUtils.getDeclaredMethodFromClass(cls, "getProperty", new Class[]{String.class});
         try {
+            Method isPropertySupportedMethod = ReflectUtils.getDeclaredMethodFromClass(cls, "isPropertySupported", new Class[]{String.class});
+            Method getPropertyMethod = ReflectUtils.getDeclaredMethodFromClass(cls, "getProperty", new Class[]{String.class});
+
             boolean supportDTD = invokeXMLInputFactoryMethod(isPropertySupportedMethod, getPropertyMethod, obj,
                     " javax.xml.stream.supportDTD".substring(1));
             if (!supportDTD) {
