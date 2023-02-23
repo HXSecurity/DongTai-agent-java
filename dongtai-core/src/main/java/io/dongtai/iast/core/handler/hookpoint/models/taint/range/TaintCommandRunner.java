@@ -269,7 +269,7 @@ public class TaintCommandRunner {
 
         // APPEND StringWriter
         METHOD = "java.io.StringWriter.write(char[],int,int)";
-        put(METHOD, create(METHOD, TaintCommand.APPEND, Arrays.asList("P2", "P3"))); // P1=>O
+        put(METHOD, create(METHOD, TaintCommand.APPEND, Arrays.asList("P2", "P3", "0"))); // P1=>O
         METHOD = "java.io.StringWriter.write(java.lang.String)";
         put(METHOD, create(METHOD, TaintCommand.APPEND));
         METHOD = "java.io.StringWriter.write(java.lang.String,int,int)";
