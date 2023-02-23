@@ -27,6 +27,8 @@ public class PolicyTag {
         put(sign, Arrays.asList(new String[]{TaintTag.CROSS_SITE.getKey()}, new String[0]));
         sign = "javax.servlet.http.HttpServletRequest.getParameterMap()";
         put(sign, Arrays.asList(new String[]{TaintTag.CROSS_SITE.getKey()}, new String[0]));
+        sign = "javax.servlet.http.HttpServletRequest.getParameter(java.lang.String)";
+        put(sign, Arrays.asList(new String[]{TaintTag.CROSS_SITE.getKey()}, new String[0]));
         sign = "javax.servlet.http.HttpServletRequest.getInputStream()";
         put(sign, Arrays.asList(new String[]{TaintTag.CROSS_SITE.getKey()}, new String[0]));
         sign = "javax.servlet.http.HttpServletRequest.getHeaders(java.lang.String)";
@@ -39,6 +41,8 @@ public class PolicyTag {
         // put(sign, Arrays.asList(new String[0], new String[0]));
 
         // source jakarta HttpServletRequest
+        sign = "jakarta.servlet.http.HttpServletRequest.getParameter(java.lang.String)";
+        put(sign, Arrays.asList(new String[]{TaintTag.CROSS_SITE.getKey()}, new String[0]));
         sign = "jakarta.servlet.http.HttpServletRequest.getQueryString()";
         put(sign, Arrays.asList(new String[]{TaintTag.CROSS_SITE.getKey(), TaintTag.XSS_ENCODED.getKey()}, new String[0]));
         sign = "jakarta.servlet.http.HttpServletRequest.getParts()";
