@@ -4,7 +4,7 @@ public enum Scope {
     HTTP_REQUEST(1),
     HTTP_ENTRY(2),
     SERVLET_INPUT_STREAM_READ(3),
-    SERVLET_OUTPUT_STREAM_WRITE(4),
+    SERVLET_OUTPUT_WRITE(4),
     ;
 
     private final int id;

@@ -73,6 +73,10 @@ public class NopSpy implements SpyDispatcher {
     public void onServletOutputStreamWrite(String desc, Object stream, int b, byte[] bs, int offset, int len) {
     }
 
+    @Override
+    public void onPrintWriterWrite(String desc, Object writer, int b, String s, char[] cs, int offset, int len) {
+    }
+
     /**
      * mark for enter Source Entry Point
      *

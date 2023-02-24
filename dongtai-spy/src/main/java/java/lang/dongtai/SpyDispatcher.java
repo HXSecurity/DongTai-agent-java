@@ -47,6 +47,8 @@ public interface SpyDispatcher {
 
     void onServletOutputStreamWrite(String desc, Object stream, int b, byte[] bs, int offset, int len);
 
+    void onPrintWriterWrite(String desc, Object writer, int b, String s, char[] cs, int offset, int len);
+
     /**
      * mark for enter Source Entry Point
      *

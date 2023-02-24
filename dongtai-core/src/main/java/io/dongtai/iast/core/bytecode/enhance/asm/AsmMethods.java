@@ -120,6 +120,18 @@ public interface AsmMethods {
             int.class
     );
 
+    Method SPY$onPrintWriterWrite = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "onPrintWriterWrite",
+            String.class,
+            Object.class,
+            int.class,
+            String.class,
+            char[].class,
+            int.class,
+            int.class
+    );
+
     Method SPY$enterSource = InnerHelper.getAsmMethod(
             SpyDispatcher.class,
             "enterSource"

@@ -245,6 +245,26 @@ public class SpyDispatcherImpl implements SpyDispatcher {
         }
     }
 
+    @Override
+    public void onPrintWriterWrite(String desc, Object writer, int b, String s, char[] cs, int offset, int len) {
+        try {
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
+            if (!EngineManager.isEngineRunning()) {
+                return;
+            }
+
+            if (!ScopeManager.SCOPE_TRACKER.getScope(Scope.HTTP_ENTRY).in()) {
+                return;
+            }
+
+            HttpImpl.onPrintWriterWrite(desc, writer, b, s, cs, offset, len);
+        } catch (Throwable e) {
+            DongTaiLog.warn(ErrorCode.SPY_COLLECT_HTTP_FAILED, "response body", e);
+        } finally {
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
+        }
+    }
+
     /**
      * mark for enter Source Entry Point
      *

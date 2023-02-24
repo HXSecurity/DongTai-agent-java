@@ -227,29 +227,83 @@ public class HttpImpl {
             maxLength = 50000;
         }
 
-        if ("(I)V".equals(desc)) {
-            if (b == -1) {
-                return;
-            }
-            ByteArrayOutputStream buff = EngineManager.BODY_BUFFER.getResponse();
-            if (buff.size() < maxLength) {
-                buff.write(b);
-            }
-        } else if ("([B)V".equals(desc)) {
-            if (bs == null) {
-                return;
-            }
-            onServletOutputStreamWrite("([BII)V", stream, b, bs, 0, bs.length);
-        } else if ("([BII)V".equals(desc)) {
-            if (bs == null || offset < 0 || len < 0) {
-                return;
-            }
+        try {
+            if ("(I)V".equals(desc)) {
+                if (b == -1) {
+                    return;
+                }
+                ByteArrayOutputStream buff = EngineManager.BODY_BUFFER.getResponse();
+                if (buff.size() < maxLength) {
+                    buff.write(b);
+                }
+            } else if ("([B)V".equals(desc)) {
+                if (bs == null) {
+                    return;
+                }
+                onServletOutputStreamWrite("([BII)V", stream, b, bs, 0, bs.length);
+            } else if ("([BII)V".equals(desc)) {
+                if (bs == null || offset < 0 || len < 0) {
+                    return;
+                }
 
-            ByteArrayOutputStream buff = EngineManager.BODY_BUFFER.getResponse();
-            int size = buff.size();
-            if (size < maxLength) {
-                buff.write(bs, offset, Math.min(len, maxLength - size));
+                ByteArrayOutputStream buff = EngineManager.BODY_BUFFER.getResponse();
+                int size = buff.size();
+                if (size < maxLength) {
+                    buff.write(bs, offset, Math.min(len, maxLength - size));
+                }
             }
+        } catch (Throwable ignore) {
+        }
+    }
+
+    public static void onPrintWriterWrite(String desc, Object writer, int b, String s, char[] cs, int offset, int len) {
+        try {
+            boolean getBody = ((Config<Boolean>) ConfigBuilder.getInstance().getConfig(ConfigKey.REPORT_RESPONSE_BODY)).get();
+            if (!getBody) {
+                return;
+            }
+        } catch (Throwable ignore) {
+            return;
+        }
+
+        Integer maxLength = PropertyUtils.getInstance().getResponseLength();
+        if (maxLength == 0) {
+            return;
+        } else if (maxLength < 0 || maxLength > 50000) {
+            maxLength = 50000;
+        }
+
+        try {
+            if ("(I)V".equals(desc)) {
+                if (b == -1) {
+                    return;
+                }
+                ByteArrayOutputStream buff = EngineManager.BODY_BUFFER.getResponse();
+                if (buff.size() < maxLength) {
+                    buff.write(b);
+                }
+            } else if ("([CII)V".equals(desc)) {
+                if (cs == null || offset < 0 || len < 0) {
+                    return;
+                }
+
+                ByteArrayOutputStream buff = EngineManager.BODY_BUFFER.getResponse();
+                int size = buff.size();
+                if (size < maxLength) {
+                    buff.write((new String(cs, offset, Math.min(len, maxLength - size))).getBytes());
+                }
+            } else if ("(Ljava/lang/String;II)V".equals(desc)) {
+                if (StringUtils.isEmpty(s) || offset < 0 || len < 0) {
+                    return;
+                }
+
+                ByteArrayOutputStream buff = EngineManager.BODY_BUFFER.getResponse();
+                int size = buff.size();
+                if (size < maxLength) {
+                    buff.write((new String(s.toCharArray(), offset, Math.min(len, maxLength - size))).getBytes());
+                }
+            }
+        } catch (Throwable ignore) {
         }
     }
 
