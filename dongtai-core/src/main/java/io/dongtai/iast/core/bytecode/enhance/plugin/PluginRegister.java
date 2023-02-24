@@ -50,7 +50,9 @@ public class PluginRegister {
             if (pluginVisitor != classVisitor) {
                 classVisitor = pluginVisitor;
                 // TODO: need transform multiple times?
-                break;
+                if (!context.getClassName().equals(DispatchJ2ee.APACHE_COYOTE_WRITER)) {
+                    break;
+                }
             }
         }
         return classVisitor;
