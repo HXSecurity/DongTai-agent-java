@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <properties>
-        <revision>1.8.2-beta2</revision>
+        <revision>1.8.2-beta3</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <shade-prefix>io.dongtai.iast.thirdparty</shade-prefix>
 
