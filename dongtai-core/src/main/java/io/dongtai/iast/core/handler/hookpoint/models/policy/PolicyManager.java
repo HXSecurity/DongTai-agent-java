@@ -21,6 +21,7 @@ public class PolicyManager {
             DispatchJ2ee.JAVAX_FACES_SERVLET,
             DispatchJ2ee.JAKARTA_FACES_SERVLET,
             DispatchJ2ee.APACHE_COYOTE_WRITER,
+            DispatchJ2ee.UNDERTOW_SERVLET_WRITER,
             " javax.servlet.jsp.JspPage".substring(1),
             " org.apache.jasper.runtime.HttpJspBase".substring(1),
             " org.springframework.web.servlet.FrameworkServlet".substring(1),
