@@ -23,6 +23,7 @@ public class DispatchJ2ee implements DispatchPlugin {
     public static final String JAVAX_SERVLET_OUTPUT_STREAM = " javax.servlet.ServletOutputStream".substring(1);
     public static final String JAKARTA_SERVLET_OUTPUT_STREAM = " jakarta.servlet.ServletOutputStream".substring(1);
     public static final String APACHE_COYOTE_WRITER = " org.apache.catalina.connector.CoyoteWriter".substring(1);
+    public static final String UNDERTOW_SERVLET_WRITER = " io.undertow.servlet.spec.ServletPrintWriter".substring(1);
 
     @Override
     public ClassVisitor dispatch(ClassVisitor classVisitor, ClassContext context, Policy policy) {
@@ -41,7 +42,7 @@ public class DispatchJ2ee implements DispatchPlugin {
             classVisitor = new ServletOutputStreamAdapter(classVisitor, context);
         } else if (ancestors.contains(JAKARTA_SERVLET_OUTPUT_STREAM)) {
             classVisitor = new ServletOutputStreamAdapter(classVisitor, context);
-        } else if (APACHE_COYOTE_WRITER.equals(className)) {
+        } else if (APACHE_COYOTE_WRITER.equals(className) || UNDERTOW_SERVLET_WRITER.equals(className)) {
             classVisitor = new PrintWriterAdapter(classVisitor, context);
         }
         return classVisitor;
