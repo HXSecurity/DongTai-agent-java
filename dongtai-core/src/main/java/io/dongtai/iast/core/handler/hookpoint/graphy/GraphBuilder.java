@@ -81,12 +81,19 @@ public class GraphBuilder {
         if (StringUtils.isEmpty(requestURI)) {
             return null;
         }
+
         detail.put(ReportKey.URI, requestURI);
         detail.put(ReportKey.CLIENT_IP, requestMeta.getOrDefault("remoteAddr", ""));
         detail.put(ReportKey.QUERY_STRING, requestMeta.getOrDefault("queryString", ""));
         detail.put(ReportKey.REQ_HEADER, AbstractNormalVulScan.getEncodedHeader(
                 (Map<String, String>) requestMeta.getOrDefault("headers", new HashMap<String, String>())));
-        detail.put(ReportKey.REQ_BODY, EngineManager.BODY_BUFFER.getRequest().toString());
+
+        String reqBody = (String) requestMeta.get("body");
+        if (StringUtils.isEmpty(reqBody)) {
+            reqBody = EngineManager.BODY_BUFFER.getRequest().toString();
+        }
+        detail.put(ReportKey.REQ_BODY, reqBody);
+
         detail.put(ReportKey.RES_HEADER, AbstractNormalVulScan.getEncodedResponseHeader(
                 (String) requestMeta.get("responseStatus"),
                 (Map<String, Collection<String>>) requestMeta.get("responseHeaders")));

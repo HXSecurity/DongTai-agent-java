@@ -95,6 +95,34 @@ public class HttpImpl {
         } catch (Throwable ignore) {
         }
 
+        try {
+            String contentType = ((Map<String, String>) requestMeta.get("headers")).get("Content-Type");
+            String method = (String) requestMeta.get("method");
+            if (("POST".equalsIgnoreCase(method) || "PUT".equalsIgnoreCase(method))
+                    && !isRawBody(contentType)) {
+                Method getParameterNamesMethod = ReflectUtils.getDeclaredMethodFromSuperClass(req.getClass(),
+                        "getParameterNames", null);
+                Method getParameterMethod = ReflectUtils.getDeclaredMethodFromSuperClass(req.getClass(),
+                        "getParameter", new Class[]{String.class});
+                Enumeration<?> parameterNames = (Enumeration<?>) getParameterNamesMethod.invoke(req);
+                StringBuilder postBody = new StringBuilder();
+                boolean first = true;
+                while (parameterNames.hasMoreElements()) {
+                    String key = (String) parameterNames.nextElement();
+                    if (first) {
+                        first = false;
+                        postBody.append(key).append("=").append((String) getParameterMethod.invoke(req, key));
+                    } else {
+                        postBody.append("&").append(key).append("=").append((String) getParameterMethod.invoke(req, key));
+                    }
+                }
+                if (postBody.length() > 0) {
+                    requestMeta.put("body", postBody.toString());
+                }
+            }
+        } catch (Throwable ignore) {
+        }
+
         EngineManager.enterHttpEntry(requestMeta);
         DongTaiLog.debug("HTTP Request:{} {} from: {}", requestMeta.get("method"), requestMeta.get("requestURI"),
                 obj.getClass().getName());
@@ -111,6 +139,9 @@ public class HttpImpl {
             try {
                 String key = (String) headerNames.nextElement();
                 String val = (String) getHeaderMethod.invoke(req, key);
+                if ("content-type".equalsIgnoreCase(key)) {
+                    key = "Content-Type";
+                }
                 headers.put(key, val);
             } catch (Throwable ignore) {
             }
@@ -119,6 +150,13 @@ public class HttpImpl {
     }
 
     public static void onServletInputStreamRead(int ret, String desc, Object stream, byte[] bs, int offset, int len) {
+        if (EngineManager.REQUEST_CONTEXT.get() != null
+                && EngineManager.REQUEST_CONTEXT.get().get("body") != null
+                && EngineManager.REQUEST_CONTEXT.get().get("body") != ""
+        ) {
+            return;
+        }
+
         if ("()I".equals(desc)) {
             if (ret == -1) {
                 return;
@@ -217,5 +255,10 @@ public class HttpImpl {
 
     public static IastClassLoader getClassLoader() {
         return iastClassLoader;
+    }
+
+    public static boolean isRawBody(String contentType) {
+        return contentType != null
+                && (contentType.contains("application/json") || contentType.contains("application/xml"));
     }
 }
