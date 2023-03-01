@@ -4,8 +4,7 @@ import org.objectweb.asm.commons.Method;
 
 import java.lang.dongtai.SpyDispatcher;
 import java.lang.dongtai.SpyDispatcherHandler;
-import java.util.Collection;
-import java.util.Enumeration;
+import java.util.*;
 
 /**
  * 常用的ASM method 集合 省得我到处声明
@@ -204,6 +203,19 @@ public interface AsmMethods {
             "traceFeignInvoke",
             Object.class,
             Object[].class,
+            String.class,
+            String.class,
+            String.class
+    );
+
+    Method SPY$traceDubboInvoke = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "traceDubboInvoke",
+            Object.class,
+            String.class,
+            Object.class,
+            Object[].class,
+            Map.class,
             String.class,
             String.class,
             String.class

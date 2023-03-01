@@ -3,6 +3,7 @@ package io.dongtai.iast.core.bytecode.enhance.plugin;
 import io.dongtai.iast.core.bytecode.enhance.ClassContext;
 import io.dongtai.iast.core.bytecode.enhance.plugin.authentication.shiro.DispatchShiro;
 import io.dongtai.iast.core.bytecode.enhance.plugin.core.DispatchClassPlugin;
+import io.dongtai.iast.core.bytecode.enhance.plugin.framework.dubbo.DispatchDubbo;
 import io.dongtai.iast.core.bytecode.enhance.plugin.framework.feign.DispatchFeign;
 import io.dongtai.iast.core.bytecode.enhance.plugin.framework.j2ee.dispatch.DispatchJ2ee;
 import io.dongtai.iast.core.bytecode.enhance.plugin.hardcoded.DispatchHardcodedPlugin;
@@ -34,6 +35,7 @@ public class PluginRegister {
         this.plugins.add(new DispatchJdbc());
         this.plugins.add(new DispatchShiro());
         this.plugins.add(new DispatchFeign());
+        this.plugins.add(new DispatchDubbo());
 
         this.plugins.add(new DispatchClassPlugin());
     }

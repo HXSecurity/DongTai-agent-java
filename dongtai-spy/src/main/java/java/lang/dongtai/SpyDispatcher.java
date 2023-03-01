@@ -1,7 +1,6 @@
 package java.lang.dongtai;
 
-import java.util.Collection;
-import java.util.Enumeration;
+import java.util.*;
 
 public interface SpyDispatcher {
 
@@ -146,4 +145,8 @@ public interface SpyDispatcher {
 
     boolean traceFeignInvoke(Object instance, Object[] parameters,
                              String className, String methodName, String signature);
+
+    boolean traceDubboInvoke(Object instance, String url, Object invocation, Object[] arguments,
+                             Map<String, String> headers, String className, String methodName,
+                             String signature);
 }

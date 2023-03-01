@@ -11,6 +11,7 @@ import io.dongtai.iast.core.handler.hookpoint.controller.impl.*;
 import io.dongtai.iast.core.handler.hookpoint.graphy.GraphBuilder;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.*;
+import io.dongtai.iast.core.handler.hookpoint.service.trace.DubboService;
 import io.dongtai.iast.core.handler.hookpoint.service.trace.FeignService;
 import io.dongtai.iast.core.utils.StringUtils;
 import io.dongtai.log.DongTaiLog;
@@ -529,6 +530,28 @@ public class SpyDispatcherImpl implements SpyDispatcher {
             FeignService.solveSyncInvoke(event, INVOKE_ID_SEQUENCER);
         } catch (Throwable e) {
             DongTaiLog.error(ErrorCode.SPY_TRACE_FEIGN_INVOKE_FAILED, e);
+        } finally {
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
+        }
+        return false;
+    }
+
+    @Override
+    public boolean traceDubboInvoke(Object instance, String url, Object invocation, Object[] arguments,
+                                    Map<String, String> headers, String className, String methodName,
+                                    String signature) {
+        try {
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
+            if (!isCollectAllowed(false)) {
+                return false;
+            }
+
+            MethodEvent event = new MethodEvent(className, className, methodName,
+                    signature, instance, arguments, null);
+
+            DubboService.solveSyncInvoke(event, invocation, url, headers, INVOKE_ID_SEQUENCER);
+        } catch (Throwable e) {
+            DongTaiLog.error(ErrorCode.SPY_TRACE_DUBBO_INVOKE_FAILED, e);
         } finally {
             ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
         }

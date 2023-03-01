@@ -78,6 +78,7 @@ public enum ErrorCode {
     SPY_COLLECT_METHOD_FAILED(20303, "hookpoint collect method failed"),
     SPY_TRACE_FEIGN_INVOKE_FAILED(20304, "hookpoint trace feign invoke failed"),
     SPY_METHOD_POOL_OVER_CAPACITY(20305, "current request method pool size over capacity: {}"),
+    SPY_TRACE_DUBBO_INVOKE_FAILED(20306, "hookpoint trace dubbo invoke failed"),
     API_COLLECTOR_GET_API_THREAD_EXECUTE_FAILED(20311, "get api thread execute failed"),
     GRAPH_BUILD_AND_REPORT_FAILED(20321, "build and report request graph failed"),
     TAINT_COMMAND_GET_PARAMETERS_FAILED(20351, "taint command get {} parameters failed"),
