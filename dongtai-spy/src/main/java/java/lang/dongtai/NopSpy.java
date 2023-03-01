@@ -1,7 +1,6 @@
 package java.lang.dongtai;
 
-import java.util.Collection;
-import java.util.Enumeration;
+import java.util.*;
 
 public class NopSpy implements SpyDispatcher {
     @Override
@@ -216,6 +215,13 @@ public class NopSpy implements SpyDispatcher {
     @Override
     public boolean traceFeignInvoke(Object instance, Object[] parameters,
                                     String className, String methodName, String signature) {
+        return false;
+    }
+
+    @Override
+    public boolean traceDubboInvoke(Object instance, String url, Object invocation, Object[] arguments,
+                                    Map<String, String> headers, String className, String methodName,
+                                    String signature) {
         return false;
     }
 }

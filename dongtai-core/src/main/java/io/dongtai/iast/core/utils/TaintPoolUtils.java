@@ -2,9 +2,13 @@ package io.dongtai.iast.core.utils;
 
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
+import io.dongtai.iast.core.handler.hookpoint.models.policy.PolicyNode;
+import io.dongtai.iast.core.handler.hookpoint.models.policy.SourceNode;
+import io.dongtai.iast.core.handler.hookpoint.models.taint.range.*;
 import io.dongtai.log.DongTaiLog;
 import io.dongtai.log.ErrorCode;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.util.*;
@@ -251,5 +255,111 @@ public class TaintPoolUtils {
         }
 
         return isAllowTaintType(method.getReturnType());
+    }
+
+    public static void trackObject(MethodEvent event, PolicyNode policyNode, Object obj, int depth) {
+        if (depth >= 10 || !TaintPoolUtils.isNotEmpty(obj) || !TaintPoolUtils.isAllowTaintType(obj)) {
+            return;
+        }
+
+        int hash = 0;
+        boolean isSourceNode = policyNode instanceof SourceNode;
+        if (isSourceNode) {
+            hash = System.identityHashCode(obj);
+            if (EngineManager.TAINT_HASH_CODES.contains(hash)) {
+                return;
+            }
+        }
+
+        Class<?> cls = obj.getClass();
+        if (cls.isArray() && !cls.getComponentType().isPrimitive()) {
+            trackArray(event, policyNode, obj, depth);
+        } else if (obj instanceof Iterator && !(obj instanceof Enumeration)) {
+            trackIterator(event, policyNode, (Iterator<?>) obj, depth);
+        } else if (obj instanceof Map) {
+            trackMap(event, policyNode, (Map<?, ?>) obj, depth);
+        } else if (obj instanceof Map.Entry) {
+            trackMapEntry(event, policyNode, (Map.Entry<?, ?>) obj, depth);
+        } else if (obj instanceof Collection && !(obj instanceof Enumeration)) {
+            if (obj instanceof List) {
+                trackList(event, policyNode, (List<?>) obj, depth);
+            } else {
+                trackIterator(event, policyNode, ((Collection<?>) obj).iterator(), depth);
+            }
+        } else if ("java.util.Optional".equals(obj.getClass().getName())) {
+            trackOptional(event, policyNode, obj, depth);
+        } else {
+            if (isSourceNode) {
+                int len = TaintRangesBuilder.getLength(obj);
+                if (hash == 0 || len == 0) {
+                    return;
+                }
+
+                SourceNode sourceNode = (SourceNode) policyNode;
+                TaintRanges tr = new TaintRanges(new TaintRange(0, len));
+                if (sourceNode.hasTags()) {
+                    String[] tags = sourceNode.getTags();
+                    for (String tag : tags) {
+                        tr.add(new TaintRange(tag, 0, len));
+                    }
+                }
+                event.targetRanges.add(new MethodEvent.MethodEventTargetRange(hash, tr));
+
+                EngineManager.TAINT_HASH_CODES.add(hash);
+                event.addTargetHash(hash);
+                EngineManager.TAINT_RANGES_POOL.add(hash, tr);
+            } else {
+                if (!(obj instanceof String)) {
+                    Set<Object> modelValues = TaintPoolUtils.parseCustomModel(obj);
+                    for (Object modelValue : modelValues) {
+                        trackObject(event, policyNode, modelValue, depth + 1);
+                    }
+                }
+
+                hash = System.identityHashCode(obj);
+                if (EngineManager.TAINT_HASH_CODES.contains(hash)) {
+                    event.addSourceHash(hash);
+                }
+            }
+        }
+    }
+
+    private static void trackArray(MethodEvent event, PolicyNode policyNode, Object arr, int depth) {
+        int length = Array.getLength(arr);
+        for (int i = 0; i < length; i++) {
+            trackObject(event, policyNode, Array.get(arr, i), depth + 1);
+        }
+    }
+
+    private static void trackIterator(MethodEvent event, PolicyNode policyNode, Iterator<?> it, int depth) {
+        while (it.hasNext()) {
+            trackObject(event, policyNode, it.next(), depth + 1);
+        }
+    }
+
+    private static void trackMap(MethodEvent event, PolicyNode policyNode, Map<?, ?> map, int depth) {
+        for (Object key : map.keySet()) {
+            trackObject(event, policyNode, key, depth + 1);
+            trackObject(event, policyNode, map.get(key), depth + 1);
+        }
+    }
+
+    private static void trackMapEntry(MethodEvent event, PolicyNode policyNode, Map.Entry<?, ?> entry, int depth) {
+        trackObject(event, policyNode, entry.getKey(), depth + 1);
+        trackObject(event, policyNode, entry.getValue(), depth + 1);
+    }
+
+    private static void trackList(MethodEvent event, PolicyNode policyNode, List<?> list, int depth) {
+        for (Object obj : list) {
+            trackObject(event, policyNode, obj, depth + 1);
+        }
+    }
+
+    private static void trackOptional(MethodEvent event, PolicyNode policyNode, Object obj, int depth) {
+        try {
+            Object v = ((Optional<?>) obj).orElse(null);
+            trackObject(event, policyNode, v, depth + 1);
+        } catch (Throwable ignore) {
+        }
     }
 }
