@@ -71,7 +71,7 @@ public class GraphBuilder {
         detail.put(ReportKey.PROTOCOL, requestMeta.getOrDefault("protocol", "unknown"));
         detail.put(ReportKey.SCHEME, requestMeta.getOrDefault("scheme", ""));
         detail.put(ReportKey.METHOD, requestMeta.getOrDefault("method", ""));
-        detail.put(ReportKey.SECURE, requestMeta.getOrDefault("secure", ""));
+        detail.put(ReportKey.SECURE, requestMeta.getOrDefault("secure", false));
         String requestURL = requestMeta.getOrDefault("requestURL", "").toString();
         if (StringUtils.isEmpty(requestURL)) {
             return null;

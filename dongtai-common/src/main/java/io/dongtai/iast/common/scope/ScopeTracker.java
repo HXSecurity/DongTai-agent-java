@@ -16,13 +16,19 @@ public class ScopeTracker extends ThreadLocal<ScopeAggregator> {
                 return this.get().getServletInputStreamReadScope();
             case SERVLET_OUTPUT_WRITE:
                 return this.get().getServletOutputStreamWriteScope();
+            case DUBBO_REQUEST:
+                return this.get().getDubboRequestScope();
+            case DUBBO_ENTRY:
+                return this.get().getDubboEntryScope();
+            case DUBBO_SOURCE:
+                return this.get().getDubboSourceScope();
             default:
                 return null;
         }
     }
 
     public boolean inEnterEntry() {
-        return this.get().getHttpEntryScope().in();
+        return this.get().getHttpEntryScope().in() || this.get().getDubboRequestScope().in();
     }
 
     public PolicyScope getPolicyScope() {

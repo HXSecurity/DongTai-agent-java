@@ -19,6 +19,7 @@ public class PropagatorNode extends TaintFlowNode {
         this.commandArguments = commandArguments;
     }
 
+    @Override
     public PolicyNodeType getType() {
         return PolicyNodeType.PROPAGATOR;
     }

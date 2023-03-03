@@ -18,6 +18,7 @@ import io.dongtai.log.DongTaiLog;
 import io.dongtai.log.ErrorCode;
 
 import java.lang.dongtai.SpyDispatcher;
+import java.net.InetSocketAddress;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -149,6 +150,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
         }
     }
 
+    @Override
     public void collectHttpRequest(Object obj, Object req, Object resp, StringBuffer requestURL, String requestURI,
                                    String queryString, String method, String protocol, String scheme,
                                    String serverName, String contextPath, String remoteAddr,
@@ -261,6 +263,97 @@ public class SpyDispatcherImpl implements SpyDispatcher {
             HttpImpl.onPrintWriterWrite(desc, writer, b, s, cs, offset, len);
         } catch (Throwable e) {
             DongTaiLog.warn(ErrorCode.SPY_COLLECT_HTTP_FAILED, "response body", e);
+        } finally {
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
+        }
+    }
+
+    @Override
+    public void enterDubbo() {
+        if (!EngineManager.isEngineRunning()) {
+            return;
+        }
+        try {
+            ScopeManager.SCOPE_TRACKER.getScope(Scope.DUBBO_REQUEST).enter();
+        } catch (Throwable ignore) {
+        }
+    }
+
+    @Override
+    public void leaveDubbo(Object request, Object response, Object result, byte status) {
+        if (!EngineManager.isEngineRunning()) {
+            EngineManager.cleanThreadState();
+            return;
+        }
+        try {
+            if (ScopeManager.SCOPE_TRACKER.getScope(Scope.DUBBO_REQUEST).isFirst()
+                    && ScopeManager.SCOPE_TRACKER.getScope(Scope.DUBBO_ENTRY).in()) {
+                DubboImpl.collectDubboResponse(result, status);
+            }
+
+            ScopeManager.SCOPE_TRACKER.getScope(Scope.DUBBO_REQUEST).leave();
+            if (!ScopeManager.SCOPE_TRACKER.getScope(Scope.DUBBO_REQUEST).in()
+                    && ScopeManager.SCOPE_TRACKER.getScope(Scope.DUBBO_ENTRY).in()) {
+                EngineManager.maintainRequestCount();
+                GraphBuilder.buildAndReport(request, response);
+                EngineManager.cleanThreadState();
+            }
+        } catch (Throwable e) {
+            DongTaiLog.error(ErrorCode.SPY_LEAVE_DUBBO_FAILED, e);
+            EngineManager.cleanThreadState();
+        }
+    }
+
+    @Override
+    public boolean isFirstLevelDubbo() {
+        if (!EngineManager.isEngineRunning()) {
+            return false;
+        }
+        try {
+            return ScopeManager.SCOPE_TRACKER.getScope(Scope.DUBBO_REQUEST).isFirst();
+        } catch (Throwable ignore) {
+            return false;
+        }
+    }
+
+    @Override
+    public void collectDubboRequest(Object handler, Object channel, Object request,
+                                    String url, InetSocketAddress remoteAddress,
+                                    boolean isTwoWay, boolean isEvent, boolean isBroken, boolean isHeartbeat) {
+        try {
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
+
+            if (!EngineManager.isEngineRunning()) {
+                return;
+            }
+
+            if (isEvent || isBroken || isHeartbeat || !isTwoWay) {
+                return;
+            }
+
+            DubboImpl.solveDubboRequest(handler, channel, request, url, remoteAddress.getAddress().getHostAddress());
+        } catch (Throwable e) {
+            DongTaiLog.warn(ErrorCode.SPY_COLLECT_DUBBO_FAILED, "request", e);
+        } finally {
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
+        }
+    }
+
+    @Override
+    public void collectDubboRequestSource(Object handler, Object invocation, String methodName,
+                                          Object[] arguments, Map<String, String> headers,
+                                          String hookClass, String hookMethod, String hookSign) {
+        try {
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
+
+            if (!EngineManager.isEngineRunning()) {
+                return;
+            }
+
+            DubboImpl.collectDubboRequestSource(handler, invocation, methodName, arguments, headers,
+                    hookClass, hookMethod, hookSign, INVOKE_ID_SEQUENCER);
+        } catch (Throwable e) {
+            DongTaiLog.warn(ErrorCode.SPY_COLLECT_DUBBO_FAILED, "request source", e);
         } finally {
             ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
         }
@@ -551,7 +644,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
 
             DubboService.solveSyncInvoke(event, invocation, url, headers, INVOKE_ID_SEQUENCER);
         } catch (Throwable e) {
-            DongTaiLog.error(ErrorCode.SPY_TRACE_DUBBO_INVOKE_FAILED, e);
+            DongTaiLog.error(ErrorCode.SPY_TRACE_DUBBO_CONSUMER_INVOKE_FAILED, e);
         } finally {
             ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
         }

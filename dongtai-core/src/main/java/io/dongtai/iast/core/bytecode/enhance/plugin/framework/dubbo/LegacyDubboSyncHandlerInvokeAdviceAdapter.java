@@ -93,7 +93,7 @@ public class LegacyDubboSyncHandlerInvokeAdviceAdapter extends AbstractAdviceAda
 
     private void traceMethod() {
         invokeStatic(ASM_TYPE_SPY_HANDLER, SPY_HANDLER$getDispatcher);
-        loadThisOrPushNullIfIsStatic();
+        loadThis();
         dup();
         invokeVirtual(this.handlerType, GET_URL_METHOD);
         invokeVirtual(this.urlType, URL_TO_STRING_METHOD);
