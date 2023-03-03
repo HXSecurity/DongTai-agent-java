@@ -4,6 +4,7 @@ import org.objectweb.asm.commons.Method;
 
 import java.lang.dongtai.SpyDispatcher;
 import java.lang.dongtai.SpyDispatcherHandler;
+import java.net.InetSocketAddress;
 import java.util.*;
 
 /**
@@ -129,6 +130,49 @@ public interface AsmMethods {
             char[].class,
             int.class,
             int.class
+    );
+
+    Method SPY$enterDubbo = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "enterDubbo"
+    );
+    Method SPY$leaveDubbo = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "leaveDubbo",
+            Object.class,
+            Object.class,
+            Object.class,
+            byte.class
+    );
+    Method SPY$isFirstLevelDubbo = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "isFirstLevelDubbo"
+    );
+    Method SPY$collectDubboRequest = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "collectDubboRequest",
+            Object.class,
+            Object.class,
+            Object.class,
+            String.class,
+            InetSocketAddress.class,
+            boolean.class,
+            boolean.class,
+            boolean.class,
+            boolean.class
+    );
+
+    Method SPY$collectDubboRequestSource = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "collectDubboRequestSource",
+            Object.class,
+            Object.class,
+            String.class,
+            Object[].class,
+            Map.class,
+            String.class,
+            String.class,
+            String.class
     );
 
     Method SPY$enterSource = InnerHelper.getAsmMethod(

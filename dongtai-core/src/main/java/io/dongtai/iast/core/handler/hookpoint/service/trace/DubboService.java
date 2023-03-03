@@ -51,6 +51,4 @@ public class DubboService {
                     e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "");
         }
     }
-
-
 }

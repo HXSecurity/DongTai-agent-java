@@ -12,6 +12,7 @@ public class SinkNode extends PolicyNode {
         this.sources = sources;
     }
 
+    @Override
     public PolicyNodeType getType() {
         return PolicyNodeType.SINK;
     }

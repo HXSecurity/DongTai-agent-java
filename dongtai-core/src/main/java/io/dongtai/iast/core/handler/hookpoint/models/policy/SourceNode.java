@@ -11,6 +11,7 @@ public class SourceNode extends TaintFlowNode {
         this.sources = sources;
     }
 
+    @Override
     public PolicyNodeType getType() {
         return PolicyNodeType.SOURCE;
     }

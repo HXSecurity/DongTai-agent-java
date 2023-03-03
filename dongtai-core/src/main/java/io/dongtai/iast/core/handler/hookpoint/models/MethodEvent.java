@@ -103,6 +103,10 @@ public class MethodEvent {
             this.value = value;
         }
 
+        public String getValue() {
+            return this.value;
+        }
+
         public JSONObject toJson() {
             JSONObject json = new JSONObject();
             json.put("index", this.index);

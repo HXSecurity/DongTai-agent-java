@@ -5,6 +5,9 @@ public enum Scope {
     HTTP_ENTRY(2),
     SERVLET_INPUT_STREAM_READ(3),
     SERVLET_OUTPUT_WRITE(4),
+    DUBBO_REQUEST(5),
+    DUBBO_ENTRY(6),
+    DUBBO_SOURCE(7),
     ;
 
     private final int id;

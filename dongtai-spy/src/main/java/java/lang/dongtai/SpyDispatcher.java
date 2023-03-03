@@ -1,5 +1,6 @@
 package java.lang.dongtai;
 
+import java.net.InetSocketAddress;
 import java.util.*;
 
 public interface SpyDispatcher {
@@ -47,6 +48,20 @@ public interface SpyDispatcher {
     void onServletOutputStreamWrite(String desc, Object stream, int b, byte[] bs, int offset, int len);
 
     void onPrintWriterWrite(String desc, Object writer, int b, String s, char[] cs, int offset, int len);
+
+    void enterDubbo();
+
+    void leaveDubbo(final Object request, final Object response, Object result, byte status);
+
+    boolean isFirstLevelDubbo();
+
+    void collectDubboRequest(Object handler, Object channel, Object request,
+                             String url, InetSocketAddress remoteAddress,
+                             boolean isTwoWay, boolean isEvent, boolean isBroken, boolean isHeartbeat);
+
+    void collectDubboRequestSource(Object handler, Object invocation, String methodName,
+                                   Object[] arguments, Map<String, String> headers,
+                                   String hookClass, String hookMethod, String hookSign);
 
     /**
      * mark for enter Source Entry Point

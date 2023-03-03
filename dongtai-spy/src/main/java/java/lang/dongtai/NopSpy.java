@@ -1,5 +1,6 @@
 package java.lang.dongtai;
 
+import java.net.InetSocketAddress;
 import java.util.*;
 
 public class NopSpy implements SpyDispatcher {
@@ -28,7 +29,6 @@ public class NopSpy implements SpyDispatcher {
      */
     @Override
     public void enterHttp() {
-
     }
 
     /**
@@ -40,7 +40,6 @@ public class NopSpy implements SpyDispatcher {
      */
     @Override
     public void leaveHttp(Object request, Object response) {
-
     }
 
     /**
@@ -54,6 +53,7 @@ public class NopSpy implements SpyDispatcher {
         return false;
     }
 
+    @Override
     public void collectHttpRequest(Object obj, Object req, Object resp, StringBuffer requestURL, String requestURI,
                                    String queryString, String method, String protocol, String scheme,
                                    String serverName, String contextPath, String remoteAddr,
@@ -74,6 +74,31 @@ public class NopSpy implements SpyDispatcher {
 
     @Override
     public void onPrintWriterWrite(String desc, Object writer, int b, String s, char[] cs, int offset, int len) {
+    }
+
+    @Override
+    public void enterDubbo() {
+    }
+
+    @Override
+    public void leaveDubbo(Object request, Object response, Object result, byte status) {
+    }
+
+    @Override
+    public boolean isFirstLevelDubbo() {
+        return false;
+    }
+
+    @Override
+    public void collectDubboRequest(Object handler, Object channel, Object request,
+                                    String url, InetSocketAddress remoteAddress,
+                                    boolean isTwoWay, boolean isEvent, boolean isBroken, boolean isHeartbeat) {
+    }
+
+    @Override
+    public void collectDubboRequestSource(Object handler, Object invocation, String methodName,
+                                          Object[] arguments, Map<String, String> headers,
+                                          String hookClass, String hookMethod, String hookSign) {
     }
 
     /**
