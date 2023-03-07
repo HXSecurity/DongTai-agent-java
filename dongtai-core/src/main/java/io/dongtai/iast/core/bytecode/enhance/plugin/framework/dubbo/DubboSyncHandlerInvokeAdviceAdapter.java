@@ -5,22 +5,27 @@ import io.dongtai.iast.core.bytecode.enhance.plugin.AbstractAdviceAdapter;
 import org.objectweb.asm.*;
 import org.objectweb.asm.commons.Method;
 
-public class LegacyDubboSyncHandlerInvokeAdviceAdapter extends AbstractAdviceAdapter {
-    private static final Method GET_URL_METHOD = Method.getMethod(" com.alibaba.dubbo.common.URL getUrl()".substring(1));
+public class DubboSyncHandlerInvokeAdviceAdapter extends AbstractAdviceAdapter {
+    private final Method GET_URL_METHOD;
     private static final Method GET_ARGUMENTS_METHOD = Method.getMethod("java.lang.Object[] getArguments()");
     private static final Method GET_GETATTACHMENTS_METHOD = Method.getMethod("java.util.Map getAttachments()");
     private static final Method URL_TO_STRING_METHOD = Method.getMethod("java.lang.String toString()");
 
+    private final String packageName;
     private Label exHandler;
     private final Type handlerType;
     private final Type urlType;
     private final Type invocationType;
 
-    protected LegacyDubboSyncHandlerInvokeAdviceAdapter(MethodVisitor mv, int access, String name, String desc, String signature, ClassContext context) {
+    protected DubboSyncHandlerInvokeAdviceAdapter(MethodVisitor mv, int access, String name, String desc,
+                                                  String signature, ClassContext context, String packageName) {
         super(mv, access, name, desc, context, "dubbo", signature);
-        this.handlerType = Type.getObjectType(" com/alibaba/dubbo/rpc/listener/ListenerInvokerWrapper".substring(1));
-        this.invocationType = Type.getObjectType(" com/alibaba/dubbo/rpc/Invocation".substring(1));
-        this.urlType = Type.getObjectType(" com/alibaba/dubbo/common/URL".substring(1));
+        GET_URL_METHOD = Method.getMethod(packageName + ".dubbo.common.URL getUrl()");
+        this.packageName = packageName;
+        String packageDesc = packageName.replace(".", "/");
+        this.handlerType = Type.getObjectType(packageDesc + "/dubbo/rpc/listener/ListenerInvokerWrapper");
+        this.invocationType = Type.getObjectType(packageDesc + "/dubbo/rpc/Invocation");
+        this.urlType = Type.getObjectType(packageDesc + "/dubbo/common/URL");
     }
 
     @Override

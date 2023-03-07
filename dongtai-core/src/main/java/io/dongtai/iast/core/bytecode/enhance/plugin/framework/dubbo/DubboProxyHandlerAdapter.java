@@ -7,11 +7,16 @@ import io.dongtai.log.DongTaiLog;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 
-public class LegacyDubboSyncHandlerAdapter extends AbstractClassVisitor {
-    private static final String LEGACY_DUBBO_SYNC_HANDLER_INVOKE = " com.alibaba.dubbo.rpc.listener.ListenerInvokerWrapper.invoke(com.alibaba.dubbo.rpc.Invocation)".substring(1);
+public class DubboProxyHandlerAdapter extends AbstractClassVisitor {
+    public static final String DUBBO_PROXY_HANDLER_INVOKE = "{package}.dubbo.rpc.proxy.AbstractProxyInvoker.invoke({package}.dubbo.rpc.Invocation)";
 
-    public LegacyDubboSyncHandlerAdapter(ClassVisitor classVisitor, ClassContext context) {
+    private final String packageName;
+    private final String fullSign;
+
+    public DubboProxyHandlerAdapter(ClassVisitor classVisitor, ClassContext context, String packageName) {
         super(classVisitor, context);
+        this.packageName = packageName;
+        this.fullSign = DUBBO_PROXY_HANDLER_INVOKE.replace("{package}", this.packageName);
     }
 
     @Override
@@ -19,9 +24,10 @@ public class LegacyDubboSyncHandlerAdapter extends AbstractClassVisitor {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
         String signCode = AsmUtils.buildSignature(context.getClassName(), name, desc);
 
-        if (LEGACY_DUBBO_SYNC_HANDLER_INVOKE.equals(signCode)) {
-            DongTaiLog.debug("Adding dubbo consumer tracking by {}", signCode);
-            mv = new LegacyDubboSyncHandlerInvokeAdviceAdapter(mv, access, name, desc, signCode, this.context);
+        if (this.fullSign.equals(signCode)) {
+            DongTaiLog.debug("Adding dubbo provider source tracking by {}", signCode);
+            mv = new DubboProxyHandlerInvokeAdviceAdapter(mv, access, name, desc, signCode,
+                    this.context, this.packageName);
             setTransformed();
         }
         return mv;

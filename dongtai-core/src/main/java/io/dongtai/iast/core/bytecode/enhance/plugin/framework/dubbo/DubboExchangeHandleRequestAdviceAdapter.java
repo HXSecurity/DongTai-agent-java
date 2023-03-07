@@ -5,8 +5,7 @@ import io.dongtai.iast.core.bytecode.enhance.plugin.AbstractAdviceAdapter;
 import org.objectweb.asm.*;
 import org.objectweb.asm.commons.Method;
 
-public class LegacyDubboExchangeHandleRequestAdviceAdapter extends AbstractAdviceAdapter {
-    private static final Method GET_URL_METHOD = Method.getMethod(" com.alibaba.dubbo.common.URL getUrl()".substring(1));
+public class DubboExchangeHandleRequestAdviceAdapter extends AbstractAdviceAdapter {
     private static final Method URL_TO_STRING_METHOD = Method.getMethod("java.lang.String toString()");
     private static final Method GET_REMOTE_ADDRESS_METHOD = Method.getMethod("java.net.InetSocketAddress getRemoteAddress()");
     private static final Method IS_TWO_WAY_METHOD = Method.getMethod("boolean isTwoWay()");
@@ -16,19 +15,31 @@ public class LegacyDubboExchangeHandleRequestAdviceAdapter extends AbstractAdvic
     private static final Method GET_RESULT_METHOD = Method.getMethod("java.lang.Object getResult()");
     private static final Method GET_STATUS_METHOD = Method.getMethod("byte getStatus()");
 
+    private final String packageName;
     private final Type endpointType;
     private final Type urlType;
     private final Type channelType;
     private final Type requestType;
     private final Type responseType;
+    private final Method getUrlMethod;
 
-    protected LegacyDubboExchangeHandleRequestAdviceAdapter(MethodVisitor mv, int access, String name, String desc, String signature, ClassContext context) {
+    protected DubboExchangeHandleRequestAdviceAdapter(MethodVisitor mv, int access, String name, String desc,
+                                                      String signature, ClassContext context, String packageName) {
         super(mv, access, name, desc, context, "dubbo", signature);
-        this.endpointType = Type.getObjectType(" com/alibaba/dubbo/remoting/Endpoint".substring(1));
-        this.urlType = Type.getObjectType(" com/alibaba/dubbo/common/URL".substring(1));
-        this.channelType = Type.getObjectType(" com/alibaba/dubbo/remoting/Channel".substring(1));
-        this.requestType = Type.getObjectType(" com/alibaba/dubbo/remoting/exchange/Request".substring(1));
-        this.responseType = Type.getObjectType(" com/alibaba/dubbo/remoting/exchange/Response".substring(1));
+        this.packageName = packageName;
+        String packageDesc = packageName.replace(".", "/");
+        this.endpointType = Type.getObjectType(packageDesc + "/dubbo/remoting/Endpoint");
+        this.urlType = Type.getObjectType(packageDesc + "/dubbo/common/URL");
+        this.channelType = Type.getObjectType(packageDesc + "/dubbo/remoting/Channel");
+        this.requestType = Type.getObjectType(packageDesc + "/dubbo/remoting/exchange/Request");
+        if (" com.alibaba".substring(1).equals(packageName)) {
+            this.responseType = Type.getObjectType(packageDesc + "/dubbo/remoting/exchange/Response");
+        } else {
+            // org.apache.dubbo use HeaderExchangeChannel to track response
+            this.responseType = null;
+        }
+
+        this.getUrlMethod = Method.getMethod(packageName + ".dubbo.common.URL getUrl()");
     }
 
     @Override
@@ -47,13 +58,13 @@ public class LegacyDubboExchangeHandleRequestAdviceAdapter extends AbstractAdvic
 
     @Override
     protected void after(int opcode) {
-        // if (opcode != ATHROW) {
-        //     Label elseLabel = new Label();
-        //     isFirstLevelDubbo();
-        //     mv.visitJumpInsn(EQ, elseLabel);
-        //     collectDubboResponse(opcode);
-        //     mark(elseLabel);
-        // }
+        if (this.responseType != null && opcode != ATHROW) {
+            Label elseLabel = new Label();
+            isFirstLevelDubbo();
+            mv.visitJumpInsn(EQ, elseLabel);
+            collectDubboResponse(opcode);
+            mark(elseLabel);
+        }
 
         leaveDubbo(opcode);
     }
@@ -64,26 +75,9 @@ public class LegacyDubboExchangeHandleRequestAdviceAdapter extends AbstractAdvic
     }
 
     private void leaveDubbo(int opcode) {
-        int retLocal = newLocal(ASM_TYPE_OBJECT);
-        if (!isThrow(opcode)) {
-            loadReturn(opcode);
-        } else {
-            pushNull();
-        }
-        storeLocal(retLocal);
         invokeStatic(ASM_TYPE_SPY_HANDLER, SPY_HANDLER$getDispatcher);
+        loadArg(0);
         loadArg(1);
-        loadLocal(retLocal);
-        if (!isThrow(opcode)) {
-            loadLocal(retLocal);
-            invokeVirtual(this.responseType, GET_RESULT_METHOD);
-            loadLocal(retLocal);
-            invokeVirtual(this.responseType, GET_STATUS_METHOD);
-        } else {
-            pushNull();
-            byte b = 0;
-            push(b);
-        }
         invokeInterface(ASM_TYPE_SPY_DISPATCHER, SPY$leaveDubbo);
     }
 
@@ -104,7 +98,7 @@ public class LegacyDubboExchangeHandleRequestAdviceAdapter extends AbstractAdvic
         loadArg(0);
         loadArg(1);
         loadArg(0);
-        invokeInterface(this.endpointType, GET_URL_METHOD);
+        invokeInterface(this.endpointType, this.getUrlMethod);
         invokeVirtual(this.urlType, URL_TO_STRING_METHOD);
         loadArg(0);
         invokeInterface(this.channelType, GET_REMOTE_ADDRESS_METHOD);
@@ -122,7 +116,27 @@ public class LegacyDubboExchangeHandleRequestAdviceAdapter extends AbstractAdvic
         Label endL = new Label();
         visitJumpInsn(GOTO, endL);
         visitLabel(exHandlerL);
-        visitVarInsn(ASTORE, this.nextLocal);
+        int nextL = newLocal(ASM_TYPE_OBJECT);
+        storeLocal(nextL);
         visitLabel(endL);
+    }
+
+    private void collectDubboResponse(int opcode) {
+        int retLocal = newLocal(ASM_TYPE_OBJECT);
+        loadReturn(opcode);
+        storeLocal(retLocal);
+
+        Label nonNullLabel = new Label();
+        loadLocal(retLocal);
+        ifNull(nonNullLabel);
+
+        invokeStatic(ASM_TYPE_SPY_HANDLER, SPY_HANDLER$getDispatcher);
+        loadLocal(retLocal);
+        invokeVirtual(this.responseType, GET_RESULT_METHOD);
+        loadLocal(retLocal);
+        invokeVirtual(this.responseType, GET_STATUS_METHOD);
+        invokeInterface(ASM_TYPE_SPY_DISPATCHER, SPY$collectDubboResponse);
+
+        mark(nonNullLabel);
     }
 }
