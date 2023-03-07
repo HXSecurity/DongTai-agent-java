@@ -6,6 +6,7 @@ import io.dongtai.iast.core.handler.context.ContextManager;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.SourceNode;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.TaintPosition;
+import io.dongtai.iast.core.handler.hookpoint.models.taint.range.*;
 import io.dongtai.iast.core.utils.StackUtils;
 import io.dongtai.iast.core.utils.TaintPoolUtils;
 import io.dongtai.log.DongTaiLog;
@@ -68,9 +69,7 @@ public class DubboImpl {
         tgt.add(new TaintPosition("P1"));
 
         SourceNode sourceNode = new SourceNode(src, tgt, null);
-        if (arguments != null && arguments.length > 0) {
-            TaintPoolUtils.trackObject(event, sourceNode, arguments, 0);
-        }
+        TaintPoolUtils.trackObject(event, sourceNode, arguments, 0);
 
         Map<String, String> sHeaders = new HashMap<String, String>();
         if (headers != null) {
@@ -99,6 +98,13 @@ public class DubboImpl {
         event.addParameterValue(0, arguments, true);
         event.setObjectValue(handler, false);
         event.setTaintPositions(sourceNode.getSources(), sourceNode.getTargets());
+
+        // for display taint range (full arguments value)
+        String fv = event.parameterValues.get(0).getValue();
+        int hash = System.identityHashCode(fv);
+        int len = TaintRangesBuilder.getLength(fv);
+        TaintRanges tr = new TaintRanges(new TaintRange(0, len));
+        event.targetRanges.add(0, new MethodEvent.MethodEventTargetRange(hash, tr));
 
         requestMeta.put("headers", sHeaders);
         JSONArray arr = new JSONArray();
