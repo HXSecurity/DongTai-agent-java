@@ -6,16 +6,25 @@ import io.dongtai.iast.core.bytecode.enhance.plugin.AbstractAdviceAdapter;
 import org.objectweb.asm.*;
 import org.objectweb.asm.commons.Method;
 
-public class LegacyDubboProxyHandlerInvokeAdviceAdapter extends AbstractAdviceAdapter {
+public class DubboProxyHandlerInvokeAdviceAdapter extends AbstractAdviceAdapter {
     private static final Method GET_ARGUMENTS_METHOD = Method.getMethod("java.lang.Object[] getArguments()");
-    private static final Method GET_GETATTACHMENTS_METHOD = Method.getMethod("java.util.Map getAttachments()");
     private static final Method GET_METHOD_NAME_METHOD = Method.getMethod("java.lang.String getMethodName()");
 
+    private final String packageName;
     private final Type invocationType;
+    private final Method getAttachmentsMethod;
 
-    protected LegacyDubboProxyHandlerInvokeAdviceAdapter(MethodVisitor mv, int access, String name, String desc, String signature, ClassContext context) {
+    protected DubboProxyHandlerInvokeAdviceAdapter(MethodVisitor mv, int access, String name, String desc,
+                                                   String signature, ClassContext context, String packageName) {
         super(mv, access, name, desc, context, "dubbo", signature);
-        this.invocationType = Type.getObjectType(" com/alibaba/dubbo/rpc/Invocation".substring(1));
+        this.packageName = packageName;
+        String packageDesc = packageName.replace(".", "/");
+        this.invocationType = Type.getObjectType(packageDesc + "/dubbo/rpc/Invocation");
+        if (" com.alibaba".substring(1).equals(packageName)) {
+            this.getAttachmentsMethod = Method.getMethod("java.util.Map getAttachments()");
+        } else {
+            this.getAttachmentsMethod = Method.getMethod("java.util.Map getObjectAttachments()");
+        }
     }
 
     @Override
@@ -51,7 +60,7 @@ public class LegacyDubboProxyHandlerInvokeAdviceAdapter extends AbstractAdviceAd
         loadArg(0);
         invokeInterface(this.invocationType, GET_ARGUMENTS_METHOD);
         loadArg(0);
-        invokeInterface(this.invocationType, GET_GETATTACHMENTS_METHOD);
+        invokeInterface(this.invocationType, this.getAttachmentsMethod);
         push(this.classContext.getClassName());
         push(this.name);
         push(this.signature);

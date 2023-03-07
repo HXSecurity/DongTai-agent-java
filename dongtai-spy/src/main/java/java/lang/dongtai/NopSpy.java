@@ -81,7 +81,7 @@ public class NopSpy implements SpyDispatcher {
     }
 
     @Override
-    public void leaveDubbo(Object request, Object response, Object result, byte status) {
+    public void leaveDubbo(Object channel, Object request) {
     }
 
     @Override
@@ -97,8 +97,12 @@ public class NopSpy implements SpyDispatcher {
 
     @Override
     public void collectDubboRequestSource(Object handler, Object invocation, String methodName,
-                                          Object[] arguments, Map<String, String> headers,
+                                          Object[] arguments, Map<String, ?> headers,
                                           String hookClass, String hookMethod, String hookSign) {
+    }
+
+    @Override
+    public void collectDubboResponse(Object result, byte status) {
     }
 
     /**

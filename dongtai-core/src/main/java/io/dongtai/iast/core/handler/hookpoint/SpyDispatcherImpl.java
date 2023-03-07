@@ -124,7 +124,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
             if (!ScopeManager.SCOPE_TRACKER.getScope(Scope.HTTP_REQUEST).in()
                     && ScopeManager.SCOPE_TRACKER.getScope(Scope.HTTP_ENTRY).in()) {
                 EngineManager.maintainRequestCount();
-                GraphBuilder.buildAndReport(request, response);
+                GraphBuilder.buildAndReport();
                 EngineManager.cleanThreadState();
             }
         } catch (Throwable e) {
@@ -280,22 +280,17 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     }
 
     @Override
-    public void leaveDubbo(Object request, Object response, Object result, byte status) {
+    public void leaveDubbo(Object channel, Object request) {
         if (!EngineManager.isEngineRunning()) {
             EngineManager.cleanThreadState();
             return;
         }
         try {
-            if (ScopeManager.SCOPE_TRACKER.getScope(Scope.DUBBO_REQUEST).isFirst()
-                    && ScopeManager.SCOPE_TRACKER.getScope(Scope.DUBBO_ENTRY).in()) {
-                DubboImpl.collectDubboResponse(result, status);
-            }
-
             ScopeManager.SCOPE_TRACKER.getScope(Scope.DUBBO_REQUEST).leave();
             if (!ScopeManager.SCOPE_TRACKER.getScope(Scope.DUBBO_REQUEST).in()
                     && ScopeManager.SCOPE_TRACKER.getScope(Scope.DUBBO_ENTRY).in()) {
                 EngineManager.maintainRequestCount();
-                GraphBuilder.buildAndReport(request, response);
+                GraphBuilder.buildAndReport();
                 EngineManager.cleanThreadState();
             }
         } catch (Throwable e) {
@@ -341,7 +336,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
 
     @Override
     public void collectDubboRequestSource(Object handler, Object invocation, String methodName,
-                                          Object[] arguments, Map<String, String> headers,
+                                          Object[] arguments, Map<String, ?> headers,
                                           String hookClass, String hookMethod, String hookSign) {
         try {
             ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
@@ -354,6 +349,28 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                     hookClass, hookMethod, hookSign, INVOKE_ID_SEQUENCER);
         } catch (Throwable e) {
             DongTaiLog.warn(ErrorCode.SPY_COLLECT_DUBBO_FAILED, "request source", e);
+        } finally {
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
+        }
+    }
+
+    @Override
+    public void collectDubboResponse(Object result, byte status) {
+        try {
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
+
+            if (!EngineManager.isEngineRunning()) {
+                return;
+            }
+
+            if (!ScopeManager.SCOPE_TRACKER.getScope(Scope.DUBBO_REQUEST).isFirst()
+                    || !ScopeManager.SCOPE_TRACKER.getScope(Scope.DUBBO_ENTRY).in()) {
+                return;
+            }
+
+            DubboImpl.collectDubboResponse(result, status);
+        } catch (Throwable e) {
+            DongTaiLog.warn(ErrorCode.SPY_COLLECT_DUBBO_FAILED, "response", e);
         } finally {
             ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
         }

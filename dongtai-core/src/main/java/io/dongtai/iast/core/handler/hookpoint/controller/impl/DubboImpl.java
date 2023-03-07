@@ -43,7 +43,7 @@ public class DubboImpl {
 
 
     public static void collectDubboRequestSource(Object handler, Object invocation, String methodName,
-                                                 Object[] arguments, Map<String, String> headers,
+                                                 Object[] arguments, Map<String, ?> headers,
                                                  String hookClass, String hookMethod, String hookSign,
                                                  AtomicInteger invokeIdSequencer) {
         if (arguments == null || arguments.length == 0) {
@@ -71,13 +71,24 @@ public class DubboImpl {
         if (arguments != null && arguments.length > 0) {
             TaintPoolUtils.trackObject(event, sourceNode, arguments, 0);
         }
-        if (headers != null && !headers.isEmpty()) {
+
+        Map<String, String> sHeaders = new HashMap<String, String>();
+        if (headers != null) {
+            for (Map.Entry<String, ?> entry : headers.entrySet()) {
+                if (entry.getValue() == null) {
+                    continue;
+                }
+                sHeaders.put(entry.getKey(), entry.getValue().toString());
+            }
+        }
+
+        if (!sHeaders.isEmpty()) {
             String traceIdKey = ContextManager.getHeaderKey();
             if (headers.containsKey(traceIdKey)) {
-                ContextManager.parseTraceId(headers.get(traceIdKey));
+                ContextManager.parseTraceId(sHeaders.get(traceIdKey));
             } else {
                 String newTraceId = ContextManager.currentTraceId();
-                headers.put(traceIdKey, newTraceId);
+                sHeaders.put(traceIdKey, newTraceId);
             }
         }
 
@@ -89,7 +100,7 @@ public class DubboImpl {
         event.setObjectValue(handler, false);
         event.setTaintPositions(sourceNode.getSources(), sourceNode.getTargets());
 
-        requestMeta.put("headers", headers);
+        requestMeta.put("headers", sHeaders);
         JSONArray arr = new JSONArray();
         for (Object arg : arguments) {
             arr.put(event.obj2String(arg));

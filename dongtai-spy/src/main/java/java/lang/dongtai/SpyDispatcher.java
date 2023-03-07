@@ -51,7 +51,7 @@ public interface SpyDispatcher {
 
     void enterDubbo();
 
-    void leaveDubbo(final Object request, final Object response, Object result, byte status);
+    void leaveDubbo(Object channel, Object request);
 
     boolean isFirstLevelDubbo();
 
@@ -60,8 +60,10 @@ public interface SpyDispatcher {
                              boolean isTwoWay, boolean isEvent, boolean isBroken, boolean isHeartbeat);
 
     void collectDubboRequestSource(Object handler, Object invocation, String methodName,
-                                   Object[] arguments, Map<String, String> headers,
+                                   Object[] arguments, Map<String, ?> headers,
                                    String hookClass, String hookMethod, String hookSign);
+
+    void collectDubboResponse(Object result, byte status);
 
     /**
      * mark for enter Source Entry Point

@@ -25,11 +25,11 @@ public class GraphBuilder {
     private static String URL;
     private static String URI;
 
-    public static void buildAndReport(Object request, Object response) {
+    public static void buildAndReport() {
         try {
             ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
             List<GraphNode> nodeList = build();
-            String report = convertToReport(nodeList, request, response);
+            String report = convertToReport(nodeList);
             if (report == null) {
                 return;
             }
@@ -56,7 +56,7 @@ public class GraphBuilder {
         return nodeList;
     }
 
-    public static String convertToReport(List<GraphNode> nodeList, Object request, Object response) {
+    public static String convertToReport(List<GraphNode> nodeList) {
         Map<String, Object> requestMeta = EngineManager.REQUEST_CONTEXT.get();
 
         JSONObject report = new JSONObject();

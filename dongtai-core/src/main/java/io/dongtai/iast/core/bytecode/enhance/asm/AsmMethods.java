@@ -140,9 +140,7 @@ public interface AsmMethods {
             SpyDispatcher.class,
             "leaveDubbo",
             Object.class,
-            Object.class,
-            Object.class,
-            byte.class
+            Object.class
     );
     Method SPY$isFirstLevelDubbo = InnerHelper.getAsmMethod(
             SpyDispatcher.class,
@@ -173,6 +171,13 @@ public interface AsmMethods {
             String.class,
             String.class,
             String.class
+    );
+
+    Method SPY$collectDubboResponse = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "collectDubboResponse",
+            Object.class,
+            byte.class
     );
 
     Method SPY$enterSource = InnerHelper.getAsmMethod(
