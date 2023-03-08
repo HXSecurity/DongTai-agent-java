@@ -83,13 +83,21 @@ public class HttpImpl {
         try {
             boolean enableVersionHeader = ((Config<Boolean>) ConfigBuilder.getInstance()
                     .getConfig(ConfigKey.ENABLE_VERSION_HEADER)).get();
-            if (enableVersionHeader) {
-                String versionHeaderKey = ((Config<String>) ConfigBuilder.getInstance()
-                        .getConfig(ConfigKey.VERSION_HEADER_KEY)).get();
+            String xrayHeader = ((Map<String, String>) requestMeta.get("headers")).get("Xray");
+            if (enableVersionHeader || xrayHeader != null) {
                 Method setHeaderMethod = ReflectUtils.getDeclaredMethodFromSuperClass(resp.getClass(),
                         "setHeader", new Class[]{String.class, String.class});
                 if (setHeaderMethod != null) {
-                    setHeaderMethod.invoke(resp, versionHeaderKey, AgentConstant.VERSION_VALUE);
+                    if (enableVersionHeader) {
+                        String versionHeaderKey = ((Config<String>) ConfigBuilder.getInstance()
+                                .getConfig(ConfigKey.VERSION_HEADER_KEY)).get();
+                        setHeaderMethod.invoke(resp, versionHeaderKey, AgentConstant.VERSION_VALUE);
+                    }
+                    if (xrayHeader != null) {
+                        String reqId = String.valueOf(EngineManager.getAgentId()) + "."
+                                + UUID.randomUUID().toString().replaceAll("-", "");
+                        setHeaderMethod.invoke(resp, "dt-request-id", reqId);
+                    }
                 }
             }
         } catch (Throwable ignore) {
@@ -141,6 +149,8 @@ public class HttpImpl {
                 String val = (String) getHeaderMethod.invoke(req, key);
                 if ("content-type".equalsIgnoreCase(key)) {
                     key = "Content-Type";
+                } else if ("xray".equalsIgnoreCase(key)) {
+                    key = "Xray";
                 }
                 headers.put(key, val);
             } catch (Throwable ignore) {
