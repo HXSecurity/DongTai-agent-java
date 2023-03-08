@@ -1,5 +1,6 @@
 package io.dongtai.iast.core.handler.hookpoint.service.trace;
 
+import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.context.ContextManager;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.PolicyNode;
@@ -52,6 +53,8 @@ public class HttpService implements ServiceTrace {
                 final HttpURLConnection connection = (HttpURLConnection) event.objectInstance;
                 final String traceId = ContextManager.nextTraceId();
                 connection.setRequestProperty(ContextManager.getHeaderKey(), traceId);
+                connection.setRequestProperty(ContextManager.getParentKey(),
+                        String.valueOf(EngineManager.getAgentId()));
                 return traceId;
             }
         } catch (IllegalStateException ignore) {
@@ -84,6 +87,7 @@ public class HttpService implements ServiceTrace {
             }
             final String traceId = ContextManager.nextTraceId();
             method.invoke(obj, ContextManager.getHeaderKey(), traceId);
+            method.invoke(obj, ContextManager.getParentKey(), String.valueOf(EngineManager.getAgentId()));
             return traceId;
         } catch (Throwable e) {
             DongTaiLog.debug("add traceId header to apache http client failed: {}, {}",
@@ -105,6 +109,7 @@ public class HttpService implements ServiceTrace {
             }
             final String traceId = ContextManager.nextTraceId();
             method.invoke(obj, ContextManager.getHeaderKey(), traceId);
+            method.invoke(obj, ContextManager.getParentKey(), String.valueOf(EngineManager.getAgentId()));
             return traceId;
         } catch (Throwable e) {
             DongTaiLog.debug("add traceId header to apache legacy http client failed: {}, {}",
@@ -134,6 +139,8 @@ public class HttpService implements ServiceTrace {
             Method methodAddHeader = reqBuilder.getClass().getMethod("addHeader", String.class, String.class);
             final String traceId = ContextManager.nextTraceId();
             methodAddHeader.invoke(reqBuilder, ContextManager.getHeaderKey(), traceId);
+            methodAddHeader.invoke(reqBuilder, ContextManager.getParentKey(),
+                    String.valueOf(EngineManager.getAgentId()));
             Method methodBuild = reqBuilder.getClass().getMethod("build");
             Object newReq = methodBuild.invoke(reqBuilder);
             reqField.set(obj, newReq);
