@@ -24817,7 +24817,7 @@ java/util/RandomAccessSubList
 java/util/RegularEnumSet
 java/util/RegularEnumSet$EnumSetIterator
 java/util/ResourceBundle*
-java/util/Scanner*
+#java/util/Scanner*
 java/util/Set
 java/util/ServiceConfigurationError
 java/util/ServiceLoader
