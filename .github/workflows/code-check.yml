@@ -5,9 +5,13 @@ name: Build Agent and Upload To OSS
 
 on:
   push:
-    branches: [ beta ]
+    branches:
+      - main
+      - beta
   pull_request:
-    branches: [ beta ]
+    branches:
+      - main
+      - beta
     paths-ignore:
       - '.github/**'
       - 'changes/**'
