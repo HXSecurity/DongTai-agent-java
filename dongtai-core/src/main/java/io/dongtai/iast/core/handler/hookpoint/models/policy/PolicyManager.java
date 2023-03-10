@@ -1,5 +1,7 @@
 package io.dongtai.iast.core.handler.hookpoint.models.policy;
 
+import io.dongtai.iast.core.bytecode.enhance.plugin.framework.dubbo.DispatchDubbo;
+import io.dongtai.iast.core.bytecode.enhance.plugin.framework.feign.DispatchFeign;
 import io.dongtai.iast.core.bytecode.enhance.plugin.framework.j2ee.dispatch.DispatchJ2ee;
 import io.dongtai.iast.core.utils.StringUtils;
 import io.dongtai.log.DongTaiLog;
@@ -27,11 +29,16 @@ public class PolicyManager {
             " org.springframework.web.servlet.FrameworkServlet".substring(1),
             " javax.servlet.http.Cookie".substring(1),
             " org/springframework/web/servlet/mvc/annotation/AnnotationMethodHandlerAdapter$ServletHandlerMethodInvoker".substring(1),
-            " feign.SynchronousMethodHandler.invoke".substring(1)
+            DispatchFeign.FEIGN_SYNC_HANDLER,
+            DispatchDubbo.ALIBABA_DUBBO_SYNC_HANDLER,
+            DispatchDubbo.APACHE_DUBBO_SYNC_HANDLER,
+            DispatchDubbo.ALIBABA_DUBBO_EXCHANGE_HANDLER,
+            DispatchDubbo.APACHE_DUBBO_EXCHANGE_HANDLER,
+            DispatchDubbo.APACHE_DUBBO_EXCHANGE_CHANNEL,
+            DispatchDubbo.ALIBABA_DUBBO_PROXY_HANDLER,
+            DispatchDubbo.APACHE_DUBBO_PROXY_HANDLER
     ));
-    private static final Set<String> HOOK_CLASS_SUFFIX_NAMES = new HashSet<String>(Collections.singletonList(
-            ".dubbo.monitor.support.MonitorFilter"
-    ));
+    private static final Set<String> HOOK_CLASS_SUFFIX_NAMES = new HashSet<String>();
 
     public Policy getPolicy() {
         return this.policy;

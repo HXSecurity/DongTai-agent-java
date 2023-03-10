@@ -4,8 +4,8 @@ import org.objectweb.asm.commons.Method;
 
 import java.lang.dongtai.SpyDispatcher;
 import java.lang.dongtai.SpyDispatcherHandler;
-import java.util.Collection;
-import java.util.Enumeration;
+import java.net.InetSocketAddress;
+import java.util.*;
 
 /**
  * 常用的ASM method 集合 省得我到处声明
@@ -132,6 +132,54 @@ public interface AsmMethods {
             int.class
     );
 
+    Method SPY$enterDubbo = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "enterDubbo"
+    );
+    Method SPY$leaveDubbo = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "leaveDubbo",
+            Object.class,
+            Object.class
+    );
+    Method SPY$isFirstLevelDubbo = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "isFirstLevelDubbo"
+    );
+    Method SPY$collectDubboRequest = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "collectDubboRequest",
+            Object.class,
+            Object.class,
+            Object.class,
+            String.class,
+            InetSocketAddress.class,
+            boolean.class,
+            boolean.class,
+            boolean.class,
+            boolean.class
+    );
+
+    Method SPY$collectDubboRequestSource = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "collectDubboRequestSource",
+            Object.class,
+            Object.class,
+            String.class,
+            Object[].class,
+            Map.class,
+            String.class,
+            String.class,
+            String.class
+    );
+
+    Method SPY$collectDubboResponse = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "collectDubboResponse",
+            Object.class,
+            byte.class
+    );
+
     Method SPY$enterSource = InnerHelper.getAsmMethod(
             SpyDispatcher.class,
             "enterSource"
@@ -204,6 +252,19 @@ public interface AsmMethods {
             "traceFeignInvoke",
             Object.class,
             Object[].class,
+            String.class,
+            String.class,
+            String.class
+    );
+
+    Method SPY$traceDubboInvoke = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "traceDubboInvoke",
+            Object.class,
+            String.class,
+            Object.class,
+            Object[].class,
+            Map.class,
             String.class,
             String.class,
             String.class

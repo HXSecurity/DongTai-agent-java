@@ -82,6 +82,9 @@ public enum ErrorCode {
     GRAPH_BUILD_AND_REPORT_FAILED(20321, "build and report request graph failed"),
     TAINT_COMMAND_GET_PARAMETERS_FAILED(20351, "taint command get {} parameters failed"),
     TAINT_COMMAND_RANGE_PROCESS_FAILED(20352, "taint command range process failed"),
+    SPY_TRACE_DUBBO_CONSUMER_INVOKE_FAILED(20361, "hookpoint trace dubbo consumer invoke failed"),
+    SPY_LEAVE_DUBBO_FAILED(20362, "hookpoint leave dubbo failed"),
+    SPY_COLLECT_DUBBO_FAILED(20363, "hookpoint collect dubbo {} failed"),
 
     // report & replay
     REPORT_SEND_FAILED(20401, "send report to {} error, report: {}"),

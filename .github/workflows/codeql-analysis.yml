@@ -13,7 +13,9 @@ name: "CodeQL"
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
+      - beta
     paths-ignore:
       - '.github/**'
       - 'changes/**'
@@ -24,7 +26,9 @@ on:
       - 'LICENSE'
       - '.gitignore'
   pull_request:
-    branches: [ main ]
+    branches:
+      - main
+      - beta
     paths-ignore:
       - '.github/**'
       - 'changes/**'

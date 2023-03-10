@@ -77,11 +77,12 @@ public abstract class AbstractNormalVulScan implements IVulScan {
         if (status == null) {
             return "";
         }
-        if (headers == null || headers.isEmpty()) {
-            return status;
-        }
         StringBuilder sb = new StringBuilder();
-        sb.append(status).append("\n");
+        sb.append(status);
+        if (headers == null || headers.isEmpty()) {
+            return Base64Encoder.encodeBase64String(sb.toString().getBytes()).replaceAll("\n", "").replaceAll("\r", "");
+        }
+        sb.append("\n");
         for (Map.Entry<String, Collection<String>> headerItem : headers.entrySet()) {
             for (String v : headerItem.getValue()) {
                 sb.append(headerItem.getKey());
