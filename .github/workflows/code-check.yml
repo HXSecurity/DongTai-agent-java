@@ -8,10 +8,12 @@ on:
     branches:
       - main
       - beta
+      - develop
   pull_request:
     branches:
       - main
       - beta
+      - develop
     paths-ignore:
       - '.github/**'
       - 'changes/**'
@@ -110,6 +112,10 @@ jobs:
         with:
           maven-version: 3.2.5
 
+      - name: Get the release version
+        id: version
+        run: echo ::set-output name=GITHUB_REF::${GITHUB_REF##*/}
+
       - name: Restore dependencies from cache
         uses: actions/cache@v2
         with:
@@ -135,12 +141,19 @@ jobs:
           endpoint: ${{ secrets.CHART_OSS_ENDPOINT }}
           access-key-id: ${{ secrets.OSS_KEY_ID }}
           access-key-secret: ${{ secrets.OSS_KEY_SECRET }}
-      - run: |
-          ossutil cp -rf dongtai-agent/target/dongtai-agent.jar oss://dongtai-helm-charts/agent_test/java/dongtai-agent.jar --meta x-oss-object-acl:public-read
-          ossutil cp -rf dongtai-agent/src/main/resources/bin/ oss://dongtai-helm-charts/agent_test/java/ --meta x-oss-object-acl:public-read
 
-          ossutil cp -rf dongtai-agent/target/dongtai-agent.jar oss://dongtai-helm-charts/agent_test/java/latest/dongtai-agent.jar --meta x-oss-object-acl:public-read
-          ossutil cp -rf dongtai-agent/src/main/resources/bin/ oss://dongtai-helm-charts/agent_test/java/latest/ --meta x-oss-object-acl:public-read
+      - name: add agent
+        if: ${{ steps.version.outputs.GITHUB_REF }} == develop || ${{ steps.version.outputs.GITHUB_REF }} == beta || ${{ steps.version.outputs.GITHUB_REF }} == main
+        run: |
+          if [ ${{ steps.version.outputs.GITHUB_REF }} = develop ] ; then 
+            ossutil cp -rf dongtai-agent/target/dongtai-agent.jar oss://dongtai-helm-charts/agent_test/java/latest/dongtai-agent.jar --meta x-oss-object-acl:public-read
+            ossutil cp -rf dongtai-agent/src/main/resources/bin/ oss://dongtai-helm-charts/agent_test/java/latest/ --meta x-oss-object-acl:public-read
+          else  
+            ossutil cp -rf dongtai-agent/target/dongtai-agent.jar oss://dongtai-helm-charts/agent_${{ steps.version.outputs.GITHUB_REF }}/java/latest/dongtai-agent.jar --meta x-oss-object-acl:public-read
+            ossutil cp -rf dongtai-agent/src/main/resources/bin/ oss://dongtai-helm-charts/agent_${{ steps.version.outputs.GITHUB_REF }}/java/latest/ --meta x-oss-object-acl:public-read
+          fi
+          # ossutil cp -rf dongtai-agent/target/dongtai-agent.jar oss://dongtai-helm-charts/agent_test/java/dongtai-agent.jar --meta x-oss-object-acl:public-read
+          # ossutil cp -rf dongtai-agent/src/main/resources/bin/ oss://dongtai-helm-charts/agent_test/java/ --meta x-oss-object-acl:public-read
 
       - name: Trigger Openapi Workflow
         uses: benc-uk/workflow-dispatch@v1
