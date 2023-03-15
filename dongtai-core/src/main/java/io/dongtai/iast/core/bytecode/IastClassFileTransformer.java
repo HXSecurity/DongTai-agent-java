@@ -9,6 +9,7 @@ import io.dongtai.iast.core.bytecode.enhance.plugin.PluginRegister;
 import io.dongtai.iast.core.bytecode.sca.ScaScanner;
 import io.dongtai.iast.core.handler.hookpoint.SpyDispatcherImpl;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.PolicyManager;
+import io.dongtai.iast.core.handler.hookpoint.vulscan.dynamic.FastjsonCheck;
 import io.dongtai.iast.core.utils.AsmUtils;
 import io.dongtai.iast.core.utils.PropertyUtils;
 import io.dongtai.iast.core.utils.matcher.ConfigMatcher;
@@ -120,6 +121,12 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                     || internalClassName.startsWith("java/lang/iast/")
                     || internalClassName.startsWith("cn/huoxian/iast/")) {
                 return null;
+            }
+
+            if (" com/alibaba/fastjson/JSON".substring(1).equals(internalClassName)) {
+                FastjsonCheck.setJsonClassLoader(loader);
+            } else if (" com/alibaba/fastjson/parser/ParserConfig".substring(1).equals(internalClassName)) {
+                FastjsonCheck.setParseConfigClassLoader(loader);
             }
 
             if (null != loader && loader.toString().toLowerCase().contains("rasp")) {

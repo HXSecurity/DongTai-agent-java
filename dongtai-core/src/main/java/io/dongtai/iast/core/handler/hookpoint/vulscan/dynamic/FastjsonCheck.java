@@ -19,6 +19,9 @@ public class FastjsonCheck implements SinkSafeChecker {
 
     private String policySignature;
 
+    private static ClassLoader JSON_CLASS_LOADER;
+    private static ClassLoader PARSE_CONFIG_CLASS_LOADER;
+
     @Override
     public boolean match(MethodEvent event, SinkNode sinkNode) {
         if (sinkNode.getMethodMatcher() instanceof SignatureMethodMatcher) {
@@ -31,7 +34,12 @@ public class FastjsonCheck implements SinkSafeChecker {
     @Override
     public boolean isSafe(MethodEvent event, SinkNode sinkNode) {
         try {
-            Class<?> cls = Class.forName("com.alibaba.fastjson.JSON");
+            Class<?> cls;
+            if (JSON_CLASS_LOADER == null) {
+                cls = Class.forName("com.alibaba.fastjson.JSON");
+            } else {
+                cls = Class.forName("com.alibaba.fastjson.JSON", false, JSON_CLASS_LOADER);
+            }
             Field f = cls.getDeclaredField("VERSION");
             Class<?> t = f.getType();
             if (t != String.class) {
@@ -51,14 +59,28 @@ public class FastjsonCheck implements SinkSafeChecker {
             }
 
             // https://github.com/alibaba/fastjson/wiki/fastjson_safemode
-            Class<?> cfgClass = Class.forName("com.alibaba.fastjson.parser.ParserConfig");
+            Class<?> cfgClass;
+            if (PARSE_CONFIG_CLASS_LOADER == null) {
+                cfgClass = Class.forName("com.alibaba.fastjson.parser.ParserConfig");
+            } else {
+                cfgClass = Class.forName("com.alibaba.fastjson.parser.ParserConfig", false, PARSE_CONFIG_CLASS_LOADER);
+            }
             Object cfg = cfgClass.getMethod("getGlobalInstance").invoke(null);
             Object isSafeMode = cfg.getClass().getMethod("isSafeMode").invoke(cfg);
             return isSafeMode != null && (Boolean) isSafeMode;
         } catch (Throwable e) {
             DongTaiLog.debug("fastjson version and safe mode check failed: {}, {}",
-                    e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "");
+                    e.getClass().getName() + ": " + e.getMessage(),
+                    e.getCause() != null ? e.getCause().getMessage() : "");
             return true;
         }
+    }
+
+    public static void setJsonClassLoader(ClassLoader jsonClassLoader) {
+        JSON_CLASS_LOADER = jsonClassLoader;
+    }
+
+    public static void setParseConfigClassLoader(ClassLoader parseConfigClassLoader) {
+        PARSE_CONFIG_CLASS_LOADER = parseConfigClassLoader;
     }
 }
