@@ -9,8 +9,7 @@ import io.dongtai.iast.core.handler.hookpoint.models.policy.Policy;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.PolicyNode;
 import io.dongtai.iast.core.utils.AsmUtils;
 import io.dongtai.log.DongTaiLog;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.*;
 import org.objectweb.asm.commons.JSRInlinerAdapter;
 
 import java.lang.reflect.Modifier;
@@ -71,7 +70,7 @@ public class DispatchClassPlugin implements DispatchPlugin {
             mv = lazyAop(mv, access, name, descriptor, matchedSignature, methodContext);
             boolean methodIsTransformed = mv instanceof MethodAdviceAdapter;
 
-            if (methodIsTransformed && this.classVersion < 50) {
+            if (methodIsTransformed && this.classVersion <= Opcodes.V1_6) {
                 mv = new JSRInlinerAdapter(mv, access, name, descriptor, signature, exceptions);
             }
 
