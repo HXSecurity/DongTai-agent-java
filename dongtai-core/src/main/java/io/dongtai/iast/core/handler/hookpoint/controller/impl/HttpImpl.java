@@ -83,7 +83,7 @@ public class HttpImpl {
         try {
             boolean enableVersionHeader = ((Config<Boolean>) ConfigBuilder.getInstance()
                     .getConfig(ConfigKey.ENABLE_VERSION_HEADER)).get();
-            String xrayHeader = ((Map<String, String>) requestMeta.get("headers")).get("Xray");
+            String xrayHeader = ((Map<String, String>) requestMeta.get("headers")).get("dt-dast");
             if (enableVersionHeader || xrayHeader != null) {
                 Method setHeaderMethod = ReflectUtils.getDeclaredMethodFromSuperClass(resp.getClass(),
                         "setHeader", new Class[]{String.class, String.class});
@@ -149,8 +149,8 @@ public class HttpImpl {
                 String val = (String) getHeaderMethod.invoke(req, key);
                 if ("content-type".equalsIgnoreCase(key)) {
                     key = "Content-Type";
-                } else if ("xray".equalsIgnoreCase(key)) {
-                    key = "Xray";
+                } else if ("dt-dast".equalsIgnoreCase(key)) {
+                    key = "dt-dast";
                 }
                 headers.put(key, val);
             } catch (Throwable ignore) {
