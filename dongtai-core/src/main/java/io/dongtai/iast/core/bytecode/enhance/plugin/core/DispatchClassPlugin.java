@@ -60,6 +60,12 @@ public class DispatchClassPlugin implements DispatchPlugin {
                 return mv;
             }
 
+            if (this.policy.isBlacklistHooks(this.context.getClassName())
+                    && !this.policy.isIgnoreBlacklistHooks(this.context.getClassName())
+                    && !this.policy.isIgnoreInternalHooks(this.context.getClassName())) {
+                return mv;
+            }
+
             MethodContext methodContext = new MethodContext(this.context, name);
             methodContext.setModifier(access);
             methodContext.setDescriptor(descriptor);

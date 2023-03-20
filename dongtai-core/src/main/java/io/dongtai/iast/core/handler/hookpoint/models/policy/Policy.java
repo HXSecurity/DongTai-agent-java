@@ -10,6 +10,10 @@ public class Policy {
     private final Set<String> classHooks = new HashSet<String>();
     private final Set<String> ancestorClassHooks = new HashSet<String>();
 
+    private final Set<String> blacklistHooks = new HashSet<String>();
+    private final Set<String> ignoreInternalHooks = new HashSet<String>();
+    private final Set<String> ignoreBlacklistHooks = new HashSet<String>();
+
     public List<SourceNode> getSources() {
         return sources;
     }
@@ -51,6 +55,12 @@ public class Policy {
             methodMatcher = (SignatureMethodMatcher) node.getMethodMatcher();
             this.policyNodesMap.put(node.toString(), node);
             addHooks(methodMatcher.getSignature().getClassName(), node.getInheritable());
+            if (node.isIgnoreInternal()) {
+                this.ignoreInternalHooks.add(methodMatcher.getSignature().getClassName());
+            }
+            if (node.isIgnoreBlacklist()) {
+                this.ignoreBlacklistHooks.add(methodMatcher.getSignature().getClassName());
+            }
         }
     }
 
@@ -85,5 +95,21 @@ public class Policy {
 
     public Set<String> getAncestorClassHooks() {
         return this.ancestorClassHooks;
+    }
+
+    public void addBlacklistHooks(String className) {
+        this.blacklistHooks.add(className);
+    }
+
+    public boolean isBlacklistHooks(String className) {
+        return this.blacklistHooks.contains(className);
+    }
+
+    public boolean isIgnoreInternalHooks(String className) {
+        return this.ignoreInternalHooks.contains(className);
+    }
+
+    public boolean isIgnoreBlacklistHooks(String className) {
+        return this.ignoreBlacklistHooks.contains(className);
     }
 }

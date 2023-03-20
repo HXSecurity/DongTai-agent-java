@@ -22,6 +22,8 @@ public class PolicyBuilder {
     private static final String KEY_INHERIT = "inherit";
     private static final String KEY_VUL_TYPE = "vul_type";
     private static final String KEY_COMMAND = "command";
+    private static final String KEY_IGNORE_INTERNAL = "ignore_internal";
+    private static final String KEY_IGNORE_BLACKLIST = "ignore_blacklist";
 
     public static JSONArray fetchFromServer() throws PolicyException {
         try {
@@ -82,6 +84,7 @@ public class PolicyBuilder {
         setInheritable(node, sourceNode);
         List<String[]> tags = parseTags(node, sourceNode);
         sourceNode.setTags(tags.get(0));
+        parseFlags(node, sourceNode);
         policy.addSource(sourceNode);
     }
 
@@ -99,6 +102,7 @@ public class PolicyBuilder {
         List<String[]> tags = parseTags(node, propagatorNode);
         propagatorNode.setTags(tags.get(0));
         propagatorNode.setUntags(tags.get(1));
+        parseFlags(node, propagatorNode);
         policy.addPropagator(propagatorNode);
     }
 
@@ -118,6 +122,7 @@ public class PolicyBuilder {
         setInheritable(node, sinkNode);
         sinkNode.setVulType(vulType);
         sinkNode.setStackDenyList(parseStackDenyList(sinkNode));
+        parseFlags(node, sinkNode);
         policy.addSink(sinkNode);
     }
 
@@ -235,5 +240,15 @@ public class PolicyBuilder {
         }
 
         return taintTags;
+    }
+
+    private static void parseFlags(JSONObject node, PolicyNode policyNode) {
+        try {
+            boolean ignoreInternal = node.getBoolean(KEY_IGNORE_INTERNAL);
+            policyNode.setIgnoreInternal(ignoreInternal);
+            boolean ignoreBlackList = node.getBoolean(KEY_IGNORE_BLACKLIST);
+            policyNode.setIgnoreBlacklist(ignoreBlackList);
+        } catch (JSONException ignore) {
+        }
     }
 }

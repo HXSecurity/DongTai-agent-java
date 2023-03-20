@@ -62,7 +62,7 @@ public class PolicyManager {
         }
     }
 
-    public static boolean isHookClass(String className) {
+    public boolean isHookClass(String className) {
         return HOOK_CLASS_NAMES.contains(className) || hookBySuffix(className);
     }
 

@@ -131,6 +131,10 @@ public interface SpyDispatcher {
      */
     boolean isFirstLevelSink();
 
+    void enterIgnoreInternal();
+
+    void leaveIgnoreInternal();
+
     void reportService(String category, String type, String host, String port, String handler);
 
     boolean isReplayRequest();
