@@ -13,16 +13,19 @@ public class ConfigBuilderTest {
         JSONObject configJson;
         String configString;
         ConfigBuilder builder = ConfigBuilder.getInstance();
-        boolean reportResponseBody;
-        int reportMaxMethodPoolSize;
+        Boolean reportResponseBody;
+        Integer reportMaxMethodPoolSize;
+        String versionHeaderKey;
         RequestDenyList requestDenyList;
 
         // default
-        reportResponseBody = ((Config<Boolean>)builder.getConfig(ConfigKey.REPORT_RESPONSE_BODY)).get();
+        reportResponseBody = builder.get(ConfigKey.REPORT_RESPONSE_BODY);
         Assert.assertTrue("REPORT_RESPONSE_BODY default", reportResponseBody);
-        reportMaxMethodPoolSize = ((Config<Integer>)builder.getConfig(ConfigKey.REPORT_MAX_METHOD_POOL_SIZE)).get();
-        Assert.assertEquals("REPORT_MAX_METHOD_POOL_SIZE default", 5000, reportMaxMethodPoolSize);
-        requestDenyList = ((Config<RequestDenyList>)builder.getConfig(ConfigKey.REQUEST_DENY_LIST)).get();
+        reportMaxMethodPoolSize = builder.get(ConfigKey.REPORT_MAX_METHOD_POOL_SIZE);
+        Assert.assertEquals("REPORT_MAX_METHOD_POOL_SIZE default", new Integer(5000), reportMaxMethodPoolSize);
+        versionHeaderKey = builder.get(ConfigKey.VERSION_HEADER_KEY);
+        Assert.assertEquals("VERSION_HEADER_KEY default", "DongTai", versionHeaderKey);
+        requestDenyList = builder.get(ConfigKey.REQUEST_DENY_LIST);
         Assert.assertNull("REQUEST_DENY_LIST default", requestDenyList);
 
         // update
@@ -41,11 +44,11 @@ public class ConfigBuilderTest {
                 RequestDeny.Operator.EXISTS, "key1");
         expectRequestDenyList.addRule(Collections.singletonList(headerKeyMatch));
 
-        reportResponseBody = ((Config<Boolean>)builder.getConfig(ConfigKey.REPORT_RESPONSE_BODY)).get();
+        reportResponseBody = builder.get(ConfigKey.REPORT_RESPONSE_BODY);
         Assert.assertFalse("REPORT_RESPONSE_BODY updated", reportResponseBody);
-        reportMaxMethodPoolSize = ((Config<Integer>)builder.getConfig(ConfigKey.REPORT_MAX_METHOD_POOL_SIZE)).get();
-        Assert.assertEquals("REPORT_MAX_METHOD_POOL_SIZE updated", 1000, reportMaxMethodPoolSize);
-        requestDenyList = ((Config<RequestDenyList>)builder.getConfig(ConfigKey.REQUEST_DENY_LIST)).get();
+        reportMaxMethodPoolSize = builder.get(ConfigKey.REPORT_MAX_METHOD_POOL_SIZE);
+        Assert.assertEquals("REPORT_MAX_METHOD_POOL_SIZE updated", new Integer(1000), reportMaxMethodPoolSize);
+        requestDenyList = builder.get(ConfigKey.REQUEST_DENY_LIST);
         Assert.assertEquals("REQUEST_DENY_LIST updated", expectRequestDenyList, requestDenyList);
 
         // update invalid
@@ -62,11 +65,11 @@ public class ConfigBuilderTest {
         configJson = new JSONObject(configString);
         builder.update(configJson);
 
-        reportResponseBody = ((Config<Boolean>)builder.getConfig(ConfigKey.REPORT_RESPONSE_BODY)).get();
+        reportResponseBody = builder.get(ConfigKey.REPORT_RESPONSE_BODY);
         Assert.assertFalse("REPORT_RESPONSE_BODY not updated", reportResponseBody);
-        reportMaxMethodPoolSize = ((Config<Integer>)builder.getConfig(ConfigKey.REPORT_MAX_METHOD_POOL_SIZE)).get();
-        Assert.assertEquals("REPORT_MAX_METHOD_POOL_SIZE not updated", 1000, reportMaxMethodPoolSize);
-        requestDenyList = ((Config<RequestDenyList>)builder.getConfig(ConfigKey.REQUEST_DENY_LIST)).get();
+        reportMaxMethodPoolSize = builder.get(ConfigKey.REPORT_MAX_METHOD_POOL_SIZE);
+        Assert.assertEquals("REPORT_MAX_METHOD_POOL_SIZE not updated", new Integer(1000), reportMaxMethodPoolSize);
+        requestDenyList = builder.get(ConfigKey.REQUEST_DENY_LIST);
         Assert.assertEquals("REQUEST_DENY_LIST not updated", expectRequestDenyList, requestDenyList);
 
         ConfigBuilder.clear();

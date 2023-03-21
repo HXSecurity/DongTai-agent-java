@@ -1,6 +1,7 @@
 package io.dongtai.iast.core.handler.hookpoint.controller.impl;
 
-import io.dongtai.iast.common.config.*;
+import io.dongtai.iast.common.config.ConfigBuilder;
+import io.dongtai.iast.common.config.ConfigKey;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.context.ContextManager;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
@@ -127,12 +128,10 @@ public class DubboImpl {
         if (result == null) {
             return;
         }
-        try {
-            boolean getBody = ((Config<Boolean>) ConfigBuilder.getInstance().getConfig(ConfigKey.REPORT_RESPONSE_BODY)).get();
-            if (!getBody) {
-                return;
-            }
-        } catch (Throwable ignore) {
+
+        Boolean getBody = ConfigBuilder.getInstance().get(ConfigKey.REPORT_RESPONSE_BODY);
+        // default true
+        if (getBody != null && !getBody) {
             return;
         }
 

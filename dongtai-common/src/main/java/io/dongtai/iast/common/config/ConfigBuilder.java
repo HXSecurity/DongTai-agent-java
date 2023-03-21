@@ -15,11 +15,15 @@ public class ConfigBuilder {
         this.configMap.put(ConfigKey.REPORT_RESPONSE_BODY,
                 Config.<Boolean>create(ConfigKey.REPORT_RESPONSE_BODY).setDefaultValue(true));
         this.configMap.put(ConfigKey.REQUEST_DENY_LIST,
-                Config.<RequestDenyList>create(ConfigKey.REQUEST_DENY_LIST).setDefaultValue(null));
+                Config.<RequestDenyList>create(ConfigKey.REQUEST_DENY_LIST));
         this.configMap.put(ConfigKey.ENABLE_VERSION_HEADER,
                 Config.<Boolean>create(ConfigKey.VERSION_HEADER_KEY).setDefaultValue(true));
         this.configMap.put(ConfigKey.VERSION_HEADER_KEY,
                 Config.<String>create(ConfigKey.VERSION_HEADER_KEY).setDefaultValue("DongTai"));
+        this.configMap.put(ConfigKey.ENABLE_LOGGER,
+                Config.<Boolean>create(ConfigKey.ENABLE_LOGGER));
+        this.configMap.put(ConfigKey.LOGGER_LEVEL,
+                Config.<String>create(ConfigKey.LOGGER_LEVEL));
     }
 
     public static ConfigBuilder getInstance() {
@@ -56,7 +60,18 @@ public class ConfigBuilder {
         updateInt(config, ConfigKey.JsonKey.JSON_REPORT_MAX_METHOD_POOL_SIZE);
         updateBool(config, ConfigKey.JsonKey.JSON_ENABLE_VERSION_HEADER);
         updateString(config, ConfigKey.JsonKey.JSON_VERSION_HEADER_KEY);
+        updateBool(config, ConfigKey.JsonKey.JSON_ENABLE_LOGGER);
+        updateString(config, ConfigKey.JsonKey.JSON_LOGGER_LEVEL);
         updateRequestDenyList(config);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T get(ConfigKey key) {
+        try {
+            return ((Config<T>) getConfig(key)).get();
+        } catch (Throwable ignore) {
+            return null;
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -89,7 +104,7 @@ public class ConfigBuilder {
             Config<String> conf = (Config<String>) getConfig(jsonKey.getConfigKey());
             if (conf != null) {
                 String value = config.getString(jsonKey.getKey());
-                if (value != null || !value.isEmpty()) {
+                if (value != null && !value.isEmpty()) {
                     conf.setValue(value);
                 }
             }

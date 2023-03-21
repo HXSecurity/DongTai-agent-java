@@ -109,6 +109,10 @@ public class DongTaiLog {
 
     private static LogLevel getCurrentLevel() {
         String logLevel = IastProperties.getLogLevel();
+        return parseLevel(logLevel);
+    }
+
+    public static LogLevel parseLevel(String logLevel) {
         LogLevel lvl;
         if ("trace".equalsIgnoreCase(logLevel)) {
             lvl = LogLevel.TRACE;
