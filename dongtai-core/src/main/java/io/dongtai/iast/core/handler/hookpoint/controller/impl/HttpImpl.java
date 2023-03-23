@@ -22,6 +22,8 @@ import java.util.*;
 public class HttpImpl {
     private static IastClassLoader iastClassLoader;
     public static File IAST_REQUEST_JAR_PACKAGE;
+    public static final String HEADER_DAST_MARK = "dt-mark-header";
+    public static final String HEADER_DAST = "dt-dast";
 
     static {
         IAST_REQUEST_JAR_PACKAGE = new File(PropertyUtils.getTmpDir() + "dongtai-api.jar");
@@ -83,8 +85,9 @@ public class HttpImpl {
         try {
             boolean enableVersionHeader = ((Config<Boolean>) ConfigBuilder.getInstance()
                     .getConfig(ConfigKey.ENABLE_VERSION_HEADER)).get();
-            String xrayHeader = ((Map<String, String>) requestMeta.get("headers")).get("dt-dast");
-            if (enableVersionHeader || xrayHeader != null) {
+            String dastHeader = ((Map<String, String>) requestMeta.get("headers")).get(HEADER_DAST);
+            String dastMarkHeader = ((Map<String, String>) requestMeta.get("headers")).get(HEADER_DAST_MARK);
+            if (enableVersionHeader || dastHeader != null || dastMarkHeader != null) {
                 Method setHeaderMethod = ReflectUtils.getDeclaredMethodFromSuperClass(resp.getClass(),
                         "setHeader", new Class[]{String.class, String.class});
                 if (setHeaderMethod != null) {
@@ -93,11 +96,14 @@ public class HttpImpl {
                                 .getConfig(ConfigKey.VERSION_HEADER_KEY)).get();
                         setHeaderMethod.invoke(resp, versionHeaderKey, AgentConstant.VERSION_VALUE);
                     }
-                    if (xrayHeader != null) {
+                    if (dastMarkHeader != null) {
                         String reqId = String.valueOf(EngineManager.getAgentId()) + "."
                                 + UUID.randomUUID().toString().replaceAll("-", "");
                         setHeaderMethod.invoke(resp, "dt-request-id", reqId);
                     }
+                }
+                if (dastHeader != null) {
+                    return;
                 }
             }
         } catch (Throwable ignore) {
@@ -149,8 +155,10 @@ public class HttpImpl {
                 String val = (String) getHeaderMethod.invoke(req, key);
                 if ("content-type".equalsIgnoreCase(key)) {
                     key = "Content-Type";
-                } else if ("dt-dast".equalsIgnoreCase(key)) {
-                    key = "dt-dast";
+                } else if (HEADER_DAST_MARK.equalsIgnoreCase(key)) {
+                    key = HEADER_DAST_MARK;
+                } else if (HEADER_DAST.equalsIgnoreCase(key)) {
+                    key = HEADER_DAST;
                 }
                 headers.put(key, val);
             } catch (Throwable ignore) {
