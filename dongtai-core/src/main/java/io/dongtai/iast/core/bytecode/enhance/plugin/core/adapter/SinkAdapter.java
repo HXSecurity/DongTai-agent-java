@@ -16,7 +16,7 @@ public class SinkAdapter extends MethodAdapter {
                 continue;
             }
 
-            enterScope(adapter);
+            enterScope(adapter, policyNode);
 
             Label elseLabel = new Label();
             Label endLabel = new Label();
@@ -39,18 +39,28 @@ public class SinkAdapter extends MethodAdapter {
                 continue;
             }
 
-            leaveScope(adapter);
+            leaveScope(adapter, policyNode);
         }
     }
 
-    private void enterScope(MethodAdviceAdapter adapter) {
+    private void enterScope(MethodAdviceAdapter adapter, PolicyNode policyNode) {
+        if (policyNode.isIgnoreInternal()) {
+            adapter.invokeStatic(ASM_TYPE_SPY_HANDLER, SPY_HANDLER$getDispatcher);
+            adapter.invokeInterface(ASM_TYPE_SPY_DISPATCHER, SPY$enterIgnoreInternal);
+        }
+
         adapter.invokeStatic(ASM_TYPE_SPY_HANDLER, SPY_HANDLER$getDispatcher);
         adapter.invokeInterface(ASM_TYPE_SPY_DISPATCHER, SPY$enterSink);
     }
 
-    private void leaveScope(MethodAdviceAdapter adapter) {
+    private void leaveScope(MethodAdviceAdapter adapter, PolicyNode policyNode) {
         adapter.invokeStatic(ASM_TYPE_SPY_HANDLER, SPY_HANDLER$getDispatcher);
         adapter.invokeInterface(ASM_TYPE_SPY_DISPATCHER, SPY$leaveSink);
+
+        if (policyNode.isIgnoreInternal()) {
+            adapter.invokeStatic(ASM_TYPE_SPY_HANDLER, SPY_HANDLER$getDispatcher);
+            adapter.invokeInterface(ASM_TYPE_SPY_DISPATCHER, SPY$leaveIgnoreInternal);
+        }
     }
 
     private void isFirstScope(MethodAdviceAdapter adapter) {

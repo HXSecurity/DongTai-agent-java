@@ -6,6 +6,7 @@ public class PolicyScope {
     private int propagatorLevel;
     private int propagatorSkipDepth;
     private int sinkLevel;
+    private int ignoreInternalLevel;
     /**
      * over max method pool size
      */
@@ -29,7 +30,8 @@ public class PolicyScope {
     }
 
     public boolean isValidSource() {
-        return this.agentLevel == 0 && !this.overCapacity
+        return this.agentLevel == 0
+                && this.ignoreInternalLevel == 0 && !this.overCapacity
                 && this.sourceLevel == 1;
     }
 
@@ -45,7 +47,8 @@ public class PolicyScope {
     }
 
     public boolean isValidPropagator() {
-        return this.agentLevel == 0 && !this.overCapacity && this.sourceLevel == 0
+        return this.agentLevel == 0
+                && this.ignoreInternalLevel == 0 && !this.overCapacity && this.sourceLevel == 0
                 && (this.propagatorLevel == 1 || this.propagatorSkipDepth > 0);
     }
 
@@ -61,12 +64,21 @@ public class PolicyScope {
     }
 
     public boolean isValidSink() {
-        return this.agentLevel == 0 && !this.overCapacity && this.sourceLevel == 0
+        return this.agentLevel == 0
+                && this.ignoreInternalLevel == 0 && !this.overCapacity && this.sourceLevel == 0
                 && this.sinkLevel == 1;
     }
 
     public void leaveSink() {
         this.sinkLevel = decrement(this.sinkLevel);
+    }
+
+    public void enterIgnoreInternal() {
+        this.ignoreInternalLevel++;
+    }
+
+    public void leaveIgnoreInternal() {
+        this.ignoreInternalLevel = decrement(this.ignoreInternalLevel);
     }
 
     public boolean isOverCapacity() {

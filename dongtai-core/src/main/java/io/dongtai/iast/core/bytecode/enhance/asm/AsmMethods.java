@@ -218,6 +218,14 @@ public interface AsmMethods {
             SpyDispatcher.class,
             "isFirstLevelSink"
     );
+    Method SPY$enterIgnoreInternal = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "enterIgnoreInternal"
+    );
+    Method SPY$leaveIgnoreInternal = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "leaveIgnoreInternal"
+    );
     Method SPY$collectMethodPool = InnerHelper.getAsmMethod(
             SpyDispatcher.class,
             "collectMethodPool",

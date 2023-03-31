@@ -18,7 +18,7 @@ public class PropagatorAdapter extends MethodAdapter {
             }
 
             String signature = context.toString();
-            enterScope(adapter, signature);
+            enterScope(adapter, signature, policyNode);
         }
     }
 
@@ -43,11 +43,16 @@ public class PropagatorAdapter extends MethodAdapter {
             adapter.mark(elseLabel);
             adapter.mark(endLabel);
 
-            leaveScope(adapter, signature);
+            leaveScope(adapter, signature, policyNode);
         }
     }
 
-    private void enterScope(MethodAdviceAdapter adapter, String signature) {
+    private void enterScope(MethodAdviceAdapter adapter, String signature, PolicyNode policyNode) {
+        if (policyNode.isIgnoreInternal()) {
+            adapter.invokeStatic(ASM_TYPE_SPY_HANDLER, SPY_HANDLER$getDispatcher);
+            adapter.invokeInterface(ASM_TYPE_SPY_DISPATCHER, SPY$enterIgnoreInternal);
+        }
+
         adapter.invokeStatic(ASM_TYPE_SPY_HANDLER, SPY_HANDLER$getDispatcher);
         if (PropagatorImpl.isSkipScope(signature)) {
             adapter.push(true);
@@ -57,7 +62,7 @@ public class PropagatorAdapter extends MethodAdapter {
         adapter.invokeInterface(ASM_TYPE_SPY_DISPATCHER, SPY$enterPropagator);
     }
 
-    private void leaveScope(MethodAdviceAdapter adapter, String signature) {
+    private void leaveScope(MethodAdviceAdapter adapter, String signature, PolicyNode policyNode) {
         adapter.invokeStatic(ASM_TYPE_SPY_HANDLER, SPY_HANDLER$getDispatcher);
         if (PropagatorImpl.isSkipScope(signature)) {
             adapter.push(true);
@@ -65,6 +70,11 @@ public class PropagatorAdapter extends MethodAdapter {
             adapter.push(false);
         }
         adapter.invokeInterface(ASM_TYPE_SPY_DISPATCHER, SPY$leavePropagator);
+
+        if (policyNode.isIgnoreInternal()) {
+            adapter.invokeStatic(ASM_TYPE_SPY_HANDLER, SPY_HANDLER$getDispatcher);
+            adapter.invokeInterface(ASM_TYPE_SPY_DISPATCHER, SPY$leaveIgnoreInternal);
+        }
     }
 
     private void isFirstScope(MethodAdviceAdapter adapter) {

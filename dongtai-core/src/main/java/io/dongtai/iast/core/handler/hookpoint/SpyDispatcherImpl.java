@@ -548,6 +548,34 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     }
 
     @Override
+    public void enterIgnoreInternal() {
+        try {
+            if (!EngineManager.isEngineRunning()) {
+                return;
+            }
+            if (ScopeManager.SCOPE_TRACKER.inAgent() || !ScopeManager.SCOPE_TRACKER.inEnterEntry()) {
+                return;
+            }
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().enterIgnoreInternal();
+        } catch (Throwable ignore) {
+        }
+    }
+
+    @Override
+    public void leaveIgnoreInternal() {
+        try {
+            if (!EngineManager.isEngineRunning()) {
+                return;
+            }
+            if (ScopeManager.SCOPE_TRACKER.inAgent() || !ScopeManager.SCOPE_TRACKER.inEnterEntry()) {
+                return;
+            }
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveIgnoreInternal();
+        } catch (Throwable ignore) {
+        }
+    }
+
+    @Override
     public void reportService(String category, String type, String host, String port, String handler) {
         // @TODO: refactor
     }

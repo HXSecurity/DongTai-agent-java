@@ -144,45 +144,47 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                 }
             }
 
-            if (null != classBeingRedefined || configMatcher.canHook(internalClassName)) {
-                byte[] sourceCodeBak = new byte[srcByteCodeArray.length];
-                System.arraycopy(srcByteCodeArray, 0, sourceCodeBak, 0, srcByteCodeArray.length);
-                final ClassReader cr = new ClassReader(sourceCodeBak);
-
-                ClassContext classContext = new ClassContext(cr, loader);
-                if (Modifier.isInterface(classContext.getModifier())) {
-                    sourceCodeBak = null;
-                    return null;
-                }
-                final String className = classContext.getClassName();
-
-                Set<String> ancestors = classDiagram.getDiagram(className);
-                if (ancestors == null) {
-                    classDiagram.setLoader(loader);
-                    classDiagram.saveAncestors(className, classContext.getSuperClassName(), classContext.getInterfaces());
-                    ancestors = classDiagram.getAncestors(className, classContext.getSuperClassName(),
-                            classContext.getInterfaces());
-                }
-                classContext.setAncestors(ancestors);
-
-                final ClassWriter cw = createClassWriter(loader, cr);
-                ClassVisitor cv = plugins.initial(cw, classContext, policyManager);
-
-                if (cv instanceof AbstractClassVisitor) {
-                    cr.accept(cv, ClassReader.EXPAND_FRAMES);
-                    AbstractClassVisitor dumpClassVisitor = (AbstractClassVisitor) cv;
-                    if (dumpClassVisitor.hasTransformed()) {
-                        if (null == classBeingRedefined) {
-                            transformMap.put(className, srcByteCodeArray);
-                        } else {
-                            transformMap.put(classBeingRedefined, srcByteCodeArray);
-                        }
-                        transformCount++;
-                        return dumpClassIfNecessary(cr.getClassName(), cw.toByteArray(), srcByteCodeArray);
-                    }
-                }
-                sourceCodeBak = null;
+            if (null == classBeingRedefined && !configMatcher.canHook(internalClassName, this.policyManager)) {
+                return null;
             }
+
+            byte[] sourceCodeBak = new byte[srcByteCodeArray.length];
+            System.arraycopy(srcByteCodeArray, 0, sourceCodeBak, 0, srcByteCodeArray.length);
+            final ClassReader cr = new ClassReader(sourceCodeBak);
+
+            ClassContext classContext = new ClassContext(cr, loader);
+            if (Modifier.isInterface(classContext.getModifier())) {
+                sourceCodeBak = null;
+                return null;
+            }
+            final String className = classContext.getClassName();
+
+            Set<String> ancestors = classDiagram.getDiagram(className);
+            if (ancestors == null) {
+                classDiagram.setLoader(loader);
+                classDiagram.saveAncestors(className, classContext.getSuperClassName(), classContext.getInterfaces());
+                ancestors = classDiagram.getAncestors(className, classContext.getSuperClassName(),
+                        classContext.getInterfaces());
+            }
+            classContext.setAncestors(ancestors);
+
+            final ClassWriter cw = createClassWriter(loader, cr);
+            ClassVisitor cv = plugins.initial(cw, classContext, policyManager);
+
+            if (cv instanceof AbstractClassVisitor) {
+                cr.accept(cv, ClassReader.EXPAND_FRAMES);
+                AbstractClassVisitor dumpClassVisitor = (AbstractClassVisitor) cv;
+                if (dumpClassVisitor.hasTransformed()) {
+                    if (null == classBeingRedefined) {
+                        transformMap.put(className, srcByteCodeArray);
+                    } else {
+                        transformMap.put(classBeingRedefined, srcByteCodeArray);
+                    }
+                    transformCount++;
+                    return dumpClassIfNecessary(cr.getClassName(), cw.toByteArray(), srcByteCodeArray);
+                }
+            }
+            sourceCodeBak = null;
         } catch (Throwable throwable) {
             DongTaiLog.warn(ErrorCode.TRANSFORM_CLASS_FAILED, internalClassName, throwable);
         } finally {
@@ -271,7 +273,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                 continue;
             }
             try {
-                if (!configMatcher.canHook(clazz)) {
+                if (!configMatcher.canHook(clazz, this.policyManager)) {
                     continue;
                 }
                 String className = clazz.getName();
@@ -295,7 +297,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                     classDiagram.setDiagram(className, diagram);
                 }
                 for (String clazzName : diagram) {
-                    if (PolicyManager.isHookClass(clazzName) ||
+                    if (this.policyManager.isHookClass(clazzName) ||
                             (this.policyManager.getPolicy() != null && this.policyManager.getPolicy().isMatchClass(clazzName))) {
                         enhanceClasses[enhanceClassSize++] = clazz;
                         break;
