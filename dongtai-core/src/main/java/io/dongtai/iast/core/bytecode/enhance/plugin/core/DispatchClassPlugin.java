@@ -53,6 +53,13 @@ public class DispatchClassPlugin implements DispatchPlugin {
         }
 
         @Override
+        public void visit(int version, int access, String name, String signature, String superName,
+                          String[] interfaces) {
+            this.classVersion = version;
+            super.visit(version, access, name, signature, superName, interfaces);
+        }
+
+        @Override
         public MethodVisitor visitMethod(final int access, final String name, final String descriptor,
                                          final String signature, final String[] exceptions) {
             MethodVisitor mv = super.visitMethod(access, name, descriptor, signature, exceptions);
