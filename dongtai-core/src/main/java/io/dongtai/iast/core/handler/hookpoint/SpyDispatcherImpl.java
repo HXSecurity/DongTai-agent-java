@@ -1,7 +1,8 @@
 package io.dongtai.iast.core.handler.hookpoint;
 
 import com.secnium.iast.core.AgentEngine;
-import io.dongtai.iast.common.config.*;
+import io.dongtai.iast.common.config.ConfigBuilder;
+import io.dongtai.iast.common.config.ConfigKey;
 import io.dongtai.iast.common.scope.Scope;
 import io.dongtai.iast.common.scope.ScopeManager;
 import io.dongtai.iast.core.EngineManager;
@@ -668,7 +669,6 @@ public class SpyDispatcherImpl implements SpyDispatcher {
         return false;
     }
 
-    @SuppressWarnings("unchecked")
     private boolean isCollectAllowed(boolean isEnterEntry) {
         if (!EngineManager.isEngineRunning()) {
             return false;
@@ -683,15 +683,12 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                 return false;
             }
 
-            try {
-                int methodPoolMaxSize = ((Config<Integer>) ConfigBuilder.getInstance()
-                        .getConfig(ConfigKey.REPORT_MAX_METHOD_POOL_SIZE)).get();
-                if (methodPoolMaxSize > 0 && EngineManager.TRACK_MAP.get().size() >= methodPoolMaxSize) {
-                    ScopeManager.SCOPE_TRACKER.getPolicyScope().setOverCapacity(true);
-                    DongTaiLog.warn(ErrorCode.SPY_METHOD_POOL_OVER_CAPACITY, methodPoolMaxSize);
-                    return false;
-                }
-            } catch (Throwable ignore) {
+            Integer methodPoolMaxSize = ConfigBuilder.getInstance().get(ConfigKey.REPORT_MAX_METHOD_POOL_SIZE);
+            if (methodPoolMaxSize != null && methodPoolMaxSize > 0
+                    && EngineManager.TRACK_MAP.get().size() >= methodPoolMaxSize) {
+                ScopeManager.SCOPE_TRACKER.getPolicyScope().setOverCapacity(true);
+                DongTaiLog.warn(ErrorCode.SPY_METHOD_POOL_OVER_CAPACITY, methodPoolMaxSize);
+                return false;
             }
         }
 

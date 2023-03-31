@@ -6,6 +6,8 @@ public enum ConfigKey {
     REQUEST_DENY_LIST,
     ENABLE_VERSION_HEADER,
     VERSION_HEADER_KEY,
+    ENABLE_LOGGER,
+    LOGGER_LEVEL,
     ;
 
     public enum JsonKey {
@@ -14,6 +16,8 @@ public enum ConfigKey {
         JSON_REQUEST_DENY_LIST("blacklist_rules", REQUEST_DENY_LIST),
         JSON_ENABLE_VERSION_HEADER("enable_version_header", ENABLE_VERSION_HEADER),
         JSON_VERSION_HEADER_KEY("version_header_name", VERSION_HEADER_KEY),
+        JSON_ENABLE_LOGGER("enable_log", ENABLE_LOGGER),
+        JSON_LOGGER_LEVEL("log_level", LOGGER_LEVEL),
         ;
 
         private final String key;

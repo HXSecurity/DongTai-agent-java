@@ -55,19 +55,14 @@ public class HttpImpl {
             return;
         }
 
-        try {
-            Config<RequestDenyList> config = (Config<RequestDenyList>) ConfigBuilder.getInstance()
-                    .getConfig(ConfigKey.REQUEST_DENY_LIST);
-            RequestDenyList requestDenyList = config.get();
-            if (requestDenyList != null) {
-                String requestURL = ((StringBuffer) requestMeta.get("requestURL")).toString();
-                Map<String, String> headers = (Map<String, String>) requestMeta.get("headers");
-                if (requestDenyList.match(requestURL, headers)) {
-                    DongTaiLog.trace("HTTP Request {} deny to collect", requestURL);
-                    return;
-                }
+        RequestDenyList requestDenyList = ConfigBuilder.getInstance().get(ConfigKey.REQUEST_DENY_LIST);
+        if (requestDenyList != null) {
+            String requestURL = ((StringBuffer) requestMeta.get("requestURL")).toString();
+            Map<String, String> headers = (Map<String, String>) requestMeta.get("headers");
+            if (requestDenyList.match(requestURL, headers)) {
+                DongTaiLog.trace("HTTP Request {} deny to collect", requestURL);
+                return;
             }
-        } catch (Throwable ignore) {
         }
 
         Boolean isReplay = (Boolean) requestMeta.get("replay-request");
@@ -83,8 +78,7 @@ public class HttpImpl {
         }
 
         try {
-            boolean enableVersionHeader = ((Config<Boolean>) ConfigBuilder.getInstance()
-                    .getConfig(ConfigKey.ENABLE_VERSION_HEADER)).get();
+            boolean enableVersionHeader = ConfigBuilder.getInstance().get(ConfigKey.ENABLE_VERSION_HEADER);
             String dastHeader = ((Map<String, String>) requestMeta.get("headers")).get(HEADER_DAST);
             String dastMarkHeader = ((Map<String, String>) requestMeta.get("headers")).get(HEADER_DAST_MARK);
             if (enableVersionHeader || dastHeader != null || dastMarkHeader != null) {
@@ -92,8 +86,7 @@ public class HttpImpl {
                         "setHeader", new Class[]{String.class, String.class});
                 if (setHeaderMethod != null) {
                     if (enableVersionHeader) {
-                        String versionHeaderKey = ((Config<String>) ConfigBuilder.getInstance()
-                                .getConfig(ConfigKey.VERSION_HEADER_KEY)).get();
+                        String versionHeaderKey = ConfigBuilder.getInstance().get(ConfigKey.VERSION_HEADER_KEY);
                         setHeaderMethod.invoke(resp, versionHeaderKey, AgentConstant.VERSION_VALUE);
                     }
                     if (dastMarkHeader != null) {
@@ -234,12 +227,8 @@ public class HttpImpl {
     }
 
     public static void onServletOutputStreamWrite(String desc, Object stream, int b, byte[] bs, int offset, int len) {
-        try {
-            boolean getBody = ((Config<Boolean>) ConfigBuilder.getInstance().getConfig(ConfigKey.REPORT_RESPONSE_BODY)).get();
-            if (!getBody) {
-                return;
-            }
-        } catch (Throwable ignore) {
+        Boolean getBody = ConfigBuilder.getInstance().get(ConfigKey.REPORT_RESPONSE_BODY);
+        if (getBody != null && !getBody) {
             return;
         }
 
@@ -280,12 +269,8 @@ public class HttpImpl {
     }
 
     public static void onPrintWriterWrite(String desc, Object writer, int b, String s, char[] cs, int offset, int len) {
-        try {
-            boolean getBody = ((Config<Boolean>) ConfigBuilder.getInstance().getConfig(ConfigKey.REPORT_RESPONSE_BODY)).get();
-            if (!getBody) {
-                return;
-            }
-        } catch (Throwable ignore) {
+        Boolean getBody = ConfigBuilder.getInstance().get(ConfigKey.REPORT_RESPONSE_BODY);
+        if (getBody != null && !getBody) {
             return;
         }
 

@@ -6,6 +6,7 @@ import io.dongtai.iast.agent.report.AgentRegisterReport;
 import io.dongtai.iast.agent.util.HttpClientUtils;
 import io.dongtai.iast.agent.util.ThreadUtils;
 import io.dongtai.iast.common.config.ConfigBuilder;
+import io.dongtai.iast.common.config.ConfigKey;
 import io.dongtai.iast.common.constants.AgentConstant;
 import io.dongtai.iast.common.constants.ApiPath;
 import io.dongtai.log.DongTaiLog;
@@ -30,8 +31,22 @@ public class ConfigMonitor implements IMonitor {
 
             StringBuilder response = HttpClientUtils.sendGet(ApiPath.AGENT_CONFIG, parameters);
             ConfigBuilder.getInstance().updateFromRemote(response.toString());
+
+            updateConfig();
         } catch (Throwable t) {
             DongTaiLog.warn(ErrorCode.AGENT_MONITOR_THREAD_CHECK_FAILED, t);
+        }
+    }
+
+    private void updateConfig() {
+        Boolean enableLog = ConfigBuilder.getInstance().get(ConfigKey.ENABLE_LOGGER);
+        if (enableLog != null) {
+            DongTaiLog.ENABLED = enableLog;
+        }
+
+        String logLevel = ConfigBuilder.getInstance().get(ConfigKey.LOGGER_LEVEL);
+        if (logLevel != null) {
+            DongTaiLog.setLevel(DongTaiLog.parseLevel(logLevel));
         }
     }
 
