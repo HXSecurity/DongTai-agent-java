@@ -45,11 +45,13 @@ public class PropagatorImpl {
         Set<TaintPosition> sources = propagatorNode.getSources();
         Set<TaintPosition> targets = propagatorNode.getTargets();
 
+        TaintCommandRunner r = TaintCommandRunner.getCommandRunner(event.signature);
         // O => O || O => R, source equals target and no change in taint range
         if (event.getSourceHashes().equals(event.getTargetHashes())
                 && sources.size() == 1 && targets.size() == 1
                 && TaintPosition.hasObject(sources)
-                && TaintCommandRunner.getCommandRunner(event.signature) == null
+                && (r == null || TaintCommand.KEEP.equals(r.getCommand()) || TaintCommand.TRIM.equals(r.getCommand())
+                || TaintCommand.TRIM_LEFT.equals(r.getCommand()) || TaintCommand.TRIM_RIGHT.equals(r.getCommand()))
         ) {
             if (TaintPosition.hasObject(targets) || TaintPosition.hasReturn(targets)) {
                 return;
