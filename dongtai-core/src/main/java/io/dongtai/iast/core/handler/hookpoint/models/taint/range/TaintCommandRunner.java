@@ -42,6 +42,10 @@ public class TaintCommandRunner {
         }
     }
 
+    public TaintCommand getCommand() {
+        return command;
+    }
+
     public static TaintCommandRunner create(String signature, TaintCommand command) {
         return create(signature, command, null);
     }
