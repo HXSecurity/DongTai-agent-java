@@ -9,8 +9,7 @@ import io.dongtai.iast.core.handler.hookpoint.models.policy.Policy;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.PolicyNode;
 import io.dongtai.iast.core.utils.AsmUtils;
 import io.dongtai.log.DongTaiLog;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.*;
 import org.objectweb.asm.commons.JSRInlinerAdapter;
 
 import java.lang.reflect.Modifier;
@@ -54,10 +53,23 @@ public class DispatchClassPlugin implements DispatchPlugin {
         }
 
         @Override
+        public void visit(int version, int access, String name, String signature, String superName,
+                          String[] interfaces) {
+            this.classVersion = version;
+            super.visit(version, access, name, signature, superName, interfaces);
+        }
+
+        @Override
         public MethodVisitor visitMethod(final int access, final String name, final String descriptor,
                                          final String signature, final String[] exceptions) {
             MethodVisitor mv = super.visitMethod(access, name, descriptor, signature, exceptions);
             if (Modifier.isInterface(access) || Modifier.isAbstract(access) || "<clinit>".equals(name)) {
+                return mv;
+            }
+
+            if (this.policy.isBlacklistHooks(this.context.getClassName())
+                    && !this.policy.isIgnoreBlacklistHooks(this.context.getClassName())
+                    && !this.policy.isIgnoreInternalHooks(this.context.getClassName())) {
                 return mv;
             }
 
@@ -71,7 +83,7 @@ public class DispatchClassPlugin implements DispatchPlugin {
             mv = lazyAop(mv, access, name, descriptor, matchedSignature, methodContext);
             boolean methodIsTransformed = mv instanceof MethodAdviceAdapter;
 
-            if (methodIsTransformed && this.classVersion < 50) {
+            if (methodIsTransformed && this.classVersion <= Opcodes.V1_6) {
                 mv = new JSRInlinerAdapter(mv, access, name, descriptor, signature, exceptions);
             }
 

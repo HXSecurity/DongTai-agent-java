@@ -1,5 +1,6 @@
 package io.dongtai.iast.core.utils.matcher;
 
+import io.dongtai.iast.core.handler.hookpoint.models.policy.PolicyManager;
 import io.dongtai.iast.core.utils.ConfigUtils;
 import io.dongtai.iast.core.utils.PropertyUtils;
 import io.dongtai.log.DongTaiLog;
@@ -110,7 +111,7 @@ public class ConfigMatcher {
      * @return
      * @since 1.4.0
      */
-    public boolean canHook(Class<?> clazz) {
+    public boolean canHook(Class<?> clazz, PolicyManager policyManager) {
         if (!inst.isModifiableClass(clazz)) {
             return false;
         }
@@ -118,7 +119,7 @@ public class ConfigMatcher {
             return false;
         }
         String className = clazz.getName().replace('.', '/');
-        return canHook(className);
+        return canHook(className, policyManager);
     }
 
     /**
@@ -127,7 +128,10 @@ public class ConfigMatcher {
      * @param className jvm内部类名，如：java/lang/Runtime
      * @return 是否支持hook
      */
-    public boolean canHook(String className) {
+    public boolean canHook(String className, PolicyManager policyManager) {
+        if (StringUtils.isEmpty(className)) {
+            return false;
+        }
         if (className.startsWith("[")) {
             // DongTaiLog.trace("ignore transform {}. Reason: class is a Array Type", className);
             return false;
@@ -146,10 +150,6 @@ public class ConfigMatcher {
             // DongTaiLog.trace("ignore transform {}. Reason: class is in blacklist", className);
             return false;
         }
-        if (inHookBlacklist(className)) {
-            // DongTaiLog.trace("ignore transform {}. Reason: classname is startswith com/secnium/iast/", className);
-            return false;
-        }
         if (className.contains("CGLIB$$")) {
             // DongTaiLog.trace("ignore transform {}. Reason: classname is a aop class by CGLIB", className);
             return false;
@@ -163,6 +163,17 @@ public class ConfigMatcher {
         if (className.contains("_$$_jvst")) {
             // DongTaiLog.trace("ignore transform {}. Reason: classname is a aop class", className);
             return false;
+        }
+
+        String realClassName = className.replace('/', '.');
+        boolean isBlack = inHookBlacklist(className);
+        if (isBlack) {
+            policyManager.getPolicy().addBlacklistHooks(realClassName);
+            if (!policyManager.getPolicy().isIgnoreBlacklistHooks(realClassName)
+                    && !policyManager.getPolicy().isIgnoreInternalHooks(realClassName)) {
+                // DongTaiLog.trace("ignore transform {}. Reason: classname is startswith com/secnium/iast/", className);
+                return false;
+            }
         }
         return true;
     }

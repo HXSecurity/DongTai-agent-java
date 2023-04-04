@@ -199,6 +199,14 @@ public class NopSpy implements SpyDispatcher {
     }
 
     @Override
+    public void enterIgnoreInternal() {
+    }
+
+    @Override
+    public void leaveIgnoreInternal() {
+    }
+
+    @Override
     public void reportService(String category, String type, String host, String port, String handler) {
 
     }

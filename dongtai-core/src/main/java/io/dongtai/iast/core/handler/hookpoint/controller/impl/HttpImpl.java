@@ -22,6 +22,8 @@ import java.util.*;
 public class HttpImpl {
     private static IastClassLoader iastClassLoader;
     public static File IAST_REQUEST_JAR_PACKAGE;
+    public static final String HEADER_DAST_MARK = "dt-mark-header";
+    public static final String HEADER_DAST = "dt-dast";
 
     static {
         IAST_REQUEST_JAR_PACKAGE = new File(PropertyUtils.getTmpDir() + "dongtai-api.jar");
@@ -53,19 +55,14 @@ public class HttpImpl {
             return;
         }
 
-        try {
-            Config<RequestDenyList> config = (Config<RequestDenyList>) ConfigBuilder.getInstance()
-                    .getConfig(ConfigKey.REQUEST_DENY_LIST);
-            RequestDenyList requestDenyList = config.get();
-            if (requestDenyList != null) {
-                String requestURL = ((StringBuffer) requestMeta.get("requestURL")).toString();
-                Map<String, String> headers = (Map<String, String>) requestMeta.get("headers");
-                if (requestDenyList.match(requestURL, headers)) {
-                    DongTaiLog.trace("HTTP Request {} deny to collect", requestURL);
-                    return;
-                }
+        RequestDenyList requestDenyList = ConfigBuilder.getInstance().get(ConfigKey.REQUEST_DENY_LIST);
+        if (requestDenyList != null) {
+            String requestURL = ((StringBuffer) requestMeta.get("requestURL")).toString();
+            Map<String, String> headers = (Map<String, String>) requestMeta.get("headers");
+            if (requestDenyList.match(requestURL, headers)) {
+                DongTaiLog.trace("HTTP Request {} deny to collect", requestURL);
+                return;
             }
-        } catch (Throwable ignore) {
         }
 
         Boolean isReplay = (Boolean) requestMeta.get("replay-request");
@@ -81,51 +78,25 @@ public class HttpImpl {
         }
 
         try {
-            boolean enableVersionHeader = ((Config<Boolean>) ConfigBuilder.getInstance()
-                    .getConfig(ConfigKey.ENABLE_VERSION_HEADER)).get();
-            String xrayHeader = ((Map<String, String>) requestMeta.get("headers")).get("Xray");
-            if (enableVersionHeader || xrayHeader != null) {
+            boolean enableVersionHeader = ConfigBuilder.getInstance().get(ConfigKey.ENABLE_VERSION_HEADER);
+            String dastHeader = ((Map<String, String>) requestMeta.get("headers")).get(HEADER_DAST);
+            String dastMarkHeader = ((Map<String, String>) requestMeta.get("headers")).get(HEADER_DAST_MARK);
+            if (enableVersionHeader || dastHeader != null || dastMarkHeader != null) {
                 Method setHeaderMethod = ReflectUtils.getDeclaredMethodFromSuperClass(resp.getClass(),
                         "setHeader", new Class[]{String.class, String.class});
                 if (setHeaderMethod != null) {
                     if (enableVersionHeader) {
-                        String versionHeaderKey = ((Config<String>) ConfigBuilder.getInstance()
-                                .getConfig(ConfigKey.VERSION_HEADER_KEY)).get();
+                        String versionHeaderKey = ConfigBuilder.getInstance().get(ConfigKey.VERSION_HEADER_KEY);
                         setHeaderMethod.invoke(resp, versionHeaderKey, AgentConstant.VERSION_VALUE);
                     }
-                    if (xrayHeader != null) {
+                    if (dastMarkHeader != null) {
                         String reqId = String.valueOf(EngineManager.getAgentId()) + "."
                                 + UUID.randomUUID().toString().replaceAll("-", "");
                         setHeaderMethod.invoke(resp, "dt-request-id", reqId);
                     }
                 }
-            }
-        } catch (Throwable ignore) {
-        }
-
-        try {
-            String contentType = ((Map<String, String>) requestMeta.get("headers")).get("Content-Type");
-            String method = (String) requestMeta.get("method");
-            if (("POST".equalsIgnoreCase(method) || "PUT".equalsIgnoreCase(method))
-                    && !isRawBody(contentType)) {
-                Method getParameterNamesMethod = ReflectUtils.getDeclaredMethodFromSuperClass(req.getClass(),
-                        "getParameterNames", null);
-                Method getParameterMethod = ReflectUtils.getDeclaredMethodFromSuperClass(req.getClass(),
-                        "getParameter", new Class[]{String.class});
-                Enumeration<?> parameterNames = (Enumeration<?>) getParameterNamesMethod.invoke(req);
-                StringBuilder postBody = new StringBuilder();
-                boolean first = true;
-                while (parameterNames.hasMoreElements()) {
-                    String key = (String) parameterNames.nextElement();
-                    if (first) {
-                        first = false;
-                        postBody.append(key).append("=").append((String) getParameterMethod.invoke(req, key));
-                    } else {
-                        postBody.append("&").append(key).append("=").append((String) getParameterMethod.invoke(req, key));
-                    }
-                }
-                if (postBody.length() > 0) {
-                    requestMeta.put("body", postBody.toString());
+                if (dastHeader != null) {
+                    return;
                 }
             }
         } catch (Throwable ignore) {
@@ -149,8 +120,10 @@ public class HttpImpl {
                 String val = (String) getHeaderMethod.invoke(req, key);
                 if ("content-type".equalsIgnoreCase(key)) {
                     key = "Content-Type";
-                } else if ("xray".equalsIgnoreCase(key)) {
-                    key = "Xray";
+                } else if (HEADER_DAST_MARK.equalsIgnoreCase(key)) {
+                    key = HEADER_DAST_MARK;
+                } else if (HEADER_DAST.equalsIgnoreCase(key)) {
+                    key = HEADER_DAST;
                 }
                 headers.put(key, val);
             } catch (Throwable ignore) {
@@ -197,6 +170,39 @@ public class HttpImpl {
         if (EngineManager.REQUEST_CONTEXT.get() == null) {
             return;
         }
+
+        Map<String, Object> requestMeta = EngineManager.REQUEST_CONTEXT.get();
+        try {
+            // Collecting the form urlencoded POST body must be done at the exit of the http method
+            // Otherwise, it may cause character encoding errors
+            String contentType = ((Map<String, String>) requestMeta.get("headers")).get("Content-Type");
+            String method = (String) requestMeta.get("method");
+            if (("POST".equalsIgnoreCase(method) || "PUT".equalsIgnoreCase(method))
+                    && (requestMeta.get("body") == null || requestMeta.get("body") == "")
+                    && !isRawBody(contentType)) {
+                Method getParameterNamesMethod = ReflectUtils.getDeclaredMethodFromSuperClass(req.getClass(),
+                        "getParameterNames", null);
+                Method getParameterMethod = ReflectUtils.getDeclaredMethodFromSuperClass(req.getClass(),
+                        "getParameter", new Class[]{String.class});
+                Enumeration<?> parameterNames = (Enumeration<?>) getParameterNamesMethod.invoke(req);
+                StringBuilder postBody = new StringBuilder();
+                boolean first = true;
+                while (parameterNames.hasMoreElements()) {
+                    String key = (String) parameterNames.nextElement();
+                    if (first) {
+                        first = false;
+                        postBody.append(key).append("=").append((String) getParameterMethod.invoke(req, key));
+                    } else {
+                        postBody.append("&").append(key).append("=").append((String) getParameterMethod.invoke(req, key));
+                    }
+                }
+                if (postBody.length() > 0) {
+                    requestMeta.put("body", postBody.toString());
+                }
+            }
+        } catch (Throwable ignore) {
+        }
+
         Map<String, Collection<String>> headers = parseResponseHeaders(resp, headerNames);
         EngineManager.REQUEST_CONTEXT.get().put("responseStatus",
                 (String) EngineManager.REQUEST_CONTEXT.get().get("protocol") + " " + status);
@@ -221,12 +227,8 @@ public class HttpImpl {
     }
 
     public static void onServletOutputStreamWrite(String desc, Object stream, int b, byte[] bs, int offset, int len) {
-        try {
-            boolean getBody = ((Config<Boolean>) ConfigBuilder.getInstance().getConfig(ConfigKey.REPORT_RESPONSE_BODY)).get();
-            if (!getBody) {
-                return;
-            }
-        } catch (Throwable ignore) {
+        Boolean getBody = ConfigBuilder.getInstance().get(ConfigKey.REPORT_RESPONSE_BODY);
+        if (getBody != null && !getBody) {
             return;
         }
 
@@ -267,12 +269,8 @@ public class HttpImpl {
     }
 
     public static void onPrintWriterWrite(String desc, Object writer, int b, String s, char[] cs, int offset, int len) {
-        try {
-            boolean getBody = ((Config<Boolean>) ConfigBuilder.getInstance().getConfig(ConfigKey.REPORT_RESPONSE_BODY)).get();
-            if (!getBody) {
-                return;
-            }
-        } catch (Throwable ignore) {
+        Boolean getBody = ConfigBuilder.getInstance().get(ConfigKey.REPORT_RESPONSE_BODY);
+        if (getBody != null && !getBody) {
             return;
         }
 

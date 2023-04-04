@@ -43,6 +43,8 @@ public class AgentStateMonitor implements IMonitor {
             }
 
             if (this.engineManager.getAgentState().isUninstalledByCli()) {
+                HttpClientUtils.sendPost(ApiPath.ACTUAL_ACTION,
+                        HeartBeatReport.generateAgentActualActionMsg(this.engineManager.getAgentState()));
                 return;
             }
 

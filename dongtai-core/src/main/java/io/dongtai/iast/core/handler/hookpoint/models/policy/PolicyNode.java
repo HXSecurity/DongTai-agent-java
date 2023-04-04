@@ -3,6 +3,8 @@ package io.dongtai.iast.core.handler.hookpoint.models.policy;
 public abstract class PolicyNode {
     private String hashString;
     private Inheritable inheritable;
+    private boolean ignoreInternal;
+    private boolean ignoreBlacklist;
 
     protected MethodMatcher methodMatcher;
 
@@ -18,6 +20,22 @@ public abstract class PolicyNode {
 
     public void setInheritable(Inheritable inheritable) {
         this.inheritable = inheritable;
+    }
+
+    public boolean isIgnoreInternal() {
+        return this.ignoreInternal;
+    }
+
+    public void setIgnoreInternal(boolean ignoreInternal) {
+        this.ignoreInternal = ignoreInternal;
+    }
+
+    public boolean isIgnoreBlacklist() {
+        return this.ignoreBlacklist;
+    }
+
+    public void setIgnoreBlacklist(boolean ignoreBlacklist) {
+        this.ignoreBlacklist = ignoreBlacklist;
     }
 
     public MethodMatcher getMethodMatcher() {
