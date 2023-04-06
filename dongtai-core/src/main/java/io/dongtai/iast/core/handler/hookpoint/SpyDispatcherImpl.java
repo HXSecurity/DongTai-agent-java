@@ -129,7 +129,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                 EngineManager.cleanThreadState();
             }
         } catch (Throwable e) {
-            DongTaiLog.error(ErrorCode.SPY_LEAVE_HTTP_FAILED, e);
+            DongTaiLog.error(ErrorCode.get("SPY_LEAVE_HTTP_FAILED"), e);
             EngineManager.cleanThreadState();
         }
     }
@@ -183,7 +183,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
             }};
             HttpImpl.solveHttpRequest(obj, req, resp, requestMeta);
         } catch (Throwable e) {
-            DongTaiLog.warn(ErrorCode.SPY_COLLECT_HTTP_FAILED, "request", e);
+            DongTaiLog.warn(ErrorCode.get("SPY_COLLECT_HTTP_FAILED"), "request", e);
         } finally {
             ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
         }
@@ -203,7 +203,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
 
             HttpImpl.onServletInputStreamRead(ret, desc, stream, bs, offset, len);
         } catch (Throwable e) {
-            DongTaiLog.warn(ErrorCode.SPY_COLLECT_HTTP_FAILED, "request body", e);
+            DongTaiLog.warn(ErrorCode.get("SPY_COLLECT_HTTP_FAILED"), "request body", e);
         } finally {
             ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
         }
@@ -223,7 +223,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
 
             HttpImpl.solveHttpResponse(resp, req, resp, headerNames, status);
         } catch (Throwable e) {
-            DongTaiLog.warn(ErrorCode.SPY_COLLECT_HTTP_FAILED, "response header", e);
+            DongTaiLog.warn(ErrorCode.get("SPY_COLLECT_HTTP_FAILED"), "response header", e);
         } finally {
             ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
         }
@@ -243,7 +243,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
 
             HttpImpl.onServletOutputStreamWrite(desc, stream, b, bs, offset, len);
         } catch (Throwable e) {
-            DongTaiLog.warn(ErrorCode.SPY_COLLECT_HTTP_FAILED, "response body", e);
+            DongTaiLog.warn(ErrorCode.get("SPY_COLLECT_HTTP_FAILED"), "response body", e);
         } finally {
             ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
         }
@@ -263,7 +263,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
 
             HttpImpl.onPrintWriterWrite(desc, writer, b, s, cs, offset, len);
         } catch (Throwable e) {
-            DongTaiLog.warn(ErrorCode.SPY_COLLECT_HTTP_FAILED, "response body", e);
+            DongTaiLog.warn(ErrorCode.get("SPY_COLLECT_HTTP_FAILED"), "response body", e);
         } finally {
             ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
         }
@@ -295,7 +295,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                 EngineManager.cleanThreadState();
             }
         } catch (Throwable e) {
-            DongTaiLog.error(ErrorCode.SPY_LEAVE_DUBBO_FAILED, e);
+            DongTaiLog.error(ErrorCode.get("SPY_LEAVE_DUBBO_FAILED"), e);
             EngineManager.cleanThreadState();
         }
     }
@@ -329,7 +329,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
 
             DubboImpl.solveDubboRequest(handler, channel, request, url, remoteAddress.getAddress().getHostAddress());
         } catch (Throwable e) {
-            DongTaiLog.warn(ErrorCode.SPY_COLLECT_DUBBO_FAILED, "request", e);
+            DongTaiLog.warn(ErrorCode.get("SPY_COLLECT_DUBBO_FAILED"), "request", e);
         } finally {
             ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
         }
@@ -349,7 +349,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
             DubboImpl.collectDubboRequestSource(handler, invocation, methodName, arguments, headers,
                     hookClass, hookMethod, hookSign, INVOKE_ID_SEQUENCER);
         } catch (Throwable e) {
-            DongTaiLog.warn(ErrorCode.SPY_COLLECT_DUBBO_FAILED, "request source", e);
+            DongTaiLog.warn(ErrorCode.get("SPY_COLLECT_DUBBO_FAILED"), "request source", e);
         } finally {
             ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
         }
@@ -371,7 +371,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
 
             DubboImpl.collectDubboResponse(result, status);
         } catch (Throwable e) {
-            DongTaiLog.warn(ErrorCode.SPY_COLLECT_DUBBO_FAILED, "response", e);
+            DongTaiLog.warn(ErrorCode.get("SPY_COLLECT_DUBBO_FAILED"), "response", e);
         } finally {
             ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
         }
@@ -609,7 +609,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                 SpringApplicationImpl.getWebApplicationContext(retValue);
             }
         } catch (Throwable e) {
-            DongTaiLog.error(ErrorCode.SPY_COLLECT_HTTP_FAILED, "", e);
+            DongTaiLog.error(ErrorCode.get("SPY_COLLECT_HTTP_FAILED"), "", e);
         } finally {
             ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
         }
@@ -647,7 +647,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
 
             return false;
         } catch (Throwable e) {
-            DongTaiLog.error(ErrorCode.SPY_COLLECT_METHOD_FAILED, e);
+            DongTaiLog.error(ErrorCode.get("SPY_COLLECT_METHOD_FAILED"), e);
         } finally {
             ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
         }
@@ -668,7 +668,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
 
             FeignService.solveSyncInvoke(event, INVOKE_ID_SEQUENCER);
         } catch (Throwable e) {
-            DongTaiLog.error(ErrorCode.SPY_TRACE_FEIGN_INVOKE_FAILED, e);
+            DongTaiLog.error(ErrorCode.get("SPY_TRACE_FEIGN_INVOKE_FAILED"), e);
         } finally {
             ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
         }
@@ -690,7 +690,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
 
             DubboService.solveSyncInvoke(event, invocation, url, headers, INVOKE_ID_SEQUENCER);
         } catch (Throwable e) {
-            DongTaiLog.error(ErrorCode.SPY_TRACE_DUBBO_CONSUMER_INVOKE_FAILED, e);
+            DongTaiLog.error(ErrorCode.get("SPY_TRACE_DUBBO_CONSUMER_INVOKE_FAILED"), e);
         } finally {
             ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
         }
@@ -715,7 +715,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
             if (methodPoolMaxSize != null && methodPoolMaxSize > 0
                     && EngineManager.TRACK_MAP.get().size() >= methodPoolMaxSize) {
                 ScopeManager.SCOPE_TRACKER.getPolicyScope().setOverCapacity(true);
-                DongTaiLog.warn(ErrorCode.SPY_METHOD_POOL_OVER_CAPACITY, methodPoolMaxSize);
+                DongTaiLog.warn(ErrorCode.get("SPY_METHOD_POOL_OVER_CAPACITY"), methodPoolMaxSize);
                 return false;
             }
         }

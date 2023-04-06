@@ -166,7 +166,7 @@ public class IastClassDiagram {
                     }
                 }
             } catch (Throwable e) {
-                DongTaiLog.warn(ErrorCode.CLASS_DIAGRAM_SCAN_JAR_ANCESTOR_FAILED, e);
+                DongTaiLog.warn(ErrorCode.get("CLASS_DIAGRAM_SCAN_JAR_ANCESTOR_FAILED"), e);
             }
         }
     }

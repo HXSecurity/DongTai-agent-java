@@ -25,7 +25,7 @@ public class GetApiThread extends Thread {
             invoke = (Map<String, Object>) SpringApplicationImpl.getAPI.invoke(null, applicationContext);
             ApiReport.sendReport(invoke);
         } catch (Throwable e) {
-            DongTaiLog.warn(ErrorCode.API_COLLECTOR_GET_API_THREAD_EXECUTE_FAILED, e);
+            DongTaiLog.warn(ErrorCode.get("API_COLLECTOR_GET_API_THREAD_EXECUTE_FAILED"), e);
         } finally {
             SpringApplicationImpl.isSend = true;
             SpringApplicationImpl.getAPI = null;

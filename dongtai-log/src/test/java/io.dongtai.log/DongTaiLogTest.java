@@ -84,127 +84,135 @@ public class DongTaiLogTest {
         DongTaiLog.setLevel(DongTaiLog.LogLevel.DEBUG);
         clear();
         DongTaiLog.trace("foo");
-        Assert.assertEquals("DEBUG level ignore", outputStreamCaptor.toString(), "");
+        Assert.assertEquals("DEBUG level ignore", "", outputStreamCaptor.toString());
 
         DongTaiLog.setLevel(DongTaiLog.LogLevel.INFO);
         clear();
         DongTaiLog.trace("foo");
-        Assert.assertEquals("INFO level ignore", outputStreamCaptor.toString(), "");
+        Assert.assertEquals("INFO level ignore", "", outputStreamCaptor.toString());
         clear();
         DongTaiLog.debug("foo");
-        Assert.assertEquals("INFO level ignore", outputStreamCaptor.toString(), "");
+        Assert.assertEquals("INFO level ignore", "", outputStreamCaptor.toString());
 
         DongTaiLog.setLevel(DongTaiLog.LogLevel.WARN);
         clear();
         DongTaiLog.trace("foo");
-        Assert.assertEquals("WARN level ignore", outputStreamCaptor.toString(), "");
+        Assert.assertEquals("WARN level ignore", "", outputStreamCaptor.toString());
         clear();
         DongTaiLog.debug("foo");
-        Assert.assertEquals("WARN level ignore", outputStreamCaptor.toString(), "");
+        Assert.assertEquals("WARN level ignore", "", outputStreamCaptor.toString());
         clear();
         DongTaiLog.info("foo");
-        Assert.assertEquals("WARN level ignore", outputStreamCaptor.toString(), "");
+        Assert.assertEquals("WARN level ignore", "", outputStreamCaptor.toString());
 
         DongTaiLog.setLevel(DongTaiLog.LogLevel.ERROR);
         clear();
         DongTaiLog.trace("foo");
-        Assert.assertEquals("ERROR level ignore", outputStreamCaptor.toString(), "");
+        Assert.assertEquals("ERROR level ignore", "", outputStreamCaptor.toString());
         clear();
         DongTaiLog.debug("foo");
-        Assert.assertEquals("ERROR level ignore", outputStreamCaptor.toString(), "");
+        Assert.assertEquals("ERROR level ignore", "", outputStreamCaptor.toString());
         clear();
         DongTaiLog.info("foo");
-        Assert.assertEquals("ERROR level ignore", outputStreamCaptor.toString(), "");
+        Assert.assertEquals("ERROR level ignore", "", outputStreamCaptor.toString());
         clear();
         DongTaiLog.warn("foo");
-        Assert.assertEquals("ERROR level ignore", outputStreamCaptor.toString(), "");
+        Assert.assertEquals("ERROR level ignore", "", outputStreamCaptor.toString());
 
         DongTaiLog.setLevel(DongTaiLog.LogLevel.TRACE);
         clear();
         DongTaiLog.trace("foo");
-        Assert.assertEquals("TRACE log", outputStreamCaptor.toString().substring(20),
-                TITLE + "[TRACE] foo" + LS);
+        Assert.assertEquals("TRACE log", TITLE + "[TRACE] foo" + LS,
+                outputStreamCaptor.toString().substring(20));
         clear();
         DongTaiLog.trace("foo {} {}", "bar", "baz");
-        Assert.assertEquals("TRACE log format", outputStreamCaptor.toString().substring(20),
-                TITLE + "[TRACE] foo bar baz" + LS);
+        Assert.assertEquals("TRACE log format", TITLE + "[TRACE] foo bar baz" + LS,
+                outputStreamCaptor.toString().substring(20));
         clear();
         DongTaiLog.trace("foo", new Exception("bar"));
-        Assert.assertEquals("TRACE log message with exception", outputStreamCaptor.toString().substring(20),
-                TITLE + "[TRACE] foo, Exception: java.lang.Exception: bar" + LS);
+        Assert.assertEquals("TRACE log message with exception",
+                TITLE + "[TRACE] foo, Exception: java.lang.Exception: bar" + LS,
+                outputStreamCaptor.toString().substring(20));
 
         DongTaiLog.setLevel(DongTaiLog.LogLevel.DEBUG);
         clear();
         DongTaiLog.debug("foo");
-        Assert.assertEquals("DEBUG log", outputStreamCaptor.toString().substring(20),
-                TITLE + "[DEBUG] foo" + LS);
+        Assert.assertEquals("DEBUG log", TITLE + "[DEBUG] foo" + LS,
+                outputStreamCaptor.toString().substring(20));
         clear();
         DongTaiLog.debug("foo {} {}", "bar", "baz");
-        Assert.assertEquals("DEBUG log format", outputStreamCaptor.toString().substring(20),
-                TITLE + "[DEBUG] foo bar baz" + LS);
+        Assert.assertEquals("DEBUG log format", TITLE + "[DEBUG] foo bar baz" + LS,
+                outputStreamCaptor.toString().substring(20));
         clear();
         DongTaiLog.debug("foo", new Exception("bar"));
-        Assert.assertEquals("DEBUG log message with exception", outputStreamCaptor.toString().substring(20),
-                TITLE + "[DEBUG] foo, Exception: java.lang.Exception: bar" + LS);
+        Assert.assertEquals("DEBUG log message with exception",
+                TITLE + "[DEBUG] foo, Exception: java.lang.Exception: bar" + LS,
+                outputStreamCaptor.toString().substring(20));
 
         DongTaiLog.setLevel(DongTaiLog.LogLevel.INFO);
         clear();
         DongTaiLog.info("foo");
-        Assert.assertEquals("INFO log", outputStreamCaptor.toString().substring(20),
-                TITLE + "[INFO] foo" + LS);
+        Assert.assertEquals("INFO log", TITLE + "[INFO] foo" + LS,
+                outputStreamCaptor.toString().substring(20));
         clear();
         DongTaiLog.info("foo {} {}", "bar", "baz");
-        Assert.assertEquals("INFO log format", outputStreamCaptor.toString().substring(20),
-                TITLE + "[INFO] foo bar baz" + LS);
+        Assert.assertEquals("INFO log format", TITLE + "[INFO] foo bar baz" + LS,
+                outputStreamCaptor.toString().substring(20));
         clear();
         DongTaiLog.info("foo", new Exception("bar"));
-        Assert.assertEquals("INFO log message with exception", outputStreamCaptor.toString().substring(20),
-                TITLE + "[INFO] foo, Exception: java.lang.Exception: bar" + LS);
+        Assert.assertEquals("INFO log message with exception",
+                TITLE + "[INFO] foo, Exception: java.lang.Exception: bar" + LS,
+                outputStreamCaptor.toString().substring(20));
 
         DongTaiLog.setLevel(DongTaiLog.LogLevel.WARN);
         clear();
         DongTaiLog.warn("foo");
-        Assert.assertEquals("WARN log", outputStreamCaptor.toString().substring(20),
-                TITLE + "[WARN] foo" + LS);
+        Assert.assertEquals("WARN log", TITLE + "[WARN] foo" + LS,
+                outputStreamCaptor.toString().substring(20));
         clear();
         DongTaiLog.warn("foo {} {}", "bar", "baz");
-        Assert.assertEquals("WARN log format", outputStreamCaptor.toString().substring(20),
-                TITLE + "[WARN] foo bar baz" + LS);
+        Assert.assertEquals("WARN log format", TITLE + "[WARN] foo bar baz" + LS,
+                outputStreamCaptor.toString().substring(20));
         clear();
         DongTaiLog.warn("foo", new Exception("bar"));
-        Assert.assertEquals("WARN log message with exception", outputStreamCaptor.toString().substring(20),
-                TITLE + "[WARN] foo, Exception: java.lang.Exception: bar" + LS);
+        Assert.assertEquals("WARN log message with exception",
+                TITLE + "[WARN] foo, Exception: java.lang.Exception: bar" + LS,
+                outputStreamCaptor.toString().substring(20));
 
         DongTaiLog.setLevel(DongTaiLog.LogLevel.ERROR);
         clear();
         DongTaiLog.error("foo");
-        Assert.assertEquals("ERROR log", outputStreamCaptor.toString().substring(20),
-                TITLE + "[ERROR] foo" + LS);
+        Assert.assertEquals("ERROR log", TITLE + "[ERROR] foo" + LS,
+                outputStreamCaptor.toString().substring(20));
         clear();
         DongTaiLog.error("foo {} {}", "bar", "baz");
-        Assert.assertEquals("ERROR log format", outputStreamCaptor.toString().substring(20),
-                TITLE + "[ERROR] foo bar baz" + LS);
+        Assert.assertEquals("ERROR log format", TITLE + "[ERROR] foo bar baz" + LS,
+                outputStreamCaptor.toString().substring(20));
         clear();
         DongTaiLog.error("foo", new Exception("bar"));
-        Assert.assertEquals("ERROR log message with exception", outputStreamCaptor.toString().substring(20),
-                TITLE + "[ERROR] foo, Exception: java.lang.Exception: bar" + LS);
+        Assert.assertEquals("ERROR log message with exception",
+                TITLE + "[ERROR] foo, Exception: java.lang.Exception: bar" + LS,
+                outputStreamCaptor.toString().substring(20));
         clear();
         DongTaiLog.error(110, "foo {} {}", "bar", "baz");
-        Assert.assertEquals("ERROR log format", outputStreamCaptor.toString().substring(20),
-                TITLE + "[ERROR] [110] foo bar baz" + LS);
+        Assert.assertEquals("ERROR log format", TITLE + "[ERROR] [110] foo bar baz" + LS,
+                outputStreamCaptor.toString().substring(20));
         clear();
         DongTaiLog.error(110, "foo {} {}", "bar", "baz", new Exception("bar"));
-        Assert.assertEquals("ERROR log format with code and exception", outputStreamCaptor.toString().substring(20),
-                TITLE + "[ERROR] [110] foo bar baz, Exception: java.lang.Exception: bar" + LS);
+        Assert.assertEquals("ERROR log format with code and exception",
+                TITLE + "[ERROR] [110] foo bar baz, Exception: java.lang.Exception: bar" + LS,
+                outputStreamCaptor.toString().substring(20));
 
         clear();
         DongTaiLog.error(110, "foo {}", "bar", "baz", new Exception("bar"));
-        Assert.assertEquals("ERROR log format less with code and exception", outputStreamCaptor.toString().substring(20),
-                TITLE + "[ERROR] [110] foo bar, Exception: java.lang.Exception: bar" + LS);
+        Assert.assertEquals("ERROR log format less with code and exception",
+                TITLE + "[ERROR] [110] foo bar, Exception: java.lang.Exception: bar" + LS,
+                outputStreamCaptor.toString().substring(20));
         clear();
         DongTaiLog.error(110, "foo {} {} {}", "bar", "baz", new Exception("bar"));
-        Assert.assertEquals("ERROR log format more with code and exception", outputStreamCaptor.toString().substring(20),
-                TITLE + "[ERROR] [110] foo bar baz {}, Exception: java.lang.Exception: bar" + LS);
+        Assert.assertEquals("ERROR log format more with code and exception",
+                TITLE + "[ERROR] [110] foo bar baz {}, Exception: java.lang.Exception: bar" + LS,
+                outputStreamCaptor.toString().substring(20));
 
         int code;
         String fmt;
@@ -212,13 +220,39 @@ public class DongTaiLogTest {
         DongTaiLog.error(ErrorCode.AGENT_PREMAIN_INVOKE_FAILED, new Exception("bar"));
         code = ErrorCode.AGENT_PREMAIN_INVOKE_FAILED.getCode();
         fmt = ErrorCode.AGENT_PREMAIN_INVOKE_FAILED.getMessage();
-        Assert.assertEquals("ERROR log with ErrorCode and exception", outputStreamCaptor.toString().substring(20),
-                TITLE + "[ERROR] [" + code + "] " + fmt + ", Exception: java.lang.Exception: bar" + LS);
+        Assert.assertEquals("ERROR log with ErrorCode and exception",
+                TITLE + "[ERROR] [" + code + "] " + fmt + ", Exception: java.lang.Exception: bar" + LS,
+                outputStreamCaptor.toString().substring(20));
+        clear();
+        DongTaiLog.error(ErrorCode.get("AGENT_PREMAIN_INVOKE_FAILED"), new Exception("bar"));
+        Assert.assertEquals("ERROR log with ErrorCode name and exception",
+                TITLE + "[ERROR] [" + code + "] " + fmt + ", Exception: java.lang.Exception: bar" + LS,
+                outputStreamCaptor.toString().substring(20));
         clear();
         DongTaiLog.error(ErrorCode.JATTACH_EXTRACT_FAILED, "/tmp/test");
         code = ErrorCode.JATTACH_EXTRACT_FAILED.getCode();
         fmt = String.format(ErrorCode.JATTACH_EXTRACT_FAILED.getMessage().replaceAll("\\{\\}", "%s"), "/tmp/test");
-        Assert.assertEquals("ERROR log with ErrorCode and exception", outputStreamCaptor.toString().substring(20),
-                TITLE + "[ERROR] [" + code + "] " + fmt + LS);
+        Assert.assertEquals("ERROR log with ErrorCode and arguments",
+                TITLE + "[ERROR] [" + code + "] " + fmt + LS,
+                outputStreamCaptor.toString().substring(20));
+        clear();
+        DongTaiLog.error(ErrorCode.get("JATTACH_EXTRACT_FAILED"), "/tmp/test");
+        Assert.assertEquals("ERROR log with ErrorCode name and arguments",
+                TITLE + "[ERROR] [" + code + "] " + fmt + LS,
+                outputStreamCaptor.toString().substring(20));
+        clear();
+        DongTaiLog.error(ErrorCode.get("NOT EXISTS"));
+        code = ErrorCode.UNKNOWN.getCode();
+        fmt = String.format(ErrorCode.UNKNOWN.getMessage());
+        Assert.assertEquals("ERROR log with ErrorCode invalid name",
+                TITLE + "[ERROR] [" + code + "] NOT EXISTS" + LS,
+                outputStreamCaptor.toString().substring(20));
+        clear();
+        DongTaiLog.error(ErrorCode.get("NOT EXISTS"), "/tmp/test", "foo");
+        Assert.assertEquals("ERROR log with ErrorCode invalid name and arguments",
+                TITLE + "[ERROR] [" + code + "] NOT EXISTS" + LS,
+                outputStreamCaptor.toString().substring(20));
+
+        clear();
     }
 }

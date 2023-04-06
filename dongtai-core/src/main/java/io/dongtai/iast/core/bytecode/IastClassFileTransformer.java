@@ -186,7 +186,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
             }
             sourceCodeBak = null;
         } catch (Throwable throwable) {
-            DongTaiLog.warn(ErrorCode.TRANSFORM_CLASS_FAILED, internalClassName, throwable);
+            DongTaiLog.warn(ErrorCode.get("TRANSFORM_CLASS_FAILED"), internalClassName, throwable);
         } finally {
             classDiagram.setLoader(null);
             ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
@@ -244,7 +244,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
             final File classPath = new File(enhancedClass.getParent());
 
             if (!classPath.mkdirs() && !classPath.exists()) {
-                DongTaiLog.warn(ErrorCode.TRANSFORM_CREATE_CLASS_DUMP_DIR_FAILED, classPath);
+                DongTaiLog.warn(ErrorCode.get("TRANSFORM_CREATE_CLASS_DUMP_DIR_FAILED"), classPath);
                 return data;
             }
 
@@ -252,7 +252,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
             writeByteArrayToFile(originalClass, originalData);
             DongTaiLog.trace("dump class {} to {} success.", className, enhancedClass);
         } catch (Throwable e) {
-            DongTaiLog.warn(ErrorCode.TRANSFORM_CLASS_DUMP_FAILED, className, e);
+            DongTaiLog.warn(ErrorCode.get("TRANSFORM_CLASS_DUMP_FAILED"), className, e);
         }
 
         return data;
@@ -331,11 +331,11 @@ public class IastClassFileTransformer implements ClassFileTransformer {
             try {
                 inst.retransformClasses(clazz);
             } catch (ClassCircularityError e) {
-                DongTaiLog.error(ErrorCode.RETRANSFORM_CLASS_CIRCULARITY_ERROR, clazz.getCanonicalName(),
+                DongTaiLog.error(ErrorCode.get("RETRANSFORM_CLASS_CIRCULARITY_ERROR"), clazz.getCanonicalName(),
                         e.getCause() != null ? e.getCause().getMessage() : "");
             } catch (InternalError ignored) {
             } catch (Throwable e) {
-                DongTaiLog.error(ErrorCode.RETRANSFORM_CLASS_FAILED, clazz.getCanonicalName(), e);
+                DongTaiLog.error(ErrorCode.get("RETRANSFORM_CLASS_FAILED"), clazz.getCanonicalName(), e);
             }
         }
         stopWatch.stop();

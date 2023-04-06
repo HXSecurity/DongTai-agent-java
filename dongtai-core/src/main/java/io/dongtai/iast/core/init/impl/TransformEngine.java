@@ -33,7 +33,7 @@ public class TransformEngine implements IEngine {
             classFileTransformer.reTransform();
             DongTaiLog.debug("transform engine is successfully started");
         } catch (Throwable e) {
-            DongTaiLog.error(ErrorCode.TRANSFORM_ENGINE_START_FAILED, e);
+            DongTaiLog.error(ErrorCode.get("TRANSFORM_ENGINE_START_FAILED"), e);
         }
     }
 
@@ -70,7 +70,7 @@ public class TransformEngine implements IEngine {
             try {
                 inst.redefineClasses(classDefinition);
             } catch (Throwable e) {
-                DongTaiLog.error(ErrorCode.TRANSFORM_ENGINE_DESTROY_REDEFINE_CLASSES_FAILED, e);
+                DongTaiLog.error(ErrorCode.get("TRANSFORM_ENGINE_DESTROY_REDEFINE_CLASSES_FAILED"), e);
             }
         }
         inst = null;

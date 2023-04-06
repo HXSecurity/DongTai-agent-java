@@ -90,7 +90,7 @@ public class TaintCommandRunner {
                 p3 = this.params.get(2).getParam(params);
             }
         } catch (Throwable e) {
-            DongTaiLog.warn(ErrorCode.TAINT_COMMAND_GET_PARAMETERS_FAILED, this.signature, e.getMessage());
+            DongTaiLog.warn(ErrorCode.get("TAINT_COMMAND_GET_PARAMETERS_FAILED"), this.signature, e.getMessage());
             return tr;
         }
 
@@ -134,7 +134,7 @@ public class TaintCommandRunner {
                     break;
             }
         } catch (Throwable e) {
-            DongTaiLog.warn(ErrorCode.TAINT_COMMAND_RANGE_PROCESS_FAILED, e);
+            DongTaiLog.warn(ErrorCode.get("TAINT_COMMAND_RANGE_PROCESS_FAILED"), e);
         }
 
         tr.untag(propagatorNode.getUntags());

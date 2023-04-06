@@ -50,7 +50,7 @@ public class HttpRequestReplay implements Runnable {
                 HttpClientUtils.sendReplayRequest(replayModel.getRequestMethod(), url, replayModel.getRequestBody(), headers);
             }
         } catch (Throwable e) {
-            DongTaiLog.warn(ErrorCode.REPLAY_REQUEST_FAILED, replayModel.getFullUrl(), e);
+            DongTaiLog.warn(ErrorCode.get("REPLAY_REQUEST_FAILED"), replayModel.getFullUrl(), e);
         }
     }
 
