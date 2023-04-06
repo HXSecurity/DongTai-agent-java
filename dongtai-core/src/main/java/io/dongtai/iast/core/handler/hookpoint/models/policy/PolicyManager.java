@@ -58,7 +58,7 @@ public class PolicyManager {
             }
             this.policy = PolicyBuilder.build(policyConfig);
         } catch (Throwable e) {
-            DongTaiLog.error(ErrorCode.POLICY_LOAD_FAILED, e);
+            DongTaiLog.error(ErrorCode.get("POLICY_LOAD_FAILED"), e);
         }
     }
 

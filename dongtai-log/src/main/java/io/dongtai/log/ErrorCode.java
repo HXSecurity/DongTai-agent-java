@@ -1,5 +1,8 @@
 package io.dongtai.log;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public enum ErrorCode {
     // prepare & common
     LOG_INITIALIZE_FAILED(10101, "log initialize failed"),
@@ -99,10 +102,20 @@ public enum ErrorCode {
     UTIL_CONFIG_LOAD_FAILED(20601, "load config {} failed"),
     UTIL_TAINT_ADD_OBJECT_TO_POOL_FAILED(20611, "add object to taint pool failed"),
     UTIL_TAINT_PARSE_CUSTOM_MODEL_FAILED(20612, "parse custom model {} getter {} failed"),
+
+    UNKNOWN(99999, "unknown error"),
     ;
 
     private final int code;
-    private final String message;
+    private String message;
+
+    private static final Map<String, ErrorCode> LOOKUP = new HashMap<String, ErrorCode>();
+
+    static {
+        for (ErrorCode e : ErrorCode.values()) {
+            LOOKUP.put(e.name(), e);
+        }
+    }
 
     ErrorCode(int code, String message) {
         this.code = code;
@@ -115,5 +128,15 @@ public enum ErrorCode {
 
     public String getMessage() {
         return this.message;
+    }
+
+    public static ErrorCode get(String name) {
+        ErrorCode ec = LOOKUP.get(name);
+        if (ec != null) {
+            return ec;
+        }
+
+        UNKNOWN.message = name;
+        return UNKNOWN;
     }
 }

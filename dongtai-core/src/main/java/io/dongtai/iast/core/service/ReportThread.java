@@ -34,7 +34,7 @@ public class ReportThread implements Runnable {
         try {
             HttpClientUtils.sendPost(uri, report);
         } catch (Throwable e) {
-            DongTaiLog.error(ErrorCode.REPORT_SEND_FAILED, uri, report, e);
+            DongTaiLog.error(ErrorCode.get("REPORT_SEND_FAILED"), uri, report, e);
         }
     }
 }

@@ -29,7 +29,7 @@ public class ScaReport {
         try {
             HttpClientUtils.sendPost(ApiPath.REPORT_UPLOAD, report);
         } catch (Throwable e) {
-            DongTaiLog.warn(ErrorCode.SCA_REPORT_SEND_FAILED,
+            DongTaiLog.warn(ErrorCode.get("SCA_REPORT_SEND_FAILED"),
                     e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "");
         }
     }
