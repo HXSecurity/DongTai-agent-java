@@ -1,6 +1,7 @@
 package io.dongtai.iast.core.handler.hookpoint.models.policy;
 
 import io.dongtai.iast.common.constants.ApiPath;
+import io.dongtai.iast.core.handler.hookpoint.models.taint.tag.TaintTag;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.VulnType;
 import io.dongtai.iast.core.utils.HttpClientUtils;
 import io.dongtai.iast.core.utils.StringUtils;
@@ -21,6 +22,8 @@ public class PolicyBuilder {
     private static final String KEY_SIGNATURE = "signature";
     private static final String KEY_INHERIT = "inherit";
     private static final String KEY_VUL_TYPE = "vul_type";
+    private static final String KEY_TAGS = "tags";
+    private static final String KEY_UNTAGS = "untags";
     private static final String KEY_COMMAND = "command";
     private static final String KEY_IGNORE_INTERNAL = "ignore_internal";
     private static final String KEY_IGNORE_BLACKLIST = "ignore_blacklist";
@@ -66,7 +69,7 @@ public class PolicyBuilder {
                 buildPropagator(policy, nodeType, node);
                 buildSink(policy, nodeType, node);
             } catch (PolicyException e) {
-                DongTaiLog.warn(ErrorCode.get("POLICY_CONFIG_INVALID"), e.getMessage());
+                DongTaiLog.warn(ErrorCode.get("POLICY_CONFIG_INVALID"), e);
             }
         }
         return policy;
@@ -231,15 +234,52 @@ public class PolicyBuilder {
         if (!(policyNode.getMethodMatcher() instanceof SignatureMethodMatcher)) {
             return empty;
         }
-        String signature = ((SignatureMethodMatcher) policyNode.getMethodMatcher()).getSignature().toString();
 
-        // TODO: parse tags/untags from policy
-        List<String[]> taintTags = PolicyTag.TAGS.get(signature);
-        if (taintTags == null || taintTags.size() != 2) {
-            return empty;
+        boolean hasInvalid = false;
+        List<String> tags = new ArrayList<String>();
+        List<String> untags = new ArrayList<String>();
+        try {
+            JSONArray ts = node.getJSONArray(KEY_TAGS);
+            for (Object o : ts) {
+                String t = (String) o;
+                if (TaintTag.UNTRUSTED.equals(t)) {
+                    continue;
+                }
+                if (TaintTag.get(t) != null) {
+                    tags.add(TaintTag.get(t).getKey());
+                } else {
+                    hasInvalid = true;
+                }
+            }
+        } catch (JSONException ignore) {
         }
 
-        return taintTags;
+        try {
+            JSONArray uts = node.getJSONArray(KEY_UNTAGS);
+            for (Object o : uts) {
+                String ut = (String) o;
+                if (TaintTag.UNTRUSTED.equals(ut)) {
+                    continue;
+                }
+                TaintTag tt = TaintTag.get(ut);
+                if (tt != null) {
+                    if (tags.contains(tt.getKey())) {
+                        hasInvalid = true;
+                    }
+                    untags.add(tt.getKey());
+                } else {
+                    hasInvalid = true;
+                }
+            }
+        } catch (JSONException ignore) {
+        }
+
+        if (hasInvalid) {
+            DongTaiLog.warn(ErrorCode.get("POLICY_CONFIG_INVALID"),
+                    new PolicyException(PolicyException.ERR_POLICY_NODE_TAGS_UNTAGS_INVALID + ": " + node.toString()));
+        }
+
+        return Arrays.asList(tags.toArray(new String[0]), untags.toArray(new String[0]));
     }
 
     private static void parseFlags(JSONObject node, PolicyNode policyNode) {

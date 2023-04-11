@@ -1,5 +1,6 @@
 package io.dongtai.iast.core.handler.hookpoint.models.policy;
 
+import io.dongtai.iast.core.handler.hookpoint.models.taint.tag.TaintTag;
 import io.dongtai.iast.core.utils.PropertyUtils;
 import org.json.JSONArray;
 import org.junit.*;
@@ -173,6 +174,35 @@ public class PolicyBuilderTest {
                     });
             Assert.assertTrue("buildSink exception " + entry.getKey() + " => " + exception.getMessage(),
                     exception.getMessage().startsWith(entry.getValue()));
+        }
+    }
+
+    @Test
+    public void testTags() throws PolicyException {
+        Map<String, List<String[]>> tests = new HashMap<String, List<String[]>>() {{
+            put("tags/policy-tags-empty.json", Arrays.asList(new String[0], new String[0]));
+            put("tags/policy-tags-invalid.json", Arrays.asList(new String[0], new String[0]));
+            put("tags/policy-tags-valid-single.json", Arrays.asList(
+                    new String[]{TaintTag.URL_ENCODED.getKey()}, new String[]{TaintTag.URL_DECODED.getKey()}));
+            put("tags/policy-tags-valid-multi.json", Arrays.asList(
+                    new String[]{TaintTag.URL_ENCODED.getKey(), TaintTag.HTML_ENCODED.getKey()},
+                    new String[]{TaintTag.URL_DECODED.getKey(), TaintTag.HTML_DECODED.getKey()}));
+            put("tags/policy-tags-multi-has-invalid.json", Arrays.asList(
+                    new String[]{TaintTag.URL_ENCODED.getKey(), TaintTag.HTML_ENCODED.getKey()},
+                    new String[]{TaintTag.URL_DECODED.getKey(), TaintTag.HTML_DECODED.getKey()}));
+            put("tags/policy-tags-multi-has-dup.json", Arrays.asList(
+                    new String[]{TaintTag.URL_ENCODED.getKey(), TaintTag.HTML_ENCODED.getKey()},
+                    new String[]{TaintTag.URL_DECODED.getKey(), TaintTag.HTML_ENCODED.getKey()}));
+        }};
+        for (Map.Entry<String, List<String[]>> entry : tests.entrySet()) {
+            JSONArray policyConfig = PolicyBuilder.fetchFromFile(POLICY_DIR + entry.getKey());
+            Policy policy = new Policy();
+            PolicyBuilder.buildPropagator(policy, PolicyNodeType.PROPAGATOR, policyConfig.getJSONObject(0));
+            Assert.assertEquals("tags/untags policy length " + entry.getKey(), 1, policy.getPolicyNodesMap().size());
+            String[] tags = policy.getPropagators().get(0).getTags();
+            String[] untags = policy.getPropagators().get(0).getUntags();
+            Assert.assertArrayEquals("tags " + entry.getKey(), tags, entry.getValue().get(0));
+            Assert.assertArrayEquals("untags " + entry.getKey(), untags, entry.getValue().get(1));
         }
     }
 }
