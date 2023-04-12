@@ -1,5 +1,7 @@
 package io.dongtai.iast.core.handler.hookpoint.models.policy;
 
+import io.dongtai.iast.core.handler.hookpoint.models.taint.range.TaintCommand;
+import io.dongtai.iast.core.handler.hookpoint.models.taint.range.TaintCommandRunner;
 import io.dongtai.iast.core.handler.hookpoint.models.taint.tag.TaintTag;
 import io.dongtai.iast.core.utils.PropertyUtils;
 import org.json.JSONArray;
@@ -201,8 +203,41 @@ public class PolicyBuilderTest {
             Assert.assertEquals("tags/untags policy length " + entry.getKey(), 1, policy.getPolicyNodesMap().size());
             String[] tags = policy.getPropagators().get(0).getTags();
             String[] untags = policy.getPropagators().get(0).getUntags();
-            Assert.assertArrayEquals("tags " + entry.getKey(), tags, entry.getValue().get(0));
-            Assert.assertArrayEquals("untags " + entry.getKey(), untags, entry.getValue().get(1));
+            Assert.assertArrayEquals("tags " + entry.getKey(), entry.getValue().get(0), tags);
+            Assert.assertArrayEquals("untags " + entry.getKey(), entry.getValue().get(1), untags);
+        }
+    }
+
+    @Test
+    public void testCommand() throws PolicyException {
+        Map<String, TaintCommandRunner> tests = new HashMap<String, TaintCommandRunner>() {{
+            put("command/policy-command-empty.json", null);
+            put("command/policy-command-invalid.json", null);
+            put("command/policy-command-invalid-cmd.json", null);
+            put("command/policy-command-invalid-args.json", null);
+            put("command/policy-keep-empty-args.json", TaintCommandRunner.create("",
+                    TaintCommand.KEEP, new String[0]));
+            put("command/policy-append-p2-p3.json", TaintCommandRunner.create("", TaintCommand.APPEND,
+                    new String[]{"P2", "P3"}));
+            put("command/policy-append-p2-p3-0.json", TaintCommandRunner.create("", TaintCommand.APPEND,
+                    new String[]{"P2", "P3", "0"}));
+            put("command/policy-append-p2-p3-0-with-space.json", TaintCommandRunner.create("", TaintCommand.APPEND,
+                    new String[]{"P2", "P3", "0"}));
+            put("command/policy-subset-0-p1.json", TaintCommandRunner.create("", TaintCommand.SUBSET,
+                    new String[]{"0", "P1"}));
+        }};
+        for (Map.Entry<String, TaintCommandRunner> entry : tests.entrySet()) {
+            JSONArray policyConfig = PolicyBuilder.fetchFromFile(POLICY_DIR + entry.getKey());
+            Policy policy = new Policy();
+            PolicyBuilder.buildPropagator(policy, PolicyNodeType.PROPAGATOR, policyConfig.getJSONObject(0));
+            TaintCommandRunner r = policy.getPropagators().get(0).getCommandRunner();
+            if (entry.getValue() == null) {
+                Assert.assertNull(r);
+            } else {
+                Assert.assertEquals("policy command " + entry.getKey(), entry.getValue().getCommand(), r.getCommand());
+                Assert.assertEquals("policy command args " + entry.getKey(),
+                        entry.getValue().getOrigParams(), r.getOrigParams());
+            }
         }
     }
 }

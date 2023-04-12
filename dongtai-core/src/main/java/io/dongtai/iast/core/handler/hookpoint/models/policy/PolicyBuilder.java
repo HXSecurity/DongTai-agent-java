@@ -1,6 +1,8 @@
 package io.dongtai.iast.core.handler.hookpoint.models.policy;
 
 import io.dongtai.iast.common.constants.ApiPath;
+import io.dongtai.iast.core.handler.hookpoint.models.taint.range.TaintCommand;
+import io.dongtai.iast.core.handler.hookpoint.models.taint.range.TaintCommandRunner;
 import io.dongtai.iast.core.handler.hookpoint.models.taint.tag.TaintTag;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.VulnType;
 import io.dongtai.iast.core.utils.HttpClientUtils;
@@ -99,12 +101,12 @@ public class PolicyBuilder {
         Set<TaintPosition> sources = parseSource(node, type);
         Set<TaintPosition> targets = parseTarget(node, type);
         MethodMatcher methodMatcher = buildMethodMatcher(node);
-        // @TODO: command
-        PropagatorNode propagatorNode = new PropagatorNode(sources, targets, null, new String[]{}, methodMatcher);
+        PropagatorNode propagatorNode = new PropagatorNode(sources, targets, methodMatcher);
         setInheritable(node, propagatorNode);
         List<String[]> tags = parseTags(node, propagatorNode);
         propagatorNode.setTags(tags.get(0));
         propagatorNode.setUntags(tags.get(1));
+        parseCommand(node, propagatorNode);
         parseFlags(node, propagatorNode);
         policy.addPropagator(propagatorNode);
     }
@@ -280,6 +282,65 @@ public class PolicyBuilder {
         }
 
         return Arrays.asList(tags.toArray(new String[0]), untags.toArray(new String[0]));
+    }
+
+    private static void parseCommand(JSONObject node, PropagatorNode propagatorNode) {
+        try {
+            String cmdConfig = node.getString(KEY_COMMAND);
+            if (cmdConfig == null) {
+                return;
+            }
+            cmdConfig = cmdConfig.trim();
+            if (cmdConfig.isEmpty()) {
+                return;
+            }
+
+            boolean isInvalid = false;
+            int parametersStartIndex = cmdConfig.indexOf("(");
+            int parametersEndIndex = cmdConfig.indexOf(")");
+
+            if (parametersStartIndex <= 2 || parametersEndIndex <= 3
+                    || parametersStartIndex > parametersEndIndex
+                    || parametersEndIndex != cmdConfig.length() - 1) {
+                isInvalid = true;
+            } else {
+                String cmd = cmdConfig.substring(0, parametersStartIndex).trim();
+                String argumentsStr = cmdConfig.substring(parametersStartIndex + 1, parametersEndIndex).trim();
+                String[] arguments = new String[]{};
+                if (!argumentsStr.isEmpty()) {
+                    argumentsStr = argumentsStr.toUpperCase();
+                    arguments = argumentsStr.replace(" ", "").split(",");
+                    for (String argument : arguments) {
+                        String dig = argument;
+                        if (dig.startsWith("P")) {
+                            dig = dig.substring(1);
+                        }
+                        if (!dig.matches("\\d+")) {
+                            isInvalid = true;
+                            break;
+                        }
+                    }
+                }
+
+                TaintCommand command = TaintCommand.get(cmd);
+                if (command == null) {
+                    isInvalid = true;
+                } else {
+                    if (!(propagatorNode.getMethodMatcher() instanceof SignatureMethodMatcher)) {
+                        return;
+                    }
+                    String signature = ((SignatureMethodMatcher) propagatorNode.getMethodMatcher()).getSignature().toString();
+                    TaintCommandRunner commandRunner = TaintCommandRunner.create(signature, command, arguments);
+                    propagatorNode.setCommandRunner(commandRunner);
+                }
+            }
+
+            if (isInvalid) {
+                DongTaiLog.warn(ErrorCode.get("POLICY_CONFIG_INVALID"),
+                        new PolicyException(PolicyException.ERR_POLICY_NODE_RANGE_COMMAND_INVALID + ": " + node.toString()));
+            }
+        } catch (JSONException ignore) {
+        }
     }
 
     private static void parseFlags(JSONObject node, PolicyNode policyNode) {
