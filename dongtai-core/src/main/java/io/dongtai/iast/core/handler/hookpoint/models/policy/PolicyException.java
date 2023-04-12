@@ -14,6 +14,7 @@ public class PolicyException extends Exception {
     public static final String ERR_POLICY_SINK_NODE_VUL_TYPE_INVALID = "policy sink node vul type is invalid";
     public static final String ERR_POLICY_NODE_TAGS_UNTAGS_INVALID = "policy node tags/untags has invalid config";
     public static final String ERR_POLICY_NODE_RANGE_COMMAND_INVALID = "policy node range command is invalid";
+    public static final String ERR_POLICY_NODE_STACK_BLACKLIST_INVALID = "policy node stack blacklist is invalid";
 
     public PolicyException(String message) {
         super(message);

@@ -4,25 +4,40 @@ import io.dongtai.iast.core.handler.hookpoint.models.taint.range.TaintCommand;
 import io.dongtai.iast.core.handler.hookpoint.models.taint.range.TaintCommandRunner;
 import io.dongtai.iast.core.handler.hookpoint.models.taint.tag.TaintTag;
 import io.dongtai.iast.core.utils.PropertyUtils;
+import io.dongtai.log.DongTaiLog;
 import org.json.JSONArray;
 import org.junit.*;
 import org.junit.function.ThrowingRunnable;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.*;
 
 public class PolicyBuilderTest {
     private static final String POLICY_DIR = "src/test/fixture/policy/";
     private static final String PROPERTY_FILE = "src/test/fixture/property/policy-test-invalid.properties";
+    private final PrintStream standardOut = System.out;
+    private final ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
+
 
     @Before
     public void setUp() {
         PropertyUtils.getInstance(PROPERTY_FILE);
-        System.setProperty("dongtai.log", "false");
+        DongTaiLog.ENABLED = true;
+        clear();
+        System.setOut(new PrintStream(outputStreamCaptor));
     }
 
     @After
     public void tearDown() {
         PropertyUtils.clear();
+        DongTaiLog.ENABLED = false;
+        clear();
+        System.setOut(standardOut);
+    }
+
+    private void clear() {
+        outputStreamCaptor.reset();
     }
 
     @Test
@@ -184,6 +199,11 @@ public class PolicyBuilderTest {
         Map<String, List<String[]>> tests = new HashMap<String, List<String[]>>() {{
             put("tags/policy-tags-empty.json", Arrays.asList(new String[0], new String[0]));
             put("tags/policy-tags-invalid.json", Arrays.asList(new String[0], new String[0]));
+            put("tags/policy-tags-invalid-type-tags.json", Arrays.asList(new String[0], new String[0]));
+            put("tags/policy-tags-invalid-type-tags-value.json", Arrays.asList(new String[0], new String[0]));
+            put("tags/policy-tags-invalid-type-untags.json", Arrays.asList(new String[0], new String[0]));
+            put("tags/policy-tags-invalid-type-untags-value.json", Arrays.asList(new String[0], new String[0]));
+            put("tags/policy-tags-valid-empty.json", Arrays.asList(new String[0], new String[0]));
             put("tags/policy-tags-valid-single.json", Arrays.asList(
                     new String[]{TaintTag.URL_ENCODED.getKey()}, new String[]{TaintTag.URL_DECODED.getKey()}));
             put("tags/policy-tags-valid-multi.json", Arrays.asList(
@@ -197,14 +217,28 @@ public class PolicyBuilderTest {
                     new String[]{TaintTag.URL_DECODED.getKey(), TaintTag.HTML_ENCODED.getKey()}));
         }};
         for (Map.Entry<String, List<String[]>> entry : tests.entrySet()) {
+            clear();
             JSONArray policyConfig = PolicyBuilder.fetchFromFile(POLICY_DIR + entry.getKey());
             Policy policy = new Policy();
             PolicyBuilder.buildPropagator(policy, PolicyNodeType.PROPAGATOR, policyConfig.getJSONObject(0));
-            Assert.assertEquals("tags/untags policy length " + entry.getKey(), 1, policy.getPolicyNodesMap().size());
+
+            if ("tags/policy-tags-invalid.json".equals(entry.getKey())
+                    || "tags/policy-tags-invalid-type-tags.json".equals(entry.getKey())
+                    || "tags/policy-tags-invalid-type-tags-value.json".equals(entry.getKey())
+                    || "tags/policy-tags-invalid-type-untags.json".equals(entry.getKey())
+                    || "tags/policy-tags-invalid-type-untags-value.json".equals(entry.getKey())
+                    || "tags/policy-tags-multi-has-invalid.json".equals(entry.getKey())
+                    || "tags/policy-tags-multi-has-dup.json".equals(entry.getKey())) {
+                Assert.assertTrue("policy tags/untags warn " + entry.getKey(), outputStreamCaptor.size() > 0);
+            } else {
+                Assert.assertEquals("policy tags/untags no warn " + entry.getKey(), 0, outputStreamCaptor.size());
+            }
+
+            Assert.assertEquals("policy tags/untags length " + entry.getKey(), 1, policy.getPolicyNodesMap().size());
             String[] tags = policy.getPropagators().get(0).getTags();
             String[] untags = policy.getPropagators().get(0).getUntags();
-            Assert.assertArrayEquals("tags " + entry.getKey(), entry.getValue().get(0), tags);
-            Assert.assertArrayEquals("untags " + entry.getKey(), entry.getValue().get(1), untags);
+            Assert.assertArrayEquals("policy tags " + entry.getKey(), entry.getValue().get(0), tags);
+            Assert.assertArrayEquals("policy untags " + entry.getKey(), entry.getValue().get(1), untags);
         }
     }
 
@@ -213,6 +247,7 @@ public class PolicyBuilderTest {
         Map<String, TaintCommandRunner> tests = new HashMap<String, TaintCommandRunner>() {{
             put("command/policy-command-empty.json", null);
             put("command/policy-command-invalid.json", null);
+            put("command/policy-command-invalid-type.json", null);
             put("command/policy-command-invalid-cmd.json", null);
             put("command/policy-command-invalid-args.json", null);
             put("command/policy-keep-empty-args.json", TaintCommandRunner.create("",
@@ -227,10 +262,21 @@ public class PolicyBuilderTest {
                     new String[]{"0", "P1"}));
         }};
         for (Map.Entry<String, TaintCommandRunner> entry : tests.entrySet()) {
+            clear();
             JSONArray policyConfig = PolicyBuilder.fetchFromFile(POLICY_DIR + entry.getKey());
             Policy policy = new Policy();
             PolicyBuilder.buildPropagator(policy, PolicyNodeType.PROPAGATOR, policyConfig.getJSONObject(0));
             TaintCommandRunner r = policy.getPropagators().get(0).getCommandRunner();
+
+            if ("command/policy-command-invalid.json".equals(entry.getKey())
+                    || "command/policy-command-invalid-type.json".equals(entry.getKey())
+                    || "command/policy-command-invalid-cmd.json".equals(entry.getKey())
+                    || "command/policy-command-invalid-args.json".equals(entry.getKey())) {
+                Assert.assertTrue("policy command warn " + entry.getKey(), outputStreamCaptor.size() > 0);
+            } else {
+                Assert.assertEquals("policy command no warn " + entry.getKey(), 0, outputStreamCaptor.size());
+            }
+
             if (entry.getValue() == null) {
                 Assert.assertNull(r);
             } else {
@@ -238,6 +284,36 @@ public class PolicyBuilderTest {
                 Assert.assertEquals("policy command args " + entry.getKey(),
                         entry.getValue().getOrigParams(), r.getOrigParams());
             }
+        }
+    }
+
+    @Test
+    public void testStackBlacklist() throws PolicyException {
+        Map<String, String[]> tests = new HashMap<String, String[]>() {{
+            put("stack-blacklist/policy-stack-blacklist-empty.json", null);
+            put("stack-blacklist/policy-stack-blacklist-invalid.json", null);
+            put("stack-blacklist/policy-stack-blacklist-invalid-type.json", null);
+            put("stack-blacklist/policy-stack-blacklist-invalid-type-value.json", null);
+            put("stack-blacklist/policy-stack-blacklist-valid-empty.json", new String[0]);
+            put("stack-blacklist/policy-stack-blacklist-valid.json", new String[]{"foo.Bar", "foo.Bar(baz)"});
+        }};
+        for (Map.Entry<String, String[]> entry : tests.entrySet()) {
+            clear();
+            JSONArray policyConfig = PolicyBuilder.fetchFromFile(POLICY_DIR + entry.getKey());
+            Policy policy = new Policy();
+            PolicyBuilder.buildSink(policy, PolicyNodeType.SINK, policyConfig.getJSONObject(0));
+            SinkNode sinkNode = policy.getSinks().get(0);
+
+            if ("stack-blacklist/policy-stack-blacklist-invalid.json".equals(entry.getKey())
+                    || "stack-blacklist/policy-stack-blacklist-invalid-type.json".equals(entry.getKey())
+                    || "stack-blacklist/policy-stack-blacklist-invalid-type-value.json".equals(entry.getKey())) {
+                Assert.assertTrue("policy stack blacklist warn " + entry.getKey(), outputStreamCaptor.size() > 0);
+            } else {
+                Assert.assertEquals("policy stack blacklist no warn " + entry.getKey(), 0, outputStreamCaptor.size());
+            }
+
+            Assert.assertArrayEquals("policy stack blacklist " + entry.getKey(),
+                    entry.getValue(), sinkNode.getStackDenyList());
         }
     }
 }
