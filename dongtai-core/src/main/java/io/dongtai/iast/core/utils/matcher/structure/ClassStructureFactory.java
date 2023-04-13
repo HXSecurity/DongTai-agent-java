@@ -29,7 +29,7 @@ public class ClassStructureFactory {
         try {
             return new ClassStructureImplByAsm(classInputStream, loader);
         } catch (IOException cause) {
-            DongTaiLog.warn(ErrorCode.ASM_CREATE_CLASS_STRUCTURE_FAILED, loader, cause);
+            DongTaiLog.warn(ErrorCode.get("ASM_CREATE_CLASS_STRUCTURE_FAILED"), loader, cause);
             return null;
         }
     }

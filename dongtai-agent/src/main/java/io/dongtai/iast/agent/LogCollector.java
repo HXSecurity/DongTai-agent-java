@@ -59,6 +59,7 @@ public class LogCollector {
             fluent = Runtime.getRuntime().exec(execution);
             DongTaiLog.info("fluent process started");
             shutdownHook = new Thread(new Runnable() {
+                @Override
                 public void run() {
                     stopFluent();
                 }

@@ -337,7 +337,7 @@ public class ClassStructureImplByAsm extends FamilyClassStructure {
             return classStructure;
         } catch (Throwable cause) {
             // ignore
-            DongTaiLog.warn(ErrorCode.ASM_CREATE_CLASS_STRUCTURE_BY_NAME_FAILED, javaClassName, loader, cause);
+            DongTaiLog.warn(ErrorCode.get("ASM_CREATE_CLASS_STRUCTURE_BY_NAME_FAILED"), javaClassName, loader, cause);
             classStructureCache.put(pair, null);
         } finally {
             pair = null;

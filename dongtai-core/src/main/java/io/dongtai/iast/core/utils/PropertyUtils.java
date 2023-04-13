@@ -64,7 +64,7 @@ public class PropertyUtils {
                 fis.close();
             }
         } catch (Throwable e) {
-            DongTaiLog.error(ErrorCode.ENGINE_PROPERTIES_INITIALIZE_FAILED, e);
+            DongTaiLog.error(ErrorCode.get("ENGINE_PROPERTIES_INITIALIZE_FAILED"), e);
         }
     }
 

@@ -39,7 +39,7 @@ public class AbstractHttpClientUtils {
                 reqBody = new GzipCompressingEntity(new StringEntity(data, "UTF-8"));
             }
         } catch (Throwable e) {
-            DongTaiLog.error(ErrorCode.HTTP_CLIENT_PREPARE_REQUEST_BODY_FAILED, url, e);
+            DongTaiLog.error(ErrorCode.get("HTTP_CLIENT_PREPARE_REQUEST_BODY_FAILED"), url, e);
         }
         StringBuilder response = sendRequest(client, method, url, reqBody, headers, handler);
         DongTaiLog.trace("dongtai request url is {}, request is {}, response is {}",
@@ -72,7 +72,7 @@ public class AbstractHttpClientUtils {
                 }
             }
         } catch (Throwable e) {
-            DongTaiLog.warn(ErrorCode.HTTP_CLIENT_PREPARE_REQUEST_BODY_FAILED, url, e);
+            DongTaiLog.warn(ErrorCode.get("HTTP_CLIENT_PREPARE_REQUEST_BODY_FAILED"), url, e);
             return response;
         }
         response = sendRequest(client, m, url, reqBody, headers, null);
@@ -96,7 +96,7 @@ public class AbstractHttpClientUtils {
             }
             if (resp != null) {
                 if (resp.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
-                    DongTaiLog.warn(ErrorCode.HTTP_CLIENT_REQUEST_RESPONSE_CODE_INVALID,
+                    DongTaiLog.warn(ErrorCode.get("HTTP_CLIENT_REQUEST_RESPONSE_CODE_INVALID"),
                             url, resp.getStatusLine().getStatusCode());
                 }
 
@@ -104,7 +104,7 @@ public class AbstractHttpClientUtils {
                 return response;
             }
         } catch (Throwable e) {
-            DongTaiLog.error(ErrorCode.HTTP_CLIENT_REQUEST_PARSE_RESPONSE_FAILED, url, e);
+            DongTaiLog.error(ErrorCode.get("HTTP_CLIENT_REQUEST_PARSE_RESPONSE_FAILED"), url, e);
             if (handler != null) {
                 handler.run();
             }
@@ -150,7 +150,7 @@ public class AbstractHttpClientUtils {
             }
             return client.execute(req);
         } catch (IOException e) {
-            DongTaiLog.error(ErrorCode.HTTP_CLIENT_REQUEST_EXECUTE_FAILED, req.getURI().toString(), e);
+            DongTaiLog.error(ErrorCode.get("HTTP_CLIENT_REQUEST_EXECUTE_FAILED"), req.getURI().toString(), e);
             if (func != null) {
                 func.run();
             }
@@ -201,7 +201,7 @@ public class AbstractHttpClientUtils {
             HttpGet req = new HttpGet(fileURL);
             resp = sendRequestInternal(client, req, null, headers, null);
             if (resp == null) {
-                DongTaiLog.error(ErrorCode.HTTP_CLIENT_REMOTE_FILE_RESPONSE_EMPTY, fileURL);
+                DongTaiLog.error(ErrorCode.get("HTTP_CLIENT_REMOTE_FILE_RESPONSE_EMPTY"), fileURL);
                 return false;
             }
 
@@ -210,7 +210,7 @@ public class AbstractHttpClientUtils {
                     || MEDIA_TYPE_TEXT_PLAIN.equals(contentType)
                     || MEDIA_TYPE_TEXT_HTML.equals(contentType)) {
                 String r = EntityUtils.toString(resp.getEntity(), "UTF-8");
-                DongTaiLog.error(ErrorCode.HTTP_CLIENT_REMOTE_FILE_RESPONSE_INVALID,
+                DongTaiLog.error(ErrorCode.get("HTTP_CLIENT_REMOTE_FILE_RESPONSE_INVALID"),
                         fileURL, resp.getStatusLine().getStatusCode(), r);
                 return false;
             }
@@ -234,7 +234,7 @@ public class AbstractHttpClientUtils {
             DongTaiLog.info("The remote file {} was successfully written to the local file {}", fileURL, fileName);
             return true;
         } catch (Throwable e) {
-            DongTaiLog.error(ErrorCode.HTTP_CLIENT_REMOTE_FILE_DOWNLOAD_FAILED, fileURL, e);
+            DongTaiLog.error(ErrorCode.get("HTTP_CLIENT_REMOTE_FILE_DOWNLOAD_FAILED"), fileURL, e);
         } finally {
             if (resp != null) {
                 try {

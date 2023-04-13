@@ -66,7 +66,7 @@ public class PolicyBuilder {
                 buildPropagator(policy, nodeType, node);
                 buildSink(policy, nodeType, node);
             } catch (PolicyException e) {
-                DongTaiLog.warn(ErrorCode.POLICY_CONFIG_INVALID.getCode(), e.getMessage());
+                DongTaiLog.warn(ErrorCode.get("POLICY_CONFIG_INVALID"), e.getMessage());
             }
         }
         return policy;

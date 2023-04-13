@@ -28,7 +28,7 @@ public class SignatureAlgorithm {
             BigInteger bigInteger = new BigInteger(1, digest.digest());
             signature = String.format("%040x", bigInteger);
         } catch (Throwable e) {
-            DongTaiLog.warn(ErrorCode.SCA_CALCULATE_JAR_SIGNATURE_FAILED,
+            DongTaiLog.warn(ErrorCode.get("SCA_CALCULATE_JAR_SIGNATURE_FAILED"),
                     e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "");
         }
         return signature;
@@ -44,7 +44,7 @@ public class SignatureAlgorithm {
             in = new FileInputStream(file);
             signature = getSignature(in, algorithm);
         } catch (Throwable e) {
-            DongTaiLog.warn(ErrorCode.SCA_CALCULATE_JAR_SIGNATURE_FAILED,
+            DongTaiLog.warn(ErrorCode.get("SCA_CALCULATE_JAR_SIGNATURE_FAILED"),
                     e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "");
         } finally {
             try {

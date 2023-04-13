@@ -35,7 +35,7 @@ public class GraphBuilder {
             }
             ThreadPools.sendPriorityReport(ApiPath.REPORT_UPLOAD, report);
         } catch (Throwable e) {
-            DongTaiLog.error(ErrorCode.GRAPH_BUILD_AND_REPORT_FAILED, e);
+            DongTaiLog.error(ErrorCode.get("GRAPH_BUILD_AND_REPORT_FAILED"), e);
         } finally {
             ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
         }

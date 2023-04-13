@@ -169,7 +169,7 @@ public class TaintPoolUtils {
                     }
                     modelValues.add(itemValue);
                 } catch (Throwable e) {
-                    DongTaiLog.error(ErrorCode.UTIL_TAINT_PARSE_CUSTOM_MODEL_FAILED,
+                    DongTaiLog.error(ErrorCode.get("UTIL_TAINT_PARSE_CUSTOM_MODEL_FAILED"),
                             model.getClass().getName(), method.getName(), e);
                 }
             }
