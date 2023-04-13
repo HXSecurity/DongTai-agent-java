@@ -310,7 +310,7 @@ public class PolicyBuilder {
                 int parametersStartIndex = cmdConfig.indexOf("(");
                 int parametersEndIndex = cmdConfig.indexOf(")");
 
-                if (parametersStartIndex <= 2 || parametersEndIndex <= 3
+                if (parametersStartIndex <= 0 || parametersEndIndex <= 1
                         || parametersStartIndex > parametersEndIndex
                         || parametersEndIndex != cmdConfig.length() - 1) {
                     isInvalid = true;
