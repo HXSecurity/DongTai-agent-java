@@ -1,5 +1,7 @@
 package io.dongtai.iast.agent.monitor.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import io.dongtai.iast.agent.manager.EngineManager;
 import io.dongtai.iast.agent.monitor.IMonitor;
 import io.dongtai.iast.agent.monitor.MonitorDaemonThread;
@@ -13,7 +15,6 @@ import io.dongtai.iast.common.state.State;
 import io.dongtai.iast.common.state.StateCause;
 import io.dongtai.log.DongTaiLog;
 import io.dongtai.log.ErrorCode;
-import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -73,7 +74,7 @@ public class AgentStateMonitor implements IMonitor {
             parameters.put("agentId", String.valueOf(AgentRegisterReport.getAgentId()));
             String respRaw = HttpClientUtils.sendGet(ApiPath.EXCEPT_ACTION, parameters).toString();
             if (!respRaw.isEmpty()) {
-                JSONObject resp = new JSONObject(respRaw);
+                JSONObject resp = JSON.parseObject(respRaw);
                 JSONObject data = (JSONObject) resp.get("data");
                 return data.get("exceptRunningStatus").toString();
             }

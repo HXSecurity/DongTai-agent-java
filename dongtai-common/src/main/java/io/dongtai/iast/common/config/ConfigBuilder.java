@@ -1,6 +1,9 @@
 package io.dongtai.iast.common.config;
 
-import org.json.*;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONException;
+import com.alibaba.fastjson.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -44,7 +47,7 @@ public class ConfigBuilder {
     public void updateFromRemote(String content) {
         JSONObject config = null;
         try {
-            JSONObject json = new JSONObject(content);
+            JSONObject json = JSON.parseObject(content);
             config = json.getJSONObject("data");
         } catch (JSONException ignore) {
         }
@@ -91,7 +94,7 @@ public class ConfigBuilder {
         try {
             Config<Integer> conf = (Config<Integer>) getConfig(jsonKey.getConfigKey());
             if (conf != null) {
-                Integer value = config.getInt(jsonKey.getKey());
+                Integer value = config.getIntValue(jsonKey.getKey());
                 conf.setValue(value);
             }
         } catch (Throwable ignore) {

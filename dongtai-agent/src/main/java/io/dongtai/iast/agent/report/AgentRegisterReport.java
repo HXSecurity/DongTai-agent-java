@@ -1,5 +1,8 @@
 package io.dongtai.iast.agent.report;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import io.dongtai.iast.agent.IastProperties;
 import io.dongtai.iast.agent.manager.EngineManager;
 import io.dongtai.iast.agent.middlewarerecognition.IServer;
@@ -10,8 +13,7 @@ import io.dongtai.iast.common.constants.ApiPath;
 import io.dongtai.iast.common.utils.base64.Base64Encoder;
 import io.dongtai.log.DongTaiLog;
 import io.dongtai.log.ErrorCode;
-import org.json.JSONArray;
-import org.json.JSONObject;
+
 
 import java.io.*;
 import java.net.*;
@@ -211,7 +213,7 @@ public class AgentRegisterReport {
                     } else {
                         jsonObject.put("isAddress", "0");
                     }
-                    network.put(jsonObject);
+                    network.add(jsonObject);
                 }
             }
             return network.toString();
@@ -258,7 +260,7 @@ public class AgentRegisterReport {
      */
     private void setAgentData(StringBuilder responseRaw) {
         try {
-            JSONObject responseObj = new JSONObject(responseRaw.toString());
+            JSONObject responseObj = JSON.parseObject(responseRaw.toString());
             Integer status = (Integer) responseObj.get("status");
             if (status == 201) {
                 JSONObject data = (JSONObject) responseObj.get("data");

@@ -1,5 +1,6 @@
 package io.dongtai.iast.core.handler.hookpoint.controller.impl;
 
+import com.alibaba.fastjson.JSONArray;
 import io.dongtai.iast.common.config.ConfigBuilder;
 import io.dongtai.iast.common.config.ConfigKey;
 import io.dongtai.iast.core.EngineManager;
@@ -11,7 +12,6 @@ import io.dongtai.iast.core.handler.hookpoint.models.taint.range.*;
 import io.dongtai.iast.core.utils.StackUtils;
 import io.dongtai.iast.core.utils.TaintPoolUtils;
 import io.dongtai.log.DongTaiLog;
-import org.json.JSONArray;
 
 import java.io.ByteArrayOutputStream;
 import java.net.URI;
@@ -110,7 +110,7 @@ public class DubboImpl {
         requestMeta.put("headers", sHeaders);
         JSONArray arr = new JSONArray();
         for (Object arg : arguments) {
-            arr.put(event.obj2String(arg));
+            arr.add(event.obj2String(arg));
         }
         requestMeta.put("body", arr.toString());
         EngineManager.REQUEST_CONTEXT.set(requestMeta);

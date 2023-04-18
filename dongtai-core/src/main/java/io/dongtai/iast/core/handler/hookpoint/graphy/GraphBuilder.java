@@ -1,5 +1,7 @@
 package io.dongtai.iast.core.handler.hookpoint.graphy;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import io.dongtai.iast.common.constants.*;
 import io.dongtai.iast.common.scope.ScopeManager;
 import io.dongtai.iast.common.utils.base64.Base64Encoder;
@@ -11,8 +13,7 @@ import io.dongtai.iast.core.service.ThreadPools;
 import io.dongtai.iast.core.utils.StringUtils;
 import io.dongtai.log.DongTaiLog;
 import io.dongtai.log.ErrorCode;
-import org.json.JSONArray;
-import org.json.JSONObject;
+
 
 import java.nio.charset.Charset;
 import java.util.*;
@@ -111,6 +112,7 @@ public class GraphBuilder {
         for (GraphNode node : nodeList) {
             methodPool.put(node.toJson());
         }
+
         return report.toString();
     }
 }

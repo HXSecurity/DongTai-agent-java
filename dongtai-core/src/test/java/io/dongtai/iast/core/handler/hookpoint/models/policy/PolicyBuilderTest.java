@@ -1,7 +1,7 @@
 package io.dongtai.iast.core.handler.hookpoint.models.policy;
 
+import com.alibaba.fastjson.JSONArray;
 import io.dongtai.iast.core.utils.PropertyUtils;
-import org.json.JSONArray;
 import org.junit.*;
 import org.junit.function.ThrowingRunnable;
 
@@ -38,7 +38,7 @@ public class PolicyBuilderTest {
     public void testFetchFromFile() throws PolicyException {
         JSONArray policy = PolicyBuilder.fetchFromFile(POLICY_DIR + "policy.json");
         Assert.assertNotNull("fetch file", policy);
-        Assert.assertEquals("fetch file", 3, policy.length());
+        Assert.assertEquals("fetch file", 3, policy.size());
 
         PolicyException exception;
         Map<String, String> exceptionTest = new HashMap<String, String>() {{

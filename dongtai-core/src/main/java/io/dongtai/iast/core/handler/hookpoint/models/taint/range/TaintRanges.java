@@ -1,8 +1,8 @@
 package io.dongtai.iast.core.handler.hookpoint.models.taint.range;
 
+import com.alibaba.fastjson.JSONArray;
 import io.dongtai.iast.core.handler.hookpoint.models.taint.tag.TaintTag;
 import io.dongtai.iast.core.utils.StringUtils;
-import org.json.JSONArray;
 
 import java.util.*;
 
@@ -309,7 +309,7 @@ public class TaintRanges {
     public JSONArray toJson() {
         JSONArray json = new JSONArray();
         for (TaintRange tr : this.taintRanges) {
-            json.put(tr.toJson());
+            json.add(tr.toJson());
         }
         return json;
     }

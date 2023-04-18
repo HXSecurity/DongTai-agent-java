@@ -1,10 +1,10 @@
 package io.dongtai.iast.core.handler.hookpoint.graphy;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.TaintPosition;
 import io.dongtai.iast.core.utils.StringUtils;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.*;
 
@@ -138,7 +138,7 @@ public class GraphNode {
         }
         if (this.parameterValues != null && this.parameterValues.size() > 0) {
             for (MethodEvent.Parameter parameter : this.parameterValues) {
-                parameterArray.put(parameter.toJson());
+                parameterArray.add(parameter.toJson());
             }
             value.put("parameterValues", parameterArray);
         }
@@ -146,19 +146,15 @@ public class GraphNode {
             value.put("retValue", returnValue);
         }
 
-        for (Integer hash : sourceHash) {
-            sourceHashArray.put(hash);
-        }
+        sourceHashArray.addAll(sourceHash);
 
-        for (Integer hash : targetHash) {
-            targetHashArray.put(hash);
-        }
+        targetHashArray.addAll(targetHash);
 
         if (targetRanges.size() > 0) {
             JSONArray tr = new JSONArray();
             value.put("targetRange", tr);
             for (MethodEvent.MethodEventTargetRange range : targetRanges) {
-                tr.put(range.toJson());
+                tr.add(range.toJson());
             }
         }
 
@@ -166,7 +162,7 @@ public class GraphNode {
             JSONArray st = new JSONArray();
             value.put("sourceType", st);
             for (MethodEvent.MethodEventSourceType s : sourceTypes) {
-                st.put(s.toJson());
+                st.add(s.toJson());
             }
         }
 

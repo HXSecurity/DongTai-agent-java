@@ -1,6 +1,7 @@
 package io.dongtai.iast.common.config;
 
-import org.json.JSONObject;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -30,13 +31,13 @@ public class ConfigBuilderTest {
 
         // update
         configString = "{\"gather_res_body\": false}";
-        configJson = new JSONObject(configString);
+        configJson = JSON.parseObject(configString);
         builder.update(configJson);
         configString = "{\"method_pool_max_length\": 1000}";
-        configJson = new JSONObject(configString);
+        configJson = JSON.parseObject(configString);
         builder.update(configJson);
         configString = "{\"blacklist_rules\": [[{\"target_type\": \"HEADER_KEY\", \"operator\": \"EXISTS\", \"value\": \"key1\"}]]}";
-        configJson = new JSONObject(configString);
+        configJson = JSON.parseObject(configString);
         builder.update(configJson);
 
         RequestDenyList expectRequestDenyList = new RequestDenyList();
@@ -53,16 +54,16 @@ public class ConfigBuilderTest {
 
         // update invalid
         configString = "{\"gather_res_body\": \"invalid\"}";
-        configJson = new JSONObject(configString);
+        configJson = JSON.parseObject(configString);
         builder.update(configJson);
         configString = "{\"method_pool_max_length\": \"invalid\"}";
-        configJson = new JSONObject(configString);
+        configJson = JSON.parseObject(configString);
         builder.update(configJson);
         configString = "{\"blacklist_rules\": \"invalid\"}";
-        configJson = new JSONObject(configString);
+        configJson = JSON.parseObject(configString);
         builder.update(configJson);
         configString = "{\"invalid\": \"invalid\"}";
-        configJson = new JSONObject(configString);
+        configJson = JSON.parseObject(configString);
         builder.update(configJson);
 
         reportResponseBody = builder.get(ConfigKey.REPORT_RESPONSE_BODY);

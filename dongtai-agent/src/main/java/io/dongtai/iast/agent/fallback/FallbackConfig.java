@@ -1,5 +1,6 @@
 package io.dongtai.iast.agent.fallback;
 
+import com.alibaba.fastjson.JSONObject;
 import com.google.gson.reflect.TypeToken;
 import io.dongtai.iast.agent.IastProperties;
 import io.dongtai.iast.agent.fallback.entity.*;
@@ -15,7 +16,7 @@ import io.dongtai.iast.common.state.AgentState;
 import io.dongtai.iast.common.state.State;
 import io.dongtai.log.DongTaiLog;
 import io.dongtai.log.ErrorCode;
-import org.json.JSONObject;
+
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -111,7 +112,7 @@ public class FallbackConfig {
         try {
             // 默认响应标识调用失败
             if (REMOTE_CONFIG_DEFAULT_META.equals(remoteResponse)
-                    || REMOTE_CONFIG_DEFAULT_META.equals(new JSONObject(remoteResponse).get("data").toString())) {
+                    || REMOTE_CONFIG_DEFAULT_META.equals(JSONObject.parseObject(remoteResponse).get("data").toString())) {
                 FallbackConfig.enableAutoFallback = false;
                 if (AgentState.getInstance().isFallback()) {
                     DongTaiLog.info("fallback remote config empty, auto fallback closed, starting agent");

@@ -1,6 +1,6 @@
 package io.dongtai.iast.common.config;
 
-import org.json.JSONArray;
+import com.alibaba.fastjson.JSONArray;
 
 import java.util.*;
 
@@ -8,18 +8,18 @@ public class RequestDenyList {
     private final List<List<RequestDeny>> denies = new ArrayList<List<RequestDeny>>();
 
     public static RequestDenyList parse(JSONArray config) {
-        if (config == null || config.length() == 0) {
+        if (config == null || config.size() == 0) {
             return null;
         }
 
         RequestDenyList denyList = new RequestDenyList();
-        int orLen = config.length();
+        int orLen = config.size();
         for (int i = 0; i < orLen; i++) {
             JSONArray andConfig = config.getJSONArray(i);
-            if (andConfig == null || andConfig.length() == 0) {
+            if (andConfig == null || andConfig.size() == 0) {
                 continue;
             }
-            int andLen = andConfig.length();
+            int andLen = andConfig.size();
             List<RequestDeny> andList = new ArrayList<RequestDeny>();
             for (int j = 0; j < andLen; j++) {
                 RequestDeny requestDeny = RequestDeny.parse(andConfig.getJSONObject(j));

@@ -1,12 +1,11 @@
 package io.dongtai.iast.core.bytecode.sca;
 
+import com.alibaba.fastjson.JSONObject;
 import io.dongtai.iast.common.constants.*;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.utils.HttpClientUtils;
 import io.dongtai.log.DongTaiLog;
 import io.dongtai.log.ErrorCode;
-import org.json.JSONObject;
-
 
 /**
  * 定时发送资产信息

@@ -1,5 +1,9 @@
 package io.dongtai.iast.core.handler.hookpoint.models.policy;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONException;
+import com.alibaba.fastjson.JSONObject;
 import io.dongtai.iast.common.constants.ApiPath;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.VulnType;
 import io.dongtai.iast.core.utils.HttpClientUtils;
@@ -7,7 +11,6 @@ import io.dongtai.iast.core.utils.StringUtils;
 import io.dongtai.log.DongTaiLog;
 import io.dongtai.log.ErrorCode;
 import org.apache.commons.io.FileUtils;
-import org.json.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,7 +31,7 @@ public class PolicyBuilder {
     public static JSONArray fetchFromServer() throws PolicyException {
         try {
             StringBuilder resp = HttpClientUtils.sendGet(ApiPath.HOOK_PROFILE, null);
-            JSONObject respObj = new JSONObject(resp.toString());
+            JSONObject respObj = JSON.parseObject(resp.toString());
             return respObj.getJSONArray(KEY_DATA);
         } catch (JSONException e) {
             throw new PolicyException(PolicyException.ERR_POLICY_CONFIG_FROM_SERVER_INVALID, e);
@@ -39,7 +42,7 @@ public class PolicyBuilder {
         try {
             File file = new File(path);
             String content = FileUtils.readFileToString(file);
-            JSONObject respObj = new JSONObject(content);
+            JSONObject respObj = JSON.parseObject(content);
             return respObj.getJSONArray(KEY_DATA);
         } catch (IOException e) {
             throw new PolicyException(String.format(PolicyException.ERR_POLICY_CONFIG_FILE_READ_FAILED, path), e);
@@ -49,14 +52,14 @@ public class PolicyBuilder {
     }
 
     public static Policy build(JSONArray policyConfig) throws PolicyException {
-        if (policyConfig == null || policyConfig.length() == 0) {
+        if (policyConfig == null || policyConfig.size() == 0) {
             throw new PolicyException(PolicyException.ERR_POLICY_CONFIG_EMPTY);
         }
-        int policyLen = policyConfig.length();
+        int policyLen = policyConfig.size();
         Policy policy = new Policy();
         for (int i = 0; i < policyLen; i++) {
             JSONObject node = policyConfig.getJSONObject(i);
-            if (node == null || node.length() == 0) {
+            if (node == null || node.size() == 0) {
                 throw new PolicyException(PolicyException.ERR_POLICY_NODE_EMPTY);
             }
 
@@ -128,7 +131,7 @@ public class PolicyBuilder {
 
     private static PolicyNodeType parseNodeType(JSONObject node) throws PolicyException {
         try {
-            int type = node.getInt(KEY_TYPE);
+            int type = node.getInteger(KEY_TYPE);
             PolicyNodeType nodeType = PolicyNodeType.get(type);
             if (nodeType == null) {
                 throw new PolicyException(PolicyException.ERR_POLICY_NODE_TYPE_INVALID + ": " + node.toString());

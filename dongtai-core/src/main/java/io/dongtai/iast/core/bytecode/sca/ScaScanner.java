@@ -1,13 +1,13 @@
 package io.dongtai.iast.core.bytecode.sca;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import io.dongtai.iast.common.constants.ReportKey;
 import io.dongtai.iast.common.constants.ReportType;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.service.ThreadPools;
 import io.dongtai.log.DongTaiLog;
 import io.dongtai.log.ErrorCode;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.io.File;
 import java.io.InputStream;
@@ -112,7 +112,7 @@ public class ScaScanner {
                         packageObj.put(ScaReport.KEY_SCA_PACKAGE_NAME, packageName);
                         packageObj.put(ScaReport.KEY_SCA_PACKAGE_SIGNATURE, signature);
                         packageObj.put(ScaReport.KEY_SCA_PACKAGE_ALGORITHM, ScaScanner.ALGORITHM);
-                        packages.put(packageObj);
+                        packages.add(packageObj);
                     }
                 }
             }
@@ -143,7 +143,7 @@ public class ScaScanner {
                     packageObj.put(ScaReport.KEY_SCA_PACKAGE_SIGNATURE,
                             SignatureAlgorithm.getSignature(file, ScaScanner.ALGORITHM));
                     packageObj.put(ScaReport.KEY_SCA_PACKAGE_ALGORITHM, ScaScanner.ALGORITHM);
-                    this.packages.put(packageObj);
+                    this.packages.add(packageObj);
                 }
             }
         }
@@ -177,7 +177,7 @@ public class ScaScanner {
                         packageObj.put(ScaReport.KEY_SCA_PACKAGE_NAME, packageName);
                         packageObj.put(ScaReport.KEY_SCA_PACKAGE_SIGNATURE, signature);
                         packageObj.put(ScaReport.KEY_SCA_PACKAGE_ALGORITHM, ScaScanner.ALGORITHM);
-                        packages.put(packageObj);
+                        packages.add(packageObj);
                     }
                 }
             } catch (Throwable e) {

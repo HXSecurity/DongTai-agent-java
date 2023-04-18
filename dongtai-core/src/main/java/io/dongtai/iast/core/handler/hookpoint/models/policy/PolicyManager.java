@@ -1,12 +1,12 @@
 package io.dongtai.iast.core.handler.hookpoint.models.policy;
 
+import com.alibaba.fastjson.JSONArray;
 import io.dongtai.iast.core.bytecode.enhance.plugin.framework.dubbo.DispatchDubbo;
 import io.dongtai.iast.core.bytecode.enhance.plugin.framework.feign.DispatchFeign;
 import io.dongtai.iast.core.bytecode.enhance.plugin.framework.j2ee.dispatch.DispatchJ2ee;
 import io.dongtai.iast.core.utils.StringUtils;
 import io.dongtai.log.DongTaiLog;
 import io.dongtai.log.ErrorCode;
-import org.json.JSONArray;
 
 import java.util.*;
 
