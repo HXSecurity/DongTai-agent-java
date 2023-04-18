@@ -109,8 +109,10 @@ public class GraphBuilder {
         detail.put(ReportKey.METHOD_POOL, methodPool);
         detail.put(ReportKey.TRACE_ID, ContextManager.currentTraceId());
 
-        for (GraphNode node : nodeList) {
-            methodPool.put(node.toJson());
+        int nodeListSize = nodeList.size();
+        for (int i=0;i<nodeListSize;i++){
+            methodPool.add(nodeList.get(0).toJson());
+            nodeList.remove(nodeList.get(0));
         }
 
         return report.toString();
