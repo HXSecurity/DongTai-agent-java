@@ -1,22 +1,18 @@
 package io.dongtai.iast.core.handler.hookpoint.models.policy;
 
-import io.dongtai.iast.core.handler.hookpoint.models.taint.range.TaintCommand;
+import io.dongtai.iast.core.handler.hookpoint.models.taint.range.TaintCommandRunner;
 
 import java.util.Set;
 
 public class PropagatorNode extends TaintFlowNode {
     private Set<TaintPosition> sources;
-    private TaintCommand command;
-    private String[] commandArguments;
+    private TaintCommandRunner commandRunner;
     private String[] tags;
     private String[] untags;
 
-    public PropagatorNode(Set<TaintPosition> sources, Set<TaintPosition> targets,
-                          TaintCommand command, String[] commandArguments, MethodMatcher methodMatcher) {
+    public PropagatorNode(Set<TaintPosition> sources, Set<TaintPosition> targets, MethodMatcher methodMatcher) {
         super(targets, methodMatcher);
         this.sources = sources;
-        this.command = command;
-        this.commandArguments = commandArguments;
     }
 
     @Override
@@ -30,22 +26,6 @@ public class PropagatorNode extends TaintFlowNode {
 
     public void setSources(Set<TaintPosition> sources) {
         this.sources = sources;
-    }
-
-    public TaintCommand getCommand() {
-        return this.command;
-    }
-
-    public void setCommand(TaintCommand command) {
-        this.command = command;
-    }
-
-    public String[] getCommandArguments() {
-        return this.commandArguments;
-    }
-
-    public void setCommandArguments(String[] commandArguments) {
-        this.commandArguments = commandArguments;
     }
 
     public String[] getTags() {
@@ -66,5 +46,13 @@ public class PropagatorNode extends TaintFlowNode {
 
     public void setUntags(String[] untags) {
         this.untags = untags;
+    }
+
+    public TaintCommandRunner getCommandRunner() {
+        return this.commandRunner;
+    }
+
+    public void setCommandRunner(TaintCommandRunner r) {
+        this.commandRunner = r;
     }
 }
