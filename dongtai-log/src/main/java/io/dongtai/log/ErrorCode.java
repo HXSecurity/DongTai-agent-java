@@ -50,7 +50,7 @@ public enum ErrorCode {
     AGENT_MONITOR_GET_DISK_USAGE_FAILED(10413, "agent monitor get disk usage failed: {}, {}"),
 
     // fallback
-    AGENT_FALLBACK_SYNC_REMOTE_CONFIG_FAILED(10501, "agent fallback sync remote config failed"),
+    AGENT_FALLBACK_SYNC_REMOTE_CONFIG_FAILED(10501, "agent fallback sync remote config failed: {}, cause: {}"),
     AGENT_FALLBACK_METRICS_CONFIG_INVALID(10502, "agent fallback metrics config {} invalid: {}"),
     AGENT_FALLBACK_STATE_CHANGE_WITH_EXCEPTION(10503, "agent fallback state change to {}, but agent currently has exception"),
     AGENT_FALLBACK_CHECKER_CREATE_FAILED(10511, "agent fallback checker create failed: {}"),

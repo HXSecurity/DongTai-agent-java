@@ -45,7 +45,7 @@ public class PropagatorImpl {
         Set<TaintPosition> sources = propagatorNode.getSources();
         Set<TaintPosition> targets = propagatorNode.getTargets();
 
-        TaintCommandRunner r = TaintCommandRunner.getCommandRunner(event.signature);
+        TaintCommandRunner r = propagatorNode.getCommandRunner();
         // O => O || O => R, source equals target and no change in taint range
         if (event.getSourceHashes().equals(event.getTargetHashes())
                 && sources.size() == 1 && targets.size() == 1
@@ -176,7 +176,7 @@ public class PropagatorImpl {
     }
 
     private static void trackTaintRange(PropagatorNode propagatorNode, MethodEvent event) {
-        TaintCommandRunner r = TaintCommandRunner.getCommandRunner(event.signature);
+        TaintCommandRunner r = propagatorNode.getCommandRunner();
 
         TaintRanges oldTaintRanges = new TaintRanges();
         TaintRanges srcTaintRanges = new TaintRanges();
