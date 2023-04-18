@@ -72,6 +72,10 @@
                                     <pattern>org.json</pattern>
                                     <shadedPattern>${shade-prefix}.org.json</shadedPattern>
                                 </relocation>
+                                <relocation>
+                                    <pattern>org.json</pattern>
+                                    <shadedPattern>${shade-prefix}.com.alibaba</shadedPattern>
+                                </relocation>
                             </relocations>
                         </configuration>
                     </execution>
