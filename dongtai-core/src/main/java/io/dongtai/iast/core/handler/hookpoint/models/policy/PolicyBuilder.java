@@ -224,7 +224,6 @@ public class PolicyBuilder {
             if (node.containsKey(KEY_STACK_BLACKLIST)) {
                 JSONArray arr = node.getJSONArray(KEY_STACK_BLACKLIST);
                 sinkNode.setStackDenyList(arr.toArray(new String[0]));
-                org.json.JSONArray objects = new org.json.JSONArray();
             }
         } catch (JSONException ignore) {
             DongTaiLog.warn(ErrorCode.get("POLICY_CONFIG_INVALID"),
