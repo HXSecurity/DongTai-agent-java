@@ -101,6 +101,10 @@
                                     <pattern>org.slf4j</pattern>
                                     <shadedPattern>${shade-prefix}.org.slf4j</shadedPattern>
                                 </relocation>
+                                <relocation>
+                                    <pattern>com.alibaba</pattern>
+                                    <shadedPattern>${shade-prefix}.com.alibaba</shadedPattern>
+                                </relocation>
                             </relocations>
                         </configuration>
                     </execution>
