@@ -1,13 +1,12 @@
 package io.dongtai.iast.common.utils;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import io.dongtai.iast.common.enums.HttpMethods;
 import io.dongtai.log.DongTaiLog;
 import io.dongtai.log.ErrorCode;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.json.JSONObject;
 import org.junit.*;
 
 import java.io.ByteArrayOutputStream;
@@ -58,15 +57,15 @@ public class AbstractHttpClientUtilsTest {
 
         url = BASE_URL + "/api/v1/captcha/refresh";
         resp = AbstractHttpClientUtils.sendRequest(HttpMethods.GET, url, null, headers, 0, "", -1, null);
-        respObj = JSON.parseObject(resp.toString());
-        status = respObj.getInteger("status");
+        respObj = new JSONObject(resp.toString());
+        status = respObj.getInt("status");
         Assert.assertEquals("captcha/refresh status", 201, status);
 
         url = BASE_URL + "/api/v1/user/login";
         data = "{\"username\":\"test\",\"password\":\"test\",\"captcha\":\"test\",\"captcha_hash_key\":\"test\"}";
         resp = AbstractHttpClientUtils.sendRequest(HttpMethods.POST, url, data, headers, 0, "", -1, null);
-        respObj = JSON.parseObject(resp.toString());
-        status = respObj.getInteger("status");
+        respObj = new JSONObject(resp.toString());
+        status = respObj.getInt("status");
         Assert.assertEquals("user/login status", 202, status);
 
         url = BASE_URL + "/api/v1/profiles";

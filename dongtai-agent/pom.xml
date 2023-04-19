@@ -181,6 +181,10 @@
                                     <pattern>com.google</pattern>
                                     <shadedPattern>${shade-prefix}.com.google</shadedPattern>
                                 </relocation>
+                                <relocation>
+                                    <pattern>com.alibaba</pattern>
+                                    <shadedPattern>${shade-prefix}.com.alibaba</shadedPattern>
+                                </relocation>
                             </relocations>
                         </configuration>
                     </execution>
