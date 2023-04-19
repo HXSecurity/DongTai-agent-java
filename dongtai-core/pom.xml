@@ -105,6 +105,10 @@
                                     <pattern>com.alibaba</pattern>
                                     <shadedPattern>${shade-prefix}.com.alibaba</shadedPattern>
                                 </relocation>
+                                <relocation>
+                                    <pattern>com.sun.xml</pattern>
+                                    <shadedPattern>${shade-prefix}.com.sun.xml</shadedPattern>
+                                </relocation>
                             </relocations>
                         </configuration>
                     </execution>
