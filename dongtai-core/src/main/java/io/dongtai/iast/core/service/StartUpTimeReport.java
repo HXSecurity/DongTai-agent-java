@@ -1,6 +1,6 @@
 package io.dongtai.iast.core.service;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 import io.dongtai.iast.common.constants.ApiPath;
 import io.dongtai.iast.common.constants.ReportKey;
 

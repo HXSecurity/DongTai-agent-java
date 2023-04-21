@@ -1,6 +1,6 @@
 package io.dongtai.iast.core.handler.hookpoint.models.taint.range;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 import io.dongtai.iast.core.handler.hookpoint.models.taint.tag.TaintTag;
 
 public class TaintRange {

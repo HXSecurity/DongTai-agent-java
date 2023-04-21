@@ -1,7 +1,7 @@
 package io.dongtai.iast.core.bytecode.sca;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import io.dongtai.iast.common.constants.ReportKey;
 import io.dongtai.iast.common.constants.ReportType;
 import io.dongtai.iast.core.EngineManager;

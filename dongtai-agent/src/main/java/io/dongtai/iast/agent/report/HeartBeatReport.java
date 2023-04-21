@@ -1,6 +1,6 @@
 package io.dongtai.iast.agent.report;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 import io.dongtai.iast.agent.monitor.impl.PerformanceMonitor;
 import io.dongtai.iast.agent.util.ByteUtils;
 import io.dongtai.iast.common.constants.ReportKey;

@@ -1,6 +1,6 @@
 package io.dongtai.iast.agent.fallback;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 import com.google.gson.reflect.TypeToken;
 import io.dongtai.iast.agent.IastProperties;
 import io.dongtai.iast.agent.fallback.entity.*;

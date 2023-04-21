@@ -1,6 +1,6 @@
 package io.dongtai.iast.core.handler.hookpoint.controller.impl;
 
-import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson2.JSONArray;
 import io.dongtai.iast.common.config.ConfigBuilder;
 import io.dongtai.iast.common.config.ConfigKey;
 import io.dongtai.iast.core.EngineManager;

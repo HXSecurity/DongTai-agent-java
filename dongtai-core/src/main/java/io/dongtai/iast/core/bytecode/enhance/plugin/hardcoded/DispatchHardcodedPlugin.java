@@ -1,6 +1,6 @@
 package io.dongtai.iast.core.bytecode.enhance.plugin.hardcoded;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 import io.dongtai.iast.common.constants.*;
 import io.dongtai.iast.common.utils.base64.Base64Encoder;
 import io.dongtai.iast.core.EngineManager;

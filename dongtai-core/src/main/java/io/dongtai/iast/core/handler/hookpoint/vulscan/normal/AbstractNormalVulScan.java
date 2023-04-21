@@ -1,7 +1,7 @@
 package io.dongtai.iast.core.handler.hookpoint.vulscan.normal;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import io.dongtai.iast.common.constants.*;
 import io.dongtai.iast.common.utils.base64.Base64Encoder;
 import io.dongtai.iast.core.EngineManager;
