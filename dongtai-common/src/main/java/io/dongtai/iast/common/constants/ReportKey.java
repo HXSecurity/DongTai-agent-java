@@ -28,4 +28,5 @@ public class ReportKey {
     public static final String VULN_CALLER = "appCaller";
     public static final String API_DATA = "apiData";
     public static final String TRACE_ID = "traceId";
+    public static final String STACKS = "stacks";
 }
