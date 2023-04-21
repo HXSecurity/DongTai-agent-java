@@ -66,6 +66,7 @@ public class DynamicPropagatorScanner implements IVulScan {
             int invokeId = SpyDispatcherImpl.INVOKE_ID_SEQUENCER.getAndIncrement();
             event.setInvokeId(invokeId);
             event.setTaintPositions(sinkNode.getSources(), null);
+            event.setStacks(stackTraceElements);
 
             EngineManager.TRACK_MAP.addTrackMethod(invokeId, event);
         }
