@@ -711,6 +711,10 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                 return false;
             }
 
+            if (EngineManager.TRACK_MAP.get() == null) {
+                return false;
+            }
+
             Integer methodPoolMaxSize = ConfigBuilder.getInstance().get(ConfigKey.REPORT_MAX_METHOD_POOL_SIZE);
             if (methodPoolMaxSize != null && methodPoolMaxSize > 0
                     && EngineManager.TRACK_MAP.get().size() >= methodPoolMaxSize) {
