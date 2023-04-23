@@ -179,6 +179,11 @@ public class GraphBuilder {
             value.put("traceId", event.traceId);
         }
 
+        if (null != event.getStacks()){
+            JSONArray methodStacksArray = new JSONArray(event.getStacks());
+            value.put("stacks",methodStacksArray);
+        }
+
         return value;
     }
 }
