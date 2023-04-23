@@ -119,7 +119,9 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                     || internalClassName.startsWith("io/dongtai/")
                     || internalClassName.startsWith("com/secnium/iast/")
                     || internalClassName.startsWith("java/lang/iast/")
-                    || internalClassName.startsWith("cn/huoxian/iast/")) {
+                    || internalClassName.startsWith("cn/huoxian/iast/")
+                    || internalClassName.startsWith("META-INF/")
+                    || "module-info".equals(internalClassName)) {
                 return null;
             }
 
