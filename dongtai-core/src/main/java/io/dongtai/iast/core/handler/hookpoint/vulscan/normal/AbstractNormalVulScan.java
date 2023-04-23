@@ -10,9 +10,7 @@ import io.dongtai.iast.core.service.ThreadPools;
 import io.dongtai.iast.core.utils.StackUtils;
 
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -29,8 +27,6 @@ public abstract class AbstractNormalVulScan implements IVulScan {
         JSONObject report = new JSONObject();
         JSONObject detail = new JSONObject();
         JSONArray vulStacks = new JSONArray();
-        List<Object> stacksList = new ArrayList<>();
-        JSONArray stacksJsonArray = new JSONArray(stacksList);
 
         report.put(ReportKey.TYPE, ReportType.VULN_NORMAL);
         report.put(ReportKey.DETAIL, detail);
@@ -53,12 +49,6 @@ public abstract class AbstractNormalVulScan implements IVulScan {
         detail.put(ReportKey.CONTEXT_PATH, requestMeta.get("contextPath"));
         detail.put(ReportKey.REPLAY_REQUEST, requestMeta.get("replay-request"));
         detail.put(ReportKey.VULN_CALLER, vulStacks);
-
-        // 获取方法调用栈
-        for(StackTraceElement stackTraceElement:stacks){
-            stacksList.add(stackTraceElement.toString());
-        }
-        detail.put(ReportKey.STACKS, stacksJsonArray);
 
         for (StackTraceElement element : stacks) {
             vulStacks.add(element.toString());
