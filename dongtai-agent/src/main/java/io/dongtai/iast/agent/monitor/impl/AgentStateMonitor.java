@@ -50,33 +50,26 @@ public class AgentStateMonitor implements IMonitor {
                 return;
             }
 
-            Map<String, String> stringStringMap = checkExpectState();
+            Map<String, Object> stringStringMap = checkExpectState();
             // 默认值
             String expectState = "other";
-            String allowReport = "1";
+            boolean allowReport = true;
 
             if (stringStringMap != null) {
-                expectState = stringStringMap.get("exceptRunningStatus");
-                allowReport = stringStringMap.get("isAllowDateReport");
-                if ("null".equals(allowReport)){
-                    allowReport = "1";
+                expectState = stringStringMap.get("exceptRunningStatus").toString();
+                if (null != stringStringMap.get("isAllowDateReport")) {
+                    allowReport = (boolean) stringStringMap.get("isAllowDateReport");
                 }
             }
 
-            if (!agentState.isAllowReport(allowReport)) {
-                if (null == agentState.getAllowReport()) {
-                    DongTaiLog.info("engine is not allowed to report data");
-                    agentState.setAllowReport(allowReport);
-                }
-                if (!allowReport.equals(agentState.getAllowReport())) {
-                    DongTaiLog.info("engine is not allowed to report data");
-                    agentState.setAllowReport(allowReport);
-                    engineManager.stop();
-                }
-            } else if (agentState.isAllowReport(allowReport) && !allowReport.equals(agentState.getAllowReport())) {
+            if (allowReport && !agentState.isAllowReport()) {
                 DongTaiLog.info("engine is allowed to report data");
                 agentState.setAllowReport(allowReport);
                 engineManager.start();
+            } else if (!allowReport && agentState.isAllowReport()) {
+                DongTaiLog.info("engine is not allowed to report data");
+                agentState.setAllowReport(allowReport);
+                engineManager.stop();
             }
 
             if (!agentState.isFallback() && !agentState.isException() && agentState.isAllowReport() && agentState.isAllowReport()) {
@@ -97,7 +90,7 @@ public class AgentStateMonitor implements IMonitor {
         }
     }
 
-    private Map<String, String> checkExpectState() {
+    private Map<String, Object> checkExpectState() {
         try {
             Map<String, String> parameters = new HashMap<String, String>();
             parameters.put("agentId", String.valueOf(AgentRegisterReport.getAgentId()));
@@ -105,7 +98,7 @@ public class AgentStateMonitor implements IMonitor {
             if (!respRaw.isEmpty()) {
                 JSONObject resp = JSON.parseObject(respRaw);
                 JSONObject data = (JSONObject) resp.get("data");
-                Map<String, String> objectObjectHashMap = new HashMap<>(2);
+                Map<String, Object> objectObjectHashMap = new HashMap<>(2);
                 String s = data.toJSONString();
                 objectObjectHashMap = JSON.parseObject(s, Map.class);
                 return objectObjectHashMap;
