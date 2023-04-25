@@ -58,6 +58,9 @@ public class AgentStateMonitor implements IMonitor {
             if (stringStringMap != null) {
                 expectState = stringStringMap.get("exceptRunningStatus");
                 allowReport = stringStringMap.get("isAllowDateReport");
+                if ("null".equals(allowReport)){
+                    allowReport = "1";
+                }
             }
 
             if (!agentState.isAllowReport(allowReport)) {
@@ -70,6 +73,7 @@ public class AgentStateMonitor implements IMonitor {
                     DongTaiLog.info("engine is not allowed to report data");
                     agentState.setAllowReport(allowReport);
                     engineManager.stop();
+                    return;
                 }
             } else if (agentState.isAllowReport(allowReport) && !allowReport.equals(agentState.getAllowReport())) {
                 DongTaiLog.info("engine is allowed to report data");
@@ -78,15 +82,15 @@ public class AgentStateMonitor implements IMonitor {
                 return;
             }
 
-            if (!agentState.isFallback() && !agentState.isException()) {
+            if (!agentState.isFallback() && !agentState.isException() && agentState.isAllowReport()) {
                 if (State.RUNNING.equals(expectState) && agentState.isPaused()) {
                     DongTaiLog.info("engine start by server expect state");
                     engineManager.start();
-                    engineManager.getAgentState().setState(State.RUNNING).setCause(StateCause.RUNNING_BY_SERVER);
+                    agentState.setState(State.RUNNING).setCause(StateCause.RUNNING_BY_SERVER);
                 } else if (State.PAUSED.equals(expectState) && agentState.isRunning()) {
                     DongTaiLog.info("engine stop by server expect state");
                     engineManager.stop();
-                    engineManager.getAgentState().setState(State.PAUSED).setCause(StateCause.PAUSE_BY_SERVER);
+                    agentState.setState(State.PAUSED).setCause(StateCause.PAUSE_BY_SERVER);
                 }
             }
             HttpClientUtils.sendPost(ApiPath.ACTUAL_ACTION,
