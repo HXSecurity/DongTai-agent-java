@@ -152,8 +152,6 @@ public class AgentLauncher {
     public static synchronized void uninstall() {
         EngineManager engineManager = EngineManager.getInstance();
         engineManager.uninstall();
-        // 手动卸载时将线程停止
-        MonitorDaemonThread.isExit = true;
     }
 
     /**

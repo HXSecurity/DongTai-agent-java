@@ -176,7 +176,6 @@ public class EngineManager {
                             String.class)
                     .invoke(null, launchMode, this.properties.getPropertiesFilePath(),
                             AgentRegisterReport.getAgentId(), inst, agentPath);
-            MonitorDaemonThread.isExit = false;
             return true;
         } catch (Throwable e) {
             DongTaiLog.error(ErrorCode.AGENT_REFLECTION_INSTALL_FAILED, e);
