@@ -65,11 +65,9 @@ public class AgentStateMonitor implements IMonitor {
             if (allowReport && !agentState.isAllowReport()) {
                 DongTaiLog.info("engine is allowed to report data");
                 agentState.setAllowReport(allowReport);
-                engineManager.start();
             } else if (!allowReport && agentState.isAllowReport()) {
                 DongTaiLog.info("engine is not allowed to report data");
                 agentState.setAllowReport(allowReport);
-                engineManager.stop();
             }
 
             if (!agentState.isFallback() && !agentState.isException() && agentState.isAllowReport() && agentState.isAllowReport()) {
