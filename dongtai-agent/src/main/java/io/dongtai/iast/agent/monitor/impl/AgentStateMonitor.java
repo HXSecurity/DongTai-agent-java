@@ -50,15 +50,15 @@ public class AgentStateMonitor implements IMonitor {
                 return;
             }
 
-            Map<String, Object> stringStringMap = checkExpectState();
+            Map<String, String> stringStringMap = checkExpectState();
             // 默认值
             String expectState = "other";
             boolean allowReport = true;
 
             if (stringStringMap != null) {
-                expectState = stringStringMap.get("exceptRunningStatus").toString();
+                expectState = stringStringMap.get("exceptRunningStatus");
                 if (null != stringStringMap.get("isAllowDateReport")) {
-                    allowReport = (boolean) stringStringMap.get("isAllowDateReport");
+                    allowReport = !"0".equals(stringStringMap.get("isAllowDateReport"));
                 }
             }
 
@@ -90,15 +90,15 @@ public class AgentStateMonitor implements IMonitor {
         }
     }
 
-    private Map<String, Object> checkExpectState() {
+    private Map<String, String> checkExpectState() {
         try {
-            Map<String, String> parameters = new HashMap<String, String>();
+            Map<String, String> parameters = new HashMap<>();
             parameters.put("agentId", String.valueOf(AgentRegisterReport.getAgentId()));
             String respRaw = HttpClientUtils.sendGet(ApiPath.EXCEPT_ACTION, parameters).toString();
             if (!respRaw.isEmpty()) {
                 JSONObject resp = JSON.parseObject(respRaw);
                 JSONObject data = (JSONObject) resp.get("data");
-                Map<String, Object> objectObjectHashMap = new HashMap<>(2);
+                Map<String, String> objectObjectHashMap = new HashMap<>(2);
                 String s = data.toJSONString();
                 objectObjectHashMap = JSON.parseObject(s, Map.class);
                 return objectObjectHashMap;
