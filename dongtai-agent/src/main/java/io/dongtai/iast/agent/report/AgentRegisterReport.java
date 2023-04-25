@@ -29,7 +29,6 @@ public class AgentRegisterReport {
     public static AgentRegisterReport INSTANCE;
     private String projectName = null;
     private static Integer agentId = -1;
-    private static Integer coreRegisterStart = 1;
     final IServer server = ServerDetect.getWebserver();
     private static String AGENT_NAME = null;
     private static String HOST_NAME = null;
@@ -265,7 +264,6 @@ public class AgentRegisterReport {
             if (status == 201) {
                 JSONObject data = (JSONObject) responseObj.get("data");
                 agentId = (Integer) data.get("id");
-                coreRegisterStart = (Integer) data.get("coreAutoStart");
             } else {
                 DongTaiLog.error(ErrorCode.AGENT_REGISTER_RESPONSE_CODE_INVALID, responseRaw);
             }
@@ -273,10 +271,6 @@ public class AgentRegisterReport {
             DongTaiLog.error(ErrorCode.AGENT_REGISTER_PARSE_RESPONSE_FAILED,
                     IastProperties.getInstance().getBaseUrl(), e);
         }
-    }
-
-    public static Boolean agentStat() {
-        return coreRegisterStart == 1;
     }
 
     private static String generateUUID() {

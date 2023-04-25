@@ -55,10 +55,8 @@ public class MonitorDaemonThread implements Runnable {
         if (MonitorDaemonThread.delayTime > 0) {
             try {
                 Thread.sleep(delayTime);
-            } catch (InterruptedException ignore) {
-            }
-            if (AgentStateMonitor.isCoreRegisterStart) {
                 startEngine();
+            } catch (InterruptedException ignore) {
             }
         }
         // 引擎启动成功后，创建子线程执行monitor任务
@@ -81,7 +79,6 @@ public class MonitorDaemonThread implements Runnable {
             // jdk8以上
             status = engineManager.extractPackage();
             status = status && engineManager.install();
-            status = status && engineManager.start();
         }
         if (!status) {
             DongTaiLog.info("DongTai IAST started failure");

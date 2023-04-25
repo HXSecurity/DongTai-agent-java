@@ -5,6 +5,7 @@ public class AgentState {
     private State pendingState;
     private StateCause cause;
     private boolean fallback;
+    private Integer allowReport;
     private static AgentState INSTANCE;
 
     public static AgentState getInstance() {
@@ -94,5 +95,25 @@ public class AgentState {
 
     public boolean isFallback() {
         return this.fallback;
+    }
+
+    public Boolean isAllowReport(String allowReport) {
+        if (null == allowReport) {
+            return true;
+        } else {
+            return Integer.valueOf(allowReport).equals(1);
+        }
+    }
+
+    public Boolean isAllowReport() {
+        return 1 == this.allowReport;
+    }
+
+    public void setAllowReport(String allowReport) {
+        this.allowReport = Integer.valueOf(allowReport);
+    }
+
+    public String getAllowReport() {
+        return String.valueOf(allowReport);
     }
 }

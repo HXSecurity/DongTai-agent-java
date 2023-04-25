@@ -11,6 +11,7 @@ import io.dongtai.iast.agent.util.HttpClientUtils;
 import io.dongtai.iast.agent.util.ThreadUtils;
 import io.dongtai.iast.common.constants.AgentConstant;
 import io.dongtai.iast.common.constants.ApiPath;
+import io.dongtai.iast.common.state.AgentState;
 import io.dongtai.iast.common.state.State;
 import io.dongtai.iast.common.state.StateCause;
 import io.dongtai.log.DongTaiLog;
@@ -24,7 +25,6 @@ import java.util.Map;
  */
 public class AgentStateMonitor implements IMonitor {
     private final EngineManager engineManager;
-    public static Boolean isCoreRegisterStart = false;
     private static final String NAME = "AgentStateMonitor";
 
     public AgentStateMonitor(EngineManager engineManager) {
@@ -38,37 +38,65 @@ public class AgentStateMonitor implements IMonitor {
 
     @Override
     public void check() {
+        AgentState agentState = this.engineManager.getAgentState();
         try {
-            if (this.engineManager.getAgentState().getState() == null) {
+            if (agentState.getState() == null) {
                 return;
             }
 
-            if (this.engineManager.getAgentState().isUninstalledByCli()) {
+            if (agentState.isUninstalledByCli()) {
                 HttpClientUtils.sendPost(ApiPath.ACTUAL_ACTION,
-                        HeartBeatReport.generateAgentActualActionMsg(this.engineManager.getAgentState()));
+                        HeartBeatReport.generateAgentActualActionMsg(agentState));
                 return;
             }
 
-            if (!this.engineManager.getAgentState().isFallback() && !this.engineManager.getAgentState().isException()) {
-                String expectState = checkExpectState();
-                if (State.RUNNING.equals(expectState) && this.engineManager.getAgentState().isPaused()) {
+            Map<String, String> stringStringMap = checkExpectState();
+            // 默认值
+            String expectState = "other";
+            String allowReport = "1";
+
+            if (stringStringMap != null) {
+                expectState = stringStringMap.get("exceptRunningStatus");
+                allowReport = stringStringMap.get("isAllowDateReport");
+            }
+
+            if (!agentState.isAllowReport(allowReport)) {
+                if (null == agentState.getAllowReport()) {
+                    DongTaiLog.info("engine is not allowed to report data");
+                    agentState.setAllowReport(allowReport);
+                    return;
+                }
+                if (!allowReport.equals(agentState.getAllowReport())) {
+                    DongTaiLog.info("engine is not allowed to report data");
+                    agentState.setAllowReport(allowReport);
+                    engineManager.stop();
+                }
+            } else if (agentState.isAllowReport(allowReport) && !allowReport.equals(agentState.getAllowReport())) {
+                DongTaiLog.info("engine is allowed to report data");
+                agentState.setAllowReport(allowReport);
+                engineManager.start();
+                return;
+            }
+
+            if (!agentState.isFallback() && !agentState.isException()) {
+                if (State.RUNNING.equals(expectState) && agentState.isPaused()) {
                     DongTaiLog.info("engine start by server expect state");
                     engineManager.start();
                     engineManager.getAgentState().setState(State.RUNNING).setCause(StateCause.RUNNING_BY_SERVER);
-                } else if (State.PAUSED.equals(expectState) && this.engineManager.getAgentState().isRunning()) {
+                } else if (State.PAUSED.equals(expectState) && agentState.isRunning()) {
                     DongTaiLog.info("engine stop by server expect state");
                     engineManager.stop();
                     engineManager.getAgentState().setState(State.PAUSED).setCause(StateCause.PAUSE_BY_SERVER);
                 }
             }
             HttpClientUtils.sendPost(ApiPath.ACTUAL_ACTION,
-                    HeartBeatReport.generateAgentActualActionMsg(this.engineManager.getAgentState()));
+                    HeartBeatReport.generateAgentActualActionMsg(agentState));
         } catch (Throwable t) {
             DongTaiLog.warn(ErrorCode.AGENT_MONITOR_THREAD_CHECK_FAILED, getName(), t);
         }
     }
 
-    private String checkExpectState() {
+    private Map<String, String> checkExpectState() {
         try {
             Map<String, String> parameters = new HashMap<String, String>();
             parameters.put("agentId", String.valueOf(AgentRegisterReport.getAgentId()));
@@ -76,12 +104,15 @@ public class AgentStateMonitor implements IMonitor {
             if (!respRaw.isEmpty()) {
                 JSONObject resp = JSON.parseObject(respRaw);
                 JSONObject data = (JSONObject) resp.get("data");
-                return data.get("exceptRunningStatus").toString();
+                Map<String, String> objectObjectHashMap = new HashMap<>(2);
+                String s = data.toJSONString();
+                objectObjectHashMap = JSON.parseObject(s, Map.class);
+                return objectObjectHashMap;
             }
         } catch (Throwable e) {
-            return "other";
+            return null;
         }
-        return "other";
+        return null;
     }
 
     @Override
