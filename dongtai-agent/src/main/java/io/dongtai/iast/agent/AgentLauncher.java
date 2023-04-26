@@ -164,13 +164,6 @@ public class AgentLauncher {
         if (send) {
             LogCollector.extractFluent();
             DongTaiLog.info("Agent registered successfully.");
-            Boolean agentStat = AgentRegisterReport.agentStat();
-            if (!agentStat) {
-                AgentStateMonitor.isCoreRegisterStart = false;
-                DongTaiLog.info("Detection engine not started, agent waiting to be audited.");
-            } else {
-                AgentStateMonitor.isCoreRegisterStart = true;
-            }
             shutdownHook = new ShutdownThread();
             Runtime.getRuntime().addShutdownHook(shutdownHook);
             loadEngine(inst);
@@ -187,7 +180,7 @@ public class AgentLauncher {
     private static void loadEngine(final Instrumentation inst) {
         EngineManager engineManager = EngineManager.getInstance(inst, LAUNCH_MODE, EngineManager.getPID(), AGENT_STATE);
         MonitorDaemonThread daemonThread = MonitorDaemonThread.getInstance(engineManager);
-        if (MonitorDaemonThread.delayTime <= 0 && AgentStateMonitor.isCoreRegisterStart) {
+        if (MonitorDaemonThread.delayTime <= 0) {
             daemonThread.startEngine();
         }
 

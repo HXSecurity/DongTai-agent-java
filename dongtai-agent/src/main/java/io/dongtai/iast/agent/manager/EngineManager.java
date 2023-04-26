@@ -2,6 +2,7 @@ package io.dongtai.iast.agent.manager;
 
 import io.dongtai.iast.agent.*;
 import io.dongtai.iast.agent.fallback.FallbackManager;
+import io.dongtai.iast.agent.monitor.MonitorDaemonThread;
 import io.dongtai.iast.agent.report.AgentRegisterReport;
 import io.dongtai.iast.agent.util.*;
 import io.dongtai.iast.common.state.AgentState;
@@ -36,7 +37,7 @@ public class EngineManager {
     private final IastProperties properties;
     private final String launchMode;
     private Class<?> classOfEngine;
-    private FallbackManager fallbackManager;
+    private final FallbackManager fallbackManager;
     private final AgentState agentState;
 
     /**
