@@ -36,17 +36,12 @@ public class DispatchClassPlugin implements DispatchPlugin {
         }
 
         classContext.setMatchedClassName(matchedClassName);
-        ClassVisit cv = new ClassVisit(classVisitor, classContext, policy);
-        if (cv.isNeedTransform()) {
-            return cv;
-        }
-        return classVisitor;
+        return new ClassVisit(classVisitor, classContext, policy);
     }
 
     public class ClassVisit extends AbstractClassVisitor {
         private int classVersion;
         private final MethodAdapter[] methodAdapters;
-        private boolean needTransform;
 
         ClassVisit(ClassVisitor classVisitor, ClassContext classContext, Policy policy) {
             super(classVisitor, classContext, policy);
@@ -55,10 +50,6 @@ public class DispatchClassPlugin implements DispatchPlugin {
                     new PropagatorAdapter(),
                     new SinkAdapter(),
             };
-        }
-
-        public boolean isNeedTransform() {
-            return this.needTransform;
         }
 
         @Override
@@ -97,7 +88,6 @@ public class DispatchClassPlugin implements DispatchPlugin {
             }
 
             if (methodIsTransformed) {
-                this.needTransform = true;
                 DongTaiLog.trace("rewrite method {} for listener[class={}]", matchedSignature, context.getClassName());
             }
 
