@@ -223,7 +223,7 @@ public class IastProperties {
     public String getIsDownloadPackage() {
         if (null == isDownloadPackage) {
             isDownloadPackage = System.getProperty(PropertyConstant.PROPERTY_SERVER_PACKAGE,
-                    cfg.getProperty(PropertyConstant.PROPERTY_SERVER_PACKAGE, "true"));
+                    cfg.getProperty(PropertyConstant.PROPERTY_SERVER_PACKAGE, "false"));
         }
         return isDownloadPackage;
     }
