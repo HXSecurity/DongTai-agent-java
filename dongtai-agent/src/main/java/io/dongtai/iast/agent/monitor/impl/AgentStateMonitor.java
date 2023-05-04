@@ -57,8 +57,8 @@ public class AgentStateMonitor implements IMonitor {
 
             if (stringStringMap != null) {
                 expectState = stringStringMap.get("exceptRunningStatus").toString();
-                if (null != stringStringMap.get("isAllowDateReport")) {
-                    allowReport = !"0".equals(stringStringMap.get("isAllowDateReport").toString());
+                if (null != stringStringMap.get("allowReport")) {
+                    allowReport = !"0".equals(stringStringMap.get("allowReport").toString());
                 }
             }
 
