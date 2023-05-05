@@ -29,14 +29,23 @@ public class PluginRegister {
 
     public PluginRegister() {
         this.plugins = new ArrayList<DispatchPlugin>();
-        this.plugins.add(new DispatchSpringApplication());
+        if(!"false".equals(System.getProperty("dongtai.plugin.api"))){
+            this.plugins.add(new DispatchSpringApplication());
+        }
         this.plugins.add(new DispatchJ2ee());
-        this.plugins.add(new DispatchKafka());
+        if(!"false".equals(System.getProperty("dongtai.plugin.kafka"))) {
+            this.plugins.add(new DispatchKafka());
+        }
         this.plugins.add(new DispatchJdbc());
-        this.plugins.add(new DispatchShiro());
-        this.plugins.add(new DispatchFeign());
-        this.plugins.add(new DispatchDubbo());
-
+        if(!"false".equals(System.getProperty("dongtai.plugin.shiro"))) {
+            this.plugins.add(new DispatchShiro());
+        }
+        if(!"false".equals(System.getProperty("dongtai.plugin.feign"))) {
+            this.plugins.add(new DispatchFeign());
+        }
+        if(!"false".equals(System.getProperty("dongtai.plugin.dubbo"))) {
+            this.plugins.add(new DispatchDubbo());
+        }
         this.plugins.add(new DispatchClassPlugin());
     }
 
