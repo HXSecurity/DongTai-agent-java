@@ -9,13 +9,12 @@ import io.dongtai.iast.core.bytecode.enhance.plugin.framework.j2ee.dispatch.Disp
 import io.dongtai.iast.core.bytecode.enhance.plugin.hardcoded.DispatchHardcodedPlugin;
 import io.dongtai.iast.core.bytecode.enhance.plugin.service.jdbc.DispatchJdbc;
 import io.dongtai.iast.core.bytecode.enhance.plugin.service.kafka.DispatchKafka;
-import io.dongtai.iast.core.bytecode.enhance.plugin.spring.DispatchSpringApplication;
+import io.dongtai.iast.core.bytecode.enhance.plugin.spring.DispatchApiCollector;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.Policy;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.PolicyManager;
 import org.objectweb.asm.ClassVisitor;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -28,16 +27,26 @@ public class PluginRegister {
     private final List<DispatchPlugin> plugins;
 
     public PluginRegister() {
-        this.plugins = new ArrayList<DispatchPlugin>();
-        this.plugins.add(new DispatchSpringApplication());
-        this.plugins.add(new DispatchJ2ee());
-        this.plugins.add(new DispatchKafka());
-        this.plugins.add(new DispatchJdbc());
-        this.plugins.add(new DispatchShiro());
-        this.plugins.add(new DispatchFeign());
-        this.plugins.add(new DispatchDubbo());
-
+        this.plugins = new ArrayList<>();
+        List<String> disabledPlugins = getdisabledPlugins();
+        List<DispatchPlugin> allPlugins = new ArrayList<>(Arrays.asList(
+                new DispatchApiCollector(),
+                new DispatchJ2ee(),
+                new DispatchKafka(),
+                new DispatchJdbc(),
+                new DispatchShiro(),
+                new DispatchFeign(),
+                new DispatchDubbo()
+        ));
+        allPlugins.removeIf(plugin -> disabledPlugins != null && disabledPlugins.contains(plugin.getName()));
+        this.plugins.addAll(allPlugins);
         this.plugins.add(new DispatchClassPlugin());
+    }
+
+    private List<String> getdisabledPlugins() {
+        return Optional.ofNullable(System.getProperty("dongtai.disabled.plugins"))
+                .map(s -> Arrays.asList(s.split(",")))
+                .orElse(null);
     }
 
     public ClassVisitor initial(ClassVisitor classVisitor, ClassContext context, PolicyManager policyManager) {

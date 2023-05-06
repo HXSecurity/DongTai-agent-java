@@ -38,6 +38,7 @@ public class Agent {
         attachOptions.addOption(build("log_level", "log_level", "optional: DongTai agent log print level."));
         attachOptions.addOption(build("log_path", "log_path", "optional: DongTai agent log print path."));
         attachOptions.addOption(build("log_disable_collector", "log_disable_collector", "optional: DongTai agent disable log collector."));
+        attachOptions.addOption(build("disabled_plugins", "disabled_plugins", "optional: DongTai agent disable plugins."));
 
         CommandLineParser parser = new DefaultParser();
         HelpFormatter formatter = new HelpFormatter();

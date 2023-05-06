@@ -4,6 +4,7 @@ import io.dongtai.iast.core.bytecode.enhance.asm.AsmMethods;
 import io.dongtai.iast.core.bytecode.enhance.asm.AsmTypes;
 import io.dongtai.iast.core.handler.hookpoint.service.ServiceType;
 import io.dongtai.iast.core.utils.AsmUtils;
+import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.AdviceAdapter;
@@ -20,6 +21,12 @@ public class KafkaAbstractConfigInitAdviceAdapter extends AdviceAdapter implemen
     @Override
     protected void onMethodExit(int opcode) {
         if (opcode != ATHROW) {
+            Label tryL = new Label();
+            Label catchL = new Label();
+            Label exHandlerL = new Label();
+            visitTryCatchBlock(tryL, catchL, exHandlerL, ASM_TYPE_THROWABLE.getInternalName());
+            visitLabel(tryL);
+
             localServers = newLocal(Type.getType(List.class));
             loadThis();
             push("bootstrap.servers");
@@ -39,6 +46,13 @@ public class KafkaAbstractConfigInitAdviceAdapter extends AdviceAdapter implemen
             push("");
             push("KafkaUrlHandler");
             invokeInterface(ASM_TYPE_SPY_DISPATCHER, SPY$reportService);
+
+            visitLabel(catchL);
+            Label endL = new Label();
+            visitJumpInsn(GOTO, endL);
+            visitLabel(exHandlerL);
+            visitVarInsn(ASTORE, this.nextLocal);
+            visitLabel(endL);
         }
     }
 }

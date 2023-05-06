@@ -18,4 +18,9 @@ public class DispatchFeign implements DispatchPlugin {
 
         return classVisitor;
     }
+
+    @Override
+    public String getName() {
+        return "feign";
+    }
 }

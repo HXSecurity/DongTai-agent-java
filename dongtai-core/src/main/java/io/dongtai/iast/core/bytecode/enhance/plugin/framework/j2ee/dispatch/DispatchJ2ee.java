@@ -48,6 +48,11 @@ public class DispatchJ2ee implements DispatchPlugin {
         return classVisitor;
     }
 
+    @Override
+    public String getName() {
+        return "j2ee";
+    }
+
     private boolean isJavaxServlet(String className, Set<String> diagram) {
         return JAVAX_FACES_SERVLET.equals(className) || JAVAX_HTTP_SERVLET.equals(className)
                 || diagram.contains(JAVAX_HTTP_SERVLET) || diagram.contains(JAVAX_FILTER);

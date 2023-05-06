@@ -36,4 +36,9 @@ public class DispatchDubbo implements DispatchPlugin {
 
         return classVisitor;
     }
+
+    @Override
+    public String getName() {
+        return "dubbo";
+    }
 }
