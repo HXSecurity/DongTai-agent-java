@@ -27,4 +27,9 @@ public class DispatchJdbc implements DispatchPlugin {
 
         return classVisitor;
     }
+
+    @Override
+    public String getName() {
+        return "jdbc";
+    }
 }

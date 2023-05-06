@@ -39,6 +39,11 @@ public class DispatchClassPlugin implements DispatchPlugin {
         return new ClassVisit(classVisitor, classContext, policy);
     }
 
+    @Override
+    public String getName() {
+        return "class";
+    }
+
     public class ClassVisit extends AbstractClassVisitor {
         private int classVersion;
         private final MethodAdapter[] methodAdapters;

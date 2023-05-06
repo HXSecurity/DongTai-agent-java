@@ -33,6 +33,11 @@ public class DispatchHardcodedPlugin implements DispatchPlugin {
         return classVisitor;
     }
 
+    @Override
+    public String getName() {
+        return "hardcode";
+    }
+
     private class ExtractClassContent extends AbstractClassVisitor {
 
         private String source;
