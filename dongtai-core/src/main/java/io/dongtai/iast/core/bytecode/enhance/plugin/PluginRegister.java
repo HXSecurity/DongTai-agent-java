@@ -36,11 +36,11 @@ public class PluginRegister {
                 new DispatchJdbc(),
                 new DispatchShiro(),
                 new DispatchFeign(),
-                new DispatchDubbo(),
-                new DispatchClassPlugin()
+                new DispatchDubbo()
         ));
         allPlugins.removeIf(plugin -> disabledPlugins != null && disabledPlugins.contains(plugin.getName()));
         this.plugins.addAll(allPlugins);
+        this.plugins.add(new DispatchClassPlugin());
     }
 
     private List<String> getdisabledPlugins() {
