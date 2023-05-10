@@ -29998,7 +29998,7 @@ org/apache/catalina/connector/Request$SpecialAttributeAdapter
 org/apache/catalina/connector/ResponseFacade
 org/apache/catalina/connector/SessionTracker
 org/apache/catalina/core/AccessLogAdapter
-org/apache/catalina/core/ApplicationContext
+#org/apache/catalina/core/ApplicationContext
 org/apache/catalina/core/ApplicationContext$DispatchData
 org/apache/catalina/core/ApplicationContextFacade
 org/apache/catalina/core/ApplicationDispatcher
