@@ -82,23 +82,7 @@ public class SourceImpl {
         }
 
         TaintPoolUtils.trackObject(event, sourceNode, event.returnInstance, 0);
-        // @TODO: hook json serializer for custom model
-        handlerCustomModel(event, sourceNode);
         return true;
-    }
-
-    /**
-     * todo: 处理过程和结果需要细化
-     *
-     * @param event MethodEvent
-     */
-    public static void handlerCustomModel(MethodEvent event, SourceNode sourceNode) {
-        if (!"getSession".equals(event.getMethodName())) {
-            Set<Object> modelValues = TaintPoolUtils.parseCustomModel(event.returnInstance);
-            for (Object modelValue : modelValues) {
-                TaintPoolUtils.trackObject(event, sourceNode, modelValue, 0);
-            }
-        }
     }
 
     private static boolean allowCall(MethodEvent event) {

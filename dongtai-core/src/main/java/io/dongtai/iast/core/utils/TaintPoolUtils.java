@@ -146,38 +146,6 @@ public class TaintPoolUtils {
         return isAllowTaintType(obj.getClass());
     }
 
-    public static Set<Object> parseCustomModel(Object model) {
-        Set<Object> modelValues = new HashSet<Object>();
-        try {
-            if (!TaintPoolUtils.isAllowTaintGetterModel(model)) {
-                return modelValues;
-            }
-
-            // getter methods
-            Method[] methods = model.getClass().getMethods();
-            Object itemValue = null;
-            for (Method method : methods) {
-                if (!TaintPoolUtils.isAllowTaintGetterMethod(method)) {
-                    continue;
-                }
-
-                try {
-                    method.setAccessible(true);
-                    itemValue = method.invoke(model);
-                    if (!TaintPoolUtils.isNotEmpty(itemValue) || !TaintPoolUtils.isAllowTaintType(itemValue)) {
-                        continue;
-                    }
-                    modelValues.add(itemValue);
-                } catch (Throwable e) {
-                    DongTaiLog.error(ErrorCode.get("UTIL_TAINT_PARSE_CUSTOM_MODEL_FAILED"),
-                            model.getClass().getName(), method.getName(), e);
-                }
-            }
-        } catch (Throwable ignore) {
-        }
-        return modelValues;
-    }
-
     public static boolean isAllowTaintGetterModel(Object model) {
         if (!TaintPoolUtils.isNotEmpty(model)) {
             return false;
@@ -309,13 +277,6 @@ public class TaintPoolUtils {
                 event.addTargetHash(hash);
                 EngineManager.TAINT_RANGES_POOL.add(hash, tr);
             } else {
-                if (!(obj instanceof String)) {
-                    Set<Object> modelValues = TaintPoolUtils.parseCustomModel(obj);
-                    for (Object modelValue : modelValues) {
-                        trackObject(event, policyNode, modelValue, depth + 1);
-                    }
-                }
-
                 hash = System.identityHashCode(obj);
                 if (EngineManager.TAINT_HASH_CODES.contains(hash)) {
                     event.addSourceHash(hash);
