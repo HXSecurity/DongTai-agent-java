@@ -5513,7 +5513,7 @@ com/google/common/util/concurrent/ThreadFactoryBuilder$1
 com/google/common/util/concurrent/UncheckedExecutionException
 com/google/common/util/concurrent/Uninterruptibles
 com/google/gson/FieldNamingPolicy*
-com/google/gson/Gson*
+# com/google/gson/Gson*
 com/google/gson/JsonArray
 com/google/gson/JsonElement
 com/google/gson/JsonIOException
@@ -5523,7 +5523,7 @@ com/google/gson/JsonParseException
 com/google/gson/JsonPrimitive
 com/google/gson/JsonSyntaxException
 com/google/gson/LongSerializationPolicy*
-com/google/gson/TypeAdapter*
+# com/google/gson/TypeAdapter*
 com/google/gson/internal/*
 com/google/gson/reflect/TypeToken
 com/google/gson/stream/JsonReader
