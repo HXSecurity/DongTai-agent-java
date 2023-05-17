@@ -1,9 +1,9 @@
 package io.dongtai.iast.core.handler.hookpoint.models;
 
+import com.alibaba.fastjson2.JSONObject;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.TaintPosition;
 import io.dongtai.iast.core.handler.hookpoint.models.taint.range.TaintRanges;
 import io.dongtai.iast.core.utils.StringUtils;
-import org.json.JSONObject;
 
 import java.io.StringWriter;
 import java.util.*;
@@ -91,6 +91,8 @@ public class MethodEvent {
     public List<MethodEventSourceType> sourceTypes;
 
     private StackTraceElement callStack;
+
+    private List<Object> stacks;
 
     public String traceId = null;
 
@@ -301,5 +303,17 @@ public class MethodEvent {
                     .append(Integer.toHexString(System.identityHashCode(value)));
         }
         return sb.toString();
+    }
+
+    public List<Object> getStacks() {
+        return stacks;
+    }
+
+    public void setStacks(StackTraceElement[] stackTraceElements) {
+        List<Object> stacks = new ArrayList<>();
+        for(StackTraceElement stackTraceElement:stackTraceElements){
+            stacks.add(stackTraceElement.toString());
+        }
+        this.stacks = stacks;
     }
 }

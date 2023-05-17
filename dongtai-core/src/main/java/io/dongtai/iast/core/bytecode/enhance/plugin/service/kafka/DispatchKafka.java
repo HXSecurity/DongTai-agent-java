@@ -18,4 +18,9 @@ public class DispatchKafka implements DispatchPlugin {
 
         return classVisitor;
     }
+
+    @Override
+    public String getName() {
+        return "kafka";
+    }
 }

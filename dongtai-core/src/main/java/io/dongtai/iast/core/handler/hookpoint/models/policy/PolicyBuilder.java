@@ -1,6 +1,9 @@
 package io.dongtai.iast.core.handler.hookpoint.models.policy;
 
 import io.dongtai.iast.common.constants.ApiPath;
+import io.dongtai.iast.core.handler.hookpoint.models.taint.range.TaintCommand;
+import io.dongtai.iast.core.handler.hookpoint.models.taint.range.TaintCommandRunner;
+import io.dongtai.iast.core.handler.hookpoint.models.taint.tag.TaintTag;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.VulnType;
 import io.dongtai.iast.core.utils.HttpClientUtils;
 import io.dongtai.iast.core.utils.StringUtils;
@@ -21,7 +24,10 @@ public class PolicyBuilder {
     private static final String KEY_SIGNATURE = "signature";
     private static final String KEY_INHERIT = "inherit";
     private static final String KEY_VUL_TYPE = "vul_type";
+    private static final String KEY_TAGS = "tags";
+    private static final String KEY_UNTAGS = "untags";
     private static final String KEY_COMMAND = "command";
+    private static final String KEY_STACK_BLACKLIST = "stack_blacklist";
     private static final String KEY_IGNORE_INTERNAL = "ignore_internal";
     private static final String KEY_IGNORE_BLACKLIST = "ignore_blacklist";
 
@@ -66,7 +72,7 @@ public class PolicyBuilder {
                 buildPropagator(policy, nodeType, node);
                 buildSink(policy, nodeType, node);
             } catch (PolicyException e) {
-                DongTaiLog.warn(ErrorCode.get("POLICY_CONFIG_INVALID"), e.getMessage());
+                DongTaiLog.warn(ErrorCode.get("POLICY_CONFIG_INVALID"), e);
             }
         }
         return policy;
@@ -96,12 +102,12 @@ public class PolicyBuilder {
         Set<TaintPosition> sources = parseSource(node, type);
         Set<TaintPosition> targets = parseTarget(node, type);
         MethodMatcher methodMatcher = buildMethodMatcher(node);
-        // @TODO: command
-        PropagatorNode propagatorNode = new PropagatorNode(sources, targets, null, new String[]{}, methodMatcher);
+        PropagatorNode propagatorNode = new PropagatorNode(sources, targets, methodMatcher);
         setInheritable(node, propagatorNode);
         List<String[]> tags = parseTags(node, propagatorNode);
         propagatorNode.setTags(tags.get(0));
         propagatorNode.setUntags(tags.get(1));
+        parseCommand(node, propagatorNode);
         parseFlags(node, propagatorNode);
         policy.addPropagator(propagatorNode);
     }
@@ -121,7 +127,7 @@ public class PolicyBuilder {
         }
         setInheritable(node, sinkNode);
         sinkNode.setVulType(vulType);
-        sinkNode.setStackDenyList(parseStackDenyList(sinkNode));
+        parseStackDenyList(node, sinkNode);
         parseFlags(node, sinkNode);
         policy.addSink(sinkNode);
     }
@@ -209,21 +215,20 @@ public class PolicyBuilder {
 
     /**
      * stack deny list for sink node
-     * TODO: parse stack deny list from policy
      */
-    private static String[] parseStackDenyList(SinkNode node) {
-        if (!(node.getMethodMatcher() instanceof SignatureMethodMatcher)) {
-            return new String[0];
+    private static void parseStackDenyList(JSONObject node, SinkNode sinkNode) {
+        try {
+            if (node.has(KEY_STACK_BLACKLIST)) {
+                JSONArray arr = node.getJSONArray(KEY_STACK_BLACKLIST);
+                sinkNode.setStackDenyList(arr.toList().toArray(new String[0]));
+            }
+        } catch (JSONException ignore) {
+            DongTaiLog.warn(ErrorCode.get("POLICY_CONFIG_INVALID"),
+                    new PolicyException(PolicyException.ERR_POLICY_NODE_STACK_BLACKLIST_INVALID + ": " + node.toString()));
+        } catch (ArrayStoreException ignore) {
+            DongTaiLog.warn(ErrorCode.get("POLICY_CONFIG_INVALID"),
+                    new PolicyException(PolicyException.ERR_POLICY_NODE_STACK_BLACKLIST_INVALID + ": " + node.toString()));
         }
-
-        String signature = ((SignatureMethodMatcher) node.getMethodMatcher()).getSignature().toString();
-        if ("java.lang.Class.forName(java.lang.String)".equals(signature)) {
-            return new String[]{"java.net.URL.getURLStreamHandler"};
-        } else if ("java.lang.Class.forName(java.lang.String,boolean,java.lang.ClassLoader)".equals(signature)) {
-            return new String[]{"org.jruby.javasupport.JavaSupport.loadJavaClass"};
-        }
-
-        return new String[0];
     }
 
     private static List<String[]> parseTags(JSONObject node, PolicyNode policyNode) {
@@ -231,21 +236,135 @@ public class PolicyBuilder {
         if (!(policyNode.getMethodMatcher() instanceof SignatureMethodMatcher)) {
             return empty;
         }
-        String signature = ((SignatureMethodMatcher) policyNode.getMethodMatcher()).getSignature().toString();
 
-        // TODO: parse tags/untags from policy
-        List<String[]> taintTags = PolicyTag.TAGS.get(signature);
-        if (taintTags == null || taintTags.size() != 2) {
-            return empty;
+        boolean hasInvalid = false;
+        List<String> tags = new ArrayList<String>();
+        List<String> untags = new ArrayList<String>();
+        try {
+            if (node.has(KEY_TAGS)) {
+                JSONArray ts = node.getJSONArray(KEY_TAGS);
+                for (Object o : ts) {
+                    String t = (String) o;
+                    if (TaintTag.UNTRUSTED.equals(t)) {
+                        continue;
+                    }
+                    if (TaintTag.get(t) != null) {
+                        tags.add(TaintTag.get(t).getKey());
+                    } else {
+                        hasInvalid = true;
+                    }
+                }
+            }
+        } catch (JSONException ignore) {
+            hasInvalid = true;
+        } catch (ClassCastException ignore) {
+            hasInvalid = true;
         }
 
-        return taintTags;
+        try {
+            if (node.has(KEY_TAGS)) {
+                JSONArray uts = node.getJSONArray(KEY_UNTAGS);
+                for (Object o : uts) {
+                    String ut = (String) o;
+                    if (TaintTag.UNTRUSTED.equals(ut)) {
+                        continue;
+                    }
+                    TaintTag tt = TaintTag.get(ut);
+                    if (tt != null) {
+                        if (tags.contains(tt.getKey())) {
+                            hasInvalid = true;
+                        }
+                        untags.add(tt.getKey());
+                    } else {
+                        hasInvalid = true;
+                    }
+                }
+            }
+        } catch (JSONException ignore) {
+            hasInvalid = true;
+        } catch (ClassCastException ignore) {
+            hasInvalid = true;
+        }
+
+        if (hasInvalid) {
+            DongTaiLog.warn(ErrorCode.get("POLICY_CONFIG_INVALID"),
+                    new PolicyException(PolicyException.ERR_POLICY_NODE_TAGS_UNTAGS_INVALID + ": " + node.toString()));
+        }
+
+        return Arrays.asList(tags.toArray(new String[0]), untags.toArray(new String[0]));
+    }
+
+    private static void parseCommand(JSONObject node, PropagatorNode propagatorNode) {
+        try {
+            if (node.has(KEY_COMMAND)) {
+                String cmdConfig = node.getString(KEY_COMMAND);
+                if (cmdConfig == null) {
+                    return;
+                }
+                cmdConfig = cmdConfig.trim();
+                if (cmdConfig.isEmpty()) {
+                    return;
+                }
+
+                boolean isInvalid = false;
+                int parametersStartIndex = cmdConfig.indexOf("(");
+                int parametersEndIndex = cmdConfig.indexOf(")");
+
+                if (parametersStartIndex <= 0 || parametersEndIndex <= 1
+                        || parametersStartIndex > parametersEndIndex
+                        || parametersEndIndex != cmdConfig.length() - 1) {
+                    isInvalid = true;
+                } else {
+                    String cmd = cmdConfig.substring(0, parametersStartIndex).trim();
+                    String argumentsStr = cmdConfig.substring(parametersStartIndex + 1, parametersEndIndex).trim();
+                    String[] arguments = new String[]{};
+                    if (!argumentsStr.isEmpty()) {
+                        argumentsStr = argumentsStr.toUpperCase();
+                        arguments = argumentsStr.replace(" ", "").split(",");
+                        for (String argument : arguments) {
+                            String dig = argument;
+                            if (dig.startsWith("P")) {
+                                dig = dig.substring(1);
+                            }
+                            if (!dig.matches("\\d+")) {
+                                isInvalid = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    TaintCommand command = TaintCommand.get(cmd);
+                    if (command == null) {
+                        isInvalid = true;
+                    } else {
+                        if (!(propagatorNode.getMethodMatcher() instanceof SignatureMethodMatcher)) {
+                            return;
+                        }
+                        String signature = ((SignatureMethodMatcher) propagatorNode.getMethodMatcher()).getSignature().toString();
+                        TaintCommandRunner commandRunner = TaintCommandRunner.create(signature, command, arguments);
+                        propagatorNode.setCommandRunner(commandRunner);
+                    }
+                }
+
+                if (isInvalid) {
+                    DongTaiLog.warn(ErrorCode.get("POLICY_CONFIG_INVALID"),
+                            new PolicyException(PolicyException.ERR_POLICY_NODE_RANGE_COMMAND_INVALID + ": " + node.toString()));
+                }
+            }
+        } catch (JSONException ignore) {
+            DongTaiLog.warn(ErrorCode.get("POLICY_CONFIG_INVALID"),
+                    new PolicyException(PolicyException.ERR_POLICY_NODE_RANGE_COMMAND_INVALID + ": " + node.toString()));
+        }
     }
 
     private static void parseFlags(JSONObject node, PolicyNode policyNode) {
         try {
             boolean ignoreInternal = node.getBoolean(KEY_IGNORE_INTERNAL);
             policyNode.setIgnoreInternal(ignoreInternal);
+        } catch (JSONException ignore) {
+        }
+
+        try {
             boolean ignoreBlackList = node.getBoolean(KEY_IGNORE_BLACKLIST);
             policyNode.setIgnoreBlacklist(ignoreBlackList);
         } catch (JSONException ignore) {

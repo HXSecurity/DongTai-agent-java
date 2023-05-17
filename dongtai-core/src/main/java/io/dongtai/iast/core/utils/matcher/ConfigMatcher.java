@@ -7,7 +7,9 @@ import io.dongtai.log.DongTaiLog;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.instrument.Instrumentation;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * 各种匹配方法（通过配置文件匹配）
@@ -168,6 +170,9 @@ public class ConfigMatcher {
         String realClassName = className.replace('/', '.');
         boolean isBlack = inHookBlacklist(className);
         if (isBlack) {
+            if (policyManager.getPolicy() == null) {
+                return false;
+            }
             policyManager.getPolicy().addBlacklistHooks(realClassName);
             if (!policyManager.getPolicy().isIgnoreBlacklistHooks(realClassName)
                     && !policyManager.getPolicy().isIgnoreInternalHooks(realClassName)) {

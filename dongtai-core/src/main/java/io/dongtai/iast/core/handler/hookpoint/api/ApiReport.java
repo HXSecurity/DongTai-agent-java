@@ -1,9 +1,9 @@
 package io.dongtai.iast.core.handler.hookpoint.api;
 
+import com.alibaba.fastjson2.JSONObject;
 import io.dongtai.iast.common.constants.*;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.service.ThreadPools;
-import org.json.JSONObject;
 
 import java.util.Map;
 

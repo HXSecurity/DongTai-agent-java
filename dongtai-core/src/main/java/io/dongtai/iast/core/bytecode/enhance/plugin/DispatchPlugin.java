@@ -16,4 +16,6 @@ public interface DispatchPlugin {
      * @return ClassVisitor 命中的类访问起
      */
     ClassVisitor dispatch(ClassVisitor classVisitor, ClassContext context, Policy policy);
+
+    String getName();
 }

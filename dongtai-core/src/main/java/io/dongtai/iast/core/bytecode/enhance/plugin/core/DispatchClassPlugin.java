@@ -39,6 +39,11 @@ public class DispatchClassPlugin implements DispatchPlugin {
         return new ClassVisit(classVisitor, classContext, policy);
     }
 
+    @Override
+    public String getName() {
+        return "class";
+    }
+
     public class ClassVisit extends AbstractClassVisitor {
         private int classVersion;
         private final MethodAdapter[] methodAdapters;
@@ -64,12 +69,18 @@ public class DispatchClassPlugin implements DispatchPlugin {
                                          final String signature, final String[] exceptions) {
             MethodVisitor mv = super.visitMethod(access, name, descriptor, signature, exceptions);
             if (Modifier.isInterface(access) || Modifier.isAbstract(access) || "<clinit>".equals(name)) {
+                if (this.classVersion <= Opcodes.V1_6) {
+                    mv = new JSRInlinerAdapter(mv, access, name, descriptor, signature, exceptions);
+                }
                 return mv;
             }
 
             if (this.policy.isBlacklistHooks(this.context.getClassName())
                     && !this.policy.isIgnoreBlacklistHooks(this.context.getClassName())
                     && !this.policy.isIgnoreInternalHooks(this.context.getClassName())) {
+                if (this.classVersion <= Opcodes.V1_6) {
+                    mv = new JSRInlinerAdapter(mv, access, name, descriptor, signature, exceptions);
+                }
                 return mv;
             }
 

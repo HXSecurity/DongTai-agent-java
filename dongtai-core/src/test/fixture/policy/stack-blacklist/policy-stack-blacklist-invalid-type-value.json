@@ -1,0 +1,17 @@
+{
+  "status": 201,
+  "msg": "success",
+  "data": [
+    {
+      "type": 4,
+      "signature": "A.b()",
+      "source": "P2",
+      "inherit": "false",
+      "vul_type": "xss",
+      "stack_blacklist": [
+        1,
+        2
+      ]
+    }
+  ]
+}

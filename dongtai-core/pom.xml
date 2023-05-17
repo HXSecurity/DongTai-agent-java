@@ -101,6 +101,10 @@
                                     <pattern>org.slf4j</pattern>
                                     <shadedPattern>${shade-prefix}.org.slf4j</shadedPattern>
                                 </relocation>
+                                <relocation>
+                                    <pattern>com.alibaba</pattern>
+                                    <shadedPattern>${shade-prefix}.com.alibaba</shadedPattern>
+                                </relocation>
                             </relocations>
                         </configuration>
                     </execution>
@@ -192,6 +196,12 @@
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>${json.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.alibaba.fastjson2</groupId>
+            <artifactId>fastjson2</artifactId>
+            <version>${fastjson2.version}</version>
         </dependency>
 
         <dependency>

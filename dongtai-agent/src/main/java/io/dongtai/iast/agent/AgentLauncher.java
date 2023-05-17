@@ -2,7 +2,6 @@ package io.dongtai.iast.agent;
 
 import io.dongtai.iast.agent.manager.EngineManager;
 import io.dongtai.iast.agent.monitor.MonitorDaemonThread;
-import io.dongtai.iast.agent.monitor.impl.AgentStateMonitor;
 import io.dongtai.iast.agent.report.AgentRegisterReport;
 import io.dongtai.iast.common.constants.AgentConstant;
 import io.dongtai.iast.common.scope.ScopeManager;
@@ -164,13 +163,6 @@ public class AgentLauncher {
         if (send) {
             LogCollector.extractFluent();
             DongTaiLog.info("Agent registered successfully.");
-            Boolean agentStat = AgentRegisterReport.agentStat();
-            if (!agentStat) {
-                AgentStateMonitor.isCoreRegisterStart = false;
-                DongTaiLog.info("Detection engine not started, agent waiting to be audited.");
-            } else {
-                AgentStateMonitor.isCoreRegisterStart = true;
-            }
             shutdownHook = new ShutdownThread();
             Runtime.getRuntime().addShutdownHook(shutdownHook);
             loadEngine(inst);
@@ -187,7 +179,7 @@ public class AgentLauncher {
     private static void loadEngine(final Instrumentation inst) {
         EngineManager engineManager = EngineManager.getInstance(inst, LAUNCH_MODE, EngineManager.getPID(), AGENT_STATE);
         MonitorDaemonThread daemonThread = MonitorDaemonThread.getInstance(engineManager);
-        if (MonitorDaemonThread.delayTime <= 0 && AgentStateMonitor.isCoreRegisterStart) {
+        if (MonitorDaemonThread.delayTime <= 0) {
             daemonThread.startEngine();
         }
 

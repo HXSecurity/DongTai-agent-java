@@ -33,6 +33,10 @@ public class SinkNode extends PolicyNode {
         this.vulType = vulType;
     }
 
+    public String[] getStackDenyList() {
+        return this.stackDenyList;
+    }
+
     public boolean hasDenyStack(StackTraceElement[] stackTraceElements) {
         if (this.stackDenyList == null || this.stackDenyList.length == 0) {
             return false;

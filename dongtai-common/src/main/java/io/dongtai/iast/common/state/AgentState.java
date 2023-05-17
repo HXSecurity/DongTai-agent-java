@@ -5,6 +5,7 @@ public class AgentState {
     private State pendingState;
     private StateCause cause;
     private boolean fallback;
+    private boolean allowReport = true;
     private static AgentState INSTANCE;
 
     public static AgentState getInstance() {
@@ -94,5 +95,13 @@ public class AgentState {
 
     public boolean isFallback() {
         return this.fallback;
+    }
+
+    public boolean isAllowReport() {
+        return this.allowReport;
+    }
+
+    public void setAllowReport(boolean allowReport) {
+        this.allowReport = allowReport;
     }
 }

@@ -33,6 +33,7 @@ public class IastProperties {
         put("log_path", PropertyConstant.PROPERTY_LOG_PATH);
         put("log_disable_collector", PropertyConstant.PROPERTY_LOG_DISABLE_COLLECTOR);
         put("uuid_path", PropertyConstant.PROPERTY_UUID_PATH);
+        put("disabled_plugins", PropertyConstant.PROPERTY_DISABLED_PLUGINS);
     }};
 
     private static IastProperties instance;
@@ -223,7 +224,7 @@ public class IastProperties {
     public String getIsDownloadPackage() {
         if (null == isDownloadPackage) {
             isDownloadPackage = System.getProperty(PropertyConstant.PROPERTY_SERVER_PACKAGE,
-                    cfg.getProperty(PropertyConstant.PROPERTY_SERVER_PACKAGE, "true"));
+                    cfg.getProperty(PropertyConstant.PROPERTY_SERVER_PACKAGE, "false"));
         }
         return isDownloadPackage;
     }

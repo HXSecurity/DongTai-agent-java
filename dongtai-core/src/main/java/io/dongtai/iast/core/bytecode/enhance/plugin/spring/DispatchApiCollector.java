@@ -5,7 +5,7 @@ import io.dongtai.iast.core.bytecode.enhance.plugin.DispatchPlugin;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.Policy;
 import org.objectweb.asm.ClassVisitor;
 
-public class DispatchSpringApplication implements DispatchPlugin {
+public class DispatchApiCollector implements DispatchPlugin {
 
     private static final String FRAMEWORK_SERVLET = " org.springframework.web.servlet.FrameworkServlet".substring(1);
 
@@ -16,5 +16,10 @@ public class DispatchSpringApplication implements DispatchPlugin {
             classVisitor = new SpringApplicationAdapter(classVisitor, context);
         }
         return classVisitor;
+    }
+
+    @Override
+    public String getName() {
+        return "api";
     }
 }

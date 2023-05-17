@@ -1,13 +1,14 @@
 package io.dongtai.iast.core.handler.hookpoint.vulscan.normal;
 
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import io.dongtai.iast.common.constants.*;
 import io.dongtai.iast.common.utils.base64.Base64Encoder;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.IVulScan;
 import io.dongtai.iast.core.service.ThreadPools;
 import io.dongtai.iast.core.utils.StackUtils;
-import org.json.JSONArray;
-import org.json.JSONObject;
+
 
 import java.util.Collection;
 import java.util.Map;
@@ -50,7 +51,7 @@ public abstract class AbstractNormalVulScan implements IVulScan {
         detail.put(ReportKey.VULN_CALLER, vulStacks);
 
         for (StackTraceElement element : stacks) {
-            vulStacks.put(element.toString());
+            vulStacks.add(element.toString());
         }
         ThreadPools.sendPriorityReport(ApiPath.REPORT_UPLOAD, report.toString());
     }

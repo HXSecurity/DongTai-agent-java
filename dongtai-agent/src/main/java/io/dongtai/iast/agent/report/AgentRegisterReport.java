@@ -1,5 +1,8 @@
 package io.dongtai.iast.agent.report;
 
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import io.dongtai.iast.agent.IastProperties;
 import io.dongtai.iast.agent.manager.EngineManager;
 import io.dongtai.iast.agent.middlewarerecognition.IServer;
@@ -10,8 +13,7 @@ import io.dongtai.iast.common.constants.ApiPath;
 import io.dongtai.iast.common.utils.base64.Base64Encoder;
 import io.dongtai.log.DongTaiLog;
 import io.dongtai.log.ErrorCode;
-import org.json.JSONArray;
-import org.json.JSONObject;
+
 
 import java.io.*;
 import java.net.*;
@@ -27,7 +29,6 @@ public class AgentRegisterReport {
     public static AgentRegisterReport INSTANCE;
     private String projectName = null;
     private static Integer agentId = -1;
-    private static Integer coreRegisterStart = 1;
     final IServer server = ServerDetect.getWebserver();
     private static String AGENT_NAME = null;
     private static String HOST_NAME = null;
@@ -211,7 +212,7 @@ public class AgentRegisterReport {
                     } else {
                         jsonObject.put("isAddress", "0");
                     }
-                    network.put(jsonObject);
+                    network.add(jsonObject);
                 }
             }
             return network.toString();
@@ -258,12 +259,11 @@ public class AgentRegisterReport {
      */
     private void setAgentData(StringBuilder responseRaw) {
         try {
-            JSONObject responseObj = new JSONObject(responseRaw.toString());
+            JSONObject responseObj = JSON.parseObject(responseRaw.toString());
             Integer status = (Integer) responseObj.get("status");
             if (status == 201) {
                 JSONObject data = (JSONObject) responseObj.get("data");
                 agentId = (Integer) data.get("id");
-                coreRegisterStart = (Integer) data.get("coreAutoStart");
             } else {
                 DongTaiLog.error(ErrorCode.AGENT_REGISTER_RESPONSE_CODE_INVALID, responseRaw);
             }
@@ -271,10 +271,6 @@ public class AgentRegisterReport {
             DongTaiLog.error(ErrorCode.AGENT_REGISTER_PARSE_RESPONSE_FAILED,
                     IastProperties.getInstance().getBaseUrl(), e);
         }
-    }
-
-    public static Boolean agentStat() {
-        return coreRegisterStart == 1;
     }
 
     private static String generateUUID() {

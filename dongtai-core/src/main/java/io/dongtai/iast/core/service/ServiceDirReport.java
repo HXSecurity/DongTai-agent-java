@@ -1,9 +1,10 @@
 package io.dongtai.iast.core.service;
 
+import com.alibaba.fastjson2.JSONObject;
 import io.dongtai.iast.common.constants.*;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.log.DongTaiLog;
-import org.json.JSONObject;
+
 
 import java.io.File;
 

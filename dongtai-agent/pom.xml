@@ -84,6 +84,11 @@
             <artifactId>gson</artifactId>
             <version>${gson.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.alibaba.fastjson2</groupId>
+            <artifactId>fastjson2</artifactId>
+            <version>${fastjson2.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -175,6 +180,10 @@
                                 <relocation>
                                     <pattern>com.google</pattern>
                                     <shadedPattern>${shade-prefix}.com.google</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>com.alibaba</pattern>
+                                    <shadedPattern>${shade-prefix}.com.alibaba</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>

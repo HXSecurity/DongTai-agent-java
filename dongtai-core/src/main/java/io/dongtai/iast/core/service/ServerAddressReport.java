@@ -1,10 +1,10 @@
 package io.dongtai.iast.core.service;
 
+import com.alibaba.fastjson2.JSONObject;
 import io.dongtai.iast.common.constants.ApiPath;
 import io.dongtai.iast.common.constants.ReportKey;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.log.DongTaiLog;
-import org.json.JSONObject;
 
 /**
  * 上报agent队列与请求数量

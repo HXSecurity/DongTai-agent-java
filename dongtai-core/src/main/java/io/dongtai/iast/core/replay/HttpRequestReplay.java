@@ -1,13 +1,14 @@
 package io.dongtai.iast.core.replay;
 
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import io.dongtai.iast.common.utils.base64.Base64Decoder;
 import io.dongtai.iast.core.handler.context.ContextManager;
 import io.dongtai.iast.core.handler.hookpoint.models.IastReplayModel;
 import io.dongtai.iast.core.utils.HttpClientUtils;
 import io.dongtai.log.DongTaiLog;
 import io.dongtai.log.ErrorCode;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.HashMap;
 
@@ -78,7 +79,7 @@ public class HttpRequestReplay implements Runnable {
     @Override
     public void run() {
         try {
-            JSONObject resp = new JSONObject(replayRequestRaw.toString());
+            JSONObject resp = JSON.parseObject(replayRequestRaw.toString());
             Integer statusCode = (Integer) resp.get("status");
             if (statusCode != 201) {
                 return;
@@ -90,7 +91,7 @@ public class HttpRequestReplay implements Runnable {
             }
 
             JSONArray replayRequests = (JSONArray) resp.get("data");
-            for (int index = 0, total = replayRequests.length(); index < total; index++) {
+            for (int index = 0, total = replayRequests.size(); index < total; index++) {
                 JSONObject replayRequest = (JSONObject) replayRequests.get(index);
                 IastReplayModel replayModel = new IastReplayModel(
                         replayRequest.get("method"),

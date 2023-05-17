@@ -1,12 +1,12 @@
 package io.dongtai.iast.agent.report;
 
+import com.alibaba.fastjson2.JSONObject;
 import io.dongtai.iast.agent.monitor.impl.PerformanceMonitor;
 import io.dongtai.iast.agent.util.ByteUtils;
 import io.dongtai.iast.common.constants.ReportKey;
 import io.dongtai.iast.common.constants.ReportType;
 import io.dongtai.iast.common.entity.performance.metrics.MemoryUsageMetrics;
 import io.dongtai.iast.common.state.AgentState;
-import org.json.JSONObject;
 
 /**
  * 心跳机制实现，默认30s
