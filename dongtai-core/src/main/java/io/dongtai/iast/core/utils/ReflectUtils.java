@@ -193,7 +193,8 @@ public class ReflectUtils {
                 accessibleObject.setAccessible(true);
             }
         } catch (Throwable e){
-            DongTaiLog.debug(e.getMessage());
+            DongTaiLog.debug("setAccessible failed: {}, {}",
+                    e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "");
         }
 
     }
