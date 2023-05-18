@@ -6,10 +6,9 @@ import io.dongtai.iast.core.handler.hookpoint.models.policy.PolicyNode;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.SourceNode;
 import io.dongtai.iast.core.handler.hookpoint.models.taint.range.*;
 import io.dongtai.log.DongTaiLog;
-import io.dongtai.log.ErrorCode;
 
 import java.lang.reflect.Array;
-import java.lang.reflect.Method;
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -23,16 +22,6 @@ import java.util.*;
 public class TaintPoolUtils {
     private static final String VALUES_ENUMERATOR = " org.apache.tomcat.util.http.ValuesEnumerator".substring(1);
     private static final String SPRING_OBJECT = " org.springframework.".substring(1);
-
-    /**
-     * 判断 obj 对象是否为 java 的内置数据类型，包括：string、array、list、map、enum 等
-     *
-     * @param obj Object
-     * @return boolean
-     */
-    public static boolean isJdkType(Object obj) {
-        return obj instanceof String || obj instanceof Map || obj instanceof List;
-    }
 
     public static boolean poolContains(Object obj, MethodEvent event) {
         if (obj == null) {
@@ -146,86 +135,7 @@ public class TaintPoolUtils {
         return isAllowTaintType(obj.getClass());
     }
 
-    public static boolean isAllowTaintGetterModel(Object model) {
-        if (!TaintPoolUtils.isNotEmpty(model)) {
-            return false;
-        }
-        Class<?> sourceClass = model.getClass();
-        if (sourceClass.getClassLoader() == null) {
-            return false;
-        }
-        if (!TaintPoolUtils.isAllowTaintGetterClass(sourceClass)) {
-            return false;
-        }
-        return true;
-    }
-
-    public static boolean isAllowTaintGetterClass(Class<?> clazz) {
-        String className = clazz.getName();
-        if (className.startsWith("cn.huoxian.iast.api.") ||
-                className.startsWith("io.dongtai.api.") ||
-                className.startsWith(" org.apache.tomcat".substring(1)) ||
-                className.startsWith(" org.apache.catalina".substring(1)) ||
-                className.startsWith(" org.apache.shiro.web.servlet".substring(1)) ||
-                className.startsWith(" org.eclipse.jetty".substring(1)) ||
-                VALUES_ENUMERATOR.equals(className) ||
-                className.startsWith(SPRING_OBJECT) ||
-                className.contains("RequestWrapper") ||
-                className.contains("ResponseWrapper")
-
-        ) {
-            return false;
-        }
-
-        List<Class<?>> interfaces = ReflectUtils.getAllInterfaces(clazz);
-        for (Class<?> inter : interfaces) {
-            if (inter.getName().endsWith(".servlet.ServletRequest")
-                    || inter.getName().endsWith(".servlet.ServletResponse")) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    public static boolean isAllowTaintGetterMethod(Method method) {
-        String methodName = method.getName();
-        if (!methodName.startsWith("get")
-                || "getClass".equals(methodName)
-                || "getParserForType".equals(methodName)
-                || "getDefaultInstance".equals(methodName)
-                || "getDefaultInstanceForType".equals(methodName)
-                || "getDescriptor".equals(methodName)
-                || "getDescriptorForType".equals(methodName)
-                || "getAllFields".equals(methodName)
-                || "getInitializationErrorString".equals(methodName)
-                || "getUnknownFields".equals(methodName)
-                || "getDetailOrBuilderList".equals(methodName)
-                || "getAllFieldsMutable".equals(methodName)
-                || "getAllFieldsRaw".equals(methodName)
-                || "getOneofFieldDescriptor".equals(methodName)
-                || "getField".equals(methodName)
-                || "getFieldRaw".equals(methodName)
-                || "getRepeatedFieldCount".equals(methodName)
-                || "getRepeatedField".equals(methodName)
-                || "getSerializedSize".equals(methodName)
-                || "getMethodOrDie".equals(methodName)
-                || "getReader".equals(methodName)
-                || "getInputStream".equals(methodName)
-                || "getWriter".equals(methodName)
-                || "getOutputStream".equals(methodName)
-                || "getParameterNames".equals(methodName)
-                || "getParameterMap".equals(methodName)
-                || "getHeaderNames".equals(methodName)
-                || methodName.endsWith("Bytes")
-                || method.getParameterCount() != 0) {
-            return false;
-        }
-
-        return isAllowTaintType(method.getReturnType());
-    }
-
-    public static void trackObject(MethodEvent event, PolicyNode policyNode, Object obj, int depth) {
+    public static void trackObject(MethodEvent event, PolicyNode policyNode, Object obj, int depth, Boolean isMicroservice) {
         if (depth >= 10 || !TaintPoolUtils.isNotEmpty(obj) || !TaintPoolUtils.isAllowTaintType(obj)) {
             return;
         }
@@ -241,21 +151,21 @@ public class TaintPoolUtils {
 
         Class<?> cls = obj.getClass();
         if (cls.isArray() && !cls.getComponentType().isPrimitive()) {
-            trackArray(event, policyNode, obj, depth);
+            trackArray(event, policyNode, obj, depth, isMicroservice);
         } else if (obj instanceof Iterator && !(obj instanceof Enumeration)) {
-            trackIterator(event, policyNode, (Iterator<?>) obj, depth);
+            trackIterator(event, policyNode, (Iterator<?>) obj, depth, isMicroservice);
         } else if (obj instanceof Map) {
-            trackMap(event, policyNode, (Map<?, ?>) obj, depth);
+            trackMap(event, policyNode, (Map<?, ?>) obj, depth, isMicroservice);
         } else if (obj instanceof Map.Entry) {
-            trackMapEntry(event, policyNode, (Map.Entry<?, ?>) obj, depth);
+            trackMapEntry(event, policyNode, (Map.Entry<?, ?>) obj, depth, isMicroservice);
         } else if (obj instanceof Collection && !(obj instanceof Enumeration)) {
             if (obj instanceof List) {
-                trackList(event, policyNode, (List<?>) obj, depth);
+                trackList(event, policyNode, (List<?>) obj, depth, isMicroservice);
             } else {
-                trackIterator(event, policyNode, ((Collection<?>) obj).iterator(), depth);
+                trackIterator(event, policyNode, ((Collection<?>) obj).iterator(), depth, isMicroservice);
             }
         } else if ("java.util.Optional".equals(obj.getClass().getName())) {
-            trackOptional(event, policyNode, obj, depth);
+            trackOptional(event, policyNode, obj, depth, isMicroservice);
         } else {
             if (isSourceNode) {
                 int len = TaintRangesBuilder.getLength(obj);
@@ -276,6 +186,17 @@ public class TaintPoolUtils {
                 EngineManager.TAINT_HASH_CODES.add(hash);
                 event.addTargetHash(hash);
                 EngineManager.TAINT_RANGES_POOL.add(hash, tr);
+                if (isMicroservice && !(obj instanceof String)) {
+                    try {
+                        Field[] declaredFields = ReflectUtils.getDeclaredFieldsSecurity(cls);
+                        for (Field field : declaredFields) {
+                            trackObject(event, policyNode, field.get(obj), depth + 1, isMicroservice);
+                        }
+                    } catch (Throwable e) {
+                        DongTaiLog.debug("solve model failed: {}, {}",
+                                e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "");
+                    }
+                }
             } else {
                 hash = System.identityHashCode(obj);
                 if (EngineManager.TAINT_HASH_CODES.contains(hash)) {
@@ -285,41 +206,41 @@ public class TaintPoolUtils {
         }
     }
 
-    private static void trackArray(MethodEvent event, PolicyNode policyNode, Object arr, int depth) {
+    private static void trackArray(MethodEvent event, PolicyNode policyNode, Object arr, int depth, Boolean isMicroservice) {
         int length = Array.getLength(arr);
         for (int i = 0; i < length; i++) {
-            trackObject(event, policyNode, Array.get(arr, i), depth + 1);
+            trackObject(event, policyNode, Array.get(arr, i), depth + 1, isMicroservice);
         }
     }
 
-    private static void trackIterator(MethodEvent event, PolicyNode policyNode, Iterator<?> it, int depth) {
+    private static void trackIterator(MethodEvent event, PolicyNode policyNode, Iterator<?> it, int depth, Boolean isMicroservice) {
         while (it.hasNext()) {
-            trackObject(event, policyNode, it.next(), depth + 1);
+            trackObject(event, policyNode, it.next(), depth + 1, isMicroservice);
         }
     }
 
-    private static void trackMap(MethodEvent event, PolicyNode policyNode, Map<?, ?> map, int depth) {
+    private static void trackMap(MethodEvent event, PolicyNode policyNode, Map<?, ?> map, int depth, Boolean isMicroservice) {
         for (Object key : map.keySet()) {
-            trackObject(event, policyNode, key, depth + 1);
-            trackObject(event, policyNode, map.get(key), depth + 1);
+            trackObject(event, policyNode, key, depth + 1, isMicroservice);
+            trackObject(event, policyNode, map.get(key), depth + 1, isMicroservice);
         }
     }
 
-    private static void trackMapEntry(MethodEvent event, PolicyNode policyNode, Map.Entry<?, ?> entry, int depth) {
-        trackObject(event, policyNode, entry.getKey(), depth + 1);
-        trackObject(event, policyNode, entry.getValue(), depth + 1);
+    private static void trackMapEntry(MethodEvent event, PolicyNode policyNode, Map.Entry<?, ?> entry, int depth, Boolean isMicroservice) {
+        trackObject(event, policyNode, entry.getKey(), depth + 1, isMicroservice);
+        trackObject(event, policyNode, entry.getValue(), depth + 1, isMicroservice);
     }
 
-    private static void trackList(MethodEvent event, PolicyNode policyNode, List<?> list, int depth) {
+    private static void trackList(MethodEvent event, PolicyNode policyNode, List<?> list, int depth, Boolean isMicroservice) {
         for (Object obj : list) {
-            trackObject(event, policyNode, obj, depth + 1);
+            trackObject(event, policyNode, obj, depth + 1, isMicroservice);
         }
     }
 
-    private static void trackOptional(MethodEvent event, PolicyNode policyNode, Object obj, int depth) {
+    private static void trackOptional(MethodEvent event, PolicyNode policyNode, Object obj, int depth, Boolean isMicroservice) {
         try {
             Object v = ((Optional<?>) obj).orElse(null);
-            trackObject(event, policyNode, v, depth + 1);
+            trackObject(event, policyNode, v, depth + 1, isMicroservice);
         } catch (Throwable ignore) {
         }
     }

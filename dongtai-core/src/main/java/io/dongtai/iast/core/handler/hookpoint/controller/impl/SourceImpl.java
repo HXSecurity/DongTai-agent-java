@@ -81,7 +81,7 @@ public class SourceImpl {
             return false;
         }
 
-        TaintPoolUtils.trackObject(event, sourceNode, event.returnInstance, 0);
+        TaintPoolUtils.trackObject(event, sourceNode, event.returnInstance, 0, false);
         return true;
     }
 

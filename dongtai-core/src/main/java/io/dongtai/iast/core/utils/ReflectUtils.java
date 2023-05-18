@@ -2,6 +2,8 @@ package io.dongtai.iast.core.utils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.*;
 
 /**
@@ -55,8 +57,18 @@ public class ReflectUtils {
 
     public static Method getPublicMethodFromClass(Class<?> cls, String methodName, Class<?>[] parameterTypes) throws NoSuchMethodException {
         Method method = cls.getMethod(methodName, parameterTypes);
-        method.setAccessible(true);
-        return method;
+        return getSecurityPublicMethod(method);
+    }
+
+    public static Method getSecurityPublicMethod(Method method) throws NoSuchMethodException {
+        if (hasNotSecurityManager()) {
+            method.setAccessible(true);
+            return method;
+        }
+        return AccessController.doPrivileged((PrivilegedAction<Method>) () -> {
+            method.setAccessible(true);
+            return method;
+        });
     }
 
     public static Method getDeclaredMethodFromClass(Class<?> cls, String methodName, Class<?>[] parameterTypes) {
@@ -66,8 +78,11 @@ public class ReflectUtils {
         }
         for (Method method : methods) {
             if (methodName.equals(method.getName()) && Arrays.equals(parameterTypes, method.getParameterTypes())) {
-                method.setAccessible(true);
-                return method;
+                try {
+                    return getSecurityPublicMethod(method);
+                } catch (NoSuchMethodException e) {
+                    e.printStackTrace();
+                }
             }
         }
         return null;
@@ -137,13 +152,35 @@ public class ReflectUtils {
     private static void getAllInterfaces(Class<?> cls, List<Class<?>> interfaceList) {
         while (cls != null) {
             Class<?>[] interfaces = cls.getInterfaces();
-            for (int i = 0; i < interfaces.length; i++) {
-                if (!interfaceList.contains(interfaces[i])) {
-                    interfaceList.add(interfaces[i]);
-                    getAllInterfaces(interfaces[i], interfaceList);
+            for (Class<?> anInterface : interfaces) {
+                if (!interfaceList.contains(anInterface)) {
+                    interfaceList.add(anInterface);
+                    getAllInterfaces(anInterface, interfaceList);
                 }
             }
             cls = cls.getSuperclass();
         }
+    }
+
+    public static Field[] getDeclaredFieldsSecurity(Class<?> cls) {
+        Objects.requireNonNull(cls);
+        if (hasNotSecurityManager()) {
+            return getDeclaredFields(cls);
+        }
+        return (Field[]) AccessController.doPrivileged((PrivilegedAction<Field[]>) () -> {
+            return getDeclaredFields(cls);
+        });
+    }
+
+    private static Field[] getDeclaredFields(Class<?> cls) {
+        Field[] declaredFields = cls.getDeclaredFields();
+        for (Field field : declaredFields) {
+            field.setAccessible(true);
+        }
+        return declaredFields;
+    }
+
+    private static boolean hasNotSecurityManager() {
+        return System.getSecurityManager() == null;
     }
 }

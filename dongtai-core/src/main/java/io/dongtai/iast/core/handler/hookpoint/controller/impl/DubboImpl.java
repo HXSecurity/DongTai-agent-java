@@ -43,7 +43,6 @@ public class DubboImpl {
     }
 
 
-
     public static void collectDubboRequestSource(Object handler, Object invocation, String methodName,
                                                  Object[] arguments, Map<String, ?> headers,
                                                  String hookClass, String hookMethod, String hookSign,
@@ -51,7 +50,7 @@ public class DubboImpl {
         if (arguments == null || arguments.length == 0) {
             return;
         }
-        Map <String, Object> requestMeta = EngineManager.REQUEST_CONTEXT.get();
+        Map<String, Object> requestMeta = EngineManager.REQUEST_CONTEXT.get();
         if (requestMeta == null) {
             return;
         }
@@ -70,7 +69,7 @@ public class DubboImpl {
         tgt.add(new TaintPosition("P1"));
 
         SourceNode sourceNode = new SourceNode(src, tgt, null);
-        TaintPoolUtils.trackObject(event, sourceNode, arguments, 0);
+        TaintPoolUtils.trackObject(event, sourceNode, arguments, 0, true);
 
         Map<String, String> sHeaders = new HashMap<String, String>();
         if (headers != null) {
