@@ -1,5 +1,8 @@
 package io.dongtai.iast.core.utils;
 
+import io.dongtai.log.DongTaiLog;
+
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.security.AccessController;
@@ -13,7 +16,7 @@ public class ReflectUtils {
 
     public static Field getFieldFromClass(Class<?> cls, String fieldName) throws NoSuchFieldException {
         Field field = cls.getDeclaredField(fieldName);
-        field.setAccessible(true);
+        setAccessible(field);
         return field;
     }
 
@@ -21,7 +24,7 @@ public class ReflectUtils {
         Field[] declaredFields = cls.getDeclaredFields();
         for (Field field : declaredFields) {
             if (fieldName.equals(field.getName())) {
-                field.setAccessible(true);
+                setAccessible(field);
                 return field;
             }
         }
@@ -62,11 +65,11 @@ public class ReflectUtils {
 
     public static Method getSecurityPublicMethod(Method method) throws NoSuchMethodException {
         if (hasNotSecurityManager()) {
-            method.setAccessible(true);
+            setAccessible(method);
             return method;
         }
         return AccessController.doPrivileged((PrivilegedAction<Method>) () -> {
-            method.setAccessible(true);
+            setAccessible(method);
             return method;
         });
     }
@@ -175,12 +178,23 @@ public class ReflectUtils {
     private static Field[] getDeclaredFields(Class<?> cls) {
         Field[] declaredFields = cls.getDeclaredFields();
         for (Field field : declaredFields) {
-            field.setAccessible(true);
+            setAccessible(field);
         }
         return declaredFields;
     }
 
     private static boolean hasNotSecurityManager() {
         return System.getSecurityManager() == null;
+    }
+
+    private static void setAccessible(AccessibleObject accessibleObject) {
+        try{
+            if (!accessibleObject.isAccessible()) {
+                accessibleObject.setAccessible(true);
+            }
+        } catch (Throwable e){
+            DongTaiLog.debug(e.getMessage());
+        }
+
     }
 }
