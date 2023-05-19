@@ -4696,7 +4696,7 @@ com/fasterxml/jackson/databind/cfg/MapperConfigBase
 com/fasterxml/jackson/databind/cfg/SerializerFactoryConfig
 com/fasterxml/jackson/databind/deser/AbstractDeserializer
 com/fasterxml/jackson/databind/deser/BasicDeserializerFactory
-com/fasterxml/jackson/databind/deser/BeanDeserializer
+# com/fasterxml/jackson/databind/deser/BeanDeserializer
 com/fasterxml/jackson/databind/deser/BeanDeserializerBase
 com/fasterxml/jackson/databind/deser/BeanDeserializerBuilder
 com/fasterxml/jackson/databind/deser/BeanDeserializerModifier

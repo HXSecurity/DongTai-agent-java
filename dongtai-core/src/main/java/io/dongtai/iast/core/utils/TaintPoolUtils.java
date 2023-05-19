@@ -195,6 +195,10 @@ public class TaintPoolUtils {
                                 trackObject(event, policyNode, field.get(obj), depth + 1, isMicroservice);
                             }
                         }
+                        hash = System.identityHashCode(obj);
+                        if (EngineManager.TAINT_HASH_CODES.contains(hash)) {
+                            event.addSourceHash(hash);
+                        }
                     } catch (Throwable e) {
                         DongTaiLog.debug("solve model failed: {}, {}",
                                 e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "");
