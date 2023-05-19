@@ -9,6 +9,7 @@ import io.dongtai.log.DongTaiLog;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -190,7 +191,9 @@ public class TaintPoolUtils {
                     try {
                         Field[] declaredFields = ReflectUtils.getDeclaredFieldsSecurity(cls);
                         for (Field field : declaredFields) {
-                            trackObject(event, policyNode, field.get(obj), depth + 1, isMicroservice);
+                            if (!Modifier.isStatic(field.getModifiers())) {
+                                trackObject(event, policyNode, field.get(obj), depth + 1, isMicroservice);
+                            }
                         }
                     } catch (Throwable e) {
                         DongTaiLog.debug("solve model failed: {}, {}",
