@@ -27,7 +27,7 @@ public class DubboImpl {
                 put("requestURL", u.getScheme() + "://" + u.getAuthority() + u.getPath());
                 put("requestURI", u.getPath());
                 put("queryString", "");
-                put("method", "DUBOO");
+                put("method", "DUBBO");
                 put("protocol", "DUBBO");
                 put("scheme", u.getScheme());
                 put("contextPath", "");
