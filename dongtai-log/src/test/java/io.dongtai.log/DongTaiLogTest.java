@@ -193,26 +193,6 @@ public class DongTaiLogTest {
         Assert.assertEquals("ERROR log message with exception",
                 TITLE + "[ERROR] foo, Exception: java.lang.Exception: bar" + LS,
                 outputStreamCaptor.toString().substring(20));
-        clear();
-        DongTaiLog.error(110, "foo {} {}", "bar", "baz");
-        Assert.assertEquals("ERROR log format", TITLE + "[ERROR] [110] foo bar baz" + LS,
-                outputStreamCaptor.toString().substring(20));
-        clear();
-        DongTaiLog.error(110, "foo {} {}", "bar", "baz", new Exception("bar"));
-        Assert.assertEquals("ERROR log format with code and exception",
-                TITLE + "[ERROR] [110] foo bar baz, Exception: java.lang.Exception: bar" + LS,
-                outputStreamCaptor.toString().substring(20));
-
-        clear();
-        DongTaiLog.error(110, "foo {}", "bar", "baz", new Exception("bar"));
-        Assert.assertEquals("ERROR log format less with code and exception",
-                TITLE + "[ERROR] [110] foo bar, Exception: java.lang.Exception: bar" + LS,
-                outputStreamCaptor.toString().substring(20));
-        clear();
-        DongTaiLog.error(110, "foo {} {} {}", "bar", "baz", new Exception("bar"));
-        Assert.assertEquals("ERROR log format more with code and exception",
-                TITLE + "[ERROR] [110] foo bar baz {}, Exception: java.lang.Exception: bar" + LS,
-                outputStreamCaptor.toString().substring(20));
 
         int code;
         String fmt;
@@ -243,7 +223,6 @@ public class DongTaiLogTest {
         clear();
         DongTaiLog.error(ErrorCode.get("NOT EXISTS"));
         code = ErrorCode.UNKNOWN.getCode();
-        fmt = String.format(ErrorCode.UNKNOWN.getMessage());
         Assert.assertEquals("ERROR log with ErrorCode invalid name",
                 TITLE + "[ERROR] [" + code + "] NOT EXISTS" + LS,
                 outputStreamCaptor.toString().substring(20));
@@ -252,6 +231,37 @@ public class DongTaiLogTest {
         Assert.assertEquals("ERROR log with ErrorCode invalid name and arguments",
                 TITLE + "[ERROR] [" + code + "] NOT EXISTS" + LS,
                 outputStreamCaptor.toString().substring(20));
+
+        // System.setOut(standardOut);
+        int fi = DongTaiLog.FREQUENT_INTERVAL;
+        DongTaiLog.FREQUENT_INTERVAL = 3000;
+        code = ErrorCode.REPORT_SEND_FAILED.getCode();
+        fmt = String.format(ErrorCode.REPORT_SEND_FAILED.getMessage().replaceAll("\\{\\}", "%s"), "a", "b");
+        for (int i = 0; i < 8; i++) {
+            clear();
+            DongTaiLog.error(ErrorCode.REPORT_SEND_FAILED, "a", "b");
+            if (i == 0) {
+                String msg = outputStreamCaptor.toString();
+                Assert.assertTrue("ERROR log with frequent log " + i, msg.length() > 20);
+                Assert.assertEquals("ERROR log with frequent log " + i,
+                        TITLE + "[ERROR] [" + code + "] " + fmt + LS,
+                        msg.substring(20));
+            } else if (i % 3 == 0) {
+                String msg = outputStreamCaptor.toString();
+                Assert.assertTrue("ERROR log with frequent log " + i, msg.length() > 20);
+                Assert.assertEquals("ERROR log with frequent log " + i,
+                        TITLE + "[ERROR] [" + code + "] [occurred 2 times] " + fmt + LS,
+                        outputStreamCaptor.toString().substring(20));
+            } else {
+                Assert.assertEquals("ERROR log with frequent log " + i,
+                        "", outputStreamCaptor.toString());
+            }
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException ignore) {
+            }
+        }
+        DongTaiLog.FREQUENT_INTERVAL = fi;
 
         clear();
     }
