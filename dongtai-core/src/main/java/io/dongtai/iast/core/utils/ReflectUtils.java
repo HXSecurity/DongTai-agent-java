@@ -1,7 +1,12 @@
 package io.dongtai.iast.core.utils;
 
+import io.dongtai.log.DongTaiLog;
+
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.*;
 
 /**
@@ -11,7 +16,7 @@ public class ReflectUtils {
 
     public static Field getFieldFromClass(Class<?> cls, String fieldName) throws NoSuchFieldException {
         Field field = cls.getDeclaredField(fieldName);
-        field.setAccessible(true);
+        setAccessible(field);
         return field;
     }
 
@@ -19,7 +24,7 @@ public class ReflectUtils {
         Field[] declaredFields = cls.getDeclaredFields();
         for (Field field : declaredFields) {
             if (fieldName.equals(field.getName())) {
-                field.setAccessible(true);
+                setAccessible(field);
                 return field;
             }
         }
@@ -55,8 +60,18 @@ public class ReflectUtils {
 
     public static Method getPublicMethodFromClass(Class<?> cls, String methodName, Class<?>[] parameterTypes) throws NoSuchMethodException {
         Method method = cls.getMethod(methodName, parameterTypes);
-        method.setAccessible(true);
-        return method;
+        return getSecurityPublicMethod(method);
+    }
+
+    public static Method getSecurityPublicMethod(Method method) throws NoSuchMethodException {
+        if (hasNotSecurityManager()) {
+            setAccessible(method);
+            return method;
+        }
+        return AccessController.doPrivileged((PrivilegedAction<Method>) () -> {
+            setAccessible(method);
+            return method;
+        });
     }
 
     public static Method getDeclaredMethodFromClass(Class<?> cls, String methodName, Class<?>[] parameterTypes) {
@@ -66,8 +81,11 @@ public class ReflectUtils {
         }
         for (Method method : methods) {
             if (methodName.equals(method.getName()) && Arrays.equals(parameterTypes, method.getParameterTypes())) {
-                method.setAccessible(true);
-                return method;
+                try {
+                    return getSecurityPublicMethod(method);
+                } catch (NoSuchMethodException e) {
+                    e.printStackTrace();
+                }
             }
         }
         return null;
@@ -137,13 +155,47 @@ public class ReflectUtils {
     private static void getAllInterfaces(Class<?> cls, List<Class<?>> interfaceList) {
         while (cls != null) {
             Class<?>[] interfaces = cls.getInterfaces();
-            for (int i = 0; i < interfaces.length; i++) {
-                if (!interfaceList.contains(interfaces[i])) {
-                    interfaceList.add(interfaces[i]);
-                    getAllInterfaces(interfaces[i], interfaceList);
+            for (Class<?> anInterface : interfaces) {
+                if (!interfaceList.contains(anInterface)) {
+                    interfaceList.add(anInterface);
+                    getAllInterfaces(anInterface, interfaceList);
                 }
             }
             cls = cls.getSuperclass();
         }
+    }
+
+    public static Field[] getDeclaredFieldsSecurity(Class<?> cls) {
+        Objects.requireNonNull(cls);
+        if (hasNotSecurityManager()) {
+            return getDeclaredFields(cls);
+        }
+        return (Field[]) AccessController.doPrivileged((PrivilegedAction<Field[]>) () -> {
+            return getDeclaredFields(cls);
+        });
+    }
+
+    private static Field[] getDeclaredFields(Class<?> cls) {
+        Field[] declaredFields = cls.getDeclaredFields();
+        for (Field field : declaredFields) {
+            setAccessible(field);
+        }
+        return declaredFields;
+    }
+
+    private static boolean hasNotSecurityManager() {
+        return System.getSecurityManager() == null;
+    }
+
+    private static void setAccessible(AccessibleObject accessibleObject) {
+        try{
+            if (!accessibleObject.isAccessible()) {
+                accessibleObject.setAccessible(true);
+            }
+        } catch (Throwable e){
+            DongTaiLog.debug("setAccessible failed: {}, {}",
+                    e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "");
+        }
+
     }
 }

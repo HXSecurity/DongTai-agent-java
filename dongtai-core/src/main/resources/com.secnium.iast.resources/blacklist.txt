@@ -3583,6 +3583,7 @@ com/bea/security/xacml/target/TargetEvaluatorRegistry
 com/bea/sslplus/CerticomSSLContext
 com/bea/staxb/buildtime/internal/bts/BaseBindingLoader
 com/bea/staxb/buildtime/internal/bts/BindingFile
+com/bea/staxb/buildtime/internal/bts.BindingFileInputStream
 com/bea/staxb/buildtime/internal/bts/BindingLoader
 com/bea/staxb/buildtime/internal/bts/BindingMappingFile
 com/bea/staxb/buildtime/internal/bts/BindingProperty
@@ -4649,7 +4650,7 @@ com/fasterxml/jackson/databind/DeserializationContext
 com/fasterxml/jackson/databind/DeserializationFeature
 com/fasterxml/jackson/databind/InjectableValues
 com/fasterxml/jackson/databind/JavaType
-com/fasterxml/jackson/databind/JsonDeserializer
+# com/fasterxml/jackson/databind/JsonDeserializer
 com/fasterxml/jackson/databind/JsonMappingException
 com/fasterxml/jackson/databind/JsonSerializable
 com/fasterxml/jackson/databind/JsonSerializable$Base
@@ -4695,7 +4696,7 @@ com/fasterxml/jackson/databind/cfg/MapperConfigBase
 com/fasterxml/jackson/databind/cfg/SerializerFactoryConfig
 com/fasterxml/jackson/databind/deser/AbstractDeserializer
 com/fasterxml/jackson/databind/deser/BasicDeserializerFactory
-com/fasterxml/jackson/databind/deser/BeanDeserializer
+# com/fasterxml/jackson/databind/deser/BeanDeserializer
 com/fasterxml/jackson/databind/deser/BeanDeserializerBase
 com/fasterxml/jackson/databind/deser/BeanDeserializerBuilder
 com/fasterxml/jackson/databind/deser/BeanDeserializerModifier
@@ -4777,14 +4778,14 @@ com/fasterxml/jackson/databind/deser/std/StdKeyDeserializer$LongKD
 com/fasterxml/jackson/databind/deser/std/StdKeyDeserializer$ShortKD
 com/fasterxml/jackson/databind/deser/std/StdKeyDeserializer$StringCtorKeyDeserializer
 com/fasterxml/jackson/databind/deser/std/StdKeyDeserializer$StringFactoryKeyDeserializer
-com/fasterxml/jackson/databind/deser/std/StdKeyDeserializer$StringKD
+# com/fasterxml/jackson/databind/deser/std/StdKeyDeserializer$StringKD
 com/fasterxml/jackson/databind/deser/std/StdKeyDeserializer$UuidKD
 com/fasterxml/jackson/databind/deser/std/StdKeyDeserializers
 com/fasterxml/jackson/databind/deser/std/StdScalarDeserializer
 com/fasterxml/jackson/databind/deser/std/StdValueInstantiator
 com/fasterxml/jackson/databind/deser/std/StringArrayDeserializer
 com/fasterxml/jackson/databind/deser/std/StringCollectionDeserializer
-com/fasterxml/jackson/databind/deser/std/StringDeserializer
+# com/fasterxml/jackson/databind/deser/std/StringDeserializer
 com/fasterxml/jackson/databind/deser/std/ThrowableDeserializer
 com/fasterxml/jackson/databind/deser/std/TokenBufferDeserializer
 com/fasterxml/jackson/databind/deser/std/UUIDDeserializer
@@ -5512,7 +5513,7 @@ com/google/common/util/concurrent/ThreadFactoryBuilder$1
 com/google/common/util/concurrent/UncheckedExecutionException
 com/google/common/util/concurrent/Uninterruptibles
 com/google/gson/FieldNamingPolicy*
-com/google/gson/Gson*
+# com/google/gson/Gson*
 com/google/gson/JsonArray
 com/google/gson/JsonElement
 com/google/gson/JsonIOException
@@ -5522,7 +5523,7 @@ com/google/gson/JsonParseException
 com/google/gson/JsonPrimitive
 com/google/gson/JsonSyntaxException
 com/google/gson/LongSerializationPolicy*
-com/google/gson/TypeAdapter*
+# com/google/gson/TypeAdapter*
 com/google/gson/internal/*
 com/google/gson/reflect/TypeToken
 com/google/gson/stream/JsonReader
@@ -23724,7 +23725,7 @@ java/io/OutputStream
 java/io/OutputStreamWriter
 java/io/PipedOutputStream
 java/io/PrintStream
-java/io/PushbackInputStream
+# java/io/PushbackInputStream
 java/io/PushbackReader
 java/io/RandomAccessFile
 java/io/RandomAccessFile$1
@@ -24894,6 +24895,7 @@ java/util/StringTokenizer
 # java/util/stream/IntStream
 # java/util/stream/Stream
 java/util/zip/*
+java/util/zip/CheckedInputStream
 javassist/ByteArrayClassPath
 javassist/CannotCompileException
 javassist/ClassClassPath
@@ -27852,6 +27854,7 @@ javelin/jsp/JspTagLibraryFeature$1
 javelin/jsp/JspTagLibraryFeature$2
 javelin/jsp/JspTagLibraryFeature$TagLibraryContext
 javelin/jsp/JspTagLibraryFeature$TldChangeListener
+javelin.jsp.JspTagLibraryFeature$UncloseableInputStream
 javelin/jsp/JspTagLibraryFeature$WebXmlChangeListener
 javelin/jsp/JspTagLibraryParser
 javelin/jsp/JspTagLibraryParser$JSPEntityResolver
@@ -38053,6 +38056,7 @@ org/apache/xerces/impl/XMLEntityManager$EncodingInfo
 org/apache/xerces/impl/XMLEntityManager$Entity
 org/apache/xerces/impl/XMLEntityManager$ExternalEntity
 org/apache/xerces/impl/XMLEntityManager$InternalEntity
+org/apache/xerces/impl/XMLEntityManager$RewindableInputStream
 org/apache/xerces/impl/XMLEntityManager$ScannedEntity
 org/apache/xerces/impl/XMLEntityScanner
 org/apache/xerces/impl/XMLEntityScanner$1
@@ -59960,7 +59964,7 @@ org/springframework/util/SerializationUtils
 org/springframework/util/StopWatch
 org/springframework/util/StopWatch$TaskInfo
 org/springframework/util/StreamUtils$NonClosingOutputStream
-org/springframework/util/StringUtils
+# org/springframework/util/StringUtils
 org/springframework/util/StringValueResolver
 org/springframework/util/SystemPropertyUtils
 org/springframework/util/SystemPropertyUtils$SystemPropertyPlaceholderResolver
@@ -64568,6 +64572,7 @@ weblogic/common/internal/VersionInfoFactory$PEER_INFO_FOR_WIRE_SINGLETON
 weblogic/common/internal/VersionInfoFactory$PEER_INFO_SINGLETON
 weblogic/common/internal/VersionInfoFactory$VERSION_INFO_SINGLETON
 weblogic/common/internal/VersioningError
+weblogic/common/internal/WLObjectInputStream
 weblogic/common/internal/WLObjectOutputStream
 weblogic/common/resourcepool/IPooledResourceLinkedList
 weblogic/common/resourcepool/ObjectLifeCycle
@@ -65955,6 +65960,7 @@ weblogic/iiop/EndPointFactory
 weblogic/iiop/IDLUtils
 weblogic/iiop/IIOPClient
 weblogic/iiop/IIOPClientService
+weblogic/iiop/IIOPInputStream
 weblogic/iiop/IIOPLogger
 weblogic/iiop/IIOPLogger$MessageLoggerInitializer
 weblogic/iiop/IIOPOutputStream
@@ -70018,6 +70024,7 @@ weblogic/net/http/HttpsClient
 weblogic/net/http/HttpsURLConnection
 weblogic/net/http/KeepAliveCache
 weblogic/net/http/KeepAliveKey
+weblogic/net/http/KeepAliveStream
 weblogic/net/http/MessageHeader
 weblogic/net/http/NETEnvironment
 weblogic/net/http/SOAPHttpURLConnection
@@ -72305,6 +72312,7 @@ weblogic/utils/enumerations/LIFO_FileContainer
 weblogic/utils/expressions/ExpressionEvaluationException
 weblogic/utils/expressions/ExpressionMap
 weblogic/utils/http/BytesToString
+weblogic/utils/http/HttpChunkInputStream
 weblogic/utils/http/HttpChunkOutputStream
 weblogic/utils/http/HttpConstants
 weblogic/utils/http/HttpParsing
@@ -72318,6 +72326,7 @@ weblogic/utils/http/MaxRequestParameterExceedException
 weblogic/utils/io/ByteBufferDataInputStream
 weblogic/utils/io/ByteBufferDataOutputStream
 weblogic/utils/io/ByteBufferObjectInputStream
+weblogic/utils/io/ByteBufferObjectInputStream$ContextObjectInputStream
 weblogic/utils/io/ByteBufferObjectOutputStream
 weblogic/utils/io/ByteBufferOutputStream
 weblogic/utils/io/Chunk
@@ -72325,6 +72334,7 @@ weblogic/utils/io/ChunkInput
 weblogic/utils/io/ChunkInputStreamAccess
 weblogic/utils/io/ChunkOutput
 weblogic/utils/io/ChunkedDataOutputStream
+weblogic/utils/io/ChunkedInputStream
 weblogic/utils/io/ChunkedObjectOutputStream
 weblogic/utils/io/ChunkedObjectOutputStream$NestedObjectOutputStream
 weblogic/utils/io/ChunkedOutputStream
@@ -73559,6 +73569,7 @@ weblogic/xml/stream/events/SpaceEvent
 weblogic/xml/stream/events/StartDocumentEvent
 weblogic/xml/stream/events/StartElementEvent
 weblogic/xml/stream/util/RecyclingFactory
+weblogic/xml/util/CachedInputStream
 weblogic/xml/util/Debug
 weblogic/xml/util/Debug$DebugFacility
 weblogic/xml/util/Debug$DebugFacility$DebugListener
@@ -73628,6 +73639,7 @@ workshop/util/encoding/EncodingManager$EncodingProxy
 workshop/util/encoding/EncodingReader
 workshop/util/encoding/impl/PropertiesEncoding
 workshop/util/encoding/impl/TextEncoding
+workshop/util/filesystem/util/InputStreamWrapper
 com/alibaba/druid/filter/logging/Log4jFilter
 # disable alibaba sandbox's class dongtai-001
 com/alibaba/jvm/sandbox/*

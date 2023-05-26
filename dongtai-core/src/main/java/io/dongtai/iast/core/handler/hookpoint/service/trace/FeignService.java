@@ -27,7 +27,7 @@ public class FeignService {
 
             // get args
             Object args = event.parameterInstances[0];
-            TaintPoolUtils.trackObject(event, null, args, 0);
+            TaintPoolUtils.trackObject(event, null, args, 0, true);
 
             boolean hasTaint = false;
             if (!event.getSourceHashes().isEmpty()) {
