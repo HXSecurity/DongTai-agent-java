@@ -2,8 +2,8 @@ package io.dongtai.log;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.TimeZone;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 
@@ -23,8 +23,24 @@ public class DongTaiLog {
     private static final int YELLOW = 33;
     private static final int BLUE = 34;
 
+    // 5min
+    public static int FREQUENT_INTERVAL = 300000;
+
     private static final String TITLE = "[io.dongtai.iast.agent] ";
     private static final String TITLE_COLOR = "[" + colorStr("io.dongtai.iast.agent", BLUE) + "] ";
+
+    private static final Set<ErrorCode> RESTRICTED_ERRORS = new HashSet<ErrorCode>(Arrays.asList(
+            ErrorCode.AGENT_MONITOR_COLLECT_PERFORMANCE_METRICS_FAILED,
+            ErrorCode.AGENT_MONITOR_CHECK_PERFORMANCE_METRICS_FAILED,
+            ErrorCode.AGENT_MONITOR_GET_DISK_USAGE_FAILED,
+            ErrorCode.REPORT_SEND_FAILED,
+            ErrorCode.REPLAY_REQUEST_FAILED,
+            ErrorCode.GRAPH_BUILD_AND_REPORT_FAILED,
+            ErrorCode.TAINT_COMMAND_GET_PARAMETERS_FAILED,
+            ErrorCode.TAINT_COMMAND_RANGE_PROCESS_FAILED
+    ));
+
+    private static final ConcurrentHashMap<ErrorCode, ErrorRecord> ERROR_RECORD_MAP = new ConcurrentHashMap<ErrorCode, ErrorRecord>();
 
     static {
         if (System.console() != null && !System.getProperty("os.name").toLowerCase().contains("windows")) {
@@ -33,6 +49,35 @@ public class DongTaiLog {
 
         ENABLED = IastProperties.isEnabled();
         LOG_DIR = IastProperties.getLogDir();
+    }
+
+    private static class ErrorRecord {
+        private long lastWriteTime;
+        private int count;
+
+        public ErrorRecord() {
+            this.lastWriteTime = new Date().getTime();
+            this.count = 0;
+        }
+
+        public boolean needWrite() {
+            long now = new Date().getTime();
+            // 5min
+            return now - this.lastWriteTime > FREQUENT_INTERVAL;
+        }
+
+        public int getCount() {
+            return this.count;
+        }
+
+        public void incrementCount() {
+            this.count++;
+        }
+
+        public void rotate() {
+            this.lastWriteTime = new Date().getTime();
+            this.count = 0;
+        }
     }
 
     public static void configure(Integer agentId) throws Exception {
@@ -142,7 +187,7 @@ public class DongTaiLog {
         return "\033[" + colorCode + "m" + msg + RESET;
     }
 
-    private static String getPrefix(LogLevel lvl, int code, boolean useColor) {
+    private static String getPrefix(LogLevel lvl, int code, int cnt, boolean useColor) {
         String prefix;
         if (useColor) {
             prefix = getTime() + TITLE_COLOR + lvl.getColorPrefix();
@@ -152,6 +197,10 @@ public class DongTaiLog {
 
         if (code > 0) {
             prefix += "[" + String.valueOf(code) + "] ";
+        }
+
+        if (cnt > 0) {
+            prefix += "[occurred " + String.valueOf(cnt) + " times] ";
         }
 
         return prefix;
@@ -168,11 +217,28 @@ public class DongTaiLog {
         return msg;
     }
 
-    private static void log(LogLevel lvl, int code, String fmt, Object... arguments) {
+    private static void log(LogLevel lvl, ErrorCode ec, String fmt, Object... arguments) {
         if (!canLog(lvl)) {
             return;
         }
 
+        int cnt = 0;
+        if (RESTRICTED_ERRORS.contains(ec)) {
+            ErrorRecord er = ERROR_RECORD_MAP.get(ec);
+            if (er == null) {
+                ERROR_RECORD_MAP.put(ec, new ErrorRecord());
+            } else {
+                if (!er.needWrite()) {
+                    er.incrementCount();
+                    return;
+                }
+
+                cnt = er.getCount();
+                er.rotate();
+            }
+        }
+
+        int code = ec.getCode();
         Throwable t = null;
         String msg = fmt;
         if (arguments.length == 1 && arguments[0] instanceof Throwable) {
@@ -192,44 +258,36 @@ public class DongTaiLog {
         if (msg.isEmpty()) {
             return;
         }
-        System.out.println(getPrefix(lvl, code, ENABLE_COLOR) + msg);
-        writeLogToFile(getPrefix(lvl, code, false) + msg, t);
+        System.out.println(getPrefix(lvl, code, cnt, ENABLE_COLOR) + msg);
+        writeLogToFile(getPrefix(lvl, code, cnt, false) + msg, t);
     }
 
     public static void trace(String fmt, Object... arguments) {
-        log(LogLevel.TRACE, 0, fmt, arguments);
+        log(LogLevel.TRACE, ErrorCode.NO_CODE, fmt, arguments);
     }
 
     public static void debug(String fmt, Object... arguments) {
-        log(LogLevel.DEBUG, 0, fmt, arguments);
+        log(LogLevel.DEBUG, ErrorCode.NO_CODE, fmt, arguments);
     }
 
     public static void info(String fmt, Object... arguments) {
-        log(LogLevel.INFO, 0, fmt, arguments);
-    }
-
-    public static void warn(int code, String fmt, Object... arguments) {
-        log(LogLevel.WARN, code, fmt, arguments);
+        log(LogLevel.INFO, ErrorCode.NO_CODE, fmt, arguments);
     }
 
     public static void warn(ErrorCode ec, Object... arguments) {
-        log(LogLevel.WARN, ec.getCode(), ec.getMessage(), arguments);
+        log(LogLevel.WARN, ec, ec.getMessage(), arguments);
     }
 
     public static void warn(String format, Object... arguments) {
-        log(LogLevel.WARN, 0, format, arguments);
-    }
-
-    public static void error(int code, String fmt, Object... arguments) {
-        log(LogLevel.ERROR, code, fmt, arguments);
+        log(LogLevel.WARN, ErrorCode.NO_CODE, format, arguments);
     }
 
     public static void error(ErrorCode ec, Object... arguments) {
-        log(LogLevel.ERROR, ec.getCode(), ec.getMessage(), arguments);
+        log(LogLevel.ERROR, ec, ec.getMessage(), arguments);
     }
 
     public static void error(String format, Object... arguments) {
-        log(LogLevel.ERROR, 0, format, arguments);
+        log(LogLevel.ERROR, ErrorCode.NO_CODE, format, arguments);
     }
 
     private static String format(String from, Object... arguments) {
