@@ -165,7 +165,7 @@ public class PropagatorImpl {
     }
 
     private static TaintRanges getTaintRanges(Object obj) {
-        int hash = System.identityHashCode(obj);
+        long hash = TaintPoolUtils.getStringHash(obj);
         TaintRanges tr = EngineManager.TAINT_RANGES_POOL.get(hash);
         if (tr == null) {
             tr = new TaintRanges();
@@ -209,7 +209,7 @@ public class PropagatorImpl {
             }
         }
 
-        int tgtHash = 0;
+        long tgtHash = 0;
         Object tgt = null;
         Set<TaintPosition> targetLocs = propagatorNode.getTargets();
         // may have multiple targets?
@@ -218,17 +218,16 @@ public class PropagatorImpl {
         }
         if (TaintPosition.hasObject(targetLocs)) {
             tgt = event.objectInstance;
-            tgtHash = System.identityHashCode(tgt);
+            tgtHash = TaintPoolUtils.getStringHash(tgt);
             oldTaintRanges = getTaintRanges(tgt);
         } else if (TaintPosition.hasReturn(targetLocs)) {
-            tgt = event.returnInstance;
-            tgtHash = System.identityHashCode(tgt);
+            tgtHash = TaintPoolUtils.getStringHash(tgt);
         } else if (TaintPosition.hasParameter(targetLocs)) {
             for (TaintPosition targetLoc : targetLocs) {
                 int parameterIndex = targetLoc.getParameterIndex();
                 if (event.parameterInstances.length > parameterIndex) {
                     tgt = event.parameterInstances[parameterIndex];
-                    tgtHash = System.identityHashCode(tgt);
+                    tgtHash = TaintPoolUtils.getStringHash(tgt);
                     oldTaintRanges = getTaintRanges(tgt);
                 }
             }

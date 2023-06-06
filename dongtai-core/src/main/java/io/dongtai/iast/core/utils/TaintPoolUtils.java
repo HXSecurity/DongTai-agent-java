@@ -29,11 +29,12 @@ public class TaintPoolUtils {
             return false;
         }
 
+        long hash = getStringHash(obj);
         boolean isContains;
         // check object hash exists
-        isContains = contains(obj);
+        isContains = contains(hash);
         if (isContains) {
-            event.addSourceHash(System.identityHashCode(obj));
+            event.addSourceHash(hash);
             return true;
         }
 
@@ -59,11 +60,11 @@ public class TaintPoolUtils {
     /**
      * 判断污点是否匹配
      *
-     * @param obj Object
+     * @param hash long
      * @return boolean
      */
-    private static boolean contains(Object obj) {
-        return EngineManager.TAINT_HASH_CODES.contains(System.identityHashCode(obj));
+    private static boolean contains(long hash) {
+        return EngineManager.TAINT_HASH_CODES.contains(hash);
     }
 
     /**
@@ -141,10 +142,17 @@ public class TaintPoolUtils {
             return;
         }
 
-        int hash = 0;
+        long hash = 0;
+        long identityHash = 0;
         boolean isSourceNode = policyNode instanceof SourceNode;
         if (isSourceNode) {
-            hash = System.identityHashCode(obj);
+            if (obj instanceof String){
+                identityHash = System.identityHashCode(obj);
+                hash = toStringHash(obj.hashCode(),identityHash);
+            }else {
+                hash = System.identityHashCode(obj);
+                identityHash = hash;
+            }
             if (EngineManager.TAINT_HASH_CODES.contains(hash)) {
                 return;
             }
@@ -170,7 +178,7 @@ public class TaintPoolUtils {
         } else {
             if (isSourceNode) {
                 int len = TaintRangesBuilder.getLength(obj);
-                if (hash == 0 || len == 0) {
+                if (identityHash == 0 || len == 0) {
                     return;
                 }
 
@@ -205,7 +213,7 @@ public class TaintPoolUtils {
                     }
                 }
             } else {
-                hash = System.identityHashCode(obj);
+                hash = getStringHash(obj);
                 if (EngineManager.TAINT_HASH_CODES.contains(hash)) {
                     event.addSourceHash(hash);
                 }
@@ -251,4 +259,19 @@ public class TaintPoolUtils {
         } catch (Throwable ignore) {
         }
     }
+
+    public static Long toStringHash(long objectHashCode,long identityHashCode) {
+        return (objectHashCode << 32) | (identityHashCode & 0xFFFFFFFFL);
+    }
+
+    public static Long getStringHash(Object obj) {
+        long hash;
+        if (obj instanceof String){
+            hash = TaintPoolUtils.toStringHash(obj.hashCode(),System.identityHashCode(obj));
+        }else {
+            hash = System.identityHashCode(obj);
+        }
+        return hash;
+    }
+
 }

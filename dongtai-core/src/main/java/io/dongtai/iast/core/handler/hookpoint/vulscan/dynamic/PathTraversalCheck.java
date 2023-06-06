@@ -112,7 +112,7 @@ public class PathTraversalCheck implements SinkSourceChecker {
             return false;
         }
 
-        TaintRanges tr = EngineManager.TAINT_RANGES_POOL.get(System.identityHashCode(path));
+        TaintRanges tr = EngineManager.TAINT_RANGES_POOL.get(TaintPoolUtils.toStringHash(path.hashCode(),System.identityHashCode(path)));
         if (tr.isEmpty()) {
             return false;
         }

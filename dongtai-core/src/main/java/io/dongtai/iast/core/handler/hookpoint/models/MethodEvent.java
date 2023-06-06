@@ -82,9 +82,9 @@ public class MethodEvent {
      */
     public String returnValue;
 
-    private final Set<Integer> sourceHashes = new HashSet<Integer>();
+    private final Set<Long> sourceHashes = new HashSet<Long>();
 
-    private final Set<Integer> targetHashes = new HashSet<Integer>();
+    private final Set<Long> targetHashes = new HashSet<Long>();
 
     public List<MethodEventTargetRange> targetRanges = new ArrayList<MethodEventTargetRange>();
 
@@ -118,10 +118,10 @@ public class MethodEvent {
     }
 
     public static class MethodEventSourceType {
-        private final Integer hash;
+        private final Long hash;
         private final String type;
 
-        public MethodEventSourceType(Integer hash, String type) {
+        public MethodEventSourceType(Long hash, String type) {
             this.hash = hash;
             this.type = type;
         }
@@ -135,10 +135,10 @@ public class MethodEvent {
     }
 
     public static class MethodEventTargetRange {
-        private final Integer hash;
+        private final Long hash;
         private final TaintRanges ranges;
 
-        public MethodEventTargetRange(Integer hash, TaintRanges ranges) {
+        public MethodEventTargetRange(Long hash, TaintRanges ranges) {
             this.hash = hash;
             this.ranges = ranges;
         }
@@ -234,19 +234,19 @@ public class MethodEvent {
                 + (hasTaint ? "*" : "") + String.valueOf(str.length());
     }
 
-    public Set<Integer> getSourceHashes() {
+    public Set<Long> getSourceHashes() {
         return sourceHashes;
     }
 
-    public void addSourceHash(int hashcode) {
+    public void addSourceHash(long hashcode) {
         this.sourceHashes.add(hashcode);
     }
 
-    public Set<Integer> getTargetHashes() {
+    public Set<Long> getTargetHashes() {
         return targetHashes;
     }
 
-    public void addTargetHash(int hashCode) {
+    public void addTargetHash(long hashCode) {
         this.targetHashes.add(hashCode);
     }
 
