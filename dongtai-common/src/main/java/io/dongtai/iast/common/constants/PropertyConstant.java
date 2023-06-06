@@ -25,7 +25,6 @@ public class PropertyConstant {
     public static final String PROPERTY_JAR_API_URL = "iast.jar.api.url";
     public static final String PROPERTY_LOG_ADDRESS = "dongtai.log.address";
     public static final String PROPERTY_LOG_PORT = "dongtai.log.port";
-    public static final String PROPERTY_FALLBACK_VERSION = "dongtai.fallback.version";
     public static final String PROPERTY_DUMP_CLASS_PATH = "iast.dump.class.path";
     public static final String PROPERTY_DUMP_CLASS_ENABLE = "iast.dump.class.enable";
     public static final String PROPERTY_SERVICE_HEARTBEAT_INTERVAL = "iast.service.heartbeat.interval";
@@ -33,4 +32,5 @@ public class PropertyConstant {
     public static final String PROPERTY_POLICY_PATH = "dongtai.policy.path";
     public static final String PROPERTY_UUID_PATH = "dongtai.uuid.path";
     public static final String PROPERTY_DISABLED_PLUGINS = "dongtai.disabled.plugins";
+    public static final String PROPERTY_DISABLED_FEATURES = "dongtai.disabled_features";
 }

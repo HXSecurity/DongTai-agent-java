@@ -6,7 +6,7 @@ import io.dongtai.log.ErrorCode;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -28,6 +28,8 @@ public class PropertyUtils {
     private String debugFlag;
     private Integer responseLength;
     private String policyPath;
+    private static List<String> disabledFeatureList;
+    private static Boolean isDisabledCustomModel;
 
     private final String propertiesFilePath;
 
@@ -197,5 +199,28 @@ public class PropertyUtils {
                     cfg.getProperty(PropertyConstant.PROPERTY_POLICY_PATH, ""));
         }
         return this.policyPath;
+    }
+
+    public static List<String> getDisabledPlugins() {
+        return Optional.ofNullable(System.getProperty("dongtai.disabled.plugins"))
+                .map(s -> Arrays.asList(s.split(",")))
+                .orElse(null);
+    }
+
+    public static List<String> getDisabledFeatures() {
+        if (null == disabledFeatureList){
+            disabledFeatureList = Optional.ofNullable(System.getProperty("dongtai.disabled.features"))
+                    .map(s -> Arrays.asList(s.split(",")))
+                    .orElse(new ArrayList<>());
+        }
+        return disabledFeatureList;
+    }
+
+    public static Boolean isDisabledCustomModel() {
+        if (null == isDisabledCustomModel){
+            List<String> disabledFeatures = getDisabledFeatures();
+            isDisabledCustomModel = disabledFeatures.contains("custom-model-collection");
+        }
+        return isDisabledCustomModel;
     }
 }

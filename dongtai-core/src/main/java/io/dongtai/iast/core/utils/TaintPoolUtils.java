@@ -195,7 +195,7 @@ public class TaintPoolUtils {
                 EngineManager.TAINT_HASH_CODES.add(hash);
                 event.addTargetHash(hash);
                 EngineManager.TAINT_RANGES_POOL.add(hash, tr);
-                if (isMicroservice && !(obj instanceof String)) {
+                if (isMicroservice && !(obj instanceof String) && !PropertyUtils.isDisabledCustomModel()) {
                     try {
                         Field[] declaredFields = ReflectUtils.getDeclaredFieldsSecurity(cls);
                         for (Field field : declaredFields) {
