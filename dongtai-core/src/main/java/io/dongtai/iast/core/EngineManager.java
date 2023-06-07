@@ -136,16 +136,16 @@ public class EngineManager {
         }
         REQUEST_CONTEXT.set(requestMeta);
         TRACK_MAP.set(new HashMap<Integer, MethodEvent>(1024));
-        TAINT_HASH_CODES.set(new HashSet<Integer>());
-        TAINT_RANGES_POOL.set(new HashMap<Integer, TaintRanges>());
+        TAINT_HASH_CODES.set(new HashSet<Long>());
+        TAINT_RANGES_POOL.set(new HashMap<Long, TaintRanges>());
         ScopeManager.SCOPE_TRACKER.getScope(Scope.HTTP_ENTRY).enter();
     }
 
     public static void enterDubboEntry(Map<String, Object> requestMeta) {
         REQUEST_CONTEXT.set(requestMeta);
         TRACK_MAP.set(new HashMap<Integer, MethodEvent>(1024));
-        TAINT_HASH_CODES.set(new HashSet<Integer>());
-        TAINT_RANGES_POOL.set(new HashMap<Integer, TaintRanges>());
+        TAINT_HASH_CODES.set(new HashSet<Long>());
+        TAINT_RANGES_POOL.set(new HashMap<Long, TaintRanges>());
         ScopeManager.SCOPE_TRACKER.getScope(Scope.DUBBO_ENTRY).enter();
     }
 }

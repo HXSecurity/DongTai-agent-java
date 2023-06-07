@@ -122,7 +122,7 @@ public class DynamicPropagatorScanner implements IVulScan {
         if (VulnType.REFLECTED_XSS.equals(sinkNode.getVulType()) && !sourceInstances.isEmpty()) {
             boolean tagsHit = false;
             for (Object sourceInstance : sourceInstances) {
-                int hash = System.identityHashCode(sourceInstance);
+                long hash = TaintPoolUtils.getStringHash(sourceInstance);
                 TaintRanges tr = EngineManager.TAINT_RANGES_POOL.get(hash);
                 if (tr == null || tr.isEmpty()) {
                     continue;

@@ -101,7 +101,7 @@ public class DubboImpl {
 
         // for display taint range (full arguments value)
         String fv = event.parameterValues.get(0).getValue();
-        int hash = System.identityHashCode(fv);
+        long hash = TaintPoolUtils.toStringHash(fv.hashCode(),System.identityHashCode(fv));
         int len = TaintRangesBuilder.getLength(fv);
         TaintRanges tr = new TaintRanges(new TaintRange(0, len));
         event.targetRanges.add(0, new MethodEvent.MethodEventTargetRange(hash, tr));

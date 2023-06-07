@@ -125,8 +125,8 @@ public class UnvalidatedRedirectCheck implements SinkSourceChecker {
         if (!TaintPoolUtils.poolContains(val, event)) {
             return false;
         }
-
-        TaintRanges tr = EngineManager.TAINT_RANGES_POOL.get(System.identityHashCode(val));
+        long hash = TaintPoolUtils.getStringHash(val);
+        TaintRanges tr = EngineManager.TAINT_RANGES_POOL.get(hash);
         if (tr.isEmpty()) {
             return false;
         }
