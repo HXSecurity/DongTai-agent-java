@@ -34,6 +34,7 @@ public class IastProperties {
         put("log_disable_collector", PropertyConstant.PROPERTY_LOG_DISABLE_COLLECTOR);
         put("uuid_path", PropertyConstant.PROPERTY_UUID_PATH);
         put("disabled_plugins", PropertyConstant.PROPERTY_DISABLED_PLUGINS);
+        put("disabled_features", PropertyConstant.PROPERTY_DISABLED_FEATURES);
     }};
 
     private static IastProperties instance;

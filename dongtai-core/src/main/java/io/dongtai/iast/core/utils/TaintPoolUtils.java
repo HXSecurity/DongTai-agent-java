@@ -195,28 +195,32 @@ public class TaintPoolUtils {
                 EngineManager.TAINT_HASH_CODES.add(hash);
                 event.addTargetHash(hash);
                 EngineManager.TAINT_RANGES_POOL.add(hash, tr);
-                if (isMicroservice && !(obj instanceof String)) {
-                    try {
-                        Field[] declaredFields = ReflectUtils.getDeclaredFieldsSecurity(cls);
-                        for (Field field : declaredFields) {
-                            if (!Modifier.isStatic(field.getModifiers())) {
-                                trackObject(event, policyNode, field.get(obj), depth + 1, isMicroservice);
-                            }
-                        }
-                        hash = System.identityHashCode(obj);
-                        if (EngineManager.TAINT_HASH_CODES.contains(hash)) {
-                            event.addSourceHash(hash);
-                        }
-                    } catch (Throwable e) {
-                        DongTaiLog.debug("solve model failed: {}, {}",
-                                e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "");
-                    }
-                }
+                TaintPoolUtils.customModel(isMicroservice,obj,cls,event,policyNode,depth);
             } else {
                 hash = getStringHash(obj);
                 if (EngineManager.TAINT_HASH_CODES.contains(hash)) {
                     event.addSourceHash(hash);
                 }
+            }
+        }
+    }
+
+    private static void customModel(Boolean isMicroservice, Object obj, Class<?> cls, MethodEvent event,PolicyNode policyNode,int depth) {
+        if (isMicroservice && !(obj instanceof String) && !PropertyUtils.isDisabledCustomModel()) {
+            try {
+                Field[] declaredFields = ReflectUtils.getDeclaredFieldsSecurity(cls);
+                for (Field field : declaredFields) {
+                    if (!Modifier.isStatic(field.getModifiers())) {
+                        trackObject(event, policyNode, field.get(obj), depth + 1, isMicroservice);
+                    }
+                }
+                long hash = System.identityHashCode(obj);
+                if (EngineManager.TAINT_HASH_CODES.contains(hash)) {
+                    event.addSourceHash(hash);
+                }
+            } catch (Throwable e) {
+                DongTaiLog.debug("solve model failed: {}, {}",
+                        e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "");
             }
         }
     }
