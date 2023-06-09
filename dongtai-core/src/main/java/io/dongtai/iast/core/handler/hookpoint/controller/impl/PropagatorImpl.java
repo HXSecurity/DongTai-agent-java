@@ -221,6 +221,7 @@ public class PropagatorImpl {
             tgtHash = TaintPoolUtils.getStringHash(tgt);
             oldTaintRanges = getTaintRanges(tgt);
         } else if (TaintPosition.hasReturn(targetLocs)) {
+            tgt = event.returnInstance;
             tgtHash = TaintPoolUtils.getStringHash(tgt);
         } else if (TaintPosition.hasParameter(targetLocs)) {
             for (TaintPosition targetLoc : targetLocs) {
