@@ -15,6 +15,14 @@ public enum VulnType {
     CRYPTO_BAD_MAC("crypto-bad-mac", "high", false),
     COOKIE_FLAGS_MISSING("cookie-flags-missing", "high", true),
     REFLECTED_XSS("reflected-xss", "medium", true),
+    SQL_INJECTION("sql-injection", "high", true),
+    HQL_INJECTION("hql-injection", "high", true),
+    LDAP_INJECTION("ldap-injection", "high", true),
+    CMD_INJECTION("cmd-injection", "high", true),
+    XPATH_INJECTION("xpath-injection", "high", true),
+    PATH_TRAVERSAL("path-traversal", "high", true),
+    XXE("xxe", "medium", true),
+    UNVALIDATED_REDIRECT("unvalidated-redirect", "low", true),
     ;
 
     public String getName() {

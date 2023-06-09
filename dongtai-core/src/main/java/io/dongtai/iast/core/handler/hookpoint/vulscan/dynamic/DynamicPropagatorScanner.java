@@ -36,6 +36,50 @@ public class DynamicPropagatorScanner implements IVulScan {
             new HttpService()
     ));
 
+    // VulnType => List<TAGS, UNTAGS>
+    private static final Map<String, List<TaintTag[]>> TAINT_TAG_CHECKS = new HashMap<String, List<TaintTag[]>>() {{
+        put(VulnType.REFLECTED_XSS.getName(), Arrays.asList(
+                new TaintTag[]{TaintTag.UNTRUSTED, TaintTag.CROSS_SITE},
+                new TaintTag[]{TaintTag.BASE64_ENCODED, TaintTag.HTML_ENCODED, TaintTag.LDAP_ENCODED,
+                        TaintTag.SQL_ENCODED, TaintTag.URL_ENCODED, TaintTag.XML_ENCODED, TaintTag.XPATH_ENCODED,
+                        TaintTag.XSS_ENCODED, TaintTag.HTTP_TOKEN_LIMITED_CHARS, TaintTag.NUMERIC_LIMITED_CHARS}
+        ));
+        put(VulnType.SQL_INJECTION.getName(), Arrays.asList(
+                new TaintTag[]{TaintTag.UNTRUSTED},
+                new TaintTag[]{TaintTag.SQL_ENCODED, TaintTag.HTTP_TOKEN_LIMITED_CHARS, TaintTag.NUMERIC_LIMITED_CHARS}
+        ));
+        put(VulnType.HQL_INJECTION.getName(), Arrays.asList(
+                new TaintTag[]{TaintTag.UNTRUSTED},
+                new TaintTag[]{TaintTag.SQL_ENCODED, TaintTag.HTTP_TOKEN_LIMITED_CHARS, TaintTag.NUMERIC_LIMITED_CHARS}
+        ));
+        put(VulnType.LDAP_INJECTION.getName(), Arrays.asList(
+                new TaintTag[]{TaintTag.UNTRUSTED},
+                new TaintTag[]{TaintTag.BASE64_ENCODED, TaintTag.HTML_ENCODED, TaintTag.LDAP_ENCODED,
+                        TaintTag.SQL_ENCODED, TaintTag.URL_ENCODED, TaintTag.XML_ENCODED, TaintTag.XPATH_ENCODED,
+                        TaintTag.HTTP_TOKEN_LIMITED_CHARS, TaintTag.NUMERIC_LIMITED_CHARS}
+        ));
+        put(VulnType.XPATH_INJECTION.getName(), Arrays.asList(
+                new TaintTag[]{TaintTag.UNTRUSTED},
+                new TaintTag[]{TaintTag.XML_ENCODED, TaintTag.HTTP_TOKEN_LIMITED_CHARS, TaintTag.NUMERIC_LIMITED_CHARS}
+        ));
+        put(VulnType.CMD_INJECTION.getName(), Arrays.asList(
+                new TaintTag[]{TaintTag.UNTRUSTED},
+                new TaintTag[]{TaintTag.BASE64_ENCODED, TaintTag.HTML_ENCODED, TaintTag.LDAP_ENCODED,
+                        TaintTag.SQL_ENCODED, TaintTag.URL_ENCODED, TaintTag.XML_ENCODED, TaintTag.XPATH_ENCODED,
+                        TaintTag.HTTP_TOKEN_LIMITED_CHARS, TaintTag.NUMERIC_LIMITED_CHARS}
+        ));
+        put(VulnType.PATH_TRAVERSAL.getName(), Arrays.asList(
+                new TaintTag[]{TaintTag.UNTRUSTED},
+                new TaintTag[]{TaintTag.BASE64_ENCODED, TaintTag.HTML_ENCODED, TaintTag.LDAP_ENCODED,
+                        TaintTag.URL_ENCODED, TaintTag.XML_ENCODED, TaintTag.XPATH_ENCODED,
+                        TaintTag.HTTP_TOKEN_LIMITED_CHARS, TaintTag.NUMERIC_LIMITED_CHARS}
+        ));
+        put(VulnType.UNVALIDATED_REDIRECT.getName(), Arrays.asList(
+                new TaintTag[]{TaintTag.UNTRUSTED},
+                new TaintTag[]{TaintTag.URL_ENCODED, TaintTag.HTTP_TOKEN_LIMITED_CHARS, TaintTag.NUMERIC_LIMITED_CHARS}
+        ));
+    }};
+
     @Override
     public void scan(MethodEvent event, SinkNode sinkNode) {
         for (SinkSafeChecker chk : SAFE_CHECKERS) {
@@ -118,28 +162,27 @@ public class DynamicPropagatorScanner implements IVulScan {
         }
 
 
-        // TODO: check taint tags at server
-        if (VulnType.REFLECTED_XSS.equals(sinkNode.getVulType()) && !sourceInstances.isEmpty()) {
-            boolean tagsHit = false;
-            for (Object sourceInstance : sourceInstances) {
-                long hash = TaintPoolUtils.getStringHash(sourceInstance);
-                TaintRanges tr = EngineManager.TAINT_RANGES_POOL.get(hash);
-                if (tr == null || tr.isEmpty()) {
-                    continue;
+        if (!sourceInstances.isEmpty()) {
+            List<TaintTag[]> tagList = TAINT_TAG_CHECKS.get(sinkNode.getVulType());
+            if (tagList != null) {
+                boolean tagsHit = false;
+                TaintTag[] required = tagList.get(0);
+                TaintTag[] disallowed = tagList.get(1);
+
+                for (Object sourceInstance : sourceInstances) {
+                    long hash = TaintPoolUtils.getStringHash(sourceInstance);
+                    TaintRanges tr = EngineManager.TAINT_RANGES_POOL.get(hash);
+                    if (tr == null || tr.isEmpty()) {
+                        continue;
+                    }
+
+                    if (tr.hasRequiredTaintTags(required) && !tr.hasDisallowedTaintTags(disallowed)) {
+                        tagsHit = true;
+                    }
                 }
-                TaintTag[] required = new TaintTag[]{
-                        TaintTag.UNTRUSTED, TaintTag.CROSS_SITE
-                };
-                TaintTag[] disallowed = new TaintTag[]{
-                        TaintTag.XSS_ENCODED, TaintTag.URL_ENCODED,
-                        TaintTag.HTML_ENCODED, TaintTag.BASE64_ENCODED
-                };
-                if (tr.hasRequiredTaintTags(required) && !tr.hasDisallowedTaintTags(disallowed)) {
-                    tagsHit = true;
+                if (!tagsHit) {
+                    return false;
                 }
-            }
-            if (!tagsHit) {
-                return false;
             }
         }
 
