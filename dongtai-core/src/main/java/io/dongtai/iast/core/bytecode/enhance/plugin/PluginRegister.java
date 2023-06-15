@@ -12,6 +12,7 @@ import io.dongtai.iast.core.bytecode.enhance.plugin.service.kafka.DispatchKafka;
 import io.dongtai.iast.core.bytecode.enhance.plugin.spring.DispatchApiCollector;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.Policy;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.PolicyManager;
+import io.dongtai.iast.core.utils.PropertyUtils;
 import org.objectweb.asm.ClassVisitor;
 
 import java.util.*;
@@ -28,7 +29,7 @@ public class PluginRegister {
 
     public PluginRegister() {
         this.plugins = new ArrayList<>();
-        List<String> disabledPlugins = getdisabledPlugins();
+        List<String> disabledPlugins = PropertyUtils.getDisabledPlugins();
         List<DispatchPlugin> allPlugins = new ArrayList<>(Arrays.asList(
                 new DispatchApiCollector(),
                 new DispatchJ2ee(),
@@ -41,12 +42,6 @@ public class PluginRegister {
         allPlugins.removeIf(plugin -> disabledPlugins != null && disabledPlugins.contains(plugin.getName()));
         this.plugins.addAll(allPlugins);
         this.plugins.add(new DispatchClassPlugin());
-    }
-
-    private List<String> getdisabledPlugins() {
-        return Optional.ofNullable(System.getProperty("dongtai.disabled.plugins"))
-                .map(s -> Arrays.asList(s.split(",")))
-                .orElse(null);
     }
 
     public ClassVisitor initial(ClassVisitor classVisitor, ClassContext context, PolicyManager policyManager) {

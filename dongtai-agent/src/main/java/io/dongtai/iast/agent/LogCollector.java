@@ -22,6 +22,15 @@ public class LogCollector {
         }
         try {
             if (!isMacOs() && !isWindows()) {
+                String agentId = String.valueOf(AgentRegisterReport.getAgentId());
+                FLUENT_FILE_CONF = IastProperties.getInstance().getTmpDir() + "fluent-" + agentId + ".conf";
+                FileUtils.getResourceToFile("bin/fluent.conf", FLUENT_FILE_CONF);
+                FileUtils.confReplace(FLUENT_FILE_CONF);
+
+                String multiParserFile = IastProperties.getInstance().getTmpDir() + "parsers_multiline.conf";
+                FileUtils.getResourceToFile("bin/parsers_multiline.conf", multiParserFile);
+                FileUtils.confReplace(multiParserFile);
+
                 FLUENT_FILE = IastProperties.getInstance().getTmpDir() + "fluent";
                 File f = new File(FLUENT_FILE);
                 if (f.exists()) {
@@ -34,10 +43,6 @@ public class LogCollector {
                     FileUtils.getResourceToFile("bin/fluent", FLUENT_FILE);
                 }
 
-                String agentId = String.valueOf(AgentRegisterReport.getAgentId());
-                FLUENT_FILE_CONF = IastProperties.getInstance().getTmpDir() + "fluent-" + agentId + ".conf";
-                FileUtils.getResourceToFile("bin/fluent.conf", FLUENT_FILE_CONF);
-                FileUtils.confReplace(FLUENT_FILE_CONF);
                 if (!(new File(FLUENT_FILE)).setExecutable(true)) {
                     DongTaiLog.warn(ErrorCode.FLUENT_SET_EXECUTABLE_FAILED, FLUENT_FILE);
                 }

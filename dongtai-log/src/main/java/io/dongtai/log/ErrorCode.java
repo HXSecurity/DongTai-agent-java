@@ -104,6 +104,7 @@ public enum ErrorCode {
     UTIL_TAINT_PARSE_CUSTOM_MODEL_FAILED(20612, "parse custom model {} getter {} failed"),
 
     UNKNOWN(99999, "unknown error"),
+    NO_CODE(0, "no error code"),
     ;
 
     private final int code;

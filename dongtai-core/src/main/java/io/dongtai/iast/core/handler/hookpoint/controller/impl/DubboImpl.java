@@ -27,7 +27,7 @@ public class DubboImpl {
                 put("requestURL", u.getScheme() + "://" + u.getAuthority() + u.getPath());
                 put("requestURI", u.getPath());
                 put("queryString", "");
-                put("method", "DUBOO");
+                put("method", "DUBBO");
                 put("protocol", "DUBBO");
                 put("scheme", u.getScheme());
                 put("contextPath", "");
@@ -43,7 +43,6 @@ public class DubboImpl {
     }
 
 
-
     public static void collectDubboRequestSource(Object handler, Object invocation, String methodName,
                                                  Object[] arguments, Map<String, ?> headers,
                                                  String hookClass, String hookMethod, String hookSign,
@@ -51,7 +50,7 @@ public class DubboImpl {
         if (arguments == null || arguments.length == 0) {
             return;
         }
-        Map <String, Object> requestMeta = EngineManager.REQUEST_CONTEXT.get();
+        Map<String, Object> requestMeta = EngineManager.REQUEST_CONTEXT.get();
         if (requestMeta == null) {
             return;
         }
@@ -70,7 +69,7 @@ public class DubboImpl {
         tgt.add(new TaintPosition("P1"));
 
         SourceNode sourceNode = new SourceNode(src, tgt, null);
-        TaintPoolUtils.trackObject(event, sourceNode, arguments, 0);
+        TaintPoolUtils.trackObject(event, sourceNode, arguments, 0, true);
 
         Map<String, String> sHeaders = new HashMap<String, String>();
         if (headers != null) {
@@ -102,7 +101,7 @@ public class DubboImpl {
 
         // for display taint range (full arguments value)
         String fv = event.parameterValues.get(0).getValue();
-        int hash = System.identityHashCode(fv);
+        long hash = TaintPoolUtils.toStringHash(fv.hashCode(),System.identityHashCode(fv));
         int len = TaintRangesBuilder.getLength(fv);
         TaintRanges tr = new TaintRanges(new TaintRange(0, len));
         event.targetRanges.add(0, new MethodEvent.MethodEventTargetRange(hash, tr));

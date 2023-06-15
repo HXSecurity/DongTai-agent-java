@@ -12,9 +12,9 @@ import java.util.List;
 
 public class FastjsonCheck implements SinkSafeChecker {
     public static List<String> FASTJSON_SINK_METHODS = Arrays.asList(
-            "com.alibaba.fastjson.JSON.parseObject(java.lang.String)",
-            "com.alibaba.fastjson.JSON.parse(java.lang.String,int)",
-            "com.alibaba.fastjson.JSON.parse(java.lang.String)"
+            " com.alibaba.fastjson.JSON.parseObject(java.lang.String)".substring(1),
+            " com.alibaba.fastjson.JSON.parse(java.lang.String,int)".substring(1),
+            " com.alibaba.fastjson.JSON.parse(java.lang.String)".substring(1)
     );
 
     private String policySignature;
@@ -36,9 +36,9 @@ public class FastjsonCheck implements SinkSafeChecker {
         try {
             Class<?> cls;
             if (JSON_CLASS_LOADER == null) {
-                cls = Class.forName("com.alibaba.fastjson.JSON");
+                cls = Class.forName(" com.alibaba.fastjson.JSON".substring(1));
             } else {
-                cls = Class.forName("com.alibaba.fastjson.JSON", false, JSON_CLASS_LOADER);
+                cls = Class.forName(" com.alibaba.fastjson.JSON".substring(1), false, JSON_CLASS_LOADER);
             }
             Field f = cls.getDeclaredField("VERSION");
             Class<?> t = f.getType();
@@ -61,9 +61,9 @@ public class FastjsonCheck implements SinkSafeChecker {
             // https://github.com/alibaba/fastjson/wiki/fastjson_safemode
             Class<?> cfgClass;
             if (PARSE_CONFIG_CLASS_LOADER == null) {
-                cfgClass = Class.forName("com.alibaba.fastjson.parser.ParserConfig");
+                cfgClass = Class.forName(" com.alibaba.fastjson.parser.ParserConfig".substring(1));
             } else {
-                cfgClass = Class.forName("com.alibaba.fastjson.parser.ParserConfig", false, PARSE_CONFIG_CLASS_LOADER);
+                cfgClass = Class.forName(" com.alibaba.fastjson.parser.ParserConfig".substring(1), false, PARSE_CONFIG_CLASS_LOADER);
             }
             Object cfg = cfgClass.getMethod("getGlobalInstance").invoke(null);
             Object isSafeMode = cfg.getClass().getMethod("isSafeMode").invoke(cfg);

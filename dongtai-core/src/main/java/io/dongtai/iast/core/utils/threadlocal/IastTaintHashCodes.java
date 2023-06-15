@@ -11,9 +11,9 @@ import java.util.Map;
 /**
  * @author dongzhiyong@huoxian.cn
  */
-public class IastTaintHashCodes extends ThreadLocal<HashSet<Integer>> {
+public class IastTaintHashCodes extends ThreadLocal<HashSet<Long>> {
     @Override
-    protected HashSet<Integer> initialValue() {
+    protected HashSet<Long> initialValue() {
         return null;
     }
 
@@ -21,14 +21,14 @@ public class IastTaintHashCodes extends ThreadLocal<HashSet<Integer>> {
         return this.get() == null || this.get().isEmpty();
     }
 
-    public boolean contains(Integer hashCode) {
+    public boolean contains(Long hashCode) {
         if (this.get() == null) {
             return false;
         }
         return this.get().contains(hashCode);
     }
 
-    public void add(Integer hashCode) {
+    public void add(Long hashCode) {
         if (this.get() == null) {
             return;
         }
@@ -41,16 +41,20 @@ public class IastTaintHashCodes extends ThreadLocal<HashSet<Integer>> {
         }
 
         try {
-            int subHashCode = 0;
+            long subHashCode = 0;
             if (obj instanceof String[]) {
                 String[] tempObjs = (String[]) obj;
                 for (String tempObj : tempObjs) {
-                    subHashCode = System.identityHashCode(tempObj);
+                    subHashCode = TaintPoolUtils.toStringHash(tempObj.hashCode(),System.identityHashCode(tempObj));
                     this.add(subHashCode);
                     event.addTargetHash(subHashCode);
                 }
             } else if (obj instanceof Map) {
-                int hashCode = System.identityHashCode(obj);
+                long hashCode = System.identityHashCode(obj);
+                this.add(hashCode);
+                event.addTargetHash(hashCode);
+            } else if (obj instanceof String){
+                long hashCode = TaintPoolUtils.toStringHash(obj.hashCode(),System.identityHashCode(obj));
                 this.add(hashCode);
                 event.addTargetHash(hashCode);
             } else if (obj.getClass().isArray() && !obj.getClass().getComponentType().isPrimitive()) {

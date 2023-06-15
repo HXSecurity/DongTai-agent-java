@@ -58,6 +58,9 @@ public class TaintRanges {
     }
 
     public boolean hasRequiredTaintTags(TaintTag[] tags) {
+        if (tags == null) {
+            return true;
+        }
         int total = tags.length;
         Map<String, Boolean> found = new HashMap<String, Boolean>();
         for (TaintTag tag : tags) {
@@ -71,6 +74,9 @@ public class TaintRanges {
     }
 
     public boolean hasDisallowedTaintTags(TaintTag[] tags) {
+        if (tags == null) {
+            return false;
+        }
         for (TaintTag tag : tags) {
             for (TaintRange taintRange : this.taintRanges) {
                 if (tag.equals(taintRange.getName())) {

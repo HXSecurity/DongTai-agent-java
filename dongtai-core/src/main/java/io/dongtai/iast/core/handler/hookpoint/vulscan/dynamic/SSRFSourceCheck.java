@@ -361,7 +361,8 @@ public class SSRFSourceCheck implements SinkSourceChecker {
 
     private boolean checkTaintPool(MethodEvent event, String key, Object value) {
         if (!"".equals(value) && TaintPoolUtils.poolContains(value, event)) {
-            event.sourceTypes.add(new MethodEvent.MethodEventSourceType(System.identityHashCode(value), key));
+            long hash = TaintPoolUtils.getStringHash(value);
+            event.sourceTypes.add(new MethodEvent.MethodEventSourceType(hash, key));
             return true;
         }
         return false;

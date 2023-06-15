@@ -15,7 +15,7 @@ public class DubboService {
     public static void solveSyncInvoke(MethodEvent event, Object invocation, String url, Map<String, String> headers,
                                        AtomicInteger invokeIdSequencer) {
         try {
-            TaintPoolUtils.trackObject(event, null, event.parameterInstances, 0);
+            TaintPoolUtils.trackObject(event, null, event.parameterInstances, 0, false);
             boolean hasTaint = false;
             int sourceLen = 0;
             if (!event.getSourceHashes().isEmpty()) {
@@ -26,7 +26,7 @@ public class DubboService {
 
             if (headers != null && headers.size() > 0) {
                 hasTaint = false;
-                TaintPoolUtils.trackObject(event, null, headers, 0);
+                TaintPoolUtils.trackObject(event, null, headers, 0, false);
                 if (event.getSourceHashes().size() > sourceLen) {
                     hasTaint = true;
                 }

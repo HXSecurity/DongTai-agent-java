@@ -13,7 +13,7 @@ public class DubboService implements IServer {
         } catch (Throwable ignored) {
         }
         try {
-            loader.loadClass("com.alibaba.dubbo.monitor.support.MonitorFilter");
+            loader.loadClass(" com.alibaba.dubbo.monitor.support.MonitorFilter".substring(1));
             return true;
         } catch (Throwable ignored) {
         }
