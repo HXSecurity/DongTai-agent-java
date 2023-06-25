@@ -7,6 +7,7 @@ import io.dongtai.iast.common.scope.Scope;
 import io.dongtai.iast.common.scope.ScopeManager;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.bytecode.enhance.plugin.spring.SpringApplicationImpl;
+import io.dongtai.iast.core.handler.skip.BlackUrlSkipHandler;
 import io.dongtai.iast.core.handler.hookpoint.controller.HookType;
 import io.dongtai.iast.core.handler.hookpoint.controller.impl.*;
 import io.dongtai.iast.core.handler.hookpoint.graphy.GraphBuilder;
@@ -19,6 +20,8 @@ import io.dongtai.log.DongTaiLog;
 import io.dongtai.log.ErrorCode;
 
 import java.lang.dongtai.SpyDispatcher;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -693,6 +696,21 @@ public class SpyDispatcherImpl implements SpyDispatcher {
             DongTaiLog.error(ErrorCode.get("SPY_TRACE_DUBBO_CONSUMER_INVOKE_FAILED"), e);
         } finally {
             ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
+        }
+        return false;
+    }
+
+    @Override
+    public boolean isSkipCollect(Object invocation) {
+        if (BlackUrlSkipHandler.isBlackUrl()){
+            Method setAttachmentMethod = null;
+            try {
+                setAttachmentMethod = invocation.getClass().getMethod("setAttachment", String.class, String.class);
+                setAttachmentMethod.setAccessible(true);
+                setAttachmentMethod.invoke(invocation, BlackUrlSkipHandler.getHeaderKey(), BlackUrlSkipHandler.isBlackUrl().toString());
+            } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+                DongTaiLog.error(ErrorCode.get("SPY_SKIP_COLLECT_DUBBO_FAILED"), e);
+            }
         }
         return false;
     }

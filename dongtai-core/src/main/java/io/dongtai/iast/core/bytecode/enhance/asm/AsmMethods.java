@@ -278,6 +278,12 @@ public interface AsmMethods {
             String.class
     );
 
+    Method SPY$isSkipCollect = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "isSkipCollect",
+            Object.class
+    );
+
     Method SPY$reportService = InnerHelper.getAsmMethod(
             SpyDispatcher.class,
             "reportService",

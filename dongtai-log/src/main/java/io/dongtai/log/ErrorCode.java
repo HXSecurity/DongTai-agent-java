@@ -88,6 +88,7 @@ public enum ErrorCode {
     SPY_TRACE_DUBBO_CONSUMER_INVOKE_FAILED(20361, "hookpoint trace dubbo consumer invoke failed"),
     SPY_LEAVE_DUBBO_FAILED(20362, "hookpoint leave dubbo failed"),
     SPY_COLLECT_DUBBO_FAILED(20363, "hookpoint collect dubbo {} failed"),
+    SPY_SKIP_COLLECT_DUBBO_FAILED(20364, "hookpoint skip collect dubbo {} failed"),
 
     // report & replay
     REPORT_SEND_FAILED(20401, "send report to {} error, report: {}"),

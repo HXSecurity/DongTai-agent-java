@@ -61,6 +61,7 @@ public class DubboSyncHandlerInvokeAdviceAdapter extends AbstractAdviceAdapter {
     }
 
     private void enterMethod() {
+        skipCollect();
         enterScope();
 
         Label elseLabel = new Label();
@@ -111,6 +112,13 @@ public class DubboSyncHandlerInvokeAdviceAdapter extends AbstractAdviceAdapter {
         push(this.name);
         push(this.signature);
         invokeInterface(ASM_TYPE_SPY_DISPATCHER, SPY$traceDubboInvoke);
+        pop();
+    }
+
+    private void skipCollect() {
+        invokeStatic(ASM_TYPE_SPY_HANDLER, SPY_HANDLER$getDispatcher);
+        loadArg(0);
+        invokeInterface(ASM_TYPE_SPY_DISPATCHER,SPY$isSkipCollect);
         pop();
     }
 }

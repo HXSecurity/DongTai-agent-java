@@ -170,4 +170,6 @@ public interface SpyDispatcher {
     boolean traceDubboInvoke(Object instance, String url, Object invocation, Object[] arguments,
                              Map<String, String> headers, String className, String methodName,
                              String signature);
+
+    boolean isSkipCollect(Object invocation);
 }

@@ -261,4 +261,10 @@ public class NopSpy implements SpyDispatcher {
                                     String signature) {
         return false;
     }
+
+    @Override
+    public boolean isSkipCollect(Object invocation) {
+        return false;
+    }
+
 }
