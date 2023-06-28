@@ -28,7 +28,6 @@ public class SpringGatherApiThread extends AbstractApiGatherThread {
     private final Object applicationContext;
 
     public SpringGatherApiThread(Object applicationContext) {
-        // TODO 2023-6-28 11:38:25
         super(AgentConstant.THREAD_NAME_PREFIX_CORE + "SpringMvcGatherApi-thread");
         this.applicationContext = applicationContext;
     }
@@ -36,8 +35,8 @@ public class SpringGatherApiThread extends AbstractApiGatherThread {
     @Override
     public void run() {
         try {
-            Class<?> proxyClass = HttpImpl.getClassLoader().loadClass("io.dongtai.iast.spring.gather.SpringMVCApiGather");
-            Method getAPI = proxyClass.getDeclaredMethod("gather", Object.class);
+            Class<?> proxyClass = HttpImpl.getClassLoader().loadClass("io.dongtai.iast.api.gather.spring.extractor.SpringMVCApiExtractor");
+            Method getAPI = proxyClass.getDeclaredMethod("run", Object.class);
             Object openApi = getAPI.invoke(null, applicationContext);
             report(openApi, FRAMEWORK_NAME);
         } catch (NoClassDefFoundError e) {

@@ -18,8 +18,11 @@ public abstract class AbstractApiGatherThread extends Thread {
     public AbstractApiGatherThread(String name) {
         super(name);
     }
-    
+
     protected void report(Object openApi, String framework) {
+        if (openApi == null) {
+            return;
+        }
         try {
             String report = createReport(openApi, framework);
             ThreadPools.sendReport(ApiPath.REPORT_UPLOAD, report);

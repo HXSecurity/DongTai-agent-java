@@ -22,11 +22,10 @@ public class DubboApiGatherThread extends AbstractApiGatherThread {
     private static volatile boolean isStarted = false;
 
     public static void gather(Class handlerClass) {
-        // TODO 2023-6-28 10:38:23 for debug
-//        if (isStarted) {
-//            return;
-//        }
-//        isStarted = true;
+        if (isStarted) {
+            return;
+        }
+        isStarted = true;
 
         DubboPackage dubboPackage = parseDubboPackage(handlerClass);
         if (dubboPackage == null) {
@@ -84,7 +83,7 @@ public class DubboApiGatherThread extends AbstractApiGatherThread {
      */
     private void gatherAlibabaDubboService() {
         try {
-            Class<?> proxyClass = DubboImpl.getClassLoader().loadClass("io.dongtai.iast.dubbo.gather.AlibabaDubboServiceGather");
+            Class<?> proxyClass = DubboImpl.getClassLoader().loadClass("io.dongtai.iast.api.gather.dubbo.extractor.AlibabaDubboServiceExtractor");
             Object openApi = proxyClass.getDeclaredMethod("run").invoke(null);
             report(openApi, FRAMEWORK_NAME);
         } catch (NoClassDefFoundError e) {
@@ -99,7 +98,7 @@ public class DubboApiGatherThread extends AbstractApiGatherThread {
      */
     private void gatherApacheDubboService() {
         try {
-            Class<?> proxyClass = DubboImpl.getClassLoader().loadClass("io.dongtai.iast.dubbo.gather.ApacheDubboServiceGather");
+            Class<?> proxyClass = DubboImpl.getClassLoader().loadClass("io.dongtai.iast.api.gather.dubbo.extractor.ApacheDubboServiceExtractor");
             Object openApi = proxyClass.getDeclaredMethod("run").invoke(null);
             report(openApi, FRAMEWORK_NAME);
         } catch (NoClassDefFoundError e) {
