@@ -5,6 +5,7 @@ import com.alibaba.dubbo.rpc.Exporter;
 import com.alibaba.dubbo.rpc.Protocol;
 import com.alibaba.dubbo.rpc.protocol.dubbo.DubboProtocol;
 import io.dongtai.iast.openapi.domain.OpenApi;
+import io.dongtai.log.DongTaiLog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +48,7 @@ public class AlibabaDubboServiceGather extends AbstractDubboServiceGather {
             // 除 2.4.11 之外的版本，即 [2.0.10, 2.4.11) 和 (2.4.11, 2.6.12] 两个版本范围
             // 2.4.11 版本无法解析
             // 2023-6-26 18:49:15 发现2.4.11是一个无效的发布包，已经跟阿里开源反馈，希望他们能处理一下....
+            // 2023-6-28 16:35:45 收到了回复，他们放弃维护，不删除...那到时候有人问再解释吧...
             ((Map<String, Exporter>) exporterMap).forEach(new BiConsumer<String, Exporter>() {
                 @Override
                 public void accept(String s, Exporter exporter) {
@@ -55,7 +57,7 @@ public class AlibabaDubboServiceGather extends AbstractDubboServiceGather {
                 }
             });
         } catch (Throwable e) {
-            // TODO log
+            DongTaiLog.error("AbstractDubboServiceGather parseExportedServiceClassList error", e);
         }
         return serviceClassList;
     }

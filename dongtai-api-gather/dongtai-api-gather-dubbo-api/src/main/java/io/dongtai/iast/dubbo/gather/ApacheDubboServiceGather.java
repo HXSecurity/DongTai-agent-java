@@ -58,7 +58,7 @@ public class ApacheDubboServiceGather extends AbstractDubboServiceGather {
                 return serviceClassList;
             }
         } catch (Throwable e) {
-            // TODO 2023-6-26 15:24:50 log
+            DongTaiLog.debug("AbstractDubboServiceGather parseExportedServiceClassList DelegateExporterMap throw exception", e);
         }
 
         //  [2.7.9, 2.7.13) 和 (3.0.0, 3.2.0-beta.6] 之间都是 Map<String, Exporter<?>> 类型
@@ -73,10 +73,9 @@ public class ApacheDubboServiceGather extends AbstractDubboServiceGather {
                 return serviceClassList;
             }
         } catch (Throwable e) {
-            // TODO 2023-6-26 15:25:47 log
-            DongTaiLog.error("");
+            DongTaiLog.debug("AbstractDubboServiceGather parseExportedServiceClassList Map<String, Exporter> throw exception", e);
         }
-
+        
         return serviceClassList;
     }
 

@@ -4,6 +4,7 @@ import io.dongtai.iast.dubbo.convertor.ServiceConvertor;
 import io.dongtai.iast.openapi.convertor.OpenApiSchemaConvertorManager;
 import io.dongtai.iast.openapi.domain.OpenApi;
 import io.dongtai.iast.openapi.domain.Path;
+import io.dongtai.log.DongTaiLog;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -16,7 +17,6 @@ import java.util.function.Consumer;
  * <p>
  * 需要兼容两个版本，如果2.6.x及以下版本，可以使用：com.alibaba.dubbo，2.7.0开始，直接使用org.apache.dubbo
  * <p>
- *  TODO 协议、配置方式
  *
  * @author CC11001100
  * @since v1.12.0
@@ -31,16 +31,21 @@ public abstract class AbstractDubboServiceGather {
     }
 
     public OpenApi gather() {
-        // TODO 2023-6-26 15:32:15 解析其它协议
         Object protocolObject = this.getProtocol("dubbo");
         if (protocolObject == null) {
+            DongTaiLog.error("AbstractDubboServiceGather getProtocol null");
             return null;
         }
         Object exporterMap = this.getExporterMap(protocolObject);
         if (exporterMap == null) {
+            DongTaiLog.error("AbstractDubboServiceGather getExporterMap null");
             return null;
         }
         List<Class> exportedServiceList = this.parseExportedServiceClassList(exporterMap);
+        if (exportedServiceList == null || exportedServiceList.isEmpty()) {
+            DongTaiLog.error("AbstractDubboServiceGather parseExportedServiceClassList empty");
+            return null;
+        }
 
         // 解析服务列表
         OpenApi openApi = new OpenApi();
@@ -65,9 +70,13 @@ public abstract class AbstractDubboServiceGather {
         exportedServiceList.forEach(new Consumer<Class>() {
             @Override
             public void accept(Class aClass) {
-                Map<String, Path> convert = new ServiceConvertor(manager, aClass).convert();
-                // 暂不考虑key覆盖的问题
-                pathMap.putAll(convert);
+                try {
+                    Map<String, Path> convert = new ServiceConvertor(manager, aClass).convert();
+                    // 暂不考虑key覆盖的问题
+                    pathMap.putAll(convert);
+                } catch (Throwable e) {
+                    DongTaiLog.error("AbstractDubboServiceGather parsePaths error", e);
+                }
             }
         });
         return pathMap;
@@ -90,8 +99,7 @@ public abstract class AbstractDubboServiceGather {
                     break;
                 }
             } catch (Throwable e) {
-                // TODO log
-                e.printStackTrace();
+                DongTaiLog.error("AbstractDubboServiceGather getProtocol error", e);
             }
         }
         return protocolObj;
@@ -124,8 +132,7 @@ public abstract class AbstractDubboServiceGather {
             exporterMapField.setAccessible(true);
             return exporterMapField.get(protocolObject);
         } catch (Throwable e) {
-            // TODO 2023-6-25 12:17:59 log
-            e.printStackTrace();
+            DongTaiLog.error("AbstractDubboServiceGather getExporterMap error", e);
         }
         return null;
     }

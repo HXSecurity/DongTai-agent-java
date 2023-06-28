@@ -5,6 +5,7 @@ import io.dongtai.iast.openapi.domain.MediaType;
 import io.dongtai.iast.openapi.domain.Operation;
 import io.dongtai.iast.openapi.domain.Parameter;
 import io.dongtai.iast.openapi.domain.Response;
+import io.dongtai.log.DongTaiLog;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -32,12 +33,22 @@ public class MethodConvertor {
     public Operation convert() {
         Operation o = new Operation();
 
-        o.mergeParameters(this.parseParameters());
-        o.setResponses(this.parseResponse());
+        try {
+            o.mergeParameters(this.parseParameters());
+        } catch (Throwable e) {
+            DongTaiLog.error("MethodConvertor.convert parseParameters error", e);
+        }
 
-        // TODO 2023-6-26 11:24:05 设置这两个字段
-//        o.setOperationId();
-//        o.setTags();
+        try {
+            o.setResponses(this.parseResponse());
+        } catch (Throwable e) {
+            DongTaiLog.error("MethodConvertor.convert parseResponse error", e);
+        }
+
+        // 设置这两个字段
+        o.setOperationId(UUID.randomUUID().toString());
+        // 把类名设置为标签
+        o.setTags(Collections.singletonList(reflectionMethod.getDeclaringClass().getName()));
 
         return o;
     }
@@ -51,7 +62,6 @@ public class MethodConvertor {
 
         Class<?> returnType = this.reflectionMethod.getReturnType();
         // 这里需要注意，可能会有返回值为空的情况，这种情况就认为是没有响应值
-        // TODO 2023-6-26 11:25:24 需要确认open api的协议是否支持响应为空
         if (Void.TYPE == returnType) {
             return null;
         }
@@ -84,9 +94,13 @@ public class MethodConvertor {
         }
         List<Parameter> parameterList = new ArrayList<>();
         for (java.lang.reflect.Parameter reflectionParameter : reflectionParameterArray) {
-            Parameter convert = new ParameterConvertor(this.manager, reflectionParameter).convert();
-            if (convert != null) {
-                parameterList.add(convert);
+            try {
+                Parameter convert = new ParameterConvertor(this.manager, reflectionParameter).convert();
+                if (convert != null) {
+                    parameterList.add(convert);
+                }
+            } catch (Throwable e) {
+                DongTaiLog.error("MethodConvertor.parseParameters ParameterConvertor error", e);
             }
         }
         return parameterList;

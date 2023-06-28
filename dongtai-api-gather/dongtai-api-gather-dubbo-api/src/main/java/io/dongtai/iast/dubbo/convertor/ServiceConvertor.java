@@ -3,6 +3,7 @@ package io.dongtai.iast.dubbo.convertor;
 import io.dongtai.iast.openapi.convertor.OpenApiSchemaConvertorManager;
 import io.dongtai.iast.openapi.domain.Operation;
 import io.dongtai.iast.openapi.domain.Path;
+import io.dongtai.log.DongTaiLog;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -27,10 +28,14 @@ public class ServiceConvertor {
     public Map<String, Path> convert() {
         Map<String, Path> pathMap = new HashMap<>();
         for (Method parseServiceMethod : this.parseServiceMethods()) {
-            Operation convert = new MethodConvertor(this.manager, parseServiceMethod).convert();
-            Path path = new Path();
-            path.setDubbo(convert);
-            pathMap.put(this.buildSign(parseServiceMethod), path);
+            try {
+                Operation convert = new MethodConvertor(this.manager, parseServiceMethod).convert();
+                Path path = new Path();
+                path.setDubbo(convert);
+                pathMap.put(this.buildSign(parseServiceMethod), path);
+            } catch (Throwable e) {
+                DongTaiLog.error("ServiceConvertor.convert error", e);
+            }
         }
         return pathMap;
     }
