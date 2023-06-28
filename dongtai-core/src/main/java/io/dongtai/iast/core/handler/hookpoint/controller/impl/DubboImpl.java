@@ -44,7 +44,7 @@ public class DubboImpl {
 
 
     public static void collectDubboRequestSource(Object handler, Object invocation, String methodName,
-                                                 Object[] arguments, Map<String, ?> headers,
+                                                 Object[] arguments, Class<?>[] argumentTypes, Map<String, ?> headers,
                                                  String hookClass, String hookMethod, String hookSign,
                                                  AtomicInteger invokeIdSequencer) {
         if (arguments == null || arguments.length == 0) {
@@ -57,6 +57,23 @@ public class DubboImpl {
 
         String url = (String) requestMeta.get("requestURL") + "/" + methodName;
         String uri = (String) requestMeta.get("requestURI") + "/" + methodName;
+
+        StringBuilder argSign = new StringBuilder("(");
+        if (argumentTypes != null && argumentTypes.length > 0) {
+            int i = 0;
+            for (Class<?> argumentType : argumentTypes) {
+                if (i != 0) {
+                    argSign.append(",");
+                }
+                argSign.append(argumentType.getCanonicalName());
+                i++;
+            }
+        }
+        argSign.append(")");
+        String argSignStr = argSign.toString();
+        url += argSignStr;
+        uri += argSignStr;
+
         requestMeta.put("requestURL", url);
         requestMeta.put("requestURI", uri);
 
