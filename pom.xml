@@ -130,9 +130,9 @@
     <modules>
         <module>dongtai-spy</module>
         <module>dongtai-core</module>
-        <module>dongtai-spring-api</module>
         <module>dongtai-log</module>
         <module>dongtai-api</module>
+        <module>dongtai-api-gather</module>
         <module>dongtai-common</module>
         <module>dongtai-plugins</module>
         <module>dongtai-agent</module>
