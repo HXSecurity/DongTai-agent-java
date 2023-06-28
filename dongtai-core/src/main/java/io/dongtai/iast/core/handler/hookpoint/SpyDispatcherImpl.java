@@ -624,7 +624,6 @@ public class SpyDispatcherImpl implements SpyDispatcher {
             // 收集Spring MVC的API
             if (HookType.SPRINGAPPLICATION.equals(hookType)) {
                 SpringGatherApiThread.gather(retValue);
-//                SpringApplicationImpl.getWebApplicationContext(retValue);
             }
         } catch (Throwable e) {
             DongTaiLog.error(ErrorCode.get("SPY_COLLECT_HTTP_FAILED"), "", e);
