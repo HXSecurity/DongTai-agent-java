@@ -3,6 +3,8 @@ package io.dongtai.iast.api.openapi.convertor;
 import io.dongtai.iast.api.openapi.domain.Schema;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -71,8 +73,7 @@ public class JavaBeanOpenApiSchemaConvertor extends BaseOpenApiSchemaConvertor {
         c.setName(clazz.getSimpleName());
         c.setType("object");
 
-        // TODO 2023-6-15 16:24:06 向上递归处理所有字段，并检查是否符合Bean规范
-        // 处理类上的字段
+        // 处理类上的字段，向上递归处理所有字段，并检查是否符合Bean规范
         parseFieldList(clazz).forEach(new Consumer<Field>() {
             @Override
             public void accept(Field field) {
@@ -90,20 +91,83 @@ public class JavaBeanOpenApiSchemaConvertor extends BaseOpenApiSchemaConvertor {
         return c;
     }
 
-    // TODO 2023-6-16 16:22:48 此处暂不考虑继承泛型的问题，下个版本再处理它
+    // 此处暂不考虑继承泛型的问题，下个版本再处理它
     private List<Field> parseFieldList(Class clazz) {
-        List<Field> fieldList = new ArrayList<>();
+        List<Field> allFieldList = new ArrayList<>();
         Set<String> fieldNameSet = new HashSet<>();
+        Set<String> getterMethodNameLowercaseSet = new HashSet<>();
         Class currentClass = clazz;
         while (currentClass != null) {
+
+            // 收集类上的字段
             Field[] declaredFields = currentClass.getDeclaredFields();
             for (Field f : declaredFields) {
-                // TODO 判断是否符合Bean的属性的规范
-                fieldList.add(f);
+                if (fieldNameSet.contains(f.getName())) {
+                    continue;
+                }
+                allFieldList.add(f);
+                fieldNameSet.add(f.getName());
             }
+
+            // 收集类上的方法名字
+            getterMethodNameLowercaseSet.addAll(parseGetterMethodNameLowercaseSet(currentClass));
+
             currentClass = currentClass.getSuperclass();
         }
-        return fieldList;
+
+        // 然后筛选出来符合条件的字段，作为bean的属性
+        List<Field> beanFieldList = new ArrayList<>();
+        allFieldList.forEach(new Consumer<Field>() {
+            @Override
+            public void accept(Field field) {
+                if (isBeanField(field, getterMethodNameLowercaseSet)) {
+                    beanFieldList.add(field);
+                }
+            }
+        });
+
+        return beanFieldList;
+    }
+
+    /**
+     * 判断Field是否是bean的field
+     *
+     * @param field
+     * @param getterMethodNameLowercaseSet
+     * @return
+     */
+    private boolean isBeanField(Field field, Set<String> getterMethodNameLowercaseSet) {
+
+        // 采用白名单的方式，public并且是实例方法则认为是可以的
+        if (Modifier.isPublic(field.getModifiers())) {
+            return !Modifier.isStatic(field.getModifiers()) && !Modifier.isFinal(field.getModifiers());
+        }
+
+        // 私有方法并且有对应的getter
+        String setterMethodName = "";
+        if (field.getType() == boolean.class || field.getType() == Boolean.class) {
+            setterMethodName = "is" + field.getName().toLowerCase();
+        } else {
+            setterMethodName = "get" + field.getName().toLowerCase();
+        }
+        return getterMethodNameLowercaseSet.contains(setterMethodName);
+    }
+
+    /**
+     * 解析类上的getter方法，并将其方法名都转为小写返回
+     *
+     * @param clazz
+     * @return
+     */
+    private Set<String> parseGetterMethodNameLowercaseSet(Class clazz) {
+        Set<String> getterLowercaseMethodNameSet = new HashSet<>();
+        for (Method declaredMethod : clazz.getDeclaredMethods()) {
+            // 这里采用比较简单的策略，只要是关键字开头的就认为是ok的
+            if (declaredMethod.getName().startsWith("get") || declaredMethod.getName().startsWith("is")) {
+                getterLowercaseMethodNameSet.add(declaredMethod.getName().toLowerCase());
+            }
+        }
+        return getterLowercaseMethodNameSet;
     }
 
     @Override
