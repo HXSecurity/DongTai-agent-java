@@ -57,7 +57,7 @@ public class AlibabaDubboServiceExtractor extends AbstractDubboServiceExtractor 
                 }
             });
         } catch (Throwable e) {
-            DongTaiLog.error("AbstractDubboServiceGather parseExportedServiceClassList error", e);
+            DongTaiLog.error("AlibabaDubboServiceExtractor parseExportedServiceClassList error", e);
         }
         return serviceClassList;
     }
