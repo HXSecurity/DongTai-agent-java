@@ -337,7 +337,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
 
     @Override
     public void collectDubboRequestSource(Object handler, Object invocation, String methodName,
-                                          Object[] arguments, Map<String, ?> headers,
+                                          Object[] arguments, Class<?>[] argumentTypes, Map<String, ?> headers,
                                           String hookClass, String hookMethod, String hookSign) {
         try {
             ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
@@ -346,7 +346,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                 return;
             }
 
-            DubboImpl.collectDubboRequestSource(handler, invocation, methodName, arguments, headers,
+            DubboImpl.collectDubboRequestSource(handler, invocation, methodName, arguments, argumentTypes, headers,
                     hookClass, hookMethod, hookSign, INVOKE_ID_SEQUENCER);
         } catch (Throwable e) {
             DongTaiLog.warn(ErrorCode.get("SPY_COLLECT_DUBBO_FAILED"), "request source", e);

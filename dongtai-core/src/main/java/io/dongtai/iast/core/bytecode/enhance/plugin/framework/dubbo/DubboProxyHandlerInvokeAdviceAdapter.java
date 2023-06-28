@@ -9,6 +9,7 @@ import org.objectweb.asm.commons.Method;
 public class DubboProxyHandlerInvokeAdviceAdapter extends AbstractAdviceAdapter {
     private static final Method GET_ARGUMENTS_METHOD = Method.getMethod("java.lang.Object[] getArguments()");
     private static final Method GET_METHOD_NAME_METHOD = Method.getMethod("java.lang.String getMethodName()");
+    private static final Method GET_PARAMETER_TYPES_METHOD = Method.getMethod("java.lang.Class[] getParameterTypes()");
 
     private final String packageName;
     private final Type invocationType;
@@ -59,6 +60,8 @@ public class DubboProxyHandlerInvokeAdviceAdapter extends AbstractAdviceAdapter 
         invokeInterface(this.invocationType, GET_METHOD_NAME_METHOD);
         loadArg(0);
         invokeInterface(this.invocationType, GET_ARGUMENTS_METHOD);
+        loadArg(0);
+        invokeInterface(this.invocationType, GET_PARAMETER_TYPES_METHOD);
         loadArg(0);
         invokeInterface(this.invocationType, this.getAttachmentsMethod);
         push(this.classContext.getClassName());
