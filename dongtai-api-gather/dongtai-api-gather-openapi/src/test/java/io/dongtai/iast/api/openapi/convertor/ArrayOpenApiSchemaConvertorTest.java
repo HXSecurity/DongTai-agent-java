@@ -77,7 +77,7 @@ public class ArrayOpenApiSchemaConvertorTest {
         Assert.assertTrue(new Schema(DataType.Int64Array()).jsonEquals(convertor.convert(long[].class)));
 
         // 枚举类型数组
-        Assert.assertEquals("{\"items\":{\"enums\":[\"A\",\"B\",\"C\"],\"type\":\"string\"},\"type\":\"array\"}", convertor.convert(Enumnumnum[].class).toJson());
+        Assert.assertEquals("{\"items\":{\"enum\":[\"A\",\"B\",\"C\"],\"type\":\"string\"},\"type\":\"array\"}", convertor.convert(Enumnumnum[].class).toJson());
 
         // 多维数组
         Assert.assertEquals("{\"items\":{\"type\":\"object\"},\"type\":\"array\"}", convertor.convert(String[][].class).toJson());
