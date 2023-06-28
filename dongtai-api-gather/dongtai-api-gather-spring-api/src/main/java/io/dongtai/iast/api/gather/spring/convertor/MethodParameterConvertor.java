@@ -88,14 +88,15 @@ public class MethodParameterConvertor {
     }
 
     /**
-     * 判断参数值的类型是否是Spring框架的类，如果是的话则不能当做组件来处理
+     * 判断参数值的类型是否是Spring框架的类，如果是的话则不能当做组件来处理，这里主要是为了忽略ModelAndView、HttpServletRequest这些类
      *
      * @return
      */
     private boolean isWebFrameworkClass() {
         String parameterClassName = this.methodParameter.getParameterType().getName();
-        return parameterClassName.startsWith(" org.springframework".substring(1)) ||
-                parameterClassName.startsWith(" javax.servlet".substring(1));
+        return parameterClassName.startsWith(" org.springframework.".substring(1)) ||
+                parameterClassName.startsWith(" javax.servlet.".substring(1)) ||
+                parameterClassName.startsWith(" jakarta.servlet.".substring(1));
     }
 
     /**
