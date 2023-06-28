@@ -1,8 +1,8 @@
-package io.dongtai.iast.core.handler.skip;
+package io.dongtai.iast.core.handler.bypass;
 
 import io.dongtai.iast.core.utils.threadlocal.BooleanThreadLocal;
 
-public class BlackUrlSkipHandler {
+public class BlackUrlBypass {
 
     private static BooleanThreadLocal isBlackUrl = new BooleanThreadLocal(false);
 
@@ -11,7 +11,7 @@ public class BlackUrlSkipHandler {
     }
 
     public static void setIsBlackUrl(Boolean isBlackUrl) {
-        BlackUrlSkipHandler.isBlackUrl.set(isBlackUrl);
+        BlackUrlBypass.isBlackUrl.set(isBlackUrl);
     }
 
     public static String getHeaderKey() {

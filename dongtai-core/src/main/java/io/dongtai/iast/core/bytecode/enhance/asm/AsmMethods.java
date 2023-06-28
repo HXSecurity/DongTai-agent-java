@@ -278,9 +278,15 @@ public interface AsmMethods {
             String.class
     );
 
-    Method SPY$isSkipCollect = InnerHelper.getAsmMethod(
+    Method SPY$isSkipCollectDubbo = InnerHelper.getAsmMethod(
             SpyDispatcher.class,
-            "isSkipCollect",
+            "isSkipCollectDubbo",
+            Object.class
+    );
+
+    Method SPY$isSkipCollectFeign = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "isSkipCollectFeign",
             Object.class
     );
 

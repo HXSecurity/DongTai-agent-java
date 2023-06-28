@@ -118,7 +118,7 @@ public class DubboSyncHandlerInvokeAdviceAdapter extends AbstractAdviceAdapter {
     private void skipCollect() {
         invokeStatic(ASM_TYPE_SPY_HANDLER, SPY_HANDLER$getDispatcher);
         loadArg(0);
-        invokeInterface(ASM_TYPE_SPY_DISPATCHER,SPY$isSkipCollect);
+        invokeInterface(ASM_TYPE_SPY_DISPATCHER,SPY$isSkipCollectDubbo);
         pop();
     }
 }

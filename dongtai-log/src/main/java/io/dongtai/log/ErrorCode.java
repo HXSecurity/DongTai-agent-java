@@ -65,6 +65,7 @@ public enum ErrorCode {
     TRANSFORM_ENGINE_DESTROY_REDEFINE_CLASSES_FAILED(20122, "transform engine failed to redefine classes when destroy"),
     ENGINE_PROPERTIES_INITIALIZE_FAILED(20131, "engine properties initialize failed"),
     CLASS_DIAGRAM_SCAN_JAR_ANCESTOR_FAILED(20141, "class diagram scan jar ancestor failed"),
+    REDEFINE_MODULE_FAILED(20142, "There was a problem redefining the java.base module"),
 
     // transform
     TRANSFORM_CLASS_FAILED(20201, "transform class {} failed"),
@@ -88,7 +89,8 @@ public enum ErrorCode {
     SPY_TRACE_DUBBO_CONSUMER_INVOKE_FAILED(20361, "hookpoint trace dubbo consumer invoke failed"),
     SPY_LEAVE_DUBBO_FAILED(20362, "hookpoint leave dubbo failed"),
     SPY_COLLECT_DUBBO_FAILED(20363, "hookpoint collect dubbo {} failed"),
-    SPY_SKIP_COLLECT_DUBBO_FAILED(20364, "hookpoint skip collect dubbo {} failed"),
+    BYPASS_FAILED_DUBBO(20364, "hookpoint skip collect dubbo {} failed"),
+    BYPASS_FAILED_FEIGN(20365, "hookpoint skip collect feign {} failed"),
 
     // report & replay
     REPORT_SEND_FAILED(20401, "send report to {} error, report: {}"),

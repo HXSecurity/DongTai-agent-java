@@ -3,7 +3,6 @@ package io.dongtai.iast.core.handler.hookpoint.controller.impl;
 import io.dongtai.iast.common.config.*;
 import io.dongtai.iast.common.constants.AgentConstant;
 import io.dongtai.iast.core.EngineManager;
-import io.dongtai.iast.core.handler.skip.BlackUrlSkipHandler;
 import io.dongtai.iast.core.handler.hookpoint.IastClassLoader;
 import io.dongtai.iast.core.utils.*;
 import io.dongtai.iast.core.utils.matcher.ConfigMatcher;
@@ -72,10 +71,6 @@ public class HttpImpl {
         }
         // todo Consider increasing the capture of html request responses
         if (ConfigMatcher.getInstance().disableExtension((String) requestMeta.get("requestURI"))) {
-            return;
-        }
-        if (ConfigMatcher.getInstance().getBlackUrl(requestMeta)) {
-            BlackUrlSkipHandler.setIsBlackUrl(true);
             return;
         }
 

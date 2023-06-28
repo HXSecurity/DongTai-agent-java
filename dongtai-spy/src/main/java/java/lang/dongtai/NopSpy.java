@@ -263,7 +263,12 @@ public class NopSpy implements SpyDispatcher {
     }
 
     @Override
-    public boolean isSkipCollect(Object invocation) {
+    public boolean isSkipCollectDubbo(Object invocation) {
+        return false;
+    }
+
+    @Override
+    public boolean isSkipCollectFeign(Object instance) {
         return false;
     }
 

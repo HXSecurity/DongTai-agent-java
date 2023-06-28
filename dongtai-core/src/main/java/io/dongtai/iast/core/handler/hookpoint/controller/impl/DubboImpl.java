@@ -4,7 +4,7 @@ import com.alibaba.fastjson2.JSONArray;
 import io.dongtai.iast.common.config.ConfigBuilder;
 import io.dongtai.iast.common.config.ConfigKey;
 import io.dongtai.iast.core.EngineManager;
-import io.dongtai.iast.core.handler.skip.BlackUrlSkipHandler;
+import io.dongtai.iast.core.handler.bypass.BlackUrlBypass;
 import io.dongtai.iast.core.handler.context.ContextManager;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.SourceNode;
@@ -55,7 +55,8 @@ public class DubboImpl {
         if (requestMeta == null) {
             return;
         }
-        if (null != headers.get(BlackUrlSkipHandler.getHeaderKey()) && headers.get(BlackUrlSkipHandler.getHeaderKey()).equals("true")){
+        if (null != headers.get(BlackUrlBypass.getHeaderKey()) && headers.get(BlackUrlBypass.getHeaderKey()).equals("true")){
+            BlackUrlBypass.setIsBlackUrl(true);
             return;
         }
 

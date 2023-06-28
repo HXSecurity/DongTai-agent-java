@@ -16,8 +16,7 @@ import org.apache.commons.lang3.time.StopWatch;
 
 import java.lang.dongtai.SpyDispatcherHandler;
 import java.lang.instrument.Instrumentation;
-import java.util.ArrayList;
-import java.util.ListIterator;
+import java.util.*;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -71,6 +70,7 @@ public class AgentEngine {
             DongTaiLog.info("DongTai Engine is successfully installed to the JVM, and it takes {} s",
                     stopWatch.getTime() / 1000);
             DongTaiLog.info("DongTai Agent Version: {}, DongTai Server: {}", AgentConstant.VERSION_VALUE, cfg.getBaseUrl());
+            inject(inst);
             new ServiceDirReport().send();
         } catch (Throwable e) {
             DongTaiLog.error(ErrorCode.get("ENGINE_INSTALL_FAILED"), e);
@@ -131,6 +131,39 @@ public class AgentEngine {
         while (listIterator.hasPrevious()) {
             engine = listIterator.previous();
             engine.destroy();
+        }
+    }
+
+
+    private static void redefineJavaBaseModule(Instrumentation instrumentation) {
+        if (doesSupportModules()) {
+            try {
+                Instrumentation.class.getMethod("redefineModule", Class.forName("java.lang.Module"), Set.class, Map.class, Map.class, Set.class, Map.class).invoke(instrumentation, getModule(Object.class), Collections.emptySet(), Collections.emptyMap(), Collections.singletonMap("java.lang", Collections.singleton(getModule(EngineManager.class))), Collections.emptySet(), Collections.emptyMap());
+            } catch (Exception e) {
+                DongTaiLog.error(ErrorCode.REDEFINE_MODULE_FAILED,e);
+            }
+        }
+    }
+
+    public static boolean doesSupportModules() {
+        try {
+            Class.forName("java.lang.Module");
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
+    }
+
+    private static Object getModule(Class<?> clazz) {
+        try {
+            return Class.class.getMethod("getModule", new Class[0]).invoke(clazz, new Object[0]);
+        } catch (Exception e) {
+            throw new IllegalStateException("There was a problem while getting the module of the class", e);
+        }
+    }
+    public static void inject(Instrumentation inst) {
+        if (doesSupportModules()) {
+            redefineJavaBaseModule(inst);
         }
     }
 

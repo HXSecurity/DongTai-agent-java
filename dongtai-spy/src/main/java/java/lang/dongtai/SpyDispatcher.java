@@ -171,5 +171,7 @@ public interface SpyDispatcher {
                              Map<String, String> headers, String className, String methodName,
                              String signature);
 
-    boolean isSkipCollect(Object invocation);
+    boolean isSkipCollectDubbo(Object invocation);
+
+    boolean isSkipCollectFeign(Object instance);
 }
