@@ -19,7 +19,7 @@ public class DubboApiGatherThread extends AbstractApiGatherThread {
     }
 
     // avoid lock
-    private static volatile boolean isStarted = false;
+    private static boolean isStarted = false;
 
     public static void gather(Class handlerClass) {
         if (isStarted) {

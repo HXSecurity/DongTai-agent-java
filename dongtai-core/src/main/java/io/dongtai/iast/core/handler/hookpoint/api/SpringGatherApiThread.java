@@ -15,7 +15,7 @@ public class SpringGatherApiThread extends AbstractApiGatherThread {
     public static final String FRAMEWORK_NAME = "spring mvc";
 
     // avoid lock
-    private static volatile boolean isStarted = false;
+    private static boolean isStarted = false;
 
     public static void gather(Object applicationContext) {
         if (isStarted) {
