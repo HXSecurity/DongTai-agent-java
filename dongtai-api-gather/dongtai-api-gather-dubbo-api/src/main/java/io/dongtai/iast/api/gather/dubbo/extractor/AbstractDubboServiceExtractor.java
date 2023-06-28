@@ -2,6 +2,7 @@ package io.dongtai.iast.api.gather.dubbo.extractor;
 
 import io.dongtai.iast.api.gather.dubbo.convertor.ServiceConvertor;
 import io.dongtai.iast.api.openapi.convertor.OpenApiSchemaConvertorManager;
+import io.dongtai.iast.api.openapi.domain.Info;
 import io.dongtai.iast.api.openapi.domain.OpenApi;
 import io.dongtai.iast.api.openapi.domain.Path;
 import io.dongtai.log.DongTaiLog;
@@ -55,6 +56,10 @@ public abstract class AbstractDubboServiceExtractor {
 
         // 涉及到的组件库
         openApi.setComponentsBySchemaMap(this.manager.getDatabase().toComponentSchemasMap());
+
+        Info info = new Info();
+        info.setTitle("open api");
+        openApi.setInfo(info);
 
         return openApi;
     }
