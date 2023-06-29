@@ -1,6 +1,7 @@
 package io.dongtai.iast.core.handler.hookpoint.api;
 
 import io.dongtai.iast.common.constants.AgentConstant;
+import io.dongtai.iast.core.bytecode.enhance.plugin.PluginRegister;
 import io.dongtai.iast.core.handler.hookpoint.controller.impl.DubboImpl;
 import io.dongtai.log.DongTaiLog;
 
@@ -11,6 +12,9 @@ import io.dongtai.log.DongTaiLog;
 public class DubboApiGatherThread extends AbstractApiGatherThread {
 
     public static final String FRAMEWORK_NAME = "dubbo";
+
+    // dubbo api采集插件的名字，可以在启动agent的时候通过指定属性禁用它
+    public static final String PLUGIN_NAME = "dubbo-api";
 
     // Dubbo的包名是alibaba还是apache的
     public static enum DubboPackage {
@@ -26,6 +30,12 @@ public class DubboApiGatherThread extends AbstractApiGatherThread {
             return;
         }
         isStarted = true;
+
+        // 判断插件是否开启，仅当开启的情况下才采集
+        if (PluginRegister.isPluginDisable(PLUGIN_NAME)) {
+            DongTaiLog.debug("dubbo api gather plugin disable");
+            return;
+        }
 
         DubboPackage dubboPackage = parseDubboPackage(handlerClass);
         if (dubboPackage == null) {

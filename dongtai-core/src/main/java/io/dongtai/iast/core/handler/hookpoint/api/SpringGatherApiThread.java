@@ -22,6 +22,7 @@ public class SpringGatherApiThread extends AbstractApiGatherThread {
             return;
         }
         isStarted = true;
+        
         new SpringGatherApiThread(applicationContext).start();
     }
 
