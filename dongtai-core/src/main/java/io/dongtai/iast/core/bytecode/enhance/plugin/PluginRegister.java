@@ -73,7 +73,8 @@ public class PluginRegister {
      */
     public static boolean isPluginDisable(String pluginName) {
         // 现在插件比较少，O(n)性能损耗能够接受
-        return PropertyUtils.getDisabledPlugins().contains(pluginName);
+        List<String> l = PropertyUtils.getDisabledPlugins();
+        return l != null && PropertyUtils.getDisabledPlugins().contains(pluginName);
     }
 
 }
