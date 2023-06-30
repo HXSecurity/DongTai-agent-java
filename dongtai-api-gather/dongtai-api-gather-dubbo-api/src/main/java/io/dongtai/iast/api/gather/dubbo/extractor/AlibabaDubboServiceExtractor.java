@@ -6,6 +6,7 @@ import com.alibaba.dubbo.rpc.Protocol;
 import com.alibaba.dubbo.rpc.protocol.dubbo.DubboProtocol;
 import io.dongtai.iast.api.openapi.domain.OpenApi;
 import io.dongtai.log.DongTaiLog;
+import io.dongtai.log.ErrorCode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +58,7 @@ public class AlibabaDubboServiceExtractor extends AbstractDubboServiceExtractor 
                 }
             });
         } catch (Throwable e) {
-            DongTaiLog.error("AlibabaDubboServiceExtractor parseExportedServiceClassList error", e);
+            DongTaiLog.error(ErrorCode.API_GATHER_DUBBO_ALIBABA_PARSE_SERVICE_LIST_ERROR, e);
         }
         return serviceClassList;
     }

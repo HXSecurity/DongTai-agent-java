@@ -2,6 +2,7 @@ package io.dongtai.iast.api.openapi.convertor;
 
 import io.dongtai.iast.api.openapi.domain.Schema;
 import io.dongtai.log.DongTaiLog;
+import io.dongtai.log.ErrorCode;
 
 /**
  * 转换器的入口类
@@ -12,17 +13,17 @@ import io.dongtai.log.DongTaiLog;
 public class OpenApiSchemaConvertorManager {
 
     // 内部用来存储组件的数据
-    ComponentDatabase database;
+    final ComponentDatabase database;
 
     // 一堆类型转换器
-    PrimitiveTypeConvertor primitiveTypeConvertor;
-    EnumOpenApiSchemaConvertor enumOpenApiSchemaConvertor;
-    ArrayOpenApiSchemaConvertor arrayOpenApiSchemaConvertor;
-    JavaBeanOpenApiSchemaConvertor javaBeanOpenApiSchemaConvertor;
-    CollectionOpenApiSchemaConvertor collectionOpenApiSchemaConvertor;
+    final PrimitiveTypeConvertor primitiveTypeConvertor;
+    final EnumOpenApiSchemaConvertor enumOpenApiSchemaConvertor;
+    final ArrayOpenApiSchemaConvertor arrayOpenApiSchemaConvertor;
+    final JavaBeanOpenApiSchemaConvertor javaBeanOpenApiSchemaConvertor;
+    final CollectionOpenApiSchemaConvertor collectionOpenApiSchemaConvertor;
 
     // 转换器使用的顺序
-    private ClassOpenApiSchemaConvertor[] convertors;
+    final ClassOpenApiSchemaConvertor[] convertors;
 
     public OpenApiSchemaConvertorManager() {
 
@@ -45,7 +46,7 @@ public class OpenApiSchemaConvertorManager {
 
 
     /**
-     * 为给定的类型生成类型
+     * 将给定的类型转换为Open API的类型
      *
      * @param clazz
      * @return
@@ -58,71 +59,24 @@ public class OpenApiSchemaConvertorManager {
 
         // 依此使用转换器尝试转换
         for (ClassOpenApiSchemaConvertor convertor : convertors) {
-            if (convertor.canConvert(clazz)) {
-                try {
+            try {
+                if (convertor.canConvert(clazz)) {
                     Schema c = convertor.convert(clazz);
                     if (c != null) {
                         return c.direct();
                     }
-                } catch (Throwable e) {
-                    DongTaiLog.error("OpenApiSchemaConvertorManager.convertClass error, convert {}, class {}", convertor.getConvertorName(), clazz.getName(), e);
                 }
+            } catch (Throwable e) {
+                DongTaiLog.error(ErrorCode.API_GATHER_OPENAPI_CONVERT_ERROR, convertor.getConvertorName(), clazz.getName(), e);
             }
         }
 
         // 转换不了就算球
         return null;
-//
-//        // 数组
-//        if (clazz.isArray()) {
-//            return arrayOpenApiSchemaConvertor.convert(clazz);
-//        }
-//
-//        // 基本类型直接转换
-//        if (manager.primitiveTypeConvertor.canConvert(componentType)) {
-//            Component items = manager.primitiveTypeConvertor.convert(componentType);
-//            return new Component(DataType.Array(items));
-//        }
-//
-//        // 集合类型调用其处理
-//        if (manager.collectionOpenApiSchemaConvertor.canConvert(componentType)) {
-//            Component items = manager.collectionOpenApiSchemaConvertor.convert(componentType);
-//            return new Component(DataType.Array(items));
-//        }
-//
-//        // bean类型处理
-//        if (manager.javaBeanOpenApiSchemaConvertor.canConvert(clazz)) {
-//            Component items = manager.javaBeanOpenApiSchemaConvertor.convert(componentType);
-//            return new Component(DataType.Array(items));
-//        }
-
-//        // 尝试进行基本类型的转换，如果能够转换成功的话说明是基本类型，则直接返回即可
-//        Component c = convertPrimitiveType(clazz);
-//        if (c != null) {
-//            return c;
-//        }
-//
-//        // 查询是否已经处理过，如果已经处理过的话则直接返回之前的结果
-//        if (classToComponentMap.containsKey(clazz)) {
-//            return classToComponentMap.get(clazz);
-//        }
-//
-//        // 数组的处理
-//        if (clazz.isArray()) {
-//            c = convertArray(clazz);
-//            cache(clazz, c);
-//            return c;
-//        }
-//
-//        // 尝试进行复杂类型转换
-//        c = convertBean(clazz);
-//        // 放入到缓存中
-//        cache(clazz, c);
-//
-//        return c;
     }
 
     public ComponentDatabase getDatabase() {
         return database;
     }
+
 }

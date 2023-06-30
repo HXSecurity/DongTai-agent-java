@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Consumer;
 
 /**
  * 用于转换JavaBean到OpenApi的组件
@@ -30,10 +29,15 @@ public class JavaBeanOpenApiSchemaConvertor extends BaseOpenApiSchemaConvertor {
 
     @Override
     public boolean canConvert(Class clazz) {
-        return !manager.primitiveTypeConvertor.canConvert(clazz) &&
-                !manager.arrayOpenApiSchemaConvertor.canConvert(clazz) &&
-                !manager.collectionOpenApiSchemaConvertor.canConvert(clazz) &&
-                !manager.enumOpenApiSchemaConvertor.canConvert(clazz);
+        // Bean转换器作为兜底的存在
+        for (ClassOpenApiSchemaConvertor convertor : this.manager.convertors) {
+            if (convertor.getClass() == this.getClass()) {
+                continue;
+            } else if (convertor.canConvert(clazz)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -45,22 +49,16 @@ public class JavaBeanOpenApiSchemaConvertor extends BaseOpenApiSchemaConvertor {
     @Override
     public Schema convert(Class clazz) {
 
-        // 先查下组件库，如果有的话就直接返回即可
+        // 先查下当前转换任务的Open API组件库，如果有的话就直接返回即可
         Schema schema = manager.database.find(clazz);
         if (schema != null) {
             return schema.direct();
         }
 
-        // TODO 2023-6-16 16:18:56 想一个更合适更容易理解的处理方式
-        // 如果在已经发现的类型列表中，则表示正在处理中，则注册一个回调方法
+        // 如果在已经发现的类型列表中但是数据库中又没有，则说明已经发现了正在处理中还没有处理完成，则注册一个回调方法，在处理完成的时候拿一下结果
         if (manager.database.exists(clazz)) {
             Schema c = new Schema();
-            manager.database.addSchemaConvertDoneCallback(clazz, new Consumer<Schema>() {
-                @Override
-                public void accept(Schema schema) {
-                    c.set$ref(schema.generateRef());
-                }
-            });
+            manager.database.addSchemaConvertDoneCallback(clazz, x -> c.set$ref(x.generateRef()));
             return c;
         }
 
@@ -74,13 +72,7 @@ public class JavaBeanOpenApiSchemaConvertor extends BaseOpenApiSchemaConvertor {
         c.setType("object");
 
         // 处理类上的字段，向上递归处理所有字段，并检查是否符合Bean规范
-        parseFieldList(clazz).forEach(new Consumer<Field>() {
-            @Override
-            public void accept(Field field) {
-                Schema schema = convert(clazz, field);
-                c.addProperty(field.getName(), schema);
-            }
-        });
+        parseFieldList(clazz).forEach(field -> c.addProperty(field.getName(), convert(clazz, field)));
 
         // 把转换完的组件存储一下
         manager.database.store(clazz, c);
@@ -93,13 +85,15 @@ public class JavaBeanOpenApiSchemaConvertor extends BaseOpenApiSchemaConvertor {
 
     // 此处暂不考虑继承泛型的问题，下个版本再处理它
     private List<Field> parseFieldList(Class clazz) {
+
         List<Field> allFieldList = new ArrayList<>();
         Set<String> fieldNameSet = new HashSet<>();
-        Set<String> getterMethodNameLowercaseSet = new HashSet<>();
+        Set<String> getterNameLowercaseSet = new HashSet<>();
         Class currentClass = clazz;
-        while (currentClass != null) {
 
-            // 收集类上的字段
+        while (currentClass != null && currentClass != Object.class) {
+
+            // 收集类上的字段，可能会发生字段覆盖的情况，所以先收集再处理，而不是边处理边收集
             Field[] declaredFields = currentClass.getDeclaredFields();
             for (Field f : declaredFields) {
                 if (fieldNameSet.contains(f.getName())) {
@@ -110,19 +104,17 @@ public class JavaBeanOpenApiSchemaConvertor extends BaseOpenApiSchemaConvertor {
             }
 
             // 收集类上的方法名字
-            getterMethodNameLowercaseSet.addAll(parseGetterMethodNameLowercaseSet(currentClass));
+            getterNameLowercaseSet.addAll(parseGetterNameLowercaseSet(currentClass));
 
+            // 再处理父类，一路向上知道找到根
             currentClass = currentClass.getSuperclass();
         }
 
         // 然后筛选出来符合条件的字段，作为bean的属性
         List<Field> beanFieldList = new ArrayList<>();
-        allFieldList.forEach(new Consumer<Field>() {
-            @Override
-            public void accept(Field field) {
-                if (isBeanField(field, getterMethodNameLowercaseSet)) {
-                    beanFieldList.add(field);
-                }
+        allFieldList.forEach(field -> {
+            if (isBeanField(field, getterNameLowercaseSet)) {
+                beanFieldList.add(field);
             }
         });
 
@@ -133,10 +125,10 @@ public class JavaBeanOpenApiSchemaConvertor extends BaseOpenApiSchemaConvertor {
      * 判断Field是否是bean的field
      *
      * @param field
-     * @param getterMethodNameLowercaseSet
+     * @param getterNameLowercaseSet
      * @return
      */
-    private boolean isBeanField(Field field, Set<String> getterMethodNameLowercaseSet) {
+    private boolean isBeanField(Field field, Set<String> getterNameLowercaseSet) {
 
         // 采用白名单的方式，public并且是实例方法则认为是可以的
         if (Modifier.isPublic(field.getModifiers())) {
@@ -150,7 +142,7 @@ public class JavaBeanOpenApiSchemaConvertor extends BaseOpenApiSchemaConvertor {
         } else {
             setterMethodName = "get" + field.getName().toLowerCase();
         }
-        return getterMethodNameLowercaseSet.contains(setterMethodName);
+        return getterNameLowercaseSet.contains(setterMethodName);
     }
 
     /**
@@ -159,73 +151,21 @@ public class JavaBeanOpenApiSchemaConvertor extends BaseOpenApiSchemaConvertor {
      * @param clazz
      * @return
      */
-    private Set<String> parseGetterMethodNameLowercaseSet(Class clazz) {
-        Set<String> getterLowercaseMethodNameSet = new HashSet<>();
+    private Set<String> parseGetterNameLowercaseSet(Class clazz) {
+        Set<String> getterNameLowercaseSet = new HashSet<>();
         for (Method declaredMethod : clazz.getDeclaredMethods()) {
             // 这里采用比较简单的策略，只要是关键字开头的就认为是ok的
             if (declaredMethod.getName().startsWith("get") || declaredMethod.getName().startsWith("is")) {
-                getterLowercaseMethodNameSet.add(declaredMethod.getName().toLowerCase());
+                getterNameLowercaseSet.add(declaredMethod.getName().toLowerCase());
             }
         }
-        return getterLowercaseMethodNameSet;
+        return getterNameLowercaseSet;
     }
 
     @Override
     public Schema convert(Class clazz, Field field) {
-        Class fieldClass = field.getType();
         // 因为类型可能是各种类型，所以这里要调用manager上的来路由
-        return manager.convertClass(fieldClass);
-//        // 如果字段是原生类型，则直接转换即可
-//        if (isPrimitiveType(fieldClass)) {
-//            return convertPrimitiveType(fieldClass);
-//        } else if (fieldClass.isArray()) {
-//            // 如果是数组的话，则走数组的转换逻辑
-//            return convertArray(fieldClass);
-//        } else if () {
-//
-//        } else {
-//
-//            // TODO 2023-6-15 18:11:53 处理泛型
-//
-//            // 如果不是基本类型，则看一下是否已经处理完毕了，如果已经处理完毕了就直接拿来用
-//            if (classToComponentMap.containsKey(fieldClass)) {
-//                Component refComponent = classToComponentMap.get(fieldClass);
-//                if (refComponent.canRef()) {
-//                    // 创建一个新的组件，这个新的组件引用已经存在的这个组件
-//                    return new Component(refComponent.generateRef());
-//                }
-//            }
-//
-//            // 如果是已经存在但是没有处理完毕的，则注册一个回调
-//            if (existsClassSet.contains(fieldClass)) {
-//                Component c = new Component();
-//                if (!componentDoneCallbackMap.containsKey(fieldClass)) {
-//                    componentDoneCallbackMap.put(fieldClass, new ArrayList<>());
-//                }
-//                componentDoneCallbackMap.get(fieldClass).add(new Consumer<Component>() {
-//                    @Override
-//                    public void accept(Component component) {
-//                        // 在处理完毕的时候把当前字段的引用指向这个转换完毕的组件
-//                        c.set$ref(component.generateRef());
-//                    }
-//                });
-//                return c;
-//            }
-//
-//            // 如果是一个新的类，则递归处理它
-//            // 标记为已经发现过
-//            existsClassSet.add(fieldClass);
-//            // 递归处理
-//            Component c = generate(fieldClass);
-//            // 缓存结果
-//            cache(fieldClass, c);
-//            // 只返回一个引用，并不真的进行嵌套
-//            if (c.canRef()) {
-//                return new Component(c.generateRef());
-//            } else {
-//                return c;
-//            }
-//        }
+        return manager.convertClass(field.getType());
     }
 
 }

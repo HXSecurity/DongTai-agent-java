@@ -12,6 +12,11 @@ import java.lang.reflect.Field;
  */
 public interface FieldOpenApiSchemaConvertor {
 
+    /**
+     * 转换器的名字，方便日志打印啥的
+     *
+     * @return
+     */
     String getConvertorName();
 
     /**

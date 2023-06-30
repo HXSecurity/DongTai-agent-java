@@ -77,7 +77,7 @@ public class MethodParameterConvertor {
             String parameterName = parameterNames[this.methodParameter.getParameterIndex()];
             p.setName(parameterName);
         } catch (Throwable e) {
-            DongTaiLog.error("parse method parameter error: {}", e.getMessage());
+            DongTaiLog.debug("parse method parameter exception: {}", e.getMessage());
         }
 
         // 参数的类型需要存储一下

@@ -58,7 +58,7 @@ public class HandlerMethodConvertor {
                     parameterMap.put(p.getName(), p);
                 }
             } catch (Throwable e) {
-                DongTaiLog.error("Spring API HandlerMethodConvertor.parseParameters error", e);
+                DongTaiLog.debug("spring HandlerMethodConvertor.parseParameters exception", e);
             }
         }
         return new ArrayList<>(parameterMap.values());

@@ -4,6 +4,7 @@ import io.dongtai.iast.common.constants.AgentConstant;
 import io.dongtai.iast.core.bytecode.enhance.plugin.PluginRegister;
 import io.dongtai.iast.core.handler.hookpoint.controller.impl.DubboImpl;
 import io.dongtai.log.DongTaiLog;
+import io.dongtai.log.ErrorCode;
 
 /**
  * @author CC11001100
@@ -96,10 +97,8 @@ public class DubboApiGatherThread extends AbstractApiGatherThread {
             Class<?> proxyClass = DubboImpl.getClassLoader().loadClass("io.dongtai.iast.api.gather.dubbo.extractor.AlibabaDubboServiceExtractor");
             Object openApi = proxyClass.getDeclaredMethod("run").invoke(null);
             report(openApi, FRAMEWORK_NAME);
-        } catch (NoClassDefFoundError e) {
-            DongTaiLog.error("DubboApiGatherThread.gatherAlibabaDubbo NoClassDefFoundError", e);
         } catch (Throwable e) {
-            DongTaiLog.error("DubboApiGatherThread.gatherAlibabaDubbo error", e);
+            DongTaiLog.error(ErrorCode.API_GATHER_DUBBO_ALIBABA_ERROR, e);
         }
     }
 
@@ -111,10 +110,8 @@ public class DubboApiGatherThread extends AbstractApiGatherThread {
             Class<?> proxyClass = DubboImpl.getClassLoader().loadClass("io.dongtai.iast.api.gather.dubbo.extractor.ApacheDubboServiceExtractor");
             Object openApi = proxyClass.getDeclaredMethod("run").invoke(null);
             report(openApi, FRAMEWORK_NAME);
-        } catch (NoClassDefFoundError e) {
-            DongTaiLog.error("DubboApiGatherThread.gatherApacheDubbo NoClassDefFoundError", e);
         } catch (Throwable e) {
-            DongTaiLog.error("DubboApiGatherThread.gatherApacheDubbo error", e);
+            DongTaiLog.error(ErrorCode.API_GATHER_DUBBO_APACHE_ERROR, e);
         }
     }
 

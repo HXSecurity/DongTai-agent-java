@@ -30,7 +30,7 @@ public class ArrayOpenApiSchemaConvertor extends BaseOpenApiSchemaConvertor {
 
         Class componentType = clazz.getComponentType();
         if (componentType == null) {
-            return null;
+            return new Schema(DataType.ObjectArray());
         }
 
         // 如果是多层数组，则直接返回array，swagger spring也是这么处理的

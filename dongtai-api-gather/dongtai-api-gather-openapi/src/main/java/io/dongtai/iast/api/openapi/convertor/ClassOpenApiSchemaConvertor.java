@@ -10,6 +10,11 @@ import io.dongtai.iast.api.openapi.domain.Schema;
  */
 public interface ClassOpenApiSchemaConvertor {
 
+    /**
+     * 转换器的名字，方便日志打印啥的
+     *
+     * @return
+     */
     String getConvertorName();
 
     /**

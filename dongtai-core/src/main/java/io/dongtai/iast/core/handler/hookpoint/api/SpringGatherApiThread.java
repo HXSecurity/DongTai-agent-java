@@ -4,6 +4,7 @@ import io.dongtai.iast.common.constants.AgentConstant;
 import io.dongtai.iast.core.handler.hookpoint.IastClassLoader;
 import io.dongtai.iast.core.handler.hookpoint.controller.impl.HttpImpl;
 import io.dongtai.log.DongTaiLog;
+import io.dongtai.log.ErrorCode;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -55,7 +56,7 @@ public class SpringGatherApiThread extends AbstractApiGatherThread {
             }
 
         } catch (Throwable e) {
-            DongTaiLog.error("SpringGatherApiThread.reflection failed", e);
+            DongTaiLog.error(ErrorCode.API_GATHER_SPRING_MVC_ERROR, e);
         }
     }
 

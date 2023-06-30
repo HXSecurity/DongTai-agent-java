@@ -27,7 +27,8 @@ public class MapOpenApiSchemaConvertor extends BaseOpenApiSchemaConvertor {
 
     @Override
     public Schema convert(Class clazz) {
+        // 2023-6-30 10:39:26 暂不处理map
         return new Schema(DataType.Object());
     }
-    
+
 }

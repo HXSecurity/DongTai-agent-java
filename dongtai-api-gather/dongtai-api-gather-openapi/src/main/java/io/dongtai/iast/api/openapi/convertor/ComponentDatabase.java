@@ -16,7 +16,7 @@ public class ComponentDatabase {
     // 类到Schema的映射
     private Map<Class, Schema> classToSchemaMap;
 
-    // 已经发现了的类，用于避免重复处理
+    // 已经发现了的类，用于避免重复处理，也避免碰到循环引用时递归爆栈
     private Set<Class> existsClassSet = new HashSet<>();
 
     // 符合类型的schema生成完毕的时候的回调方法，用于处理环形依赖
@@ -72,12 +72,7 @@ public class ComponentDatabase {
         if (consumers == null) {
             return;
         }
-        consumers.forEach(new Consumer<Consumer<Schema>>() {
-            @Override
-            public void accept(Consumer<Schema> componentConsumer) {
-                componentConsumer.accept(c);
-            }
-        });
+        consumers.forEach(x -> x.accept(c));
     }
 
     /**
@@ -130,18 +125,18 @@ public class ComponentDatabase {
         return m;
     }
 
-    /**
-     * 把给定的类注册到组件库中
-     *
-     * @param clazz
-     * @return
-     */
-    public Schema register(Class clazz) {
-        Schema c = new Schema();
-        c.setType("object");
-        c.setName(clazz.getName());
-        classToSchemaMap.put(clazz, c);
-        return c.direct();
-    }
+//    /**
+//     * 把给定的类注册到组件库中，但是并不解析名称，暂时未用到先注释掉
+//     *
+//     * @param clazz
+//     * @return
+//     */
+//    public Schema register(Class clazz) {
+//        Schema c = new Schema();
+//        c.setType("object");
+//        c.setName(clazz.getName());
+//        classToSchemaMap.put(clazz, c);
+//        return c.direct();
+//    }
 
 }

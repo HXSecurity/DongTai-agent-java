@@ -6,12 +6,12 @@ import io.dongtai.iast.api.openapi.domain.Info;
 import io.dongtai.iast.api.openapi.domain.OpenApi;
 import io.dongtai.iast.api.openapi.domain.Path;
 import io.dongtai.log.DongTaiLog;
+import io.dongtai.log.ErrorCode;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
 /**
  * 两个dubbo分支Service收集共同的逻辑抽象到这里
@@ -24,6 +24,8 @@ import java.util.function.Consumer;
  */
 public abstract class AbstractDubboServiceExtractor {
 
+    private static final String DUBBO_PROTOCOL_NAME = "dubbo";
+
     // 每个Gather共享同一个Manager
     private OpenApiSchemaConvertorManager manager;
 
@@ -32,19 +34,19 @@ public abstract class AbstractDubboServiceExtractor {
     }
 
     public OpenApi extract() {
-        Object protocolObject = this.getProtocol("dubbo");
+        Object protocolObject = this.getProtocol(DUBBO_PROTOCOL_NAME);
         if (protocolObject == null) {
-            DongTaiLog.error("AbstractDubboServiceGather getProtocol null");
+            DongTaiLog.error(ErrorCode.API_GATHER_DUBBO_PROTOCOL_NULL);
             return null;
         }
         Object exporterMap = this.getExporterMap(protocolObject);
         if (exporterMap == null) {
-            DongTaiLog.error("AbstractDubboServiceGather getExporterMap null");
+            DongTaiLog.error(ErrorCode.API_GATHER_DUBBO_EXPORT_MAP_NULL);
             return null;
         }
         List<Class> exportedServiceList = this.parseExportedServiceClassList(exporterMap);
         if (exportedServiceList == null || exportedServiceList.isEmpty()) {
-            DongTaiLog.error("AbstractDubboServiceGather parseExportedServiceClassList empty");
+            DongTaiLog.error(ErrorCode.API_GATHER_DUBBO_EXPORT_LIST_EMPTY);
             return null;
         }
 
@@ -65,23 +67,20 @@ public abstract class AbstractDubboServiceExtractor {
     }
 
     /**
-     * 解析导出的类
+     * 解析dubbo协议导出的Service为Open API的Path
      *
      * @param exportedServiceList
      * @return
      */
     private Map<String, Path> parsePaths(List<Class> exportedServiceList) {
         Map<String, Path> pathMap = new HashMap<>();
-        exportedServiceList.forEach(new Consumer<Class>() {
-            @Override
-            public void accept(Class aClass) {
-                try {
-                    Map<String, Path> convert = new ServiceConvertor(manager, aClass).convert();
-                    // 暂不考虑key覆盖的问题
-                    pathMap.putAll(convert);
-                } catch (Throwable e) {
-                    DongTaiLog.error("AbstractDubboServiceGather parsePaths error", e);
-                }
+        exportedServiceList.forEach(aClass -> {
+            try {
+                Map<String, Path> convert = new ServiceConvertor(manager, aClass).convert();
+                // 暂不考虑key覆盖的问题
+                pathMap.putAll(convert);
+            } catch (Throwable e) {
+                DongTaiLog.error(ErrorCode.API_GATHER_DUBBO_SERVICE_CONVERT_ERROR, e);
             }
         });
         return pathMap;
@@ -95,17 +94,17 @@ public abstract class AbstractDubboServiceExtractor {
      */
     private Object getProtocol(String protocolName) {
         Object protocolObj = this.getProtocolObject(protocolName);
-        for (int i = 0; i < 10; i++) {
-            try {
+        try {
+            for (int i = 0; i < 10; i++) {
                 Field protocolField = protocolObj.getClass().getDeclaredField("protocol");
                 protocolField.setAccessible(true);
                 protocolObj = protocolField.get(protocolObj);
                 if (protocolObj.getClass() == this.exceptedProtocolClass()) {
                     break;
                 }
-            } catch (Throwable e) {
-                DongTaiLog.error("AbstractDubboServiceGather getProtocol error", e);
             }
+        } catch (Throwable e) {
+            DongTaiLog.error(ErrorCode.API_GATHER_DUBBO_GET_PROTOCOL_ERROR, e);
         }
         return protocolObj;
     }
@@ -137,7 +136,7 @@ public abstract class AbstractDubboServiceExtractor {
             exporterMapField.setAccessible(true);
             return exporterMapField.get(protocolObject);
         } catch (Throwable e) {
-            DongTaiLog.error("AbstractDubboServiceGather getExporterMap error", e);
+            DongTaiLog.error(ErrorCode.API_GATHER_DUBBO_GET_EXPORT_MAP_ERROR, e);
         }
         return null;
     }

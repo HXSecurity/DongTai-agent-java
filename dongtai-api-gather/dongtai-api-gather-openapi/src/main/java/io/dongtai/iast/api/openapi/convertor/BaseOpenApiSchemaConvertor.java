@@ -20,6 +20,7 @@ public abstract class BaseOpenApiSchemaConvertor implements ClassOpenApiSchemaCo
 
     @Override
     public boolean canConvert(Class clazz, Field field) {
+        // 在基类上把Field的转换复用一下Class的转换 
         return field != null && canConvert(field.getType());
     }
 

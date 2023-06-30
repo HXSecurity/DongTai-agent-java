@@ -34,7 +34,7 @@ public class ServiceConvertor {
                 path.setDubbo(convert);
                 pathMap.put(this.buildSign(parseServiceMethod), path);
             } catch (Throwable e) {
-                DongTaiLog.error("ServiceConvertor.convert error", e);
+                DongTaiLog.debug("ServiceConvertor.convert exception", e);
             }
         }
         return pathMap;

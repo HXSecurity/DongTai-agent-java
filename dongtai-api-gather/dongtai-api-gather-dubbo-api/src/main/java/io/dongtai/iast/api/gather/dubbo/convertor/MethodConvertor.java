@@ -36,13 +36,13 @@ public class MethodConvertor {
         try {
             o.mergeParameters(this.parseParameters());
         } catch (Throwable e) {
-            DongTaiLog.error("MethodConvertor.convert parseParameters error", e);
+            DongTaiLog.debug("MethodConvertor.convert parseParameters exception", e);
         }
 
         try {
             o.setResponses(this.parseResponse());
         } catch (Throwable e) {
-            DongTaiLog.error("MethodConvertor.convert parseResponse error", e);
+            DongTaiLog.debug("MethodConvertor.convert parseResponse exception", e);
         }
 
         // 设置这两个字段
@@ -100,7 +100,7 @@ public class MethodConvertor {
                     parameterList.add(convert);
                 }
             } catch (Throwable e) {
-                DongTaiLog.error("MethodConvertor.parseParameters ParameterConvertor error", e);
+                DongTaiLog.debug("MethodConvertor.parseParameters ParameterConvertor exception", e);
             }
         }
         return parameterList;

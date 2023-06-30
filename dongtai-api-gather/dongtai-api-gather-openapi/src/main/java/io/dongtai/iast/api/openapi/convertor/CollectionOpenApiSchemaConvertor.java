@@ -10,9 +10,9 @@ import io.dongtai.iast.api.openapi.domain.Schema;
  */
 public class CollectionOpenApiSchemaConvertor extends BaseOpenApiSchemaConvertor {
 
-    private final ListOpenApiSchemaConvertor listOpenApiSchemaConvertor;
-    private final SetOpenApiSchemaConvertor setOpenApiSchemaConvertor;
-    private final MapOpenApiSchemaConvertor mapOpenApiSchemaConvertor;
+    final ListOpenApiSchemaConvertor listOpenApiSchemaConvertor;
+    final SetOpenApiSchemaConvertor setOpenApiSchemaConvertor;
+    final MapOpenApiSchemaConvertor mapOpenApiSchemaConvertor;
 
     public CollectionOpenApiSchemaConvertor(OpenApiSchemaConvertorManager manager) {
         super(manager);

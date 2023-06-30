@@ -60,7 +60,7 @@ public class RequestMappingInfoConvertor {
                 });
             }
         } catch (Throwable e) {
-            DongTaiLog.error("spring api path.getPathPatternsCondition router error", e);
+            DongTaiLog.debug("spring api path.getPathPatternsCondition router exception", e);
         }
 
         try {
@@ -78,7 +78,7 @@ public class RequestMappingInfoConvertor {
                 });
             }
         } catch (Throwable e) {
-            DongTaiLog.error("spring api path.getPatternsCondition router error", e);
+            DongTaiLog.debug("spring api path.getPatternsCondition router exception", e);
         }
     }
 
@@ -126,7 +126,7 @@ public class RequestMappingInfoConvertor {
                 }
             });
         } catch (Throwable e) {
-            DongTaiLog.error("spring api method router error", e);
+            DongTaiLog.debug("spring api method router exception", e);
         }
     }
 
@@ -143,7 +143,7 @@ public class RequestMappingInfoConvertor {
             List<Parameter> parameterList = parseParamsRequestCondition();
             operation.mergeParameters(parameterList);
         } catch (Throwable e) {
-            DongTaiLog.error("Spring MVC RequestMappingInfoConvertor.parseOperation parseParamsRequestCondition error", e);
+            DongTaiLog.debug("Spring MVC RequestMappingInfoConvertor.parseOperation parseParamsRequestCondition exception", e);
         }
 
         // 请求头参数
@@ -151,7 +151,7 @@ public class RequestMappingInfoConvertor {
             List<Parameter> parameterList = parseHeadersRequestCondition(operation);
             operation.mergeParameters(parameterList);
         } catch (Throwable e) {
-            DongTaiLog.error("Spring MVC RequestMappingInfoConvertor.parseOperation parseHeadersRequestCondition error", e);
+            DongTaiLog.debug("Spring MVC RequestMappingInfoConvertor.parseOperation parseHeadersRequestCondition exception", e);
         }
 
         // 使用随机的id
@@ -164,7 +164,7 @@ public class RequestMappingInfoConvertor {
             // 解析HandlerMethod
             new HandlerMethodConvertor(this.manager, this.webApplicationContext, operation, this.handlerMethod).parse();
         } catch (Throwable e) {
-            DongTaiLog.error("Spring MVC RequestMappingInfoConvertor.parseOperation HandlerMethodConvertor error", e);
+            DongTaiLog.debug("Spring MVC RequestMappingInfoConvertor.parseOperation HandlerMethodConvertor exception", e);
         }
 
         return operation;
@@ -192,7 +192,7 @@ public class RequestMappingInfoConvertor {
             });
             return parameterList;
         } catch (Throwable e) {
-            DongTaiLog.error("spring api parameters router error: {}", e.getMessage());
+            DongTaiLog.debug("spring api parameters router exception: {}", e.getMessage());
         }
         return Collections.emptyList();
     }
@@ -224,7 +224,7 @@ public class RequestMappingInfoConvertor {
             });
             return headerParameterList;
         } catch (Throwable e) {
-            DongTaiLog.error("spring api headers router error: {}", e.getMessage());
+            DongTaiLog.debug("spring api headers router exception: {}", e.getMessage());
         }
         return Collections.emptyList();
     }

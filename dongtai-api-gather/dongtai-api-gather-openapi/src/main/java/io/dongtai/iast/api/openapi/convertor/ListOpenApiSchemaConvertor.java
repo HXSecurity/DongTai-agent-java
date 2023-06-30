@@ -36,9 +36,6 @@ public class ListOpenApiSchemaConvertor extends BaseOpenApiSchemaConvertor {
     @Override
     public Schema convert(Class clazz, Field field) {
         Schema itemsComponent = convertField(clazz, field);
-        if (itemsComponent == null) {
-            return new Schema(DataType.ObjectArray());
-        }
         return new Schema(DataType.Array(itemsComponent));
     }
 

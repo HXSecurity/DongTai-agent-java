@@ -18,6 +18,8 @@ public class PrimitiveTypeConvertor extends BaseOpenApiSchemaConvertor {
     public static Set<Class> primitiveTypeSet = new HashSet<>();
 
     static {
+
+        // 这里把String也看做是primitive的了 ，虽然看起来可能有点奇怪...
         primitiveTypeSet.add(String.class);
 
         primitiveTypeSet.add(Character.class);

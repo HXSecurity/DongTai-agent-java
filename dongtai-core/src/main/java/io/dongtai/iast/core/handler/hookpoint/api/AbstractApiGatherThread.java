@@ -27,7 +27,7 @@ public abstract class AbstractApiGatherThread extends Thread {
             String report = createReport(openApi, framework);
             ThreadPools.sendReport(ApiPath.REPORT_UPLOAD, report);
         } catch (Throwable e) {
-            DongTaiLog.warn(ErrorCode.get("API_COLLECTOR_GET_API_THREAD_EXECUTE_FAILED"), e);
+            DongTaiLog.warn(ErrorCode.API_COLLECTOR_GET_API_THREAD_EXECUTE_FAILED, e);
         }
     }
 

@@ -56,7 +56,7 @@ public class SpringMVCApiExtractor {
                 }
             }
         } catch (Throwable e) {
-            DongTaiLog.debug("try use BeanFactoryUtils find RequestMappingHandlerMapping error: {}", e.getMessage());
+            DongTaiLog.debug("try use BeanFactoryUtils find RequestMappingHandlerMapping exception", e);
         }
 
         // 没有工具类，就只从自己里面找

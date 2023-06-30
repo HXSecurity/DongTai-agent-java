@@ -32,7 +32,7 @@ public class EnumOpenApiSchemaConvertor extends BaseOpenApiSchemaConvertor {
             return null;
         }
 
-        // TODO 枚举类型是被看做一个有限取值的string，所以此处有必要查询缓存吗？
+        // Open API里枚举类型是被看做一个有限取值的string
         Schema schema = manager.database.find(clazz);
         if (schema != null) {
             return schema;
