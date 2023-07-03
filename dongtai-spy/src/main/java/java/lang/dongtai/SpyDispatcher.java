@@ -60,7 +60,7 @@ public interface SpyDispatcher {
                              boolean isTwoWay, boolean isEvent, boolean isBroken, boolean isHeartbeat);
 
     void collectDubboRequestSource(Object handler, Object invocation, String methodName,
-                                   Object[] arguments, Map<String, ?> headers,
+                                   Object[] arguments, Class<?>[] argumentTypes, Map<String, ?> headers,
                                    String hookClass, String hookMethod, String hookSign);
 
     void collectDubboResponse(Object result, byte status);

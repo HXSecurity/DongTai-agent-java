@@ -167,6 +167,7 @@ public interface AsmMethods {
             Object.class,
             String.class,
             Object[].class,
+            Class[].class,
             Map.class,
             String.class,
             String.class,

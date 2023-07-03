@@ -97,7 +97,7 @@ public class NopSpy implements SpyDispatcher {
 
     @Override
     public void collectDubboRequestSource(Object handler, Object invocation, String methodName,
-                                          Object[] arguments, Map<String, ?> headers,
+                                          Object[] arguments, Class<?>[] argumentTypes, Map<String, ?> headers,
                                           String hookClass, String hookMethod, String hookSign) {
     }
 

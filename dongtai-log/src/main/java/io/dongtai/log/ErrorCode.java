@@ -106,6 +106,23 @@ public enum ErrorCode {
     UTIL_TAINT_ADD_OBJECT_TO_POOL_FAILED(20611, "add object to taint pool failed"),
     UTIL_TAINT_PARSE_CUSTOM_MODEL_FAILED(20612, "parse custom model {} getter {} failed"),
 
+    // api gather - open api [20700, 20799]
+    API_GATHER_OPENAPI_CONVERT_ERROR(20701, "open api convert class schema error, convertor name {}, class name {}"),
+
+    // api gather - dubbo api [20800, 20899]
+    API_GATHER_DUBBO_PROTOCOL_NULL(20801, "dubbo protocol null"),
+    API_GATHER_DUBBO_GET_PROTOCOL_ERROR(20802, "dubbo get protocol error"),
+    API_GATHER_DUBBO_EXPORT_MAP_NULL(20803, "dubbo export map null"),
+    API_GATHER_DUBBO_GET_EXPORT_MAP_ERROR(20804, "dubbo get export map error"),
+    API_GATHER_DUBBO_SERVICE_CONVERT_ERROR(20805, "dubbo service convert error"),
+    API_GATHER_DUBBO_EXPORT_LIST_EMPTY(20806, "dubbo export list empty"),
+    API_GATHER_DUBBO_ALIBABA_PARSE_SERVICE_LIST_ERROR(20807, "dubbo alibaba parse service list error"),
+    API_GATHER_DUBBO_ALIBABA_ERROR(20808, "dubbo alibaba api gather error"),
+    API_GATHER_DUBBO_APACHE_ERROR(20809, "dubbo apache api gather error"),
+
+    // api gather - spring mvc api [20900, 20999]
+    API_GATHER_SPRING_MVC_ERROR(20901, "spring mvc api gather error"),
+
     UNKNOWN(99999, "unknown error"),
     NO_CODE(0, "no error code"),
     ;
