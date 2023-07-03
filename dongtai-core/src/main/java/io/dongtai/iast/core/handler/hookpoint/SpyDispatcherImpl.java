@@ -8,7 +8,6 @@ import io.dongtai.iast.common.scope.ScopeManager;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.bytecode.enhance.plugin.spring.SpringApplicationImpl;
 import io.dongtai.iast.core.handler.bypass.BlackUrlBypass;
-import io.dongtai.iast.core.handler.context.ContextManager;
 import io.dongtai.iast.core.handler.hookpoint.controller.HookType;
 import io.dongtai.iast.core.handler.hookpoint.controller.impl.*;
 import io.dongtai.iast.core.handler.hookpoint.graphy.GraphBuilder;
@@ -16,8 +15,8 @@ import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.*;
 import io.dongtai.iast.core.handler.hookpoint.service.trace.DubboService;
 import io.dongtai.iast.core.handler.hookpoint.service.trace.FeignService;
+import io.dongtai.iast.core.handler.hookpoint.service.trace.HttpService;
 import io.dongtai.iast.core.utils.StringUtils;
-import io.dongtai.iast.core.utils.TaintPoolUtils;
 import io.dongtai.iast.core.utils.matcher.ConfigMatcher;
 import io.dongtai.log.DongTaiLog;
 import io.dongtai.log.ErrorCode;
@@ -192,7 +191,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                 BlackUrlBypass.setIsBlackUrl(true);
                 return;
             }
-            if (null != headers.get(BlackUrlBypass.getHeaderKey()) && headers.get(BlackUrlBypass.getHeaderKey()).equals("true")){
+            if (null != headers.get(BlackUrlBypass.getHeaderKey()) && headers.get(BlackUrlBypass.getHeaderKey()).equals("true")) {
                 BlackUrlBypass.setIsBlackUrl(true);
                 return;
             }
@@ -607,6 +606,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
 
     /**
      * mark for enter Source Entry Point
+     *
      * @since 1.3.1
      */
     @Override
@@ -714,7 +714,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
 
     @Override
     public boolean isSkipCollectDubbo(Object invocation) {
-        if (BlackUrlBypass.isBlackUrl()){
+        if (BlackUrlBypass.isBlackUrl()) {
             Method setAttachmentMethod = null;
             try {
                 setAttachmentMethod = invocation.getClass().getMethod("setAttachment", String.class, String.class);
@@ -729,20 +729,42 @@ public class SpyDispatcherImpl implements SpyDispatcher {
 
     @Override
     public boolean isSkipCollectFeign(Object instance) {
-        Field metadataField = null;
-        try {
-            metadataField = instance.getClass().getDeclaredField("metadata");
-            metadataField.setAccessible(true);
-            Object metadata = metadataField.get(instance);
-            Method templateMethod = metadata.getClass().getMethod("template");
-            Object template = templateMethod.invoke(metadata);
+        if (BlackUrlBypass.isBlackUrl()) {
+            Field metadataField = null;
+            try {
+                metadataField = instance.getClass().getDeclaredField("metadata");
+                metadataField.setAccessible(true);
+                Object metadata = metadataField.get(instance);
+                Method templateMethod = metadata.getClass().getMethod("template");
+                Object template = templateMethod.invoke(metadata);
 
-            Method addHeaderMethod = template.getClass().getDeclaredMethod("header", String.class, String[].class);
-            addHeaderMethod.setAccessible(true);
-            addHeaderMethod.invoke(template, BlackUrlBypass.getHeaderKey(), new String[]{});
-            addHeaderMethod.invoke(template, BlackUrlBypass.getHeaderKey(), new String[]{BlackUrlBypass.isBlackUrl().toString()});
-        } catch (NoSuchFieldException | NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-            DongTaiLog.error(ErrorCode.get("BYPASS_FAILED_FEIGN"), e);
+                Method addHeaderMethod = template.getClass().getDeclaredMethod("header", String.class, String[].class);
+                addHeaderMethod.setAccessible(true);
+                addHeaderMethod.invoke(template, BlackUrlBypass.getHeaderKey(), new String[]{});
+                addHeaderMethod.invoke(template, BlackUrlBypass.getHeaderKey(), new String[]{BlackUrlBypass.isBlackUrl().toString()});
+            } catch (NoSuchFieldException | NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+                DongTaiLog.error(ErrorCode.get("BYPASS_FAILED_FEIGN"), e);
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean skipCollect(Object instance, Object[] parameters, Object retObject, String policyKey,
+                               String className, String matchedClassName, String methodName, String signature,
+                               boolean isStatic) {
+        if (BlackUrlBypass.isBlackUrl()) {
+            MethodEvent event = new MethodEvent(className, matchedClassName, methodName,
+                    signature, instance, parameters, retObject);
+            PolicyNode policyNode = getPolicyNode(policyKey);
+            if (policyNode == null) {
+                return false;
+            }
+            HttpService httpService = new HttpService();
+            if (httpService.match(event, policyNode)) {
+                httpService.addBypass(event);
+                return true;
+            }
         }
         return false;
     }
