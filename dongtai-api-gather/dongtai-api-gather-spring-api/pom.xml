@@ -3,35 +3,43 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>iast</artifactId>
         <groupId>io.dongtai.iast</groupId>
+        <artifactId>dongtai-api-gather</artifactId>
         <version>${revision}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.dongtai.api</groupId>
-    <artifactId>dongtai-api</artifactId>
+    <artifactId>dongtai-api-gather-spring-api</artifactId>
 
     <dependencies>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <version>5.3.10</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.dongtai.iast</groupId>
+            <artifactId>dongtai-log</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>io.dongtai.iast</groupId>
             <artifactId>dongtai-api-gather-openapi</artifactId>
             <version>${project.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>io.dongtai.iast</groupId>
-            <artifactId>dongtai-api-gather-spring-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.dongtai.iast</groupId>
-            <artifactId>dongtai-api-gather-dubbo-api</artifactId>
-            <version>${project.version}</version>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
     <build>
-        <finalName>dongtai-api</finalName>
+        <finalName>dongtai-spring-api</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -46,28 +54,6 @@
                     </execution>
                 </executions>
             </plugin>
-
-            <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-lib-src-webapps</id>
-                        <phase>package</phase>
-                        <configuration>
-                            <tasks>
-                                <copy todir="./../dongtai-agent/src/main/resources/bin">
-                                    <fileset dir="target/">
-                                        <include name="dongtai-api.jar"/>
-                                    </fileset>
-                                </copy>
-                            </tasks>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -78,5 +64,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

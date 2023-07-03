@@ -20,6 +20,6 @@ public class DispatchApiCollector implements DispatchPlugin {
 
     @Override
     public String getName() {
-        return "api";
+        return "spring-api";
     }
 }

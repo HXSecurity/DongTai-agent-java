@@ -14,6 +14,7 @@ public class ReportType {
     public static final int SECOND_FALLBACK = 0x46;
     public static final int ERROR_LOG = 0x51;
     public static final int API = 0x61;
+    public static final int API_V2 = 0x62;
     public static final int SERVICE = 0x81;
     public static final int SERVICE_DIR = 0x82;
 }

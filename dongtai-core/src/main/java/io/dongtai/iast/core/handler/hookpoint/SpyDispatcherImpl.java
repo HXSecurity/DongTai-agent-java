@@ -6,7 +6,8 @@ import io.dongtai.iast.common.config.ConfigKey;
 import io.dongtai.iast.common.scope.Scope;
 import io.dongtai.iast.common.scope.ScopeManager;
 import io.dongtai.iast.core.EngineManager;
-import io.dongtai.iast.core.bytecode.enhance.plugin.spring.SpringApplicationImpl;
+import io.dongtai.iast.core.handler.hookpoint.api.DubboApiGatherThread;
+import io.dongtai.iast.core.handler.hookpoint.api.SpringGatherApiThread;
 import io.dongtai.iast.core.handler.hookpoint.controller.HookType;
 import io.dongtai.iast.core.handler.hookpoint.controller.impl.*;
 import io.dongtai.iast.core.handler.hookpoint.graphy.GraphBuilder;
@@ -20,7 +21,10 @@ import io.dongtai.log.ErrorCode;
 
 import java.lang.dongtai.SpyDispatcher;
 import java.net.InetSocketAddress;
-import java.util.*;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -333,6 +337,17 @@ public class SpyDispatcherImpl implements SpyDispatcher {
         } finally {
             ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
         }
+
+        DubboImpl.createClassLoader(handler);
+
+        // TODO 2023-6-27 19:17:18 测试ClassLoader的GC回收
+        // 收集Dubbo的api
+        try {
+            DubboApiGatherThread.gather(handler.getClass());
+        } catch (Throwable e) {
+            DongTaiLog.error("SpyDispatcherImpl.collectDubboRequest collection dubbo api error", e);
+        }
+
     }
 
     @Override
@@ -592,6 +607,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
 
     /**
      * mark for enter Source Entry Point
+     *
      * @since 1.3.1
      */
     @Override
@@ -605,8 +621,9 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                 return false;
             }
 
+            // 收集Spring MVC的API
             if (HookType.SPRINGAPPLICATION.equals(hookType)) {
-                SpringApplicationImpl.getWebApplicationContext(retValue);
+                SpringGatherApiThread.gather(retValue);
             }
         } catch (Throwable e) {
             DongTaiLog.error(ErrorCode.get("SPY_COLLECT_HTTP_FAILED"), "", e);

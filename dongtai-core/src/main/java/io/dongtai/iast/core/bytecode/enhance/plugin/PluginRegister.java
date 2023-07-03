@@ -15,7 +15,9 @@ import io.dongtai.iast.core.handler.hookpoint.models.policy.PolicyManager;
 import io.dongtai.iast.core.utils.PropertyUtils;
 import org.objectweb.asm.ClassVisitor;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -63,4 +65,16 @@ public class PluginRegister {
         }
         return classVisitor;
     }
+
+    /**
+     * 查询给定的插件是否被禁用
+     *
+     * @return
+     */
+    public static boolean isPluginDisable(String pluginName) {
+        // 现在插件比较少，O(n)性能损耗能够接受
+        List<String> l = PropertyUtils.getDisabledPlugins();
+        return l != null && PropertyUtils.getDisabledPlugins().contains(pluginName);
+    }
+
 }
