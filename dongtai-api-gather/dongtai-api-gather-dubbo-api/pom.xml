@@ -16,7 +16,7 @@
             <groupId>org.apache.dubbo</groupId>
             <artifactId>dubbo</artifactId>
             <!--  不要修改这个依赖版本，如果必须改动需要保证在 [2.7.13, 3.0.0) 区间 -->
-            <version>2.7.13</version>
+            <version>2.7.21</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
