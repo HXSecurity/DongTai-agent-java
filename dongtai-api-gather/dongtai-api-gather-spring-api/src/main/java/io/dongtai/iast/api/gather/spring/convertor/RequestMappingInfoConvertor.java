@@ -56,7 +56,7 @@ public class RequestMappingInfoConvertor {
                     Path path = new Path();
                     // 方法是第二级
                     parseRequestMethodsRequestCondition(path);
-                    pathMap.put(s, path);
+                    pathMap.put(buildFullUrl(s), path);
                 });
             }
         } catch (Throwable e) {
@@ -73,12 +73,21 @@ public class RequestMappingInfoConvertor {
                         Path path = new Path();
                         // 方法是第二级
                         parseRequestMethodsRequestCondition(path);
-                        pathMap.put(s, path);
+                        pathMap.put(buildFullUrl(s), path);
                     }
                 });
             }
         } catch (Throwable e) {
             DongTaiLog.debug("spring api path.getPatternsCondition router exception", e);
+        }
+    }
+
+    private String buildFullUrl(String path) {
+        String contextPath = this.webApplicationContext.getApplicationName();
+        if (contextPath == null || contextPath.isEmpty()) {
+            return path;
+        } else {
+            return contextPath + path;
         }
     }
 
