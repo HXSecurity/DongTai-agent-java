@@ -100,7 +100,15 @@ public class RequestMappingInfoConvertor {
             Set<RequestMethod> methods = c.getMethods();
             // 如果此处默认为空的话，则将其扩展为所有的情况
             if (methods.isEmpty()) {
-                methods = new HashSet<>(Arrays.asList(RequestMethod.values()));
+                // 2023-7-4 12:31:06 默认情况下认为方法不映射trace
+                methods = new HashSet<>(Arrays.asList(RequestMethod.GET,
+                        RequestMethod.HEAD,
+                        RequestMethod.POST,
+                        RequestMethod.PUT,
+                        RequestMethod.PATCH,
+                        RequestMethod.DELETE,
+                        RequestMethod.OPTIONS
+                ));
             }
             methods.forEach(new Consumer<RequestMethod>() {
                 @Override
@@ -128,9 +136,10 @@ public class RequestMappingInfoConvertor {
                         case OPTIONS:
                             path.setOptions(operation);
                             break;
-                        case TRACE:
-                            path.setTrace(operation);
-                            break;
+                        // 2023-7-4 12:30:52 忽略所有的trace方法
+//                        case TRACE:
+//                            path.setTrace(operation);
+//                            break;
                     }
                 }
             });
