@@ -2,6 +2,8 @@ package io.dongtai.iast.api.openapi.convertor;
 
 import io.dongtai.iast.api.openapi.domain.Schema;
 
+import java.util.Collection;
+
 /**
  * 用于Java内置的集合类型的转换，比如List、Set、Map
  *
@@ -31,8 +33,13 @@ public class CollectionOpenApiSchemaConvertor extends BaseOpenApiSchemaConvertor
         return clazz != null && (
                 listOpenApiSchemaConvertor.canConvert(clazz) ||
                         setOpenApiSchemaConvertor.canConvert(clazz) ||
-                        mapOpenApiSchemaConvertor.canConvert(clazz)
+                        mapOpenApiSchemaConvertor.canConvert(clazz) ||
+                        isCollectionClass(clazz)
         );
+    }
+
+    private boolean isCollectionClass(Class clazz) {
+        return clazz != null && Collection.class.isAssignableFrom(clazz);
     }
 
     @Override
@@ -43,6 +50,8 @@ public class CollectionOpenApiSchemaConvertor extends BaseOpenApiSchemaConvertor
             return setOpenApiSchemaConvertor.convert(clazz);
         } else if (mapOpenApiSchemaConvertor.canConvert(clazz)) {
             return mapOpenApiSchemaConvertor.convert(clazz);
+        } else if (isCollectionClass(clazz)) {
+            return listOpenApiSchemaConvertor.convert(clazz);
         } else {
             return null;
         }
