@@ -71,6 +71,10 @@ public class DataType {
         return new DataType("string", null, null);
     }
 
+    public static DataType Date() {
+        return new DataType("string", "date-time", null);
+    }
+
     public static DataType StringArray() {
         return Array(String());
     }
