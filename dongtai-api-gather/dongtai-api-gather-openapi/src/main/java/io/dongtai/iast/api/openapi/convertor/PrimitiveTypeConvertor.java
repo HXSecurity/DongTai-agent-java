@@ -3,6 +3,7 @@ package io.dongtai.iast.api.openapi.convertor;
 import io.dongtai.iast.api.openapi.domain.DataType;
 import io.dongtai.iast.api.openapi.domain.Schema;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -21,6 +22,7 @@ public class PrimitiveTypeConvertor extends BaseOpenApiSchemaConvertor {
 
         // 这里把String也看做是primitive的了 ，虽然看起来可能有点奇怪...
         primitiveTypeSet.add(String.class);
+        primitiveTypeSet.add(Date.class);
 
         primitiveTypeSet.add(Character.class);
         primitiveTypeSet.add(char.class);
@@ -74,6 +76,8 @@ public class PrimitiveTypeConvertor extends BaseOpenApiSchemaConvertor {
         // 字符串类型和字符类型都修改为字符串类型，注意这里产生了一个类型丢失
         if (simpleClass == String.class || simpleClass == Character.class || simpleClass == char.class) {
             return new Schema(DataType.String());
+        } else if (simpleClass == Date.class) {
+            return new Schema(DataType.Date());
         } else if (simpleClass == Byte.class || simpleClass == byte.class ||
                 simpleClass == Short.class || simpleClass == short.class ||
                 simpleClass == Integer.class || simpleClass == int.class) {
