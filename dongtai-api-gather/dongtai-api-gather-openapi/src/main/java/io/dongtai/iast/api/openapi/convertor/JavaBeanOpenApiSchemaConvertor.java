@@ -88,7 +88,7 @@ public class JavaBeanOpenApiSchemaConvertor extends BaseOpenApiSchemaConvertor {
 
         List<Field> allFieldList = new ArrayList<>();
         Set<String> fieldNameSet = new HashSet<>();
-        Set<String> getterNameLowercaseSet = new HashSet<>();
+        Set<String> setterNameLowercaseSet = new HashSet<>();
         Class currentClass = clazz;
 
         while (currentClass != null && currentClass != Object.class) {
@@ -104,7 +104,7 @@ public class JavaBeanOpenApiSchemaConvertor extends BaseOpenApiSchemaConvertor {
             }
 
             // 收集类上的方法名字
-            getterNameLowercaseSet.addAll(parseGetterNameLowercaseSet(currentClass));
+            setterNameLowercaseSet.addAll(parseSetterNameLowercaseSet(currentClass));
 
             // 再处理父类，一路向上知道找到根
             currentClass = currentClass.getSuperclass();
@@ -113,7 +113,7 @@ public class JavaBeanOpenApiSchemaConvertor extends BaseOpenApiSchemaConvertor {
         // 然后筛选出来符合条件的字段，作为bean的属性
         List<Field> beanFieldList = new ArrayList<>();
         allFieldList.forEach(field -> {
-            if (isBeanField(field, getterNameLowercaseSet)) {
+            if (isBeanField(field, setterNameLowercaseSet)) {
                 beanFieldList.add(field);
             }
         });
@@ -125,10 +125,10 @@ public class JavaBeanOpenApiSchemaConvertor extends BaseOpenApiSchemaConvertor {
      * 判断Field是否是bean的field
      *
      * @param field
-     * @param getterNameLowercaseSet
+     * @param setterNameLowercaseSet
      * @return
      */
-    private boolean isBeanField(Field field, Set<String> getterNameLowercaseSet) {
+    private boolean isBeanField(Field field, Set<String> setterNameLowercaseSet) {
 
         // 采用白名单的方式，public并且是实例方法则认为是可以的
         if (Modifier.isPublic(field.getModifiers())) {
@@ -136,30 +136,25 @@ public class JavaBeanOpenApiSchemaConvertor extends BaseOpenApiSchemaConvertor {
         }
 
         // 私有方法并且有对应的getter
-        String setterMethodName = "";
-        if (field.getType() == boolean.class || field.getType() == Boolean.class) {
-            setterMethodName = "is" + field.getName().toLowerCase();
-        } else {
-            setterMethodName = "get" + field.getName().toLowerCase();
-        }
-        return getterNameLowercaseSet.contains(setterMethodName);
+        String setterMethodName = "set" + field.getName().toLowerCase();
+        return setterNameLowercaseSet.contains(setterMethodName);
     }
 
     /**
-     * 解析类上的getter方法，并将其方法名都转为小写返回
+     * 解析类上的setter方法，并将其方法名都转为小写返回
      *
      * @param clazz
      * @return
      */
-    private Set<String> parseGetterNameLowercaseSet(Class clazz) {
-        Set<String> getterNameLowercaseSet = new HashSet<>();
+    private Set<String> parseSetterNameLowercaseSet(Class clazz) {
+        Set<String> setterNameLowercaseSet = new HashSet<>();
         for (Method declaredMethod : clazz.getDeclaredMethods()) {
             // 这里采用比较简单的策略，只要是关键字开头的就认为是ok的
-            if (declaredMethod.getName().startsWith("get") || declaredMethod.getName().startsWith("is")) {
-                getterNameLowercaseSet.add(declaredMethod.getName().toLowerCase());
+            if (declaredMethod.getName().startsWith("set")) {
+                setterNameLowercaseSet.add(declaredMethod.getName().toLowerCase());
             }
         }
-        return getterNameLowercaseSet;
+        return setterNameLowercaseSet;
     }
 
     @Override
