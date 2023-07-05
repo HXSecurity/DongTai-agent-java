@@ -5,21 +5,61 @@ import io.dongtai.iast.common.config.ConfigBuilder;
 import io.dongtai.iast.common.config.ConfigKey;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.context.ContextManager;
+import io.dongtai.iast.core.handler.hookpoint.IastClassLoader;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.SourceNode;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.TaintPosition;
-import io.dongtai.iast.core.handler.hookpoint.models.taint.range.*;
+import io.dongtai.iast.core.handler.hookpoint.models.taint.range.TaintRange;
+import io.dongtai.iast.core.handler.hookpoint.models.taint.range.TaintRanges;
+import io.dongtai.iast.core.handler.hookpoint.models.taint.range.TaintRangesBuilder;
+import io.dongtai.iast.core.utils.HttpClientUtils;
+import io.dongtai.iast.core.utils.PropertyUtils;
 import io.dongtai.iast.core.utils.StackUtils;
 import io.dongtai.iast.core.utils.TaintPoolUtils;
 import io.dongtai.log.DongTaiLog;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class DubboImpl {
+
+    private static IastClassLoader iastClassLoader;
+    public static File IAST_REQUEST_JAR_PACKAGE;
+
+    static {
+        IAST_REQUEST_JAR_PACKAGE = new File(PropertyUtils.getTmpDir() + "dongtai-api.jar");
+        if (!IAST_REQUEST_JAR_PACKAGE.exists()) {
+            HttpClientUtils.downloadRemoteJar("/api/v1/engine/download?engineName=dongtai-api", IAST_REQUEST_JAR_PACKAGE.getAbsolutePath());
+        }
+    }
+
+    public static void createClassLoader(Object req) {
+        try {
+            if (iastClassLoader != null) {
+                return;
+            }
+            if (IAST_REQUEST_JAR_PACKAGE.exists()) {
+                iastClassLoader = new IastClassLoader(
+                        req.getClass().getClassLoader(),
+                        new URL[]{IAST_REQUEST_JAR_PACKAGE.toURI().toURL()}
+                );
+            }
+        } catch (Throwable e) {
+            DongTaiLog.warn("DubboImpl createClassLoader failed", e);
+        }
+    }
+
+    public static IastClassLoader getClassLoader() {
+        return iastClassLoader;
+    }
+
     public static void solveDubboRequest(Object handler, Object channel, Object request, String url, String remoteAddress) {
         try {
             URI u = new URI(url);
@@ -44,7 +84,7 @@ public class DubboImpl {
 
 
     public static void collectDubboRequestSource(Object handler, Object invocation, String methodName,
-                                                 Object[] arguments, Map<String, ?> headers,
+                                                 Object[] arguments, Class<?>[] argumentTypes, Map<String, ?> headers,
                                                  String hookClass, String hookMethod, String hookSign,
                                                  AtomicInteger invokeIdSequencer) {
         if (arguments == null || arguments.length == 0) {
@@ -57,6 +97,23 @@ public class DubboImpl {
 
         String url = (String) requestMeta.get("requestURL") + "/" + methodName;
         String uri = (String) requestMeta.get("requestURI") + "/" + methodName;
+
+        StringBuilder argSign = new StringBuilder("(");
+        if (argumentTypes != null && argumentTypes.length > 0) {
+            int i = 0;
+            for (Class<?> argumentType : argumentTypes) {
+                if (i != 0) {
+                    argSign.append(",");
+                }
+                argSign.append(argumentType.getCanonicalName());
+                i++;
+            }
+        }
+        argSign.append(")");
+        String argSignStr = argSign.toString();
+        url += argSignStr;
+        uri += argSignStr;
+
         requestMeta.put("requestURL", url);
         requestMeta.put("requestURI", uri);
 
@@ -101,7 +158,7 @@ public class DubboImpl {
 
         // for display taint range (full arguments value)
         String fv = event.parameterValues.get(0).getValue();
-        long hash = TaintPoolUtils.toStringHash(fv.hashCode(),System.identityHashCode(fv));
+        long hash = TaintPoolUtils.toStringHash(fv.hashCode(), System.identityHashCode(fv));
         int len = TaintRangesBuilder.getLength(fv);
         TaintRanges tr = new TaintRanges(new TaintRange(0, len));
         event.targetRanges.add(0, new MethodEvent.MethodEventTargetRange(hash, tr));

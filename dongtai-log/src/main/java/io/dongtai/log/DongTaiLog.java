@@ -1,6 +1,9 @@
 package io.dongtai.log;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,6 +32,9 @@ public class DongTaiLog {
     private static final String TITLE = "[io.dongtai.iast.agent] ";
     private static final String TITLE_COLOR = "[" + colorStr("io.dongtai.iast.agent", BLUE) + "] ";
 
+    /**
+     * 把错误码放入到这个集合中，打印的时候会限制打印频率，最多每 {@link #FREQUENT_INTERVAL} 打一次
+     */
     private static final Set<ErrorCode> RESTRICTED_ERRORS = new HashSet<ErrorCode>(Arrays.asList(
             ErrorCode.AGENT_MONITOR_COLLECT_PERFORMANCE_METRICS_FAILED,
             ErrorCode.AGENT_MONITOR_CHECK_PERFORMANCE_METRICS_FAILED,

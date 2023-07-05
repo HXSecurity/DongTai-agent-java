@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <properties>
-        <revision>1.11.0</revision>
+        <revision>1.12.0-beta1</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <shade-prefix>io.dongtai.iast.thirdparty</shade-prefix>
 
@@ -130,9 +130,9 @@
     <modules>
         <module>dongtai-spy</module>
         <module>dongtai-core</module>
-        <module>dongtai-spring-api</module>
         <module>dongtai-log</module>
         <module>dongtai-api</module>
+        <module>dongtai-api-gather</module>
         <module>dongtai-common</module>
         <module>dongtai-plugins</module>
         <module>dongtai-agent</module>
