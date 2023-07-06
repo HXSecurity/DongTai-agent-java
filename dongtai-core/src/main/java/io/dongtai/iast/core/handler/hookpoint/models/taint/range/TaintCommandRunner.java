@@ -133,6 +133,8 @@ public class TaintCommandRunner {
                 case CONCAT:
                     this.builder.concat(tr, target, oldTaintRanges, source, srcTaintRanges, params);
                     break;
+                case OVERWRITE:
+                    this.builder.overwrite(tr, oldTaintRanges, source, srcTaintRanges, p1, this.paramsCount);
                 case TRIM:
                 case TRIM_LEFT:
                 case TRIM_RIGHT:

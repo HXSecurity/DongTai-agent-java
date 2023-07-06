@@ -13,6 +13,7 @@ public enum TaintCommand {
     REMOVE,
     REPLACE,
     CONCAT,
+    OVERWRITE,
     TRIM,
     TRIM_RIGHT,
     TRIM_LEFT,
