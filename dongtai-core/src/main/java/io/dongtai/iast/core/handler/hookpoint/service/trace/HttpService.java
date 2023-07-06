@@ -1,6 +1,7 @@
 package io.dongtai.iast.core.handler.hookpoint.service.trace;
 
 import io.dongtai.iast.core.EngineManager;
+import io.dongtai.iast.core.handler.bypass.BlackUrlBypass;
 import io.dongtai.iast.core.handler.context.ContextManager;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.PolicyNode;
@@ -12,6 +13,8 @@ import io.dongtai.log.DongTaiLog;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
+import java.util.HashMap;
+import java.util.Map;
 
 public class HttpService implements ServiceTrace {
     private String matchedSignature;
@@ -44,6 +47,21 @@ public class HttpService implements ServiceTrace {
         }
     }
 
+    public void addBypass(MethodEvent event) {
+        HashMap<String, String> blackUrlHeaders = new HashMap<>();
+        blackUrlHeaders.put(BlackUrlBypass.getHeaderKey(), String.valueOf(BlackUrlBypass.isBlackUrl()));
+        if (HttpClient.matchJavaNetUrl(this.matchedSignature)) {
+            addHeaderToJavaNetURL(event, blackUrlHeaders);
+        } else if (HttpClient.matchApacheHttp4(this.matchedSignature)
+                || HttpClient.matchApacheHttp5(this.matchedSignature)) {
+            addHeaderToApacheHttpClient(event, blackUrlHeaders);
+        } else if (HttpClient.matchApacheHttp3(this.matchedSignature)) {
+            addHeaderToApacheHttpClientLegacy(event, blackUrlHeaders);
+        } else if (HttpClient.matchOkhttp(this.matchedSignature)) {
+            addHeaderToOkhttp(event, blackUrlHeaders);
+        }
+    }
+
     private String addTraceToJavaNetURL(MethodEvent event) {
         if (event.objectInstance == null) {
             return null;
@@ -63,6 +81,24 @@ public class HttpService implements ServiceTrace {
                     e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "");
         }
         return null;
+    }
+
+    private void addHeaderToJavaNetURL(MethodEvent event, Map<String, String> headers) {
+        if (event.objectInstance == null) {
+            return;
+        }
+        try {
+            if (event.objectInstance instanceof HttpURLConnection) {
+                final HttpURLConnection connection = (HttpURLConnection) event.objectInstance;
+                for (Map.Entry<String, String> header : headers.entrySet()) {
+                    connection.setRequestProperty(header.getKey(), header.getValue());
+                }
+            }
+        } catch (IllegalStateException ignore) {
+        } catch (Throwable e) {
+            DongTaiLog.debug("add header to okhttp client failed: {}, {}",
+                    e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "");
+        }
     }
 
     private String addTraceToApacheHttpClient(MethodEvent event) {
@@ -96,6 +132,38 @@ public class HttpService implements ServiceTrace {
         return null;
     }
 
+    private void addHeaderToApacheHttpClient(MethodEvent event, Map<String, String> headers) {
+        if (headers == null) {
+            return;
+        }
+        if (event.parameterInstances.length < 2) {
+            return;
+        }
+        Object obj = event.parameterInstances[1];
+        if (obj == null) {
+            return;
+        }
+        try {
+            Method method;
+            if (HttpClient.matchApacheHttp5(this.matchedSignature)) {
+                method = ReflectUtils.getDeclaredMethodFromSuperClass(obj.getClass(),
+                        "addHeader", new Class[]{String.class, Object.class});
+            } else {
+                method = ReflectUtils.getDeclaredMethodFromSuperClass(obj.getClass(),
+                        "addHeader", new Class[]{String.class, String.class});
+            }
+            if (method == null) {
+                return;
+            }
+            for (Map.Entry<String, String> header : headers.entrySet()) {
+                method.invoke(obj, header.getKey(), header.getValue());
+            }
+        } catch (Throwable e) {
+            DongTaiLog.debug("add header to okhttp client failed: {}, {}",
+                    e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "");
+        }
+    }
+
     private String addTraceToApacheHttpClientLegacy(MethodEvent event) {
         Object obj = event.objectInstance;
         if (obj == null) {
@@ -116,6 +184,26 @@ public class HttpService implements ServiceTrace {
                     e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "");
         }
         return null;
+    }
+
+    private void addHeaderToApacheHttpClientLegacy(MethodEvent event, Map<String, String> headers) {
+        Object obj = event.objectInstance;
+        if (obj == null) {
+            return;
+        }
+        try {
+            Method method = ReflectUtils.getDeclaredMethodFromSuperClass(obj.getClass(),
+                    "setRequestHeader", new Class[]{String.class, String.class});
+            if (method == null) {
+                return;
+            }
+            for (Map.Entry<String, String> header : headers.entrySet()) {
+                method.invoke(obj, header.getKey(), header.getValue());
+            }
+        } catch (Throwable e) {
+            DongTaiLog.debug("add header to okhttp client failed: {}, {}"
+                    , e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "");
+        }
     }
 
     private String addTraceToOkhttp(MethodEvent event) {
@@ -151,6 +239,38 @@ public class HttpService implements ServiceTrace {
                     e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "");
         }
         return null;
+    }
+
+    private void addHeaderToOkhttp(MethodEvent event, Map<String, String> headers) {
+        Object obj = event.objectInstance;
+        if (obj == null) {
+            return;
+        }
+        try {
+            String className = obj.getClass().getName();
+            if (!HttpClient.matchAllOkhttpCallClass(className)) {
+                return;
+            }
+
+            Field reqField = obj.getClass().getDeclaredField("originalRequest");
+            boolean accessible = reqField.isAccessible();
+            reqField.setAccessible(true);
+            Object req = reqField.get(obj);
+
+            Method methodNewBuilder = req.getClass().getMethod("newBuilder");
+            Object reqBuilder = methodNewBuilder.invoke(req);
+            Method methodAddHeader = reqBuilder.getClass().getMethod("addHeader", String.class, String.class);
+            for (Map.Entry<String, String> header : headers.entrySet()) {
+                methodAddHeader.invoke(reqBuilder, header.getKey(), header.getValue());
+            }
+            Method methodBuild = reqBuilder.getClass().getMethod("build");
+            Object newReq = methodBuild.invoke(reqBuilder);
+            reqField.set(obj, newReq);
+            reqField.setAccessible(accessible);
+        } catch (Throwable e) {
+            DongTaiLog.debug("add header to okhttp client failed: {}, {}",
+                    e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "");
+        }
     }
 
     public static boolean validate(MethodEvent event) {

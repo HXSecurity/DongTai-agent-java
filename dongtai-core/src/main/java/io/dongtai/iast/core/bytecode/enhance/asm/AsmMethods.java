@@ -256,6 +256,20 @@ public interface AsmMethods {
             boolean.class
     );
 
+    Method SPY$skipCollect = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "skipCollect",
+            Object.class,
+            Object[].class,
+            Object.class,
+            String.class,
+            String.class,
+            String.class,
+            String.class,
+            String.class,
+            boolean.class
+    );
+
     Method SPY$traceFeignInvoke = InnerHelper.getAsmMethod(
             SpyDispatcher.class,
             "traceFeignInvoke",
@@ -277,6 +291,18 @@ public interface AsmMethods {
             String.class,
             String.class,
             String.class
+    );
+
+    Method SPY$isSkipCollectDubbo = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "isSkipCollectDubbo",
+            Object.class
+    );
+
+    Method SPY$isSkipCollectFeign = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "isSkipCollectFeign",
+            Object.class
     );
 
     Method SPY$reportService = InnerHelper.getAsmMethod(
