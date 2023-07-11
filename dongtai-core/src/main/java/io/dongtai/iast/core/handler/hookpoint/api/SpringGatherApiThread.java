@@ -9,6 +9,7 @@ import io.dongtai.log.ErrorCode;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.List;
 
 /**
  * @author CC11001100
@@ -72,8 +73,12 @@ public class SpringGatherApiThread extends AbstractApiGatherThread {
     private void runWithClassLoader(ClassLoader classLoader) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, ClassNotFoundException {
         Class<?> proxyClass = classLoader.loadClass("io.dongtai.iast.api.gather.spring.extractor.SpringMVCApiExtractor");
         Method getAPI = proxyClass.getDeclaredMethod("run", Object.class);
-        Object openApi = getAPI.invoke(null, applicationContext);
-        report(openApi, FRAMEWORK_NAME);
+        Object openApiList = getAPI.invoke(null, applicationContext);
+        if (openApiList == null) {
+            return;
+        }
+        // 返回的是一个报告列表
+        ((List) openApiList).forEach(o -> report(o, FRAMEWORK_NAME));
     }
 
 }
