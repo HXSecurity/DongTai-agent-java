@@ -1,5 +1,6 @@
 package io.dongtai.iast.core.handler.hookpoint.vulscan.dynamic;
 
+import io.dongtai.iast.common.scope.ScopeManager;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.hookpoint.SpyDispatcherImpl;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
@@ -113,6 +114,7 @@ public class DynamicPropagatorScanner implements IVulScan {
             event.setStacks(stackTraceElements);
 
             EngineManager.TRACK_MAP.addTrackMethod(invokeId, event);
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().addSinkType(sinkNode.getVulType());
         }
     }
 

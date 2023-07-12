@@ -1,5 +1,6 @@
 package io.dongtai.iast.core.handler.hookpoint.vulscan.normal;
 
+import io.dongtai.iast.common.scope.ScopeManager;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.SinkNode;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.TaintPosition;
@@ -48,6 +49,7 @@ public class CryptoBadMacVulScan extends AbstractNormalVulScan {
                     }
                 }
                 sendReport(latestStack, sinkNode.getVulType());
+                ScopeManager.SCOPE_TRACKER.getPolicyScope().addSinkType(sinkNode.getVulType());
                 break;
             } catch (Throwable e) {
                 DongTaiLog.trace("CryptoBadMacVulScan scan failed: {}, {}",
