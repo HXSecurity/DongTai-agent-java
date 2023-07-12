@@ -1,6 +1,9 @@
 package io.dongtai.log;
 
-import org.junit.*;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -265,4 +268,36 @@ public class DongTaiLogTest {
 
         clear();
     }
+
+    @Test
+    public void formatTest() {
+
+        Assert.assertEquals("this is foo, i am ok", DongTaiLog.format("this is {}, i am ok", "foo"));
+        Assert.assertEquals("this is {} foo {}, i am ok", DongTaiLog.format("this is {}, i am ok", "{} foo {}"));
+
+        Assert.assertEquals("foo", DongTaiLog.format("{}", "foo"));
+        Assert.assertEquals("foo begin", DongTaiLog.format("{} begin", "foo"));
+        Assert.assertEquals("end foo", DongTaiLog.format("end {}", "foo"));
+
+        Assert.assertEquals("foobar", DongTaiLog.format("{}{}", "foo", "bar"));
+        Assert.assertEquals("foo123bar", DongTaiLog.format("{}{}{}", "foo", "123", "bar"));
+        Assert.assertEquals("foo 123 bar", DongTaiLog.format("{} {} {}", "foo", "123", "bar"));
+
+        Assert.assertEquals("{}", DongTaiLog.format("\\{}", "foo"));
+        Assert.assertEquals("{}", DongTaiLog.format("{\\}", "foo"));
+
+        Assert.assertEquals("{", DongTaiLog.format("{", "foo"));
+        Assert.assertEquals("foo {", DongTaiLog.format("foo {", "foo"));
+        Assert.assertEquals("{ foo", DongTaiLog.format("{ foo", "foo"));
+        Assert.assertEquals("}", DongTaiLog.format("}", "foo"));
+        Assert.assertEquals("}{", DongTaiLog.format("}{", "foo"));
+        Assert.assertEquals("}{", DongTaiLog.format("}{", "foo"));
+
+        // 参数不够
+        Assert.assertEquals("foo {} {}", DongTaiLog.format("{} {} {}", "foo"));
+        // 参数过多
+        Assert.assertEquals("foo", DongTaiLog.format("{}", "foo", "bar"));
+
+    }
+
 }
