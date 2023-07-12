@@ -131,7 +131,7 @@ public class TaintPoolUtils {
     }
 
     public static boolean isAllowTaintType(Object obj) {
-        if (obj == null || obj instanceof Enumeration) {
+        if (obj == null) {
             return false;
         }
         return isAllowTaintType(obj.getClass());
@@ -210,7 +210,7 @@ public class TaintPoolUtils {
             try {
                 Field[] declaredFields = ReflectUtils.getDeclaredFieldsSecurity(cls);
                 for (Field field : declaredFields) {
-                    if (!Modifier.isStatic(field.getModifiers()) && !field.isSynthetic() && !field.isEnumConstant()) {
+                    if (!Modifier.isStatic(field.getModifiers()) && !field.isSynthetic() && !field.isEnumConstant() && !(field.get(obj) instanceof Enumeration)) {
                         trackObject(event, policyNode, field.get(obj), depth + 1, isMicroservice);
                     }
                 }
