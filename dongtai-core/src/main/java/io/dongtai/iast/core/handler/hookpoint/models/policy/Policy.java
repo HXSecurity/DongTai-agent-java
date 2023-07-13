@@ -1,5 +1,7 @@
 package io.dongtai.iast.core.handler.hookpoint.models.policy;
 
+import io.dongtai.iast.core.bytecode.enhance.ClassContext;
+
 import java.util.*;
 
 public class Policy {
@@ -73,16 +75,19 @@ public class Policy {
         }
     }
 
-    public String getMatchedClass(String className, Set<String> ancestors) {
+    public Set<String> getMatchedClass(ClassContext classContext, String className, Set<String> ancestors) {
+        Set<String> matchedClassSet = new HashSet<>();
         if (this.classHooks.contains(className)) {
-            return className;
+            classContext.setMatchedClassName(className);
+            matchedClassSet.add(className);
+            return matchedClassSet;
         }
         for (String ancestor : ancestors) {
             if (this.ancestorClassHooks.contains(ancestor)) {
-                return ancestor;
+                matchedClassSet.add(ancestor);
             }
         }
-        return null;
+        return matchedClassSet;
     }
 
     public boolean isMatchClass(String className) {
