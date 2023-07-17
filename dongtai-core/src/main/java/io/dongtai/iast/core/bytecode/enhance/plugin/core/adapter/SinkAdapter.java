@@ -15,6 +15,9 @@ public class SinkAdapter extends MethodAdapter {
             if (!(policyNode instanceof SinkNode)) {
                 continue;
             }
+            if ("ssrf".equals(((SinkNode) policyNode).getVulType())){
+                adapter.skipCollect(-1, policyNode, false);
+            }
 
             enterScope(adapter, policyNode);
 

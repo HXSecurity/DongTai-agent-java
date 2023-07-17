@@ -144,6 +144,16 @@ public class TaintRangesBuilder {
         taintRanges.merge();
     }
 
+    public void overwrite(TaintRanges taintRanges, TaintRanges oldTagRanges, Object source, TaintRanges srcTagRanges, int p1, int argC) {
+        if (argC == 1) {
+            int length = getLength(source);
+            srcTagRanges.shift(p1);
+            oldTagRanges.clear(p1, length + p1);
+            taintRanges.addAll(oldTagRanges);
+            taintRanges.addAll(srcTagRanges);
+        }
+    }
+
     public void trim(TaintCommand command, TaintRanges taintRanges, Object source, TaintRanges srcTaintRanges, int argC) {
         if (argC > 0) {
             return;

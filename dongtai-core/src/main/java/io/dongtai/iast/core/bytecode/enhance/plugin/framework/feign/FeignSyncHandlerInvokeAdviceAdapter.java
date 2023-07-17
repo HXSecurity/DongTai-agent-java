@@ -44,6 +44,7 @@ public class FeignSyncHandlerInvokeAdviceAdapter extends AbstractAdviceAdapter {
     }
 
     private void enterMethod() {
+        skipCollect();
         enterScope();
 
         Label elseLabel = new Label();
@@ -87,6 +88,13 @@ public class FeignSyncHandlerInvokeAdviceAdapter extends AbstractAdviceAdapter {
         push(this.name);
         push(this.signature);
         invokeInterface(ASM_TYPE_SPY_DISPATCHER, SPY$traceFeignInvoke);
+        pop();
+    }
+
+    private void skipCollect() {
+        invokeStatic(ASM_TYPE_SPY_HANDLER, SPY_HANDLER$getDispatcher);
+        loadThisOrPushNullIfIsStatic();
+        invokeInterface(ASM_TYPE_SPY_DISPATCHER,SPY$isSkipCollectFeign);
         pop();
     }
 }

@@ -8,7 +8,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
-import java.util.regex.Matcher;
 
 /**
  * @author niuerzhuang@huoxian.cn
@@ -296,17 +295,98 @@ public class DongTaiLog {
         log(LogLevel.ERROR, ErrorCode.NO_CODE, format, arguments);
     }
 
-    private static String format(String from, Object... arguments) {
-        if (from != null) {
-            String computed = from;
-            if (arguments != null && arguments.length != 0) {
-                for (Object argument : arguments) {
-                    computed = computed.replaceFirst("\\{\\}", argument == null ? "NULL" : Matcher.quoteReplacement(argument.toString()));
-                }
-            }
-            return computed;
+    /**
+     * 格式化字符串
+     *
+     * @param pattern   用来格式化的pattern，比如 "my name is {}, today is {}"
+     * @param arguments 用来填充上面的pattern的参数，比如 []String{"CC11001100", "2023-7-12"}
+     * @return 格式化之后的字符串，比如 "my name is CC11001100, today is 2023-7-12"
+     */
+    static String format(String pattern, Object... arguments) {
+//        if (from != null) {
+//            String computed = from;
+//            if (arguments != null && arguments.length != 0) {
+//                for (Object argument : arguments) {
+//                    computed = computed.replaceFirst("\\{\\}", argument == null ? "NULL" : Matcher.quoteReplacement(argument.toString()));
+//                }
+//            }
+//            return computed;
+//        }
+//        return null;
+
+        // 如果没有参数格式化的话快速退出
+        if (arguments.length == 0 || pattern == null) {
+            return pattern;
         }
-        return null;
+
+        // 先把参数都转为字符串，并且预估参数的字符长度 
+        int argumentCharCount = 0;
+        String[] argumentStrings = new String[arguments.length];
+        for (int i = 0; i < arguments.length; i++) {
+            argumentStrings[i] = arguments[i] == null ? "NULL" : arguments[i].toString();
+            argumentCharCount += argumentStrings[i].length();
+        }
+
+        // 现在，就能算出结果的长度避免扩容了，这里没有使用减去 参数长度乘以2的占位符长度 是因为pattern中占位符的实际个数可能并不足以消费完参数
+        //  （因为并没有强制pattern里的占位符与参数一一对应，所以它们的个数是很随意的），这种情况下如果做乐观假设的话可能会导致特殊情况下扩容，
+        //   所以此处采取比较保守的策略，宁愿在特殊情况下浪费几个字节的空间也不愿在特殊情况下扩容
+        // 举一个具体的例子，比如传入的pattern: "a{}c", 传入的参数 String[]{"b", "d", .. , "z"}，参数可能有几十个，远超占位符的个数，则此时会被减去错误的长度，甚至导致长度为负
+//        StringBuilder buff = new StringBuilder(pattern.length() - argumentStrings.length * 2 + argumentCharCount);
+        StringBuilder buff = new StringBuilder(pattern.length() + argumentCharCount);
+        // 下一个被消费的参数的下标
+        int argumentConsumeIndex = 0;
+        for (int i = 0; i < pattern.length(); i++) {
+            char c = pattern.charAt(i);
+            switch (c) {
+                case '\\':
+                    // 如果是转义字符的话，则看下它在转义个啥
+                    if (i + 1 < pattern.length()) {
+                        // 非最后一个字符，则根据不同的转义保留不同的字符，并且一次消费两个字符
+                        char nextChar = pattern.charAt(++i);
+                        switch (nextChar) {
+                            case '{':
+                            case '}':
+                                // 只保留被转义的左花括号或者右花括号，转义字符本身将被丢弃
+                                buff.append(nextChar);
+                                break;
+                            default:
+                                // 转移的是其它字符，则原样保持转义，相当于是在通用转义的基础上扩展了对左右花括号的转义
+                                buff.append(c).append(nextChar);
+                                break;
+                        }
+                    } else {
+                        // 最后一个字符了，原样保留
+                        buff.append(c);
+                    }
+                    break;
+                case '{':
+                    // 如果是左括号的话，则看一下是否是个占位符
+                    if (i + 1 < pattern.length() && pattern.charAt(i + 1) == '}') {
+                        // 一次消费两个字符，把占位符 {} 消费掉
+                        i++;
+                        // 使用参数替换
+                        buff.append(argumentStrings[argumentConsumeIndex++]);
+                        // 实际传递的参数个数和pattern中的占位符数量可能会不匹配，参数更多的时候没问题多余的将被忽略
+                        // 参数更少的时候继续也没啥意义了，所以如果参数被消费完了则快速退出
+                        if (argumentConsumeIndex == argumentStrings.length) {
+                            // 把 } 后边的一股脑儿消费了，如果有的话
+                            if (i + 1 < pattern.length()) {
+                                buff.append(pattern.substring(i + 1, pattern.length()));
+                            }
+                            return buff.toString();
+                        }
+                    } else {
+                        // 最后一个字符或者不是匹配的右花括号，原样保留
+                        buff.append(c);
+                    }
+                    break;
+                default:
+                    // 普通字符，原样复制
+                    buff.append(c);
+                    break;
+            }
+        }
+        return buff.toString();
     }
 
     private static String getTime() {
@@ -315,6 +395,7 @@ public class DongTaiLog {
         return simpleDateFormat.format(new Date()) + " ";
     }
 
+    // TODO 2023-7-12 12:00:06 写日志文件效率问题
     private static void writeLogToFile(String msg, Throwable t) {
         if (LOG_PATH == null || LOG_PATH.isEmpty()) {
             return;

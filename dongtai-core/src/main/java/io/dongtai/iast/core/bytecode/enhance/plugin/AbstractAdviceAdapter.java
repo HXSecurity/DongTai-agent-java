@@ -174,6 +174,32 @@ public abstract class AbstractAdviceAdapter extends AdviceAdapter implements Asm
         pop();
     }
 
+    public void skipCollect(
+            final int opcode,
+            final PolicyNode policyNode,
+            final boolean captureRet
+    ) {
+        newLocal(ASM_TYPE_OBJECT);
+        if (captureRet && !isThrow(opcode)) {
+            loadReturn(opcode);
+        } else {
+            pushNull();
+        }
+        storeLocal(this.nextLocal - 1);
+        invokeStatic(ASM_TYPE_SPY_HANDLER, SPY_HANDLER$getDispatcher);
+        loadThisOrPushNullIfIsStatic();
+        loadArgArray();
+        loadLocal(this.nextLocal - 1);
+        push(policyNode.toString());
+        push(this.context.getClassName());
+        push(this.context.getMatchedClassName());
+        push(this.name);
+        push(this.signature);
+        push(Modifier.isStatic(this.access));
+        invokeInterface(ASM_TYPE_SPY_DISPATCHER, SPY$skipCollect);
+        pop();
+    }
+
     /**
      * 是否抛出异常返回(通过字节码判断)
      *

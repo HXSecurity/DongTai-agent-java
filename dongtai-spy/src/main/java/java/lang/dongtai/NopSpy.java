@@ -261,4 +261,20 @@ public class NopSpy implements SpyDispatcher {
                                     String signature) {
         return false;
     }
+
+    @Override
+    public boolean isSkipCollectDubbo(Object invocation) {
+        return false;
+    }
+
+    @Override
+    public boolean isSkipCollectFeign(Object instance) {
+        return false;
+    }
+
+    @Override
+    public boolean skipCollect(Object instance, Object[] parameters, Object retObject, String methodMatcher, String className, String matchedClassName, String methodName, String signature, boolean isStatic) {
+        return false;
+    }
+
 }

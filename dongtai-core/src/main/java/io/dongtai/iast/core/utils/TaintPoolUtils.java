@@ -146,10 +146,10 @@ public class TaintPoolUtils {
         long identityHash = 0;
         boolean isSourceNode = policyNode instanceof SourceNode;
         if (isSourceNode) {
-            if (obj instanceof String){
+            if (obj instanceof String) {
                 identityHash = System.identityHashCode(obj);
-                hash = toStringHash(obj.hashCode(),identityHash);
-            }else {
+                hash = toStringHash(obj.hashCode(), identityHash);
+            } else {
                 hash = System.identityHashCode(obj);
                 identityHash = hash;
             }
@@ -195,7 +195,7 @@ public class TaintPoolUtils {
                 EngineManager.TAINT_HASH_CODES.add(hash);
                 event.addTargetHash(hash);
                 EngineManager.TAINT_RANGES_POOL.add(hash, tr);
-                TaintPoolUtils.customModel(isMicroservice,obj,cls,event,policyNode,depth);
+                TaintPoolUtils.customModel(isMicroservice, obj, cls, event, policyNode, depth);
             } else {
                 hash = getStringHash(obj);
                 if (EngineManager.TAINT_HASH_CODES.contains(hash)) {
@@ -205,12 +205,12 @@ public class TaintPoolUtils {
         }
     }
 
-    private static void customModel(Boolean isMicroservice, Object obj, Class<?> cls, MethodEvent event,PolicyNode policyNode,int depth) {
+    private static void customModel(Boolean isMicroservice, Object obj, Class<?> cls, MethodEvent event, PolicyNode policyNode, int depth) {
         if (isMicroservice && !(obj instanceof String) && !PropertyUtils.isDisabledCustomModel()) {
             try {
                 Field[] declaredFields = ReflectUtils.getDeclaredFieldsSecurity(cls);
                 for (Field field : declaredFields) {
-                    if (!Modifier.isStatic(field.getModifiers())) {
+                    if (!Modifier.isStatic(field.getModifiers()) && !field.isSynthetic() && !field.isEnumConstant() && !(field.get(obj) instanceof Enumeration)) {
                         trackObject(event, policyNode, field.get(obj), depth + 1, isMicroservice);
                     }
                 }
@@ -264,15 +264,15 @@ public class TaintPoolUtils {
         }
     }
 
-    public static Long toStringHash(long objectHashCode,long identityHashCode) {
+    public static Long toStringHash(long objectHashCode, long identityHashCode) {
         return (objectHashCode << 32) | (identityHashCode & 0xFFFFFFFFL);
     }
 
     public static Long getStringHash(Object obj) {
         long hash;
-        if (obj instanceof String){
-            hash = TaintPoolUtils.toStringHash(obj.hashCode(),System.identityHashCode(obj));
-        }else {
+        if (obj instanceof String) {
+            hash = TaintPoolUtils.toStringHash(obj.hashCode(), System.identityHashCode(obj));
+        } else {
             hash = System.identityHashCode(obj);
         }
         return hash;

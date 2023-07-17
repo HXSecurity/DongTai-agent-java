@@ -6,6 +6,7 @@ import io.dongtai.iast.common.config.ConfigKey;
 import io.dongtai.iast.common.scope.Scope;
 import io.dongtai.iast.common.scope.ScopeManager;
 import io.dongtai.iast.core.EngineManager;
+import io.dongtai.iast.core.handler.bypass.BlackUrlBypass;
 import io.dongtai.iast.core.handler.hookpoint.api.DubboApiGatherThread;
 import io.dongtai.iast.core.handler.hookpoint.api.SpringGatherApiThread;
 import io.dongtai.iast.core.handler.hookpoint.controller.HookType;
@@ -15,11 +16,16 @@ import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.*;
 import io.dongtai.iast.core.handler.hookpoint.service.trace.DubboService;
 import io.dongtai.iast.core.handler.hookpoint.service.trace.FeignService;
+import io.dongtai.iast.core.handler.hookpoint.service.trace.HttpService;
 import io.dongtai.iast.core.utils.StringUtils;
+import io.dongtai.iast.core.utils.matcher.ConfigMatcher;
 import io.dongtai.log.DongTaiLog;
 import io.dongtai.log.ErrorCode;
 
 import java.lang.dongtai.SpyDispatcher;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -185,6 +191,14 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                 put("headers", headers);
                 put("replay-request", !StringUtils.isEmpty(headers.get("dongtai-replay-id")));
             }};
+            if (ConfigMatcher.getInstance().getBlackUrl(requestMeta)) {
+                BlackUrlBypass.setIsBlackUrl(true);
+                return;
+            }
+            if (null != headers.get(BlackUrlBypass.getHeaderKey()) && headers.get(BlackUrlBypass.getHeaderKey()).equals("true")) {
+                BlackUrlBypass.setIsBlackUrl(true);
+                return;
+            }
             HttpImpl.solveHttpRequest(obj, req, resp, requestMeta);
         } catch (Throwable e) {
             DongTaiLog.warn(ErrorCode.get("SPY_COLLECT_HTTP_FAILED"), "request", e);
@@ -710,6 +724,63 @@ public class SpyDispatcherImpl implements SpyDispatcher {
             DongTaiLog.error(ErrorCode.get("SPY_TRACE_DUBBO_CONSUMER_INVOKE_FAILED"), e);
         } finally {
             ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
+        }
+        return false;
+    }
+
+    @Override
+    public boolean isSkipCollectDubbo(Object invocation) {
+        if (BlackUrlBypass.isBlackUrl()) {
+            Method setAttachmentMethod = null;
+            try {
+                setAttachmentMethod = invocation.getClass().getMethod("setAttachment", String.class, String.class);
+                setAttachmentMethod.setAccessible(true);
+                setAttachmentMethod.invoke(invocation, BlackUrlBypass.getHeaderKey(), BlackUrlBypass.isBlackUrl().toString());
+            } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+                DongTaiLog.error(ErrorCode.get("BYPASS_FAILED_DUBBO"), e);
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean isSkipCollectFeign(Object instance) {
+        if (BlackUrlBypass.isBlackUrl()) {
+            Field metadataField = null;
+            try {
+                metadataField = instance.getClass().getDeclaredField("metadata");
+                metadataField.setAccessible(true);
+                Object metadata = metadataField.get(instance);
+                Method templateMethod = metadata.getClass().getMethod("template");
+                Object template = templateMethod.invoke(metadata);
+
+                Method addHeaderMethod = template.getClass().getDeclaredMethod("header", String.class, String[].class);
+                addHeaderMethod.setAccessible(true);
+                addHeaderMethod.invoke(template, BlackUrlBypass.getHeaderKey(), new String[]{});
+                addHeaderMethod.invoke(template, BlackUrlBypass.getHeaderKey(), new String[]{BlackUrlBypass.isBlackUrl().toString()});
+            } catch (NoSuchFieldException | NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+                DongTaiLog.error(ErrorCode.get("BYPASS_FAILED_FEIGN"), e);
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean skipCollect(Object instance, Object[] parameters, Object retObject, String policyKey,
+                               String className, String matchedClassName, String methodName, String signature,
+                               boolean isStatic) {
+        if (BlackUrlBypass.isBlackUrl()) {
+            MethodEvent event = new MethodEvent(className, matchedClassName, methodName,
+                    signature, instance, parameters, retObject);
+            PolicyNode policyNode = getPolicyNode(policyKey);
+            if (policyNode == null) {
+                return false;
+            }
+            HttpService httpService = new HttpService();
+            if (httpService.match(event, policyNode)) {
+                httpService.addBypass(event);
+                return true;
+            }
         }
         return false;
     }
