@@ -12,6 +12,7 @@ public class ClassContext {
     private String className;
     private String matchedClassName;
     private Set<String> ancestors;
+    private Set<String> matchedClassSet;
     private String superClassName;
     private String[] interfaces;
     private int modifier;
@@ -97,5 +98,13 @@ public class ClassContext {
 
     public void setBootstrapClassLoader(boolean isBootstrapClassLoader) {
         this.isBootstrapClassLoader = isBootstrapClassLoader;
+    }
+
+    public Set<String> getMatchedClassSet() {
+        return matchedClassSet;
+    }
+
+    public void setMatchedClassSet(Set<String> matchedClassSet) {
+        this.matchedClassSet = matchedClassSet;
     }
 }

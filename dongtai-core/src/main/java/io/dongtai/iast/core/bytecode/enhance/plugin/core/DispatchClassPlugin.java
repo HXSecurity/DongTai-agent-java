@@ -29,13 +29,13 @@ public class DispatchClassPlugin implements DispatchPlugin {
     public ClassVisitor dispatch(ClassVisitor classVisitor, ClassContext classContext, Policy policy) {
         ancestors = classContext.getAncestors();
         className = classContext.getClassName();
-        String matchedClassName = policy.getMatchedClass(className, ancestors);
+        Set<String> matchedClassNameSet = policy.getMatchedClass(classContext,className, ancestors);
 
-        if (null == matchedClassName) {
+        if (0 == matchedClassNameSet.size()) {
             return classVisitor;
         }
 
-        classContext.setMatchedClassName(matchedClassName);
+        classContext.setMatchedClassSet(matchedClassNameSet);
         return new ClassVisit(classVisitor, classContext, policy);
     }
 
@@ -89,17 +89,22 @@ public class DispatchClassPlugin implements DispatchPlugin {
             methodContext.setDescriptor(descriptor);
             methodContext.setParameters(AsmUtils.buildParameterTypes(descriptor));
 
-            String matchedSignature = AsmUtils.buildSignature(context.getMatchedClassName(), name, descriptor);
+            String matchedSignature;
+            boolean methodIsTransformed = false;
+            for (String matchedName : context.getMatchedClassSet()) {
+                context.setMatchedClassName(matchedName);
+                matchedSignature = AsmUtils.buildSignature(matchedName, name, descriptor);
+                mv = lazyAop(mv, access, name, descriptor, matchedSignature, methodContext);
+                methodIsTransformed = mv instanceof MethodAdviceAdapter;
+                if (methodIsTransformed) break;
 
-            mv = lazyAop(mv, access, name, descriptor, matchedSignature, methodContext);
-            boolean methodIsTransformed = mv instanceof MethodAdviceAdapter;
-
+            }
             if (methodIsTransformed && this.classVersion <= Opcodes.V1_6) {
                 mv = new JSRInlinerAdapter(mv, access, name, descriptor, signature, exceptions);
             }
 
             if (methodIsTransformed) {
-                DongTaiLog.trace("rewrite method {} for listener[class={}]", matchedSignature, context.getClassName());
+                DongTaiLog.trace("rewrite method {} for listener[class={}]", context.getMatchedClassName(), context.getClassName());
             }
 
             return mv;
