@@ -176,5 +176,5 @@ jobs:
             --set tag=${{ steps.version.outputs.GITHUB_REF }}-latest --set build.agent_number=iast${{github.run_number}} --set develop.agentZip=${{ env.helm_ns }} --values https://charts.dongtai.io/devops.yaml
             helm upgrade --install huoxian --create-namespace -n iast-${{ env.helm_ns }}-max ./DongTai/deploy/kubernetes/helm/ \
             --set max=true --set sca.sca_token=${{ secrets.MAX_TOKEN_SCA }} --set usb.usb_token=${{ secrets.MAX_TOKEN_SCA }} --set mysql.host=iast-mysql-${{ env.helm_mysql }}-max.huoxian.cn \
-            --set tag=max-${{ steps.version.outputs.GITHUB_REF }}-latest --set build.mysql_number=iast${{github.run_number}} --set develop.agentZip=${{ env.helm_ns }} \
-            --set build.redis_number=iast${{github.run_number}} --set build.agent_number=iast${{github.run_number}} --values https://charts.dongtai.io/devops.yaml
+            --set tag=max-${{ steps.version.outputs.GITHUB_REF }}-latest --set develop.agentZip=${{ env.helm_ns }} \
+            --set build.agent_number=iast${{github.run_number}} --values https://charts.dongtai.io/devops.yaml
