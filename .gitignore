@@ -32,6 +32,8 @@ release
 # for jenv
 .java-version
 
+jmh-result.json
+
 dongtai-api.jar
 dongtai-core.jar
 dongtai-grpc.jar
