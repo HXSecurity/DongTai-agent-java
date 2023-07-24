@@ -62,6 +62,13 @@ public class IastClassFileTransformer implements ClassFileTransformer {
         return INSTANCE;
     }
 
+    public static IastClassFileTransformer getInstance() {
+        if (null != INSTANCE) {
+            return INSTANCE;
+        }
+        return null;
+    }
+
     IastClassFileTransformer(Instrumentation inst, PolicyManager policyManager) {
         this.inst = inst;
         this.isDumpClass = EngineManager.getInstance().isEnableDumpClass();
@@ -192,11 +199,9 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                         transformMap.put(classBeingRedefined, srcByteCodeArray);
                     }
                     transformCount++;
-                    classDiagram.setLoader(null);
                     return dumpClassIfNecessary(cr.getClassName(), cw.toByteArray(), srcByteCodeArray);
                 }
             }
-            classDiagram.setLoader(null);
         } catch (Throwable throwable) {
             DongTaiLog.warn(ErrorCode.get("TRANSFORM_CLASS_FAILED"), internalClassName, throwable);
         } finally {
@@ -355,6 +360,10 @@ public class IastClassFileTransformer implements ClassFileTransformer {
 
     public static HashMap<Object, byte[]> getTransformMap() {
         return transformMap;
+    }
+
+    public IastClassDiagram getClassDiagram() {
+        return classDiagram;
     }
 }
 
