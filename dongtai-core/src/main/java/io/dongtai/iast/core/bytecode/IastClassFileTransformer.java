@@ -62,6 +62,13 @@ public class IastClassFileTransformer implements ClassFileTransformer {
         return INSTANCE;
     }
 
+    public static IastClassFileTransformer getInstance() {
+        if (null != INSTANCE) {
+            return INSTANCE;
+        }
+        return null;
+    }
+
     IastClassFileTransformer(Instrumentation inst, PolicyManager policyManager) {
         this.inst = inst;
         this.isDumpClass = EngineManager.getInstance().isEnableDumpClass();
@@ -112,27 +119,37 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                             final Class<?> classBeingRedefined,
                             final ProtectionDomain protectionDomain,
                             final byte[] srcByteCodeArray) {
+        String threadName = Thread.currentThread().getName();
+        if (threadName.startsWith("DongTai-IAST-Core")
+                || threadName.startsWith("DongTai-IAST-AgentStateMonitor")
+                || threadName.startsWith("DongTai-IAST-ConfigMonitor")
+                || threadName.startsWith("DongTai-IAST-FallbackConfigMonitor")
+                || threadName.startsWith("DongTai-IAST-HearBeatMonitor")
+                || threadName.startsWith("DongTai-IAST-PerformanceMonitor")) {
+            return null;
+        }
+
+        if (internalClassName == null
+                || internalClassName.startsWith("io/dongtai/")
+                || internalClassName.startsWith("com/secnium/iast/")
+                || internalClassName.startsWith("java/lang/iast/")
+                || internalClassName.startsWith("cn/huoxian/iast/")
+                || internalClassName.startsWith("META-INF/")
+                || "module-info".equals(internalClassName)) {
+            return null;
+        }
+
+        if (null != loader && loader.toString().toLowerCase().contains("rasp")) {
+            return null;
+        }
+
         try {
             ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
-
-            if (internalClassName == null
-                    || internalClassName.startsWith("io/dongtai/")
-                    || internalClassName.startsWith("com/secnium/iast/")
-                    || internalClassName.startsWith("java/lang/iast/")
-                    || internalClassName.startsWith("cn/huoxian/iast/")
-                    || internalClassName.startsWith("META-INF/")
-                    || "module-info".equals(internalClassName)) {
-                return null;
-            }
 
             if (" com/alibaba/fastjson/JSON".substring(1).equals(internalClassName)) {
                 FastjsonCheck.setJsonClassLoader(loader);
             } else if (" com/alibaba/fastjson/parser/ParserConfig".substring(1).equals(internalClassName)) {
                 FastjsonCheck.setParseConfigClassLoader(loader);
-            }
-
-            if (null != loader && loader.toString().toLowerCase().contains("rasp")) {
-                return null;
             }
 
             if (loader != null && protectionDomain != null) {
@@ -156,7 +173,6 @@ public class IastClassFileTransformer implements ClassFileTransformer {
 
             ClassContext classContext = new ClassContext(cr, loader);
             if (Modifier.isInterface(classContext.getModifier())) {
-                sourceCodeBak = null;
                 return null;
             }
             final String className = classContext.getClassName();
@@ -186,11 +202,9 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                     return dumpClassIfNecessary(cr.getClassName(), cw.toByteArray(), srcByteCodeArray);
                 }
             }
-            sourceCodeBak = null;
         } catch (Throwable throwable) {
             DongTaiLog.warn(ErrorCode.get("TRANSFORM_CLASS_FAILED"), internalClassName, throwable);
         } finally {
-            classDiagram.setLoader(null);
             ScopeManager.SCOPE_TRACKER.getPolicyScope().leaveAgent();
         }
 
@@ -346,6 +360,10 @@ public class IastClassFileTransformer implements ClassFileTransformer {
 
     public static HashMap<Object, byte[]> getTransformMap() {
         return transformMap;
+    }
+
+    public IastClassDiagram getClassDiagram() {
+        return classDiagram;
     }
 }
 
