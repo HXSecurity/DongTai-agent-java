@@ -25,6 +25,11 @@ public class MethodEvent {
     private int invokeId;
 
     /**
+     * policy type
+     */
+    private String policyType;
+
+    /**
      * is source policy node
      */
     public boolean source;
@@ -87,6 +92,8 @@ public class MethodEvent {
     private final Set<Long> targetHashes = new HashSet<Long>();
 
     public List<MethodEventTargetRange> targetRanges = new ArrayList<MethodEventTargetRange>();
+
+    public List<MethodEventTargetRange> sourceRanges = new ArrayList<MethodEventTargetRange>();
 
     public List<MethodEventSourceType> sourceTypes;
 
@@ -170,6 +177,14 @@ public class MethodEvent {
 
     public void setInvokeId(int invokeId) {
         this.invokeId = invokeId;
+    }
+
+    public String getPolicyType() {
+        return policyType;
+    }
+
+    public void setPolicyType(String policyType) {
+        this.policyType = policyType;
     }
 
     public boolean isSource() {

@@ -2,6 +2,7 @@ package io.dongtai.iast.core.handler.hookpoint.controller.impl;
 
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
+import io.dongtai.iast.core.handler.hookpoint.models.policy.PolicyNodeType;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.PropagatorNode;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.TaintPosition;
 import io.dongtai.iast.core.handler.hookpoint.models.taint.range.*;
@@ -63,6 +64,7 @@ public class PropagatorImpl {
         event.setCallStacks(StackUtils.createCallStack(6));
         int invokeId = invokeIdSequencer.getAndIncrement();
         event.setInvokeId(invokeId);
+        event.setPolicyType(PolicyNodeType.PROPAGATOR.getName());
         EngineManager.TRACK_MAP.get().put(invokeId, event);
     }
 

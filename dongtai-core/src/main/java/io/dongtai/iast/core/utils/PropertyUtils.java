@@ -223,4 +223,12 @@ public class PropertyUtils {
         }
         return isDisabledCustomModel;
     }
+
+    public static Boolean isDisabledValidated() {
+        if (null == isDisabledCustomModel){
+            List<String> disabledFeatures = getDisabledFeatures();
+            isDisabledCustomModel = disabledFeatures.contains("validated");
+        }
+        return isDisabledCustomModel;
+    }
 }
