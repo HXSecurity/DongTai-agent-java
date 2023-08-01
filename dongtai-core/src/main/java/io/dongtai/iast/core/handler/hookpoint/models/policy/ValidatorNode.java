@@ -7,9 +7,7 @@ import java.util.Set;
 public class ValidatorNode extends PolicyNode {
 
     private Set<TaintPosition> sources;
-    private TaintCommandRunner commandRunner;
     private String[] tags;
-    private String[] untags;
 
     public ValidatorNode(Set<TaintPosition> sources, MethodMatcher methodMatcher) {
         super(methodMatcher);
@@ -39,21 +37,5 @@ public class ValidatorNode extends PolicyNode {
 
     public void setTags(String[] tags) {
         this.tags = tags;
-    }
-
-    public String[] getUntags() {
-        return this.untags;
-    }
-
-    public void setUntags(String[] untags) {
-        this.untags = untags;
-    }
-
-    public TaintCommandRunner getCommandRunner() {
-        return this.commandRunner;
-    }
-
-    public void setCommandRunner(TaintCommandRunner r) {
-        this.commandRunner = r;
     }
 }

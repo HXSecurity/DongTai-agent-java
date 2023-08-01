@@ -55,7 +55,7 @@ public class ValidatorImpl {
                     hash = getStringHash(parameter);
                     len = TaintRangesBuilder.getLength(parameter);
                 }
-            }
+            } else return;
 
             if (null != len && null != hash){
                 TaintRanges tr = new TaintRanges(new TaintRange(TaintTag.VALIDATED.getKey(), 0, len));
@@ -72,7 +72,7 @@ public class ValidatorImpl {
                 }else {
                     taintRanges.addAll(tr);
                 }
-            }
+            }else return;
         }
 
         event.source = false;

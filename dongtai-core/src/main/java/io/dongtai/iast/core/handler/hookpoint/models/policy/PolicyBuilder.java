@@ -144,7 +144,6 @@ public class PolicyBuilder {
         setInheritable(node, validatorNode);
         List<String[]> tags = parseTags(node, validatorNode);
         validatorNode.setTags(tags.get(0));
-        validatorNode.setUntags(tags.get(1));
         policy.addValidator(validatorNode);
     }
 
@@ -273,7 +272,7 @@ public class PolicyBuilder {
         }
 
         try {
-            if (node.has(KEY_TAGS)) {
+            if (node.has(KEY_UNTAGS)) {
                 JSONArray uts = node.getJSONArray(KEY_UNTAGS);
                 for (Object o : uts) {
                     String ut = (String) o;
