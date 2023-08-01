@@ -8,6 +8,7 @@ import io.dongtai.iast.core.handler.hookpoint.models.policy.ValidatorNode;
 import io.dongtai.iast.core.handler.hookpoint.models.taint.range.TaintRange;
 import io.dongtai.iast.core.handler.hookpoint.models.taint.range.TaintRanges;
 import io.dongtai.iast.core.handler.hookpoint.models.taint.range.TaintRangesBuilder;
+import io.dongtai.iast.core.handler.hookpoint.models.taint.tag.TaintTag;
 import io.dongtai.iast.core.utils.StackUtils;
 import io.dongtai.iast.core.utils.TaintPoolUtils;
 
@@ -57,7 +58,7 @@ public class ValidatorImpl {
             }
 
             if (null != len && null != hash){
-                TaintRanges tr = new TaintRanges(new TaintRange("validated", 0, len));
+                TaintRanges tr = new TaintRanges(new TaintRange(TaintTag.VALIDATED.getKey(), 0, len));
                 if (validatorNode.hasTags()) {
                     String[] tags = validatorNode.getTags();
                     for (String tag : tags) {
