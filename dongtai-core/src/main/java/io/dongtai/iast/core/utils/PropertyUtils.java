@@ -1,5 +1,7 @@
 package io.dongtai.iast.core.utils;
 
+import io.dongtai.iast.common.config.ConfigBuilder;
+import io.dongtai.iast.common.config.ConfigKey;
 import io.dongtai.iast.common.constants.PropertyConstant;
 import io.dongtai.log.DongTaiLog;
 import io.dongtai.log.ErrorCode;
@@ -224,10 +226,9 @@ public class PropertyUtils {
         return isDisabledCustomModel;
     }
 
-    public static Boolean isDisabledValidated() {
+    public static Boolean validatedSink() {
         if (null == isDisabledCustomModel){
-            List<String> disabledFeatures = getDisabledFeatures();
-            isDisabledCustomModel = disabledFeatures.contains("validated");
+            isDisabledCustomModel = ConfigBuilder.getInstance().get(ConfigKey.VALIDATED_SINK);
         }
         return isDisabledCustomModel;
     }

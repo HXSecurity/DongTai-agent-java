@@ -42,6 +42,7 @@ public class ValidatorImpl {
                         && TaintPoolUtils.poolContains(event.objectInstance, event)) {
                     hash = getStringHash(event.objectInstance);
                     len = TaintRangesBuilder.getLength(event.objectInstance);
+                    event.setObjectValue(event.objectInstance, true);
                 }
             } else if (position.isParameter()) {
                 int parameterIndex = position.getParameterIndex();
@@ -54,6 +55,7 @@ public class ValidatorImpl {
                         && TaintPoolUtils.poolContains(parameter, event)) {
                     hash = getStringHash(parameter);
                     len = TaintRangesBuilder.getLength(parameter);
+                    event.addParameterValue(parameterIndex, parameter, true);
                 }
             } else return;
 

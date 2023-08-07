@@ -24,6 +24,8 @@ public class ConfigBuilder {
                 Config.<Boolean>create(ConfigKey.ENABLE_LOGGER));
         this.configMap.put(ConfigKey.LOGGER_LEVEL,
                 Config.<String>create(ConfigKey.LOGGER_LEVEL));
+        this.configMap.put(ConfigKey.VALIDATED_SINK,
+                Config.<Boolean>create(ConfigKey.VALIDATED_SINK).setDefaultValue(false));
     }
 
     public static ConfigBuilder getInstance() {
@@ -62,6 +64,7 @@ public class ConfigBuilder {
         updateString(config, ConfigKey.JsonKey.JSON_VERSION_HEADER_KEY);
         updateBool(config, ConfigKey.JsonKey.JSON_ENABLE_LOGGER);
         updateString(config, ConfigKey.JsonKey.JSON_LOGGER_LEVEL);
+        updateBool(config, ConfigKey.JsonKey.JSON_VALIDATED_SINK);
         updateRequestDenyList(config);
     }
 

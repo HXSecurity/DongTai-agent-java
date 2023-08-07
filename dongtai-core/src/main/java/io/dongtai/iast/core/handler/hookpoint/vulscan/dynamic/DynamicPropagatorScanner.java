@@ -181,7 +181,7 @@ public class DynamicPropagatorScanner implements IVulScan {
                     
                     boolean commonCondition = tr.hasRequiredTaintTags(required) && !tr.hasDisallowedTaintTags(disallowed);
 
-                    if (PropertyUtils.isDisabledValidated()) {
+                    if (PropertyUtils.validatedSink()) {
                         tagsHit = commonCondition && !tr.hasValidatedTags(disallowed);
                     } else {
                         tagsHit = commonCondition;
