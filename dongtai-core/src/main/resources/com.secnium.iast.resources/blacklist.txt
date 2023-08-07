@@ -29979,7 +29979,7 @@ org/apache/catalina/connector/CoyoteAdapter$CatalinaAfterServiceListener
 org/apache/catalina/connector/CoyoteAdapter$RecycleRequiredException
 #org/apache/catalina/connector/CoyoteOutputStream
 #org/apache/catalina/connector/CoyoteInputStream
-org/apache/catalina/connector/CoyoteReader
+#org/apache/catalina/connector/CoyoteReader
 org/apache/catalina/connector/InputBuffer
 org/apache/catalina/connector/MapperListener
 #org/apache/catalina/connector/OutputBuffer
