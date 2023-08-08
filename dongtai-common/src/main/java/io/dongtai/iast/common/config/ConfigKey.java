@@ -19,7 +19,7 @@ public enum ConfigKey {
         JSON_VERSION_HEADER_KEY("version_header_name", VERSION_HEADER_KEY),
         JSON_ENABLE_LOGGER("enable_log", ENABLE_LOGGER),
         JSON_LOGGER_LEVEL("log_level", LOGGER_LEVEL),
-        JSON_VALIDATED_SINK("report_validated_sink", LOGGER_LEVEL),
+        JSON_VALIDATED_SINK("report_validated_sink", VALIDATED_SINK),
         ;
 
         private final String key;
