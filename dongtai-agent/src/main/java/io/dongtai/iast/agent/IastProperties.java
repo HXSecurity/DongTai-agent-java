@@ -17,7 +17,6 @@ import java.util.*;
 public class IastProperties {
     public final static Map<String, String> ATTACH_ARG_MAP = new HashMap<String, String>() {{
         put("debug", PropertyConstant.PROPERTY_DEBUG);
-        put("app_create", PropertyConstant.PROPERTY_APP_CREATE);
         put("app_name", PropertyConstant.PROPERTY_APP_NAME);
         put("app_version", PropertyConstant.PROPERTY_APP_VERSION);
         put("app_template", PropertyConstant.PROPERTY_APP_TEMPLATE);
@@ -127,20 +126,6 @@ public class IastProperties {
 
     public boolean isDebug() {
         return "true".equalsIgnoreCase(getDebugFlag());
-    }
-
-    public Integer isAutoCreateProject() {
-        if (null == isAutoCreateProject) {
-            String result = System.getProperty(PropertyConstant.PROPERTY_APP_CREATE,
-                    System.getProperty("project.create", cfg.getProperty("project.create", "false"))
-            );
-            if ("true".equalsIgnoreCase(result)) {
-                isAutoCreateProject = 1;
-            } else {
-                isAutoCreateProject = 0;
-            }
-        }
-        return isAutoCreateProject;
     }
 
     public String getProjectName() {
