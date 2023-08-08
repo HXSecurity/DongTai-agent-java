@@ -79,6 +79,7 @@ public class ValidatorImpl {
 
         event.source = false;
         event.setCallStacks(StackUtils.createCallStack(4));
+        event.setTaintPositions(validatorNode.getSources(), null);
 
         int invokeId = invokeIdSequencer.getAndIncrement();
         event.setInvokeId(invokeId);

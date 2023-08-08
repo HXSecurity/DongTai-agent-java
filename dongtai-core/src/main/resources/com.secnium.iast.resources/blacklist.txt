@@ -58862,7 +58862,7 @@ org/springframework/http/converter/feed/AbstractWireFeedHttpMessageConverter
 org/springframework/http/converter/feed/AtomFeedHttpMessageConverter
 org/springframework/http/converter/feed/RssChannelHttpMessageConverter
 org/springframework/http/converter/feed/package-info
-org/springframework/http/converter/json/AbstractJackson2HttpMessageConverter
+# org/springframework/http/converter/json/AbstractJackson2HttpMessageConverter
 org/springframework/http/converter/json/Jackson2ObjectMapperBuilder
 org/springframework/http/converter/json/MappingJackson2HttpMessageConverter
 org/springframework/http/converter/json/MappingJacksonHttpMessageConverter
