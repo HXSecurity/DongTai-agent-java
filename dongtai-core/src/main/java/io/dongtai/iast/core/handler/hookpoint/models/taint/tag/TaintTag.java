@@ -34,6 +34,7 @@ public enum TaintTag {
     VBSCRIPT_ENCODED("vbscript-encoded"),
     HTTP_TOKEN_LIMITED_CHARS("http-token-limited-chars"),
     NUMERIC_LIMITED_CHARS("numeric-limited-chars"),
+    VALIDATED("validated"),
     ;
 
     private final String key;

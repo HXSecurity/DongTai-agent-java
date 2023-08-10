@@ -219,6 +219,12 @@ public interface AsmMethods {
             SpyDispatcher.class,
             "isFirstLevelSink"
     );
+
+    Method SPY$enterValidator = InnerHelper.getAsmMethod(
+            SpyDispatcher.class,
+            "enterValidator"
+    );
+
     Method SPY$enterIgnoreInternal = InnerHelper.getAsmMethod(
             SpyDispatcher.class,
             "enterIgnoreInternal"

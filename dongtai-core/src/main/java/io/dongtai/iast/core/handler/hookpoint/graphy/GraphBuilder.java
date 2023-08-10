@@ -110,6 +110,7 @@ public class GraphBuilder {
         List<String> targetPositions = new ArrayList<String>();
 
         value.put("invokeId", event.getInvokeId());
+        value.put("policyType", event.getPolicyType());
         value.put("source", event.isSource());
         value.put("originClassName", event.getOriginClassName());
         value.put("className", event.getMatchedClassName());
@@ -163,6 +164,14 @@ public class GraphBuilder {
             JSONArray tr = new JSONArray();
             value.put("targetRange", tr);
             for (MethodEvent.MethodEventTargetRange range : event.targetRanges) {
+                tr.add(range.toJson());
+            }
+        }
+
+        if (event.sourceRanges.size() > 0) {
+            JSONArray tr = new JSONArray();
+            value.put("sourceRange", tr);
+            for (MethodEvent.MethodEventTargetRange range : event.sourceRanges) {
                 tr.add(range.toJson());
             }
         }

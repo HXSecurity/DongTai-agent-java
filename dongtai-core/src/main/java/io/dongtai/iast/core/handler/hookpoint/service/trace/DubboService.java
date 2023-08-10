@@ -3,6 +3,7 @@ package io.dongtai.iast.core.handler.hookpoint.service.trace;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.context.ContextManager;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
+import io.dongtai.iast.core.handler.hookpoint.models.policy.PolicyNodeType;
 import io.dongtai.iast.core.utils.StackUtils;
 import io.dongtai.iast.core.utils.TaintPoolUtils;
 import io.dongtai.log.DongTaiLog;
@@ -44,6 +45,7 @@ public class DubboService {
             event.setCallStacks(StackUtils.createCallStack(4));
             int invokeId = invokeIdSequencer.getAndIncrement();
             event.setInvokeId(invokeId);
+            event.setPolicyType(PolicyNodeType.PROPAGATOR.getName());
             EngineManager.TRACK_MAP.get().put(invokeId, event);
         } catch (NoSuchMethodException ignore) {
         } catch (Throwable e) {

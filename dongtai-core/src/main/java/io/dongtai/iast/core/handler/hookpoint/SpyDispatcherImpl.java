@@ -394,7 +394,8 @@ public class SpyDispatcherImpl implements SpyDispatcher {
             }
 
             if (!ScopeManager.SCOPE_TRACKER.getScope(Scope.DUBBO_REQUEST).isFirst()
-                    || !ScopeManager.SCOPE_TRACKER.getScope(Scope.DUBBO_ENTRY).in()) {
+                    || !ScopeManager.SCOPE_TRACKER.getScope(Scope.DUBBO_ENTRY).in()
+                    || ScopeManager.SCOPE_TRACKER.getScope(Scope.HTTP_REQUEST).in()) {
                 return;
             }
 
@@ -559,6 +560,17 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     }
 
     /**
+     * mark for enter validator entry point
+     */
+    @Override
+    public boolean enterValidator() {
+        if (!EngineManager.isEngineRunning()) {
+            return false;
+        }
+        return !ScopeManager.SCOPE_TRACKER.inAgent() && ScopeManager.SCOPE_TRACKER.inEnterEntry();
+    }
+
+    /**
      * Determines whether it is a layer 1 Sink entry
      *
      * @since 1.3.1
@@ -674,6 +686,9 @@ public class SpyDispatcherImpl implements SpyDispatcher {
             } else if ((policyNode instanceof SinkNode)) {
                 SinkImpl.solveSink(event, (SinkNode) policyNode);
                 return true;
+            } else if ((policyNode instanceof ValidatorNode)) {
+                ValidatorImpl.solveValidator(event,(ValidatorNode)policyNode, INVOKE_ID_SEQUENCER);
+                return true;
             }
 
             return false;
@@ -731,7 +746,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public boolean isSkipCollectDubbo(Object invocation) {
         if (BlackUrlBypass.isBlackUrl()) {
-            Method setAttachmentMethod = null;
+            Method setAttachmentMethod;
             try {
                 setAttachmentMethod = invocation.getClass().getMethod("setAttachment", String.class, String.class);
                 setAttachmentMethod.setAccessible(true);
@@ -746,7 +761,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
     @Override
     public boolean isSkipCollectFeign(Object instance) {
         if (BlackUrlBypass.isBlackUrl()) {
-            Field metadataField = null;
+            Field metadataField;
             try {
                 metadataField = instance.getClass().getDeclaredField("metadata");
                 metadataField.setAccessible(true);

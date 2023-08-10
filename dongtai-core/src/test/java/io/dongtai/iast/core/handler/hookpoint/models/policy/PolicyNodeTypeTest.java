@@ -14,7 +14,7 @@ public class PolicyNodeTypeTest {
             put(0, null);
             put(1, PolicyNodeType.PROPAGATOR);
             put(2, PolicyNodeType.SOURCE);
-            put(3, PolicyNodeType.FILTER);
+            put(3, PolicyNodeType.VALIDATOR);
             put(4, PolicyNodeType.SINK);
             put(5, null);
         }};

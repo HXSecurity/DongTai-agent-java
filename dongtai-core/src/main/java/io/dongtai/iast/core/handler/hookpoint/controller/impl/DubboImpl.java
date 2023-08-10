@@ -8,6 +8,7 @@ import io.dongtai.iast.core.handler.bypass.BlackUrlBypass;
 import io.dongtai.iast.core.handler.context.ContextManager;
 import io.dongtai.iast.core.handler.hookpoint.IastClassLoader;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
+import io.dongtai.iast.core.handler.hookpoint.models.policy.PolicyNodeType;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.SourceNode;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.TaintPosition;
 import io.dongtai.iast.core.handler.hookpoint.models.taint.range.TaintRange;
@@ -178,6 +179,7 @@ public class DubboImpl {
 
         int invokeId = invokeIdSequencer.getAndIncrement();
         event.setInvokeId(invokeId);
+        event.setPolicyType(PolicyNodeType.SOURCE.getName());
 
         event.source = true;
         event.setCallStacks(StackUtils.createCallStack(4));

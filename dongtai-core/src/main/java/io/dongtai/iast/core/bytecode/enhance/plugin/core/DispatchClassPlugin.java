@@ -54,6 +54,7 @@ public class DispatchClassPlugin implements DispatchPlugin {
                     new SourceAdapter(),
                     new PropagatorAdapter(),
                     new SinkAdapter(),
+                    new ValidatorAdapter(),
             };
         }
 

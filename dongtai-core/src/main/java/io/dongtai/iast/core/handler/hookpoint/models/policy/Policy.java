@@ -8,6 +8,7 @@ public class Policy {
     private final List<SourceNode> sources = new ArrayList<SourceNode>();
     private final List<PropagatorNode> propagators = new ArrayList<PropagatorNode>();
     private final List<SinkNode> sinks = new ArrayList<SinkNode>();
+    private final List<ValidatorNode> validators = new ArrayList<ValidatorNode>();
     private final Map<String, PolicyNode> policyNodesMap = new HashMap<String, PolicyNode>();
     private final Set<String> classHooks = new HashSet<String>();
     private final Set<String> ancestorClassHooks = new HashSet<String>();
@@ -41,6 +42,11 @@ public class Policy {
     public void addSink(SinkNode sink) {
         this.sinks.add(sink);
         addPolicyNode(sink);
+    }
+
+    public void addValidator(ValidatorNode validator) {
+        this.validators.add(validator);
+        addPolicyNode(validator);
     }
 
     public PolicyNode getPolicyNode(String policyKey) {

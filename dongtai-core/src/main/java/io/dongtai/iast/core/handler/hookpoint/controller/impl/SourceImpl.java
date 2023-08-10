@@ -2,6 +2,7 @@ package io.dongtai.iast.core.handler.hookpoint.controller.impl;
 
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
+import io.dongtai.iast.core.handler.hookpoint.models.policy.PolicyNodeType;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.SourceNode;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.TaintPosition;
 import io.dongtai.iast.core.handler.hookpoint.models.taint.range.TaintRangesBuilder;
@@ -37,6 +38,7 @@ public class SourceImpl {
 
         int invokeId = invokeIdSequencer.getAndIncrement();
         event.setInvokeId(invokeId);
+        event.setPolicyType(PolicyNodeType.SOURCE.getName());
 
         boolean valid = trackTarget(event, sourceNode);
         if (!valid) {

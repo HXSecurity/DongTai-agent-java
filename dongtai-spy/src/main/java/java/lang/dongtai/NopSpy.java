@@ -188,6 +188,14 @@ public class NopSpy implements SpyDispatcher {
     }
 
     /**
+     *
+     */
+    @Override
+    public boolean enterValidator() {
+        return false;
+    }
+
+    /**
      * Determines whether it is a layer 1 Sink entry
      *
      * @return
