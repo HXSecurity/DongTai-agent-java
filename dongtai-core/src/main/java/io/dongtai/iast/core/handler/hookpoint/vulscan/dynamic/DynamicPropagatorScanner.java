@@ -3,6 +3,7 @@ package io.dongtai.iast.core.handler.hookpoint.vulscan.dynamic;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.hookpoint.SpyDispatcherImpl;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
+import io.dongtai.iast.core.handler.hookpoint.models.policy.PolicyNodeType;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.SinkNode;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.TaintPosition;
 import io.dongtai.iast.core.handler.hookpoint.models.taint.range.TaintRanges;
@@ -12,6 +13,7 @@ import io.dongtai.iast.core.handler.hookpoint.service.trace.ServiceTrace;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.IVulScan;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.VulnType;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.dynamic.xxe.XXECheck;
+import io.dongtai.iast.core.utils.PropertyUtils;
 import io.dongtai.iast.core.utils.StackUtils;
 import io.dongtai.iast.core.utils.TaintPoolUtils;
 
@@ -109,6 +111,7 @@ public class DynamicPropagatorScanner implements IVulScan {
             event.setCallStacks(stackTraceElements);
             int invokeId = SpyDispatcherImpl.INVOKE_ID_SEQUENCER.getAndIncrement();
             event.setInvokeId(invokeId);
+            event.setPolicyType(PolicyNodeType.SINK.getName());
             event.setTaintPositions(sinkNode.getSources(), null);
             event.setStacks(stackTraceElements);
 
@@ -175,9 +178,13 @@ public class DynamicPropagatorScanner implements IVulScan {
                     if (tr == null || tr.isEmpty()) {
                         continue;
                     }
+                    
+                    boolean commonCondition = tr.hasRequiredTaintTags(required) && !tr.hasDisallowedTaintTags(disallowed);
 
-                    if (tr.hasRequiredTaintTags(required) && !tr.hasDisallowedTaintTags(disallowed)) {
-                        tagsHit = true;
+                    if (PropertyUtils.validatedSink()) {
+                        tagsHit = commonCondition && !tr.hasValidatedTags(disallowed);
+                    } else {
+                        tagsHit = commonCondition;
                     }
                 }
                 if (!tagsHit) {

@@ -123,6 +123,8 @@ public interface SpyDispatcher {
      */
     void leaveSink();
 
+    boolean enterValidator();
+
     /**
      * Determines whether it is a layer 1 Sink entry
      *

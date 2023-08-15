@@ -29979,7 +29979,7 @@ org/apache/catalina/connector/CoyoteAdapter$CatalinaAfterServiceListener
 org/apache/catalina/connector/CoyoteAdapter$RecycleRequiredException
 #org/apache/catalina/connector/CoyoteOutputStream
 #org/apache/catalina/connector/CoyoteInputStream
-org/apache/catalina/connector/CoyoteReader
+#org/apache/catalina/connector/CoyoteReader
 org/apache/catalina/connector/InputBuffer
 org/apache/catalina/connector/MapperListener
 #org/apache/catalina/connector/OutputBuffer
@@ -58862,7 +58862,7 @@ org/springframework/http/converter/feed/AbstractWireFeedHttpMessageConverter
 org/springframework/http/converter/feed/AtomFeedHttpMessageConverter
 org/springframework/http/converter/feed/RssChannelHttpMessageConverter
 org/springframework/http/converter/feed/package-info
-org/springframework/http/converter/json/AbstractJackson2HttpMessageConverter
+# org/springframework/http/converter/json/AbstractJackson2HttpMessageConverter
 org/springframework/http/converter/json/Jackson2ObjectMapperBuilder
 org/springframework/http/converter/json/MappingJackson2HttpMessageConverter
 org/springframework/http/converter/json/MappingJacksonHttpMessageConverter

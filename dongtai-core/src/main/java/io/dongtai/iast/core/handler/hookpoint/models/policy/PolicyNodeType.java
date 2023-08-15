@@ -3,7 +3,7 @@ package io.dongtai.iast.core.handler.hookpoint.models.policy;
 public enum PolicyNodeType {
     SOURCE(2, "source"),
     PROPAGATOR(1, "propagator"),
-    FILTER(3, "filter"),
+    VALIDATOR(3, "validator"),
     SINK(4, "sink"),
     ;
 
