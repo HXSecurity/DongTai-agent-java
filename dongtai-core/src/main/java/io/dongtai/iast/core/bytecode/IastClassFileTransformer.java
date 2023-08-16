@@ -120,12 +120,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                             final ProtectionDomain protectionDomain,
                             final byte[] srcByteCodeArray) {
         String threadName = Thread.currentThread().getName();
-        if (threadName.startsWith("DongTai-IAST-Core")
-                || threadName.startsWith("DongTai-IAST-AgentStateMonitor")
-                || threadName.startsWith("DongTai-IAST-ConfigMonitor")
-                || threadName.startsWith("DongTai-IAST-FallbackConfigMonitor")
-                || threadName.startsWith("DongTai-IAST-HearBeatMonitor")
-                || threadName.startsWith("DongTai-IAST-PerformanceMonitor")) {
+        if (threadName.startsWith("DongTai-IAST-Core")) {
             return null;
         }
 
