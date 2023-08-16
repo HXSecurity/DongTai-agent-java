@@ -73,6 +73,9 @@ public class TransformEngine implements IEngine {
                 DongTaiLog.error(ErrorCode.get("TRANSFORM_ENGINE_DESTROY_REDEFINE_CLASSES_FAILED"), e);
             }
         }
+        if (IastClassFileTransformer.getInstance() != null) {
+            IastClassFileTransformer.getInstance().getClassDiagram().setLoader(null);
+        }
         inst = null;
         classFileTransformer = null;
     }

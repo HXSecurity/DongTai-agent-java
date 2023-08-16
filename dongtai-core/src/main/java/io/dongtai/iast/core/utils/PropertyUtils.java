@@ -1,5 +1,7 @@
 package io.dongtai.iast.core.utils;
 
+import io.dongtai.iast.common.config.ConfigBuilder;
+import io.dongtai.iast.common.config.ConfigKey;
 import io.dongtai.iast.common.constants.PropertyConstant;
 import io.dongtai.log.DongTaiLog;
 import io.dongtai.log.ErrorCode;
@@ -208,7 +210,7 @@ public class PropertyUtils {
     }
 
     public static List<String> getDisabledFeatures() {
-        if (null == disabledFeatureList){
+        if (null == disabledFeatureList) {
             disabledFeatureList = Optional.ofNullable(System.getProperty("dongtai.disabled.features"))
                     .map(s -> Arrays.asList(s.split(",")))
                     .orElse(new ArrayList<>());
@@ -217,10 +219,14 @@ public class PropertyUtils {
     }
 
     public static Boolean isDisabledCustomModel() {
-        if (null == isDisabledCustomModel){
+        if (null == isDisabledCustomModel) {
             List<String> disabledFeatures = getDisabledFeatures();
             isDisabledCustomModel = disabledFeatures.contains("custom-model-collection");
         }
         return isDisabledCustomModel;
+    }
+
+    public static Boolean validatedSink() {
+        return ConfigBuilder.getInstance().get(ConfigKey.VALIDATED_SINK);
     }
 }

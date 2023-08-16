@@ -17,7 +17,7 @@ public class TaintRanges {
         this.taintRanges = taintRanges;
     }
 
-    public TaintRanges(TaintRange ...taintRanges) {
+    public TaintRanges(TaintRange... taintRanges) {
         this.taintRanges = new ArrayList<TaintRange>(Arrays.asList(taintRanges));
     }
 
@@ -82,6 +82,18 @@ public class TaintRanges {
                 if (tag.equals(taintRange.getName())) {
                     return true;
                 }
+            }
+        }
+        return false;
+    }
+
+    public boolean hasValidatedTags(TaintTag[] tags) {
+        if (tags == null) {
+            return false;
+        }
+        for (TaintTag tag : tags) {
+            if (tag.equals(TaintTag.VALIDATED.getKey())) {
+                return true;
             }
         }
         return false;
