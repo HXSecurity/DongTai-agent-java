@@ -101,8 +101,8 @@ public class DubboImpl {
             return;
         }
 
-        String url = (String) requestMeta.get("requestURL") + "/" + methodName;
-        String uri = (String) requestMeta.get("requestURI") + "/" + methodName;
+        String url =requestMeta.get("requestURL").toString() + "/" + methodName;
+        String uri =requestMeta.get("requestURI").toString() + "/" + methodName;
 
         StringBuilder argSign = new StringBuilder("(");
         if (argumentTypes != null && argumentTypes.length > 0) {
@@ -200,7 +200,7 @@ public class DubboImpl {
 
         try {
             EngineManager.REQUEST_CONTEXT.get().put("responseStatus",
-                    (String) EngineManager.REQUEST_CONTEXT.get().get("protocol") + " " + status);
+                    EngineManager.REQUEST_CONTEXT.get().get("protocol").toString() + " " + status);
             ByteArrayOutputStream buff = EngineManager.BODY_BUFFER.getResponse();
             buff.write(result.toString().getBytes());
         } catch (Throwable ignore) {
