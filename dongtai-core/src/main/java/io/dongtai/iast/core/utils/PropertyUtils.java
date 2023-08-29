@@ -23,17 +23,18 @@ public class PropertyUtils {
     private String iastDumpPath;
     private Long heartBeatInterval = -1L;
     private String serverUrl;
-    private String serverMode;
     private String proxyEnableStatus;
     private String proxyHost;
     private int proxyPort = -1;
-    private String debugFlag;
     private Integer responseLength;
     private String policyPath;
     private static List<String> disabledFeatureList;
     private static Boolean isDisabledCustomModel;
 
     private final String propertiesFilePath;
+
+    private int taintValueLength = -1;
+
 
     public static PropertyUtils getInstance(String propertiesFilePath) {
         if (null == instance) {
@@ -180,13 +181,6 @@ public class PropertyUtils {
         return proxyPort;
     }
 
-    private String getDebugFlag() {
-        if (debugFlag == null) {
-            debugFlag = System.getProperty(PropertyConstant.PROPERTY_DEBUG, "false");
-        }
-        return debugFlag;
-    }
-
     public Integer getResponseLength() {
         if (responseLength == null) {
             responseLength = Integer.parseInt(System.getProperty(PropertyConstant.PROPERTY_RESPONSE_LENGTH,
@@ -228,5 +222,14 @@ public class PropertyUtils {
 
     public static Boolean validatedSink() {
         return ConfigBuilder.getInstance().get(ConfigKey.VALIDATED_SINK);
+    }
+
+    public int getTaintValueLength() {
+        if (-1 == taintValueLength) {
+            taintValueLength = Integer
+                    .parseInt(System.getProperty(PropertyConstant.PROPERTY_TAINT_LENGTH,
+                            cfg.getProperty(PropertyConstant.PROPERTY_TAINT_LENGTH, "1024")));
+        }
+        return taintValueLength;
     }
 }
