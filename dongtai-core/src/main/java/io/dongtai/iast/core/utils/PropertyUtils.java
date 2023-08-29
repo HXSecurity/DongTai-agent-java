@@ -35,6 +35,9 @@ public class PropertyUtils {
 
     private final String propertiesFilePath;
 
+    private int taintValueLength = -1;
+
+
     public static PropertyUtils getInstance(String propertiesFilePath) {
         if (null == instance) {
             instance = new PropertyUtils(propertiesFilePath);
@@ -228,5 +231,14 @@ public class PropertyUtils {
 
     public static Boolean validatedSink() {
         return ConfigBuilder.getInstance().get(ConfigKey.VALIDATED_SINK);
+    }
+
+    public int getTaintValueLength() {
+        if (-1 == taintValueLength) {
+            taintValueLength = Integer
+                    .parseInt(System.getProperty(PropertyConstant.PROPERTY_TAINT_LENGTH,
+                            cfg.getProperty(PropertyConstant.PROPERTY_TAINT_LENGTH, "1024")));
+        }
+        return taintValueLength;
     }
 }

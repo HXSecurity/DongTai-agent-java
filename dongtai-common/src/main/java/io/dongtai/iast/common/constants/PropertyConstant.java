@@ -32,4 +32,5 @@ public class PropertyConstant {
     public static final String PROPERTY_UUID_PATH = "dongtai.uuid.path";
     public static final String PROPERTY_DISABLED_PLUGINS = "dongtai.disabled.plugins";
     public static final String PROPERTY_DISABLED_FEATURES = "dongtai.disabled.features";
+    public static final String PROPERTY_TAINT_LENGTH = "dongtai.taint.length";
 }

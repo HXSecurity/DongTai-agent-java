@@ -3,6 +3,7 @@ package io.dongtai.iast.core.handler.hookpoint.models;
 import com.alibaba.fastjson2.JSONObject;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.TaintPosition;
 import io.dongtai.iast.core.handler.hookpoint.models.taint.range.TaintRanges;
+import io.dongtai.iast.core.utils.PropertyUtils;
 import io.dongtai.iast.core.utils.StringUtils;
 
 import java.io.StringWriter;
@@ -286,6 +287,7 @@ public class MethodEvent {
     }
 
     public String obj2String(Object value) {
+        int taintValueLength = PropertyUtils.getInstance().getTaintValueLength();
         StringBuilder sb = new StringBuilder();
         if (null == value) {
             return "";
@@ -299,25 +301,35 @@ public class MethodEvent {
                         if (taint.getClass().isArray() && !taint.getClass().getComponentType().isPrimitive()) {
                             Object[] subTaints = (Object[]) taint;
                             for (Object subTaint : subTaints) {
-                                sb.append(subTaint.toString()).append(" ");
+                                appendWithMaxLength(sb, subTaint.toString() + " ", taintValueLength);
                             }
                         } else {
-                            sb.append(taint.toString()).append(" ");
+                            appendWithMaxLength(sb, taint.toString() + " ", taintValueLength);
                         }
                     }
                 }
             } else if (value instanceof StringWriter) {
-                sb.append(((StringWriter) value).getBuffer().toString());
+                appendWithMaxLength(sb, ((StringWriter) value).getBuffer().toString(), taintValueLength);
             } else {
-                sb.append(value.toString());
+                appendWithMaxLength(sb, value.toString(), taintValueLength);
             }
         } catch (Throwable e) {
             // org.jruby.RubyBasicObject.hashCode() may cause NullPointerException when RubyBasicObject.metaClass is null
-            sb.append(value.getClass().getName())
-                    .append("@")
-                    .append(Integer.toHexString(System.identityHashCode(value)));
+            String typeName = value.getClass().getName() + "@" + Integer.toHexString(System.identityHashCode(value));
+            appendWithMaxLength(sb, typeName, taintValueLength);
         }
         return sb.toString();
+    }
+
+    private void appendWithMaxLength(StringBuilder sb, String content, int maxLength) {
+        if (sb.length() + content.length() > maxLength) {
+            int remainingSpace = maxLength - sb.length();
+            if (remainingSpace > 0) {
+                sb.append(content, 0, remainingSpace);
+            }
+        } else {
+            sb.append(content);
+        }
     }
 
     public List<Object> getStacks() {
