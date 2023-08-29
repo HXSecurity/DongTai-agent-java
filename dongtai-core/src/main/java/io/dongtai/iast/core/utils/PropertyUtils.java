@@ -23,11 +23,9 @@ public class PropertyUtils {
     private String iastDumpPath;
     private Long heartBeatInterval = -1L;
     private String serverUrl;
-    private String serverMode;
     private String proxyEnableStatus;
     private String proxyHost;
     private int proxyPort = -1;
-    private String debugFlag;
     private Integer responseLength;
     private String policyPath;
     private static List<String> disabledFeatureList;
@@ -181,13 +179,6 @@ public class PropertyUtils {
                             cfg.getProperty(PropertyConstant.PROPERTY_PROXY_PORT, "80")));
         }
         return proxyPort;
-    }
-
-    private String getDebugFlag() {
-        if (debugFlag == null) {
-            debugFlag = System.getProperty(PropertyConstant.PROPERTY_DEBUG, "false");
-        }
-        return debugFlag;
     }
 
     public Integer getResponseLength() {

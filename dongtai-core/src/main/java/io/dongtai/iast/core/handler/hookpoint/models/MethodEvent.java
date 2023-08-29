@@ -76,7 +76,7 @@ public class MethodEvent {
     /**
      * method all parameters string value
      */
-    public List<Parameter> parameterValues = new ArrayList<Parameter>();
+    public List<Parameter> parameterValues = new ArrayList<>();
 
     /**
      * method return instance
@@ -88,13 +88,13 @@ public class MethodEvent {
      */
     public String returnValue;
 
-    private final Set<Long> sourceHashes = new HashSet<Long>();
+    private final Set<Long> sourceHashes = new HashSet<>();
 
-    private final Set<Long> targetHashes = new HashSet<Long>();
+    private final Set<Long> targetHashes = new HashSet<>();
 
-    public List<MethodEventTargetRange> targetRanges = new ArrayList<MethodEventTargetRange>();
+    public List<MethodEventTargetRange> targetRanges = new ArrayList<>();
 
-    public List<MethodEventTargetRange> sourceRanges = new ArrayList<MethodEventTargetRange>();
+    public List<MethodEventTargetRange> sourceRanges = new ArrayList<>();
 
     public List<MethodEventSourceType> sourceTypes;
 
@@ -232,7 +232,7 @@ public class MethodEvent {
         if (param == null) {
             return;
         }
-        String indexString = "P" + String.valueOf(index + 1);
+        String indexString = "P" + (index + 1);
         Parameter parameter = new Parameter(indexString, formatValue(param, hasTaint));
         this.parameterValues.add(parameter);
     }
@@ -247,7 +247,7 @@ public class MethodEvent {
     private String formatValue(Object val, boolean hasTaint) {
         String str = obj2String(val);
         return "[" + StringUtils.normalize(str, MAX_VALUE_LENGTH) + "]"
-                + (hasTaint ? "*" : "") + String.valueOf(str.length());
+                + (hasTaint ? "*" : "") + str.length();
     }
 
     public Set<Long> getSourceHashes() {
