@@ -25,4 +25,17 @@ public class StringUtilsTest {
         nStr = StringUtils.normalize(str, maxLength);
         Assert.assertEquals("max len 6", "aa...a", nStr);
     }
+
+    @Test
+    public void formatClassNameToDotDelimiter() {
+        String s = StringUtils.formatClassNameToDotDelimiter("com/foo/bar");
+        Assert.assertEquals("com.foo.bar", s);
+    }
+
+    @Test
+    public void formatClassNameToSlashDelimiter() {
+        String s = StringUtils.formatClassNameToSlashDelimiter("com.foo.bar");
+        Assert.assertEquals("com/foo/bar", s);
+    }
+
 }
