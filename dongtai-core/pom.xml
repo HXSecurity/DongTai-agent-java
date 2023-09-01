@@ -146,12 +146,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>io.dongtai.iast</groupId>
             <artifactId>dongtai-spy</artifactId>
             <version>${project.version}</version>
