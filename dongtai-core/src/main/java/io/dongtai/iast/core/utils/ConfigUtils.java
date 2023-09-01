@@ -45,7 +45,7 @@ public class ConfigUtils {
                     }
                 }
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             DongTaiLog.error(ErrorCode.get("UTIL_CONFIG_LOAD_FAILED"), filename, e);
         }
         return new HashSet[]{container, startWith, endWith};
@@ -61,7 +61,7 @@ public class ConfigUtils {
                 String exts = lineIterator.nextLine().trim();
                 extStringArray = exts.split(",");
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             DongTaiLog.error(ErrorCode.get("UTIL_CONFIG_LOAD_FAILED"), filename, e);
         }
         return extStringArray;
@@ -77,7 +77,7 @@ public class ConfigUtils {
                 String line = lineIterator.nextLine().trim();
                 container.add(line);
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             DongTaiLog.error(ErrorCode.get("UTIL_CONFIG_LOAD_FAILED"), filename, e);
         }
         return container;
