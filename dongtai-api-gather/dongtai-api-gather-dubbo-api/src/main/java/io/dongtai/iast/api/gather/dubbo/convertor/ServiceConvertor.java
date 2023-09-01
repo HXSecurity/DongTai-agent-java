@@ -17,8 +17,8 @@ import java.util.*;
  */
 public class ServiceConvertor {
 
-    private OpenApiSchemaConvertorManager manager;
-    private Class interfaceClass;
+    private final OpenApiSchemaConvertorManager manager;
+    private final Class interfaceClass;
 
     public ServiceConvertor(OpenApiSchemaConvertorManager manager, Class interfaceClass) {
         this.manager = manager;

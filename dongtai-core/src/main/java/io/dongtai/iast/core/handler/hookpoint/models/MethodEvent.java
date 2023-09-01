@@ -7,7 +7,10 @@ import io.dongtai.iast.core.utils.PropertyUtils;
 import io.dongtai.iast.core.utils.StringUtils;
 
 import java.io.StringWriter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * 方法事件
@@ -304,7 +307,7 @@ public class MethodEvent {
                                 appendWithMaxLength(sb, subTaint.toString() + " ", taintValueLength);
                             }
                         } else {
-                            appendWithMaxLength(sb, taint.toString() + " ", taintValueLength);
+                            appendWithMaxLength(sb, taint + " ", taintValueLength);
                         }
                     }
                 }

@@ -50,8 +50,7 @@ public class IastClassLoader extends URLClassLoader {
             return loadedClass;
         }
 
-        if (!name.startsWith("io.dongtai") && !name.startsWith("com.secnium")
-                && !name.startsWith("cn.huoxian") && !name.startsWith("java.lang.iast")) {
+        if (!name.startsWith("io.dongtai") && !name.startsWith("java.lang.iast")) {
             return super.loadClass(name, resolve);
         }
 
