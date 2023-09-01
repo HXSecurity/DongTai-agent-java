@@ -256,14 +256,6 @@
             <version>${pkg.jdom.version}</version>
             <scope>test</scope>
         </dependency>
-        <!-- xom dependency xalan will cause feature secure-processing failed
-        <dependency>
-            <groupId>xom</groupId>
-            <artifactId>xom</artifactId>
-            <version>${pkg.xom.version}</version>
-            <scope>test</scope>
-        </dependency>
-        -->
     </dependencies>
 
 </project>
