@@ -2,7 +2,6 @@ package io.dongtai.iast.agent.manager;
 
 import io.dongtai.iast.agent.*;
 import io.dongtai.iast.agent.fallback.FallbackManager;
-import io.dongtai.iast.agent.monitor.MonitorDaemonThread;
 import io.dongtai.iast.agent.report.AgentRegisterReport;
 import io.dongtai.iast.agent.util.*;
 import io.dongtai.iast.common.state.AgentState;
@@ -24,11 +23,8 @@ public class EngineManager {
 
     private static final String ENGINE_ENTRYPOINT_CLASS = "com.secnium.iast.core.AgentEngine";
     private static final String INJECT_PACKAGE_REMOTE_URI = "/api/v1/engine/download?engineName=dongtai-spy";
-    private static final String INJECT_PACKAGE_REMOTE_URI_JDK6 = "/api/v1/engine/download?engineName=dongtai-spy-jdk6";
     private static final String ENGINE_PACKAGE_REMOTE_URI = "/api/v1/engine/download?engineName=dongtai-core";
-    private static final String ENGINE_PACKAGE_REMOTE_URI_JDK6 = "/api/v1/engine/download?engineName=dongtai-core-jdk6";
     private static final String API_PACKAGE_REMOTE_URI = "/api/v1/engine/download?engineName=dongtai-api";
-    private static final String API_PACKAGE_REMOTE_URI_JDK6 = "/api/v1/engine/download?engineName=dongtai-api-jdk6";
     private final static String TMP_DIR = IastProperties.getInstance().getTmpDir();
     private static IastClassLoader IAST_CLASS_LOADER;
     private static EngineManager INSTANCE;
@@ -187,7 +183,6 @@ public class EngineManager {
      * 启动检测引擎
      */
     public boolean start() {
-        // 将Spy注入到BootstrapClassLoader，todo: 异常卸载时，需要特定处理spy模块
         try {
             if (classOfEngine != null) {
                 classOfEngine.getMethod("start").invoke(null);
@@ -207,7 +202,6 @@ public class EngineManager {
      * @return 布尔值，表示stop成功或失败
      */
     public boolean stop() {
-        // 将Spy注入到BootstrapClassLoader，todo: 异常卸载时，需要特定处理spy模块
         try {
             if (classOfEngine != null) {
                 classOfEngine.getMethod("stop").invoke(null);

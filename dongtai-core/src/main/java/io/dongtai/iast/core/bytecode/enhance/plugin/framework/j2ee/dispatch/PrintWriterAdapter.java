@@ -33,9 +33,6 @@ public class PrintWriterAdapter extends AbstractClassVisitor {
     }
 
     private boolean isWrite(String name, String desc) {
-        if ("write".equals(name) && WRITE_DESC.contains(desc)) {
-            return true;
-        }
-        return false;
+        return "write".equals(name) && WRITE_DESC.contains(desc);
     }
 }

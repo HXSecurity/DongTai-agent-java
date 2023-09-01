@@ -31,7 +31,7 @@ public enum MetricsBindCollectorEnum {
     /**
      * 收集器类型
      */
-    private Class<? extends IPerformanceCollector> collector;
+    private final Class<? extends IPerformanceCollector> collector;
 
     /**
      * 描述

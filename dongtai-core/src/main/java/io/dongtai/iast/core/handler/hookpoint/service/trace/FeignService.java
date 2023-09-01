@@ -30,10 +30,7 @@ public class FeignService {
             Object args = event.parameterInstances[0];
             TaintPoolUtils.trackObject(event, null, args, 0, true);
 
-            boolean hasTaint = false;
-            if (!event.getSourceHashes().isEmpty()) {
-                hasTaint = true;
-            }
+            boolean hasTaint = !event.getSourceHashes().isEmpty();
             event.addParameterValue(0, args, hasTaint);
 
             Method addHeaderMethod = template.getClass().getDeclaredMethod("header", String.class, String[].class);

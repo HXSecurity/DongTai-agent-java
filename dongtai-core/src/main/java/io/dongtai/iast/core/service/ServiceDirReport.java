@@ -11,14 +11,14 @@ import java.io.File;
 public class ServiceDirReport {
 
     private String serviceDir;
-    private String serviceType;
-    private StringBuilder dirStringBuilder = new StringBuilder();
+    private final StringBuilder dirStringBuilder = new StringBuilder();
 
 
     public ServiceDirReport() {
     }
 
     public String getServereAddressMsg() {
+        String serviceType;
         if (new File("/var/run/secrets/kubernetes.io").exists()) {
             serviceType = "k8s";
         } else if (new File("/.dockerenv").exists()) {
@@ -33,7 +33,7 @@ public class ServiceDirReport {
 
         detail.put(ReportKey.AGENT_ID, EngineManager.getAgentId());
         detail.put("serviceDir", this.serviceDir);
-        detail.put("serviceType", this.serviceType);
+        detail.put("serviceType", serviceType);
 
         return report.toString();
     }
@@ -58,14 +58,12 @@ public class ServiceDirReport {
         if (!file.exists()) {
             return null;
         }
-        if (files.length != 0) {
-            for (File f : files) {
-                if (f.isDirectory()) {
-                    dir = f.getName();
-                    genDirTree(f.getAbsolutePath(), level, dir);
-                } else {
-                    dirStringBuilder.append(f.getAbsolutePath()).append("\n");
-                }
+        for (File f : files) {
+            if (f.isDirectory()) {
+                dir = f.getName();
+                genDirTree(f.getAbsolutePath(), level, dir);
+            } else {
+                dirStringBuilder.append(f.getAbsolutePath()).append("\n");
             }
         }
         return dirStringBuilder.toString();

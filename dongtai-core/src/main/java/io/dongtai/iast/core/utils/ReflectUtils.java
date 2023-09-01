@@ -170,9 +170,7 @@ public class ReflectUtils {
         if (hasNotSecurityManager()) {
             return getDeclaredFields(cls);
         }
-        return (Field[]) AccessController.doPrivileged((PrivilegedAction<Field[]>) () -> {
-            return getDeclaredFields(cls);
-        });
+        return AccessController.doPrivileged((PrivilegedAction<Field[]>) () -> getDeclaredFields(cls));
     }
 
     private static Field[] getDeclaredFields(Class<?> cls) {

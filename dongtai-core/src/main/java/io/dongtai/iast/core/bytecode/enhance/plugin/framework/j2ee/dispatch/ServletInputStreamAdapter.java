@@ -33,9 +33,6 @@ public class ServletInputStreamAdapter extends AbstractClassVisitor {
     }
 
     private boolean isRead(String name, String desc) {
-        if ("read".equals(name) && READ_DESC.contains(desc)) {
-            return true;
-        }
-        return false;
+        return "read".equals(name) && READ_DESC.contains(desc);
     }
 }

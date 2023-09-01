@@ -12,7 +12,7 @@ import java.util.*;
 public class ServiceHandler {
     private static final String KAFKA_URL_HANDLER = "KafkaUrlHandler";
     private static final String SIMPLE_URL_HANDLER = "SimpleUrlHandler";
-    private static Map<String, Boolean> uniqMap = new HashMap<String, Boolean>();
+    private static final Map<String, Boolean> uniqMap = new HashMap<String, Boolean>();
 
     public static void reportService(String category, String type, String host, String port, String handler) {
         try {

@@ -54,21 +54,13 @@ public class PropagatorAdapter extends MethodAdapter {
         }
 
         adapter.invokeStatic(ASM_TYPE_SPY_HANDLER, SPY_HANDLER$getDispatcher);
-        if (PropagatorImpl.isSkipScope(signature)) {
-            adapter.push(true);
-        } else {
-            adapter.push(false);
-        }
+        adapter.push(PropagatorImpl.isSkipScope(signature));
         adapter.invokeInterface(ASM_TYPE_SPY_DISPATCHER, SPY$enterPropagator);
     }
 
     private void leaveScope(MethodAdviceAdapter adapter, String signature, PolicyNode policyNode) {
         adapter.invokeStatic(ASM_TYPE_SPY_HANDLER, SPY_HANDLER$getDispatcher);
-        if (PropagatorImpl.isSkipScope(signature)) {
-            adapter.push(true);
-        } else {
-            adapter.push(false);
-        }
+        adapter.push(PropagatorImpl.isSkipScope(signature));
         adapter.invokeInterface(ASM_TYPE_SPY_DISPATCHER, SPY$leavePropagator);
 
         if (policyNode.isIgnoreInternal()) {

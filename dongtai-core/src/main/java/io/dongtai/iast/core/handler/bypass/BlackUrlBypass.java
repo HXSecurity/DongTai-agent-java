@@ -4,7 +4,7 @@ import io.dongtai.iast.core.utils.threadlocal.BooleanThreadLocal;
 
 public class BlackUrlBypass {
 
-    private static BooleanThreadLocal isBlackUrl = new BooleanThreadLocal(false);
+    private static final BooleanThreadLocal isBlackUrl = new BooleanThreadLocal(false);
 
     public static Boolean isBlackUrl() {
         return isBlackUrl.get();
