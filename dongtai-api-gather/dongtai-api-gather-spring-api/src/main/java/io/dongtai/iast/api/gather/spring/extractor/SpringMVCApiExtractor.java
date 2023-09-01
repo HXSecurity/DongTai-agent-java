@@ -2,6 +2,7 @@ package io.dongtai.iast.api.gather.spring.extractor;
 
 import io.dongtai.iast.api.gather.spring.convertor.RequestMappingHandlerMappingConvertor;
 import io.dongtai.iast.api.openapi.domain.OpenApi;
+import io.dongtai.iast.common.utils.ExceptionUtil;
 import io.dongtai.log.DongTaiLog;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
@@ -72,7 +73,11 @@ public class SpringMVCApiExtractor {
                 }
             }
         } catch (Throwable e) {
-            DongTaiLog.debug("try use BeanFactoryUtils find RequestMappingHandlerMapping exception", e);
+            // 仅在出现预期外错误的时候才打印日志
+            String s = ExceptionUtil.getPrintStackTraceString(e);
+            if (!s.contains("java.lang.NoSuchMethodException: org.springframework.beans.factory.BeanFactoryUtils.beansOfTypeIncludingAncestors()")) {
+                DongTaiLog.debug("try use BeanFactoryUtils throw RequestMappingHandlerMapping exception", e);
+            }
         }
 
         // 没有工具类，就只从自己里面找

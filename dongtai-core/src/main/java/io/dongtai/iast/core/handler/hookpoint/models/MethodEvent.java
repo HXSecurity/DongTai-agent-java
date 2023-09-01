@@ -4,7 +4,6 @@ import com.alibaba.fastjson2.JSONObject;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.TaintPosition;
 import io.dongtai.iast.core.handler.hookpoint.models.taint.range.TaintRanges;
 import io.dongtai.iast.core.utils.PropertyUtils;
-import io.dongtai.iast.core.utils.StringUtils;
 
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -18,10 +17,6 @@ import java.util.Set;
  * @author dongzhiyong@huoxian.cn
  */
 public class MethodEvent {
-    /**
-     * max display value size for object/return/parameters
-     */
-    private static final int MAX_VALUE_LENGTH = 1024;
 
     /**
      * method invoke id
@@ -249,7 +244,7 @@ public class MethodEvent {
 
     private String formatValue(Object val, boolean hasTaint) {
         String str = obj2String(val);
-        return "[" + StringUtils.normalize(str, MAX_VALUE_LENGTH) + "]"
+        return "[" + str + "]"
                 + (hasTaint ? "*" : "") + str.length();
     }
 
@@ -304,10 +299,12 @@ public class MethodEvent {
                         if (taint.getClass().isArray() && !taint.getClass().getComponentType().isPrimitive()) {
                             Object[] subTaints = (Object[]) taint;
                             for (Object subTaint : subTaints) {
-                                appendWithMaxLength(sb, subTaint.toString() + " ", taintValueLength);
+                                appendWithMaxLength(sb, subTaint.toString(), taintValueLength);
+                                sb.append(" ");
                             }
                         } else {
-                            appendWithMaxLength(sb, taint + " ", taintValueLength);
+                            appendWithMaxLength(sb, taint.toString(), taintValueLength);
+                            sb.append(" ");
                         }
                     }
                 }
