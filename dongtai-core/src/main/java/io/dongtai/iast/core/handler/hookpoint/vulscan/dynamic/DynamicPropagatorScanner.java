@@ -23,18 +23,18 @@ import java.util.*;
  * @author dongzhiyong@huoxian.cn
  */
 public class DynamicPropagatorScanner implements IVulScan {
-    private final static Set<SinkSafeChecker> SAFE_CHECKERS = new HashSet<SinkSafeChecker>(Arrays.asList(
+    private final static Set<SinkSafeChecker> SAFE_CHECKERS = new HashSet<>(Arrays.asList(
             new FastjsonCheck(),
             new XXECheck()
     ));
 
-    private final static Set<SinkSourceChecker> SOURCE_CHECKERS = new HashSet<SinkSourceChecker>(Arrays.asList(
+    private final static Set<SinkSourceChecker> SOURCE_CHECKERS = new HashSet<>(Arrays.asList(
             new PathTraversalCheck(),
             new SSRFSourceCheck(),
             new UnvalidatedRedirectCheck()
     ));
 
-    private static final Set<ServiceTrace> SERVICE_TRACES = new HashSet<ServiceTrace>(Collections.singletonList(
+    private static final Set<ServiceTrace> SERVICE_TRACES = new HashSet<>(Collections.singletonList(
             new HttpService()
     ));
 
@@ -170,7 +170,7 @@ public class DynamicPropagatorScanner implements IVulScan {
             }
         }
 
-        List<Object> sourceInstances = new ArrayList<Object>();
+        List<Object> sourceInstances = new ArrayList<>();
         boolean hasTaint = false;
         boolean objHasTaint = false;
         Set<TaintPosition> sources = sinkNode.getSources();

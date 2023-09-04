@@ -63,7 +63,7 @@ public enum TaintTag {
 
     private final String key;
 
-    private static final Map<String, TaintTag> LOOKUP = new HashMap<String, TaintTag>();
+    private static final Map<String, TaintTag> LOOKUP = new HashMap<>();
 
     static {
         for (TaintTag t : TaintTag.values()) {
