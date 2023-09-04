@@ -22,6 +22,14 @@ public enum VulnType {
     XPATH_INJECTION("xpath-injection", "high", true),
     PATH_TRAVERSAL("path-traversal", "high", true),
     XXE("xxe", "medium", true),
+    JND_INJECTION("jnd-injection", "high", true),
+    NOSQL_INJECTION("nosql-injection", "high", true),
+    SMTP_INJECTION("smtp-injection", "high", true),
+    EL_INJECTION("el-injection", "high", true),
+    REFLECTION_INJECTION("reflection-injection", "high", true),
+    SSRF("ssrf", "high", true),
+    FILE_WRITE("file-write", "medium", true),
+    REDOS("redos", "low", true),
     UNVALIDATED_REDIRECT("unvalidated-redirect", "low", true),
     ;
 

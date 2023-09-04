@@ -52,7 +52,8 @@ public class DynamicPropagatorScanner implements IVulScan {
         ));
         put(VulnType.HQL_INJECTION.getName(), Arrays.asList(
                 new TaintTag[]{TaintTag.UNTRUSTED},
-                new TaintTag[]{TaintTag.SQL_ENCODED, TaintTag.HTTP_TOKEN_LIMITED_CHARS, TaintTag.NUMERIC_LIMITED_CHARS}
+                new TaintTag[]{TaintTag.SQL_ENCODED, TaintTag.CUSTOM_ENCODED_HQL_INJECTION,
+                        TaintTag.HTTP_TOKEN_LIMITED_CHARS, TaintTag.NUMERIC_LIMITED_CHARS}
         ));
         put(VulnType.LDAP_INJECTION.getName(), Arrays.asList(
                 new TaintTag[]{TaintTag.UNTRUSTED},
@@ -68,7 +69,7 @@ public class DynamicPropagatorScanner implements IVulScan {
                 new TaintTag[]{TaintTag.UNTRUSTED},
                 new TaintTag[]{TaintTag.BASE64_ENCODED, TaintTag.HTML_ENCODED, TaintTag.LDAP_ENCODED,
                         TaintTag.SQL_ENCODED, TaintTag.URL_ENCODED, TaintTag.XML_ENCODED, TaintTag.XPATH_ENCODED,
-                        TaintTag.HTTP_TOKEN_LIMITED_CHARS, TaintTag.NUMERIC_LIMITED_CHARS}
+                        TaintTag.CUSTOM_ENCODED_CMD_INJECTION,TaintTag.HTTP_TOKEN_LIMITED_CHARS, TaintTag.NUMERIC_LIMITED_CHARS}
         ));
         put(VulnType.PATH_TRAVERSAL.getName(), Arrays.asList(
                 new TaintTag[]{TaintTag.UNTRUSTED},
@@ -79,6 +80,42 @@ public class DynamicPropagatorScanner implements IVulScan {
         put(VulnType.UNVALIDATED_REDIRECT.getName(), Arrays.asList(
                 new TaintTag[]{TaintTag.UNTRUSTED},
                 new TaintTag[]{TaintTag.URL_ENCODED, TaintTag.HTTP_TOKEN_LIMITED_CHARS, TaintTag.NUMERIC_LIMITED_CHARS}
+        ));
+        put(VulnType.XXE.getName(),Arrays.asList(
+                new TaintTag[]{TaintTag.UNTRUSTED},
+                new TaintTag[]{TaintTag.CUSTOM_ENCODED_XXE, TaintTag.HTTP_TOKEN_LIMITED_CHARS, TaintTag.NUMERIC_LIMITED_CHARS}
+        ));
+        put(VulnType.JND_INJECTION.getName(),Arrays.asList(
+                new TaintTag[]{TaintTag.UNTRUSTED},
+                new TaintTag[]{TaintTag.CUSTOM_ENCODED_JND_INJECTION, TaintTag.HTTP_TOKEN_LIMITED_CHARS, TaintTag.NUMERIC_LIMITED_CHARS}
+        ));
+        put(VulnType.NOSQL_INJECTION.getName(),Arrays.asList(
+                new TaintTag[]{TaintTag.UNTRUSTED},
+                new TaintTag[]{TaintTag.CUSTOM_ENCODED_NOSQL_INJECTION, TaintTag.HTTP_TOKEN_LIMITED_CHARS, TaintTag.NUMERIC_LIMITED_CHARS}
+        ));
+        put(VulnType.SMTP_INJECTION.getName(),Arrays.asList(
+                new TaintTag[]{TaintTag.UNTRUSTED},
+                new TaintTag[]{TaintTag.CUSTOM_ENCODED_SMTP_INJECTION, TaintTag.HTTP_TOKEN_LIMITED_CHARS, TaintTag.NUMERIC_LIMITED_CHARS}
+        ));
+        put(VulnType.EL_INJECTION.getName(),Arrays.asList(
+                new TaintTag[]{TaintTag.UNTRUSTED},
+                new TaintTag[]{TaintTag.CUSTOM_ENCODED_EL_INJECTION, TaintTag.HTTP_TOKEN_LIMITED_CHARS, TaintTag.NUMERIC_LIMITED_CHARS}
+        ));
+        put(VulnType.REFLECTION_INJECTION.getName(),Arrays.asList(
+                new TaintTag[]{TaintTag.UNTRUSTED},
+                new TaintTag[]{TaintTag.CUSTOM_ENCODED_REFLECTION_INJECTION, TaintTag.HTTP_TOKEN_LIMITED_CHARS, TaintTag.NUMERIC_LIMITED_CHARS}
+        ));
+        put(VulnType.SSRF.getName(),Arrays.asList(
+                new TaintTag[]{TaintTag.UNTRUSTED},
+                new TaintTag[]{TaintTag.CUSTOM_ENCODED_XXE, TaintTag.HTTP_TOKEN_LIMITED_CHARS, TaintTag.NUMERIC_LIMITED_CHARS}
+        ));
+        put(VulnType.FILE_WRITE.getName(),Arrays.asList(
+                new TaintTag[]{TaintTag.UNTRUSTED},
+                new TaintTag[]{TaintTag.CUSTOM_ENCODED_FILE_WRITE, TaintTag.HTTP_TOKEN_LIMITED_CHARS, TaintTag.NUMERIC_LIMITED_CHARS}
+        ));
+        put(VulnType.REDOS.getName(),Arrays.asList(
+                new TaintTag[]{TaintTag.UNTRUSTED},
+                new TaintTag[]{TaintTag.CUSTOM_ENCODED_REDOS, TaintTag.HTTP_TOKEN_LIMITED_CHARS, TaintTag.NUMERIC_LIMITED_CHARS}
         ));
     }};
 
