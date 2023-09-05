@@ -16,7 +16,9 @@ import io.dongtai.iast.core.utils.matcher.ConfigMatcher;
 import io.dongtai.log.DongTaiLog;
 import io.dongtai.log.ErrorCode;
 import org.apache.commons.lang3.time.StopWatch;
-import org.objectweb.asm.*;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.ClassWriter;
 
 import java.io.File;
 import java.lang.dongtai.SpyDispatcherHandler;
@@ -27,9 +29,12 @@ import java.net.URL;
 import java.security.CodeSource;
 import java.security.ProtectionDomain;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 import static org.apache.commons.io.FileUtils.writeByteArrayToFile;
-import static org.objectweb.asm.ClassWriter.*;
+import static org.objectweb.asm.ClassWriter.COMPUTE_FRAMES;
+import static org.objectweb.asm.ClassWriter.COMPUTE_MAXS;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -119,6 +124,8 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                             final Class<?> classBeingRedefined,
                             final ProtectionDomain protectionDomain,
                             final byte[] srcByteCodeArray) {
+
+        // TODO 那下面这段逻辑是否就可以去掉了？
         String threadName = Thread.currentThread().getName();
         if (threadName.startsWith("DongTai-IAST-Core")) {
             return null;
@@ -172,12 +179,10 @@ public class IastClassFileTransformer implements ClassFileTransformer {
             }
             final String className = classContext.getClassName();
 
-            Set<String> ancestors = classDiagram.getDiagram(className);
+            // 设置类的祖先类
+            Set<String> ancestors = classDiagram.getClassAncestorSet(className);
             if (ancestors == null) {
-                classDiagram.setLoader(loader);
-                classDiagram.saveAncestors(className, classContext.getSuperClassName(), classContext.getInterfaces());
-                ancestors = classDiagram.getAncestors(className, classContext.getSuperClassName(),
-                        classContext.getInterfaces());
+                ancestors = classDiagram.updateAncestorsByClassContext(loader, classContext);
             }
             classContext.setAncestors(ancestors);
 
@@ -288,9 +293,9 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                     continue;
                 }
                 String className = clazz.getName();
-                Set<String> diagram = classDiagram.getDiagram(className);
+                Set<String> diagram = classDiagram.getClassAncestorSet(className);
                 if (diagram == null) {
-                    diagram = new HashSet<String>();
+                    diagram = ConcurrentHashMap.newKeySet();
                     Queue<Class<?>> classQueue = new LinkedList<Class<?>>();
 
                     classQueue.add(clazz);
@@ -305,7 +310,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                         Class<?>[] interfaces = currentClazz.getInterfaces();
                         Collections.addAll(classQueue, interfaces);
                     }
-                    classDiagram.setDiagram(className, diagram);
+                    classDiagram.setClassAncestorSet(className, diagram);
                 }
                 for (String clazzName : diagram) {
                     if (this.policyManager.isHookClass(clazzName) ||
