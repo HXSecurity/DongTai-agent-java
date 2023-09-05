@@ -1,6 +1,5 @@
 package io.dongtai.iast.agent.fallback.checker;
 
-import com.alibaba.fastjson2.JSONObject;
 import io.dongtai.iast.agent.IastProperties;
 import io.dongtai.iast.agent.fallback.checker.impl.CpuUsageChecker;
 import io.dongtai.iast.common.entity.performance.PerformanceMetrics;

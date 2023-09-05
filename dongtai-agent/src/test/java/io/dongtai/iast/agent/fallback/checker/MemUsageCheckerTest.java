@@ -1,8 +1,6 @@
 package io.dongtai.iast.agent.fallback.checker;
 
-import com.alibaba.fastjson2.JSONObject;
 import io.dongtai.iast.agent.IastProperties;
-import io.dongtai.iast.agent.fallback.FallbackConfig;
 import io.dongtai.iast.agent.fallback.checker.impl.MemUsageChecker;
 import io.dongtai.iast.common.entity.performance.PerformanceMetrics;
 import io.dongtai.iast.common.entity.performance.metrics.MemoryUsageMetrics;
