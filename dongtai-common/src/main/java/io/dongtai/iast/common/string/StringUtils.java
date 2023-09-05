@@ -1,4 +1,4 @@
-package io.dongtai.iast.core.utils;
+package io.dongtai.iast.common.string;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -30,6 +30,17 @@ public class StringUtils {
 
     public static boolean isEmpty(String str) {
         return str == null || str.length() == 0;
+    }
+
+    /**
+     * 判断字符串是否为空白字符串，比如 "  " 会被认为是空白字符串
+     *
+     * @param s
+     * @return
+     * @since 1.13.2
+     */
+    public static boolean isBlank(String s) {
+        return s == null || s.trim().isEmpty();
     }
 
     public static String normalize(String str, int maxLength) {
