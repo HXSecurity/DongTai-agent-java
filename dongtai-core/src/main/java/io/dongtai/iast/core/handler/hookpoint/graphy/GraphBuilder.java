@@ -11,7 +11,7 @@ import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.TaintPosition;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.normal.AbstractNormalVulScan;
 import io.dongtai.iast.core.service.ThreadPools;
-import io.dongtai.iast.core.utils.StringUtils;
+import io.dongtai.iast.common.string.StringUtils;
 import io.dongtai.log.DongTaiLog;
 import io.dongtai.log.ErrorCode;
 

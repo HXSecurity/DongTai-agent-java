@@ -3,6 +3,7 @@ package io.dongtai.iast.core.handler.hookpoint.controller.impl;
 import com.alibaba.fastjson2.JSONArray;
 import io.dongtai.iast.common.config.ConfigBuilder;
 import io.dongtai.iast.common.config.ConfigKey;
+import io.dongtai.iast.common.string.ObjectFormatResult;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.bypass.BlackUrlBypass;
 import io.dongtai.iast.core.handler.context.ContextManager;
@@ -96,13 +97,13 @@ public class DubboImpl {
         if (requestMeta == null) {
             return;
         }
-        if (null != headers.get(BlackUrlBypass.getHeaderKey()) && headers.get(BlackUrlBypass.getHeaderKey()).equals("true")){
+        if (null != headers.get(BlackUrlBypass.getHeaderKey()) && headers.get(BlackUrlBypass.getHeaderKey()).equals("true")) {
             BlackUrlBypass.setIsBlackUrl(true);
             return;
         }
 
-        String url =requestMeta.get("requestURL").toString() + "/" + methodName;
-        String uri =requestMeta.get("requestURI").toString() + "/" + methodName;
+        String url = requestMeta.get("requestURL").toString() + "/" + methodName;
+        String uri = requestMeta.get("requestURI").toString() + "/" + methodName;
 
         StringBuilder argSign = new StringBuilder("(");
         if (argumentTypes != null && argumentTypes.length > 0) {
@@ -172,7 +173,9 @@ public class DubboImpl {
         requestMeta.put("headers", sHeaders);
         JSONArray arr = new JSONArray();
         for (Object arg : arguments) {
-            arr.add(event.obj2String(arg));
+            // 2023-9-5 11:31:53 直接拿完整的string可能会OOM（排队上报时可能会挤压占用较多的内存），这里只传递format之后的
+            ObjectFormatResult r = MethodEvent.formatObject(arg);
+            arr.add(r.objectFormatString);
         }
         requestMeta.put("body", arr.toString());
         EngineManager.REQUEST_CONTEXT.set(requestMeta);
