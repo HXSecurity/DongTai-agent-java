@@ -9,8 +9,8 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
-import static io.dongtai.iast.core.utils.StringUtils.formatClassNameToDotDelimiter;
-import static io.dongtai.iast.core.utils.StringUtils.formatClassNameToSlashDelimiter;
+import static io.dongtai.iast.common.string.StringUtils.formatClassNameToDotDelimiter;
+import static io.dongtai.iast.common.string.StringUtils.formatClassNameToSlashDelimiter;
 
 /**
  * 用于存储类名称到祖先类的映射关系：类的名字 --> Set<祖先类的名称集合>

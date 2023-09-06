@@ -1,5 +1,6 @@
-package io.dongtai.iast.core.utils;
+package io.dongtai.iast.common.string;
 
+import io.dongtai.iast.common.string.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
