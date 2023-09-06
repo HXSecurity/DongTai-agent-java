@@ -3,6 +3,8 @@ package io.dongtai.iast.core.utils;
 import io.dongtai.iast.common.config.ConfigBuilder;
 import io.dongtai.iast.common.config.ConfigKey;
 import io.dongtai.iast.common.constants.PropertyConstant;
+import io.dongtai.iast.common.exception.DongTaiIastException;
+import io.dongtai.iast.common.string.StringUtils;
 import io.dongtai.log.DongTaiLog;
 import io.dongtai.log.ErrorCode;
 
@@ -33,10 +35,12 @@ public class PropertyUtils {
 
     private final String propertiesFilePath;
 
-    private int taintValueLength = -1;
+    public static final Integer DEFAULT_TAINT_TO_STRING_CHAR_LIMIT = 1024;
 
+    // 污点转换为字符串的时候字符数长度限制
+    private Integer taintToStringCharLimit = DEFAULT_TAINT_TO_STRING_CHAR_LIMIT;
 
-    public static PropertyUtils getInstance(String propertiesFilePath) {
+    public static PropertyUtils getInstance(String propertiesFilePath) throws DongTaiPropertyConfigException, DongTaiEnvConfigException {
         if (null == instance) {
             instance = new PropertyUtils(propertiesFilePath);
         }
@@ -51,7 +55,7 @@ public class PropertyUtils {
         instance = null;
     }
 
-    private PropertyUtils(String propertiesFilePath) {
+    private PropertyUtils(String propertiesFilePath) throws DongTaiPropertyConfigException, DongTaiEnvConfigException {
         this.propertiesFilePath = propertiesFilePath;
         init();
     }
@@ -59,7 +63,7 @@ public class PropertyUtils {
     /**
      * 根据配置文件初始化单例配置类
      */
-    private void init() {
+    private void init() throws DongTaiPropertyConfigException, DongTaiEnvConfigException {
         try {
             File propertiesFile = new File(propertiesFilePath);
             if (propertiesFile.exists()) {
@@ -71,6 +75,10 @@ public class PropertyUtils {
         } catch (Throwable e) {
             DongTaiLog.error(ErrorCode.get("ENGINE_PROPERTIES_INITIALIZE_FAILED"), e);
         }
+
+        // 初始化一些参数
+        this.initTaintToStringCharLimit();
+
     }
 
     public static String getTmpDir() {
@@ -224,12 +232,96 @@ public class PropertyUtils {
         return ConfigBuilder.getInstance().get(ConfigKey.VALIDATED_SINK);
     }
 
-    public int getTaintValueLength() {
-        if (-1 == taintValueLength) {
-            taintValueLength = Integer
-                    .parseInt(System.getProperty(PropertyConstant.PROPERTY_TAINT_LENGTH,
-                            cfg.getProperty(PropertyConstant.PROPERTY_TAINT_LENGTH, "1024")));
+    /**
+     * 污点转为字符串时的长度限制
+     *
+     * @return
+     */
+    public static Integer getTaintToStringCharLimit() {
+        if (instance == null) {
+            return DEFAULT_TAINT_TO_STRING_CHAR_LIMIT;
         }
-        return taintValueLength;
+        return instance.taintToStringCharLimit;
     }
+
+    /**
+     * 初始化taintToStringCharLimit参数的值
+     *
+     * @throws DongTaiPropertyConfigException
+     * @throws DongTaiEnvConfigException
+     */
+    public void initTaintToStringCharLimit() throws DongTaiPropertyConfigException, DongTaiEnvConfigException {
+
+        // 1. 先从配置文件中读取
+        String s = cfg.getProperty(PropertyConstant.PROPERTY_TAINT_LENGTH);
+        if (!StringUtils.isBlank(s)) {
+            this.taintToStringCharLimit = Integer.parseInt(s.trim());
+            if (this.taintToStringCharLimit <= 0) {
+                throw new DongTaiPropertyConfigException("The value of this parameter " + PropertyConstant.PROPERTY_TAINT_LENGTH
+                        + " value " + s + " in your configuration file " + this.propertiesFilePath + " is illegal, such as passing an number greater than 1");
+            }
+        }
+
+        // 2. 然后从环境变量中读取
+        s = System.getProperty(PropertyConstant.PROPERTY_TAINT_LENGTH);
+        if (!StringUtils.isBlank(s)) {
+            this.taintToStringCharLimit = Integer.parseInt(s.trim());
+            if (this.taintToStringCharLimit <= 0) {
+                throw new DongTaiEnvConfigException("The value of this parameter " + PropertyConstant.PROPERTY_TAINT_LENGTH
+                        + " value " + s + " in your environment variables is illegal, such as passing an number greater than 1");
+            }
+        }
+
+    }
+
+    /**
+     * Property文件配置错误
+     */
+    public static class DongTaiPropertyConfigException extends DongTaiIastException {
+
+        public DongTaiPropertyConfigException() {
+        }
+
+        public DongTaiPropertyConfigException(String message) {
+            super(message);
+        }
+
+        public DongTaiPropertyConfigException(String message, Throwable cause) {
+            super(message, cause);
+        }
+
+        public DongTaiPropertyConfigException(Throwable cause) {
+            super(cause);
+        }
+
+        public DongTaiPropertyConfigException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+            super(message, cause, enableSuppression, writableStackTrace);
+        }
+    }
+
+    /**
+     * 环境变量传参配置错误
+     */
+    public static class DongTaiEnvConfigException extends DongTaiIastException {
+
+        public DongTaiEnvConfigException() {
+        }
+
+        public DongTaiEnvConfigException(String message) {
+            super(message);
+        }
+
+        public DongTaiEnvConfigException(String message, Throwable cause) {
+            super(message, cause);
+        }
+
+        public DongTaiEnvConfigException(Throwable cause) {
+            super(cause);
+        }
+
+        public DongTaiEnvConfigException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+            super(message, cause, enableSuppression, writableStackTrace);
+        }
+    }
+
 }

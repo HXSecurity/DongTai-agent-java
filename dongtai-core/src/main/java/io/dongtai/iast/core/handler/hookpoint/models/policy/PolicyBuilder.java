@@ -6,7 +6,7 @@ import io.dongtai.iast.core.handler.hookpoint.models.taint.range.TaintCommandRun
 import io.dongtai.iast.core.handler.hookpoint.models.taint.tag.TaintTag;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.VulnType;
 import io.dongtai.iast.core.utils.HttpClientUtils;
-import io.dongtai.iast.core.utils.StringUtils;
+import io.dongtai.iast.common.string.StringUtils;
 import io.dongtai.log.DongTaiLog;
 import io.dongtai.log.ErrorCode;
 import org.apache.commons.io.FileUtils;

@@ -2,7 +2,7 @@ package io.dongtai.iast.core.handler.hookpoint.models.taint.range;
 
 import com.alibaba.fastjson2.JSONArray;
 import io.dongtai.iast.core.handler.hookpoint.models.taint.tag.TaintTag;
-import io.dongtai.iast.core.utils.StringUtils;
+import io.dongtai.iast.common.string.StringUtils;
 
 import java.util.*;
 

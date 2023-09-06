@@ -60,7 +60,7 @@ public class RequestMappingInfoConvertor {
                 });
             }
         } catch (Throwable e) {
-            DongTaiLog.debug("spring api path.getPathPatternsCondition router exception", e);
+//            DongTaiLog.debug("spring api path.getPathPatternsCondition router exception", e);
         }
 
         try {
@@ -78,7 +78,7 @@ public class RequestMappingInfoConvertor {
                 });
             }
         } catch (Throwable e) {
-            DongTaiLog.debug("spring api path.getPatternsCondition router exception", e);
+//            DongTaiLog.debug("spring api path.getPatternsCondition router exception", e);
         }
     }
 
@@ -144,7 +144,7 @@ public class RequestMappingInfoConvertor {
                 }
             });
         } catch (Throwable e) {
-            DongTaiLog.debug("spring api method router exception", e);
+//            DongTaiLog.debug("spring api method router exception", e);
         }
     }
 
@@ -210,7 +210,7 @@ public class RequestMappingInfoConvertor {
             });
             return parameterList;
         } catch (Throwable e) {
-            DongTaiLog.debug("spring api parameters router exception: {}", e.getMessage());
+//            DongTaiLog.debug("spring api parameters router exception: {}", e.getMessage());
         }
         return Collections.emptyList();
     }
@@ -242,7 +242,7 @@ public class RequestMappingInfoConvertor {
             });
             return headerParameterList;
         } catch (Throwable e) {
-            DongTaiLog.debug("spring api headers router exception: {}", e.getMessage());
+//            DongTaiLog.debug("spring api headers router exception: {}", e.getMessage());
         }
         return Collections.emptyList();
     }
