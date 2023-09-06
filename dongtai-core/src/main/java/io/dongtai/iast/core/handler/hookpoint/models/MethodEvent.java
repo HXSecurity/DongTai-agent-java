@@ -293,7 +293,7 @@ public class MethodEvent {
      */
     @Deprecated()
     public static String obj2String(Object value) {
-        int taintValueLength = PropertyUtils.getInstance().getTaintToStringCharLimit();
+        int taintValueLength = PropertyUtils.getTaintToStringCharLimit();
         StringBuilder sb = new StringBuilder();
         if (null == value) {
             return "";
@@ -329,6 +329,7 @@ public class MethodEvent {
         return sb.toString();
     }
 
+    @Deprecated
     private static void appendWithMaxLength(StringBuilder sb, String content, int maxLength) {
         if (sb.length() + content.length() > maxLength) {
             int remainingSpace = maxLength - sb.length();

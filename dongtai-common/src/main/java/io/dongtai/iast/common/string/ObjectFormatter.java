@@ -92,6 +92,7 @@ public class ObjectFormatter {
 
             String s = objList.get(headIndex).toString();
             headIndex++;
+            // 如果这个地方的字符串比较长怎么办？是不是应该截断一下？还是有优化空间的
             header.append(s);
             r.originalLength += s.length();
 
@@ -117,6 +118,7 @@ public class ObjectFormatter {
                 tailStringList.forEach(new Consumer<String>() {
                     @Override
                     public void accept(String s) {
+                        // 是不是应该避免一下不必要的拼接拷贝？某些特殊数据下还是可能会发生占用较长时间
                         header.append(s);
                     }
                 });

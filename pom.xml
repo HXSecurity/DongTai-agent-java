@@ -39,7 +39,6 @@
         <gson.version>2.8.9</gson.version>
         <fastjson2.version>2.0.28</fastjson2.version>
         <jmh.version>1.23</jmh.version>
-        <mockito.version>4.11.0</mockito.version>
     </properties>
 
     <groupId>io.dongtai.iast</groupId>
@@ -179,16 +178,6 @@
             <version>${jmh.version}</version>
             <scope>test</scope>
         </dependency>
-
-        <!--   基准测试模拟输入啥的     -->
-        <!-- https://mvnrepository.com/artifact/org.mockito/mockito-core -->
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <version>${mockito.version}</version>
-            <scope>test</scope>
-        </dependency>
-
     </dependencies>
 
     <profiles>
