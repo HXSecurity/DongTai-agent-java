@@ -1,12 +1,17 @@
 package io.dongtai.iast.core.handler.hookpoint.models;
 
 import com.alibaba.fastjson2.JSONObject;
+import io.dongtai.iast.common.string.ObjectFormatResult;
+import io.dongtai.iast.common.string.ObjectFormatter;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.TaintPosition;
 import io.dongtai.iast.core.handler.hookpoint.models.taint.range.TaintRanges;
 import io.dongtai.iast.core.utils.PropertyUtils;
 
 import java.io.StringWriter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * 方法事件
@@ -239,10 +244,10 @@ public class MethodEvent {
         this.returnValue = formatValue(ret, hasTaint);
     }
 
-    private String formatValue(Object val, boolean hasTaint) {
-        String str = obj2String(val);
-        return "[" + str + "]"
-                + (hasTaint ? "*" : "") + str.length();
+    private static String formatValue(Object val, boolean hasTaint) {
+        ObjectFormatResult r = formatObject(val);
+        return "[" + r.objectFormatString + "]"
+                + (hasTaint ? "*" : "") + r.originalLength;
     }
 
     public Set<Long> getSourceHashes() {
@@ -281,8 +286,14 @@ public class MethodEvent {
         this.callStack = callStack;
     }
 
-    public String obj2String(Object value) {
-        int taintValueLength = PropertyUtils.getInstance().getTaintValueLength();
+    /**
+     * @param value
+     * @return
+     * @deprecated 开始是发现了有性能问题，然后进行了一版修改，这版修改影响到了与服务端的数据结构交互逻辑，因此废弃，再重写一版
+     */
+    @Deprecated()
+    public static String obj2String(Object value) {
+        int taintValueLength = PropertyUtils.getInstance().getTaintToStringCharLimit();
         StringBuilder sb = new StringBuilder();
         if (null == value) {
             return "";
@@ -318,7 +329,7 @@ public class MethodEvent {
         return sb.toString();
     }
 
-    private void appendWithMaxLength(StringBuilder sb, String content, int maxLength) {
+    private static void appendWithMaxLength(StringBuilder sb, String content, int maxLength) {
         if (sb.length() + content.length() > maxLength) {
             int remainingSpace = maxLength - sb.length();
             if (remainingSpace > 0) {
@@ -335,9 +346,21 @@ public class MethodEvent {
 
     public void setStacks(StackTraceElement[] stackTraceElements) {
         List<Object> stacks = new ArrayList<>();
-        for(StackTraceElement stackTraceElement:stackTraceElements){
+        for (StackTraceElement stackTraceElement : stackTraceElements) {
             stacks.add(stackTraceElement.toString());
         }
         this.stacks = stacks;
     }
+
+    /**
+     * 把对象格式化为字符串，高频调用要尽可能快
+     *
+     * @param value 要转换为字符串的对象
+     * @return
+     */
+    public static ObjectFormatResult formatObject(Object value) {
+        // TODO 2023-9-5 11:49:14 晚点再看看要不要把这个方法也下沉到commons中，目前是因为有依赖无法下沉...
+        return ObjectFormatter.formatObject(value, PropertyUtils.getTaintToStringCharLimit());
+    }
+
 }
