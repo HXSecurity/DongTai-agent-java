@@ -146,6 +146,7 @@ public class PolicyBuilder {
         setInheritable(node, validatorNode);
         List<String[]> tags = parseTags(node, validatorNode);
         validatorNode.setTags(tags.get(0));
+        parseFlags(node, validatorNode);
         policy.addValidator(validatorNode);
     }
 

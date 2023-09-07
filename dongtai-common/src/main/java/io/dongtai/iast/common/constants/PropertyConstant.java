@@ -33,4 +33,8 @@ public class PropertyConstant {
     public static final String PROPERTY_DISABLED_PLUGINS = "dongtai.disabled.plugins";
     public static final String PROPERTY_DISABLED_FEATURES = "dongtai.disabled.features";
     public static final String PROPERTY_TAINT_LENGTH = "dongtai.taint.length";
+    public static final String PROPERTY_POOL_CAPACITY = "dongtai.pool.capacity";
+    public static final String PROPERTY_POOL_SIZE = "dongtai.pool.size";
+    public static final String PROPERTY_POOL_MAX_SIZE = "dongtai.pool.max.size";
+    public static final String PROPERTY_POOL_KEEPALIVE = "dongtai.pool.keepalive";
 }

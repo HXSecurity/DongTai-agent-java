@@ -2,6 +2,7 @@ package io.dongtai.iast.core.service;
 
 import io.dongtai.iast.common.constants.AgentConstant;
 import io.dongtai.iast.core.replay.HttpRequestReplay;
+import io.dongtai.iast.core.utils.PropertyUtils;
 
 import java.util.concurrent.*;
 
@@ -10,8 +11,14 @@ import java.util.concurrent.*;
  */
 public class ThreadPools {
 
-    private static final ExecutorService METHOD_REPORT_THREAD = new ThreadPoolExecutor(0, 5, 10L, TimeUnit.SECONDS,
-            new LinkedBlockingQueue<Runnable>(5120), new ThreadFactory() {
+    private static final PropertyUtils propertyUtils = PropertyUtils.getInstance();
+    private static final Integer poolSize = propertyUtils.getPoolSize();
+    private static final Integer poolMaxSize = propertyUtils.getPoolMaxSize();
+    private static final Integer poolKeepAlive = propertyUtils.getPoolKeepalive();
+    private static final Integer poolCapacity = propertyUtils.getPoolCapacity();
+
+    private static final ExecutorService METHOD_REPORT_THREAD = new ThreadPoolExecutor(poolSize, poolMaxSize, poolKeepAlive, TimeUnit.SECONDS,
+            new LinkedBlockingQueue<>(poolCapacity), new ThreadFactory() {
         @Override
         public Thread newThread(Runnable r) {
             return new Thread(r, AgentConstant.THREAD_NAME_PREFIX_CORE + "VulReport-" + r.hashCode());
@@ -19,7 +26,7 @@ public class ThreadPools {
     });
 
     private static final ExecutorService COMMON_REPORT_THREAD = new ThreadPoolExecutor(0, 5, 10L, TimeUnit.SECONDS,
-            new LinkedBlockingQueue<Runnable>(10000), new ThreadFactory() {
+            new LinkedBlockingQueue<>(1024), new ThreadFactory() {
         @Override
         public Thread newThread(Runnable r) {
             return new Thread(r, AgentConstant.THREAD_NAME_PREFIX_CORE + "Report-" + r.hashCode());
@@ -27,20 +34,12 @@ public class ThreadPools {
     });
 
     private static final ExecutorService REPLAY_REQUEST_THREAD = new ThreadPoolExecutor(0, 1, 10L, TimeUnit.SECONDS,
-            new LinkedBlockingQueue<Runnable>(1024), new ThreadFactory() {
+            new LinkedBlockingQueue<>(1024), new ThreadFactory() {
         @Override
         public Thread newThread(Runnable r) {
             return new Thread(r, AgentConstant.THREAD_NAME_PREFIX_CORE + "VulReplay-" + r.hashCode());
         }
 
-    });
-
-    private static final ExecutorService LIMIT_REPORT_THREAD = new ThreadPoolExecutor(0, 5, 10L, TimeUnit.SECONDS,
-            new LinkedBlockingQueue<Runnable>(5120), new ThreadFactory() {
-        @Override
-        public Thread newThread(Runnable r) {
-            return new Thread(r, AgentConstant.THREAD_NAME_PREFIX_CORE + "LimitReport-" + r.hashCode());
-        }
     });
 
 
