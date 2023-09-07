@@ -22,7 +22,7 @@ public enum VulnType {
     XPATH_INJECTION("xpath-injection", "high", true),
     PATH_TRAVERSAL("path-traversal", "high", true),
     XXE("xxe", "medium", true),
-    JND_INJECTION("jnd-injection", "high", true),
+    JNDI_INJECTION("jndi-injection", "high", true),
     NOSQL_INJECTION("nosql-injection", "high", true),
     SMTP_INJECTION("smtp-injection", "high", true),
     EL_INJECTION("el-injection", "high", true),

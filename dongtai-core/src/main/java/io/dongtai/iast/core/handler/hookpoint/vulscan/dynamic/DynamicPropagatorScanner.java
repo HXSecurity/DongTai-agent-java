@@ -85,9 +85,9 @@ public class DynamicPropagatorScanner implements IVulScan {
                 new TaintTag[]{TaintTag.UNTRUSTED},
                 new TaintTag[]{TaintTag.CUSTOM_ENCODED_XXE, TaintTag.HTTP_TOKEN_LIMITED_CHARS, TaintTag.NUMERIC_LIMITED_CHARS}
         ));
-        put(VulnType.JND_INJECTION.getName(),Arrays.asList(
+        put(VulnType.JNDI_INJECTION.getName(),Arrays.asList(
                 new TaintTag[]{TaintTag.UNTRUSTED},
-                new TaintTag[]{TaintTag.CUSTOM_ENCODED_JND_INJECTION, TaintTag.HTTP_TOKEN_LIMITED_CHARS, TaintTag.NUMERIC_LIMITED_CHARS}
+                new TaintTag[]{TaintTag.CUSTOM_ENCODED_JNDI_INJECTION, TaintTag.HTTP_TOKEN_LIMITED_CHARS, TaintTag.NUMERIC_LIMITED_CHARS}
         ));
         put(VulnType.NOSQL_INJECTION.getName(),Arrays.asList(
                 new TaintTag[]{TaintTag.UNTRUSTED},
