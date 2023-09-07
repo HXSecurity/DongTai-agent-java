@@ -1,6 +1,6 @@
 package io.dongtai.iast.core.handler.hookpoint.models.policy;
 
-import io.dongtai.iast.core.utils.StringUtils;
+import io.dongtai.iast.common.string.StringUtils;
 
 public enum Inheritable {
     ALL("all"),

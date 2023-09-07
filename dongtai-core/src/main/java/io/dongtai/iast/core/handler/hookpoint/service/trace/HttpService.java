@@ -40,6 +40,8 @@ public class HttpService implements ServiceTrace {
             traceId = addTraceToApacheHttpClientLegacy(event);
         } else if (HttpClient.matchOkhttp(this.matchedSignature)) {
             traceId = addTraceToOkhttp(event);
+        } else if (HttpClient.matchApacheHttpComponents(this.matchedSignature)) {
+            traceId = addTraceToApacheHttpComponents(event);
         }
 
         if (traceId != null && !traceId.isEmpty()) {
@@ -273,6 +275,57 @@ public class HttpService implements ServiceTrace {
         }
     }
 
+    /**
+     * 添加traceId到Apache HttpComponents的请求上
+     *
+     * @param event
+     * @return
+     */
+    private String addTraceToApacheHttpComponents(MethodEvent event) {
+        Object obj = event.objectInstance;
+        if (obj == null) {
+            return null;
+        }
+        try {
+            String className = obj.getClass().getName();
+            if (!HttpClient.matchApacheHttpComponents(className)) {
+                return null;
+            }
+
+            // 关于库的版本兼容性：
+            // 在GA org.apache.httpcomponents:fluent-hc的[4.4, 4.5.14]这个区间的版本里的request字段是这个org.apache.http.client.fluent.InternalHttpRequest类型
+            // private final InternalHttpRequest request;
+            // 然后org.apache.http.client.fluent.InternalHttpRequest这个类继承的org.apache.http.message.AbstractHttpMessage上有个setHeader方法：
+            //    @Override // org.apache.http.HttpMessage
+            //    public void setHeader(String name, String value) {
+            //        Args.notNull(name, "Header name");
+            //        this.headergroup.updateHeader(new BasicHeader(name, value));
+            //    }
+            // 另外一提，org.apache.http.message.AbstractHttpMessage是在httpcomponents-httpcore:httpcore下的，它自从4.0-alpha5版本被添加了之后就没有变更过
+            //
+            // 在GA org.apache.httpcomponents:fluent-hc的[4.2, 4.4) 版本区间的request字段是org.apache.http.client.methods.HttpRequestBase类型，这个类属于依赖中的org.apache.httpcomponents:httpclient
+            // private final HttpRequestBase request;
+            // 在org.apache.httpcomponents:httpclient的[4.0.1, 4.2.6]版本区间，org.apache.http.client.methods.HttpRequestBase这个类是继承的org.apache.http.message.AbstractHttpMessage，此条分支可以与上面的合并
+            // org.apache.httpcomponents:httpclient的[4.3, 4.5.14]区间内是继承的org.apache.http.client.methods.AbstractExecutionAwareRequest
+            // org.apache.http.client.methods.AbstractExecutionAwareRequest自从4.3.4版本被添加依赖，一直继承的org.apache.http.message.AbstractHttpMessage，此条分支又可以与上面合并
+            // 所有版本的实现最终都会直接继承或者间接继承到org.apache.http.message.AbstractHttpMessage，所以下面的操作才可以统一
+
+            Field reqField = obj.getClass().getDeclaredField("request");
+            reqField.setAccessible(true);
+            Object internalHttpRequest = reqField.get(obj);
+            Method setHeaderMethod = internalHttpRequest.getClass().getMethod("setHeader", String.class, String.class);
+
+            // 然后把追踪的头加上
+            final String traceId = ContextManager.nextTraceId();
+            setHeaderMethod.invoke(internalHttpRequest, ContextManager.getHeaderKey(), traceId);
+            setHeaderMethod.invoke(internalHttpRequest, ContextManager.getParentKey(), String.valueOf(EngineManager.getAgentId()));
+            return traceId;
+        } catch (Throwable e) {
+            DongTaiLog.debug("add traceId header to apache http components failed: {}, {}", e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "");
+        }
+        return null;
+    }
+
     public static boolean validate(MethodEvent event) {
         if (HttpClient.matchJavaNetUrl(event.signature)) {
             return validateURLConnection(event);
@@ -280,6 +333,8 @@ public class HttpService implements ServiceTrace {
             return validateApacheHttpClient(event);
         } else if (HttpClient.matchOkhttp(event.signature)) {
             return validateOkhttp(event);
+        } else if (HttpClient.matchApacheHttpComponents(event.signature)) {
+            return validateApacheHttpComponents(event);
         }
         return true;
     }
@@ -377,4 +432,37 @@ public class HttpService implements ServiceTrace {
         }
         return false;
     }
+
+    /**
+     * 验证是否是合法的
+     *
+     * @param event
+     * @return
+     */
+    public static boolean validateApacheHttpComponents(MethodEvent event) {
+        Object obj = event.objectInstance;
+        if (obj == null) {
+            return false;
+        }
+        try {
+            String className = obj.getClass().getName();
+            if (!HttpClient.matchApacheHttpComponents(className)) {
+                return false;
+            }
+
+            // 关于类的版本兼容性，详见 #addTraceToApacheHttpComponents方法
+            Field reqField = obj.getClass().getDeclaredField("request");
+            reqField.setAccessible(true);
+            Object internalHttpRequest = reqField.get(obj);
+            Object header = internalHttpRequest.getClass().getMethod("getFirstHeader", String.class).invoke(internalHttpRequest, ContextManager.getHeaderKey());
+            // traceId header not exists
+            if (header == null) {
+                return true;
+            }
+        } catch (Throwable e) {
+            DongTaiLog.debug("validate apache http components failed: {}, {}", e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "");
+        }
+        return false;
+    }
+
 }
