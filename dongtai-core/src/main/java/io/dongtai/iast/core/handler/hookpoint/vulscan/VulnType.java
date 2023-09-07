@@ -7,7 +7,7 @@ package io.dongtai.iast.core.handler.hookpoint.vulscan;
 public enum VulnType {
 
     /**
-     * 漏洞
+     * 漏洞类型
      */
     SQL_OVER_POWER("sql-over-power", "info", false),
     CRYPTO_WEAK_RANDOMNESS("crypto-weak-randomness", "low", false),
@@ -22,6 +22,14 @@ public enum VulnType {
     XPATH_INJECTION("xpath-injection", "high", true),
     PATH_TRAVERSAL("path-traversal", "high", true),
     XXE("xxe", "medium", true),
+    JNDI_INJECTION("jndi-injection", "high", true),
+    NOSQL_INJECTION("nosql-injection", "high", true),
+    SMTP_INJECTION("smtp-injection", "high", true),
+    EL_INJECTION("el-injection", "high", true),
+    REFLECTION_INJECTION("reflection-injection", "high", true),
+    SSRF("ssrf", "high", true),
+    FILE_WRITE("file-write", "medium", true),
+    REDOS("redos", "low", true),
     UNVALIDATED_REDIRECT("unvalidated-redirect", "low", true),
     ;
 
@@ -32,9 +40,9 @@ public enum VulnType {
     /**
      * 漏洞类型 值
      */
-    String name;
-    String weight;
-    boolean tracked;
+    final String name;
+    final String weight;
+    final boolean tracked;
 
     VulnType(String name, String weight, boolean tracked) {
         this.name = name;
@@ -45,14 +53,5 @@ public enum VulnType {
 
     public boolean equals(String name) {
         return this.name.equals(name);
-    }
-
-    public static VulnType getTypeByName(String name) {
-        for (VulnType vType : VulnType.values()) {
-            if (vType.equals(name)) {
-                return vType;
-            }
-        }
-        return null;
     }
 }
