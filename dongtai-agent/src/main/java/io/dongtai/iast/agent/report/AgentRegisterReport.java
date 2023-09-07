@@ -17,7 +17,7 @@ import io.dongtai.log.ErrorCode;
 
 import java.io.*;
 import java.net.*;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 import java.util.UUID;
 
@@ -58,7 +58,7 @@ public class AgentRegisterReport {
         object.put("language", AgentConstant.LANGUAGE);
         object.put("network", readIpInfo());
         object.put("serverEnv", Base64Encoder
-                .encodeBase64String(System.getProperties().toString().getBytes(Charset.forName("UTF-8")))
+                .encodeBase64String(System.getProperties().toString().getBytes(StandardCharsets.UTF_8))
                 .replaceAll("\n", "").replaceAll("\r", ""));
         object.put("containerName", null == server ? "" : server.getName());
         object.put("containerVersion", null == server ? "" : server.getVersion());

@@ -60,14 +60,10 @@ public class ThreadPools {
         REPLAY_REQUEST_THREAD.execute(new HttpRequestReplay(replayRequestRaw));
     }
 
-    public static void sendLimitReport(final String url, final String report) {
-        LIMIT_REPORT_THREAD.execute(new ReportThread(url, report));
-    }
 
     public static void destroy() {
         METHOD_REPORT_THREAD.shutdown();
         COMMON_REPORT_THREAD.shutdown();
         REPLAY_REQUEST_THREAD.shutdown();
-        LIMIT_REPORT_THREAD.shutdown();
     }
 }

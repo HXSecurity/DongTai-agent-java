@@ -4,7 +4,7 @@ package io.dongtai.iast.core.handler.context;
  * @author owefsad
  */
 public class ContextManager {
-    private static ThreadLocal<TracingContext> CONTEXT = new ThreadLocal<TracingContext>();
+    private static final ThreadLocal<TracingContext> CONTEXT = new ThreadLocal<>();
 
     public static ThreadLocal<TracingContext> getContext() {
         return CONTEXT;

@@ -27,7 +27,7 @@ public abstract class AbstractDubboServiceExtractor {
     private static final String DUBBO_PROTOCOL_NAME = "dubbo";
 
     // 每个Gather共享同一个Manager
-    private OpenApiSchemaConvertorManager manager;
+    private final OpenApiSchemaConvertorManager manager;
 
     public AbstractDubboServiceExtractor() {
         this.manager = new OpenApiSchemaConvertorManager();

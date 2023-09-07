@@ -7,7 +7,7 @@ import io.dongtai.iast.common.string.StringUtils;
 import java.util.*;
 
 public class TaintRanges {
-    private ArrayList<TaintRange> taintRanges;
+    private final ArrayList<TaintRange> taintRanges;
 
     public TaintRanges() {
         this.taintRanges = new ArrayList<TaintRange>();

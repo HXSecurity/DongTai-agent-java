@@ -52,8 +52,7 @@ public class JBoss implements IServer {
                     if (matcher.find()) {
                         version = matcher.group(1);
                     }
-                } catch (IOException iOException) {
-                    ;
+                } catch (IOException ignored) {
                 }
             }
         }

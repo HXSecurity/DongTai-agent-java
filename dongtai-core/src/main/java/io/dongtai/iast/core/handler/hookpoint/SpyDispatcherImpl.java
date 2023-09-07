@@ -1,6 +1,6 @@
 package io.dongtai.iast.core.handler.hookpoint;
 
-import com.secnium.iast.core.AgentEngine;
+import io.dongtai.iast.core.AgentEngine;
 import io.dongtai.iast.common.config.ConfigBuilder;
 import io.dongtai.iast.common.config.ConfigKey;
 import io.dongtai.iast.common.scope.Scope;

@@ -142,11 +142,8 @@ public class ConfigMatcher {
             // DongTaiLog.trace("ignore transform {}. Reason: classname is a aop class by Proxy", className);
             return false;
         }
-        if (className.startsWith("com/secnium/iast/")
-                || className.startsWith("java/lang/iast/")
-                || className.startsWith("cn/huoxian/iast/")
+        if (className.startsWith("java/lang/iast/")
                 || className.startsWith("io/dongtai/")
-                || className.startsWith("oshi/")
                 || className.startsWith("com/sun/jna/")
         ) {
             // DongTaiLog.trace("ignore transform {}. Reason: class is in blacklist", className);

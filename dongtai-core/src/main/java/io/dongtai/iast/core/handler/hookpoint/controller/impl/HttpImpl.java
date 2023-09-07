@@ -90,7 +90,7 @@ public class HttpImpl {
                         setHeaderMethod.invoke(resp, versionHeaderKey, AgentConstant.VERSION_VALUE);
                     }
                     if (dastMarkHeader != null) {
-                        String reqId = String.valueOf(EngineManager.getAgentId()) + "."
+                        String reqId = EngineManager.getAgentId() + "."
                                 + UUID.randomUUID().toString().replaceAll("-", "");
                         setHeaderMethod.invoke(resp, "dt-request-id", reqId);
                     }
@@ -205,7 +205,7 @@ public class HttpImpl {
 
         Map<String, Collection<String>> headers = parseResponseHeaders(resp, headerNames);
         EngineManager.REQUEST_CONTEXT.get().put("responseStatus",
-                (String) EngineManager.REQUEST_CONTEXT.get().get("protocol") + " " + status);
+                EngineManager.REQUEST_CONTEXT.get().get("protocol") + " " + status);
         EngineManager.REQUEST_CONTEXT.get().put("responseHeaders", headers);
     }
 

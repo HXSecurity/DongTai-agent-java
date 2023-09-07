@@ -121,15 +121,15 @@ public class PropertyUtils {
     }
 
     public String getBlackClassFilePath() {
-        return "com.secnium.iast.resources/blacklist.txt";
+        return "io.dongtai.iast.resources/blacklist.txt";
     }
 
     public String getBlackUrl() {
-        return "com.secnium.iast.resources/blackurl.txt";
+        return "io.dongtai.iast.resources/blackurl.txt";
     }
 
     public String getBlackExtFilePath() {
-        return "com.secnium.iast.resources/blackext.txt";
+        return "io.dongtai.iast.resources/blackext.txt";
     }
 
     public String getDumpClassPath() {

@@ -33,7 +33,7 @@ public enum MetricsBindCheckerEnum {
     /**
      * 检查器类型
      */
-    private Class<? extends IPerformanceChecker> checker;
+    private final Class<? extends IPerformanceChecker> checker;
 
     /**
      * 描述

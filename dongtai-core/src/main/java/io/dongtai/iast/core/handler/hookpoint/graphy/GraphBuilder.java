@@ -16,7 +16,7 @@ import io.dongtai.log.DongTaiLog;
 import io.dongtai.log.ErrorCode;
 
 
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -82,7 +82,7 @@ public class GraphBuilder {
                 (Map<String, Collection<String>>) requestMeta.get("responseHeaders")));
         String responseBody = EngineManager.BODY_BUFFER.getResponse().toString();
         if (responseBody != null && !responseBody.isEmpty()) {
-            responseBody = Base64Encoder.encodeBase64String(responseBody.getBytes(Charset.forName("UTF-8")));
+            responseBody = Base64Encoder.encodeBase64String(responseBody.getBytes(StandardCharsets.UTF_8));
         }
         detail.put(ReportKey.RES_BODY, responseBody);
         detail.put(ReportKey.CONTEXT_PATH, requestMeta.getOrDefault("contextPath", ""));

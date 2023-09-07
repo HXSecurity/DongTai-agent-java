@@ -10,8 +10,8 @@ import java.lang.management.RuntimeMXBean;
  */
 public class Tomcat implements IServer {
 
-    private static String TOMCAT_BOOTSTAP = " org.apache.catalina.startup.Bootstrap".substring(1);
-    private static String TOMCAT_SERVER_INFO = " org.apache.catalina.util.ServerInfo".substring(1);
+    private static final String TOMCAT_BOOTSTAP = " org.apache.catalina.startup.Bootstrap".substring(1);
+    private static final String TOMCAT_SERVER_INFO = " org.apache.catalina.util.ServerInfo".substring(1);
     private String name;
     private String version;
 

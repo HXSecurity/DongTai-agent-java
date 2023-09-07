@@ -26,7 +26,7 @@ public class RequestMappingInfoConvertor {
     private final HandlerMethod handlerMethod;
 
     // 从方法中解析出的映射
-    private Map<String, Path> pathMap;
+    private final Map<String, Path> pathMap;
 
     public RequestMappingInfoConvertor(OpenApiSchemaConvertorManager manager, WebApplicationContext webApplicationContext, RequestMappingInfo requestMappingInfo, HandlerMethod handlerMethod) {
         this.manager = manager;
@@ -176,7 +176,7 @@ public class RequestMappingInfoConvertor {
         operation.setOperationId(UUID.randomUUID().toString());
 
         // 全路径类名放在tags中
-        operation.setTags(Arrays.asList(this.handlerMethod.getBeanType().getName()));
+        operation.setTags(Collections.singletonList(this.handlerMethod.getBeanType().getName()));
 
         try {
             // 解析HandlerMethod

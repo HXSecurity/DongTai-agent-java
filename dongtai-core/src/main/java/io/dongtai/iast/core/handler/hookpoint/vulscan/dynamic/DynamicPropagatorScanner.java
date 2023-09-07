@@ -34,7 +34,7 @@ public class DynamicPropagatorScanner implements IVulScan {
             new UnvalidatedRedirectCheck()
     ));
 
-    private static final Set<ServiceTrace> SERVICE_TRACES = new HashSet<ServiceTrace>(Arrays.asList(
+    private static final Set<ServiceTrace> SERVICE_TRACES = new HashSet<ServiceTrace>(Collections.singletonList(
             new HttpService()
     ));
 
