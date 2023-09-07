@@ -36,9 +36,17 @@ public class PropertyUtils {
     private final String propertiesFilePath;
 
     public static final Integer DEFAULT_TAINT_TO_STRING_CHAR_LIMIT = 1024;
+    public static final Integer DEFAULT_POOL_CAPACITY = 4096;
+    public static final Integer DEFAULT_POOL_SIZE = 0;
+    public static final Integer DEFAULT_POOL_MAX_SIZE = 10;
+    public static final Integer DEFAULT_POOL_KEEPALIVE = 10;
 
     // 污点转换为字符串的时候字符数长度限制
     private Integer taintToStringCharLimit = DEFAULT_TAINT_TO_STRING_CHAR_LIMIT;
+    private Integer poolCapacity;
+    private Integer poolSize;
+    private Integer poolMaxSize;
+    private Integer poolKeepalive;
 
     public static PropertyUtils getInstance(String propertiesFilePath) throws DongTaiPropertyConfigException, DongTaiEnvConfigException {
         if (null == instance) {
@@ -78,7 +86,7 @@ public class PropertyUtils {
 
         // 初始化一些参数
         this.initTaintToStringCharLimit();
-
+        this.initPool();
     }
 
     public static String getTmpDir() {
@@ -244,6 +252,34 @@ public class PropertyUtils {
         return instance.taintToStringCharLimit;
     }
 
+    public Integer getPoolCapacity() {
+        if (instance == null) {
+            return DEFAULT_POOL_CAPACITY;
+        }
+        return instance.poolCapacity;
+    }
+
+    public Integer getPoolSize() {
+        if (instance == null) {
+            return DEFAULT_POOL_SIZE;
+        }
+        return instance.poolSize;
+    }
+
+    public Integer getPoolMaxSize() {
+        if (instance == null) {
+            return DEFAULT_POOL_MAX_SIZE;
+        }
+        return instance.poolMaxSize;
+    }
+
+    public Integer getPoolKeepalive() {
+        if (instance == null) {
+            return DEFAULT_POOL_KEEPALIVE;
+        }
+        return instance.poolKeepalive;
+    }
+
     /**
      * 初始化taintToStringCharLimit参数的值
      *
@@ -272,6 +308,36 @@ public class PropertyUtils {
             }
         }
 
+    }
+
+    private void initPool() throws DongTaiPropertyConfigException, DongTaiEnvConfigException {
+        this.poolCapacity = parseAndSetProperty(PropertyConstant.PROPERTY_POOL_CAPACITY, DEFAULT_POOL_CAPACITY);
+        this.poolSize = parseAndSetProperty(PropertyConstant.PROPERTY_POOL_SIZE, DEFAULT_POOL_SIZE);
+        this.poolMaxSize = parseAndSetProperty(PropertyConstant.PROPERTY_POOL_MAX_SIZE, DEFAULT_POOL_MAX_SIZE);
+        this.poolKeepalive = parseAndSetProperty(PropertyConstant.PROPERTY_POOL_KEEPALIVE, DEFAULT_POOL_KEEPALIVE);
+    }
+
+    private Integer parseAndSetProperty(String propertyKey,Integer defaultValue) throws DongTaiPropertyConfigException, DongTaiEnvConfigException {
+        String propertyStr = cfg.getProperty(propertyKey);
+        Integer value = defaultValue;
+        if (!StringUtils.isBlank(propertyStr)) {
+            value = Integer.parseInt(propertyStr.trim());
+            if (value <= 0) {
+                throw new DongTaiPropertyConfigException("The value of parameter " + propertyKey
+                        + " value " + propertyStr + " in your configuration file " + this.propertiesFilePath + " is illegal, such as passing a number greater than 1");
+            }
+        }
+
+        // 2. 然后从环境变量中读取
+        propertyStr = System.getProperty(propertyKey);
+        if (!StringUtils.isBlank(propertyStr)) {
+            value = Integer.parseInt(propertyStr.trim());
+            if (value <= 0) {
+                throw new DongTaiEnvConfigException("The value of this parameter " + propertyKey
+                        + " value " + propertyStr + " in your environment variables is illegal, such as passing an number greater than 1");
+            }
+        }
+        return value;
     }
 
     /**
