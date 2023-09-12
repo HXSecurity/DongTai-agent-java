@@ -16,7 +16,7 @@ public class FileUtilsTest {
         String resourceName = "iast.properties.example"; // 假设存在名为test_resource.txt的资源文件
         String fileName = tempDirectoryPath + "test.example"; // 替换为实际的目标文件路径
 
-        boolean result = false;
+        boolean result;
         try {
             result = FileUtils.getResourceToFile(resourceName, fileName);
         } catch (IOException e) {
