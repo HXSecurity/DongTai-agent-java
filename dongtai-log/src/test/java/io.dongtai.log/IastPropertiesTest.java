@@ -9,6 +9,10 @@ public class IastPropertiesTest {
     private final String oldLogPath = System.getProperty("dongtai.log.path");
     private final String LogLevel = System.getProperty("dongtai.log.level");
 
+    private final String switchSign = System.getProperty("dongtai.log");
+
+
+
     @Before
     public void setUp() {
         clear();
@@ -26,12 +30,32 @@ public class IastPropertiesTest {
         if (LogLevel != null) {
             System.setProperty("dongtai.log.level", LogLevel);
         }
+        if (switchSign != null) {
+            System.setProperty("dongtai.log", switchSign);
+        }
     }
 
     private void clear() {
         System.clearProperty("java.io.tmpdir.dongtai");
         System.clearProperty("dongtai.log.path");
         System.clearProperty("dongtai.log.level");
+        System.clearProperty("dongtai.log");
+    }
+
+
+    @Test
+    public void isEnabledTest(){
+        boolean enabled = IastProperties.isEnabled();
+        //默认开启
+        Assert.assertTrue("isEnabled:" + enabled, enabled);
+
+
+        //修改为关闭
+        System.setProperty("dongtai.log", "false");
+        enabled = IastProperties.isEnabled();
+        Assert.assertFalse("isEnabled:" + enabled,enabled);
+
+
     }
 
     @Test
