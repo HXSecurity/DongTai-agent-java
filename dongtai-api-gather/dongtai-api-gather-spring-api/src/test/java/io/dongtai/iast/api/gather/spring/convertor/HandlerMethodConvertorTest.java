@@ -14,15 +14,14 @@ import java.util.List;
 
 public class HandlerMethodConvertorTest {
     private HandlerMethodConvertor handlerMethodConvertor;
-    private OpenApiSchemaConvertorManager manager;
     private Operation operation;
-    private HandlerMethod handlerMethod;
 
     @Before
     public void setUp() {
         // 在每个测试方法运行之前初始化必要的对象
-        manager = new OpenApiSchemaConvertorManager(); // 创建实际的 manager 对象
+        OpenApiSchemaConvertorManager manager = new OpenApiSchemaConvertorManager(); // 创建实际的 manager 对象
         operation = new Operation();
+        HandlerMethod handlerMethod;
         try {
             handlerMethod = new HandlerMethod(new TestController(), "testMethod",String.class,int.class); // 创建实际的 HandlerMethod 对象
         } catch (NoSuchMethodException e) {
