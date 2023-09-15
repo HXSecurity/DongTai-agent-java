@@ -6,11 +6,13 @@ import io.dongtai.iast.core.handler.hookpoint.models.taint.range.TaintCommandRun
 import io.dongtai.iast.core.handler.hookpoint.models.taint.tag.TaintTag;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.VulnType;
 import io.dongtai.iast.core.utils.HttpClientUtils;
-import io.dongtai.iast.core.utils.StringUtils;
+import io.dongtai.iast.common.string.StringUtils;
 import io.dongtai.log.DongTaiLog;
 import io.dongtai.log.ErrorCode;
 import org.apache.commons.io.FileUtils;
-import org.json.*;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -144,6 +146,7 @@ public class PolicyBuilder {
         setInheritable(node, validatorNode);
         List<String[]> tags = parseTags(node, validatorNode);
         validatorNode.setTags(tags.get(0));
+        parseFlags(node, validatorNode);
         policy.addValidator(validatorNode);
     }
 
@@ -152,11 +155,11 @@ public class PolicyBuilder {
             int type = node.getInt(KEY_TYPE);
             PolicyNodeType nodeType = PolicyNodeType.get(type);
             if (nodeType == null) {
-                throw new PolicyException(PolicyException.ERR_POLICY_NODE_TYPE_INVALID + ": " + node.toString());
+                throw new PolicyException(PolicyException.ERR_POLICY_NODE_TYPE_INVALID + ": " + node);
             }
             return nodeType;
         } catch (JSONException e) {
-            throw new PolicyException(PolicyException.ERR_POLICY_NODE_TYPE_INVALID + ": " + node.toString(), e);
+            throw new PolicyException(PolicyException.ERR_POLICY_NODE_TYPE_INVALID + ": " + node, e);
         }
     }
 
@@ -165,11 +168,11 @@ public class PolicyBuilder {
             return TaintPosition.parse(node.getString(KEY_SOURCE));
         } catch (JSONException e) {
             if (!PolicyNodeType.SOURCE.equals(type)) {
-                throw new PolicyException(PolicyException.ERR_POLICY_NODE_SOURCE_INVALID + ": " + node.toString(), e);
+                throw new PolicyException(PolicyException.ERR_POLICY_NODE_SOURCE_INVALID + ": " + node, e);
             }
         } catch (TaintPositionException e) {
             if (!PolicyNodeType.SOURCE.equals(type)) {
-                throw new PolicyException(PolicyException.ERR_POLICY_NODE_SOURCE_INVALID + ": " + node.toString(), e);
+                throw new PolicyException(PolicyException.ERR_POLICY_NODE_SOURCE_INVALID + ": " + node, e);
             }
         }
         return new HashSet<TaintPosition>();
@@ -179,9 +182,9 @@ public class PolicyBuilder {
         try {
             return TaintPosition.parse(node.getString(KEY_TARGET));
         } catch (JSONException e) {
-                throw new PolicyException(PolicyException.ERR_POLICY_NODE_TARGET_INVALID + ": " + node.toString(), e);
+                throw new PolicyException(PolicyException.ERR_POLICY_NODE_TARGET_INVALID + ": " + node, e);
         } catch (TaintPositionException e) {
-                throw new PolicyException(PolicyException.ERR_POLICY_NODE_TARGET_INVALID + ": " + node.toString(), e);
+                throw new PolicyException(PolicyException.ERR_POLICY_NODE_TARGET_INVALID + ": " + node, e);
         }
     }
 
@@ -190,7 +193,7 @@ public class PolicyBuilder {
             Inheritable inheritable = Inheritable.parse(node.getString(KEY_INHERIT));
             policyNode.setInheritable(inheritable);
         } catch (JSONException e) {
-            throw new PolicyException(PolicyException.ERR_POLICY_NODE_INHERITABLE_INVALID + ": " + node.toString(), e);
+            throw new PolicyException(PolicyException.ERR_POLICY_NODE_INHERITABLE_INVALID + ": " + node, e);
         }
     }
 
@@ -198,11 +201,11 @@ public class PolicyBuilder {
         try {
             String vulType = node.getString(KEY_VUL_TYPE);
             if (vulType == null || vulType.isEmpty()) {
-                throw new PolicyException(PolicyException.ERR_POLICY_SINK_NODE_VUL_TYPE_INVALID + ": " + node.toString());
+                throw new PolicyException(PolicyException.ERR_POLICY_SINK_NODE_VUL_TYPE_INVALID + ": " + node);
             }
             return vulType;
         } catch (JSONException e) {
-            throw new PolicyException(PolicyException.ERR_POLICY_SINK_NODE_VUL_TYPE_INVALID + ": " + node.toString(), e);
+            throw new PolicyException(PolicyException.ERR_POLICY_SINK_NODE_VUL_TYPE_INVALID + ": " + node, e);
         }
     }
 
@@ -210,16 +213,16 @@ public class PolicyBuilder {
         try {
             String sign = node.getString(KEY_SIGNATURE);
             if (StringUtils.isEmpty(sign)) {
-                throw new PolicyException(PolicyException.ERR_POLICY_NODE_SIGNATURE_INVALID + ": " + node.toString());
+                throw new PolicyException(PolicyException.ERR_POLICY_NODE_SIGNATURE_INVALID + ": " + node);
             }
             Signature signature = Signature.parse(sign);
 
             // @TODO add other method matcher
             return new SignatureMethodMatcher(signature);
         } catch (JSONException e) {
-            throw new PolicyException(PolicyException.ERR_POLICY_NODE_SIGNATURE_INVALID + ": " + node.toString(), e);
+            throw new PolicyException(PolicyException.ERR_POLICY_NODE_SIGNATURE_INVALID + ": " + node, e);
         } catch (IllegalArgumentException e) {
-            throw new PolicyException(PolicyException.ERR_POLICY_NODE_SIGNATURE_INVALID + ": " + node.toString(), e);
+            throw new PolicyException(PolicyException.ERR_POLICY_NODE_SIGNATURE_INVALID + ": " + node, e);
         }
     }
 
@@ -234,10 +237,10 @@ public class PolicyBuilder {
             }
         } catch (JSONException ignore) {
             DongTaiLog.warn(ErrorCode.get("POLICY_CONFIG_INVALID"),
-                    new PolicyException(PolicyException.ERR_POLICY_NODE_STACK_BLACKLIST_INVALID + ": " + node.toString()));
+                    new PolicyException(PolicyException.ERR_POLICY_NODE_STACK_BLACKLIST_INVALID + ": " + node));
         } catch (ArrayStoreException ignore) {
             DongTaiLog.warn(ErrorCode.get("POLICY_CONFIG_INVALID"),
-                    new PolicyException(PolicyException.ERR_POLICY_NODE_STACK_BLACKLIST_INVALID + ": " + node.toString()));
+                    new PolicyException(PolicyException.ERR_POLICY_NODE_STACK_BLACKLIST_INVALID + ": " + node));
         }
     }
 
@@ -298,7 +301,7 @@ public class PolicyBuilder {
 
         if (hasInvalid) {
             DongTaiLog.warn(ErrorCode.get("POLICY_CONFIG_INVALID"),
-                    new PolicyException(PolicyException.ERR_POLICY_NODE_TAGS_UNTAGS_INVALID + ": " + node.toString()));
+                    new PolicyException(PolicyException.ERR_POLICY_NODE_TAGS_UNTAGS_INVALID + ": " + node));
         }
 
         return Arrays.asList(tags.toArray(new String[0]), untags.toArray(new String[0]));
@@ -358,12 +361,12 @@ public class PolicyBuilder {
 
                 if (isInvalid) {
                     DongTaiLog.warn(ErrorCode.get("POLICY_CONFIG_INVALID"),
-                            new PolicyException(PolicyException.ERR_POLICY_NODE_RANGE_COMMAND_INVALID + ": " + node.toString()));
+                            new PolicyException(PolicyException.ERR_POLICY_NODE_RANGE_COMMAND_INVALID + ": " + node));
                 }
             }
         } catch (JSONException ignore) {
             DongTaiLog.warn(ErrorCode.get("POLICY_CONFIG_INVALID"),
-                    new PolicyException(PolicyException.ERR_POLICY_NODE_RANGE_COMMAND_INVALID + ": " + node.toString()));
+                    new PolicyException(PolicyException.ERR_POLICY_NODE_RANGE_COMMAND_INVALID + ": " + node));
         }
     }
 

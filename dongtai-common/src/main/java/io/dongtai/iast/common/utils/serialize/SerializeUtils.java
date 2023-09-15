@@ -14,7 +14,7 @@ public class SerializeUtils {
 
     private static final String DEFAULT_CHARSET = "ISO-8859-1";
 
-    private static List<Class<?>> DEFAULT_SAFE_CLASSES = new ArrayList<Class<?>>() {
+    private static final List<Class<?>> DEFAULT_SAFE_CLASSES = new ArrayList<Class<?>>() {
         private static final long serialVersionUID = -2140605358789870025L;
 
         {

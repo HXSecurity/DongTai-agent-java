@@ -146,12 +146,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>io.dongtai.iast</groupId>
             <artifactId>dongtai-spy</artifactId>
             <version>${project.version}</version>
@@ -256,14 +250,6 @@
             <version>${pkg.jdom.version}</version>
             <scope>test</scope>
         </dependency>
-        <!-- xom dependency xalan will cause feature secure-processing failed
-        <dependency>
-            <groupId>xom</groupId>
-            <artifactId>xom</artifactId>
-            <version>${pkg.xom.version}</version>
-            <scope>test</scope>
-        </dependency>
-        -->
     </dependencies>
 
 </project>

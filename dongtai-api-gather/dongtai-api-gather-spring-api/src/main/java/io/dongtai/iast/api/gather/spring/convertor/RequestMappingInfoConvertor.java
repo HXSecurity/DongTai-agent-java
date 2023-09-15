@@ -26,7 +26,7 @@ public class RequestMappingInfoConvertor {
     private final HandlerMethod handlerMethod;
 
     // 从方法中解析出的映射
-    private Map<String, Path> pathMap;
+    private final Map<String, Path> pathMap;
 
     public RequestMappingInfoConvertor(OpenApiSchemaConvertorManager manager, WebApplicationContext webApplicationContext, RequestMappingInfo requestMappingInfo, HandlerMethod handlerMethod) {
         this.manager = manager;
@@ -60,7 +60,7 @@ public class RequestMappingInfoConvertor {
                 });
             }
         } catch (Throwable e) {
-            DongTaiLog.debug("spring api path.getPathPatternsCondition router exception", e);
+//            DongTaiLog.debug("spring api path.getPathPatternsCondition router exception", e);
         }
 
         try {
@@ -78,7 +78,7 @@ public class RequestMappingInfoConvertor {
                 });
             }
         } catch (Throwable e) {
-            DongTaiLog.debug("spring api path.getPatternsCondition router exception", e);
+//            DongTaiLog.debug("spring api path.getPatternsCondition router exception", e);
         }
     }
 
@@ -144,7 +144,7 @@ public class RequestMappingInfoConvertor {
                 }
             });
         } catch (Throwable e) {
-            DongTaiLog.debug("spring api method router exception", e);
+//            DongTaiLog.debug("spring api method router exception", e);
         }
     }
 
@@ -176,7 +176,7 @@ public class RequestMappingInfoConvertor {
         operation.setOperationId(UUID.randomUUID().toString());
 
         // 全路径类名放在tags中
-        operation.setTags(Arrays.asList(this.handlerMethod.getBeanType().getName()));
+        operation.setTags(Collections.singletonList(this.handlerMethod.getBeanType().getName()));
 
         try {
             // 解析HandlerMethod
@@ -210,7 +210,7 @@ public class RequestMappingInfoConvertor {
             });
             return parameterList;
         } catch (Throwable e) {
-            DongTaiLog.debug("spring api parameters router exception: {}", e.getMessage());
+//            DongTaiLog.debug("spring api parameters router exception: {}", e.getMessage());
         }
         return Collections.emptyList();
     }
@@ -242,7 +242,7 @@ public class RequestMappingInfoConvertor {
             });
             return headerParameterList;
         } catch (Throwable e) {
-            DongTaiLog.debug("spring api headers router exception: {}", e.getMessage());
+//            DongTaiLog.debug("spring api headers router exception: {}", e.getMessage());
         }
         return Collections.emptyList();
     }

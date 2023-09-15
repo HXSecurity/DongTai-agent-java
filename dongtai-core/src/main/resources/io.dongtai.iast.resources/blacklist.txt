@@ -1,0 +1,82 @@
+# other agent
+# skywalking javaagent
+org/apache/skywalking/*
+# jacoco javaagent
+org/jacoco/*
+# jvm-sandbox
+com/alibaba/jvm/sandbox/*
+# pinpoint
+com/navercorp/pinpoint/*
+# arthas javaagent
+com/taobao/*
+com/alibaba/arthas/*
+# ziroom javaagent
+com/ziroom/*
+# icbc
+com/icbc/hmp/*
+# swagger/openapi
+com/github/xiaoymin/knife4j/spring/filter/*
+# rasp
+com/meituan/*
+com/sankuai/*
+com/dianping/*
+org/hotswap/*
+# jrebel
+com/zeroturnaround/*
+# ehcache - cache need't hook
+net/sf/ehcache/*
+# bytebuddy - need't hook
+net/bytebuddy/*
+# self package - need't hook
+org/jruby/*
+uri_3a_classloader_3a_/*
+org/asciidoctor/*
+com/sun/jmx/remote/*
+# apple package
+apple/*
+# octo
+com/octo/captcha/*
+# apache shaded
+org/apache/curator/shaded/*
+# redis client
+org/redisson/*
+# quartz
+org/quartz/*
+# sharding-jdbc
+io/shardingjdbc/*
+# micrometer
+io/micrometer/*
+io/opentelemetry/*
+groovy/*sun/rmi/transport/DGCAckHandler$1
+# https://github.com/AutoGeneral/cors-filter
+com/thetransactioncompany/*
+# protobuf
+#com/google/protobuf/*
+#Spring Cloud Sleuth
+com/github/benmanes/caffeine/*
+# spring
+org/springframework/cloud/sleuth/*
+io/netty/handler/codec/*
+# Debug
+org/jetbrains/*
+com/intellij/*
+# dont need HOOK class
+weblogic/iiop/IIOPInputStream
+javelin/jsp/JspTagLibraryFeature$UncloseableInputStream
+workshop/util/filesystem/util/InputStreamWrapper
+weblogic/utils/io/ByteBufferObjectInputStream$ContextObjectInputStream
+org/apache/xerces/impl/XMLEntityManager$RewindableInputStream
+weblogic/xml/util/CachedInputStream
+weblogic/utils/io/ChunkedInputStream
+weblogic/utils/http/HttpChunkInputStream
+weblogic/net/http/KeepAliveStream
+weblogic/common/internal/WLObjectInputStream
+java/util/zip/CheckedInputStream
+com/bea/staxb/buildtime/internal/bts/BindingFileInputStream
+weblogic/rmi/extensions/server/CBVInputStream
+org/apache/jasper/runtime/BodyContentImpl
+weblogic/servlet/jsp/BodyContentImpl
+org/slf4j/helpers/NOPLogger
+org/slf4j/helpers/NOPLoggerFactory
+org/slf4j/helpers/NOPMakerAdapter
+org/springframework/jms/listener/adapter/AbstractAdaptableMessageListener$MessagingMessageConverterAdapter$LazyResolutionMessage

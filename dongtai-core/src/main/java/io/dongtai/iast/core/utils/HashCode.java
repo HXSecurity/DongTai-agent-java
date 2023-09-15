@@ -6,7 +6,7 @@ package io.dongtai.iast.core.utils;
 public class HashCode {
     public static long calc(Object obj) {
         if (obj instanceof String) {
-            return ((String) obj).hashCode();
+            return obj.hashCode();
         } else {
             return System.identityHashCode(obj);
         }

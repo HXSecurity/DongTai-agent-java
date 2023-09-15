@@ -162,7 +162,7 @@ public interface SpyDispatcher {
                               String className, String matchClassName, String methodName, String signCode,
                               boolean isStatic, int handlerType);
 
-    public boolean collectMethod(Object instance, Object[] parameters, Object retObject, String methodMatcher,
+    boolean collectMethod(Object instance, Object[] parameters, Object retObject, String methodMatcher,
                                  String className, String matchedClassName, String methodName, String signature,
                                  boolean isStatic);
 

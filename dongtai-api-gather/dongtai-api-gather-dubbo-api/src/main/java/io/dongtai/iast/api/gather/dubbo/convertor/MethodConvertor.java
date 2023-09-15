@@ -18,8 +18,8 @@ import java.util.*;
  */
 public class MethodConvertor {
 
-    private OpenApiSchemaConvertorManager manager;
-    private Method reflectionMethod;
+    private final OpenApiSchemaConvertorManager manager;
+    private final Method reflectionMethod;
 
     /**
      * @param manager

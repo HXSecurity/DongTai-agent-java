@@ -1,12 +1,17 @@
 package io.dongtai.iast.core.handler.hookpoint.models;
 
 import com.alibaba.fastjson2.JSONObject;
+import io.dongtai.iast.common.string.ObjectFormatResult;
+import io.dongtai.iast.common.string.ObjectFormatter;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.TaintPosition;
 import io.dongtai.iast.core.handler.hookpoint.models.taint.range.TaintRanges;
-import io.dongtai.iast.core.utils.StringUtils;
+import io.dongtai.iast.core.utils.PropertyUtils;
 
 import java.io.StringWriter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * 方法事件
@@ -14,10 +19,6 @@ import java.util.*;
  * @author dongzhiyong@huoxian.cn
  */
 public class MethodEvent {
-    /**
-     * max display value size for object/return/parameters
-     */
-    private static final int MAX_VALUE_LENGTH = 1024;
 
     /**
      * method invoke id
@@ -75,7 +76,7 @@ public class MethodEvent {
     /**
      * method all parameters string value
      */
-    public List<Parameter> parameterValues = new ArrayList<Parameter>();
+    public List<Parameter> parameterValues = new ArrayList<>();
 
     /**
      * method return instance
@@ -87,13 +88,13 @@ public class MethodEvent {
      */
     public String returnValue;
 
-    private final Set<Long> sourceHashes = new HashSet<Long>();
+    private final Set<Long> sourceHashes = new HashSet<>();
 
-    private final Set<Long> targetHashes = new HashSet<Long>();
+    private final Set<Long> targetHashes = new HashSet<>();
 
-    public List<MethodEventTargetRange> targetRanges = new ArrayList<MethodEventTargetRange>();
+    public List<MethodEventTargetRange> targetRanges = new ArrayList<>();
 
-    public List<MethodEventTargetRange> sourceRanges = new ArrayList<MethodEventTargetRange>();
+    public List<MethodEventTargetRange> sourceRanges = new ArrayList<>();
 
     public List<MethodEventSourceType> sourceTypes;
 
@@ -231,7 +232,7 @@ public class MethodEvent {
         if (param == null) {
             return;
         }
-        String indexString = "P" + String.valueOf(index + 1);
+        String indexString = "P" + (index + 1);
         Parameter parameter = new Parameter(indexString, formatValue(param, hasTaint));
         this.parameterValues.add(parameter);
     }
@@ -243,10 +244,10 @@ public class MethodEvent {
         this.returnValue = formatValue(ret, hasTaint);
     }
 
-    private String formatValue(Object val, boolean hasTaint) {
-        String str = obj2String(val);
-        return "[" + StringUtils.normalize(str, MAX_VALUE_LENGTH) + "]"
-                + (hasTaint ? "*" : "") + String.valueOf(str.length());
+    private static String formatValue(Object val, boolean hasTaint) {
+        ObjectFormatResult r = formatObject(val);
+        return "[" + r.objectFormatString + "]"
+                + (hasTaint ? "*" : "") + r.originalLength;
     }
 
     public Set<Long> getSourceHashes() {
@@ -285,7 +286,14 @@ public class MethodEvent {
         this.callStack = callStack;
     }
 
-    public String obj2String(Object value) {
+    /**
+     * @param value
+     * @return
+     * @deprecated 开始是发现了有性能问题，然后进行了一版修改，这版修改影响到了与服务端的数据结构交互逻辑，因此废弃，再重写一版
+     */
+    @Deprecated()
+    public static String obj2String(Object value) {
+        int taintValueLength = PropertyUtils.getTaintToStringCharLimit();
         StringBuilder sb = new StringBuilder();
         if (null == value) {
             return "";
@@ -299,25 +307,38 @@ public class MethodEvent {
                         if (taint.getClass().isArray() && !taint.getClass().getComponentType().isPrimitive()) {
                             Object[] subTaints = (Object[]) taint;
                             for (Object subTaint : subTaints) {
-                                sb.append(subTaint.toString()).append(" ");
+                                appendWithMaxLength(sb, subTaint.toString(), taintValueLength);
+                                sb.append(" ");
                             }
                         } else {
-                            sb.append(taint.toString()).append(" ");
+                            appendWithMaxLength(sb, taint.toString(), taintValueLength);
+                            sb.append(" ");
                         }
                     }
                 }
             } else if (value instanceof StringWriter) {
-                sb.append(((StringWriter) value).getBuffer().toString());
+                appendWithMaxLength(sb, ((StringWriter) value).getBuffer().toString(), taintValueLength);
             } else {
-                sb.append(value.toString());
+                appendWithMaxLength(sb, value.toString(), taintValueLength);
             }
         } catch (Throwable e) {
             // org.jruby.RubyBasicObject.hashCode() may cause NullPointerException when RubyBasicObject.metaClass is null
-            sb.append(value.getClass().getName())
-                    .append("@")
-                    .append(Integer.toHexString(System.identityHashCode(value)));
+            String typeName = value.getClass().getName() + "@" + Integer.toHexString(System.identityHashCode(value));
+            appendWithMaxLength(sb, typeName, taintValueLength);
         }
         return sb.toString();
+    }
+
+    @Deprecated
+    private static void appendWithMaxLength(StringBuilder sb, String content, int maxLength) {
+        if (sb.length() + content.length() > maxLength) {
+            int remainingSpace = maxLength - sb.length();
+            if (remainingSpace > 0) {
+                sb.append(content, 0, remainingSpace);
+            }
+        } else {
+            sb.append(content);
+        }
     }
 
     public List<Object> getStacks() {
@@ -326,9 +347,21 @@ public class MethodEvent {
 
     public void setStacks(StackTraceElement[] stackTraceElements) {
         List<Object> stacks = new ArrayList<>();
-        for(StackTraceElement stackTraceElement:stackTraceElements){
+        for (StackTraceElement stackTraceElement : stackTraceElements) {
             stacks.add(stackTraceElement.toString());
         }
         this.stacks = stacks;
     }
+
+    /**
+     * 把对象格式化为字符串，高频调用要尽可能快
+     *
+     * @param value 要转换为字符串的对象
+     * @return
+     */
+    public static ObjectFormatResult formatObject(Object value) {
+        // TODO 2023-9-5 11:49:14 晚点再看看要不要把这个方法也下沉到commons中，目前是因为有依赖无法下沉...
+        return ObjectFormatter.formatObject(value, PropertyUtils.getTaintToStringCharLimit());
+    }
+
 }

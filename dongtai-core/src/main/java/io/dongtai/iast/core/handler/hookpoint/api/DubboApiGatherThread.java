@@ -18,9 +18,9 @@ public class DubboApiGatherThread extends AbstractApiGatherThread {
     public static final String PLUGIN_NAME = "dubbo-api";
 
     // Dubbo的包名是alibaba还是apache的
-    public static enum DubboPackage {
+    public enum DubboPackage {
         ALIBABA,
-        APACHE;
+        APACHE
     }
 
     // avoid lock

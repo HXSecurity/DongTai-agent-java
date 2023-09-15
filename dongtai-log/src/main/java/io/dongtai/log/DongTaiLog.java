@@ -110,7 +110,7 @@ public class DongTaiLog {
             throw new Exception("init log dir " + LOG_DIR + " failed: " + e.getMessage());
         }
 
-        String path = LOG_DIR + File.separator + "dongtai_javaagent-" + String.valueOf(agentId) + ".log";
+        String path = LOG_DIR + File.separator + "dongtai_javaagent-" + agentId + ".log";
         try {
             File file = new File(path);
             if (!file.exists()) {
@@ -201,11 +201,11 @@ public class DongTaiLog {
         }
 
         if (code > 0) {
-            prefix += "[" + String.valueOf(code) + "] ";
+            prefix += "[" + code + "] ";
         }
 
         if (cnt > 0) {
-            prefix += "[occurred " + String.valueOf(cnt) + " times] ";
+            prefix += "[occurred " + cnt + " times] ";
         }
 
         return prefix;
@@ -214,9 +214,9 @@ public class DongTaiLog {
     private static String getMessage(String msg, Throwable t) {
         if (t != null) {
             if (msg == null || msg.isEmpty()) {
-                msg = "Exception: " + t.toString();
+                msg = "Exception: " + t;
             } else {
-                msg += ", Exception: " + t.toString();
+                msg += ", Exception: " + t;
             }
         }
         return msg;

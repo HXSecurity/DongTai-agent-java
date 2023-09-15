@@ -13,9 +13,9 @@ import io.dongtai.log.DongTaiLog;
  */
 public class ServerAddressReport implements Runnable {
 
-    private String serverAddr;
-    private Integer serverPort;
-    private String protocol;
+    private final String serverAddr;
+    private final Integer serverPort;
+    private final String protocol;
     public ServerAddressReport(String serverAddr,Integer serverPort,String protocol) {
         this.serverAddr = serverAddr;
         this.serverPort = serverPort;

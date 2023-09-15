@@ -1,6 +1,6 @@
 package io.dongtai.iast.core.handler.hookpoint;
 
-import com.secnium.iast.core.AgentEngine;
+import io.dongtai.iast.core.AgentEngine;
 import io.dongtai.iast.common.config.ConfigBuilder;
 import io.dongtai.iast.common.config.ConfigKey;
 import io.dongtai.iast.common.scope.Scope;
@@ -17,7 +17,7 @@ import io.dongtai.iast.core.handler.hookpoint.models.policy.*;
 import io.dongtai.iast.core.handler.hookpoint.service.trace.DubboService;
 import io.dongtai.iast.core.handler.hookpoint.service.trace.FeignService;
 import io.dongtai.iast.core.handler.hookpoint.service.trace.HttpService;
-import io.dongtai.iast.core.utils.StringUtils;
+import io.dongtai.iast.common.string.StringUtils;
 import io.dongtai.iast.core.utils.matcher.ConfigMatcher;
 import io.dongtai.log.DongTaiLog;
 import io.dongtai.log.ErrorCode;

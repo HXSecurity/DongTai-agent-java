@@ -14,15 +14,15 @@ import java.util.function.Consumer;
 public class ComponentDatabase {
 
     // 类到Schema的映射
-    private Map<Class, Schema> classToSchemaMap;
+    private final Map<Class, Schema> classToSchemaMap;
 
     // 已经发现了的类，用于避免重复处理，也避免碰到循环引用时递归爆栈
     private Set<Class> existsClassSet = new HashSet<>();
 
     // 符合类型的schema生成完毕的时候的回调方法，用于处理环形依赖
-    private Map<Class, List<Consumer<Schema>>> classSchemaDoneCallbackMap;
+    private final Map<Class, List<Consumer<Schema>>> classSchemaDoneCallbackMap;
 
-    private OpenApiSchemaConvertorManager manager;
+    private final OpenApiSchemaConvertorManager manager;
 
     public ComponentDatabase(OpenApiSchemaConvertorManager manager) {
         this.manager = manager;

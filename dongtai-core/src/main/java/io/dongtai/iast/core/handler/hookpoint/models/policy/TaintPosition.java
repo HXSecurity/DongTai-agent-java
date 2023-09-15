@@ -39,7 +39,7 @@ public class TaintPosition {
             try {
                 index = Integer.parseInt(idx) - 1;
                 if (index < 0) {
-                    throw new NumberFormatException("position index can not be negative: " + String.valueOf(index));
+                    throw new NumberFormatException("position index can not be negative: " + index);
                 }
             } catch (NumberFormatException e) {
                 throw new IllegalArgumentException(ERR_POSITION_PARAMETER_INDEX_INVALID + ": " + value + ", " + e.getMessage());

@@ -21,7 +21,7 @@ public class PolicyBuilderTest {
 
 
     @Before
-    public void setUp() {
+    public void setUp() throws PropertyUtils.DongTaiPropertyConfigException, PropertyUtils.DongTaiEnvConfigException {
         PropertyUtils.getInstance(PROPERTY_FILE);
         DongTaiLog.ENABLED = true;
         clear();

@@ -34,6 +34,10 @@ public class IastProperties {
         put("uuid_path", PropertyConstant.PROPERTY_UUID_PATH);
         put("disabled_plugins", PropertyConstant.PROPERTY_DISABLED_PLUGINS);
         put("disabled_features", PropertyConstant.PROPERTY_DISABLED_FEATURES);
+        put("pool_capacity", PropertyConstant.PROPERTY_POOL_CAPACITY);
+        put("pool_size", PropertyConstant.PROPERTY_POOL_SIZE);
+        put("pool_max_size", PropertyConstant.PROPERTY_POOL_MAX_SIZE);
+        put("pool_keepalive", PropertyConstant.PROPERTY_POOL_KEEPALIVE);
     }};
 
     private static IastProperties instance;

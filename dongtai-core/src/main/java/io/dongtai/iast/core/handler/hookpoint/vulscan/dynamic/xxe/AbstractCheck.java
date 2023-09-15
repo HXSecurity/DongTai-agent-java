@@ -118,7 +118,7 @@ public abstract class AbstractCheck implements XXEChecker {
                 && (fAccessExternalDTDField = ReflectUtils.getRecursiveField(fDocumentSource.getClass(), "fAccessExternalDTD")) != null) {
             Object fAccessExternalDTD = fAccessExternalDTDField.get(fDocumentSource);
             if (fAccessExternalDTD instanceof String) {
-                if ("".equals((String) fAccessExternalDTD)) {
+                if ("".equals(fAccessExternalDTD)) {
                     return Support.DISALLOWED;
                 }
             }

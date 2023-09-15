@@ -2,6 +2,7 @@ package io.dongtai.iast.core.handler.hookpoint.controller.impl;
 
 import io.dongtai.iast.common.config.*;
 import io.dongtai.iast.common.constants.AgentConstant;
+import io.dongtai.iast.common.string.StringUtils;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.bypass.BlackUrlBypass;
 import io.dongtai.iast.core.handler.hookpoint.IastClassLoader;
@@ -89,7 +90,7 @@ public class HttpImpl {
                         setHeaderMethod.invoke(resp, versionHeaderKey, AgentConstant.VERSION_VALUE);
                     }
                     if (dastMarkHeader != null) {
-                        String reqId = String.valueOf(EngineManager.getAgentId()) + "."
+                        String reqId = EngineManager.getAgentId() + "."
                                 + UUID.randomUUID().toString().replaceAll("-", "");
                         setHeaderMethod.invoke(resp, "dt-request-id", reqId);
                     }
@@ -204,7 +205,7 @@ public class HttpImpl {
 
         Map<String, Collection<String>> headers = parseResponseHeaders(resp, headerNames);
         EngineManager.REQUEST_CONTEXT.get().put("responseStatus",
-                (String) EngineManager.REQUEST_CONTEXT.get().get("protocol") + " " + status);
+                EngineManager.REQUEST_CONTEXT.get().get("protocol") + " " + status);
         EngineManager.REQUEST_CONTEXT.get().put("responseHeaders", headers);
     }
 
