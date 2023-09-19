@@ -13,6 +13,7 @@
 
     <properties>
         <apache-httpclient.version>4.5.13</apache-httpclient.version>
+        <templating-maven-plugin.version>1.0.0</templating-maven-plugin.version>
     </properties>
 
     <dependencies>
@@ -41,6 +42,23 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>templating-maven-plugin</artifactId>
+                <version>${templating-maven-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>filtering-java-templates</id>
+                        <goals>
+                            <goal>filter-sources</goal>
+                        </goals>
+                        <configuration>
+                            <!-- 此处配置的是模板文件的位置 -->
+                            <!--                            <sourceDirectory>src/main/java-templates</sourceDirectory>-->
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>

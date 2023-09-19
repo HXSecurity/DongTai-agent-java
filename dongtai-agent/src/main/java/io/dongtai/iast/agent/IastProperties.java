@@ -2,14 +2,16 @@ package io.dongtai.iast.agent;
 
 import io.dongtai.iast.agent.util.FileUtils;
 import io.dongtai.iast.agent.util.GsonUtils;
-import io.dongtai.iast.common.constants.AgentConstant;
 import io.dongtai.iast.common.constants.PropertyConstant;
+import io.dongtai.iast.common.constants.Version;
 import io.dongtai.log.DongTaiLog;
 import io.dongtai.log.ErrorCode;
 
 import java.io.File;
 import java.io.InputStream;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -103,7 +105,7 @@ public class IastProperties {
         }
         dir.append(sysTmpDir).append(File.separator)
                 .append("dongtai-").append(System.getProperty("user.name")).append(File.separator)
-                .append(AgentConstant.VERSION_VALUE).append(File.separator);
+                .append(Version.VERSION).append(File.separator);
 
         TMP_DIR = dir.toString();
         System.setProperty("java.io.tmpdir.dongtai", TMP_DIR);
