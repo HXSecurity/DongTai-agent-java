@@ -1,6 +1,7 @@
 package io.dongtai.iast.core;
 
 import io.dongtai.iast.common.constants.AgentConstant;
+import io.dongtai.iast.common.constants.Version;
 import io.dongtai.iast.common.state.AgentState;
 import io.dongtai.iast.common.state.State;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.PolicyManager;
@@ -71,7 +72,7 @@ public class AgentEngine {
             StartUpTimeReport.sendReport(EngineManager.getAgentId(), (int) stopWatch.getTime());
             DongTaiLog.info("DongTai Engine is successfully installed to the JVM, and it takes {} s",
                     stopWatch.getTime() / 1000);
-            DongTaiLog.info("DongTai Agent Version: {}, DongTai Server: {}", AgentConstant.VERSION_VALUE, cfg.getBaseUrl());
+            DongTaiLog.info("DongTai Agent Version: {}, DongTai Server: {}", Version.VERSION, cfg.getBaseUrl());
             inject(inst);
             new ServiceDirReport().send();
         } catch (Throwable e) {

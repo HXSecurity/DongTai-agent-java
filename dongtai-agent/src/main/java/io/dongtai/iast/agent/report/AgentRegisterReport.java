@@ -10,10 +10,10 @@ import io.dongtai.iast.agent.middlewarerecognition.ServerDetect;
 import io.dongtai.iast.agent.util.HttpClientUtils;
 import io.dongtai.iast.common.constants.AgentConstant;
 import io.dongtai.iast.common.constants.ApiPath;
+import io.dongtai.iast.common.constants.Version;
 import io.dongtai.iast.common.utils.base64.Base64Encoder;
 import io.dongtai.log.DongTaiLog;
 import io.dongtai.log.ErrorCode;
-
 
 import java.io.*;
 import java.net.*;
@@ -49,7 +49,7 @@ public class AgentRegisterReport {
             object.put("uuid", uuid);
         }
         object.put("name", AgentRegisterReport.getAgentToken());
-        object.put("version", AgentConstant.VERSION_VALUE);
+        object.put("version", Version.VERSION);
         object.put("projectName", getProjectName());
         object.put("clusterName", getClusterName());
         object.put("clusterVersion", getClusterVersion());
@@ -81,7 +81,7 @@ public class AgentRegisterReport {
             String osName = System.getProperty("os.name");
             String hostname = getInternalHostName();
             AGENT_NAME =
-                    osName + "-" + hostname + "-" + AgentConstant.VERSION_VALUE + "-" + IastProperties.getInstance()
+                    osName + "-" + hostname + "-" + Version.VERSION + "-" + IastProperties.getInstance()
                             .getEngineName();
         }
         return AGENT_NAME;
