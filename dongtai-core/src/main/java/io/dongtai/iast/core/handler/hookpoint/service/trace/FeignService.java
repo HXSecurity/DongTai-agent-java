@@ -37,12 +37,16 @@ public class FeignService {
             addHeaderMethod.setAccessible(true);
             String traceId = ContextManager.nextTraceId();
             // clear old traceId header
-            addHeaderMethod.invoke(template, ContextManager.getHeaderKey(), new String[]{});
-            addHeaderMethod.invoke(template, ContextManager.getParentKey(), new String[]{});
-            addHeaderMethod.invoke(template, ContextManager.getHeaderKey(), new String[]{traceId});
-            addHeaderMethod.invoke(template, ContextManager.getParentKey(),
-                    new String[]{String.valueOf(EngineManager.getAgentId())});
-
+            /*
+            防止高并发下的treeMap修改问题，暂时可解决
+             */
+            synchronized (template){
+                addHeaderMethod.invoke(template, ContextManager.getHeaderKey(), new String[]{});
+                addHeaderMethod.invoke(template, ContextManager.getParentKey(), new String[]{});
+                addHeaderMethod.invoke(template, ContextManager.getHeaderKey(), new String[]{traceId});
+                addHeaderMethod.invoke(template, ContextManager.getParentKey(),
+                        new String[]{String.valueOf(EngineManager.getAgentId())});
+            }
             // add to method pool
             event.source = false;
             event.traceId = traceId;

@@ -1,10 +1,11 @@
 package io.dongtai.iast.core.handler.hookpoint;
 
-import io.dongtai.iast.core.AgentEngine;
 import io.dongtai.iast.common.config.ConfigBuilder;
 import io.dongtai.iast.common.config.ConfigKey;
 import io.dongtai.iast.common.scope.Scope;
 import io.dongtai.iast.common.scope.ScopeManager;
+import io.dongtai.iast.common.string.StringUtils;
+import io.dongtai.iast.core.AgentEngine;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.bypass.BlackUrlBypass;
 import io.dongtai.iast.core.handler.hookpoint.api.DubboApiGatherThread;
@@ -17,7 +18,6 @@ import io.dongtai.iast.core.handler.hookpoint.models.policy.*;
 import io.dongtai.iast.core.handler.hookpoint.service.trace.DubboService;
 import io.dongtai.iast.core.handler.hookpoint.service.trace.FeignService;
 import io.dongtai.iast.core.handler.hookpoint.service.trace.HttpService;
-import io.dongtai.iast.common.string.StringUtils;
 import io.dongtai.iast.core.utils.matcher.ConfigMatcher;
 import io.dongtai.log.DongTaiLog;
 import io.dongtai.log.ErrorCode;
@@ -31,6 +31,7 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -768,11 +769,18 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                 Object metadata = metadataField.get(instance);
                 Method templateMethod = metadata.getClass().getMethod("template");
                 Object template = templateMethod.invoke(metadata);
-
                 Method addHeaderMethod = template.getClass().getDeclaredMethod("header", String.class, String[].class);
                 addHeaderMethod.setAccessible(true);
-                addHeaderMethod.invoke(template, BlackUrlBypass.getHeaderKey(), new String[]{});
-                addHeaderMethod.invoke(template, BlackUrlBypass.getHeaderKey(), new String[]{BlackUrlBypass.isBlackUrl().toString()});
+                ConcurrentHashMap<String, Collection<String>> headers = new ConcurrentHashMap<>();
+                synchronized (template){
+                    /*
+                     * @todo 在高并发情况下，由于SynchronousMethodHandler复用的原因，会导致多线程下同时修改的问题
+                     *   所以添加了对象锁，后续是否可以考虑更改为拦截器
+                     */
+//                    addHeaderMethod.invoke(template, BlackUrlBypass.getHeaderKey(), new String[]{});
+//                    addHeaderMethod.invoke(template, BlackUrlBypass.getHeaderKey(), new String[]{BlackUrlBypass.isBlackUrl().toString()});
+                    addHeaderMethod.invoke(template, BlackUrlBypass.getHeaderKey(), new String[]{"true"});
+                }
             } catch (NoSuchFieldException | NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
                 DongTaiLog.error(ErrorCode.get("BYPASS_FAILED_FEIGN"), e);
             }
