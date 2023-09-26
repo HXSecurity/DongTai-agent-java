@@ -9,11 +9,15 @@ import io.dongtai.iast.core.handler.hookpoint.models.policy.Policy;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.PolicyNode;
 import io.dongtai.iast.core.utils.AsmUtils;
 import io.dongtai.log.DongTaiLog;
-import org.objectweb.asm.*;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.commons.JSRInlinerAdapter;
 
 import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -29,11 +33,14 @@ public class DispatchClassPlugin implements DispatchPlugin {
     public ClassVisitor dispatch(ClassVisitor classVisitor, ClassContext classContext, Policy policy) {
         ancestors = classContext.getAncestors();
         className = classContext.getClassName();
-        Set<String> matchedClassNameSet = policy.getMatchedClass(classContext,className, ancestors);
+        Set<String> matchedClassNameSet = policy.getMatchedClass(classContext, className, ancestors);
 
+        // 匹配的时候增加日志方便根据类或者策略观测定位问题
         if (0 == matchedClassNameSet.size()) {
+            DongTaiLog.trace("class = {}, no matching policy, so ignored.", classContext.getClassName());
             return classVisitor;
         }
+        DongTaiLog.trace("class = {}, matching policy classes = {}", classContext.getClassName(), String.join(", ", matchedClassNameSet));
 
         classContext.setMatchedClassSet(matchedClassNameSet);
         return new ClassVisit(classVisitor, classContext, policy);

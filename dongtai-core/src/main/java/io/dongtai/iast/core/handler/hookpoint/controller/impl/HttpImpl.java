@@ -1,12 +1,16 @@
 package io.dongtai.iast.core.handler.hookpoint.controller.impl;
 
-import io.dongtai.iast.common.config.*;
-import io.dongtai.iast.common.constants.AgentConstant;
+import io.dongtai.iast.common.config.ConfigBuilder;
+import io.dongtai.iast.common.config.ConfigKey;
+import io.dongtai.iast.common.config.RequestDenyList;
+import io.dongtai.iast.common.constants.Version;
 import io.dongtai.iast.common.string.StringUtils;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.bypass.BlackUrlBypass;
 import io.dongtai.iast.core.handler.hookpoint.IastClassLoader;
-import io.dongtai.iast.core.utils.*;
+import io.dongtai.iast.core.utils.HttpClientUtils;
+import io.dongtai.iast.core.utils.PropertyUtils;
+import io.dongtai.iast.core.utils.ReflectUtils;
 import io.dongtai.iast.core.utils.matcher.ConfigMatcher;
 import io.dongtai.log.DongTaiLog;
 
@@ -87,7 +91,7 @@ public class HttpImpl {
                 if (setHeaderMethod != null) {
                     if (enableVersionHeader) {
                         String versionHeaderKey = ConfigBuilder.getInstance().get(ConfigKey.VERSION_HEADER_KEY);
-                        setHeaderMethod.invoke(resp, versionHeaderKey, AgentConstant.VERSION_VALUE);
+                        setHeaderMethod.invoke(resp, versionHeaderKey, Version.VERSION);
                     }
                     if (dastMarkHeader != null) {
                         String reqId = EngineManager.getAgentId() + "."
