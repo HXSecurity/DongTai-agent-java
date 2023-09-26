@@ -1,9 +1,13 @@
 package io.dongtai.iast.agent.manager;
 
-import io.dongtai.iast.agent.*;
+import io.dongtai.iast.agent.IastClassLoader;
+import io.dongtai.iast.agent.IastProperties;
+import io.dongtai.iast.agent.LogCollector;
 import io.dongtai.iast.agent.fallback.FallbackManager;
 import io.dongtai.iast.agent.report.AgentRegisterReport;
-import io.dongtai.iast.agent.util.*;
+import io.dongtai.iast.agent.util.FileUtils;
+import io.dongtai.iast.agent.util.HttpClientUtils;
+import io.dongtai.iast.agent.util.ThreadUtils;
 import io.dongtai.iast.common.state.AgentState;
 import io.dongtai.log.DongTaiLog;
 import io.dongtai.log.ErrorCode;
@@ -13,6 +17,8 @@ import java.io.IOException;
 import java.lang.instrument.Instrumentation;
 import java.lang.management.ManagementFactory;
 import java.util.jar.JarFile;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 引擎管理类，负责engine模块的完整生命周期，包括：下载、安装、启动、停止、重启、卸载
@@ -248,9 +254,30 @@ public class EngineManager {
 
     public static String getPID() {
         if (PID == null) {
-            PID = ManagementFactory.getRuntimeMXBean().getName().split("@")[0];
+            String runtimeName = ManagementFactory.getRuntimeMXBean().getName();
+            PID = extractPID(runtimeName);
         }
         return PID;
+    }
+
+    /**
+     * 通过正则提取runtimeName的PID
+     * 从开头开始匹配，遇到非数字字符串停止匹配
+     * @param runtimeName 运行名称通常为PID@HostName
+     * @return PID
+     */
+    public static String extractPID(String runtimeName){
+        Pattern pattern = Pattern.compile("^\\d+");
+        Matcher matcher = pattern.matcher(runtimeName);
+
+        //防止极端情况未获取到PID ，设置默认值为0，防止服务端出现问题
+        String extractedNumber = "0";
+        if (matcher.find()) {
+            extractedNumber  = matcher.group(); // 提取匹配到的数字
+        }else {
+            DongTaiLog.warn("Get PID parsing exception, PID raw data is {}",runtimeName);
+        }
+        return extractedNumber;
     }
 
     public AgentState getAgentState() {

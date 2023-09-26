@@ -35,21 +35,23 @@ public class FeignService {
 
             Method addHeaderMethod = template.getClass().getDeclaredMethod("header", String.class, String[].class);
             addHeaderMethod.setAccessible(true);
-            String traceId = ContextManager.nextTraceId();
             // clear old traceId header
             /*
             防止高并发下的treeMap修改问题，暂时可解决
              */
             synchronized (template){
+                //将生成traceId下放到锁内
+                String traceId = ContextManager.nextTraceId();
+
                 addHeaderMethod.invoke(template, ContextManager.getHeaderKey(), new String[]{});
                 addHeaderMethod.invoke(template, ContextManager.getParentKey(), new String[]{});
                 addHeaderMethod.invoke(template, ContextManager.getHeaderKey(), new String[]{traceId});
                 addHeaderMethod.invoke(template, ContextManager.getParentKey(),
                         new String[]{String.valueOf(EngineManager.getAgentId())});
+                event.traceId = traceId;
             }
             // add to method pool
             event.source = false;
-            event.traceId = traceId;
             event.setCallStacks(StackUtils.createCallStack(4));
             int invokeId = invokeIdSequencer.getAndIncrement();
             event.setInvokeId(invokeId);
