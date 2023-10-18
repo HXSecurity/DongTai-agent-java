@@ -153,7 +153,7 @@ public class TaintPoolUtils {
                 hash = System.identityHashCode(obj);
                 identityHash = hash;
             }
-            if (EngineManager.TAINT_HASH_CODES.contains(hash) && !isMicroservice) {
+            if (EngineManager.TAINT_HASH_CODES.contains(hash)) {
                 return;
             }
         }
