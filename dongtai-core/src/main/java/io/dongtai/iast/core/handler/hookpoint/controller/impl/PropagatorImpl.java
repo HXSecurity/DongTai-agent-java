@@ -30,7 +30,8 @@ public class PropagatorImpl {
             "java.net.URL.<init>(java.net.URL,java.lang.String,java.net.URLStreamHandler)",
             "java.net.URL.<init>(java.lang.String,java.lang.String,java.lang.String)", // indirect
             "java.net.URL.<init>(java.lang.String,java.lang.String,int,java.lang.String)", // indirect
-            "java.net.URL.<init>(java.lang.String,java.lang.String,int,java.lang.String,java.net.URLStreamHandler)"
+            "java.net.URL.<init>(java.lang.String,java.lang.String,int,java.lang.String,java.net.URLStreamHandler)",
+            "com.fasterxml.jackson.databind.ObjectMapper.readValue(java.io.InputStream,com.fasterxml.jackson.databind.JavaType)"
     ));
 
     public static void solvePropagator(MethodEvent event, PropagatorNode propagatorNode, AtomicInteger invokeIdSequencer) {
