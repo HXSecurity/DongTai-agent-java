@@ -9,6 +9,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author UzJu
@@ -36,10 +37,10 @@ public class QLExpressCheck implements SinkSafeChecker {
     @Override
     public boolean isSafe(MethodEvent event, SinkNode sinkNode){
         /**
-         * Die QLExpress-Komponente bietet die Konfigurationsfunktion forbidInvokeSecurityRiskMethods, um die Erkennung von schwarzen Listen zu ermöglichen. Daher muss zusätzlich zur Bestimmung des Senkenpunkts auch festgestellt werden, ob der Benutzer diese Konfiguration aktiviert hat.
-         * Wenn diese Konfiguration aktiviert ist, werden Sie beim Aufruf einer auf der schwarzen Liste stehenden Klasse aufgefordert: com.ql.util.express.exception.QLSecurityRiskException: Eine unsichere Systemmethode wurde mit QLExpress aufgerufen: public java.lang.Process java. lang.Runtime.exec(java.lang.String) throws java.io.IOException
+         * The QLExpress component provides the forbidInvokeSecurityRiskMethods configuration function to enable blacklist detection. Therefore, in addition to determining the sink point, you must also determine if the user has this configuration enabled.
+         * If this configuration is enabled, you will be prompted when calling a blacklisted class: com.ql.util.express.exception.QLSecurityRiskException: An unsafe system method was called using QLExpress: public java.lang.Process java. lang.Runtime.exec(java.lang.String) throws java.io.IOException
          * */
-        DongTaiLog.debug("Start der Ermittlung, ob das Feld forbidInvokeSecurityRiskMethods der QLExpress-Komponente wahr ist oder nicht");
+        DongTaiLog.debug("Start determining whether the forbidInvokeSecurityRiskMethods field of the QLExpress component is true or not.");
         try {
             Class<?> cls;
             if (QL_CLASS_LOADER == null){
@@ -47,18 +48,32 @@ public class QLExpressCheck implements SinkSafeChecker {
             }else {
                 cls = Class.forName(" com.ql.util.express.config.QLExpressRunStrategy".substring(1), false, QL_CLASS_LOADER);
             }
-            Field field = cls.getDeclaredField("forbidInvokeSecurityRiskMethods");
-            if (Modifier.isStatic(field.getModifiers()) && Modifier.isPrivate(field.getModifiers())) {
-                field.setAccessible(true);
-                boolean value = field.getBoolean(null);
-                DongTaiLog.debug("forbidInvokeSecurityRiskMethods = " + value);
-                return value;
+
+            Field getBlackListField = cls.getDeclaredField("forbidInvokeSecurityRiskMethods");
+            Field getSendBoxModeField = cls.getDeclaredField("sandboxMode");
+            Field getWhiteListField = cls.getDeclaredField("SECURE_METHOD_LIST");
+
+            if (Modifier.isStatic(getBlackListField.getModifiers()) && Modifier.isPrivate(getBlackListField.getModifiers()) && Modifier.isStatic(getSendBoxModeField.getModifiers()) && Modifier.isPrivate(getSendBoxModeField.getModifiers()) && Modifier.isStatic(getWhiteListField.getModifiers()) && Modifier.isPrivate(getWhiteListField.getModifiers())) {
+                // Make private fields accessible to reflection
+                getBlackListField.setAccessible(true);
+                getSendBoxModeField.setAccessible(true);
+                getWhiteListField.setAccessible(true);
+
+                // get fields value
+                boolean blackListBoolean = getBlackListField.getBoolean(null);
+                boolean sendBoxBoolean = getSendBoxModeField.getBoolean(null);
+                Set<String> secureMethodList = (Set<String>) getWhiteListField.get(null);
+                DongTaiLog.debug("SECURE_METHOD_LIST = " + secureMethodList);
+                DongTaiLog.debug("sandboxMode = " + sendBoxBoolean);
+                DongTaiLog.debug("forbidInvokeSecurityRiskMethods = " + blackListBoolean);
+                // All three conditions need to be met
+                return (secureMethodList != null && !secureMethodList.isEmpty()) || sendBoxBoolean || blackListBoolean;
             } else {
                 DongTaiLog.debug("Field is not static and private.");
                 return true;
             }
         }catch (Throwable e){
-            DongTaiLog.debug("Beim Abrufen der Felder der QLExpress-Komponente ist ein Fehler aufgetreten.: {}, {}",
+            DongTaiLog.debug("An error occurred while retrieving the fields of the QLExpress component.: {}, {}",
                     e.getClass().getName() + ": " + e.getMessage(),
                     e.getCause() != null ? e.getCause().getMessage() : "");
              return true;
