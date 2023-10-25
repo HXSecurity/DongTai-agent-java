@@ -83,4 +83,12 @@ public class FastjsonCheck implements SinkSafeChecker {
     public static void setParseConfigClassLoader(ClassLoader parseConfigClassLoader) {
         PARSE_CONFIG_CLASS_LOADER = parseConfigClassLoader;
     }
+
+    public static void clearJsonClassLoader(){
+        JSON_CLASS_LOADER = null;
+    }
+
+    public static void clearParseConfigClassLoader(){
+        PARSE_CONFIG_CLASS_LOADER = null;
+    }
 }

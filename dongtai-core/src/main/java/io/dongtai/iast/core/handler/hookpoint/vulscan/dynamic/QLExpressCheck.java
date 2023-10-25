@@ -82,4 +82,8 @@ public class QLExpressCheck implements SinkSafeChecker {
     public static void setQLClassLoader(ClassLoader qlClassLoader) {
         QL_CLASS_LOADER = qlClassLoader;
     }
+
+    public static void clearQLClassLoader(){
+        QL_CLASS_LOADER = null;
+    }
 }
