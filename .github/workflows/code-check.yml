@@ -142,15 +142,11 @@ jobs:
           access-key-id: ${{ secrets.OSS_KEY_ID }}
           access-key-secret: ${{ secrets.OSS_KEY_SECRET }}
 
-      - name: add agent
-        if: ${{ steps.version.outputs.GITHUB_REF }} == develop || ${{ steps.version.outputs.GITHUB_REF }} == beta || ${{ steps.version.outputs.GITHUB_REF }} == main
-        run: |
-          cp dongtai-agent/target/dongtai-agent.jar dongtai-agent/src/main/resources/bin/ && cd dongtai-agent/src/main/resources/bin/ && tar -zcvf agent_latest.tar.gz * && cd ../../../../../
       - name: Upload COS
         if: ${{ steps.version.outputs.GITHUB_REF }} == develop
         uses: zkqiang/tencent-cos-action@v0.1.0
         with:
-          args: upload -rs dongtai-agent/target/dongtai-agent.jar /agent_test/java/latest/dongtai-agent.jar && upload -rs dongtai-agent/src/main/resources/bin/ /agent_test/java/latest/ && upload -rs dongtai-agent/src/main/resources/bin/agent_latest.tar.gz /agent_test/java/latest/
+          args: upload -rs dongtai-agent/target/dongtai-agent.jar /agent_test/java/latest/dongtai-agent.jar && upload -rs dongtai-agent/src/main/resources/bin/ /agent_test/java/latest/
           secret_id: ${{ secrets.TENSECRET_ID }}
           secret_key: ${{ secrets.TENSECRET_KEY }}
           bucket: dongtai-helm-charts-1251882848
@@ -159,7 +155,7 @@ jobs:
         if: ${{ steps.version.outputs.GITHUB_REF }} == beta || ${{ steps.version.outputs.GITHUB_REF }} == main
         uses: zkqiang/tencent-cos-action@v0.1.0
         with:
-          args: upload -rs dongtai-agent/target/dongtai-agent.jar /agent_${{ steps.version.outputs.GITHUB_REF }}/java/latest/dongtai-agent.jar && upload -rs dongtai-agent/src/main/resources/bin/ /agent_${{ steps.version.outputs.GITHUB_REF }}/java/latest/ && upload -rs dongtai-agent/src/main/resources/bin/agent_latest.tar.gz /agent_${{ steps.version.outputs.GITHUB_REF }}/java/latest/
+          args: upload -rs dongtai-agent/target/dongtai-agent.jar /agent_${{ steps.version.outputs.GITHUB_REF }}/java/latest/dongtai-agent.jar && upload -rs dongtai-agent/src/main/resources/bin/ /agent_${{ steps.version.outputs.GITHUB_REF }}/java/latest/
           secret_id: ${{ secrets.TENSECRET_ID }}
           secret_key: ${{ secrets.TENSECRET_KEY }}
           bucket: dongtai-helm-charts-1251882848
