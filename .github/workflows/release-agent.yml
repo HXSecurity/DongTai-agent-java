@@ -43,19 +43,28 @@ jobs:
           files=('dongtai-core.jar') && \
           for FILE in ${files[@]};do FILE_HASH=`sha256sum ${FILE} | awk '{print $1}'`; echo "${{ github.event.repository.name }},${FILE},${FILE_HASH}" >> version.txt; done \
 
-      - uses: manyuanrong/setup-ossutil@v2.0
+      - name: Upload COS 1
+        if: ${{ steps.version.outputs.GITHUB_REF }} == develop
+        uses: zkqiang/tencent-cos-action@v0.1.0
         with:
-          endpoint: "oss-cn-beijing.aliyuncs.com"
-          access-key-id: ${{ secrets.OSS_KEY_ID }}
-          access-key-secret: ${{ secrets.OSS_KEY_SECRET }}
-
-      - run: |
-          cd ${{ github.workspace }}/dongtai-agent/src/main/resources/bin/ && \
-          ossutil cp version.txt oss://huoqi-public/iast/release-version/${{ github.event.repository.name }}/${{ steps.release.outputs.VERSION }}/version.txt
-
-      - run: |
-          ossutil cp -rf dongtai-agent/target/dongtai-agent.jar oss://dongtai/agent/java/${{ steps.release.outputs.VERSION }}/dongtai-agent.jar --meta x-oss-object-acl:public-read
-          ossutil cp -rf dongtai-agent/src/main/resources/bin/ oss://dongtai/agent/java/${{ steps.release.outputs.VERSION }}/ --meta x-oss-object-acl:public-read
-
-          ossutil cp -rf dongtai-agent/target/dongtai-agent.jar oss://dongtai/agent/java/latest/dongtai-agent.jar --meta x-oss-object-acl:public-read
-          ossutil cp -rf dongtai-agent/src/main/resources/bin/ oss://dongtai/agent/java/latest/ --meta x-oss-object-acl:public-read
+          args: upload -rs dongtai-agent/src/main/resources/bin/version.txt /iast/release-version/${{ github.event.repository.name }}/${{ steps.release.outputs.VERSION }}/version.txt
+          secret_id: ${{ secrets.TENSECRET_ID }}
+          secret_key: ${{ secrets.TENSECRET_KEY }}
+          bucket: dongtai-helm-charts-1251882848
+          region: ap-hongkong
+      - name: Upload COS 2
+        uses: zkqiang/tencent-cos-action@v0.1.0
+        with:
+          args: upload -rs dongtai-agent/target/dongtai-agent.jar /agent/java/latest/dongtai-agent.jar && upload -rs dongtai-agent/src/main/resources/bin/ /agent/java/latest/
+          secret_id: ${{ secrets.TENSECRET_ID }}
+          secret_key: ${{ secrets.TENSECRET_KEY }}
+          bucket: dongtai-helm-charts-1251882848
+          region: ap-hongkong
+      - name: Upload COS 3
+        uses: zkqiang/tencent-cos-action@v0.1.0
+        with:
+          args: upload -rs dongtai-agent/target/dongtai-agent.jar /agent/java/${{ steps.release.outputs.VERSION }}/dongtai-agent.jar && upload -rs dongtai-agent/src/main/resources/bin/ /agent/java/${{ steps.release.outputs.VERSION }}/
+          secret_id: ${{ secrets.TENSECRET_ID }}
+          secret_key: ${{ secrets.TENSECRET_KEY }}
+          bucket: dongtai-helm-charts-1251882848
+          region: ap-hongkong
