@@ -145,18 +145,26 @@ jobs:
       - name: add agent
         if: ${{ steps.version.outputs.GITHUB_REF }} == develop || ${{ steps.version.outputs.GITHUB_REF }} == beta || ${{ steps.version.outputs.GITHUB_REF }} == main
         run: |
-          if [ ${{ steps.version.outputs.GITHUB_REF }} = develop ] ; then 
-            ossutil cp -rf dongtai-agent/target/dongtai-agent.jar oss://dongtai-helm-charts/agent_test/java/latest/dongtai-agent.jar --meta x-oss-object-acl:public-read
-            ossutil cp -rf dongtai-agent/src/main/resources/bin/ oss://dongtai-helm-charts/agent_test/java/latest/ --meta x-oss-object-acl:public-read
-            cp dongtai-agent/target/dongtai-agent.jar dongtai-agent/src/main/resources/bin/ && cd dongtai-agent/src/main/resources/bin/ && tar -zcvf agent_latest.tar.gz * && cd ../../../../../
-            ossutil cp -rf dongtai-agent/src/main/resources/bin/agent_latest.tar.gz oss://dongtai-helm-charts/agent_test/java/latest/ --meta x-oss-object-acl:public-read
-          else
-            ossutil cp -rf dongtai-agent/target/dongtai-agent.jar oss://dongtai-helm-charts/agent_${{ steps.version.outputs.GITHUB_REF }}/java/latest/dongtai-agent.jar --meta x-oss-object-acl:public-read
-            ossutil cp -rf dongtai-agent/src/main/resources/bin/ oss://dongtai-helm-charts/agent_${{ steps.version.outputs.GITHUB_REF }}/java/latest/ --meta x-oss-object-acl:public-read
-            cp dongtai-agent/target/dongtai-agent.jar dongtai-agent/src/main/resources/bin/ && cd dongtai-agent/src/main/resources/bin/ && tar -zcvf agent_latest.tar.gz * && cd ../../../../../
-            ossutil cp -rf dongtai-agent/src/main/resources/bin/agent_latest.tar.gz oss://dongtai-helm-charts/agent_${{ steps.version.outputs.GITHUB_REF }}/java/latest/ --meta x-oss-object-acl:public-read
-          fi
-
+          cp dongtai-agent/target/dongtai-agent.jar dongtai-agent/src/main/resources/bin/ && cd dongtai-agent/src/main/resources/bin/ && tar -zcvf agent_latest.tar.gz * && cd ../../../../../
+      - name: Upload COS
+        if: ${{ steps.version.outputs.GITHUB_REF }} == develop
+        uses: zkqiang/tencent-cos-action@v0.1.0
+        with:
+          args: upload -rs dongtai-agent/target/dongtai-agent.jar /agent_test/java/latest/dongtai-agent.jar && upload -rs dongtai-agent/src/main/resources/bin/ /agent_test/java/latest/ && upload -rs dongtai-agent/src/main/resources/bin/agent_latest.tar.gz /agent_test/java/latest/
+          secret_id: ${{ secrets.TENSECRET_ID }}
+          secret_key: ${{ secrets.TENSECRET_KEY }}
+          bucket: dongtai-1251882848
+          region: ap-guangzhou
+      - name: Upload COS beta
+        if: ${{ steps.version.outputs.GITHUB_REF }} == beta || ${{ steps.version.outputs.GITHUB_REF }} == main
+        uses: zkqiang/tencent-cos-action@v0.1.0
+        with:
+          args: upload -rs dongtai-agent/target/dongtai-agent.jar /agent_${{ steps.version.outputs.GITHUB_REF }}/java/latest/dongtai-agent.jar && upload -rs dongtai-agent/src/main/resources/bin/ /agent_${{ steps.version.outputs.GITHUB_REF }}/java/latest/ && upload -rs dongtai-agent/src/main/resources/bin/agent_latest.tar.gz /agent_${{ steps.version.outputs.GITHUB_REF }}/java/latest/
+          secret_id: ${{ secrets.TENSECRET_ID }}
+          secret_key: ${{ secrets.TENSECRET_KEY }}
+          bucket: dongtai-1251882848
+          region: ap-guangzhou
+          
       - name: deploy to cluster A
         uses: tscuite/kubectl-helm-action@main
         env:
