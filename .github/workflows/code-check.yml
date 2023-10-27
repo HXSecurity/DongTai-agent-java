@@ -153,8 +153,8 @@ jobs:
           args: upload -rs dongtai-agent/target/dongtai-agent.jar /agent_test/java/latest/dongtai-agent.jar && upload -rs dongtai-agent/src/main/resources/bin/ /agent_test/java/latest/ && upload -rs dongtai-agent/src/main/resources/bin/agent_latest.tar.gz /agent_test/java/latest/
           secret_id: ${{ secrets.TENSECRET_ID }}
           secret_key: ${{ secrets.TENSECRET_KEY }}
-          bucket: dongtai-1251882848
-          region: ap-guangzhou
+          bucket: dongtai-helm-charts-1251882848
+          region: ap-hongkong
       - name: Upload COS beta
         if: ${{ steps.version.outputs.GITHUB_REF }} == beta || ${{ steps.version.outputs.GITHUB_REF }} == main
         uses: zkqiang/tencent-cos-action@v0.1.0
@@ -162,8 +162,8 @@ jobs:
           args: upload -rs dongtai-agent/target/dongtai-agent.jar /agent_${{ steps.version.outputs.GITHUB_REF }}/java/latest/dongtai-agent.jar && upload -rs dongtai-agent/src/main/resources/bin/ /agent_${{ steps.version.outputs.GITHUB_REF }}/java/latest/ && upload -rs dongtai-agent/src/main/resources/bin/agent_latest.tar.gz /agent_${{ steps.version.outputs.GITHUB_REF }}/java/latest/
           secret_id: ${{ secrets.TENSECRET_ID }}
           secret_key: ${{ secrets.TENSECRET_KEY }}
-          bucket: dongtai-1251882848
-          region: ap-guangzhou
+          bucket: dongtai-helm-charts-1251882848
+          region: ap-hongkong
           
       - name: deploy to cluster A
         uses: tscuite/kubectl-helm-action@main
