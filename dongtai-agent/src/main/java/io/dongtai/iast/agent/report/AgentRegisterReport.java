@@ -49,7 +49,8 @@ public class AgentRegisterReport {
             object.put("uuid", uuid);
         }
         object.put("name", AgentRegisterReport.getAgentToken());
-        object.put("version", Version.VERSION);
+        //web端展示会截取v符号，历史因素
+        object.put("version","v" + Version.VERSION);
         object.put("projectName", getProjectName());
         object.put("clusterName", getClusterName());
         object.put("clusterVersion", getClusterVersion());
