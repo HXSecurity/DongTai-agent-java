@@ -8,23 +8,18 @@ import io.dongtai.iast.core.utils.StackUtils;
 import io.dongtai.iast.core.utils.TaintPoolUtils;
 import io.dongtai.log.DongTaiLog;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class FeignService {
+
     public static void solveSyncInvoke(MethodEvent event, AtomicInteger invokeIdSequencer) {
         try {
-            if (event.parameterInstances.length != 1) {
-                return;
-            }
+            Object parameterInstance = event.parameterInstances[0];
 
-            Object handlerObj = event.objectInstance;
-            Field metadataField = handlerObj.getClass().getDeclaredField("metadata");
-            metadataField.setAccessible(true);
-            Object metadata = metadataField.get(event.objectInstance);
-            Method templateMethod = metadata.getClass().getMethod("template");
-            Object template = templateMethod.invoke(metadata);
+            Method appendHeader = parameterInstance.getClass().getDeclaredMethod("appendHeader", String.class, String[].class);
+            appendHeader.setAccessible(true);
+
 
             // get args
             Object args = event.parameterInstances[0];
@@ -33,23 +28,16 @@ public class FeignService {
             boolean hasTaint = !event.getSourceHashes().isEmpty();
             event.addParameterValue(0, args, hasTaint);
 
-            Method addHeaderMethod = template.getClass().getDeclaredMethod("header", String.class, String[].class);
-            addHeaderMethod.setAccessible(true);
             // clear old traceId header
-            /*
-            防止高并发下的treeMap修改问题，暂时可解决
-             */
-            synchronized (template){
-                //将生成traceId下放到锁内
-                String traceId = ContextManager.nextTraceId();
+            //曾经的hook点在高并发下有线程安全问题，新hook点判断无此问题，除去锁
+            String traceId = ContextManager.nextTraceId();
+            DongTaiLog.trace("InvokeId is {}, request headers is {}",event.getInvokeId(),traceId);
+            appendHeader.invoke(parameterInstance,ContextManager.getHeaderKey(),new String[]{});
+            appendHeader.invoke(parameterInstance,ContextManager.getParentKey(),new String[]{});
+            appendHeader.invoke(parameterInstance,ContextManager.getHeaderKey(),new String[]{traceId});
+            appendHeader.invoke(parameterInstance,ContextManager.getParentKey(),new String[]{String.valueOf(EngineManager.getAgentId())});
+            event.traceId = traceId;
 
-                addHeaderMethod.invoke(template, ContextManager.getHeaderKey(), new String[]{});
-                addHeaderMethod.invoke(template, ContextManager.getParentKey(), new String[]{});
-                addHeaderMethod.invoke(template, ContextManager.getHeaderKey(), new String[]{traceId});
-                addHeaderMethod.invoke(template, ContextManager.getParentKey(),
-                        new String[]{String.valueOf(EngineManager.getAgentId())});
-                event.traceId = traceId;
-            }
             // add to method pool
             event.source = false;
             event.setCallStacks(StackUtils.createCallStack(4));
@@ -57,11 +45,11 @@ public class FeignService {
             event.setInvokeId(invokeId);
             event.setPolicyType(PolicyNodeType.PROPAGATOR.getName());
             EngineManager.TRACK_MAP.get().put(invokeId, event);
-        } catch (NoSuchFieldException ignore) {
         } catch (NoSuchMethodException ignore) {
         } catch (Throwable e) {
             DongTaiLog.debug("solve feign invoke failed: {}, {}",
                     e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "");
         }
     }
+
 }

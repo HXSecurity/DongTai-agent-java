@@ -8,7 +8,9 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 
 public class FeignSyncHandlerAdapter extends AbstractClassVisitor {
-    private static final String FEIGN_SYNC_HANDLER_INVOKE = "feign.SynchronousMethodHandler.invoke(java.lang.Object[])";
+    //此HOOK点添加header有并发安全风险，故修改为executeAndDecode
+//    private static final String FEIGN_SYNC_HANDLER_INVOKE = "feign.SynchronousMethodHandler.invoke(java.lang.Object[])";
+    private static final String FEIGN_SYNC_HANDLER_INVOKE = "feign.SynchronousMethodHandler.executeAndDecode(feign.RequestTemplate,feign.Request$Options)";
 
     public FeignSyncHandlerAdapter(ClassVisitor classVisitor, ClassContext context) {
         super(classVisitor, context);
