@@ -145,9 +145,14 @@ public class DubboImpl {
             }
         }
 
+        if (handler.toString().startsWith("hessian")) {
+            Map<String, String> oldHeaders = (Map<String, String>) requestMeta.get("headers");
+            sHeaders.putAll(oldHeaders);
+        }
+
         if (!sHeaders.isEmpty()) {
             String traceIdKey = ContextManager.getHeaderKey();
-            if (headers.containsKey(traceIdKey)) {
+            if (sHeaders.containsKey(traceIdKey)) {
                 ContextManager.parseTraceId(sHeaders.get(traceIdKey));
             } else {
                 String newTraceId = ContextManager.currentTraceId();

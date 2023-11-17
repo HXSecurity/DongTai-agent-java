@@ -14,6 +14,9 @@ public class DispatchDubbo implements DispatchPlugin {
     public static final String ALIBABA_DUBBO_PROXY_HANDLER = " com.alibaba.dubbo.rpc.proxy.AbstractProxyInvoker".substring(1);
     public static final String APACHE_DUBBO_PROXY_HANDLER = " org.apache.dubbo.rpc.proxy.AbstractProxyInvoker".substring(1);
 
+    //com.caucho.hessian.client.HessianProxy.sendRequest(java.lang.String,java.lang.Object[])
+    public static final String DUBBO_PROXY_HESSIAN = " com.caucho.hessian.client.HessianProxy".substring(1);
+
     @Override
     public ClassVisitor dispatch(ClassVisitor classVisitor, ClassContext context, Policy policy) {
         String className = context.getClassName();
@@ -33,7 +36,10 @@ public class DispatchDubbo implements DispatchPlugin {
         } else if (APACHE_DUBBO_PROXY_HANDLER.equals(className)) {
             classVisitor = new DubboProxyHandlerAdapter(classVisitor, context, " org.apache".substring(1));
         }
-
+        if (DUBBO_PROXY_HESSIAN.equals(className)){
+            System.out.println("dispatch" + className);
+            classVisitor = new DubboHessianAdapter(classVisitor, context);
+        }
         return classVisitor;
     }
 
