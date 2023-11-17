@@ -31,7 +31,8 @@ public class PropagatorImpl {
             "java.net.URL.<init>(java.lang.String,java.lang.String,java.lang.String)", // indirect
             "java.net.URL.<init>(java.lang.String,java.lang.String,int,java.lang.String)", // indirect
             "java.net.URL.<init>(java.lang.String,java.lang.String,int,java.lang.String,java.net.URLStreamHandler)",
-            "com.fasterxml.jackson.databind.ObjectMapper.readValue(java.io.InputStream,com.fasterxml.jackson.databind.JavaType)"
+            "com.fasterxml.jackson.databind.ObjectMapper.readValue(java.io.InputStream,com.fasterxml.jackson.databind.JavaType)",
+            "com.baomidou.mybatisplus.core.override.MybatisMapperMethod.execute(org.apache.ibatis.session.SqlSession,java.lang.Object[])"
     ));
 
     public static void solvePropagator(MethodEvent event, PropagatorNode propagatorNode, AtomicInteger invokeIdSequencer) {
