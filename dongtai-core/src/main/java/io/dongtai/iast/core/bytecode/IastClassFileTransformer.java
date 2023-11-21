@@ -31,7 +31,6 @@ import java.security.CodeSource;
 import java.security.ProtectionDomain;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListSet;
 
 import static org.apache.commons.io.FileUtils.writeByteArrayToFile;
 import static org.objectweb.asm.ClassWriter.COMPUTE_FRAMES;
@@ -165,7 +164,7 @@ public class IastClassFileTransformer implements ClassFileTransformer {
                     ScaScanner.scanForSCA(location.getFile(), internalClassName);
                 }
             }
-
+            //判断是否可以hook ，true可以 false不可以
             if (null == classBeingRedefined && !configMatcher.canHook(internalClassName, this.policyManager)) {
                 return null;
             }
