@@ -24,6 +24,9 @@ public class DubboService {
                 Method method = invocation.getClass().getMethod("addHeader", String.class, String.class);
                 method.setAccessible(true);
                 method.invoke(invocation, ContextManager.getHeaderKey(), traceId);
+                //因为dubbo已经添加事件，我取出上次事件并对traceId进行修改
+                MethodEvent methodEvent = EngineManager.TRACK_MAP.get().get(invokeIdSequencer.get() - 1);
+                methodEvent.traceId = traceId;
                 return;
             }
             TaintPoolUtils.trackObject(event, null, event.parameterInstances, 0, false);
