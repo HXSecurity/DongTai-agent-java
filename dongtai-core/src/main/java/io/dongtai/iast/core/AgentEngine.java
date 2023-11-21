@@ -5,6 +5,8 @@ import io.dongtai.iast.common.constants.Version;
 import io.dongtai.iast.common.state.AgentState;
 import io.dongtai.iast.common.state.State;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.PolicyManager;
+import io.dongtai.iast.core.handler.hookpoint.vulscan.dynamic.FastjsonCheck;
+import io.dongtai.iast.core.handler.hookpoint.vulscan.dynamic.QLExpressCheck;
 import io.dongtai.iast.core.init.IEngine;
 import io.dongtai.iast.core.init.impl.ConfigEngine;
 import io.dongtai.iast.core.init.impl.TransformEngine;
@@ -92,6 +94,10 @@ public class AgentEngine {
     public static void destroy(String mode, String propertiesFilePath, Instrumentation inst) {
         try {
             DongTaiLog.info("Uninstall engine");
+            // 卸载对FastJson和QLExpress的调用
+            FastjsonCheck.clearJsonClassLoader();
+            FastjsonCheck.clearParseConfigClassLoader();
+            QLExpressCheck.clearQLClassLoader();
             AgentEngine agentEngine = AgentEngine.getInstance();
             assert agentEngine != null;
             agentEngine.destroy();

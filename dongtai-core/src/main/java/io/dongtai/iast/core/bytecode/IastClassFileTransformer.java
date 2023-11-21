@@ -10,6 +10,7 @@ import io.dongtai.iast.core.bytecode.sca.ScaScanner;
 import io.dongtai.iast.core.handler.hookpoint.SpyDispatcherImpl;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.PolicyManager;
 import io.dongtai.iast.core.handler.hookpoint.vulscan.dynamic.FastjsonCheck;
+import io.dongtai.iast.core.handler.hookpoint.vulscan.dynamic.QLExpressCheck;
 import io.dongtai.iast.core.utils.AsmUtils;
 import io.dongtai.iast.core.utils.PropertyUtils;
 import io.dongtai.iast.core.utils.matcher.ConfigMatcher;
@@ -144,7 +145,9 @@ public class IastClassFileTransformer implements ClassFileTransformer {
 
         try {
             ScopeManager.SCOPE_TRACKER.getPolicyScope().enterAgent();
-
+            if (" com/ql/util/express/config/QLExpressRunStrategy".substring(1).equals(internalClassName)){
+                QLExpressCheck.setQLClassLoader(loader);
+            }
             if (" com/alibaba/fastjson/JSON".substring(1).equals(internalClassName)) {
                 FastjsonCheck.setJsonClassLoader(loader);
             } else if (" com/alibaba/fastjson/parser/ParserConfig".substring(1).equals(internalClassName)) {
