@@ -15,7 +15,17 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class DubboService {
     public static void solveSyncInvoke(MethodEvent event, Object invocation, String url, Map<String, String> headers,
                                        AtomicInteger invokeIdSequencer) {
+
+
         try {
+            String traceId = ContextManager.nextTraceId();
+            //当类型为HessianURLConnection，只处理添加请求头即可
+            if (invocation.getClass().getSimpleName().equals("HessianURLConnection")) {
+                Method method = invocation.getClass().getMethod("addHeader", String.class, String.class);
+                method.setAccessible(true);
+                method.invoke(invocation, ContextManager.getHeaderKey(), traceId);
+                return;
+            }
             TaintPoolUtils.trackObject(event, null, event.parameterInstances, 0, false);
             boolean hasTaint = false;
             int sourceLen = 0;
@@ -34,10 +44,11 @@ public class DubboService {
                 event.addParameterValue(1, headers, hasTaint);
             }
 
-            Method setAttachmentMethod = invocation.getClass().getMethod("setAttachment", String.class, String.class);
-            setAttachmentMethod.setAccessible(true);
-            String traceId = ContextManager.nextTraceId();
-            setAttachmentMethod.invoke(invocation, ContextManager.getHeaderKey(), traceId);
+                Method setAttachmentMethod = invocation.getClass().getMethod("setAttachment", String.class, String.class);
+                setAttachmentMethod.setAccessible(true);
+                setAttachmentMethod.invoke(invocation, ContextManager.getHeaderKey(), traceId);
+
+
 
             // add to method pool
             event.source = false;
