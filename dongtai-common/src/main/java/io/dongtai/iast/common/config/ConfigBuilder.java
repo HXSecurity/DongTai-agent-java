@@ -1,5 +1,7 @@
 package io.dongtai.iast.common.config;
 
+import io.dongtai.log.DongTaiLog;
+import io.dongtai.log.ErrorCode;
 import org.json.*;
 
 import java.util.HashMap;
@@ -49,6 +51,7 @@ public class ConfigBuilder {
             JSONObject json = new JSONObject(content);
             config = json.getJSONObject("data");
         } catch (JSONException ignore) {
+            DongTaiLog.error(ErrorCode.UTIL_CONFIG_LOAD_FAILED,ignore.getMessage());
         }
 
         update(config);
@@ -73,6 +76,7 @@ public class ConfigBuilder {
         try {
             return ((Config<T>) getConfig(key)).get();
         } catch (Throwable ignore) {
+            DongTaiLog.error(ErrorCode.UTIL_CONFIG_LOAD_FAILED,ignore.getMessage());
             return null;
         }
     }
@@ -86,6 +90,7 @@ public class ConfigBuilder {
                 conf.setValue(value);
             }
         } catch (Throwable ignore) {
+            DongTaiLog.error(ErrorCode.UTIL_CONFIG_LOAD_FAILED,ignore.getMessage());
         }
     }
 
@@ -98,6 +103,7 @@ public class ConfigBuilder {
                 conf.setValue(value);
             }
         } catch (Throwable ignore) {
+            DongTaiLog.error(ErrorCode.UTIL_CONFIG_LOAD_FAILED,ignore.getMessage());
         }
     }
 
@@ -112,6 +118,7 @@ public class ConfigBuilder {
                 }
             }
         } catch (Throwable ignore) {
+            DongTaiLog.error(ErrorCode.UTIL_CONFIG_LOAD_FAILED,ignore.getMessage());
         }
     }
 
@@ -126,6 +133,7 @@ public class ConfigBuilder {
                 conf.setValue(requestDenyList);
             }
         } catch (Throwable ignore) {
+            DongTaiLog.error(ErrorCode.UTIL_CONFIG_LOAD_FAILED,ignore.getMessage());
         }
     }
 }
