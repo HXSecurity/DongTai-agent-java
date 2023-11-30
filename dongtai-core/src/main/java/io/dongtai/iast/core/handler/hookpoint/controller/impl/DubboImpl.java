@@ -145,10 +145,10 @@ public class DubboImpl {
             }
         }
 
-        if (handler.toString().startsWith("hessian")) {
+//        if (handler.toString().startsWith("hessian")) {
             Map<String, String> oldHeaders = (Map<String, String>) requestMeta.get("headers");
             sHeaders.putAll(oldHeaders);
-        }
+//        }
 
         if (!sHeaders.isEmpty()) {
             String traceIdKey = ContextManager.getHeaderKey();
