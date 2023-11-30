@@ -75,8 +75,8 @@ public class ConfigBuilder {
     public <T> T get(ConfigKey key) {
         try {
             return ((Config<T>) getConfig(key)).get();
-        } catch (Throwable ignore) {
-            DongTaiLog.error(ErrorCode.UTIL_CONFIG_LOAD_FAILED,ignore.getMessage());
+        } catch (Throwable e) {
+            DongTaiLog.error(ErrorCode.UTIL_CONFIG_LOAD_FAILED,e.getMessage());
             return null;
         }
     }
@@ -89,8 +89,8 @@ public class ConfigBuilder {
                 Boolean value = config.getBoolean(jsonKey.getKey());
                 conf.setValue(value);
             }
-        } catch (Throwable ignore) {
-            DongTaiLog.error(ErrorCode.UTIL_CONFIG_LOAD_FAILED,ignore.getMessage());
+        } catch (Throwable e) {
+            DongTaiLog.error(ErrorCode.UTIL_CONFIG_LOAD_FAILED,e.getMessage());
         }
     }
 
@@ -102,8 +102,8 @@ public class ConfigBuilder {
                 Integer value = config.getInt(jsonKey.getKey());
                 conf.setValue(value);
             }
-        } catch (Throwable ignore) {
-            DongTaiLog.error(ErrorCode.UTIL_CONFIG_LOAD_FAILED,ignore.getMessage());
+        } catch (Throwable e) {
+            DongTaiLog.error(ErrorCode.UTIL_CONFIG_LOAD_FAILED,e.getMessage());
         }
     }
 
@@ -117,8 +117,8 @@ public class ConfigBuilder {
                     conf.setValue(value);
                 }
             }
-        } catch (Throwable ignore) {
-            DongTaiLog.error(ErrorCode.UTIL_CONFIG_LOAD_FAILED,ignore.getMessage());
+        } catch (Throwable e) {
+            DongTaiLog.error(ErrorCode.UTIL_CONFIG_LOAD_FAILED,e.getMessage());
         }
     }
 
@@ -132,8 +132,8 @@ public class ConfigBuilder {
                 RequestDenyList requestDenyList = RequestDenyList.parse(value);
                 conf.setValue(requestDenyList);
             }
-        } catch (Throwable ignore) {
-            DongTaiLog.error(ErrorCode.UTIL_CONFIG_LOAD_FAILED,ignore.getMessage());
+        } catch (Throwable e) {
+            DongTaiLog.error(ErrorCode.UTIL_CONFIG_LOAD_FAILED,e.getMessage());
         }
     }
 }
