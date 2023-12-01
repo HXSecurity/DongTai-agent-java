@@ -89,6 +89,8 @@ public class ConfigBuilder {
                 Boolean value = config.getBoolean(jsonKey.getKey());
                 conf.setValue(value);
             }
+        }catch (JSONException jsonException){
+            DongTaiLog.trace("configuration file resolution error {}",jsonException.getMessage());
         } catch (Throwable e) {
             DongTaiLog.warn(ErrorCode.UTIL_CONFIG_LOAD_FAILED,e.getMessage());
         }
@@ -102,6 +104,9 @@ public class ConfigBuilder {
                 Integer value = config.getInt(jsonKey.getKey());
                 conf.setValue(value);
             }
+        }catch (JSONException jsonException){
+            DongTaiLog.trace("configuration file resolution error {}",jsonException.getMessage());
+
         } catch (Throwable e) {
             DongTaiLog.warn(ErrorCode.UTIL_CONFIG_LOAD_FAILED,e.getMessage());
         }
@@ -117,6 +122,8 @@ public class ConfigBuilder {
                     conf.setValue(value);
                 }
             }
+        }catch (JSONException jsonException){
+            DongTaiLog.trace("configuration file resolution error {}",jsonException.getMessage());
         } catch (Throwable e) {
             DongTaiLog.warn(ErrorCode.UTIL_CONFIG_LOAD_FAILED,e.getMessage());
         }
@@ -132,6 +139,8 @@ public class ConfigBuilder {
                 RequestDenyList requestDenyList = RequestDenyList.parse(value);
                 conf.setValue(requestDenyList);
             }
+        }catch (JSONException jsonException){
+            DongTaiLog.trace("updateRequestDenyList configuration file resolution error {}",jsonException.getMessage());
         } catch (Throwable e) {
             DongTaiLog.warn(ErrorCode.UTIL_CONFIG_LOAD_FAILED,e.getMessage());
         }
