@@ -2,10 +2,12 @@ package io.dongtai.iast.common.config;
 
 import org.json.JSONArray;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class RequestDenyList {
-    private final List<List<RequestDeny>> denies = new ArrayList<List<RequestDeny>>();
+    private final List<RequestDeny> denies = new ArrayList<RequestDeny>();
 
     public static RequestDenyList parse(JSONArray config) {
         if (config == null || config.length() == 0) {
@@ -29,7 +31,7 @@ public class RequestDenyList {
                 andList.add(requestDeny);
             }
             if (!andList.isEmpty()) {
-                denyList.denies.add(andList);
+                denyList.denies.addAll(andList);
             }
         }
 
@@ -40,10 +42,21 @@ public class RequestDenyList {
     }
 
     public void addRule(List<RequestDeny> requestDenies) {
-        this.denies.add(requestDenies);
+        this.denies.addAll(requestDenies);
     }
 
+    /**
+     *
+     * @param url 请求URL
+     * @param headers 请求头集合
+     * @return true 成功匹配 false 未匹配
+     */
     public boolean match(String url, Map<String, String> headers) {
+        return denies.stream().anyMatch(requestDeny -> {
+            return requestDeny.match(url, headers); // 匹配到条件，提前终止循环
+        });
+    }
+/*    public boolean match(String url, Map<String, String> headers) {
         boolean matched = false;
         for (List<RequestDeny> denyList : this.denies) {
             boolean subHasNoMatch = false;
@@ -60,7 +73,7 @@ public class RequestDenyList {
             }
         }
         return matched;
-    }
+    }*/
 
     @Override
     public String toString() {
