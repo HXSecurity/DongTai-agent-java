@@ -76,7 +76,7 @@ public class ConfigBuilder {
         try {
             return ((Config<T>) getConfig(key)).get();
         } catch (Throwable e) {
-            DongTaiLog.error(ErrorCode.UTIL_CONFIG_LOAD_FAILED,e.getMessage());
+            DongTaiLog.warn(ErrorCode.UTIL_CONFIG_LOAD_FAILED,e.getMessage());
             return null;
         }
     }
@@ -90,7 +90,7 @@ public class ConfigBuilder {
                 conf.setValue(value);
             }
         } catch (Throwable e) {
-            DongTaiLog.error(ErrorCode.UTIL_CONFIG_LOAD_FAILED,e.getMessage());
+            DongTaiLog.warn(ErrorCode.UTIL_CONFIG_LOAD_FAILED,e.getMessage());
         }
     }
 
@@ -103,7 +103,7 @@ public class ConfigBuilder {
                 conf.setValue(value);
             }
         } catch (Throwable e) {
-            DongTaiLog.error(ErrorCode.UTIL_CONFIG_LOAD_FAILED,e.getMessage());
+            DongTaiLog.warn(ErrorCode.UTIL_CONFIG_LOAD_FAILED,e.getMessage());
         }
     }
 
@@ -118,7 +118,7 @@ public class ConfigBuilder {
                 }
             }
         } catch (Throwable e) {
-            DongTaiLog.error(ErrorCode.UTIL_CONFIG_LOAD_FAILED,e.getMessage());
+            DongTaiLog.warn(ErrorCode.UTIL_CONFIG_LOAD_FAILED,e.getMessage());
         }
     }
 
@@ -133,7 +133,7 @@ public class ConfigBuilder {
                 conf.setValue(requestDenyList);
             }
         } catch (Throwable e) {
-            DongTaiLog.error(ErrorCode.UTIL_CONFIG_LOAD_FAILED,e.getMessage());
+            DongTaiLog.warn(ErrorCode.UTIL_CONFIG_LOAD_FAILED,e.getMessage());
         }
     }
 }
