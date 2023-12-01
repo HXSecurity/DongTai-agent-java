@@ -3,6 +3,7 @@ package io.dongtai.iast.core.handler.hookpoint.controller.impl;
 import com.alibaba.fastjson2.JSONArray;
 import io.dongtai.iast.common.config.ConfigBuilder;
 import io.dongtai.iast.common.config.ConfigKey;
+import io.dongtai.iast.common.config.RequestDenyList;
 import io.dongtai.iast.common.string.ObjectFormatResult;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.bypass.BlackUrlBypass;
@@ -97,7 +98,41 @@ public class DubboImpl {
         if (requestMeta == null) {
             return;
         }
-        if (null != headers.get(BlackUrlBypass.getHeaderKey()) && headers.get(BlackUrlBypass.getHeaderKey()).equals("true")) {
+
+        Map<String, String> sHeaders = new HashMap<String, String>();
+        if (headers != null) {
+            for (Map.Entry<String, ?> entry : headers.entrySet()) {
+                if (entry.getValue() == null) {
+                    continue;
+                }
+                sHeaders.put(entry.getKey(), entry.getValue().toString());
+            }
+        }
+
+        Map<String, String> oldHeaders = (Map<String, String>) requestMeta.get("headers");
+        sHeaders.putAll(oldHeaders);
+        requestMeta.put("headers", sHeaders);
+        if (!sHeaders.isEmpty()) {
+            String traceIdKey = ContextManager.getHeaderKey();
+            if (sHeaders.containsKey(traceIdKey)) {
+                ContextManager.parseTraceId(sHeaders.get(traceIdKey));
+            } else {
+                String newTraceId = ContextManager.currentTraceId();
+                sHeaders.put(traceIdKey, newTraceId);
+            }
+        }
+        //获取采集黑名单配置集合
+        RequestDenyList requestDenyList = ConfigBuilder.getInstance().get(ConfigKey.REQUEST_DENY_LIST);
+
+        //不为空开始进行判断
+        if (requestDenyList != null){
+            if (requestDenyList.match(requestMeta.get("requestURL").toString(),sHeaders)) {
+                BlackUrlBypass.setIsBlackUrl(true);
+                return;
+            }
+        }
+        //此判断为节点拉黑判断
+        if (null != sHeaders.get(BlackUrlBypass.getHeaderKey()) && sHeaders.get(BlackUrlBypass.getHeaderKey()).equals("true")) {
             BlackUrlBypass.setIsBlackUrl(true);
             return;
         }
@@ -135,30 +170,10 @@ public class DubboImpl {
         SourceNode sourceNode = new SourceNode(src, tgt, null);
         TaintPoolUtils.trackObject(event, sourceNode, arguments, 0, true);
 
-        Map<String, String> sHeaders = new HashMap<String, String>();
-        if (headers != null) {
-            for (Map.Entry<String, ?> entry : headers.entrySet()) {
-                if (entry.getValue() == null) {
-                    continue;
-                }
-                sHeaders.put(entry.getKey(), entry.getValue().toString());
-            }
-        }
+
 
 //        if (handler.toString().startsWith("hessian")) {
-            Map<String, String> oldHeaders = (Map<String, String>) requestMeta.get("headers");
-            sHeaders.putAll(oldHeaders);
-//        }
 
-        if (!sHeaders.isEmpty()) {
-            String traceIdKey = ContextManager.getHeaderKey();
-            if (sHeaders.containsKey(traceIdKey)) {
-                ContextManager.parseTraceId(sHeaders.get(traceIdKey));
-            } else {
-                String newTraceId = ContextManager.currentTraceId();
-                sHeaders.put(traceIdKey, newTraceId);
-            }
-        }
 
         if (event.getTargetHashes().isEmpty()) {
             return;
@@ -175,7 +190,6 @@ public class DubboImpl {
         TaintRanges tr = new TaintRanges(new TaintRange(0, len));
         event.targetRanges.add(0, new MethodEvent.MethodEventTargetRange(hash, tr));
 
-        requestMeta.put("headers", sHeaders);
         JSONArray arr = new JSONArray();
         for (Object arg : arguments) {
             // 2023-9-5 11:31:53 直接拿完整的string可能会OOM（排队上报时可能会挤压占用较多的内存），这里只传递format之后的
