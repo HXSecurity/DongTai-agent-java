@@ -40,6 +40,7 @@ public class Agent {
         attachOptions.addOption(build("log_disable_collector", "log_disable_collector", "optional: DongTai agent disable log collector."));
         attachOptions.addOption(build("disabled_plugins", "disabled_plugins", "optional: DongTai agent disable plugins."));
         attachOptions.addOption(build("disabled_features", "disabled_features", "optional: DongTai agent disable features."));
+        attachOptions.addOption(build("rate_caps", "rate_caps", "optional: the maximum speed of the interface example： 100"));
 
         CommandLineParser parser = new DefaultParser();
         HelpFormatter formatter = new HelpFormatter();

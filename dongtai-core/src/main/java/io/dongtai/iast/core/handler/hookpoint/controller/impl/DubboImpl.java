@@ -5,6 +5,7 @@ import io.dongtai.iast.common.config.ConfigBuilder;
 import io.dongtai.iast.common.config.ConfigKey;
 import io.dongtai.iast.common.config.RequestDenyList;
 import io.dongtai.iast.common.string.ObjectFormatResult;
+import io.dongtai.iast.common.utils.limit.InterfaceRateLimiterUtil;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.bypass.BlackUrlBypass;
 import io.dongtai.iast.core.handler.context.ContextManager;
@@ -137,6 +138,8 @@ public class DubboImpl {
             return;
         }
 
+
+
         String url = requestMeta.get("requestURL").toString() + "/" + methodName;
         String uri = requestMeta.get("requestURI").toString() + "/" + methodName;
 
@@ -158,6 +161,18 @@ public class DubboImpl {
 
         requestMeta.put("requestURL", url);
         requestMeta.put("requestURI", uri);
+
+        if (InterfaceRateLimiterUtil.getRateLimiterState()) {
+            //速率判断方法
+            if (!uri.isEmpty() && !InterfaceRateLimiterUtil.whetherItPassesOrNot(uri)) {
+                //请求不通过速率限制器
+                //使用黑名单使用的标志将后续请求拉黑，只针对本次生效
+                BlackUrlBypass.setIsBlackUrl(true);
+                DongTaiLog.trace("Trigger interface rate limiter " +
+                        "throttling, do not collect data for the interface is:{}", uri);
+                return;
+            }
+        }
 
         MethodEvent event = new MethodEvent(hookClass, hookClass, hookMethod,
                 hookSign, null, arguments, null);

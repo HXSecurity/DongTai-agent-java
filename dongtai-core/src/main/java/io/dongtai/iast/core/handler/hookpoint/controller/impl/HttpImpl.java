@@ -5,6 +5,7 @@ import io.dongtai.iast.common.config.ConfigKey;
 import io.dongtai.iast.common.config.RequestDenyList;
 import io.dongtai.iast.common.constants.Version;
 import io.dongtai.iast.common.string.StringUtils;
+import io.dongtai.iast.common.utils.limit.InterfaceRateLimiterUtil;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.bypass.BlackUrlBypass;
 import io.dongtai.iast.core.handler.hookpoint.IastClassLoader;
@@ -71,6 +72,10 @@ public class HttpImpl {
                 return;
             }
         }
+        if (InterfaceRateLimiterUtil.getRateLimiterState()) {
+            //速率判断方法
+            if (rateDetermination(obj, req, requestMeta)) return;
+        }
 
         Boolean isReplay = (Boolean) requestMeta.get("replay-request");
         if (isReplay) {
@@ -109,6 +114,26 @@ public class HttpImpl {
         EngineManager.enterHttpEntry(requestMeta);
         DongTaiLog.debug("HTTP Request:{} {} from: {}", requestMeta.get("method"), requestMeta.get("requestURI"),
                 obj.getClass().getName());
+    }
+
+    /**
+     * 速率判断方法
+     * @param obj
+     * @param req
+     * @param requestMeta
+     * @return
+     */
+    private static boolean rateDetermination(Object obj, Object req, Map<String, Object> requestMeta) {
+        String requestURI = requestMeta.get("requestURI").toString();
+        if (requestURI != null && !requestURI.isEmpty() && !InterfaceRateLimiterUtil.whetherItPassesOrNot(requestURI)) {
+            //请求不通过速率限制器
+            //使用黑名单使用的标志将后续请求拉黑，只针对本次生效
+            BlackUrlBypass.setIsBlackUrl(true);
+            DongTaiLog.trace("Trigger interface rate limiter " +
+                    "throttling, do not collect data for the interface is:{}",requestURI);
+            return true;
+        }
+        return false;
     }
 
     public static Map<String, String> parseRequestHeaders(Object req, Enumeration<?> headerNames) {

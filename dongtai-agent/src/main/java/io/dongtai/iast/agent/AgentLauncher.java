@@ -5,7 +5,10 @@ import io.dongtai.iast.agent.monitor.MonitorDaemonThread;
 import io.dongtai.iast.agent.report.AgentRegisterReport;
 import io.dongtai.iast.common.constants.AgentConstant;
 import io.dongtai.iast.common.scope.ScopeManager;
-import io.dongtai.iast.common.state.*;
+import io.dongtai.iast.common.state.AgentState;
+import io.dongtai.iast.common.state.State;
+import io.dongtai.iast.common.state.StateCause;
+import io.dongtai.iast.common.utils.limit.InterfaceRateLimiterUtil;
 import io.dongtai.log.DongTaiLog;
 import io.dongtai.log.ErrorCode;
 
@@ -168,6 +171,19 @@ public class AgentLauncher {
             loadEngine(inst);
             if (!AGENT_STATE.isException()) {
                 AGENT_STATE.setState(State.RUNNING);
+            }
+            String rateCaps = System.getProperty("rate.caps");
+            if (rateCaps != null && !rateCaps.isEmpty()){
+                try {
+                    InterfaceRateLimiterUtil.initializeInstance(Long.parseLong(rateCaps));
+                } catch (NumberFormatException e) {
+                    // 当出现异常时，降级为默认速率
+                    rateCaps = IastProperties.getInstance().cfg.getProperty("rate.caps");
+                    DongTaiLog.error("Interface Rate Limiter Initialization Failure Reason：{} \n " +
+                            "the default rate will be used {}",e.getMessage(),rateCaps);
+                    InterfaceRateLimiterUtil.initializeInstance(Long.parseLong(rateCaps));
+
+                }
             }
         } else {
             DongTaiLog.error(ErrorCode.AGENT_REGISTER_INFO_INVALID);
