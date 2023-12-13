@@ -52,9 +52,12 @@ public class RequestDenyList {
      * @return true 成功匹配 false 未匹配
      */
     public boolean match(String url, Map<String, String> headers) {
-        return denies.stream().anyMatch(requestDeny -> {
-            return requestDeny.match(url, headers); // 匹配到条件，提前终止循环
-        });
+        for (RequestDeny requestDeny : denies) {
+            if (requestDeny.match(url, headers)) {
+                return true; // 匹配到条件，提前终止循环
+            }
+        }
+        return false;
     }
 /*    public boolean match(String url, Map<String, String> headers) {
         boolean matched = false;
