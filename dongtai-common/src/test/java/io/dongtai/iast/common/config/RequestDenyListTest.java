@@ -12,6 +12,7 @@ public class RequestDenyListTest {
         Map<String, String> headers = new HashMap<String, String>();
         headers.put("key1", "value1");
         headers.put("key2", "value2");
+        headers.put("User-Agent", "Mozilla");
 
         final RequestDeny urlMatch = new RequestDeny(RequestDeny.TargetType.URL,
                 RequestDeny.Operator.CONTAIN, "foo");
@@ -21,6 +22,14 @@ public class RequestDenyListTest {
                 RequestDeny.Operator.EXISTS, "key1");
         final RequestDeny headerKeyNotMatch = new RequestDeny(RequestDeny.TargetType.HEADER_KEY,
                 RequestDeny.Operator.NOT_EXISTS, "key1");
+
+        final RequestDeny EXISTS_KEY_AND_VALUE = new RequestDeny(RequestDeny.TargetType.HEADER_KEY,
+                RequestDeny.Operator.EXISTS_KEY_AND_VALUE, "VXNlci1BZ2VudA==:TW96aWxsYQ==");
+
+
+        boolean match = EXISTS_KEY_AND_VALUE.match(url, headers);
+
+        Assert.assertTrue(match);
 
         Map<RequestDenyList, Boolean> tests = new HashMap<RequestDenyList, Boolean>(){{
             RequestDenyList requestDenyList = new RequestDenyList();
@@ -79,7 +88,11 @@ public class RequestDenyListTest {
             requestDenyList.addRule(Collections.singletonList(urlNotMatch));
             put(requestDenyList, false);
         }};
-
+        RequestDenyList requestDenyList = new RequestDenyList();
+        requestDenyList = new RequestDenyList();
+        requestDenyList.addRule(Arrays.asList(urlMatch, headerKeyNotMatch));
+        requestDenyList.addRule(Collections.singletonList(urlNotMatch));
+        requestDenyList.match(url,headers);
         for (Map.Entry<RequestDenyList, Boolean> entry : tests.entrySet()) {
             boolean matched = entry.getKey().match(url, headers);
             Assert.assertEquals("match " + entry.getKey(), entry.getValue(), matched);
