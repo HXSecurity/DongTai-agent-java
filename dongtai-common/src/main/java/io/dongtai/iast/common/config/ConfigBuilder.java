@@ -28,6 +28,12 @@ public class ConfigBuilder {
                 Config.<String>create(ConfigKey.LOGGER_LEVEL));
         this.configMap.put(ConfigKey.VALIDATED_SINK,
                 Config.<Boolean>create(ConfigKey.VALIDATED_SINK).setDefaultValue(false));
+        this.configMap.put(ConfigKey.ENABLE_QPS_RATE_LIMIT,
+                Config.<Boolean>create(ConfigKey.ENABLE_QPS_RATE_LIMIT).setDefaultValue(false));
+        this.configMap.put(ConfigKey.QPS_RATE_LIMIT,
+                Config.<Integer>create(ConfigKey.QPS_RATE_LIMIT).setDefaultValue(100));
+        this.configMap.put(ConfigKey.TOKEN_BUCKET_POOL_SIZE,
+                Config.<Integer>create(ConfigKey.TOKEN_BUCKET_POOL_SIZE).setDefaultValue(5000));
     }
 
     public static ConfigBuilder getInstance() {
@@ -68,6 +74,9 @@ public class ConfigBuilder {
         updateBool(config, ConfigKey.JsonKey.JSON_ENABLE_LOGGER);
         updateString(config, ConfigKey.JsonKey.JSON_LOGGER_LEVEL);
         updateBool(config, ConfigKey.JsonKey.JSON_VALIDATED_SINK);
+        updateBool(config, ConfigKey.JsonKey.JSON_ENABLE_QPS_RATE_LIMIT);
+        updateInt(config, ConfigKey.JsonKey.JSON_QPS_RATE_LIMIT);
+        updateInt(config, ConfigKey.JsonKey.JSON_TOKEN_BUCKET_POOL_SIZE);
         updateRequestDenyList(config);
     }
 

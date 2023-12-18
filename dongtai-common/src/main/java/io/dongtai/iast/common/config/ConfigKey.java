@@ -9,6 +9,9 @@ public enum ConfigKey {
     ENABLE_LOGGER,
     LOGGER_LEVEL,
     VALIDATED_SINK,
+    ENABLE_QPS_RATE_LIMIT,
+    QPS_RATE_LIMIT,
+    TOKEN_BUCKET_POOL_SIZE,
     ;
 
     public enum JsonKey {
@@ -20,6 +23,9 @@ public enum ConfigKey {
         JSON_ENABLE_LOGGER("enable_log", ENABLE_LOGGER),
         JSON_LOGGER_LEVEL("log_level", LOGGER_LEVEL),
         JSON_VALIDATED_SINK("report_validated_sink", VALIDATED_SINK),
+        JSON_ENABLE_QPS_RATE_LIMIT("enable_qps_rate_limit", ENABLE_QPS_RATE_LIMIT),
+        JSON_QPS_RATE_LIMIT("qps_rate_limit", QPS_RATE_LIMIT),
+        JSON_TOKEN_BUCKET_POOL_SIZE("token_bucket_pool_size", TOKEN_BUCKET_POOL_SIZE),
         ;
 
         private final String key;

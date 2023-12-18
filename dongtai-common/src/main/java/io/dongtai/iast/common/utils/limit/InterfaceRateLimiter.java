@@ -14,19 +14,22 @@ import java.time.Duration;
  */
 public class InterfaceRateLimiter {
 
-    private final InterfaceRateLimiterSoftReferenceHashMap<String, Bucket> buckets = new InterfaceRateLimiterSoftReferenceHashMap<>();
+    private final InterfaceRateLimiterSoftReferenceHashMap<String> buckets = new InterfaceRateLimiterSoftReferenceHashMap<>();
+
+    private int theNumberOfTokenBucketPools;
 
 
     //最高速率
-    private final long rateCaps;
+    private long rateCaps;
 
 
-    private InterfaceRateLimiter(long rateCaps) {
+    private InterfaceRateLimiter(long rateCaps, int theNumberOfTokenBucketPools) {
         this.rateCaps = rateCaps;
+        this.theNumberOfTokenBucketPools = theNumberOfTokenBucketPools;
     }
 
-    public static InterfaceRateLimiter getInstance(long rateCaps) {
-        return new InterfaceRateLimiter(rateCaps);
+    public static InterfaceRateLimiter getInstance(long rateCaps, int theNumberOfTokenBucketPools) {
+        return new InterfaceRateLimiter(rateCaps, theNumberOfTokenBucketPools);
     }
 
     /**
@@ -43,8 +46,8 @@ public class InterfaceRateLimiter {
             if (bucket == null) {
                 return true;
             }
-        }else {
-            if (buckets.size() >= 5000){
+        } else {
+            if (buckets.size() >= theNumberOfTokenBucketPools) {
                 return true;
             }
             bucket = Bucket.builder().addLimit(Bandwidth.simple(rateCaps, Duration.ofSeconds(1))).build();
@@ -55,4 +58,24 @@ public class InterfaceRateLimiter {
         return probe.isConsumed();
     }
 
+    /**
+     * 更新速率限制器的配置
+     * @param rateCaps 速率
+     * @param theNumberOfTokenBucketPools 桶池大小
+     * 只有当值发生改变时，才会开启更新，否则不执行操作
+     */
+    public void updateTheData(long rateCaps, int theNumberOfTokenBucketPools) {
+        if (this.rateCaps != rateCaps){
+            this.rateCaps = rateCaps;
+            buckets.updateTheData(this.rateCaps);
+        }
+        if (this.theNumberOfTokenBucketPools != theNumberOfTokenBucketPools) {
+            this.theNumberOfTokenBucketPools = theNumberOfTokenBucketPools;
+            //需要更新桶池大小时，判断已有的是否超过最大限制，如果超过，则删除到指定大小
+            if (theNumberOfTokenBucketPools - buckets.size() < 0){
+                int i = buckets.size() - theNumberOfTokenBucketPools;
+                buckets.deleteTheElement(i);
+            }
+        }
+    }
 }

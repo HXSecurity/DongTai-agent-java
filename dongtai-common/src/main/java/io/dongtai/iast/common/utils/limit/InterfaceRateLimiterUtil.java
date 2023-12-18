@@ -24,18 +24,22 @@ public class InterfaceRateLimiterUtil {
         return turnOnTheRateLimiter;
     }
 
-    public static void turnOffTheRateLimiter(boolean state){
-        turnOnTheRateLimiter = true;
+    /**
+     * 关闭速率限制器，并将限制器置为空释放空间
+     */
+    public static void turnOffTheRateLimiter(){
+        turnOnTheRateLimiter = false;
+        instance = null;
     }
 
     /**
      * 初始化速率限制
      */
-    public static void initializeInstance(long rateCaps) {
+    public static void initializeInstance(long rateCaps,int theNumberOfTokenBucketPools) {
         if (instance == null) {
             synchronized (InterfaceRateLimiterUtil.class) {
                 if (instance == null) {
-                    instance = InterfaceRateLimiter.getInstance(rateCaps);
+                    instance = InterfaceRateLimiter.getInstance(rateCaps,theNumberOfTokenBucketPools);
                     turnOnTheRateLimiter = true;
                 }
             }
@@ -56,5 +60,13 @@ public class InterfaceRateLimiterUtil {
         return instance.whetherItPassesOrNot(interfaceName);
     }
 
+    /**
+     * 更新令牌桶的设置
+     * @param rateCaps 速率
+     * @param theNumberOfTokenBucketPools 令牌桶池上限
+     */
+    public static void updateTheData(long rateCaps,int theNumberOfTokenBucketPools) {
+        instance.updateTheData(rateCaps,theNumberOfTokenBucketPools);
+    }
 }
 
