@@ -37,7 +37,6 @@ public class DispatchDubbo implements DispatchPlugin {
             classVisitor = new DubboProxyHandlerAdapter(classVisitor, context, " org.apache".substring(1));
         }
         if (DUBBO_PROXY_HESSIAN.equals(className)){
-            System.out.println("dispatch" + className);
             classVisitor = new DubboHessianAdapter(classVisitor, context);
         }
         return classVisitor;

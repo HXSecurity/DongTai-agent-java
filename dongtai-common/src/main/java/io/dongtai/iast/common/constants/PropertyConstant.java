@@ -37,4 +37,6 @@ public class PropertyConstant {
     public static final String PROPERTY_POOL_SIZE = "dongtai.pool.size";
     public static final String PROPERTY_POOL_MAX_SIZE = "dongtai.pool.max.size";
     public static final String PROPERTY_POOL_KEEPALIVE = "dongtai.pool.keepalive";
+    //  接口速率上限，可配可不配，不配置为未开启
+    public static final String THE_UPPER_LIMIT_OF_THE_INTERFACE_RATE = "rate.caps";
 }

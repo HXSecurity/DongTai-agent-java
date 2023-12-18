@@ -40,6 +40,7 @@ public class IastProperties {
         put("pool_size", PropertyConstant.PROPERTY_POOL_SIZE);
         put("pool_max_size", PropertyConstant.PROPERTY_POOL_MAX_SIZE);
         put("pool_keepalive", PropertyConstant.PROPERTY_POOL_KEEPALIVE);
+        put("rate_caps", PropertyConstant.THE_UPPER_LIMIT_OF_THE_INTERFACE_RATE);
     }};
 
     private static IastProperties instance;

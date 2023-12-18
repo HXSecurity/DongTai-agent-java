@@ -5,7 +5,9 @@ import io.dongtai.iast.agent.monitor.MonitorDaemonThread;
 import io.dongtai.iast.agent.report.AgentRegisterReport;
 import io.dongtai.iast.common.constants.AgentConstant;
 import io.dongtai.iast.common.scope.ScopeManager;
-import io.dongtai.iast.common.state.*;
+import io.dongtai.iast.common.state.AgentState;
+import io.dongtai.iast.common.state.State;
+import io.dongtai.iast.common.state.StateCause;
 import io.dongtai.log.DongTaiLog;
 import io.dongtai.log.ErrorCode;
 

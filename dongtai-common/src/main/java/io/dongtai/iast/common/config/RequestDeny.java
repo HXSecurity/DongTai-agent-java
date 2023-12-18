@@ -1,9 +1,12 @@
 package io.dongtai.iast.common.config;
 
+import io.dongtai.log.DongTaiLog;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.*;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 public class RequestDeny {
     private static final String KEY_TARGET_TYPE = "target_type";
@@ -12,7 +15,7 @@ public class RequestDeny {
 
     private static final Map<TargetType, List<Operator>> OPERATOR_MAP = new HashMap<TargetType, List<Operator>>() {{
         put(TargetType.URL, Arrays.asList(Operator.EQUAL, Operator.NOT_EQUAL, Operator.CONTAIN, Operator.NOT_CONTAIN));
-        put(TargetType.HEADER_KEY, Arrays.asList(Operator.EXISTS, Operator.NOT_EXISTS));
+        put(TargetType.HEADER_KEY, Arrays.asList(Operator.EXISTS, Operator.NOT_EXISTS,Operator.EXISTS_KEY_AND_VALUE));
     }};
 
     public enum TargetType {
@@ -47,6 +50,8 @@ public class RequestDeny {
         NOT_CONTAIN("NOT_CONTAIN"),
         EXISTS("EXISTS"),
         NOT_EXISTS("NOT_EXISTS"),
+        //此类型是为了兼容请求头的value匹配，此时 value使用：分割格式为key：value 值使用base64编码，需要解码使用，value使用正则匹配
+        EXISTS_KEY_AND_VALUE("EXISTS_KEY_AND_VALUE"),
         ;
 
         private final String key;
@@ -93,10 +98,21 @@ public class RequestDeny {
             if (operator == null || !OPERATOR_MAP.get(targetType).contains(operator)) {
                 return null;
             }
-
             String value = config.getString(KEY_VALUE);
             if (value == null || value.isEmpty()) {
                 return null;
+            }
+            if (Operator.EXISTS_KEY_AND_VALUE.equals(operator)){
+                String[] split = value.split(":");
+                String vle = new String(Base64.getDecoder().decode(split[1]));
+                try {
+                    Pattern.compile(vle);
+                } catch (PatternSyntaxException e) {
+                    String key = new String(Base64.getDecoder().decode(split[0]));
+                    DongTaiLog.error("the regex is not valid please check！ key：{},value:{}",key,vle);
+                    return null;
+                }
+
             }
 
             return new RequestDeny(targetType, operator, value);
@@ -135,6 +151,18 @@ public class RequestDeny {
         if (headers == null || headers.isEmpty()) {
             return false;
         }
+        if (Operator.EXISTS_KEY_AND_VALUE.equals(operator)){
+            String[] split = this.value.split(":");
+            String key = new String(Base64.getDecoder().decode(split[0])).toLowerCase();
+            String vle = new String(Base64.getDecoder().decode(split[1]));
+
+            for (Map.Entry<String, String> entry : headers.entrySet()) {
+                if (key.equals(entry.getKey().toLowerCase())) {
+                    Pattern pattern = Pattern.compile(vle);
+                    return pattern.matcher(entry.getValue()).find();
+                }
+            }
+        }
 
         boolean exists = false;
         String matchVal = this.value.toLowerCase();
@@ -147,9 +175,11 @@ public class RequestDeny {
 
         if (Operator.EXISTS.equals(operator)) {
             return exists;
-        } else if (Operator.NOT_EXISTS.equals(operator)) {
+        }
+        if (Operator.NOT_EXISTS.equals(operator)) {
             return !exists;
         }
+
 
         return false;
     }

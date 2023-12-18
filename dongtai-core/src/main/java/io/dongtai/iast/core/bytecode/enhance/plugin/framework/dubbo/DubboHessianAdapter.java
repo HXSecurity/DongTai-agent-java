@@ -26,7 +26,6 @@ public class DubboHessianAdapter extends AbstractClassVisitor {
         String signCode = AsmUtils.buildSignature(context.getClassName(), name, descriptor);
         if (HESSIAN_ADDREQUESTHEADERS.equals(signCode)) {
             DongTaiLog.debug("Adding dubbo provider source tracking by {}", signCode);
-            System.out.println("hessian增强完成");
             mv = new DubboHessianAddRequestHeadersAdapter(mv, access, name, descriptor,this.context,"hessian",signCode);
             setTransformed();
         }
