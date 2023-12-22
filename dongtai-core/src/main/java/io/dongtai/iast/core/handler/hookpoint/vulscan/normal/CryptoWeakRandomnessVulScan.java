@@ -1,5 +1,6 @@
 package io.dongtai.iast.core.handler.hookpoint.vulscan.normal;
 
+import io.dongtai.iast.common.scope.ScopeManager;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.SinkNode;
 
@@ -22,5 +23,6 @@ public class CryptoWeakRandomnessVulScan extends AbstractNormalVulScan {
             return;
         }
         sendReport(getLatestStack(), sinkNode.getVulType());
+        ScopeManager.SCOPE_TRACKER.getPolicyScope().addSinkType(sinkNode.getVulType());
     }
 }

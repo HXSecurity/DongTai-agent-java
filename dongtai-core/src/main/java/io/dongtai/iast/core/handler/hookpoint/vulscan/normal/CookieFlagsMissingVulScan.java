@@ -1,5 +1,6 @@
 package io.dongtai.iast.core.handler.hookpoint.vulscan.normal;
 
+import io.dongtai.iast.common.scope.ScopeManager;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.SinkNode;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.TaintPosition;
@@ -34,6 +35,7 @@ public class CookieFlagsMissingVulScan extends AbstractNormalVulScan {
                     continue;
                 }
                 sendReport(getLatestStack(), sinkNode.getVulType());
+                ScopeManager.SCOPE_TRACKER.getPolicyScope().addSinkType(sinkNode.getVulType());
                 break;
             } catch (Throwable e) {
                 DongTaiLog.trace("CookieFlagsMissingVulScan scan failed: {}, {}",

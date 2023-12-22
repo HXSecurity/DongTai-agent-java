@@ -1,5 +1,6 @@
 package io.dongtai.iast.core.handler.hookpoint.controller.impl;
 
+import io.dongtai.iast.common.scope.ScopeManager;
 import io.dongtai.iast.core.EngineManager;
 import io.dongtai.iast.core.handler.hookpoint.models.MethodEvent;
 import io.dongtai.iast.core.handler.hookpoint.models.policy.SinkNode;
@@ -21,6 +22,11 @@ public class SinkImpl {
      */
     public static void solveSink(MethodEvent event, SinkNode sinkNode) {
         if (null == event) {
+            return;
+        }
+
+        if(ScopeManager.SCOPE_TRACKER.getPolicyScope().getSinkQueue().contains(sinkNode.getVulType())){
+            ScopeManager.SCOPE_TRACKER.getPolicyScope().addSinkType(sinkNode.getVulType());
             return;
         }
 

@@ -1,11 +1,15 @@
 package io.dongtai.iast.common.scope;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
+
 public class PolicyScope {
     private int agentLevel;
     private int sourceLevel;
     private int propagatorLevel;
     private int propagatorSkipDepth;
     private int sinkLevel;
+    private final Deque<String> sinkQueue = new ArrayDeque<>();
     private int ignoreInternalLevel;
     /**
      * over max method pool size
@@ -66,10 +70,11 @@ public class PolicyScope {
     public boolean isValidSink() {
         return this.agentLevel == 0
                 && this.ignoreInternalLevel == 0 && !this.overCapacity && this.sourceLevel == 0
-                && this.sinkLevel == 1;
+                && this.sinkLevel > 0;
     }
 
     public void leaveSink() {
+        this.sinkQueue.pop();
         this.sinkLevel = decrement(this.sinkLevel);
     }
 
@@ -94,5 +99,13 @@ public class PolicyScope {
             return level - 1;
         }
         return 0;
+    }
+
+    public Deque<String> getSinkQueue() {
+        return sinkQueue;
+    }
+
+    public void addSinkType(String sinkType) {
+        this.sinkQueue.push(sinkType);
     }
 }

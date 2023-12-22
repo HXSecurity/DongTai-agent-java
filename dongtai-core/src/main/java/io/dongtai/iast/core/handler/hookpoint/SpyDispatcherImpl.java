@@ -583,7 +583,7 @@ public class SpyDispatcherImpl implements SpyDispatcher {
                 return false;
             }
             return ScopeManager.SCOPE_TRACKER.inEnterEntry()
-                    && ScopeManager.SCOPE_TRACKER.getPolicyScope().isValidSink();
+                    && (ScopeManager.SCOPE_TRACKER.getPolicyScope().isValidSink());
         } catch (Throwable ignore) {
             return false;
         }
